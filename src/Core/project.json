@@ -1,0 +1,27 @@
+{
+    "title": "Microsoft.AspNetCore.Mvc.Versioning",
+    "copyright": "Copyright \\u00A9 2015. Microsoft Corporation. All rights reserved.",
+    "description": "A service API versioning library for Microsoft ASP.NET Core.",
+    "language": "en",
+    "version": "1.0.0-*",
+
+    "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "Microsoft.AspNetCore.Mvc": "1.0.0"
+    },
+
+    "frameworks": {
+        "net451": {
+
+        },
+        "netstandard1.6": {
+            "imports": "dnxcore50"
+        }
+    },
+
+    "buildOptions": {
+        "outputName": "Microsoft.AspNetCore.Mvc.Versioning",
+        "compile": [ "**/*.cs", "../shared/*.cs", "../common/**/*.cs" ],
+        "xmlDoc": true
+    }
+}

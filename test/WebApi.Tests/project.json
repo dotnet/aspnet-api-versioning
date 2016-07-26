@@ -1,0 +1,26 @@
+﻿{
+    "version": "1.0.0-*",
+
+    "dependencies": {
+        "Microsoft.AspNet.WebApi.Core": "5.2.3",
+        "FluentAssertions": "4.12.0",
+        "more.xunit": "2.1.0",
+        "xunit.runner.visualstudio": "2.1.0",
+        "Moq": "4.5.16",
+        "WebApi": "*"
+    },
+
+    "frameworks": {
+        "net45": {
+            "dependencies": {
+                "System.Runtime": "4.0.0",
+                "System.Threading.Tasks": "4.0.0"
+            }
+        }
+    },
+
+    "buildOptions": {
+        "compile": [ "**/*.cs", "../common/**/*.cs" ],
+        "define": [ "WEBAPI" ]
+    }
+}
