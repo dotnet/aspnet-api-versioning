@@ -8,3 +8,5 @@ before_build:
 build:
   publish_nuget: true
   publish_nuget_symbols: true
+test: off
+
