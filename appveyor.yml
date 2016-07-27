@@ -1,0 +1,6 @@
+image: Visual Studio 2015
+environment:
+  TreatWarningsAsErrors: true
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
