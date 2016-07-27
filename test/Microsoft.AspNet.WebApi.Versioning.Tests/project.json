@@ -7,7 +7,10 @@
         "more.xunit": "2.1.0",
         "xunit.runner.visualstudio": "2.1.0",
         "Moq": "4.5.16",
-        "WebApi": "*"
+        "Microsoft.AspNet.WebApi.Versioning": {
+            "target": "project",
+            "version": ""
+        }
     },
 
     "frameworks": {

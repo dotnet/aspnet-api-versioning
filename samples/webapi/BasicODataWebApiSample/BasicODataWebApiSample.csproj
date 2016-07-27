@@ -110,10 +110,10 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="..\..\..\src\WebApi\bin\$(Configuration)\net45\Microsoft.AspNet.WebApi.Versioning.dll">
+    <Reference Include="..\..\..\src\Microsoft.AspNet.WebApi.Versioning\bin\$(Configuration)\net45\Microsoft.AspNet.WebApi.Versioning.dll">
       <Name>WebApi</Name>
     </Reference>
-    <Reference Include="..\..\..\src\WebApi.OData\bin\$(Configuration)\net45\Microsoft.AspNet.OData.Versioning.dll">
+    <Reference Include="..\..\..\src\Microsoft.AspNet.OData.Versioning\bin\$(Configuration)\net45\Microsoft.AspNet.OData.Versioning.dll">
       <Name>WebApi.OData</Name>
     </Reference>
   </ItemGroup>

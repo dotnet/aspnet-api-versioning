@@ -94,7 +94,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="..\..\..\src\WebApi\bin\$(Configuration)\net45\Microsoft.AspNet.WebApi.Versioning.dll">
+    <Reference Include="..\..\..\src\Microsoft.AspNet.WebApi.Versioning\bin\$(Configuration)\net45\Microsoft.AspNet.WebApi.Versioning.dll">
       <Name>WebApi</Name>
     </Reference>
   </ItemGroup>

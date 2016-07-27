@@ -1,0 +1,42 @@
+{
+    "version": "1.0.0-*",
+    "authors": [ "Microsoft" ],
+    "title": "Microsoft ASP.NET Core API Versioning",
+    "copyright": "Copyright \u00A9 2015. Microsoft Corporation. All rights reserved.",
+    "description": "A service API versioning library for Microsoft ASP.NET Core.",
+    "language": "en",
+
+    "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "Microsoft.AspNetCore.Mvc": "1.0.0"
+    },
+
+    "frameworks": {
+        "net451": {
+
+        },
+        "netstandard1.6": {
+            "imports": "dnxcore50"
+        }
+    },
+
+    "buildOptions": {
+        "compile": [ "**/*.cs", "../shared/*.cs", "../common/**/*.cs" ],
+        "keyFile": "../../tools/key.snk",
+        "xmlDoc": true
+    },
+
+    "packOptions": {
+        "summary": "Provides API versioning for RESTful services created using ASP.NET Core",
+        "tags": [ "Microsoft", "AspNet", "AspNetCore", "Versioning" ],
+        "owners": [ "Microsoft" ],
+        "releaseNotes": "",
+        "iconUrl": "http://go.microsoft.com/fwlink/?LinkID=288890",
+        "licenseUrl": "https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE",
+        "requireLicenseAcceptance": true,
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/Microsoft/aspnet-api-versioning"
+        }
+    }
+}

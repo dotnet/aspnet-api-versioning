@@ -1,0 +1,38 @@
+﻿{
+    "version": "2.0.0-*",
+    "authors": [ "Microsoft" ],
+    "title": "Microsoft ASP.NET Web API Versioning",
+    "copyright": "Copyright \u00A9 2016. Microsoft Corporation. All rights reserved.",
+    "description": "A service API versioning library for Microsoft ASP.NET Web API.",
+    "language": "en",
+
+    "dependencies": {
+        "Microsoft.AspNet.WebApi.Core": "5.2.3"
+    },
+
+    "frameworks": {
+        "net45": {
+        }
+    },
+
+    "buildOptions": {
+        "compile": [ "**/*.cs", "../shared/*.cs", "../common/**/*.cs" ],
+        "keyFile": "../../tools/key.snk",
+        "xmlDoc": true,
+        "define": [ "WEBAPI" ]
+    },
+
+    "packOptions": {
+        "summary": "Provides API versioning for RESTful services created using ASP.NET Web API",
+        "tags": [ "Microsoft", "AspNet", "AspNetWebAPI", "Versioning" ],
+        "owners": [ "Microsoft" ],
+        "releaseNotes": "",
+        "iconUrl": "http://go.microsoft.com/fwlink/?LinkID=288890",
+        "licenseUrl": "https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE",
+        "requireLicenseAcceptance": true,
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/Microsoft/aspnet-api-versioning"
+        }
+    }
+}

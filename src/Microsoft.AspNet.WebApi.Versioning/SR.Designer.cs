@@ -38,7 +38,7 @@ namespace Microsoft.Web.Http {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WebApi.SR", typeof(SR).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager( "Microsoft.AspNet.WebApi.Versioning.SR", typeof(SR).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

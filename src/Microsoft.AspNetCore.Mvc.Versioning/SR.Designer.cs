@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.Mvc {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Core.SR", typeof(SR).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager( "Microsoft.AspNetCore.Mvc.Versioning.SR", typeof(SR).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
