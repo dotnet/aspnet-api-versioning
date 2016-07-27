@@ -1,0 +1,12 @@
+image: Visual Studio 2015
+environment:
+  TreatWarningsAsErrors: true
+before_build:
+- dotnet restore
+- nuget restore -SolutionDirectory . samples/webapi/BasicWebApiSample/BasicWebApiSample.csproj
+- nuget restore -SolutionDirectory . samples/webapi/BasicODataWebApiSample/BasicODataWebApiSample.csproj
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
+test: off
+
