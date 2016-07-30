@@ -280,7 +280,7 @@
             Action<ApiVersioningOptions> versioningSetup = o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.ApiVersionSelector = new LowestImplementedApiVersionSelector();
+                o.ApiVersionSelector = new LowestImplementedApiVersionSelector( o );
             };
             Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "{controller}/{action=Get_2015_11_15}/{id?}" );
 
@@ -383,10 +383,10 @@
             // arrange
             var currentVersion = new ApiVersion( 4, 0 );
             var controllerType = typeof( AttributeRoutedTest4Controller ).GetTypeInfo();
-            Action<ApiVersioningOptions> setup = options =>
+            Action<ApiVersioningOptions> setup = o =>
             {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.ApiVersionSelector = new CurrentImplementationApiVersionSelector();
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ApiVersionSelector = new CurrentImplementationApiVersionSelector( o );
             };
 
             using ( var server = new WebServer( setupApiVersioning: setup ) )
@@ -407,10 +407,10 @@
             // arrange
             var currentVersion = new ApiVersion( 3, 0 );
             var controllerType = typeof( TestVersion2Controller ).GetTypeInfo();
-            Action<ApiVersioningOptions> versioningSetup = options =>
+            Action<ApiVersioningOptions> versioningSetup = o =>
             {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.ApiVersionSelector = new CurrentImplementationApiVersionSelector();
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ApiVersionSelector = new CurrentImplementationApiVersionSelector( o );
             };
             Action<IRouteBuilder> routeSetup = routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
 

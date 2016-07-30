@@ -498,7 +498,7 @@
             configuration.AddApiVersioning( o =>
                 {
                     o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.ApiVersionSelector = new LowestImplementedApiVersionSelector();
+                    o.ApiVersionSelector = new LowestImplementedApiVersionSelector( o );
                 } );
             configuration.Routes.MapHttpRoute( "Default", "{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();
@@ -718,7 +718,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             configuration.AddApiVersioning( o =>
                 {
                     o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.ApiVersionSelector = new CurrentImplementationApiVersionSelector();
+                    o.ApiVersionSelector = new CurrentImplementationApiVersionSelector( o );
                 } );
             configuration.MapHttpAttributeRoutes();
             configuration.EnsureInitialized();
@@ -760,7 +760,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             configuration.AddApiVersioning( o =>
                 {
                     o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.ApiVersionSelector = new CurrentImplementationApiVersionSelector();
+                    o.ApiVersionSelector = new CurrentImplementationApiVersionSelector( o );
                 } );
             configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();

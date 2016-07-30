@@ -3,7 +3,6 @@
     using FluentAssertions;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Http;
     using Xunit;
 
@@ -11,18 +10,19 @@
     {
         [Theory]
         [ClassData( typeof( MaxSelectVersionData ) )]
-        public void select_version_should_return_max_api_version( IEnumerable<ApiVersion> supported, IEnumerable<ApiVersion> deprecated, ApiVersion version )
+        public void select_version_should_return_max_api_version( IEnumerable<ApiVersion> supportedVersions, IEnumerable<ApiVersion> deprecatedVersions, ApiVersion expectedVersion )
         {
             // arrange
-            var selector = new CurrentImplementationApiVersionSelector();
+            var options = new ApiVersioningOptions() { DefaultApiVersion = new ApiVersion( 42, 0 ) };
+            var selector = new CurrentImplementationApiVersionSelector( options );
             var request = new HttpRequestMessage();
-            var model = new ApiVersionModel( supported, deprecated );
+            var model = new ApiVersionModel( supportedVersions, deprecatedVersions );
 
             // act
             var selectedVersion = selector.SelectVersion( request, model );
 
             // assert
-            selectedVersion.Should().Be( version );
+            selectedVersion.Should().Be( expectedVersion );
         }
     }
 }

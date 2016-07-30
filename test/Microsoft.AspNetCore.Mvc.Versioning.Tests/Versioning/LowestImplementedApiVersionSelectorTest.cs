@@ -11,18 +11,19 @@
     {
         [Theory]
         [ClassData( typeof( MinSelectVersionData ) )]
-        public void select_version_should_return_min_api_version( IEnumerable<ApiVersion> supported, IEnumerable<ApiVersion> deprecated, ApiVersion version )
+        public void select_version_should_return_min_api_version( IEnumerable<ApiVersion> supportedVersions, IEnumerable<ApiVersion> deprecatedVersions, ApiVersion expectedVersion )
         {
             // arrange
-            var selector = new LowestImplementedApiVersionSelector();
+            var options = new ApiVersioningOptions() { DefaultApiVersion = new ApiVersion( 42, 0 ) };
+            var selector = new LowestImplementedApiVersionSelector( options );
             var request = new Mock<HttpRequest>().Object;
-            var versionInfo = new ApiVersionModel( supported, deprecated );
+            var versionInfo = new ApiVersionModel( supportedVersions, deprecatedVersions );
 
             // act
             var selectedVersion = selector.SelectVersion( request, versionInfo );
 
             // assert
-            selectedVersion.Should().Be( version );
+            selectedVersion.Should().Be( expectedVersion );
         }
     }
 }

@@ -36,14 +36,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                     Supported(),
                     Deprecated(),
-                    Expected( new ApiVersion( 1, 0 ) )
+                    Expected( new ApiVersion( 42, 0 ) )
             };
 
             yield return new object[]
             {
                     Supported( new ApiVersion( 1, 1, "RC1" ) ),
                     Deprecated(),
-                    Expected( new ApiVersion( 1, 0 ) )
+                    Expected( new ApiVersion( 42, 0 ) )
             };
 
             yield return new object[]
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                     Supported( new ApiVersion( 0, 8, "Beta" ), new ApiVersion( 0, 9, "RC" ) ),
                     Deprecated(),
-                    Expected( new ApiVersion( 1, 0 ) )
+                    Expected( new ApiVersion( 42, 0 ) )
             };
         }
     }
