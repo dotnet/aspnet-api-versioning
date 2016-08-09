@@ -9,9 +9,6 @@
     using System.Web.OData.Routing;
     using Xunit;
 
-    /// <summary>
-    /// Provides unit tests for <see cref="VersionedMetadataRoutingConvention"/>.
-    /// </summary>
     public class VersionedMetadataRoutingConventionTest
     {
         public static IEnumerable<object[]> SelectControllerData
@@ -29,10 +26,11 @@
         {
             get
             {
-                yield return new object[] { new ODataPath(), "GetServiceDocument" };
-                yield return new object[] { new ODataPath( new MetadataPathSegment() ), "GetMetadata" };
-                yield return new object[] { new ODataPath( new EntitySetPathSegment( "Tests" ) ), null };
-                yield return new object[] { new ODataPath( new EntitySetPathSegment( "Tests" ), new KeyValuePathSegment( "42" ) ), null };
+                yield return new object[] { new ODataPath(), "GET", "GetServiceDocument" };
+                yield return new object[] { new ODataPath( new MetadataPathSegment() ), "GET", "GetMetadata" };
+                yield return new object[] { new ODataPath( new MetadataPathSegment() ), "OPTIONS", "GetOptions" };
+                yield return new object[] { new ODataPath( new EntitySetPathSegment( "Tests" ) ), "GET", null };
+                yield return new object[] { new ODataPath( new EntitySetPathSegment( "Tests" ), new KeyValuePathSegment( "42" ) ), "GET", null };
             }
         }
 
@@ -53,10 +51,11 @@
 
         [Theory]
         [MemberData( nameof( SelectActionData ) )]
-        public void select_action_should_return_expected_name( ODataPath odataPath, string expected )
+        public void select_action_should_return_expected_name( ODataPath odataPath, string verb, string expected )
         {
             // arrange
-            var controllerContext = new HttpControllerContext();
+            var request = new HttpRequestMessage( new HttpMethod( verb ), "http://localhost/$metadata" );
+            var controllerContext = new HttpControllerContext() { Request = request };
             var actionMap = new Mock<ILookup<string, HttpActionDescriptor>>().Object;
             var routingConvention = new VersionedMetadataRoutingConvention();
 

@@ -1,12 +1,13 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
+    using Controllers;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http.Controllers;
-    using System.Web.OData;
     using System.Web.OData.Routing;
     using System.Web.OData.Routing.Conventions;
+    using static System.Net.Http.HttpMethod;
 
     /// <summary>
     /// Represents the <see cref="IODataRoutingConvention">OData routing convention</see> for versioned service and metadata documents.
@@ -43,12 +44,23 @@
 
             if ( odataPath.PathTemplate == "~" )
             {
-                return nameof( MetadataController.GetServiceDocument );
+                return nameof( VersionedMetadataController.GetServiceDocument );
             }
 
-            if ( odataPath.PathTemplate == "~/$metadata" )
+            if ( odataPath.PathTemplate != "~/$metadata" )
             {
-                return nameof( MetadataController.GetMetadata );
+                return null;
+            }
+
+            var method = controllerContext.Request.Method;
+
+            if ( method == Get )
+            {
+                return nameof( VersionedMetadataController.GetMetadata );
+            }
+            else if ( method == Options )
+            {
+                return nameof( VersionedMetadataController.GetOptions );
             }
 
             return null;
