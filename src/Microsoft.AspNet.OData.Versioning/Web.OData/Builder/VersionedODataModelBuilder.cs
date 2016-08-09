@@ -17,7 +17,7 @@
     /// </summary>
     public class VersionedODataModelBuilder
     {
-        private readonly IHttpControllerSelector controllerSelector;
+        private readonly HttpConfiguration configuration;
         private Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder();
 
         /// <summary>
@@ -31,17 +31,7 @@
         public VersionedODataModelBuilder( HttpConfiguration configuration )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
-            controllerSelector = configuration.Services.GetHttpControllerSelector();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VersionedODataModelBuilder"/>
-        /// </summary>
-        /// <param name="controllerSelector">The <see cref="IHttpControllerSelector">controller selector</see> associated with the builder.</param>
-        public VersionedODataModelBuilder( IHttpControllerSelector controllerSelector )
-        {
-            Arg.NotNull( controllerSelector, nameof( controllerSelector ) );
-            this.controllerSelector = controllerSelector;
+            this.configuration = configuration;
         }
 
         /// <summary>
@@ -107,9 +97,13 @@
         {
             var configurations = GetMergedConfigurations();
             var models = new List<IEdmModel>();
-            var apiVersions = ( from mapping in controllerSelector.GetControllerMapping().Values
-                                let descriptorGroup = mapping as IEnumerable<HttpControllerDescriptor> ?? new[] { mapping }
-                                from descriptor in descriptorGroup
+            var services = configuration.Services;
+            var assembliesResolver = services.GetAssembliesResolver();
+            var typeResolver = services.GetHttpControllerTypeResolver();
+            var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver );
+            var apiVersions = ( from controllerType in controllerTypes
+                                where controllerType.IsODataController()
+                                let descriptor = new HttpControllerDescriptor( configuration, string.Empty, controllerType )
                                 from version in descriptor.GetImplementedApiVersions()
                                 select version ).Distinct();
 

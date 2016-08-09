@@ -8,31 +8,37 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
-    using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
+    using System.Web.OData;
     using System.Web.OData.Builder;
     using Xunit;
 
     public class VersionedODataModelBuilderTest
     {
+        [ApiVersion( "1.0" )]
+        private sealed class ControllerV1 : ODataController
+        {
+        }
+
         [Fact]
         public void get_edm_models_should_return_expected_results()
         {
             // arrange
             var configuration = new HttpConfiguration();
-            var controllerDescriptor = new HttpControllerDescriptor( configuration, "Test", typeof( IHttpController ) );
-            var controllerMapping = new Dictionary<string, HttpControllerDescriptor>() { { "Test", controllerDescriptor } };
-            var controllerSelector = new Mock<IHttpControllerSelector>();
+            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+            var controllerTypes = new List<Type>() { typeof( ControllerV1 ) };
+
+            controllerTypeResolver.Setup( ctr => ctr.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+
             var defaultConfiguration = new Mock<Action<ODataModelBuilder, ApiVersion>>();
             var modelCreated = new Mock<Action<ODataModelBuilder, IEdmModel>>();
             var apiVersion = new ApiVersion( 1, 0 );
-            var builder = new VersionedODataModelBuilder( controllerSelector.Object )
+            var builder = new VersionedODataModelBuilder( configuration )
             {
                 DefaultModelConfiguration = defaultConfiguration.Object,
                 OnModelCreated = modelCreated.Object
             };
-
-            controllerSelector.Setup( cs => cs.GetControllerMapping() ).Returns( controllerMapping );
 
             // act
             var model = builder.GetEdmModels().Single();

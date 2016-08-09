@@ -1,12 +1,10 @@
 ﻿namespace System.Web.OData
 {
-    using FluentAssertions;
     using Batch;
     using Builder;
     using Collections.Generic;
-    using Collections.ObjectModel;
+    using FluentAssertions;
     using Http;
-    using Http.Controllers;
     using Http.Dispatcher;
     using Linq;
     using Microsoft.OData.Edm;
@@ -19,16 +17,25 @@
 
     public class HttpConfigurationExtensionsTest
     {
+        [ApiVersion( "1.0" )]
+        private sealed class ControllerV1 : ODataController
+        {
+        }
+
+        [ApiVersion( "2.0" )]
+        private sealed class ControllerV2 : ODataController
+        {
+        }
+
         private static IEnumerable<IEdmModel> CreateModels( HttpConfiguration configuration )
         {
-            var controllerDescriptor = new Mock<HttpControllerDescriptor>( configuration, "Test", typeof( IHttpController ) ) { CallBase = true };
-            var controllerMapping = new Dictionary<string, HttpControllerDescriptor>() { { "Test", controllerDescriptor.Object } };
-            var controllerSelector = new Mock<IHttpControllerSelector>();
-            var apiVersions = new Collection<ApiVersionAttribute>( new[] { new ApiVersionAttribute( "1.0" ), new ApiVersionAttribute( "2.0" ) } );
-            var builder = new VersionedODataModelBuilder( controllerSelector.Object );
+            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+            var controllerTypes = new List<Type>() { typeof( ControllerV1 ), typeof( ControllerV2 ) };
 
-            controllerDescriptor.Setup( cd => cd.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) ).Returns( apiVersions );
-            controllerSelector.Setup( cs => cs.GetControllerMapping() ).Returns( controllerMapping );
+            controllerTypeResolver.Setup( ctr => ctr.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+
+            var builder = new VersionedODataModelBuilder( configuration );
 
             return builder.GetEdmModels();
         }
@@ -51,7 +58,7 @@
             var batchRoute = configuration.Routes["odataBatch"];
 
             // assert
-            constraint.RoutingConventions[0].Should().BeOfType<AttributeRoutingConvention>();
+            constraint.RoutingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
             constraint.RoutingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
             constraint.RoutingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
             constraint.RouteName.Should().Be( routeName );
@@ -82,7 +89,7 @@
                 var apiVersion = constraint.EdmModel.GetAnnotationValue<ApiVersionAnnotation>( constraint.EdmModel ).ApiVersion;
                 var versionedRouteName = routeName + "-" + apiVersion.ToString();
 
-                constraint.RoutingConventions[0].Should().BeOfType<AttributeRoutingConvention>();
+                constraint.RoutingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
                 constraint.RoutingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
                 constraint.RoutingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
                 constraint.RouteName.Should().Be( versionedRouteName );
