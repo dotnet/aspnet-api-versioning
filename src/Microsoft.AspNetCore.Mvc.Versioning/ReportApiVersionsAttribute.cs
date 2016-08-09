@@ -9,7 +9,7 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using Versioning;
-    using static ApiVersion;
+    using static System.String;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -48,12 +48,12 @@
         private static void AddApiVersionHeader( IHeaderDictionary headers, string headerName, IReadOnlyList<ApiVersion> versions )
         {
             Contract.Requires( headers != null );
-            Contract.Requires( !string.IsNullOrEmpty( headerName ) );
+            Contract.Requires( !IsNullOrEmpty( headerName ) );
             Contract.Requires( versions != null );
 
             if ( versions.Count > 0 && !headers.ContainsKey( headerName ) )
             {
-                headers.Add( headerName, versions.Select( v => v.ToString() ).ToArray() );
+                headers.Add( headerName, Join( ValueSeparator, versions.Select( v => v.ToString() ).ToArray() ) );
             }
         }
     }

@@ -42,7 +42,7 @@
             attribute.OnActionExecuted( context );
 
             // assert
-            context.Response.Headers.GetValues( "api-supported-versions" ).Should().BeEquivalentTo( "1.0", "2.0" );
+            context.Response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
             context.Response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "0.5" );
         }
 

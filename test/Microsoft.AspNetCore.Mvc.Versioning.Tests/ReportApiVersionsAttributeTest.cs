@@ -41,7 +41,7 @@
             attribute.OnActionExecuted( context );
 
             // assert
-            context.HttpContext.Response.Headers["api-supported-versions"].Should().BeEquivalentTo( "1.0", "2.0" );
+            context.HttpContext.Response.Headers["api-supported-versions"].Single().Should().Be( "1.0, 2.0" );
             context.HttpContext.Response.Headers["api-deprecated-versions"].Single().Should().Be( "0.5" );
         }
 

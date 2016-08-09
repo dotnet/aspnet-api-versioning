@@ -1,13 +1,13 @@
-﻿using System.Diagnostics.Contracts;
-namespace Microsoft.Web.Http
+﻿namespace Microsoft.Web.Http
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Web.Http;
     using System.Web.Http.Filters;
+    using static System.String;
 
     /// <content>
     /// Provides the implementation for ASP.NET Web API.
@@ -40,39 +40,19 @@ namespace Microsoft.Web.Http
 
             var headers = response.Headers;
 
-            if ( model.SupportedApiVersions.Count == 0 )
-            {
-                TryAddHeaderWithDefaultSupportedApiVersion( headers, actionExecutedContext.Request );
-                return;
-            }
-
             AddApiVersionHeader( headers, ApiSupportedVersions, model.SupportedApiVersions );
             AddApiVersionHeader( headers, ApiDeprecatedVersions, model.DeprecatedApiVersions );
-        }
-
-        private static void TryAddHeaderWithDefaultSupportedApiVersion( HttpHeaders headers, HttpRequestMessage request )
-        {
-            Contract.Requires( headers != null );
-            Contract.Requires( request != null );
-
-            if ( headers.Contains( ApiSupportedVersions ) )
-            {
-                return;
-            }
-
-            var supportedVersion = request.GetRequestedApiVersion() ?? request.GetConfiguration().GetDefaultApiVersion();
-            headers.Add( ApiSupportedVersions, supportedVersion.ToString() );
         }
 
         private static void AddApiVersionHeader( HttpHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
         {
             Contract.Requires( headers != null );
-            Contract.Requires( !string.IsNullOrEmpty( headerName ) );
+            Contract.Requires( !IsNullOrEmpty( headerName ) );
             Contract.Requires( versions != null );
 
             if ( versions.Count > 0 && !headers.Contains( headerName ) )
             {
-                headers.Add( headerName, versions.Select( v => v.ToString() ).ToArray() );
+                headers.Add( headerName, Join( ValueSeparator, versions.Select( v => v.ToString() ) ) );
             }
         }
     }

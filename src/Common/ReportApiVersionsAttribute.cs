@@ -22,5 +22,6 @@ namespace Microsoft.AspNetCore.Mvc
     {
         private const string ApiSupportedVersions = "api-supported-versions";
         private const string ApiDeprecatedVersions = "api-deprecated-versions";
+        private const string ValueSeparator = ", ";
     }
 }
