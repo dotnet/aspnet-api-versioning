@@ -21,7 +21,6 @@
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        private const string UnsupportedVersionRouteNameFormat = "{0}-UnsupportedVersion-{1}";
         private const string ResolverSettingsKey = "System.Web.OData.ResolverSettingsKey";
         private static readonly Lazy<Action<DefaultODataPathHandler, object>> setResolverSettings = new Lazy<Action<DefaultODataPathHandler, object>>( GetResolverSettingsMutator );
 
@@ -208,7 +207,6 @@
             routeConventions.Insert( 0, null );
 
             var odataRoutes = new List<ODataRoute>();
-            var unversionedRouteConstraints = new List<ODataPathRouteConstraint>();
 
             foreach ( var model in models )
             {
@@ -216,31 +214,22 @@
                 var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
                 var routeConstraint = default( ODataPathRouteConstraint );
 
-                routeConventions[0] = new AttributeRoutingConvention( model, configuration );
-
-                var unversionedRouteConstraint = new ODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray() );
+                routeConventions[0] = new VersionedAttributeRoutingConvention( model, configuration );
 
                 if ( apiVersion == null )
                 {
-                    routeConstraint = unversionedRouteConstraint;
+                    routeConstraint = new ODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray() );
                 }
                 else
                 {
                     versionedRouteName += "-" + apiVersion.ToString();
                     routeConstraint = new VersionedODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray(), apiVersion );
-                    unversionedRouteConstraints.Add( unversionedRouteConstraint );
                 }
 
                 var route = new ODataRoute( routePrefix, routeConstraint );
 
                 routes.Add( versionedRouteName, route );
                 odataRoutes.Add( route );
-            }
-
-            for ( var i = 0; i < unversionedRouteConstraints.Count; i++ )
-            {
-                var routeConstraint = unversionedRouteConstraints[i];
-                routes.Add( UnsupportedVersionRouteNameFormat.FormatInvariant( routeName, i ), new ODataRoute( routePrefix, routeConstraint ) );
             }
 
             return odataRoutes;
@@ -353,8 +342,7 @@
 
             configuration.SetResolverSettings( pathHandler );
             model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
-            routeConventions.Insert( 0, null );
-            routeConventions[0] = new AttributeRoutingConvention( model, configuration );
+            routeConventions.Insert( 0, new VersionedAttributeRoutingConvention( model, configuration ) );
 
             var routeConstraint = new VersionedODataPathRouteConstraint( pathHandler, model, routeName, routeConventions.ToArray(), apiVersion );
             var route = new ODataRoute( routePrefix, routeConstraint );
