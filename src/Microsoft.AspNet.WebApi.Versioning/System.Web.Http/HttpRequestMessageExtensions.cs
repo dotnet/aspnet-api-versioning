@@ -59,6 +59,19 @@
         }
 
         /// <summary>
+        /// Gets the current API versioning options.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get the API versioning options for.</param>
+        /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
+        public static ApiVersioningOptions GetApiVersioningOptions( this HttpRequestMessage request )
+        {
+            Arg.NotNull( request, nameof( request ) );
+            Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
+
+            return request.GetConfiguration()?.GetApiVersioningOptions() ?? new ApiVersioningOptions();
+        }
+
+        /// <summary>
         /// Gets the current raw, unparsed service API version requested.
         /// </summary>
         /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get the API version for.</param>
@@ -70,7 +83,7 @@
         {
             Arg.NotNull( request, nameof( request ) );
 
-            var reader = request.GetConfiguration()?.GetApiVersionReader() ?? new QueryStringApiVersionReader();
+            var reader = request.GetApiVersioningOptions().ApiVersionReader;
             return reader.Read( request );
         }
 

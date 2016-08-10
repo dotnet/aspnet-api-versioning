@@ -91,7 +91,7 @@
 
             if ( versions.Count == 0 )
             {
-                versions = new[] { controllerDescriptor.Configuration.GetDefaultApiVersion() };
+                versions = new[] { controllerDescriptor.Configuration.GetApiVersioningOptions().DefaultApiVersion };
             }
 
             return versions;
@@ -110,7 +110,7 @@
 
                 if ( versions.Count == 0 )
                 {
-                    versions = new[] { controllerDescriptor.Configuration.GetDefaultApiVersion() };
+                    versions = new[] { controllerDescriptor.Configuration.GetApiVersioningOptions().DefaultApiVersion };
                 }
                 else
                 {
