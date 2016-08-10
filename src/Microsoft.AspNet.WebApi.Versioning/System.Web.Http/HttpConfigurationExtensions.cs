@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-namespace System.Web.Http
+﻿namespace System.Web.Http
 {
     using Controllers;
     using Diagnostics.CodeAnalysis;
@@ -9,9 +8,7 @@ namespace System.Web.Http
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Controllers;
     using Microsoft.Web.Http.Dispatcher;
-    using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning;
-    using Routing;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
@@ -20,43 +17,18 @@ namespace System.Web.Http
     {
         private const string ApiVersioningOptionsKey = "MS_ApiVersioningOptions";
 
-        private static ApiVersioningOptions GetApiVersioningOptions( this HttpConfiguration configuration )
+        /// <summary>
+        /// Gets the current API versioning options.
+        /// </summary>
+        /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
+        /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
+        public static ApiVersioningOptions GetApiVersioningOptions( this HttpConfiguration configuration )
         {
-            Contract.Requires( configuration != null );
+            Arg.NotNull( configuration, nameof( configuration ) );
+            Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
 
             var options = default( ApiVersioningOptions );
-            configuration.Properties.TryGetValue( ApiVersioningOptionsKey, out options );
-            return options;
-        }
-
-        /// <summary>
-        /// Gets the configured, default service API version.
-        /// </summary>
-        /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
-        /// <returns>The configured, default <see cref="ApiVersion">API version</see>.</returns>
-        /// <remarks>If the <paramref name="configuration"/> has not added API versioning, then this method
-        /// always returns <see cref="ApiVersion.Default"/>.</remarks>
-        public static ApiVersion GetDefaultApiVersion( this HttpConfiguration configuration )
-        {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Contract.Ensures( Contract.Result<ApiVersion>() != null );
-
-            return configuration.GetApiVersioningOptions()?.DefaultApiVersion ?? ApiVersion.Default;
-        }
-
-        /// <summary>
-        /// Gets the configured service API version reader.
-        /// </summary>
-        /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
-        /// <returns>The configured <see cref="IApiVersionReader">API service reader</see>.</returns>
-        /// <remarks>If the <paramref name="configuration"/> has not added API versioning, then this method
-        /// always returns a new instance of the <see cref="QueryStringApiVersionReader"/>.</remarks>
-        public static IApiVersionReader GetApiVersionReader( this HttpConfiguration configuration )
-        {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Contract.Ensures( Contract.Result<IApiVersionReader>() != null );
-
-            return configuration.GetApiVersioningOptions()?.ApiVersionReader ?? new QueryStringApiVersionReader();
+            return configuration.Properties.TryGetValue( ApiVersioningOptionsKey, out options ) ? options : new ApiVersioningOptions();
         }
 
         /// <summary>
