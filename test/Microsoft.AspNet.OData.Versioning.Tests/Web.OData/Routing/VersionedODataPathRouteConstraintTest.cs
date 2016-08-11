@@ -1,4 +1,5 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿using Xunit;
+namespace Microsoft.Web.OData.Routing
 {
     using FluentAssertions;
     using Http;
