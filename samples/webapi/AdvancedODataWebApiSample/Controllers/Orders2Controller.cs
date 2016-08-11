@@ -8,20 +8,19 @@
     using System.Web.OData.Query;
     using System.Web.OData.Routing;
 
-    [ApiVersion( "1.0" )]
+    [ApiVersion( "2.0" )]
+    [ControllerName( "Orders" )]
     [ODataRoutePrefix( "Orders" )]
-    public class OrdersController : ODataController
+    public class Orders2Controller : ODataController
     {
-        // GET ~/v1/orders
-        // GET ~/orders?api-version=1.0
+        // GET ~/orders?api-version=2.0
         [ODataRoute]
         public IHttpActionResult Get( ODataQueryOptions<Person> options ) =>
-            Ok( new[] { new Order() { Id = 1, Customer = "Bill Mei" } } );
+            Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } } );
 
-        // GET ~/v1/orders(1)
-        // GET ~/orders(1)?api-version=1.0
+        // GET ~/orders({id})?api-version=2.0
         [ODataRoute( "({id})" )]
         public IHttpActionResult Get( [FromODataUri] int id, ODataQueryOptions<Person> options ) =>
-            Ok( new Order() { Id = id, Customer = "Bill Mei" } );
+            Ok( new Order() { Id = id, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } );
     }
 }

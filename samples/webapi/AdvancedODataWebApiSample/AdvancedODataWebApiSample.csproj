@@ -9,12 +9,12 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8C09CD67-5153-413C-B870-2FC7488C2D53}</ProjectGuid>
+    <ProjectGuid>{E496EED0-F8C9-4FE9-83E6-75E47A3C41A1}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Examples</RootNamespace>
-    <AssemblyName>BasicODataWebApiSample</AssemblyName>
+    <AssemblyName>AdvancedODataWebApiSample</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -33,8 +33,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <NoWarn>
-    </NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -133,8 +131,10 @@
   <ItemGroup>
     <Compile Include="Configuration\OrderModelConfiguration.cs" />
     <Compile Include="Configuration\PersonModelConfiguration.cs" />
-    <Compile Include="Controllers\People2Controller.cs" />
+    <Compile Include="Controllers\Orders2Controller.cs" />
+    <Compile Include="Controllers\Orders3Controller.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Controllers\People2Controller.cs" />
     <Compile Include="Controllers\PeopleController.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Person.cs" />
@@ -154,9 +154,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>4129</DevelopmentServerPort>
+          <DevelopmentServerPort>1044</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:25282/</IISUrl>
+          <IISUrl>http://localhost:1044/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

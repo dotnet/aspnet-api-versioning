@@ -12,6 +12,6 @@
     public class Values2Controller : ApiController
     {
         // GET api/values?api-version=2.0
-        public async Task<IHttpActionResult> Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+        public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
     }
 }

@@ -12,6 +12,6 @@
     public class HelloWorldController : ApiController
     {
         // GET api/v{version}/helloworld
-        public async Task<IHttpActionResult> Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+        public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
     }
 }
