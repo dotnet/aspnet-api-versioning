@@ -153,19 +153,25 @@
 
             var requestedVersion = request.GetRequestedApiVersion() ?? GetApiVersionFromRoutePrefix( request, route );
 
-            if ( requestedVersion == null )
+            if ( requestedVersion != null )
             {
-                if ( IsServiceDocumentOrMetadataRoute( values ) )
-                {
-                    var defaultApiVersion = request.GetConfiguration().GetDefaultApiVersion();
-                    request.SetRequestedApiVersion( defaultApiVersion );
-                    return base.Match( request, route, parameterName, values, routeDirection );
-                }
+                return ApiVersion == requestedVersion && base.Match( request, route, parameterName, values, routeDirection );
+            }
 
+            var options = request.GetApiVersioningOptions();
+
+            if ( options.DefaultApiVersion != ApiVersion )
+            {
                 return false;
             }
 
-            return ApiVersion == requestedVersion && base.Match( request, route, parameterName, values, routeDirection );
+            if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
+            {
+                request.SetRequestedApiVersion( ApiVersion );
+                return base.Match( request, route, parameterName, values, routeDirection );
+            }
+
+            return false;
         }
     }
 }
