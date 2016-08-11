@@ -92,21 +92,50 @@
         }
 
         [Theory]
-        [InlineData( "http://localhost", null )]
-        [InlineData( "http://localhost/$metadata", "$metadata" )]
-        public void match_should_return_true_for_service_and_metadata_document( string requestUri, string odataPath )
+        [InlineData( "http://localhost", null, "1.0", true )]
+        [InlineData( "http://localhost", null, "2.0", false )]
+        [InlineData( "http://localhost/$metadata", "$metadata", "1.0", true )]
+        [InlineData( "http://localhost/$metadata", "$metadata", "2.0", false )]
+        public void match_should_return_expected_result_for_service_and_metadata_document( string requestUri, string odataPath, string apiVersionValue, bool expected )
         {
             // arrange
+            var apiVersion = Parse( apiVersionValue );
             var model = EmptyModel;
             var request = new HttpRequestMessage( Get, requestUri );
             var values = new Dictionary<string, object>() { { "odataPath", odataPath } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, model, Default );
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, apiVersion );
 
             // act
             var result = constraint.Match( request, null, null, values, UriResolution );
 
             // assert
-            result.Should().BeTrue();
+            result.Should().Be( expected );
+        }
+
+        [Theory]
+        [InlineData( true, true )]
+        [InlineData( false, false )]
+        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( bool allowImplicitVersioning, bool expected )
+        {
+            // arrange
+            var apiVersion = new ApiVersion( 2, 0 );
+            var model = TestModel;
+            var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)" );
+            var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, apiVersion );
+
+            request.GetConfiguration().AddApiVersioning(
+                o =>
+                {
+                    o.DefaultApiVersion = apiVersion;
+                    o.AssumeDefaultVersionWhenUnspecified = allowImplicitVersioning;
+                } );
+
+            // act
+            var result = constraint.Match( request, null, null, values, UriResolution );
+
+            // assert
+            result.Should().Be( expected );
         }
 
         [Theory]
