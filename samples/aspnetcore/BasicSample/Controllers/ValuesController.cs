@@ -10,7 +10,7 @@
     [Route( "api/[controller]" )]
     public class ValuesController : Controller
     {
-        // GET api/values?api-version-1.0
+        // GET api/values?api-version=1.0
         [HttpGet]
         public string Get() => $"Controller = {GetType().Name}\nVersion = {HttpContext.GetRequestedApiVersion()}";
     }

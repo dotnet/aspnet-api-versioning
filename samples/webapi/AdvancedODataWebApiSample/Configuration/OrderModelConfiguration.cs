@@ -7,7 +7,7 @@
 
     public class OrderModelConfiguration : IModelConfiguration
     {
-        private static readonly ApiVersion V1 = new ApiVersion( 1, 0 );
+        private static readonly ApiVersion V2 = new ApiVersion( 2, 0 );
 
         private EntityTypeConfiguration<Order> ConfigureCurrent( ODataModelBuilder builder )
         {
@@ -20,8 +20,8 @@
 
         public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
         {
-            // note: the EDM for orders is only available in version 1.0
-            if ( apiVersion == V1 )
+            // note: the EDM for orders is only available in version 2.0
+            if ( apiVersion == V2 )
             {
                 ConfigureCurrent( builder );
             }

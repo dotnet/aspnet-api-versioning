@@ -11,7 +11,7 @@
     [Route( "api/values" )]
     public class ValuesController : ApiController
     {
-        // GET api/values?api-version-1.0
-        public async Task<IHttpActionResult> Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+        // GET api/values?api-version=1.0
+        public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
     }
 }
