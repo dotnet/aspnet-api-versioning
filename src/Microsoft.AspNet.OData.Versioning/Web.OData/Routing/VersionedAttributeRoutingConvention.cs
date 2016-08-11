@@ -40,7 +40,7 @@
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
         /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
-        /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see>
+        /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see></param>
         public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers )
             : base( model, controllers )
         {
