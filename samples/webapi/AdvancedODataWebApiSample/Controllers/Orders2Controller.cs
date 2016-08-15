@@ -15,12 +15,12 @@
     {
         // GET ~/orders?api-version=2.0
         [ODataRoute]
-        public IHttpActionResult Get( ODataQueryOptions<Person> options ) =>
+        public IHttpActionResult Get( ODataQueryOptions<Order> options ) =>
             Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } } );
 
         // GET ~/orders({id})?api-version=2.0
         [ODataRoute( "({id})" )]
-        public IHttpActionResult Get( [FromODataUri] int id, ODataQueryOptions<Person> options ) =>
+        public IHttpActionResult Get( [FromODataUri] int id, ODataQueryOptions<Order> options ) =>
             Ok( new Order() { Id = id, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } );
     }
 }
