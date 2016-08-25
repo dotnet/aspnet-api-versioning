@@ -37,27 +37,8 @@
                 return false;
             }
 
-            requestedVersion = DefaultMinorVersionToZeroWhenOnlyMajorVersionIsSpecified( requestedVersion );
             httpContext.SetRequestedApiVersion( requestedVersion );
             return true;
-        }
-
-        private static ApiVersion DefaultMinorVersionToZeroWhenOnlyMajorVersionIsSpecified( ApiVersion requestedVersion )
-        {
-            Contract.Requires( requestedVersion != null );
-            Contract.Ensures( Contract.Result<ApiVersion>() != null );
-
-            if ( requestedVersion.MajorVersion == null )
-            {
-                return requestedVersion;
-            }
-
-            if ( requestedVersion.MinorVersion == null )
-            {
-                return new ApiVersion( requestedVersion.GroupVersion, requestedVersion.MajorVersion, new int?( 0 ), requestedVersion.Status );
-            }
-
-            return requestedVersion;
         }
     }
 }
