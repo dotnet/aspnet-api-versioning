@@ -139,6 +139,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <value>The minor version number or <c>null</c>.</value>
         public int? MinorVersion { get; }
 
+        private int ImpliedMinorVersion => MinorVersion ?? 0;
+
         /// <summary>
         /// Gets the optional version status.
         /// </summary>
@@ -325,8 +327,14 @@ namespace Microsoft.AspNetCore.Mvc
                 }
 
                 text.Append( MajorVersion.Value.ToString( formatProvider ) );
+
+                if ( MinorVersion == null )
+                {
+                    return;
+                }
+
                 text.Append( '.' );
-                text.Append( ( MinorVersion ?? 0 ).ToString( formatProvider ) );
+                text.Append( MinorVersion.Value.ToString( formatProvider ) );
             }
             else if ( MinorVersion != null )
             {
@@ -470,7 +478,7 @@ namespace Microsoft.AspNetCore.Mvc
 
             return Nullable.Equals( GroupVersion, other.GroupVersion ) &&
                    Nullable.Equals( MajorVersion, other.MajorVersion ) &&
-                   Nullable.Equals( MinorVersion, other.MinorVersion ) &&
+                   ImpliedMinorVersion.Equals( other.ImpliedMinorVersion ) &&
                    string.Equals( Status, other.Status, StringComparison.OrdinalIgnoreCase );
         }
 
@@ -498,7 +506,7 @@ namespace Microsoft.AspNetCore.Mvc
 
                 if ( result == 0 )
                 {
-                    result = Nullable.Compare( MinorVersion, other.MinorVersion );
+                    result = ImpliedMinorVersion.CompareTo( other.ImpliedMinorVersion );
 
                     if ( result == 0 )
                     {

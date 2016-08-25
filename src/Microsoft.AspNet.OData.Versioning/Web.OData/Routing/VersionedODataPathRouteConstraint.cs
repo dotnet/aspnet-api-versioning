@@ -69,7 +69,6 @@
                     continue;
                 }
 
-                requestedVersion = AddMinorVersionIfNeeded( requestedVersion );
                 request.SetRequestedApiVersion( requestedVersion );
                 return requestedVersion;
             }
@@ -84,45 +83,6 @@
             var ch = segment[0];
             var text = ch == 'v' || ch == 'V' ? segment.Substring( 1 ) : segment;
             return TryParse( text, out apiVersion );
-        }
-
-        private static ApiVersion AddMinorVersionIfNeeded( ApiVersion requestedVersion )
-        {
-            Contract.Requires( requestedVersion != null );
-            Contract.Ensures( Contract.Result<ApiVersion>() != null );
-
-            if ( requestedVersion.MinorVersion != null )
-            {
-                return requestedVersion;
-            }
-
-            if ( requestedVersion.MajorVersion == null )
-            {
-                return requestedVersion;
-            }
-
-            var major = requestedVersion.MajorVersion.Value;
-
-            if ( requestedVersion.GroupVersion == null )
-            {
-                if ( requestedVersion.Status == null )
-                {
-                    return new ApiVersion( major, 0 );
-                }
-                else
-                {
-                    return new ApiVersion( major, 0, requestedVersion.Status );
-                }
-            }
-
-            var group = requestedVersion.GroupVersion.Value;
-
-            if ( requestedVersion.Status == null )
-            {
-                return new ApiVersion( group, major, 0 );
-            }
-
-            return new ApiVersion( group, major, 0, requestedVersion.Status );
         }
 
         /// <summary>
