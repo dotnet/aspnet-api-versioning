@@ -8,6 +8,9 @@ namespace Microsoft.AspNetCore.Mvc
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using Versioning;
+    using static System.Globalization.CultureInfo;
+    using static System.String;
 
     internal static partial class CollectionExtensions
     {
@@ -57,6 +60,21 @@ namespace Microsoft.AspNetCore.Mvc
             {
                 collection.Add( item );
             }
+        }
+
+        internal static string EnsureZeroOrOneApiVersions( this ICollection<string> apiVersions )
+        {
+            Contract.Requires( apiVersions != null );
+
+            if ( apiVersions.Count < 2 )
+            {
+                return apiVersions.SingleOrDefault();
+            }
+
+            var requestedVersions = Join( ", ", apiVersions.OrderBy( v => v ) );
+            var message = Format( InvariantCulture, SR.MultipleDifferentApiVersionsRequested, requestedVersions );
+
+            throw new AmbiguousApiVersionException( message, apiVersions.OrderBy( v => v ) );
         }
     }
 }

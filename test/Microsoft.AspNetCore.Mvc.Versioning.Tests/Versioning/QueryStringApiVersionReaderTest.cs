@@ -1,8 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
+    using Extensions.Primitives;
     using FluentAssertions;
     using Http;
     using Moq;
+    using System;
     using Xunit;
 
     public class QueryStringApiVersionReaderTest
@@ -17,7 +19,7 @@
             var reader = new QueryStringApiVersionReader();
 
             query.SetupGet( q => q["api-version"] ).Returns( requestedVersion );
-            request.SetupGet( r => r.Query ).Returns( query.Object );
+            request.SetupProperty( r => r.Query, query.Object );
 
             // act
             var version = reader.Read( request.Object );
@@ -35,7 +37,7 @@
             var reader = new QueryStringApiVersionReader();
 
             query.SetupGet( q => q["api-version"] ).Returns( default( string ) );
-            request.SetupGet( r => r.Query ).Returns( query.Object );
+            request.SetupProperty( r => r.Query, query.Object );
 
             // act
             var version = reader.Read( request.Object );
@@ -53,13 +55,49 @@
             var reader = new QueryStringApiVersionReader();
 
             query.SetupGet( q => q["api-version"] ).Returns( string.Empty );
-            request.SetupGet( r => r.Query ).Returns( query.Object );
+            request.SetupProperty( r => r.Query, query.Object );
 
             // act
             var version = reader.Read( request.Object );
 
             // assert
-            version.Should().Be( string.Empty );
+            version.Should().BeNull();
+        }
+
+        [Fact]
+        public void read_should_throw_exception_when_ambiguous_api_versions_are_requested()
+        {
+            // arrange
+            var query = new Mock<IQueryCollection>();
+            var request = new Mock<HttpRequest>();
+            var reader = new QueryStringApiVersionReader();
+
+            query.SetupGet( q => q["api-version"] ).Returns( new StringValues( new[] { "1.0", "2.0" } ) );
+            request.SetupProperty( r => r.Query, query.Object );
+
+            // act
+            Action read = () => reader.Read( request.Object );
+
+            // assert
+            read.ShouldThrow<AmbiguousApiVersionException>().And.ApiVersions.Should().BeEquivalentTo( "1.0", "2.0" );
+        }
+
+        [Fact]
+        public void read_should_not_throw_exception_when_duplicate_api_versions_are_requested()
+        {
+            // arrange
+            var query = new Mock<IQueryCollection>();
+            var request = new Mock<HttpRequest>();
+            var reader = new QueryStringApiVersionReader();
+
+            query.SetupGet( q => q["api-version"] ).Returns( new StringValues( new[] { "1.0", "1.0" } ) );
+            request.SetupProperty( r => r.Query, query.Object );
+
+            // act
+            var version = reader.Read( request.Object );
+
+            // assert
+            version.Should().Be( "1.0" );
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
     using Http;
+    using Http.Versioning;
+    using Microsoft.OData.Core;
     using Microsoft.OData.Edm;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -11,6 +13,7 @@
     using System.Web.OData.Routing;
     using System.Web.OData.Routing.Conventions;
     using static Http.ApiVersion;
+    using static System.Net.HttpStatusCode;
     using static System.StringSplitOptions;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
@@ -85,6 +88,22 @@
             return TryParse( text, out apiVersion );
         }
 
+        private static ApiVersion ResolveApiVersion( HttpRequestMessage request, IHttpRoute route )
+        {
+            Contract.Requires( request != null );
+            Contract.Requires( route != null );
+
+            try
+            {
+                return request.GetRequestedApiVersion() ?? GetApiVersionFromRoutePrefix( request, route );
+            }
+            catch ( AmbiguousApiVersionException ex )
+            {
+                var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
+                throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
+            }
+        }
+
         /// <summary>
         /// Gets the API version matched by the current OData path route constraint.
         /// </summary>
@@ -111,7 +130,7 @@
                 return false;
             }
 
-            var requestedVersion = request.GetRequestedApiVersion() ?? GetApiVersionFromRoutePrefix( request, route );
+            var requestedVersion = ResolveApiVersion( request, route );
 
             if ( requestedVersion != null )
             {

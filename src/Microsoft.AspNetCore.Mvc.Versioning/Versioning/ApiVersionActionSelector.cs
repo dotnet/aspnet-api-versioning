@@ -6,6 +6,7 @@
     using Extensions.Logging;
     using Extensions.Options;
     using Http;
+    using Http.Extensions;
     using Infrastructure;
     using Internal;
     using System;
@@ -90,24 +91,33 @@
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( candidates, nameof( candidates ) );
 
-            var matches = EvaluateActionConstraints( context, candidates );
             var httpContext = context.HttpContext;
-            var selectionContext = new ActionSelectionContext( httpContext, matches, httpContext.GetRequestedApiVersion() );
+            var apiVersion = default( ApiVersion );
+            var badRequest = default( BadRequestHandler );
+
+            if ( ( badRequest = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out apiVersion ) ) != null )
+            {
+                context.Handler = badRequest;
+                return null;
+            }
+
+            var matches = EvaluateActionConstraints( context, candidates );
+            var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
 
             if ( finalMatches == null || finalMatches.Count == 0 )
             {
-                if ( IsValidRequest( selectionContext ) )
+                if ( ( badRequest = IsValidRequest( selectionContext ) ) != null )
                 {
-                    return null;
+                    context.Handler = badRequest;
                 }
 
-                context.Handler = BadRequest;
                 return null;
             }
             else if ( finalMatches.Count == 1 )
             {
                 var selectedAction = finalMatches[0];
+                httpContext.SetRequestedApiVersion( selectionContext.RequestedVersion );
                 return selectedAction;
             }
             else
@@ -181,13 +191,31 @@
             return bestMatches;
         }
 
-        private bool IsValidRequest( ActionSelectionContext context )
+        private BadRequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
+        {
+            Contract.Requires( httpContext != null );
+
+            try
+            {
+                apiVersion = httpContext.GetRequestedApiVersion();
+            }
+            catch ( AmbiguousApiVersionException ex )
+            {
+                logger.LogInformation( ex.Message );
+                apiVersion = default( ApiVersion );
+                return new BadRequestHandler( "AmbiguousApiVersion", ex.Message );
+            }
+
+            return null;
+        }
+
+        private BadRequestHandler IsValidRequest( ActionSelectionContext context )
         {
             Contract.Requires( context != null );
 
             if ( !context.MatchingActions.Any() )
             {
-                return true;
+                return null;
             }
 
             var requestedVersion = context.HttpContext.GetRawRequestedApiVersion();
@@ -204,33 +232,24 @@
                 {
                     logger.ApiVersionUnspecified( parsedVersion, actionNames.Value );
                 }
-                return true;
+                return null;
             }
+
+            var code = default( string );
 
             if ( TryParse( requestedVersion, out parsedVersion ) )
             {
+                code = "UnsupportedApiVersion";
                 logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
             }
             else
             {
+                code = "InvalidApiVersion";
                 logger.ApiVersionInvalid( requestedVersion );
             }
 
-            return false;
-        }
-
-        private static async Task BadRequest( HttpContext context )
-        {
-            Contract.Requires( context != null );
-
-            var actionContext = new ActionContext()
-            {
-                HttpContext = context,
-                RouteData = context.GetRouteData(),
-                ActionDescriptor = new ActionDescriptor()
-            };
-            var result = new BadRequestResult();
-            await result.ExecuteResultAsync( actionContext );
+            var message = SR.VersionedResourceNotSupported.FormatDefault( context.HttpContext.Request.GetDisplayUrl(), requestedVersion );
+            return new BadRequestHandler( code, message );
         }
 
         private static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>

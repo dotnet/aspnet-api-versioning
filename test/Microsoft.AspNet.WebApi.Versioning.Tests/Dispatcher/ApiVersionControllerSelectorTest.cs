@@ -1,4 +1,5 @@
-﻿namespace Microsoft.Web.Http.Dispatcher
+﻿using Xunit;
+namespace Microsoft.Web.Http.Dispatcher
 {
     using Controllers;
     using FluentAssertions;
@@ -787,14 +788,14 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
         [InlineData( "v3.0", typeof( ApiVersionedRouteController ), "Get", "1.0,2.0,3.0" )]
         [InlineData( "v4", typeof( ApiVersionedRoute2Controller ), "GetV4", "4.0,5.0" )]
         [InlineData( "v5", typeof( ApiVersionedRoute2Controller ), "Get", "4.0,5.0" )]
-        public void select_controller_should_return_correct_controller_for_versioned_route_attribute( string versionSegment, Type controllerType, string actionName, string declaredVersionsValue )
+        public void select_controller_should_return_correct_controller_for_versioned_url( string versionSegment, Type controllerType, string actionName, string declaredVersionsValue )
         {
             // arrange
             var declared = declaredVersionsValue.Split( ',' ).Select( v => ApiVersion.Parse( v ) );
             var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 5, 0 ) };
             var deprecated = new[] { new ApiVersion( 4, 0 ) };
             var implemented = supported.Union( deprecated ).OrderBy( v => v ).ToArray();
-            var requestUri = "http://localhost/api/" + versionSegment + "/test";
+            var requestUri = $"http://localhost/api/{versionSegment}/test";
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, requestUri );
 
@@ -833,6 +834,31 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
                     SupportedApiVersions = supported,
                     DeprecatedApiVersions = deprecated
                 } );
+        }
+
+        [Fact]
+        public void select_controller_should_return_400_when_requested_api_version_is_ambiguous()
+        {
+            // arrange
+            var configuration = AttributeRoutingEnabledConfiguration;
+            var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=2.0" );
+
+            request.Headers.TryAddWithoutValidation( "api-version", "1.0" );
+            configuration.AddApiVersioning( o => o.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } } );
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            var selector = configuration.Services.GetHttpControllerSelector();
+
+            // act
+            Action selectController = () => selector.SelectController( request );
+
+            // assert
+            selectController.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
         }
     }
 }

@@ -23,6 +23,7 @@
         /// <returns>The raw, unparsed service API version or <c>null</c> if no service API version was requested.</returns>
         /// <remarks>This method is primarily meant for internal use and is generally only useful for instrumentation purposes.
         /// It is recommended that you use the <see cref="GetRequestedApiVersion(HttpContext)"/> instead.</remarks>
+        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         [EditorBrowsable( Never )]
         public static string GetRawRequestedApiVersion( this HttpContext context )
         {
@@ -39,6 +40,7 @@
         /// <returns>The requested <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
         /// <remarks>This method will return <c>null</c> no service API version was requested or the requested
         /// service API version is in an invalid format.</remarks>
+        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         public static ApiVersion GetRequestedApiVersion( this HttpContext context )
         {
             Arg.NotNull( context, nameof( context ) );

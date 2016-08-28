@@ -49,10 +49,12 @@
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( request.RequestUri, requestedVersion );
             var messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( request.RequestUri, requestedVersion );
+            var error = new HttpError() { Message = message, MessageDetail = messageDetail };
 
+            error["Code"] = "UnsupportedApiVersion";
             traceWriter.Info( request, ControllerSelectorCategory, message );
 
-            return new HttpResponseException( request.CreateErrorResponse( BadRequest, message, messageDetail ) );
+            return new HttpResponseException( request.CreateErrorResponse( BadRequest, error ) );
         }
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
@@ -68,10 +70,12 @@
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( request.RequestUri, requestedVersion );
             var messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( request.RequestUri, requestedVersion );
+            var error = new HttpError() { Message = message, MessageDetail = messageDetail };
 
+            error["Code"] = "InvalidApiVersion";
             traceWriter.Info( request, ControllerSelectorCategory, message );
 
-            return new HttpResponseException( request.CreateErrorResponse( BadRequest, message, messageDetail ) );
+            return new HttpResponseException( request.CreateErrorResponse( BadRequest, error ) );
         }
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]

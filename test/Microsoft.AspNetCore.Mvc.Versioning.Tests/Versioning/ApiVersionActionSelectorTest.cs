@@ -1,4 +1,5 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Versioning
+﻿using Xunit;
+namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Abstractions;
     using AspNetCore.Routing;
@@ -459,6 +460,24 @@
                          SupportedApiVersions = supported,
                          DeprecatedApiVersions = deprecated
                      } );
+            }
+        }
+
+        [Fact]
+        public async Task select_controller_should_return_400_when_requested_api_version_is_ambiguous()
+        {
+            // arrange
+            Action<ApiVersioningOptions> versioningSetup = o => o.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } };
+
+            using ( var server = new WebServer( versioningSetup ) )
+            {
+                server.Client.DefaultRequestHeaders.TryAddWithoutValidation( "api-version", "1.0" );
+
+                // act
+                var response = await server.Client.GetAsync( $"api/attributed?api-version=2.0" );
+
+                // assert
+                response.StatusCode.Should().Be( BadRequest );
             }
         }
     }
