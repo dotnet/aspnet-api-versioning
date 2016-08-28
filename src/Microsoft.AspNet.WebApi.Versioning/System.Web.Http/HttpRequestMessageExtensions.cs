@@ -78,6 +78,7 @@
         /// <returns>The raw, unparsed service API version or <c>null</c> if no service API version was requested.</returns>
         /// <remarks>This method is primarily meant for internal use and is generally only useful for instrumentation purposes.
         /// It is recommended that you use the <see cref="GetRequestedApiVersion(HttpRequestMessage)"/> instead.</remarks>
+        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         [EditorBrowsable( Never )]
         public static string GetRawRequestedApiVersion( this HttpRequestMessage request )
         {
@@ -94,6 +95,7 @@
         /// <returns>The requested <see cref="ApiVersion">API version</see>.</returns>
         /// <remarks>This method will return <c>null</c> no service API version was requested or the requested
         /// service API version is in an invalid format.</remarks>
+        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public static ApiVersion GetRequestedApiVersion( this HttpRequestMessage request )
         {

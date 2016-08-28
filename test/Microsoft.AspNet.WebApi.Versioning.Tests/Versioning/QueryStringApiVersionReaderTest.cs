@@ -1,6 +1,8 @@
-﻿namespace Microsoft.Web.Http.Versioning
+﻿using Xunit;
+namespace Microsoft.Web.Http.Versioning
 {
     using FluentAssertions;
+    using System;
     using System.Net.Http;
     using Xunit;
     using static System.Net.Http.HttpMethod;
@@ -48,6 +50,34 @@
 
             // assert
             version.Should().BeNull();
+        }
+
+        [Fact]
+        public void read_should_throw_exception_when_ambiguous_api_versions_are_requested()
+        {
+            // arrange
+            var request = new HttpRequestMessage( Get, "http://localhost/test?api-version=1.0&api-version=2.0" );
+            var reader = new QueryStringApiVersionReader();
+
+            // act
+            Action read = () => reader.Read( request );
+
+            // assert
+            read.ShouldThrow<AmbiguousApiVersionException>().And.ApiVersions.Should().BeEquivalentTo( "1.0", "2.0" );
+        }
+
+        [Fact]
+        public void read_should_not_throw_exception_when_duplicate_api_versions_are_requested()
+        {
+            // arrange
+            var request = new HttpRequestMessage( Get, "http://localhost/test?api-version=1.0&api-version=1.0" );
+            var reader = new QueryStringApiVersionReader();
+
+            // act
+            var version = reader.Read( request );
+
+            // assert
+            version.Should().Be( "1.0" );
         }
     }
 }

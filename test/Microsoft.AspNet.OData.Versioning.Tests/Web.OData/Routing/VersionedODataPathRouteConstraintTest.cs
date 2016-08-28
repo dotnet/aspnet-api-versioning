@@ -4,6 +4,7 @@
     using Http;
     using Microsoft.OData.Edm;
     using Moq;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
@@ -15,6 +16,7 @@
     using Xunit;
     using static Http.ApiVersion;
     using static System.Net.Http.HttpMethod;
+    using static System.Net.HttpStatusCode;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
     public class VersionedODataPathRouteConstraintTest
@@ -157,6 +159,22 @@
             // assert
             result.Should().BeTrue();
             request.GetRequestedApiVersion().Should().Be( requestedVersion );
+        }
+
+        [Fact]
+        public void match_should_return_400_when_requested_api_version_is_ambiguous()
+        {
+            // arrange
+            var model = TestModel;
+            var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)?api-version=1.0&api-version=2.0" );
+            var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, new ApiVersion( 1, 0 ) );
+
+            // act
+            Action match = () => constraint.Match( request, null, null, values, UriResolution );
+
+            // assert
+            match.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
         }
     }
 }

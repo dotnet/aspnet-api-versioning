@@ -159,6 +159,9 @@
   <data name="DirectRoute_AmbiguousController" xml:space="preserve">
     <value>Multiple controller types were found that match the URL. This can happen if attribute routes on multiple controllers match the requested URL.{1}{1}The request has found the following matching controller types: {0}</value>
   </data>
+  <data name="MultipleDifferentApiVersionsRequested" xml:space="preserve">
+    <value>The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request.</value>
+  </data>
   <data name="ResourceNotFound" xml:space="preserve">
     <value>No HTTP resource was found that matches the request URI '{0}'.</value>
   </data>

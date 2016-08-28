@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{261B77
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Versioning", "Versioning", "{DE4EE45F-F8EA-4B32-B16F-441F946ACEF4}"
 	ProjectSection(SolutionItems) = preProject
+		src\Common\Versioning\AmbiguousApiVersionException.cs = src\Common\Versioning\AmbiguousApiVersionException.cs
 		src\Common\Versioning\ApiVersioningOptions.cs = src\Common\Versioning\ApiVersioningOptions.cs
 		src\Common\Versioning\ApiVersionModel.cs = src\Common\Versioning\ApiVersionModel.cs
 		src\Common\Versioning\ApiVersionModelDebugView.cs = src\Common\Versioning\ApiVersionModelDebugView.cs

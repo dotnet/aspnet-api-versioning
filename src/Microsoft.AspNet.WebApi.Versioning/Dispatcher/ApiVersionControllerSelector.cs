@@ -13,6 +13,7 @@
     using System.Web.Http.Dispatcher;
     using Versioning;
     using static Controllers.HttpControllerDescriptorComparer;
+    using static System.Net.HttpStatusCode;
     using static System.StringComparer;
 
     /// <summary>
@@ -68,6 +69,8 @@
             Arg.NotNull( request, nameof( request ) );
             Contract.Ensures( Contract.Result<HttpControllerDescriptor>() != null );
 
+            EnsureRequestHasValidApiVersion( request );
+
             var aggregator = new ApiVersionControllerAggregator( request, GetControllerName, controllerInfoCache );
             var conventionRouteSelector = new ConventionRouteControllerSelector( options, controllerTypeCache );
             var conventionRouteResult = default( ControllerSelectionResult );
@@ -119,10 +122,10 @@
                 return null;
             }
 
-            string controller;
+            object controller;
             routeData.Values.TryGetValue( RouteDataTokenKeys.Controller, out controller );
 
-            return controller;
+            return (string) controller;
         }
 
         private ConcurrentDictionary<string, HttpControllerDescriptorGroup> InitializeControllerInfoCache()
@@ -150,6 +153,21 @@
             }
 
             return mapping;
+        }
+
+        private static void EnsureRequestHasValidApiVersion( HttpRequestMessage request )
+        {
+            Contract.Requires( request != null );
+
+            try
+            {
+                var apiVersion = request.GetRequestedApiVersion();
+            }
+            catch ( AmbiguousApiVersionException ex )
+            {
+                var error = new HttpError( ex.Message ) { ["Code"] = "AmbiguousApiVersion" };
+                throw new HttpResponseException( request.CreateErrorResponse( BadRequest, error ) );
+            }
         }
     }
 }
