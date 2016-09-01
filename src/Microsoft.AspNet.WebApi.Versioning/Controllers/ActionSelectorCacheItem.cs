@@ -6,7 +6,6 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
     using System.Reflection;
     using System.Text;
@@ -124,11 +123,39 @@
 
                 InitializeStandardActions();
 
-                var selectedCandidates = FindMatchingActions( controllerContext );
+                var firstAttempt = FindAction( controllerContext, selector, ignoreSubRoutes: false );
+
+                if ( firstAttempt.Succeeded )
+                {
+                    return firstAttempt.Action;
+                }
+
+                if ( controllerContext.RouteData.GetSubRoutes() == null )
+                {
+                    throw firstAttempt.Exception;
+                }
+
+                var secondAttempt = FindAction( controllerContext, selector, ignoreSubRoutes: true );
+
+                if ( secondAttempt.Succeeded )
+                {
+                    return secondAttempt.Action;
+                }
+
+                throw firstAttempt.Exception;
+            }
+
+            private ActionSelectionResult FindAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor> selector, bool ignoreSubRoutes )
+            {
+                Contract.Requires( controllerContext != null );
+                Contract.Requires( selector != null );
+                Contract.Ensures( Contract.Result<ActionSelectionResult>() != null );
+
+                var selectedCandidates = FindMatchingActions( controllerContext, ignoreSubRoutes );
 
                 if ( selectedCandidates.Count == 0 )
                 {
-                    throw new HttpResponseException( CreateSelectionError( controllerContext ) );
+                    return new ActionSelectionResult( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
                 }
 
                 var action = selector( controllerContext, selectedCandidates ) as CandidateHttpActionDescriptor;
@@ -136,29 +163,32 @@
                 if ( action != null )
                 {
                     ElevateRouteData( controllerContext, action.CandidateAction );
-                    return action;
+                    return new ActionSelectionResult( action );
                 }
 
                 if ( selectedCandidates.Count == 1 )
                 {
-                    throw new HttpResponseException( CreateSelectionError( controllerContext ) );
+                    return new ActionSelectionResult( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
                 }
 
                 var ambiguityList = CreateAmbiguousMatchList( selectedCandidates );
-                throw new InvalidOperationException( SR.ApiControllerActionSelector_AmbiguousMatch.FormatDefault( ambiguityList ) );
+
+                return new ActionSelectionResult( new InvalidOperationException( SR.ApiControllerActionSelector_AmbiguousMatch.FormatDefault( ambiguityList ) ) );
             }
 
             private static void ElevateRouteData( HttpControllerContext controllerContext, CandidateActionWithParams selectedCandidate ) => controllerContext.RouteData = selectedCandidate.RouteDataSource;
 
-            private IReadOnlyList<CandidateHttpActionDescriptor> FindMatchingActions( HttpControllerContext controllerContext, bool ignoreVerbs = false )
+            private IReadOnlyList<CandidateHttpActionDescriptor> FindMatchingActions( HttpControllerContext controllerContext, bool ignoreSubRoutes = false, bool ignoreVerbs = false )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<IReadOnlyList<CandidateHttpActionDescriptor>>() != null );
 
                 var routeData = controllerContext.RouteData;
-                var subRoutes = routeData.GetSubRoutes();
-                var actionsWithParameters = GetInitialCandidateWithParameterListForRegularRoutes( controllerContext, ignoreVerbs )
-                                    .Union( GetInitialCandidateWithParameterListForDirectRoutes( controllerContext, subRoutes, ignoreVerbs ) );
+                var subRoutes = ignoreSubRoutes ? default( IEnumerable<IHttpRouteData> ) : routeData.GetSubRoutes();
+                var actionsWithParameters = subRoutes == null ?
+                    GetInitialCandidateWithParameterListForRegularRoutes( controllerContext, ignoreVerbs ) :
+                    GetInitialCandidateWithParameterListForDirectRoutes( controllerContext, subRoutes, ignoreVerbs );
+
                 var actionsFoundByParams = FindActionMatchRequiredRouteAndQueryParameters( actionsWithParameters );
                 var orderCandidates = RunOrderFilter( actionsFoundByParams );
                 var precedenceCandidates = RunPrecedenceFilter( orderCandidates );

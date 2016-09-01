@@ -860,5 +860,62 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             // assert
             selectController.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
         }
+
+        [Fact]
+        public async Task select_controller_should_resolve_controller_with_api_versionX2Dneutral_action_using_convention_and_attribute_routing()
+        {
+            // arrange
+            var controllerTypes = new Collection<Type>() { typeof( AdminController ) };
+            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+            var configuration = new HttpConfiguration();
+            var request = new HttpRequestMessage( Post, "http://localhost/admin/markAsTest" );
+
+            controllerTypeResolver.Setup( r => r.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+            configuration.AddApiVersioning(
+                options =>
+                {
+                    options.AssumeDefaultVersionWhenUnspecified = true;
+                    options.DefaultApiVersion = new ApiVersion( new DateTime( 2015, 11, 15 ) );
+                    options.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version", "x-ms-version" } };
+                } );
+            configuration.Routes.MapHttpRoute( "Admin-1", "admin", new { controller = "admin", action = "Get" } );
+            configuration.Routes.MapHttpRoute( "Admin-2", "admin/seedData", new { controller = "admin", action = "SeedData" } );
+            configuration.Routes.MapHttpRoute( "Admin-3", "admin/markAsTest", new { controller = "admin", action = "MarkAsTest" } );
+            configuration.MapHttpAttributeRoutes();
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            var controllerSelector = configuration.Services.GetHttpControllerSelector();
+            var actionSelector = configuration.Services.GetActionSelector();
+            var controllerDescriptor = controllerSelector.SelectController( request );
+            var controllerContext = new HttpControllerContext( configuration, routeData, request )
+            {
+                ControllerDescriptor = controllerDescriptor,
+                RequestContext = new HttpRequestContext()
+                {
+                    Configuration = configuration,
+                    RouteData = routeData
+                }
+            };
+
+            // act
+            var controller = controllerSelector.SelectController( request );
+            var action = actionSelector.SelectAction( controllerContext );
+
+            // assert
+            controller.ControllerType.Should().Be( typeof( AdminController ) );
+            action.ActionName.Should().Be( "MarkAsTest" );
+
+            var server = new HttpServer( configuration );
+            var client = new HttpClient( server );
+            var response = await client.SendAsync( request );
+
+            response.StatusCode.Should().Be( OK );
+        }
     }
 }
