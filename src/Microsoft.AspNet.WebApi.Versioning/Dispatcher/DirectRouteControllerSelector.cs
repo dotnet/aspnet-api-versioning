@@ -127,7 +127,7 @@
 
             if ( !controller.HasApiVersionInfo() )
             {
-                controller.SetApiVersionInfo( aggregator.AllVersions );
+                controller.SetApiVersionModel( aggregator.AllVersions );
             }
 
             return controller;

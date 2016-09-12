@@ -39,6 +39,9 @@
             return (ApiVersionModel) actionDescriptor.Properties.GetOrAdd( ApiVersionInfoKey, key => new ApiVersionModel( actionDescriptor ) );
         }
 
+        internal static void SetApiVersionModel( this HttpActionDescriptor actionDescriptor, ApiVersionModel model ) =>
+            actionDescriptor.Properties.AddOrUpdate( ApiVersionInfoKey, model, ( key, value ) => model );
+
         /// <summary>
         /// Gets a value indicating whether the action is API version neutral.
         /// </summary>

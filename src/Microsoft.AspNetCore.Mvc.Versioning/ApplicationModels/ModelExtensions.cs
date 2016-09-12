@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApplicationModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Versioning;
 
@@ -20,7 +19,7 @@
         public static bool HasExplicitVersioning( this ControllerModel controller )
         {
             Arg.NotNull( controller, nameof( controller ) );
-            return controller.Attributes.OfType<IApiVersionProvider>().Any();
+            return controller.Properties.ContainsKey( typeof( ApiVersionModel ) ) || controller.Attributes.OfType<IApiVersionProvider>().Any();
         }
 
         /// <summary>

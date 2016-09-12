@@ -8,12 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.Web.Http
-{
+namespace Microsoft.Web.Http {
     using System;
     using System.Reflection;
-
-
+    
+    
     /// <summary>
     ///    A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,246 +22,211 @@ namespace Microsoft.Web.Http
     // with the /str option, or rebuild your VS project.
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class SR
-    {
-
+    public class SR {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
-        internal SR()
-        {
+        
+        internal SR() {
         }
-
+        
         /// <summary>
         ///    Returns the cached ResourceManager instance used by this class.
         /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute( global::System.ComponentModel.EditorBrowsableState.Advanced )]
-        public static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if ( object.ReferenceEquals( resourceMan, null ) )
-                {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager( "Microsoft.AspNet.WebApi.Versioning.SR", typeof( SR ).GetTypeInfo().Assembly );
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.AspNet.WebApi.Versioning.SR", typeof(SR).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///    Overrides the current thread's CurrentUICulture property for all
         ///    resource lookups using this strongly typed resource class.
         /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute( global::System.ComponentModel.EditorBrowsableState.Advanced )]
-        public static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        public static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to {0} on type {1}.
         /// </summary>
-        public static string ActionSelector_AmbiguousMatchType
-        {
-            get
-            {
-                return ResourceManager.GetString( "ActionSelector_AmbiguousMatchType", resourceCulture );
+        public static string ActionSelector_AmbiguousMatchType {
+            get {
+                return ResourceManager.GetString("ActionSelector_AmbiguousMatchType", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to No action was found on the controller &apos;{0}&apos; that matches the name &apos;{1}&apos;..
         /// </summary>
-        public static string ApiControllerActionSelector_ActionNameNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiControllerActionSelector_ActionNameNotFound", resourceCulture );
+        public static string ApiControllerActionSelector_ActionNameNotFound {
+            get {
+                return ResourceManager.GetString("ApiControllerActionSelector_ActionNameNotFound", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to No action was found on the controller &apos;{0}&apos; that matches the request..
         /// </summary>
-        public static string ApiControllerActionSelector_ActionNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiControllerActionSelector_ActionNotFound", resourceCulture );
+        public static string ApiControllerActionSelector_ActionNotFound {
+            get {
+                return ResourceManager.GetString("ApiControllerActionSelector_ActionNotFound", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to Multiple actions were found that match the request: {0}.
         /// </summary>
-        public static string ApiControllerActionSelector_AmbiguousMatch
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiControllerActionSelector_AmbiguousMatch", resourceCulture );
+        public static string ApiControllerActionSelector_AmbiguousMatch {
+            get {
+                return ResourceManager.GetString("ApiControllerActionSelector_AmbiguousMatch", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The requested resource does not support http method &apos;{0}&apos;..
         /// </summary>
-        public static string ApiControllerActionSelector_HttpMethodNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiControllerActionSelector_HttpMethodNotSupported", resourceCulture );
+        public static string ApiControllerActionSelector_HttpMethodNotSupported {
+            get {
+                return ResourceManager.GetString("ApiControllerActionSelector_HttpMethodNotSupported", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The specified API group version &apos;{0}&apos; is invalid..
         /// </summary>
-        public static string ApiVersionBadGroupVersion
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiVersionBadGroupVersion", resourceCulture );
+        public static string ApiVersionBadGroupVersion {
+            get {
+                return ResourceManager.GetString("ApiVersionBadGroupVersion", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The specified API version status &apos;{0}&apos; is invalid..
         /// </summary>
-        public static string ApiVersionBadStatus
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiVersionBadStatus", resourceCulture );
+        public static string ApiVersionBadStatus {
+            get {
+                return ResourceManager.GetString("ApiVersionBadStatus", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The specified API version is invalid..
         /// </summary>
-        public static string ApiVersionInvalidFormat
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiVersionInvalidFormat", resourceCulture );
+        public static string ApiVersionInvalidFormat {
+            get {
+                return ResourceManager.GetString("ApiVersionInvalidFormat", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The format &apos;{0}&apos; is invalid or not supported..
         /// </summary>
-        public static string ApiVersionInvalidFormatCode
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiVersionInvalidFormatCode", resourceCulture );
+        public static string ApiVersionInvalidFormatCode {
+            get {
+                return ResourceManager.GetString("ApiVersionInvalidFormatCode", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The requested API version &apos;{0}&apos; is not supported..
         /// </summary>
-        public static string ApiVersionNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString( "ApiVersionNotSupported", resourceCulture );
+        public static string ApiVersionNotSupported {
+            get {
+                return ResourceManager.GetString("ApiVersionNotSupported", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to No route providing a controller name was found to match request URI &apos;{0}&apos;..
         /// </summary>
-        public static string ControllerNameNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString( "ControllerNameNotFound", resourceCulture );
+        public static string ControllerNameNotFound {
+            get {
+                return ResourceManager.GetString("ControllerNameNotFound", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to Multiple types were found that match the controller named &apos;{0}&apos;. This can happen if the route that services this request (&apos;{1}&apos;) found multiple controllers defined with the same name but differing namespaces, which is not supported.{3}{3}The request for &apos;{0}&apos; has found the following matching controllers:{2}.
         /// </summary>
-        public static string DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate
-        {
-            get
-            {
-                return ResourceManager.GetString( "DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate", resourceCulture );
+        public static string DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate {
+            get {
+                return ResourceManager.GetString("DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to No type was found that matches the controller named &apos;{0}&apos;..
         /// </summary>
-        public static string DefaultControllerFactory_ControllerNameNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString( "DefaultControllerFactory_ControllerNameNotFound", resourceCulture );
+        public static string DefaultControllerFactory_ControllerNameNotFound {
+            get {
+                return ResourceManager.GetString("DefaultControllerFactory_ControllerNameNotFound", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to Multiple controller types were found that match the URL. This can happen if attribute routes on multiple controllers match the requested URL.{1}{1}The request has found the following matching controller types: {0}.
         /// </summary>
-        public static string DirectRoute_AmbiguousController
-        {
-            get
-            {
-                return ResourceManager.GetString( "DirectRoute_AmbiguousController", resourceCulture );
+        public static string DirectRoute_AmbiguousController {
+            get {
+                return ResourceManager.GetString("DirectRoute_AmbiguousController", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///    Looks up a localized string similar to No HTTP resource was found that matches the request URI &apos;{0}&apos;..
+        ///    Looks up a localized string similar to The expression &apos;{0}&apos; must refer to a controller action method..
         /// </summary>
-        public static string ResourceNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString( "ResourceNotFound", resourceCulture );
+        public static string InvalidActionMethodExpression {
+            get {
+                return ResourceManager.GetString("InvalidActionMethodExpression", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///    Looks up a localized string similar to No route providing a controller name with API version &apos;{1}&apos; was found to match request URI &apos;{0}&apos;..
-        /// </summary>
-        public static string VersionedControllerNameNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString( "VersionedControllerNameNotFound", resourceCulture );
-            }
-        }
-
-        /// <summary>
-        ///    Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; does not support the API version &apos;{1}&apos;..
-        /// </summary>
-        public static string VersionedResourceNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString( "VersionedResourceNotSupported", resourceCulture );
-            }
-        }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request..
         /// </summary>
-        public static string MultipleDifferentApiVersionsRequested
-        {
-            get
-            {
-                return ResourceManager.GetString( "MultipleDifferentApiVersionsRequested", resourceCulture );
+        public static string MultipleDifferentApiVersionsRequested {
+            get {
+                return ResourceManager.GetString("MultipleDifferentApiVersionsRequested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to No HTTP resource was found that matches the request URI &apos;{0}&apos;..
+        /// </summary>
+        public static string ResourceNotFound {
+            get {
+                return ResourceManager.GetString("ResourceNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to No route providing a controller name with API version &apos;{1}&apos; was found to match request URI &apos;{0}&apos;..
+        /// </summary>
+        public static string VersionedControllerNameNotFound {
+            get {
+                return ResourceManager.GetString("VersionedControllerNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; does not support the API version &apos;{1}&apos;..
+        /// </summary>
+        public static string VersionedResourceNotSupported {
+            get {
+                return ResourceManager.GetString("VersionedResourceNotSupported", resourceCulture);
             }
         }
     }

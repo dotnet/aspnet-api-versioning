@@ -1,0 +1,142 @@
+﻿namespace Microsoft.Web.Http.Versioning.Conventions
+{
+    using FluentAssertions;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Web.Http.Controllers;
+    using Xunit;
+
+    public class ActionApiVersionConventionBuilderExtensionsTest
+    {
+        private sealed class TestActionApiVersionConventionBuilder : ActionApiVersionConventionBuilder<IHttpController>
+        {
+            internal TestActionApiVersionConventionBuilder()
+                : base( new ControllerApiVersionConventionBuilder<IHttpController>() )
+            {
+            }
+
+            internal ICollection<ApiVersion> ProtectedMappedVersions => MappedVersions;
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_major_version()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersion( 1 );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( 1, 0 ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_major_version_with_status()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersion( 1, "beta" );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( 1, 0, "beta" ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_major_and_minor_version()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersion( 1, 5 );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( 1, 5 ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_major_and_minor_version_with_status()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersion( 1, 5, "rc" );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( 1, 5, "rc" ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_group_version_parts()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersion( 2016, 9, 10 );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( new DateTime( 2016, 9, 10 ) ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_group_version_parts_with_status()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersion( 2016, 9, 10, "alpha" );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( new DateTime( 2016, 9, 10 ), "alpha" ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_group_version()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+            var groupVersion = new DateTime( 2016, 9, 10 );
+
+            // act
+            actionBuilder.MapToApiVersion( groupVersion );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( groupVersion ) );
+        }
+
+        [Fact]
+        public void map_to_api_version_should_add_group_version_with_status()
+        {
+            // arrange
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+            var groupVersion = new DateTime( 2016, 9, 10 );
+
+            // act
+            actionBuilder.MapToApiVersion( groupVersion, "alpha" );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Single().Should().Be( new ApiVersion( groupVersion, "alpha" ) );
+        }
+
+        [Fact]
+        public void map_to_api_versions_should_add_multiple_api_versions()
+        {
+            // arrange
+            var apiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
+            var actionBuilder = new TestActionApiVersionConventionBuilder();
+
+            // act
+            actionBuilder.MapToApiVersions( apiVersions );
+
+            // assert
+            actionBuilder.ProtectedMappedVersions.Should().BeEquivalentTo( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) } );
+        }
+    }
+}

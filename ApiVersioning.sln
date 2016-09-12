@@ -85,6 +85,18 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.WebApi.Ver
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.OData.Versioning.Tests", "test\Microsoft.AspNet.OData.Versioning.Tests\Microsoft.AspNet.OData.Versioning.Tests.xproj", "{D87E54CC-C2D6-4AE5-806D-AE825B051C66}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conventions", "Conventions", "{B24995FB-AF48-4E5D-9327-377A599BDE2A}"
+	ProjectSection(SolutionItems) = preProject
+		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderT.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderT.cs
+		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs
+		src\Common\Versioning\Conventions\ActionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ActionConventionBuilderTExtensions.cs
+		src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs = src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs
+		src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs
+		src\Common\Versioning\Conventions\ExpressionExtensions.cs = src\Common\Versioning\Conventions\ExpressionExtensions.cs
+		src\Common\Versioning\Conventions\IActionConventionBuilderT.cs = src\Common\Versioning\Conventions\IActionConventionBuilderT.cs
+		src\Common\Versioning\Conventions\IApiVersionConventionT.cs = src\Common\Versioning\Conventions\IApiVersionConventionT.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,5 +143,6 @@ Global
 		{69C59656-53D1-4ACB-92B5-8B34C8E62175} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{AEB074E1-E57A-4DD3-A972-3625B367CE5D} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{D87E54CC-C2D6-4AE5-806D-AE825B051C66} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{B24995FB-AF48-4E5D-9327-377A599BDE2A} = {DE4EE45F-F8EA-4B32-B16F-441F946ACEF4}
 	EndGlobalSection
 EndGlobal

@@ -75,6 +75,34 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             }
         }
 
+        internal ApiVersionModel(
+            bool apiVersionNeutral,
+            IEnumerable<ApiVersion> supported,
+            IEnumerable<ApiVersion> deprecated,
+            IEnumerable<ApiVersion> advertised,
+            IEnumerable<ApiVersion> deprecatedAdvertised )
+        {
+            Contract.Requires( supported != null );
+            Contract.Requires( deprecated != null );
+            Contract.Requires( advertised != null );
+            Contract.Requires( deprecatedAdvertised != null );
+
+            if ( IsApiVersionNeutral = apiVersionNeutral )
+            {
+                declaredVersions = emptyVersions;
+                implementedVersions = emptyVersions;
+                supportedVersions = emptyVersions;
+                deprecatedVersions = emptyVersions;
+            }
+            else
+            {
+                declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supported.Union( deprecated ).OrderBy( v => v ).ToArray() );
+                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supported.Union( advertised ).OrderBy( v => v ).ToArray() );
+                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => deprecated.Union( deprecatedAdvertised ).OrderBy( v => v ).ToArray() );
+                implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supportedVersions.Value.Union( deprecatedVersions.Value ).OrderBy( v => v ).ToArray() );
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
         /// </summary>
@@ -125,9 +153,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         public static ApiVersionModel Neutral => neutralVersion.Value;
 
         /// <summary>
-        /// Gets the neutral API version information.
+        /// Gets empty API version information.
         /// </summary>
-        /// <value>The neutral <see cref="ApiVersionModel">API version information</see>.</value>
+        /// <value>The empty <see cref="ApiVersionModel">API version information</see>.</value>
         public static ApiVersionModel Empty => emptyVersion.Value;
 
         /// <summary>

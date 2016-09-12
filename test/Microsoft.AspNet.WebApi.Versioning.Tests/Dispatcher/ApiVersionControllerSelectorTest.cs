@@ -17,6 +17,7 @@ namespace Microsoft.Web.Http.Dispatcher
     using System.Web.Http.Dispatcher;
     using System.Web.Http.Routing;
     using Versioning;
+    using Versioning.Conventions;
     using Xunit;
     using static System.Net.Http.HttpMethod;
     using static System.Net.HttpStatusCode;
@@ -916,6 +917,131 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             var response = await client.SendAsync( request );
 
             response.StatusCode.Should().Be( OK );
+        }
+
+        [Fact]
+        public void select_controller_should_resolve_controller_using_api_versioning_conventions()
+        {
+            // arrange
+            var supportedVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
+            var controllerType = typeof( TestController );
+            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+            var controllerTypes = new Collection<Type>() { controllerType };
+            var configuration = new HttpConfiguration();
+            var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=2.0" );
+
+            controllerTypeResolver.Setup( r => r.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+            configuration.AddApiVersioning( o => o.Conventions.Controller<TestController>().HasApiVersion( 2, 0 ).AdvertisesApiVersion( 3, 0 ) );
+            configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            var selector = configuration.Services.GetHttpControllerSelector();
+
+            // act
+            var controller = selector.SelectController( request );
+
+            // assert
+            controller.ControllerType.Should().Be( controllerType );
+            controller.GetSupportedApiVersions().Should().BeEquivalentTo( supportedVersions );
+        }
+
+        [Fact]
+        public void select_controller_should_resolve_controller_action_using_api_versioning_conventions()
+        {
+            // arrange
+            var supportedVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) };
+            var configuration = new HttpConfiguration();
+            var request = new HttpRequestMessage( Get, "http://localhost/api/conventions?api-version=2.0" );
+
+            configuration.AddApiVersioning( o =>
+            {
+                o.Conventions.Controller<ConventionsController>()
+                             .HasApiVersion( 1, 0 )
+                             .HasApiVersion( 2, 0 )
+                             .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
+                             .Action( c => c.GetV2( default( int ) ) ).MapToApiVersion( 2, 0 );
+            } );
+            configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            var controllerSelector = configuration.Services.GetHttpControllerSelector();
+            var actionSelector = configuration.Services.GetActionSelector();
+            var controllerDescriptor = controllerSelector.SelectController( request );
+            var controllerContext = new HttpControllerContext( configuration, routeData, request )
+            {
+                ControllerDescriptor = controllerDescriptor,
+                RequestContext = new HttpRequestContext()
+                {
+                    Configuration = configuration,
+                    RouteData = routeData
+                }
+            };
+
+            // act
+            var action = actionSelector.SelectAction( controllerContext );
+
+            // assert
+            action.ActionName.Should().Be( nameof( ConventionsController.GetV2 ) );
+            action.GetParameters().Should().HaveCount( 1 );
+        }
+
+        [Fact]
+        public void select_controller_should_report_correct_api_versions_using_conventions()
+        {
+            // arrange
+            var supportedVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
+            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+            var controllerTypes = new Collection<Type>() { typeof( ConventionsController ), typeof( Conventions2Controller ) };
+            var configuration = new HttpConfiguration();
+            var request = new HttpRequestMessage( Get, "http://localhost/api/conventions?api-version=1.0" );
+
+            controllerTypeResolver.Setup( r => r.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+            configuration.AddApiVersioning( o =>
+            {
+                o.Conventions.Controller<ConventionsController>()
+                             .HasApiVersion( 1, 0 )
+                             .HasApiVersion( 2, 0 )
+                             .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
+                             .Action( c => c.GetV2( default( int ) ) ).MapToApiVersion( 2, 0 );
+
+                o.Conventions.Controller<Conventions2Controller>().HasApiVersion( 3, 0 );
+            } );
+            configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
+            configuration.MapHttpAttributeRoutes();
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            var selector = configuration.Services.GetHttpControllerSelector();
+
+            // act
+            var controller = selector.SelectController( request );
+
+            // assert
+            controller.GetApiVersionModel().ShouldBeEquivalentTo(
+                new
+                {
+                    IsApiVersionNeutral = false,
+                    DeclaredApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) },
+                    SupportedApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
+                    DeprecatedApiVersions = new ApiVersion[0],
+                    ImplementedApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) }
+                } );
         }
     }
 }

@@ -55,6 +55,11 @@
                         mvcOptions.Filters.Add( typeof( ReportApiVersionsAttribute ) );
                     }
 
+                    if ( options.Conventions.Count > 0 )
+                    {
+                        mvcOptions.Conventions.Add( new ApiVersionConvention( options.Conventions ) );
+                    }
+
                     mvcOptions.Conventions.Add( new ImplicitControllerVersionConvention( options.DefaultApiVersion ) );
                 } );
 
