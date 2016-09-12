@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
-    using Versioning;
 
     /// <content>
     /// Provides the implementation for ASP.NET Web API.

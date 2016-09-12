@@ -50,10 +50,11 @@
             Arg.NotNull( setupAction, nameof( setupAction ) );
 
             var options = new ApiVersioningOptions();
+            var services = configuration.Services;
 
             setupAction( options );
-            configuration.Services.Replace( typeof( IHttpControllerSelector ), new ApiVersionControllerSelector( configuration, options ) );
-            configuration.Services.Replace( typeof( IHttpActionSelector ), new ApiVersionActionSelector() );
+            services.Replace( typeof( IHttpControllerSelector ), new ApiVersionControllerSelector( configuration, options ) );
+            services.Replace( typeof( IHttpActionSelector ), new ApiVersionActionSelector() );
 
             if ( options.ReportApiVersions )
             {

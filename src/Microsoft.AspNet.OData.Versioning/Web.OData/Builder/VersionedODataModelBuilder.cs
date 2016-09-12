@@ -100,12 +100,21 @@
             var services = configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
-            var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver );
-            var apiVersions = ( from controllerType in controllerTypes
-                                where controllerType.IsODataController()
-                                let descriptor = new HttpControllerDescriptor( configuration, string.Empty, controllerType )
-                                from version in descriptor.GetImplementedApiVersions()
-                                select version ).Distinct();
+            var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver ).Where( c => c.IsODataController() );
+            var options = configuration.GetApiVersioningOptions();
+            var apiVersions = new HashSet<ApiVersion>();
+
+            foreach ( var controllerType in controllerTypes )
+            {
+                var descriptor = new HttpControllerDescriptor( configuration, string.Empty, controllerType );
+
+                options.Conventions.ApplyTo( descriptor );
+
+                foreach ( var apiVersion in descriptor.GetImplementedApiVersions() )
+                {
+                    apiVersions.Add( apiVersion );
+                }
+            }
 
             foreach ( var apiVersion in apiVersions )
             {

@@ -15,6 +15,7 @@
     {
         private const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
         private const string ApiVersionInfoKey = "MS_ApiVersionInfo";
+        private const string ConventionsApiVersionInfoKey = "MS_ConventionsApiVersionInfo";
 
         internal static bool IsAttributeRouted( this HttpControllerDescriptor controllerDescriptor )
         {
@@ -62,12 +63,47 @@
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
             Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
 
+            var properties = controllerDescriptor.Properties;
             var versionInfo = default( ApiVersionModel );
-            return controllerDescriptor.Properties.TryGetValue( ApiVersionInfoKey, out versionInfo ) ? versionInfo : new ApiVersionModel( controllerDescriptor );
+
+            if ( properties.TryGetValue( ApiVersionInfoKey, out versionInfo ) )
+            {
+                return versionInfo;
+            }
+
+            var options = controllerDescriptor.Configuration.GetApiVersioningOptions();
+
+            if ( options.Conventions.Count == 0 )
+            {
+                return new ApiVersionModel( controllerDescriptor );
+            }
+
+            options.Conventions.ApplyTo( controllerDescriptor );
+            return properties.TryGetValue( ConventionsApiVersionInfoKey, out versionInfo ) ? versionInfo : new ApiVersionModel( controllerDescriptor );
         }
 
-        internal static void SetApiVersionInfo( this HttpControllerDescriptor controllerDescriptor, ApiVersionModel versionInfo ) =>
-            controllerDescriptor.Properties.AddOrUpdate( ApiVersionInfoKey, key => new ApiVersionModel( controllerDescriptor, versionInfo ), ( key, value ) => ( (ApiVersionModel) value ).Aggregate( versionInfo ) );
+        internal static void SetApiVersionModel( this HttpControllerDescriptor controllerDescriptor, ApiVersionModel model )
+        {
+            var properties = controllerDescriptor.Properties;
+
+            properties.AddOrUpdate(
+                ApiVersionInfoKey,
+                key =>
+                {
+                    var value = default( object );
+
+                    if ( properties.TryRemove( ConventionsApiVersionInfoKey, out value ) )
+                    {
+                        return ( (ApiVersionModel) value ).Aggregate( model );
+                    }
+
+                    return new ApiVersionModel( controllerDescriptor, model );
+                },
+                ( key, value ) => ( (ApiVersionModel) value ).Aggregate( model ) );
+        }
+
+        internal static void SetConventionsApiVersionModel( this HttpControllerDescriptor controllerDescriptor, ApiVersionModel model ) =>
+            controllerDescriptor.Properties.AddOrUpdate( ConventionsApiVersionInfoKey, model, ( key, currentModel ) => ( (ApiVersionModel) currentModel ).Aggregate( model ) );
 
         /// <summary>
         /// Gets a value indicating whether the controller is API version neutral.

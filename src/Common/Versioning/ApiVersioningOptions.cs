@@ -4,6 +4,7 @@ namespace Microsoft.Web.Http.Versioning
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
+    using Conventions;
     using System;
     using System.Diagnostics.Contracts;
 
@@ -15,6 +16,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         private ApiVersion defaultApiVersion = ApiVersion.Default;
         private IApiVersionReader apiVersionReader = new QueryStringApiVersionReader();
         private IApiVersionSelector apiVersionSelector;
+        private ApiVersionConventionBuilder conventions = new ApiVersionConventionBuilder();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningOptions"/> class.
@@ -119,6 +121,27 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                 Arg.NotNull( value, nameof( value ) );
                 apiVersionSelector = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the builder used to define API version conventions.
+        /// </summary>
+        /// <value>An <see cref="ApiVersionConventionBuilder">API version convention builder</see>.</value>
+#if !WEBAPI
+        [CLSCompliant( false )]
+#endif
+        public ApiVersionConventionBuilder Conventions
+        {
+            get
+            {
+                Contract.Ensures( conventions != null );
+                return conventions;
+            }
+            set
+            {
+                Arg.NotNull( conventions, nameof( conventions ) );
+                conventions = value;
             }
         }
     }

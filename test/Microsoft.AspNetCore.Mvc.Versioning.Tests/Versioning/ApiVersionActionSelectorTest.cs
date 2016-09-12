@@ -1,10 +1,10 @@
-﻿using Xunit;
-namespace Microsoft.AspNetCore.Mvc.Versioning
+﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Abstractions;
     using AspNetCore.Routing;
     using Builder;
     using Controllers;
+    using Conventions;
     using Extensions.DependencyInjection;
     using FluentAssertions;
     using Infrastructure;
@@ -478,6 +478,39 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
                 // assert
                 response.StatusCode.Should().Be( BadRequest );
+            }
+        }
+
+        [Fact]
+        public async Task select_controller_should_resolve_controller_action_using_api_versioning_conventions()
+        {
+            // arrange
+            Action<ApiVersioningOptions> versioningSetup = o => o.Conventions.Controller<ConventionsController>()
+                                                                             .HasApiVersion( 1, 0 )
+                                                                             .HasApiVersion( 2, 0 )
+                                                                             .AdvertisesApiVersion( 3, 0 )
+                                                                             .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
+                                                                             .Action( c => c.GetV2( default( int ) ) ).MapToApiVersion( 2, 0 );
+            using ( var server = new WebServer( versioningSetup ) )
+            {
+                var response = await server.Client.GetAsync( $"api/conventions/1?api-version=2.0" );
+
+                // act
+                var action = ( (TestApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
+
+                // assert
+                action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( typeof( ConventionsController ).GetTypeInfo() );
+                action.As<ControllerActionDescriptor>().ActionName.Should().Be( nameof( ConventionsController.GetV2 ) );
+                action.Parameters.Count.Should().Be( 1 );
+                action.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+                     new
+                     {
+                         IsApiVersionNeutral = false,
+                         DeclaredApiVersions = new[] { new ApiVersion( 2, 0 ) },
+                         ImplementedApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
+                         SupportedApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
+                         DeprecatedApiVersions = new ApiVersion[0]
+                     } );
             }
         }
     }

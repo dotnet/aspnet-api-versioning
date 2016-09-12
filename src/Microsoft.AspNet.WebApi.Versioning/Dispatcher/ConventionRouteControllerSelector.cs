@@ -121,19 +121,22 @@
 
             if ( candidates.Count == 1 )
             {
-                if ( controller.GetDeclaredApiVersions().Contains( requestedVersion ) )
+                if ( !controller.GetDeclaredApiVersions().Contains( requestedVersion ) )
                 {
-                    return controller;
+                    return null;
                 }
-
-                return null;
+            }
+            else
+            {
+                if ( ( controller = ResolveController( candidates, requestedVersion, ambiguousException ) ) == null )
+                {
+                    return null;
+                }
             }
 
-            controller = ResolveController( candidates, requestedVersion, ambiguousException );
-
-            if ( controller != null && !controller.HasApiVersionInfo() )
+            if ( !controller.HasApiVersionInfo() )
             {
-                controller.SetApiVersionInfo( aggregator.AllVersions );
+                controller.SetApiVersionModel( aggregator.AllVersions );
             }
 
             return controller;
