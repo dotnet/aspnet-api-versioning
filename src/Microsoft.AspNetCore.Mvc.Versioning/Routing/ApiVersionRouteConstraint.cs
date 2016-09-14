@@ -3,9 +3,9 @@
     using AspNetCore.Routing;
     using Http;
     using System;
-    using System.Diagnostics.Contracts;
     using static ApiVersion;
     using static AspNetCore.Routing.RouteDirection;
+    using static System.String;
 
     /// <summary>
     /// Represents a route constraint for service <see cref="ApiVersion">API versions</see>.
@@ -24,12 +24,13 @@
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
         public bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
         {
-            if ( routeDirection != IncomingRequest )
+            var value = default( string );
+
+            if ( routeDirection == UrlGeneration )
             {
-                return false;
+                return !IsNullOrEmpty( routeKey ) && values.TryGetValue( routeKey, out value ) && !IsNullOrEmpty( value );
             }
 
-            var value = default( string );
             var requestedVersion = default( ApiVersion );
 
             if ( !values.TryGetValue( routeKey, out value ) || !TryParse( value, out requestedVersion ) )

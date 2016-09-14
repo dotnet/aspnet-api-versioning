@@ -257,9 +257,10 @@
             Action<ApiVersioningOptions> versioningSetup = o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.ApiVersionSelector = new ConstantApiVersionSelector( new ApiVersion( new DateTime( 2015, 11, 15 ) ) );
+                o.ApiVersionSelector = new LowestImplementedApiVersionSelector( o );
+
             };
-            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get_2015_11_15}/{id?}" );
+            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
 
             using ( var server = new WebServer( versioningSetup, routesSetup ) )
             {
@@ -269,32 +270,13 @@
                 var action = ( (TestApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
 
                 // assert
-                action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType );
-            }
-        }
-
-        [Fact]
-        public async Task select_best_candidate_should_use_api_version_selector_for_attributeX2Dbased_controller_when_allowed()
-        {
-            // arrange
-            var controllerType = typeof( OrdersController ).GetTypeInfo();
-            Action<ApiVersioningOptions> versioningSetup = o =>
-            {
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.ApiVersionSelector = new LowestImplementedApiVersionSelector( o );
-            };
-            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "{controller}/{action=Get_2015_11_15}/{id?}" );
-
-            using ( var server = new WebServer( versioningSetup, routesSetup ) )
-            {
-                await server.Client.GetAsync( "orders" );
-
-                // act
-                var action = ( (TestApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
-
-                // assert
-                action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType );
-                action.As<ControllerActionDescriptor>().ActionName.Should().Be( nameof( OrdersController.Get_2015_11_15 ) );
+                action.As<ControllerActionDescriptor>().ShouldBeEquivalentTo(
+                    new
+                    {
+                        ControllerTypeInfo = controllerType,
+                        ActionName = nameof( OrdersController.Get )
+                    },
+                    options => options.ExcludingMissingMembers() );
             }
         }
 
