@@ -5,11 +5,8 @@ namespace Microsoft.Examples
     using Configuration;
     using Controllers;
     using global::Owin;
-    using Microsoft.OData.Edm;
-    using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning.Conventions;
     using Microsoft.Web.OData.Builder;
-    using System.Linq;
     using System.Web.Http;
     using System.Web.OData.Batch;
     using System.Web.OData.Builder;
@@ -54,11 +51,9 @@ namespace Microsoft.Examples
             };
             var models = modelBuilder.GetEdmModels();
             var batchHandler = new DefaultODataBatchHandler( httpServer );
-            var v1 = new ApiVersion( 1, 0 );
-            var modelV1 = models.Single( m => m.GetAnnotationValue<ApiVersionAnnotation>( m ).ApiVersion == v1 );
 
             configuration.MapVersionedODataRoutes( "odata", "api", models, batchHandler );
-            configuration.MapVersionedODataRoute( "odata-v1", "v1", modelV1, v1, batchHandler );
+            configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, batchHandler );
             appBuilder.UseWebApi( httpServer );
         }
     }
