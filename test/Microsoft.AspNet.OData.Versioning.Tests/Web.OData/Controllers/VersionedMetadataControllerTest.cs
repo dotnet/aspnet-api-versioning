@@ -1,11 +1,13 @@
 ﻿namespace Microsoft.Web.OData.Controllers
 {
+    using Builder;
     using FluentAssertions;
     using Http;
     using Moq;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -33,16 +35,27 @@
         {
             // arrange
             var configuration = new HttpConfiguration();
+            var builder = new VersionedODataModelBuilder( configuration );
+            var metadata = new VersionedMetadataController() { Configuration = configuration };
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
-            var controllerTypes = new List<Type>() { typeof( Controller1 ), typeof( Controller2 ) };
+            var controllerTypes = new List<Type>() { typeof( Controller1 ), typeof( Controller2 ), typeof( VersionedMetadataController ) };
 
             controllerTypeResolver.Setup( ctr => ctr.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
             configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+            configuration.AddApiVersioning();
 
-            var metadata = new VersionedMetadataController() { Configuration = configuration };
+            var models = builder.GetEdmModels();
+            var request = new HttpRequestMessage( new HttpMethod( "OPTIONS" ), "http://localhost/$metadata" );
+            var response = default( HttpResponseMessage );
 
-            // act
-            var response = await metadata.GetOptions().ExecuteAsync( CancellationToken.None );
+            configuration.MapVersionedODataRoutes( "odata", null, models );
+
+            using ( var server = new HttpServer( configuration ) )
+            using ( var client = new HttpClient( server ) )
+            {
+                // act
+                response = ( await client.SendAsync( request ) ).EnsureSuccessStatusCode();
+            }
 
             // assert
             response.Headers.GetValues( "OData-Version" ).Single().Should().Be( "4.0" );

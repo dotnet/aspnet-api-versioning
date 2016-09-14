@@ -3,16 +3,22 @@
     using FluentAssertions;
     using Moq;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Http;
+    using System.Web.Http;
+    using System.Web.Http.Hosting;
     using System.Web.Http.Routing;
     using Xunit;
+    using static System.String;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
     public class ApiVersionRouteConstraintTest
     {
-        [Fact]
-        public void match_should_return_false_for_uri_generation()
+        [Theory]
+        [InlineData( "apiVersion", "1", true )]
+        [InlineData( "apiVersion", null, false )]
+        [InlineData( "apiVersion", "", false )]
+        [InlineData( null, "", false )]
+        public void match_should_return_expected_result_for_url_generation( string key, string value, bool expected )
         {
             // arrange
             var request = new HttpRequestMessage();
@@ -21,11 +27,16 @@
             var routeDirection = UriGeneration;
             var constraint = new ApiVersionRouteConstraint();
 
+            if ( !IsNullOrEmpty( key ) )
+            {
+                values[key] = value;
+            }
+
             // act
-            var matched = constraint.Match( request, route, "version", values, routeDirection );
+            var matched = constraint.Match( request, route, key, values, routeDirection );
 
             // assert
-            matched.Should().BeFalse();
+            matched.Should().Be( expected );
         }
 
         [Fact]
@@ -81,6 +92,27 @@
 
             // assert
             matched.Should().BeTrue();
+        }
+
+        [Fact]
+        public void url_helper_should_create_route_link_with_api_version_constriant()
+        {
+            // arrange
+            var request = new HttpRequestMessage();
+            var routes = new HttpRouteCollection( "/" );
+            var route = routes.MapHttpRoute( "Default", "v{apiVersion}/{controller}/{id}", defaults: null, constraints: new { apiVersion = new ApiVersionRouteConstraint() } );
+            var values = new HttpRouteValueDictionary( new { apiVersion = "1", controller = "people", id = "123" } );
+            var urlHelper = new UrlHelper( request );
+            var routeValues = new { apiVersion = "1", controller = "people", id = "123" };
+
+            request.Properties[HttpPropertyKeys.HttpConfigurationKey] = new HttpConfiguration( routes );
+            request.Properties[HttpPropertyKeys.HttpRouteDataKey] = new HttpRouteData( route, values );
+
+            // act
+            var url = urlHelper.Route( "Default", routeValues );
+
+            // assert
+            url.Should().Be( "/v1/people/123" );
         }
     }
 }

@@ -13,15 +13,15 @@
     {
         private static readonly string ControllerSelectorCategory = typeof( IHttpControllerSelector ).FullName;
         private readonly HttpRequestMessage request;
-        private readonly ITraceWriter traceWriter;
 
         internal HttpResponseExceptionFactory( HttpRequestMessage request )
         {
             Contract.Requires( request != null );
 
             this.request = request;
-            traceWriter = request.GetConfiguration().Services.GetTraceWriter() ?? NullTraceWriter.Instance;
         }
+
+        private ITraceWriter TraceWriter => request.GetConfiguration().Services.GetTraceWriter() ?? NullTraceWriter.Instance;
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
         internal HttpResponseException NewNotFoundOrBadRequestException( ControllerSelectionResult conventionRouteResult, ControllerSelectionResult directRouteResult ) =>
@@ -52,7 +52,7 @@
             var error = new HttpError() { Message = message, MessageDetail = messageDetail };
 
             error["Code"] = "UnsupportedApiVersion";
-            traceWriter.Info( request, ControllerSelectorCategory, message );
+            TraceWriter.Info( request, ControllerSelectorCategory, message );
 
             return new HttpResponseException( request.CreateErrorResponse( BadRequest, error ) );
         }
@@ -73,7 +73,7 @@
             var error = new HttpError() { Message = message, MessageDetail = messageDetail };
 
             error["Code"] = "InvalidApiVersion";
-            traceWriter.Info( request, ControllerSelectorCategory, message );
+            TraceWriter.Info( request, ControllerSelectorCategory, message );
 
             return new HttpResponseException( request.CreateErrorResponse( BadRequest, error ) );
         }
@@ -95,7 +95,7 @@
                 messageDetail = SR.DefaultControllerFactory_ControllerNameNotFound.FormatDefault( conventionRouteResult.ControllerName );
             }
 
-            traceWriter.Info( request, ControllerSelectorCategory, message );
+            TraceWriter.Info( request, ControllerSelectorCategory, message );
 
             return new HttpResponseException( request.CreateErrorResponse( NotFound, message, messageDetail ) );
         }

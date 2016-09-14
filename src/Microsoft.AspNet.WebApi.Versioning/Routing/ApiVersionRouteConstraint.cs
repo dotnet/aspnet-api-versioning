@@ -2,13 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
-    using static System.Web.Http.Routing.HttpRouteDirection;
     using static ApiVersion;
+    using static System.String;
+    using static System.Web.Http.Routing.HttpRouteDirection;
 
     /// <summary>
     /// Represents a route constraint for <see cref="ApiVersion">API versions</see>.
@@ -26,12 +25,13 @@
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
         public bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
         {
-            if ( routeDirection != UriResolution )
+            var value = default( string );
+
+            if ( routeDirection == UriGeneration )
             {
-                return false;
+                return !IsNullOrEmpty( parameterName ) && values.TryGetValue( parameterName, out value ) && !IsNullOrEmpty( value );
             }
 
-            var value = default( string );
             var requestedVersion = default( ApiVersion );
 
             if ( !values.TryGetValue( parameterName, out value ) || !TryParse( value, out requestedVersion ) )

@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Web.OData.Builder
 {
+    using Controllers;
     using Http;
+    using Http.Versioning.Conventions;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -102,7 +104,8 @@
             var typeResolver = services.GetHttpControllerTypeResolver();
             var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver ).Where( c => c.IsODataController() );
             var options = configuration.GetApiVersioningOptions();
-            var apiVersions = new HashSet<ApiVersion>();
+            var supported = new HashSet<ApiVersion>();
+            var deprecated = new HashSet<ApiVersion>();
 
             foreach ( var controllerType in controllerTypes )
             {
@@ -110,13 +113,22 @@
 
                 options.Conventions.ApplyTo( descriptor );
 
-                foreach ( var apiVersion in descriptor.GetImplementedApiVersions() )
+                var model = descriptor.GetApiVersionModel();
+
+                foreach ( var apiVersion in model.SupportedApiVersions )
                 {
-                    apiVersions.Add( apiVersion );
+                    supported.Add( apiVersion );
+                }
+
+                foreach ( var apiVersion in model.DeprecatedApiVersions )
+                {
+                    deprecated.Add( apiVersion );
                 }
             }
 
-            foreach ( var apiVersion in apiVersions )
+            deprecated.ExceptWith( supported );
+
+            foreach ( var apiVersion in supported.Union( deprecated ) )
             {
                 var builder = ModelBuilderFactory();
 
@@ -132,7 +144,35 @@
                 models.Add( model );
             }
 
+            ConfigureMetadataController( configuration, supported, deprecated );
+
             return models;
+        }
+
+        /// <summary>
+        /// Configures the metadata controller using the specified configuration and API versions.
+        /// </summary>
+        /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
+        /// <param name="supportedApiVersions">The discovered <see cref="IEnumerable{T}">sequence</see> of
+        /// supported OData controller <see cref="ApiVersion">API versions</see>.</param>
+        /// <param name="deprecatedApiVersions">The discovered <see cref="IEnumerable{T}">sequence</see> of
+        /// deprecated OData controller <see cref="ApiVersion">API versions</see>.</param>
+        protected virtual void ConfigureMetadataController( HttpConfiguration configuration, IEnumerable<ApiVersion> supportedApiVersions, IEnumerable<ApiVersion> deprecatedApiVersions )
+        {
+            var controllerMapping = configuration.Services.GetHttpControllerSelector().GetControllerMapping();
+            var controllerDescriptor = default( HttpControllerDescriptor );
+
+            if ( !controllerMapping.TryGetValue( "VersionedMetadata", out controllerDescriptor ))
+            {
+                return;
+            }
+
+            var options = configuration.GetApiVersioningOptions();
+            var controllerBuilder = options.Conventions.Controller<VersionedMetadataController>()
+                                                       .HasApiVersions( supportedApiVersions )
+                                                       .HasDeprecatedApiVersions( deprecatedApiVersions );
+
+            controllerBuilder.ApplyTo( controllerDescriptor );
         }
     }
 }
