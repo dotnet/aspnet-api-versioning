@@ -8,13 +8,17 @@
     using Microsoft;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Routing;
     using Microsoft.Web.OData.Builder;
     using Microsoft.Web.OData.Routing;
     using OData.Batch;
     using OData.Extensions;
     using OData.Routing;
     using OData.Routing.Conventions;
+    using Routing;
     using static Linq.Expressions.Expression;
+    using static System.String;
+    using static System.StringComparison;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
@@ -22,6 +26,9 @@
     public static class HttpConfigurationExtensions
     {
         private const string ResolverSettingsKey = "System.Web.OData.ResolverSettingsKey";
+        private const string UnversionedRouteSuffix = "-Unversioned";
+        private const string ApiVersionConstraintName = "apiVersion";
+        private const string ApiVersionConstraint = "{" + ApiVersionConstraintName + "}";
         private static readonly Lazy<Action<DefaultODataPathHandler, object>> setResolverSettings = new Lazy<Action<DefaultODataPathHandler, object>>( GetResolverSettingsMutator );
 
         private static Action<DefaultODataPathHandler, object> GetResolverSettingsMutator()
@@ -192,14 +199,14 @@
             var routeConventions = EnsureConventions( routingConventions.ToList() );
             var routes = configuration.Routes;
 
-            if ( !string.IsNullOrEmpty( routePrefix ) )
+            if ( !IsNullOrEmpty( routePrefix ) )
             {
                 routePrefix = routePrefix.TrimEnd( '/' );
             }
 
             if ( batchHandler != null )
             {
-                var batchTemplate = string.IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
+                var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
                 routes.MapHttpBatchRoute( routeName + "Batch", batchTemplate, batchHandler );
             }
 
@@ -207,30 +214,26 @@
             routeConventions.Insert( 0, null );
 
             var odataRoutes = new List<ODataRoute>();
+            var unversionedConstraints = new List<IHttpRouteConstraint>();
 
             foreach ( var model in models )
             {
                 var versionedRouteName = routeName;
-                var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
                 var routeConstraint = default( ODataPathRouteConstraint );
 
                 routeConventions[0] = new VersionedAttributeRoutingConvention( model, configuration );
-
-                if ( apiVersion == null )
-                {
-                    routeConstraint = new ODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray() );
-                }
-                else
-                {
-                    versionedRouteName += "-" + apiVersion.ToString();
-                    routeConstraint = new VersionedODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray(), apiVersion );
-                }
+                routeConstraint = new ODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray() );
+                unversionedConstraints.Add( routeConstraint );
+                routeConstraint = MakeVersionedODataRouteConstraint( routeConstraint, pathHandler, routeConventions, model, ref versionedRouteName );
 
                 var route = new ODataRoute( routePrefix, routeConstraint );
 
+                AddApiVersionConstraintIfNecessary( route );
                 routes.Add( versionedRouteName, route );
                 odataRoutes.Add( route );
             }
+
+            AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, routes, odataRoutes, unversionedConstraints );
 
             return odataRoutes;
         }
@@ -329,14 +332,14 @@
             var routeConventions = EnsureConventions( routingConventions.ToList() );
             var routes = configuration.Routes;
 
-            if ( !string.IsNullOrEmpty( routePrefix ) )
+            if ( !IsNullOrEmpty( routePrefix ) )
             {
                 routePrefix = routePrefix.TrimEnd( '/' );
             }
 
             if ( batchHandler != null )
             {
-                var batchTemplate = string.IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
+                var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
                 routes.MapHttpBatchRoute( routeName + "Batch", batchTemplate, batchHandler );
             }
 
@@ -347,9 +350,80 @@
             var routeConstraint = new VersionedODataPathRouteConstraint( pathHandler, model, routeName, routeConventions.ToArray(), apiVersion );
             var route = new ODataRoute( routePrefix, routeConstraint );
 
+            AddApiVersionConstraintIfNecessary( route );
             routes.Add( routeName, route );
 
+            var unversionedRouteConstraint = new ODataPathRouteConstraint( pathHandler, model, routeName, routeConventions.ToArray() );
+            var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedRouteConstraint, apiVersion ) );
+
+            AddApiVersionConstraintIfNecessary( unversionedRoute );
+            routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
+
             return route;
+        }
+
+        private static ODataPathRouteConstraint MakeVersionedODataRouteConstraint(
+            ODataPathRouteConstraint routeConstraint,
+            IODataPathHandler pathHandler,
+            IList<IODataRoutingConvention> routeConventions,
+            IEdmModel model,
+            ref string versionedRouteName )
+        {
+            Contract.Requires( routeConstraint != null );
+            Contract.Requires( pathHandler != null );
+            Contract.Requires( routeConventions != null );
+            Contract.Requires( model != null );
+            Contract.Requires( !IsNullOrEmpty( versionedRouteName ) );
+            Contract.Ensures( Contract.Result<ODataPathRouteConstraint>() != null );
+
+            var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+
+            if ( apiVersion == null )
+            {
+                return routeConstraint;
+            }
+
+            versionedRouteName += "-" + apiVersion.ToString();
+            return new VersionedODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray(), apiVersion );
+        }
+
+        private static void AddApiVersionConstraintIfNecessary( ODataRoute route )
+        {
+            Contract.Requires( route != null );
+
+            var routePrefix = route.RoutePrefix;
+
+            if ( routePrefix == null || routePrefix.IndexOf( ApiVersionConstraint, Ordinal ) < 0 || route.Constraints.ContainsKey( ApiVersionConstraintName ) )
+            {
+                return;
+            }
+
+            // note: even though the constraints are a dictionary, it's important to rebuild the entire collection
+            // to make sure the api version constraint is evaluated first; otherwise, the current api version will
+            // not be resolved when the odata versioning constraint is evaluated
+            var originalConstraints = new Dictionary<string, object>( route.Constraints );
+
+            route.Constraints.Clear();
+            route.Constraints.Add( ApiVersionConstraintName, new ApiVersionRouteConstraint() );
+
+            foreach ( var constraint in originalConstraints )
+            {
+                route.Constraints.Add( constraint.Key, constraint.Value );
+            }
+        }
+
+        private static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( string routeName, string routePrefix, HttpRouteCollection routes, List<ODataRoute> odataRoutes, List<IHttpRouteConstraint> unversionedConstraints )
+        {
+            Contract.Requires( !IsNullOrEmpty( routeName ) );
+            Contract.Requires( routes != null );
+            Contract.Requires( odataRoutes != null );
+            Contract.Requires( unversionedConstraints != null );
+
+            var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedConstraints ) );
+
+            AddApiVersionConstraintIfNecessary( unversionedRoute );
+            routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
+            odataRoutes.Add( unversionedRoute );
         }
     }
 }

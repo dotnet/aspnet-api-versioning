@@ -55,7 +55,7 @@
         }
 
         [Fact]
-        public void match_should_only_evaluate_uri_resolution()
+        public void match_should_always_return_true_for_uri_resolution()
         {
             // arrange
             var request = new HttpRequestMessage();
@@ -72,7 +72,7 @@
             var result = constraint.Match( request, route, parameterName, values, routeDirection );
 
             // assert
-            result.Should().BeFalse();
+            result.Should().BeTrue();
         }
 
         [Theory]
@@ -138,27 +138,6 @@
 
             // assert
             result.Should().Be( expected );
-        }
-
-        [Theory]
-        [InlineData( "v1", "1.0" )]
-        [InlineData( "v2.0", "2.0" )]
-        public void match_should_set_requested_api_version_from_route_prefix( string routePrefix, string apiVersion )
-        {
-            // arrange
-            var requestedVersion = Parse( apiVersion );
-            var model = TestModel;
-            var request = new HttpRequestMessage( Get, $"http://localhost/{routePrefix}/Tests(1)" );
-            var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, model, requestedVersion, routePrefix );
-            var route = request.GetConfiguration().Routes.Single();
-
-            // act
-            var result = constraint.Match( request, route, null, values, UriResolution );
-
-            // assert
-            result.Should().BeTrue();
-            request.GetRequestedApiVersion().Should().Be( requestedVersion );
         }
 
         [Fact]

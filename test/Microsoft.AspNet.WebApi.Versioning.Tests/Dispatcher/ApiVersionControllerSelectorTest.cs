@@ -1,5 +1,4 @@
-﻿using Xunit;
-namespace Microsoft.Web.Http.Dispatcher
+﻿namespace Microsoft.Web.Http.Dispatcher
 {
     using Controllers;
     using FluentAssertions;
@@ -955,7 +954,6 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
         public void select_controller_should_resolve_controller_action_using_api_versioning_conventions()
         {
             // arrange
-            var supportedVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) };
             var configuration = new HttpConfiguration();
             var request = new HttpRequestMessage( Get, "http://localhost/api/conventions?api-version=2.0" );
 
@@ -1000,7 +998,6 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
         public void select_controller_should_report_correct_api_versions_using_conventions()
         {
             // arrange
-            var supportedVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
             var controllerTypes = new Collection<Type>() { typeof( ConventionsController ), typeof( Conventions2Controller ) };
             var configuration = new HttpConfiguration();

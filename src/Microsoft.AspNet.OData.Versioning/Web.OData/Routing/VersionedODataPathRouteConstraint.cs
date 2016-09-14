@@ -1,8 +1,6 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
     using Http;
-    using Http.Versioning;
-    using Microsoft.OData.Core;
     using Microsoft.OData.Edm;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -12,9 +10,6 @@
     using System.Web.Http.Routing;
     using System.Web.OData.Routing;
     using System.Web.OData.Routing.Conventions;
-    using static Http.ApiVersion;
-    using static System.Net.HttpStatusCode;
-    using static System.StringSplitOptions;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
     /// <summary>
@@ -49,61 +44,6 @@
             return values.TryGetValue( "odataPath", out value ) && ( value == null || Equals( value, "$metadata" ) );
         }
 
-        private static ApiVersion GetApiVersionFromRoutePrefix( HttpRequestMessage request, IHttpRoute route )
-        {
-            Contract.Requires( request != null );
-            Contract.Requires( route != null );
-
-            var routePrefix = ( route as ODataRoute )?.RoutePrefix;
-
-            if ( string.IsNullOrEmpty( routePrefix ) )
-            {
-                return null;
-            }
-
-            var segments = routePrefix.Trim( '/' ).Split( new[] { '/' }, RemoveEmptyEntries );
-
-            foreach ( var segment in segments )
-            {
-                var requestedVersion = default( ApiVersion );
-
-                if ( !TryExtractApiVersionFromSegment( segment, out requestedVersion ) )
-                {
-                    continue;
-                }
-
-                request.SetRequestedApiVersion( requestedVersion );
-                return requestedVersion;
-            }
-
-            return null;
-        }
-
-        private static bool TryExtractApiVersionFromSegment( string segment, out ApiVersion apiVersion )
-        {
-            Contract.Requires( !string.IsNullOrEmpty( segment ) );
-
-            var ch = segment[0];
-            var text = ch == 'v' || ch == 'V' ? segment.Substring( 1 ) : segment;
-            return TryParse( text, out apiVersion );
-        }
-
-        private static ApiVersion ResolveApiVersion( HttpRequestMessage request, IHttpRoute route )
-        {
-            Contract.Requires( request != null );
-            Contract.Requires( route != null );
-
-            try
-            {
-                return request.GetRequestedApiVersion() ?? GetApiVersionFromRoutePrefix( request, route );
-            }
-            catch ( AmbiguousApiVersionException ex )
-            {
-                var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
-                throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
-            }
-        }
-
         /// <summary>
         /// Gets the API version matched by the current OData path route constraint.
         /// </summary>
@@ -125,16 +65,22 @@
             Arg.NotNull( request, nameof( request ) );
             Arg.NotNull( values, nameof( values ) );
 
-            if ( routeDirection != UriResolution )
+            if ( routeDirection == UriGeneration )
             {
-                return false;
+                return true;
             }
 
-            var requestedVersion = ResolveApiVersion( request, route );
+            var requestedVersion = request.GetRequestedApiVersionOrReturnBadRequest();
 
             if ( requestedVersion != null )
             {
-                return ApiVersion == requestedVersion && base.Match( request, route, parameterName, values, routeDirection );
+                if ( ApiVersion == requestedVersion && base.Match( request, route, parameterName, values, routeDirection ) )
+                {
+                    DecorateUrlHelperWithApiVersionRouteValueIfNecessary( request, values );
+                    return true;
+                }
+
+                return false;
             }
 
             var options = request.GetApiVersioningOptions();
@@ -151,6 +97,22 @@
             }
 
             return false;
+        }
+
+        private static void DecorateUrlHelperWithApiVersionRouteValueIfNecessary( HttpRequestMessage request, IDictionary<string, object> values )
+        {
+            Contract.Requires( request != null );
+            Contract.Requires( values != null );
+
+            var apiVersion = default( object );
+
+            if ( !values.TryGetValue( nameof( apiVersion ), out apiVersion ) )
+            {
+                return;
+            }
+
+            var requestContext = request.GetRequestContext();
+            requestContext.Url = new VersionedUrlHelperDecorator( requestContext.Url, apiVersion );
         }
     }
 }

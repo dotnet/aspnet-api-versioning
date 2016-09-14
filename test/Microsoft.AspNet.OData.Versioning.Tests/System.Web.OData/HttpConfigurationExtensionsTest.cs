@@ -85,7 +85,13 @@
             // assert
             foreach ( var route in routes )
             {
-                var constraint = (VersionedODataPathRouteConstraint) route.PathRouteConstraint;
+                var constraint = route.PathRouteConstraint as VersionedODataPathRouteConstraint;
+
+                if ( constraint == null )
+                {
+                    continue;
+                }
+
                 var apiVersion = constraint.EdmModel.GetAnnotationValue<ApiVersionAnnotation>( constraint.EdmModel ).ApiVersion;
                 var versionedRouteName = routeName + "-" + apiVersion.ToString();
 
