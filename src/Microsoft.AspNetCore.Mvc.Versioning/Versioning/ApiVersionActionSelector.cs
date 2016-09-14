@@ -218,34 +218,36 @@
                 return null;
             }
 
-            var requestedVersion = context.HttpContext.GetRawRequestedApiVersion();
+            var code = default( string );
+            var requestedVersion = default( string );
             var parsedVersion = context.RequestedVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, context.MatchingActions.Select( a => a.DisplayName ) ) );
 
-            if ( IsNullOrEmpty( requestedVersion ) )
+            if ( parsedVersion == null )
             {
-                if ( parsedVersion == null )
+                requestedVersion = context.HttpContext.GetRawRequestedApiVersion();
+
+                if ( IsNullOrEmpty( requestedVersion ) )
                 {
                     logger.ApiVersionUnspecified( actionNames.Value );
+                    return null;
+                }
+                else if ( TryParse( requestedVersion, out parsedVersion ) )
+                {
+                    code = "UnsupportedApiVersion";
+                    logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
                 }
                 else
                 {
-                    logger.ApiVersionUnspecified( parsedVersion, actionNames.Value );
+                    code = "InvalidApiVersion";
+                    logger.ApiVersionInvalid( requestedVersion );
                 }
-                return null;
-            }
-
-            var code = default( string );
-
-            if ( TryParse( requestedVersion, out parsedVersion ) )
-            {
-                code = "UnsupportedApiVersion";
-                logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
             }
             else
             {
-                code = "InvalidApiVersion";
-                logger.ApiVersionInvalid( requestedVersion );
+                requestedVersion = parsedVersion.ToString();
+                code = "UnsupportedApiVersion";
+                logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
             }
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( context.HttpContext.Request.GetDisplayUrl(), requestedVersion );

@@ -1,17 +1,59 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Routing
 {
     using AspNetCore.Routing;
+    using Builder;
+    using Extensions.DependencyInjection;
+    using Extensions.ObjectPool;
     using FluentAssertions;
     using Http;
     using Moq;
+    using System;
     using System.Collections.Generic;
+    using System.Text.Encodings.Web;
+    using System.Threading.Tasks;
     using Xunit;
     using static AspNetCore.Routing.RouteDirection;
+    using static System.String;
 
     public class ApiVersionRouteConstraintTest
     {
-        [Fact]
-        public void match_should_return_false_for_url_generation()
+        private class PassThroughRouter : IRouter
+        {
+            public VirtualPathData GetVirtualPath( VirtualPathContext context ) => null;
+
+            public Task RouteAsync( RouteContext context )
+            {
+                context.Handler = c => Task.CompletedTask;
+                return Task.CompletedTask;
+            }
+        }
+
+        private static ServiceCollection CreateServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddOptions();
+            services.AddLogging();
+            services.AddRouting();
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+                    .AddSingleton( UrlEncoder.Default );
+
+            return services;
+        }
+
+        private static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
+        {
+            var app = new Mock<IApplicationBuilder>();
+            app.SetupGet( a => a.ApplicationServices ).Returns( services );
+            return new RouteBuilder( app.Object ) { DefaultHandler = new PassThroughRouter() };
+        }
+
+        [Theory]
+        [InlineData( "apiVersion", "1", true )]
+        [InlineData( "apiVersion", null, false )]
+        [InlineData( "apiVersion", "", false )]
+        [InlineData( null, "", false )]
+        public void match_should_return_expected_result_for_url_generation( string key, string value, bool expected )
         {
             // arrange
             var httpContext = new Mock<HttpContext>().Object;
@@ -20,11 +62,16 @@
             var routeDirection = UrlGeneration;
             var constraint = new ApiVersionRouteConstraint();
 
+            if ( !IsNullOrEmpty( key ) )
+            {
+                values[key] = value;
+            }
+
             // act
-            var matched = constraint.Match( httpContext, route, null, values, routeDirection );
+            var matched = constraint.Match( httpContext, route, key, values, routeDirection );
 
             // assert
-            matched.Should().BeFalse();
+            matched.Should().Be( expected );
         }
 
         [Fact]
@@ -86,6 +133,28 @@
 
             // assert
             matched.Should().BeTrue();
+        }
+
+        [Fact]
+        public void url_helper_should_create_route_link_with_api_version_constriant()
+        {
+            // arrange
+            var services = CreateServices().AddApiVersioning();
+            var provider = services.BuildServiceProvider();
+            var routeBuilder = CreateRouteBuilder( provider );
+            var actionContext = new ActionContext() { HttpContext = new DefaultHttpContext() { RequestServices = provider } };
+
+            routeBuilder.MapRoute( "default", "v{version:apiVersion}/{controller}/{action}" );
+            actionContext.RouteData = new RouteData();
+            actionContext.RouteData.Routers.Add( routeBuilder.Build() );
+
+            var urlHelper = new UrlHelper( actionContext );
+
+            // act
+            var url = urlHelper.Link( "default", new { version = "1", controller = "Store", action = "Buy" } );
+
+            // assert
+            url.Should().Be( "/v1/Store/Buy" );
         }
     }
 }
