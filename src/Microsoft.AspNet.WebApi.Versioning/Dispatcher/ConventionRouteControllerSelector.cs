@@ -139,6 +139,7 @@
                 controller.SetApiVersionModel( aggregator.AllVersions );
             }
 
+            controller.SetRelatedCandidates( candidates );
             return controller;
         }
 

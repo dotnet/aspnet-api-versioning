@@ -4,6 +4,7 @@
     using Controllers;
     using Diagnostics.CodeAnalysis;
     using Diagnostics.Contracts;
+    using Linq;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
@@ -16,6 +17,7 @@
         private const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
         private const string ApiVersionInfoKey = "MS_ApiVersionInfo";
         private const string ConventionsApiVersionInfoKey = "MS_ConventionsApiVersionInfo";
+        private const string RelatedControllerCandidatesKey = "MS_RelatedControllerCandidates";
 
         internal static bool IsAttributeRouted( this HttpControllerDescriptor controllerDescriptor )
         {
@@ -104,6 +106,12 @@
 
         internal static void SetConventionsApiVersionModel( this HttpControllerDescriptor controllerDescriptor, ApiVersionModel model ) =>
             controllerDescriptor.Properties.AddOrUpdate( ConventionsApiVersionInfoKey, model, ( key, currentModel ) => ( (ApiVersionModel) currentModel ).Aggregate( model ) );
+
+        internal static IEnumerable<HttpControllerDescriptor> GetRelatedCandidates( this HttpControllerDescriptor controllerDescriptor ) =>
+            (IEnumerable<HttpControllerDescriptor>) controllerDescriptor.Properties.GetOrAdd( RelatedControllerCandidatesKey, key => Enumerable.Empty<HttpControllerDescriptor>() );
+
+        internal static void SetRelatedCandidates( this HttpControllerDescriptor controllerDescriptor, IEnumerable<HttpControllerDescriptor> value ) =>
+            controllerDescriptor.Properties.AddOrUpdate( RelatedControllerCandidatesKey, value, ( key, oldValue ) => value );
 
         /// <summary>
         /// Gets a value indicating whether the controller is API version neutral.

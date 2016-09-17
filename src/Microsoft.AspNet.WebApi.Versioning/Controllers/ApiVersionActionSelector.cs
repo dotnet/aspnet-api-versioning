@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
+    using Dispatcher;
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
@@ -63,7 +65,14 @@
             Arg.NotNull( controllerContext, nameof( controllerContext ) );
             Arg.NotNull( candidateActions, nameof( candidateActions ) );
 
-            var requestedVersion = controllerContext.Request.GetRequestedApiVersion();
+            if ( candidateActions.Count == 0 )
+            {
+                return null;
+            }
+
+            var request = controllerContext.Request;
+            var requestedVersion = request.GetRequestedApiVersion();
+            var exceptionFactory = new HttpResponseExceptionFactory( request );
 
             if ( candidateActions.Count == 1 )
             {
@@ -93,12 +102,29 @@
             switch ( explicitMatches.Count )
             {
                 case 0:
-                    return implicitMatches.Count == 1 ? implicitMatches[0] : null;
+                    switch ( implicitMatches.Count )
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            return implicitMatches[0];
+                        default:
+                            throw CreateAmbiguousActionException( implicitMatches );
+                    }
+                    break;
                 case 1:
                     return explicitMatches[0];
+                default:
+                    throw CreateAmbiguousActionException( explicitMatches );
             }
 
             return null;
+        }
+
+        private Exception CreateAmbiguousActionException( IEnumerable<HttpActionDescriptor> matches )
+        {
+            var ambiguityList = ActionSelectorCacheItem.CreateAmbiguousMatchList( matches );
+            return new InvalidOperationException( SR.ApiControllerActionSelector_AmbiguousMatch.FormatDefault( ambiguityList ) );
         }
 
         /// <summary>
@@ -129,7 +155,19 @@
             Contract.Ensures( Contract.Result<ILookup<string, HttpActionDescriptor>>() != null );
 
             var internalSelector = GetInternalSelector( controllerDescriptor );
-            return internalSelector.GetActionMapping();
+            var actionMappings = new List<ILookup<string, HttpActionDescriptor>>();
+
+            actionMappings.Add( internalSelector.GetActionMapping() );
+
+            foreach ( var relatedControllerDescriptor in controllerDescriptor.GetRelatedCandidates() )
+            {
+                if ( relatedControllerDescriptor != controllerDescriptor )
+                {
+                    actionMappings.Add( GetInternalSelector( relatedControllerDescriptor ).GetActionMapping() );
+                }
+            }
+
+            return actionMappings.Count == 1 ? actionMappings[0] : new AggregatedActionMapping( actionMappings );
         }
     }
 }
