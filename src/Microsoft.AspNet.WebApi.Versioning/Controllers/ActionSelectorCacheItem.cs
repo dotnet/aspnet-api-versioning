@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
+    using Dispatcher;
     using Routing;
     using System;
     using System.Collections.Generic;
@@ -202,18 +203,34 @@
             {
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
 
+                if ( !controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral )
+                {
+                    return CreateBadRequestResponse( controllerContext );
+                }
+
                 var actionsFoundByParams = FindMatchingActions( controllerContext, ignoreVerbs: true );
 
                 if ( actionsFoundByParams.Count > 0 )
                 {
-                    return Create405Response( controllerContext, actionsFoundByParams );
+                    return CreateMethodNotAllowedResponse( controllerContext, actionsFoundByParams );
                 }
 
                 return CreateActionNotFoundResponse( controllerContext );
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
-            private static HttpResponseMessage Create405Response( HttpControllerContext controllerContext, IEnumerable<HttpActionDescriptor> allowedCandidates )
+            private static HttpResponseMessage CreateBadRequestResponse( HttpControllerContext controllerContext )
+            {
+                Contract.Requires( controllerContext != null );
+                Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
+
+                var request = controllerContext.Request;
+                var exceptionFactory = new HttpResponseExceptionFactory( request );
+                return exceptionFactory.CreateBadRequestResponseForUnsupportedApiVersion( request.GetRequestedApiVersion() );
+            }
+
+            [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
+            private static HttpResponseMessage CreateMethodNotAllowedResponse( HttpControllerContext controllerContext, IEnumerable<HttpActionDescriptor> allowedCandidates )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Requires( allowedCandidates != null );
@@ -252,6 +269,11 @@
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
+
+                if ( !controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral )
+                {
+                    return CreateBadRequestResponse( controllerContext );
+                }
 
                 var message = SR.ResourceNotFound.FormatDefault( controllerContext.Request.RequestUri );
                 var messageDetail = SR.ApiControllerActionSelector_ActionNameNotFound.FormatDefault( controllerDescriptor.ControllerName, actionName );
@@ -515,7 +537,7 @@
                 }
             }
 
-            private static string CreateAmbiguousMatchList( IEnumerable<CandidateHttpActionDescriptor> ambiguousCandidates )
+            internal static string CreateAmbiguousMatchList( IEnumerable<HttpActionDescriptor> ambiguousCandidates )
             {
                 Contract.Requires( ambiguousCandidates != null );
                 Contract.Ensures( Contract.Result<string>() != null );
