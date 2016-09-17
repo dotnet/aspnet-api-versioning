@@ -104,13 +104,46 @@
             var template = subroute.Route.RouteTemplate;
             var comparer = StringComparer.OrdinalIgnoreCase;
             var controllers = from route in routes
-                              where comparer.Equals( route.RouteTemplate, template ) &&
-                                    route.DataTokens.ContainsKey( "controller" )
-                              let controller = route.DataTokens["controller"] as HttpControllerDescriptor
-                              where controller != null
+                              where comparer.Equals( route.RouteTemplate, template )
+                              from controller in EnumerateControllersInDataTokens( route.DataTokens )
                               select controller;
 
             return controllers.Distinct();
+        }
+
+        private static IEnumerable<HttpControllerDescriptor> EnumerateControllersInDataTokens( IDictionary<string, object> dataTokens )
+        {
+            Contract.Requires( dataTokens != null );
+            Contract.Ensures( Contract.Result<IEnumerable<HttpControllerDescriptor>>() != null );
+
+            var value = default( object );
+
+            if ( dataTokens.TryGetValue( "controller", out value ) )
+            {
+                var controllerDescriptor = value as HttpControllerDescriptor;
+
+                if ( controllerDescriptor != null )
+                {
+                    yield return controllerDescriptor;
+                }
+
+                yield break;
+            }
+
+            if ( dataTokens.TryGetValue( "actions", out value ) )
+            {
+                var actionDescriptors = value as HttpActionDescriptor[];
+
+                if ( actionDescriptors == null )
+                {
+                    yield break;
+                }
+
+                foreach ( var actionDescriptor in actionDescriptors )
+                {
+                    yield return actionDescriptor.ControllerDescriptor;
+                }
+            }
         }
     }
 }
