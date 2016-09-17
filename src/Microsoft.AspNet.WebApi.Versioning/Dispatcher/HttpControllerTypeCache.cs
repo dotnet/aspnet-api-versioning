@@ -32,7 +32,9 @@
             var attribute = type.GetCustomAttributes<ControllerNameAttribute>( false ).SingleOrDefault();
 
             if ( attribute != null )
+            {
                 return attribute.Name;
+            }
 
             // use standard convention for the controller name
             var name = type.Name;
@@ -75,7 +77,9 @@
             if ( cache.Value.TryGetValue( controllerName, out lookup ) )
             {
                 foreach ( var grouping in lookup )
+                {
                     set.UnionWith( grouping );
+                }
             }
 
             return set;
