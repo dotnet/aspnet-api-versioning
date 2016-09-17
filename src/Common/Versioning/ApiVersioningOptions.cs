@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// <summary>
     /// Represents the possible API versioning options for services.
     /// </summary>
-    public class ApiVersioningOptions
+    public partial class ApiVersioningOptions
     {
         private ApiVersion defaultApiVersion = ApiVersion.Default;
         private IApiVersionReader apiVersionReader = new QueryStringApiVersionReader();

@@ -8,17 +8,21 @@
 
     internal sealed class BadRequestHandler
     {
+        private readonly ApiVersioningOptions options;
         private readonly string code;
         private readonly string message;
 
-        internal BadRequestHandler( string message )
-            : this( null, message )
+        internal BadRequestHandler( ApiVersioningOptions options, string message )
+            : this( options, null, message )
         {
         }
 
-        internal BadRequestHandler( string code, string message )
+        internal BadRequestHandler( ApiVersioningOptions options, string code, string message )
         {
+            Contract.Requires( options != null );
             Contract.Requires( !string.IsNullOrEmpty( message ) );
+
+            this.options = options;
             this.message = message;
             this.code = code;
         }
@@ -33,7 +37,7 @@
                 RouteData = context.GetRouteData(),
                 ActionDescriptor = new ActionDescriptor()
             };
-            var result = new BadRequestObjectResult( new { Code = code, Message = message } );
+            var result = options.CreateBadRequest( context.Request, code, message, null );
             await result.ExecuteResultAsync( actionContext );
         }
 

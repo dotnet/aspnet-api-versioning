@@ -203,7 +203,7 @@
             {
                 logger.LogInformation( ex.Message );
                 apiVersion = default( ApiVersion );
-                return new BadRequestHandler( "AmbiguousApiVersion", ex.Message );
+                return new BadRequestHandler( Options, "AmbiguousApiVersion", ex.Message );
             }
 
             return null;
@@ -251,7 +251,7 @@
             }
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( context.HttpContext.Request.GetDisplayUrl(), requestedVersion );
-            return new BadRequestHandler( code, message );
+            return new BadRequestHandler( Options, code, message );
         }
 
         private static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>

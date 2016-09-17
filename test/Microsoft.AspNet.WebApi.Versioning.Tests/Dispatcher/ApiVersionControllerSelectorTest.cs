@@ -51,6 +51,8 @@
             }
         }
 
+        private static Task<T> ReadAsErrorByExampleAsync<T>( HttpContent content, T example ) => content.ReadAsAsync<T>();
+
         [Theory]
         [MemberData( nameof( ControllerNameData ) )]
         public void get_controller_name_should_return_expected_value( HttpRequestMessage request, string expected )
@@ -219,12 +221,21 @@
 
             // act
             var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
-            var error = await response.Content.ReadAsAsync<HttpError>();
+            var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
-            error.Message.Should().Be( message );
-            error.MessageDetail.Should().Be( messageDetail );
+            content.ShouldBeEquivalentTo(
+                new
+                {
+                    Error = new
+                    {
+                        Code = "UnsupportedApiVersion",
+                        Message = message,
+                        InnerError = new { Message = messageDetail }
+                    }
+                },
+                options => options.ExcludingMissingMembers() );
         }
 
         [Fact]
@@ -250,12 +261,21 @@
 
             // act
             var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
-            var error = await response.Content.ReadAsAsync<HttpError>();
+            var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
-            error.Message.Should().Be( message );
-            error.MessageDetail.Should().Be( messageDetail );
+            content.ShouldBeEquivalentTo(
+                new
+                {
+                    Error = new
+                    {
+                        Code = "InvalidApiVersion",
+                        Message = message,
+                        InnerError = new { Message = messageDetail }
+                    }
+                },
+                options => options.ExcludingMissingMembers() );
         }
 
         [Fact]
@@ -282,12 +302,21 @@
 
             // act
             var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
-            var error = await response.Content.ReadAsAsync<HttpError>();
+            var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
-            error.Message.Should().Be( message );
-            error.MessageDetail.Should().Be( messageDetail );
+            content.ShouldBeEquivalentTo(
+                new
+                {
+                    Error = new
+                    {
+                        Code = "UnsupportedApiVersion",
+                        Message = message,
+                        InnerError = new { Message = messageDetail }
+                    }
+                },
+                options => options.ExcludingMissingMembers() );
         }
 
         [Fact]
@@ -314,12 +343,21 @@
 
             // act
             var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
-            var error = await response.Content.ReadAsAsync<HttpError>();
+            var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
-            error.Message.Should().Be( message );
-            error.MessageDetail.Should().Be( messageDetail );
+            content.ShouldBeEquivalentTo(
+                new
+                {
+                    Error = new
+                    {
+                        Code = "InvalidApiVersion",
+                        Message = message,
+                        InnerError = new { Message = messageDetail }
+                    }
+                },
+                options => options.ExcludingMissingMembers() );
         }
 
         [Theory]
@@ -348,12 +386,12 @@
 
             // act
             var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
-            var error = await response.Content.ReadAsAsync<HttpError>();
+            var content = await response.Content.ReadAsAsync<HttpError>();
 
             // assert
             response.StatusCode.Should().Be( NotFound );
-            error.Message.Should().Be( message );
-            error.MessageDetail.Should().Be( messageDetail );
+            content.Message.Should().Be( message );
+            content.MessageDetail.Should().Be( messageDetail );
         }
 
         [Fact]
