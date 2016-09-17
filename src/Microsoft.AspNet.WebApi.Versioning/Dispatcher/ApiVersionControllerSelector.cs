@@ -13,7 +13,6 @@
     using System.Web.Http.Dispatcher;
     using Versioning;
     using static Controllers.HttpControllerDescriptorComparer;
-    using static System.Net.HttpStatusCode;
     using static System.StringComparer;
 
     /// <summary>
@@ -165,8 +164,8 @@
             }
             catch ( AmbiguousApiVersionException ex )
             {
-                var error = new HttpError( ex.Message ) { ["Code"] = "AmbiguousApiVersion" };
-                throw new HttpResponseException( request.CreateErrorResponse( BadRequest, error ) );
+                var options = request.GetApiVersioningOptions();
+                throw new HttpResponseException( options.CreateBadRequest( request, "AmbiguousApiVersion", ex.Message, null ) );
             }
         }
     }
