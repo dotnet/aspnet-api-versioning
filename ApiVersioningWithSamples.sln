@@ -106,11 +106,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedODataWebApiSample",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByNamespaceWebApiSample", "samples\webapi\ByNamespaceWebApiSample\ByNamespaceWebApiSample.csproj", "{A02A4245-3AEB-4549-9037-D89DFDC7E74D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ConventionsSamples", "samples\aspnetcore\ConventionsSamples\ConventionsSamples.xproj", "{1EFC221F-35CF-4B55-BD59-240D5B808E14}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConventionsWebApiSample", "samples\webapi\ConventionsWebApiSample\ConventionsWebApiSample.csproj", "{C1F89961-7134-4D97-BA3A-2693FD1CBF4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConventionsODataWebApiSample", "samples\webapi\ConventionsODataWebApiSample\ConventionsODataWebApiSample.csproj", "{9A22600C-7768-4D16-B67D-514F55942FAF}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ConventionsSample", "samples\aspnetcore\ConventionsSample\ConventionsSample.xproj", "{1EFC221F-35CF-4B55-BD59-240D5B808E14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,10 +162,6 @@ Global
 		{A02A4245-3AEB-4549-9037-D89DFDC7E74D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A02A4245-3AEB-4549-9037-D89DFDC7E74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A02A4245-3AEB-4549-9037-D89DFDC7E74D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1F89961-7134-4D97-BA3A-2693FD1CBF4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1F89961-7134-4D97-BA3A-2693FD1CBF4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1F89961-7134-4D97-BA3A-2693FD1CBF4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -174,6 +170,10 @@ Global
 		{9A22600C-7768-4D16-B67D-514F55942FAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A22600C-7768-4D16-B67D-514F55942FAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A22600C-7768-4D16-B67D-514F55942FAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,8 +197,8 @@ Global
 		{D87E54CC-C2D6-4AE5-806D-AE825B051C66} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{E496EED0-F8C9-4FE9-83E6-75E47A3C41A1} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
 		{A02A4245-3AEB-4549-9037-D89DFDC7E74D} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
-		{1EFC221F-35CF-4B55-BD59-240D5B808E14} = {900DD210-8500-4D89-A05D-C9526935A719}
 		{C1F89961-7134-4D97-BA3A-2693FD1CBF4E} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
 		{9A22600C-7768-4D16-B67D-514F55942FAF} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
+		{1EFC221F-35CF-4B55-BD59-240D5B808E14} = {900DD210-8500-4D89-A05D-C9526935A719}
 	EndGlobalSection
 EndGlobal
