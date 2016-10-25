@@ -47,8 +47,9 @@
             var model = new ODataModelBuilder().GetEdmModel();
             var controller = new HttpControllerDescriptor( new HttpConfiguration(), string.Empty, typeof( NeutralController ) );
             var convention = new VersionedAttributeRoutingConvention( model, new HttpControllerDescriptor[0] );
+            var annotation = new ApiVersionAnnotation( new ApiVersion( 1, 0 ) );
 
-            model.SetAnnotationValue( model, new ApiVersion( 1, 0 ) );
+            model.SetAnnotationValue( model, annotation );
 
             // act
             var result = convention.ShouldMapController( controller );
@@ -66,8 +67,9 @@
             var model = new ODataModelBuilder().GetEdmModel();
             var controller = new HttpControllerDescriptor( new HttpConfiguration(), string.Empty, typeof( ControllerV1 ) );
             var convention = new VersionedAttributeRoutingConvention( model, new HttpControllerDescriptor[0] );
+            var annotation = new ApiVersionAnnotation( new ApiVersion( majorVersion, 0 ) );
 
-            model.SetAnnotationValue( model, new ApiVersion( majorVersion, 0 ) );
+            model.SetAnnotationValue( model, annotation );
 
             // act
             var result = convention.ShouldMapController( controller );

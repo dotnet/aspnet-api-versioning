@@ -20,7 +20,7 @@
 
         // GET ~/v3/people(1)
         // GET ~/api/people(1)?api-version=3.0
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "({id})" )]
         public IHttpActionResult Get( [FromODataUri] int id, ODataQueryOptions<Person> options ) =>
             Ok( new Person() { Id = id, FirstName = "Bill", LastName = "Mei", Email = "bill.mei@somewhere.com", Phone = "555-555-5555" } );
     }

@@ -67,7 +67,7 @@
 
             if ( routeDirection == UriGeneration )
             {
-                return true;
+                return base.Match( request, route, parameterName, values, routeDirection );
             }
 
             var requestedVersion = request.GetRequestedApiVersionOrReturnBadRequest();
@@ -112,7 +112,11 @@
             }
 
             var requestContext = request.GetRequestContext();
-            requestContext.Url = new VersionedUrlHelperDecorator( requestContext.Url, apiVersion );
+
+            if ( !( requestContext.Url is VersionedUrlHelperDecorator ) )
+            {
+                requestContext.Url = new VersionedUrlHelperDecorator( requestContext.Url, apiVersion );
+            }
         }
     }
 }

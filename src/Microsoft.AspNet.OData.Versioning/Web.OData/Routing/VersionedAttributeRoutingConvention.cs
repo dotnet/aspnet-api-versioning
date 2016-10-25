@@ -76,7 +76,7 @@
                 return true;
             }
 
-            var apiVersion = Model.GetAnnotationValue<ApiVersion>( Model );
+            var apiVersion = Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion;
 
             return apiVersion != null && versionModel.DeclaredApiVersions.Contains( apiVersion );
         }
