@@ -1,5 +1,5 @@
 ﻿{
-    "version": "2.0.0-*",
+    "version": "2.0.1-*",
     "authors": [ "Microsoft" ],
     "title": "Microsoft ASP.NET Web API Versioning for OData v4.0",
     "copyright": "Copyright \u00A9 2016. Microsoft Corporation. All rights reserved.",
@@ -7,7 +7,7 @@
     "language": "en",
 
     "dependencies": {
-        "Microsoft.AspNet.OData": "5.9.1",
+        "Microsoft.AspNet.OData": "[5.9.1,6.0.0)",
         "Microsoft.AspNet.WebApi.Versioning": "2.0.0-*"
     },
 
@@ -26,7 +26,7 @@
         "summary": "Provides API versioning for RESTful services created using ASP.NET Web API and OData v4.0",
         "tags": [ "Microsoft", "AspNet", "AspNetWebAPI", "OData", "Versioning" ],
         "owners": [ "Microsoft" ],
-        "releaseNotes": "",
+        "releaseNotes": "\u2022 Fixes route template parameter name binding (Issue #40)",
         "iconUrl": "http://go.microsoft.com/fwlink/?LinkID=288890",
         "licenseUrl": "https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE",
         "requireLicenseAcceptance": true,
