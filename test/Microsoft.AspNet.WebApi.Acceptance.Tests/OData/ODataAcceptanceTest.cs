@@ -8,6 +8,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Framework", "OData" )]
     public abstract class ODataAcceptanceTest : AcceptanceTest
     {
         protected ODataAcceptanceTest()

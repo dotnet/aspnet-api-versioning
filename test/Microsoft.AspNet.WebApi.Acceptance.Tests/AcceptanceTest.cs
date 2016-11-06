@@ -14,6 +14,7 @@
     using static System.Web.Http.IncludeErrorDetailPolicy;
 
     [Trait( "Kind", "Acceptance" )]
+    [Trait( "Framework", "Web API" )]
     public abstract class AcceptanceTest : IDisposable
     {
         private sealed class FilteredControllerTypeResolver : List<Type>, IHttpControllerTypeResolver

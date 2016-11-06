@@ -19,7 +19,8 @@
     using static System.Net.Http.HttpMethod;
 
     [Trait( "Kind", "Acceptance" )]
-    public abstract class AcceptanceTest
+    [Trait( "Framework", "ASP.NET Core" )]
+    public abstract class AcceptanceTest : IDisposable
     {
         private const string JsonMediaType = "application/json";
         private static readonly HttpMethod Patch = new HttpMethod( "PATCH" );

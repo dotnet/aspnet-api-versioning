@@ -154,20 +154,11 @@
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
             Contract.Ensures( Contract.Result<ILookup<string, HttpActionDescriptor>>() != null );
 
-            var internalSelector = GetInternalSelector( controllerDescriptor );
-            var actionMappings = new List<ILookup<string, HttpActionDescriptor>>();
+            var actionMappings = ( from descriptor in controllerDescriptor.AsEnumerable()
+                                   let selector = GetInternalSelector( descriptor )
+                                   select selector.GetActionMapping() ).ToArray();
 
-            actionMappings.Add( internalSelector.GetActionMapping() );
-
-            foreach ( var relatedControllerDescriptor in controllerDescriptor.GetRelatedCandidates() )
-            {
-                if ( relatedControllerDescriptor != controllerDescriptor )
-                {
-                    actionMappings.Add( GetInternalSelector( relatedControllerDescriptor ).GetActionMapping() );
-                }
-            }
-
-            return actionMappings.Count == 1 ? actionMappings[0] : new AggregatedActionMapping( actionMappings );
+            return actionMappings.Length == 1 ? actionMappings[0] : new AggregatedActionMapping( actionMappings );
         }
     }
 }
