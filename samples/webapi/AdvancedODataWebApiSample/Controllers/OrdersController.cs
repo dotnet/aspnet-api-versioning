@@ -4,9 +4,6 @@
     using Models;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
 
     // note: since the application is configured with AssumeDefaultVersionWhenUnspecifed, this controller
     // is implicitly versioned to the DefaultApiVersion, which has the default value 1.0.

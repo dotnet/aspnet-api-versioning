@@ -19,7 +19,6 @@ namespace Microsoft.Examples
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
 
-            configuration.MapHttpAttributeRoutes();
             configuration.AddApiVersioning(
                 o =>
                 {
@@ -51,7 +50,6 @@ namespace Microsoft.Examples
 
             configuration.MapVersionedODataRoutes( "odata", "api", models, batchHandler );
             configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{id}", new { id = Optional } );
-
             appBuilder.UseWebApi( httpServer );
         }
     }
