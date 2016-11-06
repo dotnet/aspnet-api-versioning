@@ -112,6 +112,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConventionsODataWebApiSampl
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ConventionsSample", "samples\aspnetcore\ConventionsSample\ConventionsSample.xproj", "{1EFC221F-35CF-4B55-BD59-240D5B808E14}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.WebApi.Acceptance.Tests", "test\Microsoft.AspNet.WebApi.Acceptance.Tests\Microsoft.AspNet.WebApi.Acceptance.Tests.xproj", "{5C31964D-EA8B-420B-9297-5ADFEFE54962}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Mvc.Acceptance.Tests", "test\Microsoft.AspNetCore.Mvc.Acceptance.Tests\Microsoft.AspNetCore.Mvc.Acceptance.Tests.xproj", "{4EED304C-D1A6-4866-8D7F-450D084FD25D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -174,6 +178,14 @@ Global
 		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EFC221F-35CF-4B55-BD59-240D5B808E14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C31964D-EA8B-420B-9297-5ADFEFE54962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C31964D-EA8B-420B-9297-5ADFEFE54962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C31964D-EA8B-420B-9297-5ADFEFE54962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C31964D-EA8B-420B-9297-5ADFEFE54962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,5 +212,7 @@ Global
 		{C1F89961-7134-4D97-BA3A-2693FD1CBF4E} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
 		{9A22600C-7768-4D16-B67D-514F55942FAF} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
 		{1EFC221F-35CF-4B55-BD59-240D5B808E14} = {900DD210-8500-4D89-A05D-C9526935A719}
+		{5C31964D-EA8B-420B-9297-5ADFEFE54962} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{4EED304C-D1A6-4866-8D7F-450D084FD25D} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 	EndGlobalSection
 EndGlobal
