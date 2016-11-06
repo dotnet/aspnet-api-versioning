@@ -19,7 +19,6 @@
             FilteredControllerTypes.Add( typeof( PeopleController ) );
             FilteredControllerTypes.Add( typeof( People2Controller ) );
 
-            Configuration.MapHttpAttributeRoutes();
             Configuration.AddApiVersioning(
                 options =>
                 {

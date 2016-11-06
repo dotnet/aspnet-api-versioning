@@ -107,11 +107,49 @@
         internal static void SetConventionsApiVersionModel( this HttpControllerDescriptor controllerDescriptor, ApiVersionModel model ) =>
             controllerDescriptor.Properties.AddOrUpdate( ConventionsApiVersionInfoKey, model, ( key, currentModel ) => ( (ApiVersionModel) currentModel ).Aggregate( model ) );
 
-        internal static IEnumerable<HttpControllerDescriptor> GetRelatedCandidates( this HttpControllerDescriptor controllerDescriptor ) =>
-            (IEnumerable<HttpControllerDescriptor>) controllerDescriptor.Properties.GetOrAdd( RelatedControllerCandidatesKey, key => Enumerable.Empty<HttpControllerDescriptor>() );
-
         internal static void SetRelatedCandidates( this HttpControllerDescriptor controllerDescriptor, IEnumerable<HttpControllerDescriptor> value ) =>
             controllerDescriptor.Properties.AddOrUpdate( RelatedControllerCandidatesKey, value, ( key, oldValue ) => value );
+
+        internal static IEnumerable<HttpControllerDescriptor> AsEnumerable( this HttpControllerDescriptor controllerDescriptor )
+        {
+            IEnumerable<HttpControllerDescriptor> relatedCandidates;
+
+            if ( controllerDescriptor.Properties.TryGetValue( RelatedControllerCandidatesKey, out relatedCandidates ) )
+            {
+                using ( var relatedControllerDescriptors = relatedCandidates.GetEnumerator() )
+                {
+                    if ( relatedControllerDescriptors.MoveNext() )
+                    {
+                        yield return controllerDescriptor;
+
+                        do
+                        {
+                            if ( relatedControllerDescriptors.Current != controllerDescriptor )
+                            {
+                                yield return relatedControllerDescriptors.Current;
+                            }
+                        }
+                        while ( relatedControllerDescriptors.MoveNext() );
+
+                        yield break;
+                    }
+                }
+            }
+
+            var groupedControllerDescriptors = controllerDescriptor as IEnumerable<HttpControllerDescriptor>;
+
+            if ( groupedControllerDescriptors == null )
+            {
+                yield return controllerDescriptor;
+            }
+            else
+            {
+                foreach ( var groupedControllerDescriptor in groupedControllerDescriptors )
+                {
+                    yield return groupedControllerDescriptor;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the controller is API version neutral.

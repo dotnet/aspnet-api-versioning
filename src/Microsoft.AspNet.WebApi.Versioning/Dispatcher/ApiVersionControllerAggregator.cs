@@ -118,7 +118,7 @@
 
             var value = default( object );
 
-            if ( dataTokens.TryGetValue( "controller", out value ) )
+            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Controller, out value ) )
             {
                 var controllerDescriptor = value as HttpControllerDescriptor;
 
@@ -130,7 +130,7 @@
                 yield break;
             }
 
-            if ( dataTokens.TryGetValue( "actions", out value ) )
+            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out value ) )
             {
                 var actionDescriptors = value as HttpActionDescriptor[];
 
