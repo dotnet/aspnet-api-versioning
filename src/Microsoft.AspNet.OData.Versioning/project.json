@@ -8,7 +8,7 @@
 
     "dependencies": {
         "Microsoft.AspNet.OData": "[5.9.1,6.0.0)",
-        "Microsoft.AspNet.WebApi.Versioning": "2.0.0-*"
+        "Microsoft.AspNet.WebApi.Versioning": "2.0.1-*"
     },
 
     "frameworks": {
