@@ -55,12 +55,6 @@
         protected ApiVersioningOptions Options => options.Value;
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <value></value>
-        protected IApiVersionReader ApiVersionReader => Options.ApiVersionReader;
-
-        /// <summary>
         /// Gets the API version selector associated with the action selector.
         /// </summary>
         /// <value>The <see cref="IApiVersionSelector">API version selector</see> used to select the default

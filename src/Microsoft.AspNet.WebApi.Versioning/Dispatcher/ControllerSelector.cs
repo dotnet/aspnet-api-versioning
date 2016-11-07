@@ -15,8 +15,6 @@
 
         protected bool AssumeDefaultVersionWhenUnspecified => options.AssumeDefaultVersionWhenUnspecified;
 
-        protected IApiVersionReader ApiVersionReader => options.ApiVersionReader;
-
         protected IApiVersionSelector ApiVersionSelector => options.ApiVersionSelector;
 
         internal abstract ControllerSelectionResult SelectController( ApiVersionControllerAggregator aggregator );
