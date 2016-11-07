@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
             controllerModel.SetProperty( model );
 
-            return new ControllerVersionInfo( supportedVersions, deprecatedAdvertisedVersions, advertisedVersions, deprecatedAdvertisedVersions );
+            return new ControllerVersionInfo( supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions );
         }
 
         private void MergeAttributesWithConventions( ControllerModel controllerModel )
@@ -56,6 +56,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             }
 
             var providers = controllerModel.Attributes.OfType<IApiVersionProvider>().ToArray();
+
+            if ( providers.Length == 0 )
+            {
+                return;
+            }
 
             supportedVersions.UnionWith( from provider in providers
                                          where !provider.AdvertiseOnly && !provider.Deprecated

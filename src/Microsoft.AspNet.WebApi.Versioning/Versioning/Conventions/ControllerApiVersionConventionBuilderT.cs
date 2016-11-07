@@ -49,6 +49,11 @@
 
             var providers = controllerDescriptor.GetCustomAttributes<IApiVersionProvider>().ToArray();
 
+            if ( providers.Length == 0 )
+            {
+                return;
+            }
+
             supportedVersions.UnionWith( from provider in providers
                                          where !provider.AdvertiseOnly && !provider.Deprecated
                                          from version in provider.Versions

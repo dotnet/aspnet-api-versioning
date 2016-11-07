@@ -14,31 +14,41 @@
     public class _a_url_versioned_ApiController_using_conventions : ConventionsAcceptanceTest
     {
         [Theory]
-        [InlineData( "api/v1/helloworld", "1", null )]
-        [InlineData( "api/v2/helloworld", "2", null )]
-        [InlineData( "api/v1/helloworld/42", "1", "42" )]
-        [InlineData( "api/v2/helloworld/42", "2", "42" )]
-        public async Task _get_should_return_200( string requestUrl, string apiVersion, string id )
+        [InlineData( "api/v1/helloworld", nameof( HelloWorldController ), "1" )]
+        [InlineData( "api/v2/helloworld", nameof( HelloWorld2Controller ), "2" )]
+        [InlineData( "api/v3/helloworld", nameof( HelloWorld2Controller ), "3" )]
+        public async Task _get_should_return_200( string requestUrl, string controllerName, string apiVersion )
         {
             // arrange
-            var body = new Dictionary<string, string>()
-            {
-                ["controller"] = nameof( HelloWorldController ),
-                ["version"] = apiVersion
-            };
-
-            if ( !string.IsNullOrEmpty( id ) )
-            {
-                body["id"] = id;
-            }
+            var example = new { controller = "", version = "" };
 
             // act
             var response = await GetAsync( requestUrl ).EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsAsync<IDictionary<string, string>>();
+            var content = await response.Content.ReadAsExampleAsync( example );
 
             // assert
-            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
-            content.ShouldBeEquivalentTo( body );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
+            content.ShouldBeEquivalentTo( new { controller = controllerName, version = apiVersion } );
+        }
+
+        [Theory]
+        [InlineData( "api/v1/helloworld/42", nameof( HelloWorldController ), "1" )]
+        [InlineData( "api/v2/helloworld/42", nameof( HelloWorld2Controller ), "2" )]
+        [InlineData( "api/v3/helloworld/42", nameof( HelloWorld2Controller ), "3" )]
+        public async Task _get_with_id_should_return_200( string requestUrl, string controllerName, string apiVersion )
+        {
+            // arrange
+            var example = new { controller = "", version = "", id = "" };
+
+            // act
+            var response = await GetAsync( requestUrl ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
+
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
+            content.ShouldBeEquivalentTo( new { controller = controllerName, version = apiVersion, id = "42" } );
         }
 
         [Fact]
@@ -48,7 +58,7 @@
 
 
             // act
-            var response = await GetAsync( "api/v3/helloworld" );
+            var response = await GetAsync( "api/v4/helloworld" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
