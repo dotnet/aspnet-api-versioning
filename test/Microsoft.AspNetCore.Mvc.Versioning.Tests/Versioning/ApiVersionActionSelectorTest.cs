@@ -12,11 +12,13 @@
     using Simulators;
     using System;
     using System.Linq;
+    using System.Net.Http;
     using System.Reflection;
     using System.Threading.Tasks;
     using Xunit;
     using static ApiVersion;
     using static System.Environment;
+    using static System.Net.Http.HttpMethod;
     using static System.Net.HttpStatusCode;
 
     public partial class ApiVersionActionSelectorTest
@@ -167,6 +169,22 @@
             {
                 // act
                 var response = await server.Client.GetAsync( requestUri );
+
+                // assert
+                response.StatusCode.Should().Be( NotFound );
+            }
+        }
+
+        [Fact]
+        public async Task select_best_candidate_should_return_404_for_unmatched_action()
+        {
+            // arrange
+            var request = new HttpRequestMessage( Post, "api/attributed?api-version=1.0" );
+
+            using ( var server = new WebServer() )
+            {
+                // act
+                var response = await server.Client.SendAsync( request );
 
                 // assert
                 response.StatusCode.Should().Be( NotFound );

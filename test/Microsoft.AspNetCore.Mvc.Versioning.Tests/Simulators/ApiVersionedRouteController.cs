@@ -9,6 +9,7 @@
     [Route( "api/v{version:apiVersion}/attributed" )]
     public sealed class ApiVersionedRouteController : Controller
     {
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
     }
 }

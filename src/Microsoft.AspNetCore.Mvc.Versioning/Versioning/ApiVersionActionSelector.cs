@@ -13,7 +13,6 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Threading.Tasks;
     using static ApiVersion;
     using static System.Environment;
     using static System.String;
@@ -24,6 +23,7 @@
     [CLSCompliant( false )]
     public class ApiVersionActionSelector : IActionSelector
     {
+        private static readonly IReadOnlyList<ActionDescriptor> NoMatches = new ActionDescriptor[0];
         private readonly IActionSelectorDecisionTreeProvider decisionTreeProvider;
         private readonly ActionConstraintCache actionConstraintCache;
         private readonly IOptions<ApiVersioningOptions> options;
@@ -111,6 +111,7 @@
             else if ( finalMatches.Count == 1 )
             {
                 var selectedAction = finalMatches[0];
+                selectedAction.AggregateAllVersions( selectionContext );
                 httpContext.SetRequestedApiVersion( selectionContext.RequestedVersion );
                 return selectedAction;
             }
@@ -172,15 +173,10 @@
                 return bestMatches;
             }
 
-            var match = bestMatches[0];
-
-            if ( match.IsApiVersionNeutral() )
+            if ( bestMatches[0].IsApiVersionNeutral() )
             {
                 bestMatches.AddRange( implicitMatches );
-                return bestMatches;
             }
-
-            match.AggregateAllVersions( context );
 
             return bestMatches;
         }
@@ -281,6 +277,7 @@
         {
             Contract.Requires( context != null );
             Contract.Requires( actions != null );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
 
             var candidates = new List<ActionSelectorCandidate>();
 
@@ -292,22 +289,13 @@
             }
 
             var matches = EvaluateActionConstraintsCore( context, candidates, startingOrder: null );
-            var results = default( List<ActionDescriptor> );
 
             if ( matches == null )
             {
-                return results;
+                return NoMatches;
             }
 
-            results = new List<ActionDescriptor>( matches.Count );
-
-            for ( var i = 0; i < matches.Count; i++ )
-            {
-                var candidate = matches[i];
-                results.Add( candidate.Action );
-            }
-
-            return results;
+            return matches.Select( candidate => candidate.Action ).ToArray();
         }
 
         private IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )

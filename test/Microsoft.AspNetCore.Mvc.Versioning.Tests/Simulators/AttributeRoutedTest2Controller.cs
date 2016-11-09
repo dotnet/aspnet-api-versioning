@@ -9,8 +9,10 @@
     [Route( "api/attributed" )]
     public sealed class AttributeRoutedTest2Controller : Controller
     {
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
 
+        [HttpGet]
         [MapToApiVersion( "3.0" )]
         public Task<string> GetV3() => Task.FromResult( "Test" );
     }

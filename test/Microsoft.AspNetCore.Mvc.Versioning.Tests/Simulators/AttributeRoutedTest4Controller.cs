@@ -9,6 +9,7 @@
     [Route( "api/attributed" )]
     public sealed class AttributeRoutedTest4Controller : Controller
     {
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
     }
 }

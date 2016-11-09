@@ -5,6 +5,7 @@
     [ApiVersion( "3.0" )]
     public class AgreementsController : Controller
     {
+        [HttpGet]
         public IActionResult Get( string accountId ) => Ok( new Agreement( GetType().FullName, accountId, HttpContext.GetRequestedApiVersion().ToString() ) );
     }
 }
