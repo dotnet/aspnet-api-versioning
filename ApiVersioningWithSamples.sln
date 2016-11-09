@@ -116,6 +116,19 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.WebApi.Acc
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Mvc.Acceptance.Tests", "test\Microsoft.AspNetCore.Mvc.Acceptance.Tests\Microsoft.AspNetCore.Mvc.Acceptance.Tests.xproj", "{4EED304C-D1A6-4866-8D7F-450D084FD25D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conventions", "Conventions", "{2ABB1DE5-8E77-440D-9517-4A5E6877D1C5}"
+	ProjectSection(SolutionItems) = preProject
+		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderCollectionT.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderCollectionT.cs
+		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderT.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderT.cs
+		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs
+		src\Common\Versioning\Conventions\ActionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ActionConventionBuilderTExtensions.cs
+		src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs = src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs
+		src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs
+		src\Common\Versioning\Conventions\ExpressionExtensions.cs = src\Common\Versioning\Conventions\ExpressionExtensions.cs
+		src\Common\Versioning\Conventions\IActionConventionBuilderT.cs = src\Common\Versioning\Conventions\IActionConventionBuilderT.cs
+		src\Common\Versioning\Conventions\IApiVersionConventionT.cs = src\Common\Versioning\Conventions\IApiVersionConventionT.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -214,5 +227,6 @@ Global
 		{1EFC221F-35CF-4B55-BD59-240D5B808E14} = {900DD210-8500-4D89-A05D-C9526935A719}
 		{5C31964D-EA8B-420B-9297-5ADFEFE54962} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{2ABB1DE5-8E77-440D-9517-4A5E6877D1C5} = {DE4EE45F-F8EA-4B32-B16F-441F946ACEF4}
 	EndGlobalSection
 EndGlobal
