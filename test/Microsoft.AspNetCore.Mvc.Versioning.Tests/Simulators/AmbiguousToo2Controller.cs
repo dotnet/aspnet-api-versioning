@@ -7,6 +7,7 @@
     [ControllerName( "AmbiguousToo" )]
     public sealed class AmbiguousToo2Controller : Controller
     {
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
     }
 }

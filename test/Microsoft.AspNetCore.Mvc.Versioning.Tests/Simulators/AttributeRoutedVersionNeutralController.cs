@@ -7,6 +7,7 @@
     [Route( "api/attributed-neutral" )]
     public sealed class AttributeRoutedVersionNeutralController : Controller
     {
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
     }
 }

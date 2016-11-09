@@ -7,6 +7,7 @@
     [Route( "api/attributed-ambiguous" )]
     public sealed class AttributeRoutedAmbiguousNeutralController : Controller
     {
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
     }
 }

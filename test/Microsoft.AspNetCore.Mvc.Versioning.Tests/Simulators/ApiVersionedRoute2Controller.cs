@@ -8,9 +8,11 @@
     [Route( "api/v{version:apiVersion}/attributed" )]
     public sealed class ApiVersionedRoute2Controller : Controller
     {
+        [HttpGet]
         [MapToApiVersion( "4.0" )]
         public Task<string> GetV4() => Task.FromResult( "Test" );
-        
+
+        [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );
     }
 }
