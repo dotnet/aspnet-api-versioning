@@ -1,5 +1,5 @@
 ﻿{
-    "version": "2.0.1-*",
+    "version": "2.0.2-*",
     "authors": [ "Microsoft" ],
     "title": "Microsoft ASP.NET Web API Versioning",
     "copyright": "Copyright \u00A9 2016. Microsoft Corporation. All rights reserved.",
@@ -26,7 +26,7 @@
         "summary": "Provides API versioning for RESTful services created using ASP.NET Web API",
         "tags": [ "Microsoft", "AspNet", "AspNetWebAPI", "Versioning" ],
         "owners": [ "Microsoft" ],
-        "releaseNotes": "\u2022 Fixed InvalidCastException in attribute-routing (Issue #44)",
+        "releaseNotes": "\u2022 Fixed mapping of API-versioned actions by convention (Issue #55)",
         "iconUrl": "http://go.microsoft.com/fwlink/?LinkID=288890",
         "licenseUrl": "https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE",
         "requireLicenseAcceptance": true,

@@ -22,6 +22,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         private readonly HashSet<ApiVersion> deprecatedAdvertisedVersions = new HashSet<ApiVersion>();
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ControllerApiVersionConventionBuilder{T}"/> class.
+        /// </summary>
+        public ControllerApiVersionConventionBuilder()
+        {
+            ActionBuilders = new ActionApiVersionConventionBuilderCollection<T>( this );
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the current controller is API version-neutral.
         /// </summary>
         /// <value>True if the current controller is API version-neutral; otherwise, false. The default value is <c>false</c>.</value>
@@ -54,10 +62,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <summary>
         /// Gets a collection of controller action convention builders.
         /// </summary>
-        /// <value>A <see cref="IDictionary{TKey, TValue}">collection</see> of
+        /// <value>A <see cref="ActionApiVersionConventionBuilderCollection{T}">collection</see> of
         /// <see cref="ActionApiVersionConventionBuilder{T}">controller action convention builders</see>.</value>
-        protected IDictionary<int, ActionApiVersionConventionBuilder<T>> ActionBuilders { get; } =
-            new Dictionary<int, ActionApiVersionConventionBuilder<T>>();
+        protected virtual ActionApiVersionConventionBuilderCollection<T> ActionBuilders { get; }
 
         /// <summary>
         /// Indicates that the controller is API version-neutral.
@@ -136,16 +143,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         {
             Arg.NotNull( actionMethod, nameof( actionMethod ) );
             Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder<T>>() != null );
-
-            var key = actionMethod.GetHashCode();
-            var actionBuilder = default( ActionApiVersionConventionBuilder<T> );
-
-            if ( !ActionBuilders.TryGetValue( key, out actionBuilder ) )
-            {
-                ActionBuilders[key] = actionBuilder = new ActionApiVersionConventionBuilder<T>( this );
-            }
-
-            return actionBuilder;
+            return ActionBuilders.GetOrAdd( actionMethod );
         }
     }
 }

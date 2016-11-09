@@ -13,63 +13,42 @@
 
     public class _a_url_versioned_Controller_using_conventions : ConventionsAcceptanceTest
     {
-        [Fact]
-        public async Task _get_should_return_200()
+        [Theory]
+        [InlineData( "api/v1/helloworld", nameof( HelloWorldController ), "1" )]
+        [InlineData( "api/v2/helloworld", nameof( HelloWorld2Controller ), "2" )]
+        [InlineData( "api/v3/helloworld", nameof( HelloWorld2Controller ), "3" )]
+        public async Task _get_should_return_200( string requestUrl, string controllerName, string apiVersion )
         {
-            // REMARKS: this test should be a theory, but when it is, it becomes flaky. any failure succeeds when run again.
-            // the exact cause is unknown, but seems to be related to some form of caching. running a loop in a single test
-            // case seems to resolve the problem.
-
             // arrange
-            var iterations = new[]
-            {
-                new { RequestUrl = "api/v1/helloworld", ControllerName = nameof( HelloWorldController ), ApiVersion = "1" },
-                new { RequestUrl = "api/v2/helloworld", ControllerName = nameof( HelloWorld2Controller ), ApiVersion = "2" },
-                new { RequestUrl = "api/v3/helloworld", ControllerName = nameof( HelloWorld2Controller ), ApiVersion = "3" },
-            };
             var example = new { controller = "", version = "" };
 
-            foreach ( var iteration in iterations )
-            {
-                // act
-                var response = await GetAsync( iteration.RequestUrl ).EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsExampleAsync( example );
+            // act
+            var response = await GetAsync( requestUrl ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
 
-                // assert
-                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
-                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
-                content.ShouldBeEquivalentTo( new { controller = iteration.ControllerName, version = iteration.ApiVersion } );
-            }
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
+            content.ShouldBeEquivalentTo( new { controller = controllerName, version = apiVersion } );
         }
 
-        [Fact]
-        public async Task _get_with_id_should_return_200()
+        [Theory]
+        [InlineData( "api/v1/helloworld/42", nameof( HelloWorldController ), "1" )]
+        [InlineData( "api/v2/helloworld/42", nameof( HelloWorld2Controller ), "2" )]
+        [InlineData( "api/v3/helloworld/42", nameof( HelloWorld2Controller ), "3" )]
+        public async Task _get_with_id_should_return_200( string requestUrl, string controllerName, string apiVersion )
         {
-            // REMARKS: this test should be a theory, but when it is, it becomes flaky. any failure succeeds when run again.
-            // the exact cause is unknown, but seems to be related to some form of caching. running a loop in a single test
-            // case seems to resolve the problem.
-
-            // arrange
-            var iterations = new[]
-            {
-                new { RequestUrl = "api/v1/helloworld/42", ControllerName = nameof( HelloWorldController ), ApiVersion = "1" },
-                new { RequestUrl = "api/v2/helloworld/42", ControllerName = nameof( HelloWorld2Controller ), ApiVersion = "2" },
-                new { RequestUrl = "api/v3/helloworld/42", ControllerName = nameof( HelloWorld2Controller ), ApiVersion = "3" },
-            };
-
+            // act
             var example = new { controller = "", version = "", id = "" };
 
-            foreach ( var iteration in iterations )
-            {
-                // act
-                var response = await GetAsync( iteration.RequestUrl ).EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsExampleAsync( example );
+            // act
+            var response = await GetAsync( requestUrl ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
 
-                // assert
-                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
-                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
-                content.ShouldBeEquivalentTo( new { controller = iteration.ControllerName, version = iteration.ApiVersion, id = "42" } );
-            }
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
+            content.ShouldBeEquivalentTo( new { controller = controllerName, version = apiVersion, id = "42" } );
         }
 
         [Fact]

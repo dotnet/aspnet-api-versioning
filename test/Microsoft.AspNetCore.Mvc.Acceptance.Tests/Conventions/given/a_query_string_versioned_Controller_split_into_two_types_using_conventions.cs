@@ -12,32 +12,22 @@
 
     public class _a_query_string_versioned_Controller_split_into_two_types_using_conventions : ConventionsAcceptanceTest
     {
-        [Fact]
-        public async Task _get_should_return_200()
+        [Theory]
+        [InlineData( nameof( ValuesController ), "1.0" )]
+        [InlineData( nameof( Values2Controller ), "2.0" )]
+        [InlineData( nameof( Values2Controller ), "3.0" )]
+        public async Task _get_should_return_200( string controller, string apiVersion )
         {
-            // REMARKS: this test should be a theory, but when it is, it becomes flaky. any failure succeeds when run again.
-            // the exact cause is unknown, but seems to be related to some form of caching. running a loop in a single test
-            // case seems to resolve the problem.
-
             // arrange
-            var iterations = new[]
-            {
-                new { Controller = nameof( ValuesController),  ApiVersion = "1.0" },
-                new { Controller = nameof( Values2Controller), ApiVersion = "2.0" },
-                new { Controller = nameof( Values2Controller), ApiVersion = "3.0" }
-            };
             var example = new { controller = "", version = "" };
 
-            foreach ( var iteration in iterations )
-            {
-                // act
-                var response = await GetAsync( $"api/values?api-version={iteration.ApiVersion}" ).EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsExampleAsync( example );
+            // act
+            var response = await GetAsync( $"api/values?api-version={apiVersion}" ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
 
-                // assert
-                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
-                content.ShouldBeEquivalentTo( new { controller = iteration.Controller, version = iteration.ApiVersion } );
-            }
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
+            content.ShouldBeEquivalentTo( new { controller = controller, version = apiVersion } );
         }
 
         [Fact]

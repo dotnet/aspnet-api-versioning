@@ -16,7 +16,7 @@
         {
             internal bool ProtectedVersionNeutral => VersionNeutral;
 
-            internal IDictionary<int, ActionApiVersionConventionBuilder<IHttpController>> ProtectedActionBuilders => ActionBuilders;
+            internal ActionApiVersionConventionBuilderCollection<IHttpController> ProtectedActionBuilders => ActionBuilders;
         }
 
         private sealed class UndecoratedController : ApiController
@@ -70,7 +70,7 @@
             var actionBuilder = controllerBuilder.Action( method );
 
             // assert
-            controllerBuilder.ProtectedActionBuilders.Values.Single().Should().BeSameAs( actionBuilder );
+            controllerBuilder.ProtectedActionBuilders.Single().Should().BeSameAs( actionBuilder );
         }
 
         [Fact]
@@ -86,7 +86,7 @@
 
             // assert
             actionBuilder.Should().BeSameAs( originalActionBuilder );
-            controllerBuilder.ProtectedActionBuilders.Values.Single().Should().BeSameAs( actionBuilder );
+            controllerBuilder.ProtectedActionBuilders.Single().Should().BeSameAs( actionBuilder );
         }
 
         [Fact]

@@ -84,7 +84,7 @@
 
             foreach ( var actionDescriptor in actionDescriptors )
             {
-                var key = actionDescriptor.MethodInfo.GetHashCode();
+                var key = actionDescriptor.MethodInfo;
                 var actionBuilder = default( ActionApiVersionConventionBuilder<T> );
 
                 if ( ActionBuilders.TryGetValue( key, out actionBuilder ) )

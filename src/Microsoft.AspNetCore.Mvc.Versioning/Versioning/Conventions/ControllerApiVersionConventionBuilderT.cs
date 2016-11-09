@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
             foreach ( var action in controller.Actions )
             {
-                var key = action.ActionMethod.GetHashCode();
+                var key = action.ActionMethod;
                 var actionBuilder = default( ActionApiVersionConventionBuilder<T> );
 
                 action.SetProperty( controller );
