@@ -8,8 +8,8 @@
     [ApiVersion( "1.0" )]
     public class AgreementsController : ApiController
     {
-        // GET ~/v1/agreements
-        // GET ~/agreements?api-version=1.0
+        // GET ~/v1/agreements/{accountId}
+        // GET ~/agreements/{accountId}?api-version=1.0
         public IHttpActionResult Get( string accountId ) => Ok( new Agreement( GetType().FullName, accountId, Request.GetRequestedApiVersion().ToString() ) );
     }
 }

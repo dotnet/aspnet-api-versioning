@@ -21,13 +21,13 @@ namespace Microsoft.Examples
             configuration.Routes.MapHttpRoute(
                 "VersionedQueryString",
                 "api/{controller}/{accountId}",
-                new { accountId = Optional } );
+                defaults: null );
 
             configuration.Routes.MapHttpRoute(
                 "VersionedUrl",
                 "v{apiVersion}/{controller}/{accountId}",
-                new { accountId = Optional },
-                new { apiVersion = new ApiVersionRouteConstraint() } );
+                defaults: null,
+                constraints: new { apiVersion = new ApiVersionRouteConstraint() } );
 
             builder.UseWebApi( httpServer );
         }
