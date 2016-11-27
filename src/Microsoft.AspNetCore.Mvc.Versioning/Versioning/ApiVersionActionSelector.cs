@@ -101,7 +101,7 @@
 
             if ( finalMatches == null || finalMatches.Count == 0 )
             {
-                if ( ( badRequest = IsValidRequest( selectionContext ) ) != null )
+                if ( ( badRequest = IsValidRequest( selectionContext, candidates ) ) != null )
                 {
                     context.Handler = badRequest;
                 }
@@ -199,11 +199,12 @@
             return null;
         }
 
-        private BadRequestHandler IsValidRequest( ActionSelectionContext context )
+        private BadRequestHandler IsValidRequest( ActionSelectionContext context, IReadOnlyList<ActionDescriptor> candidates )
         {
             Contract.Requires( context != null );
+            Contract.Requires( candidates != null );
 
-            if ( !context.MatchingActions.Any() )
+            if ( !context.MatchingActions.Any() && !candidates.Any() )
             {
                 return null;
             }
@@ -219,8 +220,9 @@
 
                 if ( IsNullOrEmpty( requestedVersion ) )
                 {
+                    code = "ApiVersionUnspecified";
                     logger.ApiVersionUnspecified( actionNames.Value );
-                    return null;
+                    return new BadRequestHandler( Options, code, SR.ApiVersionUnspecified );
                 }
                 else if ( TryParse( requestedVersion, out parsedVersion ) )
                 {

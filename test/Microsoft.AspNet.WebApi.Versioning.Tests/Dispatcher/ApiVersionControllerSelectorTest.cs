@@ -395,6 +395,67 @@
         }
 
         [Fact]
+        public void select_controller_should_return_400_when_no_version_is_specified_and_controller_could_be_matched()
+        {
+            // arrange
+            var configuration = AttributeRoutingEnabledConfiguration;
+            var request = new HttpRequestMessage( Get, "http://localhost/api/test" );
+
+            configuration.AddApiVersioning();
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+
+            var selector = configuration.Services.GetHttpControllerSelector();
+            Action selectAction = () => selector.SelectController( request );
+
+            // act
+            var response = selectAction.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+
+            // assert
+            response.StatusCode.Should().Be( BadRequest );
+        }
+
+        [Fact]
+        public void select_controller_should_return_400_for_unmatched_action()
+        {
+            // arrange
+            var configuration = AttributeRoutingEnabledConfiguration;
+            var request = new HttpRequestMessage( Post, "http://localhost/api/test?api-version=1.0" );
+
+            configuration.AddApiVersioning();
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            var controllerDescriptor = configuration.Services.GetHttpControllerSelector().SelectController( request );
+            var controllerContext = new HttpControllerContext( configuration, routeData, request )
+            {
+                ControllerDescriptor = controllerDescriptor,
+                RequestContext = new HttpRequestContext()
+                {
+                    Configuration = configuration,
+                    RouteData = routeData
+                }
+            };
+            var actionSelector = configuration.Services.GetActionSelector();
+            Action selectAction = () => actionSelector.SelectAction( controllerContext );
+
+            // act
+            var response = selectAction.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+
+            // assert
+            response.StatusCode.Should().Be( BadRequest );
+        }
+
+        [Fact]
         public void select_controller_should_assume_1X2E0_for_attributeX2Dbased_controller_when_allowed()
         {
             // arrange

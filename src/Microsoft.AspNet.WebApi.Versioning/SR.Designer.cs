@@ -150,6 +150,15 @@ namespace Microsoft.Web.Http {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to An API version is required, but was not specified..
+        /// </summary>
+        public static string ApiVersionUnspecified {
+            get {
+                return ResourceManager.GetString("ApiVersionUnspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to No route providing a controller name was found to match request URI &apos;{0}&apos;..
         /// </summary>
         public static string ControllerNameNotFound {

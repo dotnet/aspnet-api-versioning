@@ -1,5 +1,5 @@
 {
-    "version": "1.0.2-*",
+    "version": "1.0.3-*",
     "authors": [ "Microsoft" ],
     "title": "Microsoft ASP.NET Core API Versioning",
     "copyright": "Copyright \u00A9 2015. Microsoft Corporation. All rights reserved.",
@@ -30,7 +30,7 @@
         "summary": "Provides API versioning for RESTful services created using ASP.NET Core",
         "tags": [ "Microsoft", "AspNet", "AspNetCore", "Versioning" ],
         "owners": [ "Microsoft" ],
-        "releaseNotes": "\u2022 Fixed ArgumentNullException in ApiVersionActionSelector (Issue #52)\n\u2022 Fixed mapping of API-versioned actions by convention (Issue #55)",
+        "releaseNotes": "\u2022 Fixed responses when a version is unspecified (Issue #62)",
         "iconUrl": "http://go.microsoft.com/fwlink/?LinkID=288890",
         "licenseUrl": "https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE",
         "requireLicenseAcceptance": true,
