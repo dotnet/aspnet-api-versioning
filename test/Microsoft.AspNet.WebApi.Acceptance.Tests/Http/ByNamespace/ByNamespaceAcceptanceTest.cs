@@ -14,12 +14,12 @@
             Agreements
         }
 
-        protected ByNamespaceAcceptanceTest(SetupKind kind)
+        protected ByNamespaceAcceptanceTest( SetupKind kind )
         {
             switch ( kind )
             {
                 case SetupKind.HelloWorld:
-                    ConfigureHellWorld();
+                    ConfigureHelloWorld();
                     break;
                 case SetupKind.Agreements:
                     ConfigureAgreements();
@@ -50,7 +50,7 @@
 
         }
 
-        private void ConfigureHellWorld()
+        private void ConfigureHelloWorld()
         {
             FilteredControllerTypes.Add( typeof( Controllers.V1.HelloWorldController ) );
             FilteredControllerTypes.Add( typeof( Controllers.V2.HelloWorldController ) );
@@ -68,7 +68,7 @@
                     options.ReportApiVersions = true;
                     options.DefaultApiVersion = new ApiVersion( 2, 0 );
                     options.AssumeDefaultVersionWhenUnspecified = true;
-                } );   
+                } );
         }
     }
 }

@@ -114,6 +114,15 @@ namespace Microsoft.AspNetCore.Mvc {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to An API version is required, but was not specified..
+        /// </summary>
+        public static string ApiVersionUnspecified {
+            get {
+                return ResourceManager.GetString("ApiVersionUnspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to The expression &apos;{0}&apos; must refer to a controller action method..
         /// </summary>
         public static string InvalidActionMethodExpression {

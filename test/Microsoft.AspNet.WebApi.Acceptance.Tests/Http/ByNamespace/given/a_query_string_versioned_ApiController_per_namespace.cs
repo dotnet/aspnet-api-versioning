@@ -45,5 +45,20 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        [Fact]
+        public async Task _get_should_return_400_when_version_is_unspecified()
+        {
+            // arrange
+
+
+            // act
+            var response = await GetAsync( "api/agreements/42" );
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
+            // assert
+            response.StatusCode.Should().Be( BadRequest );
+            content.Error.Code.Should().Be( "ApiVersionUnspecified" );
+        }
     }
 }

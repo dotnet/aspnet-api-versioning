@@ -147,6 +147,9 @@
   <data name="ApiVersionNotSupported" xml:space="preserve">
     <value>The requested API version '{0}' is not supported.</value>
   </data>
+  <data name="ApiVersionUnspecified" xml:space="preserve">
+    <value>An API version is required, but was not specified.</value>
+  </data>
   <data name="ControllerNameNotFound" xml:space="preserve">
     <value>No route providing a controller name was found to match request URI '{0}'.</value>
   </data>

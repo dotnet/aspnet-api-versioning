@@ -5,44 +5,16 @@
 
     internal sealed class ControllerSelectionResult
     {
-        internal HttpControllerDescriptor Controller
-        {
-            get;
-            set;
-        }
+        internal HttpControllerDescriptor Controller { get; set; }
 
-        internal string ControllerName
-        {
-            get;
-            set;
-        }
+        internal string ControllerName { get; set; }
 
-        internal bool Succeeded
-        {
-            get
-            {
-                return this.Controller != null;
-            }
-        }
+        internal bool Succeeded => Controller != null;
 
-        internal bool CouldMatchVersion
-        {
-            get
-            {
-                return this.HasCandidates && this.RequestedVersion != null;
-            }
-        }
+        internal bool CouldMatchVersion => HasCandidates;
 
-        internal bool HasCandidates
-        {
-            get;
-            set;
-        }
+        internal bool HasCandidates { get; set; }
 
-        internal ApiVersion RequestedVersion
-        {
-            get;
-            set;
-        }
+        internal ApiVersion RequestedVersion { get; set; }
     }
 }

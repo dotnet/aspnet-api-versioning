@@ -176,7 +176,7 @@
         }
 
         [Fact]
-        public async Task select_best_candidate_should_return_404_for_unmatched_action()
+        public async Task select_best_candidate_should_return_400_for_unmatched_action()
         {
             // arrange
             var request = new HttpRequestMessage( Post, "api/attributed?api-version=1.0" );
@@ -187,7 +187,7 @@
                 var response = await server.Client.SendAsync( request );
 
                 // assert
-                response.StatusCode.Should().Be( NotFound );
+                response.StatusCode.Should().Be( BadRequest );
             }
         }
 

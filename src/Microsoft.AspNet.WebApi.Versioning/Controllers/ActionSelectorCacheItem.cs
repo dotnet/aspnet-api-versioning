@@ -226,7 +226,7 @@
 
                 var request = controllerContext.Request;
                 var exceptionFactory = new HttpResponseExceptionFactory( request );
-                return exceptionFactory.CreateBadRequestResponseForUnsupportedApiVersion( request.GetRequestedApiVersion() );
+                return exceptionFactory.CreateBadRequestResponse( request.GetRequestedApiVersion() );
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
