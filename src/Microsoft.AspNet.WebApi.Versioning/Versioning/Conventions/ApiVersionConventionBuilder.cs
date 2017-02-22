@@ -50,7 +50,9 @@
         /// </summary>
         /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller descriptor</see>
         /// to apply configured conventions to.</param>
-        public virtual void ApplyTo( HttpControllerDescriptor controllerDescriptor )
+        /// <returns>True if any conventions were applied to the
+        /// <paramref name="controllerDescriptor">controller descriptor</paramref>; otherwise, false.</returns>
+        public virtual bool ApplyTo( HttpControllerDescriptor controllerDescriptor )
         {
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
 
@@ -60,7 +62,10 @@
             if ( ControllerConventions.TryGetValue( key, out convention ) )
             {
                 convention.ApplyTo( controllerDescriptor );
+                return true;
             }
+
+            return false;
         }
     }
 }

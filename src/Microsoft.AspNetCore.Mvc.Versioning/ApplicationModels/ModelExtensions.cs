@@ -12,17 +12,6 @@
     public static class ModelExtensions
     {
         /// <summary>
-        /// Returns a value indicating whether controller model has explicit version information.
-        /// </summary>
-        /// <param name="controller">The <see cref="ControllerModel">model</see> to evaluate.</param>
-        /// <returns>True if the <paramref name="controller"/> has explicit version information; otherwise, false.</returns>
-        public static bool HasExplicitVersioning( this ControllerModel controller )
-        {
-            Arg.NotNull( controller, nameof( controller ) );
-            return controller.Properties.ContainsKey( typeof( ApiVersionModel ) ) || controller.Attributes.OfType<IApiVersionProvider>().Any();
-        }
-
-        /// <summary>
         /// Gets the property associated with the controller model.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type">type</see> and key of the property.</typeparam>

@@ -3,6 +3,7 @@
     using ApplicationModels;
     using Conventions;
     using System;
+    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Represents an <see cref="IApplicationModelConvention">application model convention</see> which applies
@@ -12,15 +13,43 @@
     public class ApiVersionConvention : IApplicationModelConvention
     {
         private readonly ApiVersionConventionBuilder conventionBuilder;
+        private readonly ApiVersionModel implicitVersionModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionConvention"/> class.
         /// </summary>
-        /// <param name="conventionBuilder">The <see cref="ApiVersionConventionBuilder">convention builder</see>
-        /// containing the configured conventions to aply.</param>
-        public ApiVersionConvention( ApiVersionConventionBuilder conventionBuilder )
+        public ApiVersionConvention()
         {
+            implicitVersionModel = ApiVersionModel.Default;
+            conventionBuilder = new ApiVersionConventionBuilder();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionConvention"/> class.
+        /// </summary>
+        /// <param name="implicitlyDeclaredVersion">The implicitly declared <see cref="ApiVersion">API version</see> for
+        /// controllers and actions that have no other API versioning information applied.</param>
+        public ApiVersionConvention( ApiVersion implicitlyDeclaredVersion )
+        {
+            Arg.NotNull( implicitlyDeclaredVersion, nameof( implicitlyDeclaredVersion ) );
+
+            implicitVersionModel = new ApiVersionModel( implicitlyDeclaredVersion );
+            conventionBuilder = new ApiVersionConventionBuilder();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionConvention"/> class.
+        /// </summary>
+        /// <param name="implicitlyDeclaredVersion">The implicitly declared <see cref="ApiVersion">API version</see> for
+        /// controllers and actions that have no other API versioning information applied.</param>
+        /// <param name="conventionBuilder">The <see cref="ApiVersionConventionBuilder">convention builder</see>
+        /// containing the configured conventions to apply.</param>
+        public ApiVersionConvention( ApiVersion implicitlyDeclaredVersion, ApiVersionConventionBuilder conventionBuilder )
+        {
+            Arg.NotNull( implicitlyDeclaredVersion, nameof( implicitlyDeclaredVersion ) );
             Arg.NotNull( conventionBuilder, nameof( conventionBuilder ) );
+
+            implicitVersionModel = new ApiVersionModel( implicitlyDeclaredVersion );
             this.conventionBuilder = conventionBuilder;
         }
 
@@ -30,9 +59,64 @@
         /// <param name="application">The <see cref="ApplicationModel">application</see> to apply the convention to.</param>
         public void Apply( ApplicationModel application )
         {
-            foreach ( var controller in application.Controllers )
+            if ( conventionBuilder.Count == 0 )
             {
-                conventionBuilder.ApplyTo( controller );
+                foreach ( var controller in application.Controllers )
+                {
+                    ApplyAttributeOrImplicitConventions( controller );
+                }
+            }
+            else
+            {
+                foreach ( var controller in application.Controllers )
+                {
+                    if ( !conventionBuilder.ApplyTo( controller ) )
+                    {
+                        ApplyAttributeOrImplicitConventions( controller );
+                    }
+                }
+            }
+        }
+
+        private static bool IsDecoratedWithAttributes( ControllerModel controller )
+        {
+            Contract.Requires( controller != null );
+
+            foreach ( var attribute in controller.Attributes )
+            {
+                if ( attribute is IApiVersionProvider || attribute is IApiVersionNeutral )
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void ApplyImplicitConventions( ControllerModel controller )
+        {
+            Contract.Requires( controller != null );
+
+            controller.SetProperty( implicitVersionModel );
+
+            foreach ( var action in controller.Actions )
+            {
+                action.SetProperty( implicitVersionModel );
+            }
+        }
+
+        private void ApplyAttributeOrImplicitConventions( ControllerModel controller )
+        {
+            Contract.Requires( controller != null );
+
+            if ( IsDecoratedWithAttributes( controller ) )
+            {
+                var conventions = new ControllerApiVersionConventionBuilder<ControllerModel>();
+                conventions.ApplyTo( controller );
+            }
+            else
+            {
+                ApplyImplicitConventions( controller );
             }
         }
     }

@@ -96,10 +96,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             }
             else
             {
-                declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supported.Union( deprecated ).OrderBy( v => v ).ToArray() );
-                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supported.Union( advertised ).OrderBy( v => v ).ToArray() );
-                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => deprecated.Union( deprecatedAdvertised ).OrderBy( v => v ).ToArray() );
-                implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supportedVersions.Value.Union( deprecatedVersions.Value ).OrderBy( v => v ).ToArray() );
+                declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( supported.Union( deprecated ).ToSortedReadOnlyList );
+                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supported.Union( advertised ).ToSortedReadOnlyList );
+                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecated.Union( deprecatedAdvertised ).ToSortedReadOnlyList );
+                implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supportedVersions.Value.Union( deprecatedVersions.Value ).ToSortedReadOnlyList() );
             }
         }
 
@@ -136,6 +136,33 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.Union( deprecatedVersions ).Distinct().ToSortedReadOnlyList );
             this.supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.ToSortedReadOnlyList );
             this.deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecatedVersions.ToSortedReadOnlyList );
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
+        /// </summary>
+        /// <param name="declaredVersions">The declared <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller or action.</param>
+        /// <param name="supportedVersions">The supported <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        /// <param name="deprecatedVersions">The deprecated <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        /// <param name="advertisedVersions">The advertised <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        /// <param name="deprecatedAdvertisedVersions">The deprecated, advertised <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        public ApiVersionModel(
+            IEnumerable<ApiVersion> declaredVersions,
+            IEnumerable<ApiVersion> supportedVersions,
+            IEnumerable<ApiVersion> deprecatedVersions,
+            IEnumerable<ApiVersion> advertisedVersions,
+            IEnumerable<ApiVersion> deprecatedAdvertisedVersions )
+        {
+            Arg.NotNull( declaredVersions, nameof( declaredVersions ) );
+            Arg.NotNull( supportedVersions, nameof( supportedVersions ) );
+            Arg.NotNull( deprecatedVersions, nameof( deprecatedVersions ) );
+            Arg.NotNull( advertisedVersions, nameof( advertisedVersions ) );
+            Arg.NotNull( deprecatedAdvertisedVersions, nameof( deprecatedAdvertisedVersions ) );
+
+            this.declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( declaredVersions.ToSortedReadOnlyList );
+            this.supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.Union( advertisedVersions ).ToSortedReadOnlyList );
+            this.deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecatedVersions.Union( deprecatedAdvertisedVersions ).ToSortedReadOnlyList );
+            this.implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => this.supportedVersions.Value.Union( this.deprecatedVersions.Value ).ToSortedReadOnlyList() );
         }
 
         private string DebuggerDisplayText => IsApiVersionNeutral ? "*.*" : string.Join( ", ", DeclaredApiVersions );

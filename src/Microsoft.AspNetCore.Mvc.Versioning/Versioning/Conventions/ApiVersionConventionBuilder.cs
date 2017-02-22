@@ -52,7 +52,9 @@
         /// </summary>
         /// <param name="controllerModel">The <see cref="ControllerModel">controller model</see>
         /// to apply configured conventions to.</param>
-        public virtual void ApplyTo( ControllerModel controllerModel )
+        /// <returns>True if any conventions were applied to the
+        /// <paramref name="controllerModel">controller model</paramref>; otherwise, false.</returns>
+        public virtual bool ApplyTo( ControllerModel controllerModel )
         {
             Arg.NotNull( controllerModel, nameof( controllerModel ) );
 
@@ -62,7 +64,10 @@
             if ( ControllerConventions.TryGetValue( key, out convention ) )
             {
                 convention.ApplyTo( controllerModel );
+                return true;
             }
+
+            return false;
         }
     }
 }

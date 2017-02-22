@@ -55,12 +55,7 @@
                         mvcOptions.Filters.Add( typeof( ReportApiVersionsAttribute ) );
                     }
 
-                    if ( options.Conventions.Count > 0 )
-                    {
-                        mvcOptions.Conventions.Add( new ApiVersionConvention( options.Conventions ) );
-                    }
-
-                    mvcOptions.Conventions.Add( new ImplicitControllerVersionConvention( options.DefaultApiVersion ) );
+                    mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
                 } );
 
             services.AddRouting( mvcOptions => mvcOptions.ConstraintMap.Add( "apiVersion", typeof( ApiVersionRouteConstraint ) ) );
