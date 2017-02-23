@@ -20,9 +20,13 @@
             deprecatedVersions = emptyVersions;
         }
 
-        internal ApiVersionModel( HttpControllerDescriptor controllerDescriptor )
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
+        /// </summary>
+        /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor"/> to initialize the API version model from.</param>
+        public ApiVersionModel( HttpControllerDescriptor controllerDescriptor )
         {
-            Contract.Requires( controllerDescriptor != null );
+            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
 
             if ( IsApiVersionNeutral = controllerDescriptor.GetCustomAttributes<IApiVersionNeutral>( false ).Any() )
             {
@@ -61,9 +65,13 @@
             }
         }
 
-        internal ApiVersionModel( HttpActionDescriptor actionDescriptor )
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
+        /// </summary>
+        /// <param name="actionDescriptor">The <see cref="HttpActionDescriptor"/> to initialize the API version model from.</param>
+        public ApiVersionModel( HttpActionDescriptor actionDescriptor )
         {
-            Contract.Requires( actionDescriptor != null );
+            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
             if ( IsApiVersionNeutral = actionDescriptor.ControllerDescriptor.GetCustomAttributes<IApiVersionNeutral>( false ).Any() )
             {

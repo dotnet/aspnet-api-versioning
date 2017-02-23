@@ -23,13 +23,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         public void ApplyTo( ControllerModel controllerModel )
         {
             Arg.NotNull( controllerModel, nameof( controllerModel ) );
-
-            var controllerVersionInfo = ApplyControllerConventions( controllerModel );
-
-            if ( ActionBuilders.Count > 0 )
-            {
-                ApplyActionConventions( controllerModel, controllerVersionInfo );
-            }
+            ApplyActionConventions( controllerModel, ApplyControllerConventions( controllerModel ) );
         }
 
         private ControllerVersionInfo ApplyControllerConventions( ControllerModel controllerModel )
@@ -37,20 +31,25 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Contract.Requires( controllerModel != null );
             Contract.Ensures( Contract.Result<ControllerVersionInfo>() != null );
 
-            MergeAttributesWithConventions( controllerModel );
+            MergeControllerAttributesWithConventions( controllerModel );
 
-            var model = new ApiVersionModel( VersionNeutral, supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions );
-
-            controllerModel.SetProperty( model );
+            if ( VersionNeutral )
+            {
+                controllerModel.SetProperty( ApiVersionModel.Neutral );
+            }
+            else
+            {
+                controllerModel.SetProperty( new ApiVersionModel( VersionNeutral, supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions ) );
+            }
 
             return new ControllerVersionInfo( supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions );
         }
 
-        private void MergeAttributesWithConventions( ControllerModel controllerModel )
+        private void MergeControllerAttributesWithConventions( ControllerModel controllerModel )
         {
             Contract.Requires( controllerModel != null );
 
-            if ( VersionNeutral )
+            if ( VersionNeutral |= controllerModel.Attributes.OfType<IApiVersionNeutral>().Any() )
             {
                 return;
             }
@@ -86,6 +85,33 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         private void ApplyActionConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
         {
             Contract.Requires( controller != null );
+            Contract.Requires( controllerVersionInfo != null );
+
+            if ( VersionNeutral )
+            {
+                ApplyNeutralModelToActions( controller );
+            }
+            else
+            {
+                MergeActionAttributesWithConventions( controller, controllerVersionInfo );
+            }
+        }
+
+        private void ApplyNeutralModelToActions( ControllerModel controller )
+        {
+            Contract.Requires( controller != null );
+
+            foreach ( var action in controller.Actions )
+            {
+                action.SetProperty( controller );
+                action.SetProperty( ApiVersionModel.Neutral );
+            }
+        }
+
+        private void MergeActionAttributesWithConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
+        {
+            Contract.Requires( controller != null );
+            Contract.Requires( controllerVersionInfo != null );
 
             foreach ( var action in controller.Actions )
             {

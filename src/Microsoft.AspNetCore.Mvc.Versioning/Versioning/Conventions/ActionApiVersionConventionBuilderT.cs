@@ -30,11 +30,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
             var controllerControllerVersionInfo = actionModel.GetProperty<ControllerVersionInfo>();
             var versionModel = new ApiVersionModel(
-                declared: mappedVersions,
-                supported: controllerControllerVersionInfo.Item1,
-                deprecated: controllerControllerVersionInfo.Item2,
-                advertised: controllerControllerVersionInfo.Item3,
-                deprecatedAdvertised: controllerControllerVersionInfo.Item4 );
+                declaredVersions: mappedVersions,
+                supportedVersions: controllerControllerVersionInfo.Item1,
+                deprecatedVersions: controllerControllerVersionInfo.Item2,
+                advertisedVersions: controllerControllerVersionInfo.Item3,
+                deprecatedAdvertisedVersions: controllerControllerVersionInfo.Item4 );
 
             actionModel.SetProperty( versionModel );
         }
