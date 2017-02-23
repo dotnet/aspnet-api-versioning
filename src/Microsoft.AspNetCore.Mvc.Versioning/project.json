@@ -7,13 +7,12 @@
     "language": "en",
 
     "dependencies": {
-        "NETStandard.Library": "1.6.0",
-        "Microsoft.AspNetCore.Mvc": "1.0.0"
+        "NETStandard.Library": "1.6.1",
+        "Microsoft.AspNetCore.Mvc.Core": "1.1.1"
     },
 
     "frameworks": {
         "net451": {
-
         },
         "netstandard1.6": {
             "imports": "dnxcore50"
