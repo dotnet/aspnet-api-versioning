@@ -212,7 +212,7 @@
             var code = default( string );
             var requestedVersion = default( string );
             var parsedVersion = context.RequestedVersion;
-            var actionNames = new Lazy<string>( () => Join( NewLine, context.MatchingActions.Select( a => a.DisplayName ) ) );
+            var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
 
             if ( parsedVersion == null )
             {
