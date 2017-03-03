@@ -24,14 +24,9 @@ namespace Microsoft.Examples
                 {
                     o.ReportApiVersions = true;
                     o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.ApiVersionReader = new QueryStringOrHeaderApiVersionReader()
-                    {
-                        HeaderNames =
-                        {
-                            "api-version",
-                            "x-ms-version"
-                        }
-                    };
+                    o.ApiVersionReader = ApiVersionReader.Combine(
+                        new QueryStringApiVersionReader(),
+                        new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
                 } );
             configuration.EnableCaseInsensitive( true );
             configuration.EnableUnqualifiedNameCall( true );

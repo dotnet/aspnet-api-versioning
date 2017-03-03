@@ -7,6 +7,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Conventions;
     using System;
     using System.Diagnostics.Contracts;
+#if WEBAPI
+    using static Microsoft.Web.Http.Versioning.ApiVersionReader;
+#else
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionReader;
+#endif
 
     /// <summary>
     /// Represents the possible API versioning options for services.
@@ -14,7 +19,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     public partial class ApiVersioningOptions
     {
         private ApiVersion defaultApiVersion = ApiVersion.Default;
-        private IApiVersionReader apiVersionReader = new QueryStringApiVersionReader();
+        private IApiVersionReader apiVersionReader = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
         private IApiVersionSelector apiVersionSelector;
         private ApiVersionConventionBuilder conventions = new ApiVersionConventionBuilder();
 
@@ -140,7 +145,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             }
             set
             {
-                Arg.NotNull( conventions, nameof( conventions ) );
+                Arg.NotNull( value, nameof( value ) );
                 conventions = value;
             }
         }

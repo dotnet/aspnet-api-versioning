@@ -17,7 +17,7 @@
             // arrange
             var headers = new HeaderDictionary() { [headerName] = requestedVersion };
             var request = new Mock<HttpRequest>();
-            var reader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version", "x-ms-version" } };
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
 
             request.SetupGet( r => r.Query ).Returns( Mock.Of<IQueryCollection>() );
             request.SetupGet( r => r.Headers ).Returns( headers );
@@ -36,7 +36,7 @@
             var query = new Mock<IQueryCollection>();
             var headers = new HeaderDictionary() { ["api-version"] = new StringValues( new[] { "1.0" } ) };
             var request = new Mock<HttpRequest>();
-            var reader = new QueryStringOrHeaderApiVersionReader(){ HeaderNames = { "api-version" } };
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
             query.SetupGet( q => q["api-version"] ).Returns( new StringValues( "2.0" ) );
             request.SetupProperty( r => r.Query, query.Object );
@@ -56,7 +56,7 @@
             var query = new Mock<IQueryCollection>();
             var headers = new HeaderDictionary() { ["api-version"] = new StringValues( new[] { "1.0" } ) };
             var request = new Mock<HttpRequest>();
-            var reader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } };
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
             query.SetupGet( q => q["api-version"] ).Returns( new StringValues( "1.0" ) );
             request.SetupProperty( r => r.Query, query.Object );

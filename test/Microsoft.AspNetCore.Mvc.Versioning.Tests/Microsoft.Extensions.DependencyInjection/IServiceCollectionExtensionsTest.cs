@@ -33,7 +33,7 @@
             routeConfiguration.Configure( routeOptions );
 
             // assert
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().BeOfType<QueryStringApiVersionReader>();
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().NotBeNull();
             services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationInstance.Should().BeOfType<DefaultApiVersionSelector>();
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ApiVersionActionSelector ) );
             mvcOptions.Conventions.Single().Should().BeOfType<ApiVersionConvention>();
@@ -53,7 +53,7 @@
                  o =>
                  {
                      o.ReportApiVersions = true;
-                     o.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } };
+                     o.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
                      o.ApiVersionSelector = new ConstantApiVersionSelector( new ApiVersion( DateTime.Today ) );
                  } );
 
@@ -66,7 +66,7 @@
             routeConfiguration.Configure( routeOptions );
 
             // assert
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().BeOfType<QueryStringOrHeaderApiVersionReader>();
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().NotBeNull();
             services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationInstance.Should().BeOfType<ConstantApiVersionSelector>();
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ApiVersionActionSelector ) );
             services.Single( sd => sd.ServiceType == typeof( ReportApiVersionsAttribute ) ).ImplementationType.Should().Be( typeof( ReportApiVersionsAttribute ) );
