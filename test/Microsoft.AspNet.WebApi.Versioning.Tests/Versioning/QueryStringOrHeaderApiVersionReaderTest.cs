@@ -15,7 +15,7 @@
         {
             // arrange
             var request = new HttpRequestMessage();
-            var reader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version", "x-ms-version" } };
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
 
             request.Headers.TryAddWithoutValidation( headerName, requestedVersion );
 
@@ -31,7 +31,7 @@
         {
             // arrange
             var request = new HttpRequestMessage( Get, "http://localhost/test?api-version=2.0" );
-            var reader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } };
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
             request.Headers.TryAddWithoutValidation( "api-version", "1.0" );
 
@@ -47,7 +47,7 @@
         {
             // arrange
             var request = new HttpRequestMessage( Get, "http://localhost/test?api-version=1.0" );
-            var reader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } };
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
             request.Headers.TryAddWithoutValidation( "api-version", "1.0" );
 

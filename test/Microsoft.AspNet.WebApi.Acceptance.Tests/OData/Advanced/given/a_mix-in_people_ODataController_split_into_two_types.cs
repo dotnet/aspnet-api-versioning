@@ -140,14 +140,28 @@
         [Theory]
         [InlineData( "1.0" )]
         [InlineData( "3.0" )]
-        [InlineData( "4.0" )]
-        public async Task _patch_should_return_400_when_version_is_unsupported( string apiVersion )
+        public async Task _patch_should_return_405_when_version_could_be_supported( string apiVersion )
         {
             // arrange
             var person = new { lastName = "Me" };
 
             // act
             var response = await PatchAsync( $"api/people(42)?api-version={apiVersion}", person );
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
+            // assert
+            response.StatusCode.Should().Be( MethodNotAllowed );
+            content.Error.Code.Should().Be( "UnsupportedApiVersion" );
+        }
+
+        [Fact]
+        public async Task _patch_should_return_400_when_version_is_unsupported()
+        {
+            // arrange
+            var person = new { lastName = "Me" };
+
+            // act
+            var response = await PatchAsync( $"api/people(42)?api-version=4.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

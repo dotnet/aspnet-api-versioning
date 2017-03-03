@@ -24,22 +24,36 @@
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
         public bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
         {
-            var value = default( string );
-
-            if ( routeDirection == UrlGeneration )
-            {
-                return !IsNullOrEmpty( routeKey ) && values.TryGetValue( routeKey, out value ) && !IsNullOrEmpty( value );
-            }
-
-            var requestedVersion = default( ApiVersion );
-
-            if ( !values.TryGetValue( routeKey, out value ) || !TryParse( value, out requestedVersion ) )
+            if ( IsNullOrEmpty( routeKey ) )
             {
                 return false;
             }
 
-            httpContext.SetRequestedApiVersion( requestedVersion );
-            return true;
+            var value = default( string );
+
+            if ( values.TryGetValue( routeKey, out value ) )
+            {
+                httpContext.SetRouteParameterName( routeKey );
+            }
+            else
+            {
+                return false;
+            }
+
+            if ( routeDirection == UrlGeneration )
+            {
+                return !IsNullOrEmpty( value );
+            }
+
+            var requestedVersion = default( ApiVersion );
+
+            if ( TryParse( value, out requestedVersion ) )
+            {
+                httpContext.SetRequestedApiVersion( requestedVersion );
+                return true;
+            }
+
+            return false;
         }
     }
 }

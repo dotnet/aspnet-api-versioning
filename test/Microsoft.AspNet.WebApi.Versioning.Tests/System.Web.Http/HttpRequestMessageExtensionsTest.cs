@@ -45,7 +45,7 @@
             // arrange
             var configuration = new HttpConfiguration();
             var request = new HttpRequestMessage();
-            var versionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version", "x-ms-version" } };
+            var versionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
 
             configuration.AddApiVersioning( o => o.ApiVersionReader = versionReader );
             request.SetConfiguration( configuration );
@@ -91,7 +91,7 @@
             var requestedVersion = new ApiVersion( 1, 0 );
             var configuration = new HttpConfiguration();
             var request = new HttpRequestMessage();
-            var versionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { headerName } };
+            var versionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( headerName ) );
 
             configuration.AddApiVersioning( o => o.ApiVersionReader = versionReader );
             request.SetConfiguration( configuration );

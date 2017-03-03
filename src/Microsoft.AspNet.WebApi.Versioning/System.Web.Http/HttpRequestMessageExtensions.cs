@@ -5,12 +5,14 @@
     using Diagnostics.Contracts;
     using Microsoft;
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning;
     using Net;
     using Net.Http;
     using System;
-    using static Microsoft.Web.Http.ApiVersion;
     using static ComponentModel.EditorBrowsableState;
+    using static Microsoft.Web.Http.ApiVersion;
+    using static System.String;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequestMessage"/> class.
@@ -18,6 +20,7 @@
     public static class HttpRequestMessageExtensions
     {
         private const string ApiVersionKey = "MS_" + nameof( ApiVersion );
+        private const string ApiVersionRouteParameterName = "MS_" + nameof( ApiVersionRouteConstraint ) + "_ParameterName";
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
         private static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, Func<bool, HttpError> errorCreator )
@@ -138,6 +141,34 @@
             else
             {
                 request.Properties[ApiVersionKey] = version;
+            }
+        }
+
+        internal static string GetRouteParameterNameAssignedByApiVersionRouteConstraint( this HttpRequestMessage request )
+        {
+            Contract.Requires( request != null );
+
+            var parameterName = default( string );
+
+            if ( request.Properties.TryGetValue( ApiVersionRouteParameterName, out parameterName ) )
+            {
+                return parameterName;
+            }
+
+            return null;
+        }
+
+        internal static void SetRouteParameterName( this HttpRequestMessage request, string parameterName )
+        {
+            Contract.Requires( request != null );
+
+            if ( IsNullOrEmpty( parameterName ) )
+            {
+                request.Properties.Remove( ApiVersionRouteParameterName );
+            }
+            else
+            {
+                request.Properties[ApiVersionRouteParameterName] = parameterName;
             }
         }
     }

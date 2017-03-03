@@ -130,7 +130,7 @@
     <value>Multiple actions were found that match the request: {0}</value>
   </data>
   <data name="ApiControllerActionSelector_HttpMethodNotSupported" xml:space="preserve">
-    <value>The requested resource does not support http method '{0}'.</value>
+    <value>The requested resource does not support HTTP method '{0}'.</value>
   </data>
   <data name="ApiVersionBadGroupVersion" xml:space="preserve">
     <value>The specified API group version '{0}' is invalid.</value>
@@ -171,10 +171,19 @@
   <data name="ResourceNotFound" xml:space="preserve">
     <value>No HTTP resource was found that matches the request URI '{0}'.</value>
   </data>
+  <data name="VersionedActionNameNotFound" xml:space="preserve">
+    <value>No route providing a controller name with API version '{2}' was found to match HTTP method '{1}' and request URI '{0}'.</value>
+  </data>
   <data name="VersionedControllerNameNotFound" xml:space="preserve">
     <value>No route providing a controller name with API version '{1}' was found to match request URI '{0}'.</value>
   </data>
+  <data name="VersionedMethodNotSupported" xml:space="preserve">
+    <value>The requested resource with API version '{0}' does not support HTTP method '{1}'.</value>
+  </data>
   <data name="VersionedResourceNotSupported" xml:space="preserve">
     <value>The HTTP resource that matches the request URI '{0}' does not support the API version '{1}'.</value>
+  </data>
+  <data name="ZeroApiVersionReaders" xml:space="preserve">
+    <value>At least one IApiVersionReader must be specified.</value>
   </data>
 </root>

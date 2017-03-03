@@ -87,11 +87,11 @@
 
             var httpContext = context.HttpContext;
             var apiVersion = default( ApiVersion );
-            var badRequest = default( BadRequestHandler );
+            var invalidRequestHandler = default( RequestHandler );
 
-            if ( ( badRequest = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out apiVersion ) ) != null )
+            if ( ( invalidRequestHandler = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out apiVersion ) ) != null )
             {
-                context.Handler = badRequest;
+                context.Handler = invalidRequestHandler;
                 return null;
             }
 
@@ -101,9 +101,9 @@
 
             if ( finalMatches == null || finalMatches.Count == 0 )
             {
-                if ( ( badRequest = IsValidRequest( selectionContext, candidates ) ) != null )
+                if ( ( invalidRequestHandler = IsValidRequest( selectionContext, candidates ) ) != null )
                 {
-                    context.Handler = badRequest;
+                    context.Handler = invalidRequestHandler;
                 }
 
                 return null;
@@ -181,7 +181,7 @@
             return bestMatches;
         }
 
-        private BadRequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
+        private RequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
         {
             Contract.Requires( httpContext != null );
 
@@ -199,7 +199,7 @@
             return null;
         }
 
-        private BadRequestHandler IsValidRequest( ActionSelectionContext context, IReadOnlyList<ActionDescriptor> candidates )
+        private RequestHandler IsValidRequest( ActionSelectionContext context, IReadOnlyList<ActionDescriptor> candidates )
         {
             Contract.Requires( context != null );
             Contract.Requires( candidates != null );
@@ -212,7 +212,12 @@
             var code = default( string );
             var requestedVersion = default( string );
             var parsedVersion = context.RequestedVersion;
-            var actionNames = new Lazy<string>( () => Join( NewLine, context.MatchingActions.Select( a => a.DisplayName ) ) );
+            var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
+            var allowedMethods = new Lazy<HashSet<string>>(
+                () => new HashSet<string>( candidates.SelectMany( c => c.ActionConstraints.OfType<HttpMethodActionConstraint>() )
+                                                     .SelectMany( ac => ac.HttpMethods ),
+                                           StringComparer.OrdinalIgnoreCase ) );
+            var newRequestHandler = default( Func<ApiVersioningOptions, string, string, RequestHandler> );
 
             if ( parsedVersion == null )
             {
@@ -228,11 +233,21 @@
                 {
                     code = "UnsupportedApiVersion";
                     logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
+
+                    if ( allowedMethods.Value.Contains( context.HttpContext.Request.Method ) )
+                    {
+                        newRequestHandler = ( o, c, m ) => new BadRequestHandler( o, c, m );
+                    }
+                    else
+                    {
+                        newRequestHandler = ( o, c, m ) => new MethodNotAllowedHandler( o, c, m, allowedMethods.Value.ToArray() );
+                    }
                 }
                 else
                 {
                     code = "InvalidApiVersion";
                     logger.ApiVersionInvalid( requestedVersion );
+                    newRequestHandler = ( o, c, m ) => new BadRequestHandler( o, c, m );
                 }
             }
             else
@@ -240,10 +255,19 @@
                 requestedVersion = parsedVersion.ToString();
                 code = "UnsupportedApiVersion";
                 logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
+
+                if ( allowedMethods.Value.Contains( context.HttpContext.Request.Method ) )
+                {
+                    newRequestHandler = ( o, c, m ) => new BadRequestHandler( o, c, m );
+                }
+                else
+                {
+                    newRequestHandler = ( o, c, m ) => new MethodNotAllowedHandler( o, c, m, allowedMethods.Value.ToArray() );
+                }
             }
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( context.HttpContext.Request.GetDisplayUrl(), requestedVersion );
-            return new BadRequestHandler( Options, code, message );
+            return newRequestHandler( Options, code, message );
         }
 
         private static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>

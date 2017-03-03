@@ -46,14 +46,28 @@
         [Theory]
         [InlineData( "v1/people(42)" )]
         [InlineData( "v3/people(42)" )]
-        [InlineData( "v4/people(42)" )]
-        public async Task _patch_should_return_400_when_version_is_unsupported( string requestUrl )
+        public async Task _patch_should_return_405_when_version_could_be_supported( string requestUrl )
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
 
             // act
             var response = await PatchAsync( requestUrl, person );
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
+            // assert
+            response.StatusCode.Should().Be( MethodNotAllowed );
+            content.Error.Code.Should().Be( "UnsupportedApiVersion" );
+        }
+
+        [Fact]
+        public async Task _patch_should_return_400_when_version_is_unsupported()
+        {
+            // arrange
+            var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
+
+            // act
+            var response = await PatchAsync( "v4/people(42)", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

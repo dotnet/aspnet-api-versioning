@@ -176,7 +176,7 @@
         }
 
         [Fact]
-        public async Task select_best_candidate_should_return_400_for_unmatched_action()
+        public async Task select_best_candidate_should_return_405_for_unmatched_action()
         {
             // arrange
             var request = new HttpRequestMessage( Post, "api/attributed?api-version=1.0" );
@@ -187,7 +187,7 @@
                 var response = await server.Client.SendAsync( request );
 
                 // assert
-                response.StatusCode.Should().Be( BadRequest );
+                response.StatusCode.Should().Be( MethodNotAllowed );
             }
         }
 
@@ -467,7 +467,7 @@
         public async Task select_controller_should_return_400_when_requested_api_version_is_ambiguous()
         {
             // arrange
-            Action<ApiVersioningOptions> versioningSetup = o => o.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } };
+            Action<ApiVersioningOptions> versioningSetup = o => o.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
             using ( var server = new WebServer( versioningSetup ) )
             {

@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Routing
 {
-    using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Web.Http;
@@ -25,22 +24,36 @@
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
         public bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
         {
-            var value = default( string );
-
-            if ( routeDirection == UriGeneration )
-            {
-                return !IsNullOrEmpty( parameterName ) && values.TryGetValue( parameterName, out value ) && !IsNullOrEmpty( value );
-            }
-
-            var requestedVersion = default( ApiVersion );
-
-            if ( !values.TryGetValue( parameterName, out value ) || !TryParse( value, out requestedVersion ) )
+            if ( IsNullOrEmpty( parameterName ) )
             {
                 return false;
             }
 
-            request.SetRequestedApiVersion( requestedVersion );
-            return true;
+            var value = default( string );
+
+            if ( values.TryGetValue( parameterName, out value ) )
+            {
+                request.SetRouteParameterName( parameterName );
+            }
+            else
+            {
+                return false;
+            }
+
+            if ( routeDirection == UriGeneration )
+            {
+                return !IsNullOrEmpty( value );
+            }
+
+            var requestedVersion = default( ApiVersion );
+
+            if ( TryParse( value, out requestedVersion ) )
+            {
+                request.SetRequestedApiVersion( requestedVersion );
+                return true;
+            }
+
+            return false;
         }
     }
 }

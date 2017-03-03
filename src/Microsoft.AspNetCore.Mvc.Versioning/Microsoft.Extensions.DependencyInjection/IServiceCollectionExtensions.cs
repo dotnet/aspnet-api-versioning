@@ -47,7 +47,7 @@
                 services.AddSingleton<ReportApiVersionsAttribute>();
             }
 
-            services.AddMvc(
+            services.AddMvcCore(
                 mvcOptions =>
                 {
                     if ( options.ReportApiVersions )

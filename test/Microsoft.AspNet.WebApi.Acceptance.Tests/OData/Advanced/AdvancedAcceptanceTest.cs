@@ -24,14 +24,9 @@
                 {
                     options.ReportApiVersions = true;
                     options.AssumeDefaultVersionWhenUnspecified = true;
-                    options.ApiVersionReader = new QueryStringOrHeaderApiVersionReader()
-                    {
-                        HeaderNames =
-                        {
-                            "api-version",
-                            "x-ms-version"
-                        }
-                    };
+                    options.ApiVersionReader = ApiVersionReader.Combine(
+                        new QueryStringApiVersionReader(),
+                        new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
                 } );
 
             var modelBuilder = new VersionedODataModelBuilder( Configuration )

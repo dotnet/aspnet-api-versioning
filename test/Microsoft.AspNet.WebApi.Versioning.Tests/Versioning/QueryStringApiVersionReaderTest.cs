@@ -1,5 +1,4 @@
-﻿using Xunit;
-namespace Microsoft.Web.Http.Versioning
+﻿namespace Microsoft.Web.Http.Versioning
 {
     using FluentAssertions;
     using System;

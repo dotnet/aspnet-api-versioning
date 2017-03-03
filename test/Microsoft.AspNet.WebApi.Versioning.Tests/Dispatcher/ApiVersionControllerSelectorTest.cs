@@ -425,6 +425,30 @@
         {
             // arrange
             var configuration = AttributeRoutingEnabledConfiguration;
+            var request = new HttpRequestMessage( Get, "http://localhost/api/test/1?api-version=2.0" );
+
+            configuration.AddApiVersioning();
+            configuration.EnsureInitialized();
+
+            var routeData = configuration.Routes.GetRouteData( request );
+
+            request.SetConfiguration( configuration );
+            request.SetRouteData( routeData );
+
+            Action selectController = () => configuration.Services.GetHttpControllerSelector().SelectController( request );
+
+            // act
+            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+
+            // assert
+            response.StatusCode.Should().Be( BadRequest );
+        }
+
+        [Fact]
+        public void select_controller_should_return_405_for_unmatched_action()
+        {
+            // arrange
+            var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Post, "http://localhost/api/test?api-version=1.0" );
 
             configuration.AddApiVersioning();
@@ -452,7 +476,7 @@
             var response = selectAction.ShouldThrow<HttpResponseException>().Subject.Single().Response;
 
             // assert
-            response.StatusCode.Should().Be( BadRequest );
+            response.StatusCode.Should().Be( MethodNotAllowed );
         }
 
         [Fact]
@@ -943,7 +967,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=2.0" );
 
             request.Headers.TryAddWithoutValidation( "api-version", "1.0" );
-            configuration.AddApiVersioning( o => o.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version" } } );
+            configuration.AddApiVersioning( o => o.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) ) );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -976,7 +1000,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
                 {
                     options.AssumeDefaultVersionWhenUnspecified = true;
                     options.DefaultApiVersion = new ApiVersion( new DateTime( 2015, 11, 15 ) );
-                    options.ApiVersionReader = new QueryStringOrHeaderApiVersionReader() { HeaderNames = { "api-version", "x-ms-version" } };
+                    options.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
                 } );
             configuration.Routes.MapHttpRoute( "Admin-1", "admin", new { controller = "admin", action = "Get" } );
             configuration.Routes.MapHttpRoute( "Admin-2", "admin/seedData", new { controller = "admin", action = "SeedData" } );

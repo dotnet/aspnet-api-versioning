@@ -11,14 +11,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// <summary>
     /// Represents a service API version reader that reads the value from a HTTP header.
     /// </summary>
-    public partial class HeaderApiVersionReader : ApiVersionReader
+    public partial class HeaderApiVersionReader : IApiVersionReader
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderApiVersionReader"/> class.
         /// </summary>
-        public HeaderApiVersionReader()
-        {
-        }
+        public HeaderApiVersionReader() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderApiVersionReader"/> class.
