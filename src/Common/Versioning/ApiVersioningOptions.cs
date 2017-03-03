@@ -21,6 +21,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         private ApiVersion defaultApiVersion = ApiVersion.Default;
         private IApiVersionReader apiVersionReader = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
         private IApiVersionSelector apiVersionSelector;
+        private IErrorResponseProvider errorResponseProvider = new DefaultErrorResponseProvider();
         private ApiVersionConventionBuilder conventions = new ApiVersionConventionBuilder();
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// service API version specified by a client. The default value is the
         /// <see cref="QueryStringApiVersionReader"/>, which only reads the service API version from
         /// the "api-version" query string parameter. Replace the default value with an alternate
-        /// implementation, such as the <see cref="QueryStringOrHeaderApiVersionReader"/>, which
+        /// implementation, such as the <see cref="HeaderApiVersionReader"/>, which
         /// can read the service API version from additional information like HTTP headers.</remarks>
 #if !WEBAPI
         [CLSCompliant( false )]
@@ -147,6 +148,28 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                 Arg.NotNull( value, nameof( value ) );
                 conventions = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the object used to generate HTTP error responses related to API versioning.
+        /// </summary>
+        /// <value>An <see cref="IErrorResponseProvider">error response provider</see> object.
+        /// The default value is an instance of the <see cref="DefaultErrorResponseProvider"/>.</value>
+#if !WEBAPI
+        [CLSCompliant( false )]
+#endif
+        public IErrorResponseProvider ErrorResponses
+        {
+            get
+            {
+                Contract.Ensures( errorResponseProvider != null );
+                return errorResponseProvider;
+            }
+            set
+            {
+                Arg.NotNull( value, nameof( value ) );
+                errorResponseProvider = value;
             }
         }
     }

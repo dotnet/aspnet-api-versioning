@@ -49,14 +49,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Versioning", "Versioning", 
 		src\Common\Versioning\ConstantApiVersionSelector.cs = src\Common\Versioning\ConstantApiVersionSelector.cs
 		src\Common\Versioning\CurrentImplementationApiVersionSelector.cs = src\Common\Versioning\CurrentImplementationApiVersionSelector.cs
 		src\Common\Versioning\DefaultApiVersionSelector.cs = src\Common\Versioning\DefaultApiVersionSelector.cs
+		src\Common\Versioning\ErrorResponseContext.cs = src\Common\Versioning\ErrorResponseContext.cs
 		src\Common\Versioning\HeaderApiVersionReader.cs = src\Common\Versioning\HeaderApiVersionReader.cs
 		src\Common\Versioning\IApiVersionNeutral.cs = src\Common\Versioning\IApiVersionNeutral.cs
 		src\Common\Versioning\IApiVersionProvider.cs = src\Common\Versioning\IApiVersionProvider.cs
 		src\Common\Versioning\IApiVersionReader.cs = src\Common\Versioning\IApiVersionReader.cs
 		src\Common\Versioning\IApiVersionSelector.cs = src\Common\Versioning\IApiVersionSelector.cs
+		src\Common\Versioning\IErrorResponseProvider.cs = src\Common\Versioning\IErrorResponseProvider.cs
 		src\Common\Versioning\LowestImplementedApiVersionSelector.cs = src\Common\Versioning\LowestImplementedApiVersionSelector.cs
 		src\Common\Versioning\QueryStringApiVersionReader.cs = src\Common\Versioning\QueryStringApiVersionReader.cs
-		src\Common\Versioning\QueryStringOrHeaderApiVersionReader.cs = src\Common\Versioning\QueryStringOrHeaderApiVersionReader.cs
+		src\Common\Versioning\UrlSegmentApiVersionReader.cs = src\Common\Versioning\UrlSegmentApiVersionReader.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{915BB224-B1D0-4E27-A348-67FCC77AAA44}"
