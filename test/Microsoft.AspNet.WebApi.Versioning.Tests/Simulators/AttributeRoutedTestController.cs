@@ -9,5 +9,8 @@
     {
         [Route]
         public Task<string> Get() => Task.FromResult( "Test" );
+
+        [Route( "{id}" )]
+        public Task<string> Get( string id ) => Task.FromResult( "Test" );
     }
 }

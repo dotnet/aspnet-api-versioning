@@ -165,7 +165,8 @@
             catch ( AmbiguousApiVersionException ex )
             {
                 var options = request.GetApiVersioningOptions();
-                throw new HttpResponseException( options.CreateBadRequest( request, "AmbiguousApiVersion", ex.Message, null ) );
+                var context = new ErrorResponseContext( request, "AmbiguousApiVersion", ex.Message, messageDetail: null );
+                throw new HttpResponseException( options.ErrorResponses.BadRequest( context ) );
             }
         }
     }

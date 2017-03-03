@@ -35,6 +35,7 @@
             private readonly CandidateAction[] combinedCandidateActions;
             private readonly IDictionary<HttpActionDescriptor, string[]> actionParameterNames = new Dictionary<HttpActionDescriptor, string[]>();
             private readonly ILookup<string, HttpActionDescriptor> combinedActionNameMapping;
+            private readonly HashSet<HttpMethod> allowedMethods = new HashSet<HttpMethod>();
             private StandardActionSelectionCache standardActions;
 
             internal ActionSelectorCacheItem( HttpControllerDescriptor controllerDescriptor )
@@ -54,6 +55,7 @@
                     var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, method );
                     var actionBinding = actionDescriptor.ActionBinding;
 
+                    allowedMethods.AddRange( actionDescriptor.SupportedHttpMethods );
                     combinedCandidateActions[i] = new CandidateAction( actionDescriptor );
 
                     actionParameterNames.Add(
@@ -203,19 +205,18 @@
             {
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
 
-                if ( !controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral )
-                {
-                    return CreateBadRequestResponse( controllerContext );
-                }
-
                 var actionsFoundByParams = FindMatchingActions( controllerContext, ignoreVerbs: true );
 
-                if ( actionsFoundByParams.Count > 0 )
+                if ( actionsFoundByParams.Count == 0 )
                 {
-                    return CreateMethodNotAllowedResponse( controllerContext, actionsFoundByParams );
+                    return CreateActionNotFoundResponse( controllerContext );
                 }
 
-                return CreateActionNotFoundResponse( controllerContext );
+                var request = controllerContext.Request;
+                var versionNeutral = controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral;
+                var exceptionFactory = new HttpResponseExceptionFactory( request );
+
+                return exceptionFactory.CreateMethodNotAllowedResponse( versionNeutral, allowedMethods );
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
@@ -229,30 +230,6 @@
                 return exceptionFactory.CreateBadRequestResponse( request.GetRequestedApiVersion() );
             }
 
-            [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
-            private static HttpResponseMessage CreateMethodNotAllowedResponse( HttpControllerContext controllerContext, IEnumerable<HttpActionDescriptor> allowedCandidates )
-            {
-                Contract.Requires( controllerContext != null );
-                Contract.Requires( allowedCandidates != null );
-                Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
-
-                var incomingMethod = controllerContext.Request.Method;
-                var response = controllerContext.Request.CreateErrorResponse( MethodNotAllowed, SR.ApiControllerActionSelector_HttpMethodNotSupported.FormatDefault( incomingMethod ) );
-                var methods = new HashSet<HttpMethod>();
-
-                foreach ( var candidate in allowedCandidates )
-                {
-                    methods.UnionWith( candidate.SupportedHttpMethods );
-                }
-
-                foreach ( var method in methods )
-                {
-                    response.Content.Headers.Allow.Add( method.ToString() );
-                }
-
-                return response;
-            }
-
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
             private HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext )
             {
@@ -261,22 +238,6 @@
 
                 var message = SR.ResourceNotFound.FormatDefault( controllerContext.Request.RequestUri );
                 var messageDetail = SR.ApiControllerActionSelector_ActionNotFound.FormatDefault( controllerDescriptor.ControllerName );
-                return controllerContext.Request.CreateErrorResponse( NotFound, message, messageDetail );
-            }
-
-            [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
-            private HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext, string actionName )
-            {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
-
-                if ( !controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral )
-                {
-                    return CreateBadRequestResponse( controllerContext );
-                }
-
-                var message = SR.ResourceNotFound.FormatDefault( controllerContext.Request.RequestUri );
-                var messageDetail = SR.ApiControllerActionSelector_ActionNameNotFound.FormatDefault( controllerDescriptor.ControllerName, actionName );
                 return controllerContext.Request.CreateErrorResponse( NotFound, message, messageDetail );
             }
 
@@ -344,7 +305,11 @@
 
                     if ( actionsFoundByName.Length == 0 )
                     {
-                        throw new HttpResponseException( CreateActionNotFoundResponse( controllerContext, actionName ) );
+                        var request = controllerContext.Request;
+                        var versionNeutral = controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral;
+                        var exceptionFactory = new HttpResponseExceptionFactory( request );
+
+                        throw exceptionFactory.NewMethodNotAllowedException( versionNeutral, allowedMethods );
                     }
 
                     var candidatesFoundByName = new CandidateAction[actionsFoundByName.Length];
