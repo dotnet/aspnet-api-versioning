@@ -148,4 +148,7 @@
   <data name="VersionedResourceNotSupported" xml:space="preserve">
     <value>The HTTP resource that matches the request URI '{0}' does not support the API version '{1}'.</value>
   </data>
+  <data name="ZeroApiVersionReaders" xml:space="preserve">
+    <value>At least one IApiVersionReader must be specified.</value>
+  </data>
 </root>

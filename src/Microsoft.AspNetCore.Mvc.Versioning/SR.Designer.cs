@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.Mvc {
     // with the /str option, or rebuild your VS project.
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class SR {
+    internal class SR {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.Mvc {
         ///    Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.AspNetCore.Mvc.Versioning.SR", typeof(SR).GetTypeInfo().Assembly);
@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.Mvc {
         ///    resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to Multiple actions matched. The following actions matched route data and had all constraints satisfied:{0}{0}{1}.
         /// </summary>
-        public static string ActionSelector_AmbiguousActions {
+        internal static string ActionSelector_AmbiguousActions {
             get {
                 return ResourceManager.GetString("ActionSelector_AmbiguousActions", resourceCulture);
             }
@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The specified API group version &apos;{0}&apos; is invalid..
         /// </summary>
-        public static string ApiVersionBadGroupVersion {
+        internal static string ApiVersionBadGroupVersion {
             get {
                 return ResourceManager.GetString("ApiVersionBadGroupVersion", resourceCulture);
             }
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The specified API version status &apos;{0}&apos; is invalid..
         /// </summary>
-        public static string ApiVersionBadStatus {
+        internal static string ApiVersionBadStatus {
             get {
                 return ResourceManager.GetString("ApiVersionBadStatus", resourceCulture);
             }
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The specified API version is invalid..
         /// </summary>
-        public static string ApiVersionInvalidFormat {
+        internal static string ApiVersionInvalidFormat {
             get {
                 return ResourceManager.GetString("ApiVersionInvalidFormat", resourceCulture);
             }
@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The format &apos;{0}&apos; is invalid or not supported..
         /// </summary>
-        public static string ApiVersionInvalidFormatCode {
+        internal static string ApiVersionInvalidFormatCode {
             get {
                 return ResourceManager.GetString("ApiVersionInvalidFormatCode", resourceCulture);
             }
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The requested API version &apos;{0}&apos; is not supported..
         /// </summary>
-        public static string ApiVersionNotSupported {
+        internal static string ApiVersionNotSupported {
             get {
                 return ResourceManager.GetString("ApiVersionNotSupported", resourceCulture);
             }
@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to An API version is required, but was not specified..
         /// </summary>
-        public static string ApiVersionUnspecified {
+        internal static string ApiVersionUnspecified {
             get {
                 return ResourceManager.GetString("ApiVersionUnspecified", resourceCulture);
             }
@@ -125,7 +125,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The expression &apos;{0}&apos; must refer to a controller action method..
         /// </summary>
-        public static string InvalidActionMethodExpression {
+        internal static string InvalidActionMethodExpression {
             get {
                 return ResourceManager.GetString("InvalidActionMethodExpression", resourceCulture);
             }
@@ -134,7 +134,7 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request..
         /// </summary>
-        public static string MultipleDifferentApiVersionsRequested {
+        internal static string MultipleDifferentApiVersionsRequested {
             get {
                 return ResourceManager.GetString("MultipleDifferentApiVersionsRequested", resourceCulture);
             }
@@ -143,9 +143,18 @@ namespace Microsoft.AspNetCore.Mvc {
         /// <summary>
         ///    Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; does not support the API version &apos;{1}&apos;..
         /// </summary>
-        public static string VersionedResourceNotSupported {
+        internal static string VersionedResourceNotSupported {
             get {
                 return ResourceManager.GetString("VersionedResourceNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to At least one IApiVersionReader must be specified..
+        /// </summary>
+        internal static string ZeroApiVersionReaders {
+            get {
+                return ResourceManager.GetString("ZeroApiVersionReaders", resourceCulture);
             }
         }
     }
