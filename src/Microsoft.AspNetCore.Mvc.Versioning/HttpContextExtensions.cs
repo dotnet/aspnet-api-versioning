@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
     using Http;
+    using Routing;
     using System;
     using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using Versioning;
     using static ApiVersion;
     using static System.ComponentModel.EditorBrowsableState;
+    using static System.String;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/> class.
@@ -15,6 +17,7 @@
     public static class HttpContextExtensions
     {
         private const string ApiVersionKey = "MS_" + nameof( ApiVersion );
+        private const string ApiVersionRouteParameterName = "MS_" + nameof( ApiVersionRouteConstraint ) + "_ParameterName";
 
         /// <summary>
         /// Gets the current raw, unparsed service API version requested.
@@ -74,6 +77,34 @@
             else
             {
                 context.Items[ApiVersionKey] = version;
+            }
+        }
+
+        internal static string GetRouteParameterNameAssignedByApiVersionRouteConstraint( this HttpContext context )
+        {
+            Contract.Requires( context != null );
+
+            var parameterName = default( string );
+
+            if ( context.Items.TryGetValue( ApiVersionRouteParameterName, out parameterName ) )
+            {
+                return parameterName;
+            }
+
+            return null;
+        }
+
+        internal static void SetRouteParameterName( this HttpContext context, string parameterName )
+        {
+            Contract.Requires( context != null );
+
+            if ( IsNullOrEmpty( parameterName ) )
+            {
+                context.Items.Remove( ApiVersionRouteParameterName );
+            }
+            else
+            {
+                context.Items[ApiVersionRouteParameterName] = parameterName;
             }
         }
     }

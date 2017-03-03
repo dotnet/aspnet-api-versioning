@@ -17,7 +17,7 @@
 
     public class ApiVersionRouteConstraintTest
     {
-        private class PassThroughRouter : IRouter
+        class PassThroughRouter : IRouter
         {
             public VirtualPathData GetVirtualPath( VirtualPathContext context ) => null;
 
@@ -28,7 +28,16 @@
             }
         }
 
-        private static ServiceCollection CreateServices()
+        static HttpContext NewHttpContext()
+        {
+            var httpContext = new Mock<HttpContext>();
+
+            httpContext.SetupProperty( hc => hc.Items, new Dictionary<object, object>() );
+
+            return httpContext.Object;
+        }
+
+        static ServiceCollection CreateServices()
         {
             var services = new ServiceCollection();
 
@@ -41,7 +50,7 @@
             return services;
         }
 
-        private static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
+        static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
         {
             var app = new Mock<IApplicationBuilder>();
             app.SetupGet( a => a.ApplicationServices ).Returns( services );
@@ -56,7 +65,7 @@
         public void match_should_return_expected_result_for_url_generation( string key, string value, bool expected )
         {
             // arrange
-            var httpContext = new Mock<HttpContext>().Object;
+            var httpContext = NewHttpContext();
             var route = new Mock<IRouter>().Object;
             var values = new RouteValueDictionary();
             var routeDirection = UrlGeneration;
@@ -78,16 +87,14 @@
         public void match_should_return_false_when_route_key_is_missing()
         {
             // arrange
-            var httpContext = new Mock<HttpContext>();
+            var httpContext = NewHttpContext();
             var route = new Mock<IRouter>().Object;
             var values = new RouteValueDictionary();
             var routeDirection = IncomingRequest;
             var constraint = new ApiVersionRouteConstraint();
 
-            httpContext.SetupProperty( c => c.Items, new Dictionary<object, object>() );
-
             // act
-            var matched = constraint.Match( httpContext.Object, route, "version", values, routeDirection );
+            var matched = constraint.Match( httpContext, route, "version", values, routeDirection );
 
             // assert
             matched.Should().BeFalse();
@@ -100,17 +107,15 @@
         public void match_should_return_false_when_route_parameter_is_invalid( string version )
         {
             // arrange
-            var httpContext = new Mock<HttpContext>();
+            var httpContext = NewHttpContext();
             var route = new Mock<IRouter>().Object;
             var routeKey = nameof( version );
             var values = new RouteValueDictionary() { [routeKey] = version };
             var routeDirection = IncomingRequest;
             var constraint = new ApiVersionRouteConstraint();
 
-            httpContext.SetupProperty( c => c.Items, new Dictionary<object, object>() );
-
             // act
-            var matched = constraint.Match( httpContext.Object, route, routeKey, values, routeDirection );
+            var matched = constraint.Match( httpContext, route, routeKey, values, routeDirection );
 
             // assert
             matched.Should().BeFalse();
@@ -120,16 +125,14 @@
         public void match_should_return_true_when_matched()
         {
             // arrange
-            var httpContext = new Mock<HttpContext>();
+            var httpContext = NewHttpContext();
             var route = new Mock<IRouter>().Object;
             var values = new RouteValueDictionary() { ["version"] = "2.0" };
             var routeDirection = IncomingRequest;
             var constraint = new ApiVersionRouteConstraint();
 
-            httpContext.SetupProperty( c => c.Items, new Dictionary<object, object>() );
-
             // act
-            var matched = constraint.Match( httpContext.Object, route, "version", values, routeDirection );
+            var matched = constraint.Match( httpContext, route, "version", values, routeDirection );
 
             // assert
             matched.Should().BeTrue();
