@@ -30,10 +30,11 @@
             }
 
             var value = default( string );
+            var properties = request.ApiVersionProperties();
 
             if ( values.TryGetValue( parameterName, out value ) )
             {
-                request.SetRouteParameterName( parameterName );
+                properties.RouteParameterName = parameterName;
             }
             else
             {
@@ -49,7 +50,7 @@
 
             if ( TryParse( value, out requestedVersion ) )
             {
-                request.SetRequestedApiVersion( requestedVersion );
+                properties.ApiVersion = requestedVersion;
                 return true;
             }
 

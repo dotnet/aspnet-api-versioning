@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
     using Http;
+    using Http.Versioning;
+    using Microsoft.OData.Core;
     using Microsoft.OData.Edm;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -10,6 +12,7 @@
     using System.Web.Http.Routing;
     using System.Web.OData.Routing;
     using System.Web.OData.Routing.Conventions;
+    using static System.Net.HttpStatusCode;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
     /// <summary>
@@ -70,7 +73,8 @@
                 return base.Match( request, route, parameterName, values, routeDirection );
             }
 
-            var requestedVersion = request.GetRequestedApiVersionOrReturnBadRequest();
+            var properties = request.ApiVersionProperties();
+            var requestedVersion = GetRequestedApiVersionOrReturnBadRequest( request, properties );
 
             if ( requestedVersion != null )
             {
@@ -92,14 +96,30 @@
 
             if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
             {
-                request.SetRequestedApiVersion( ApiVersion );
+                properties.ApiVersion = ApiVersion;
                 return base.Match( request, route, parameterName, values, routeDirection );
             }
 
             return false;
         }
 
-        private static void DecorateUrlHelperWithApiVersionRouteValueIfNecessary( HttpRequestMessage request, IDictionary<string, object> values )
+        static ApiVersion GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request, ApiVersionRequestProperties properties )
+        {
+            Contract.Requires( request != null );
+            Contract.Requires( properties != null );
+
+            try
+            {
+                return properties.ApiVersion;
+            }
+            catch ( AmbiguousApiVersionException ex )
+            {
+                var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
+                throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
+            }
+        }
+
+        static void DecorateUrlHelperWithApiVersionRouteValueIfNecessary( HttpRequestMessage request, IDictionary<string, object> values )
         {
             Contract.Requires( request != null );
             Contract.Requires( values != null );

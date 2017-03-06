@@ -74,7 +74,7 @@
                 throw ambiguousException.Value;
             }
 
-            request.SetRequestedApiVersion( requestedVersion );
+            request.ApiVersionProperties().ApiVersion = requestedVersion;
             result.Controller = versionedController;
 
             return result;

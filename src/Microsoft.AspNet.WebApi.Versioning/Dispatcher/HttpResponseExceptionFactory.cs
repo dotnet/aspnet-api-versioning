@@ -69,7 +69,7 @@
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
         private HttpResponseMessage CreateBadRequestForUnspecifiedApiVersionOrInvalidApiVersion( bool versionNeutral )
         {
-            var requestedVersion = request.GetRawRequestedApiVersion();
+            var requestedVersion = request.ApiVersionProperties().RawApiVersion;
             var parsedVersion = default( ApiVersion );
             var message = default( string );
             var context = default( ErrorResponseContext );
