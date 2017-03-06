@@ -30,10 +30,11 @@
             }
 
             var value = default( string );
+            var properties = httpContext.ApiVersionProperties();
 
             if ( values.TryGetValue( routeKey, out value ) )
             {
-                httpContext.SetRouteParameterName( routeKey );
+                properties.RouteParameterName = routeKey;
             }
             else
             {
@@ -49,7 +50,7 @@
 
             if ( TryParse( value, out requestedVersion ) )
             {
-                httpContext.SetRequestedApiVersion( requestedVersion );
+                properties.ApiVersion = requestedVersion;
                 return true;
             }
 

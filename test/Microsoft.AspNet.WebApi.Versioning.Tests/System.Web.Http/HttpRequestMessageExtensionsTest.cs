@@ -3,9 +3,6 @@
     using FluentAssertions;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
-    using Moq;
-    using System;
-    using System.Collections.Generic;
     using System.Net.Http;
     using Xunit;
     using static System.Net.Http.HttpMethod;
@@ -30,7 +27,6 @@
 
             // assert
             version.Should().BeNull();
-            request.Properties["MS_ApiVersion"].Should().BeNull();
         }
 
         [Theory]
@@ -60,7 +56,6 @@
 
             // assert
             version.Should().BeNull();
-            request.Properties["MS_ApiVersion"].Should().BeNull();
         }
 
         [Fact]
@@ -79,7 +74,7 @@
 
             // assert
             version.Should().Be( requestedVersion );
-            request.Properties["MS_ApiVersion"].Should().Be( requestedVersion );
+            request.ApiVersionProperties().ApiVersion.Should().Be( requestedVersion );
         }
 
         [Theory]
@@ -102,7 +97,7 @@
 
             // assert
             version.Should().Be( requestedVersion );
-            request.Properties["MS_ApiVersion"].Should().Be( requestedVersion );
+            request.ApiVersionProperties().ApiVersion.Should().Be( requestedVersion );
         }
     }
 }

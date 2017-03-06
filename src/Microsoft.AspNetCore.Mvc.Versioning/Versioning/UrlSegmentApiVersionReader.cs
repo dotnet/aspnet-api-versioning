@@ -22,7 +22,7 @@
             Arg.NotNull( request, nameof( request ) );
 
             var context = request.HttpContext;
-            var key = context.GetRouteParameterNameAssignedByApiVersionRouteConstraint();
+            var key = context.ApiVersionProperties().RouteParameterName;
 
             if ( IsNullOrEmpty( key ) )
             {

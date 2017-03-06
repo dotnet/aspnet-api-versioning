@@ -29,7 +29,7 @@
                 return null;
             }
 
-            var key = request.GetRouteParameterNameAssignedByApiVersionRouteConstraint();
+            var key = request.ApiVersionProperties().RouteParameterName;
             var subRouteData = routeData.GetSubRoutes() ?? new[] { routeData };
             var value = default( object );
 

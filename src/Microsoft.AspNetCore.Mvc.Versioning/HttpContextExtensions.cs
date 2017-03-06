@@ -1,14 +1,9 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
     using Http;
-    using Routing;
     using System;
-    using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using Versioning;
-    using static ApiVersion;
-    using static System.ComponentModel.EditorBrowsableState;
-    using static System.String;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/> class.
@@ -16,24 +11,26 @@
     [CLSCompliant( false )]
     public static class HttpContextExtensions
     {
-        private const string ApiVersionKey = "MS_" + nameof( ApiVersion );
-        private const string ApiVersionRouteParameterName = "MS_" + nameof( ApiVersionRouteConstraint ) + "_ParameterName";
+        const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
 
         /// <summary>
-        /// Gets the current raw, unparsed service API version requested.
+        /// Gets the current API versioning request properties.
         /// </summary>
-        /// <param name="context">The current <see cref="HttpContext">HTTP context</see> to get the API version for.</param>
-        /// <returns>The raw, unparsed service API version or <c>null</c> if no service API version was requested.</returns>
-        /// <remarks>This method is primarily meant for internal use and is generally only useful for instrumentation purposes.
-        /// It is recommended that you use the <see cref="GetRequestedApiVersion(HttpContext)"/> instead.</remarks>
-        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
-        [EditorBrowsable( Never )]
-        public static string GetRawRequestedApiVersion( this HttpContext context )
+        /// <param name="context">The <see cref="HttpContext">HTTP context</see> to get the API versioning properties for.</param>
+        /// <returns>The current <see cref="ApiVersionRequestProperties">API versioning properties</see>.</returns>
+        public static ApiVersionRequestProperties ApiVersionProperties( this HttpContext context )
         {
             Arg.NotNull( context, nameof( context ) );
+            Contract.Ensures( Contract.Result<ApiVersionRequestProperties>() != null );
 
-            var reader = (IApiVersionReader) context.RequestServices.GetService( typeof( IApiVersionReader ) ) ?? new QueryStringApiVersionReader();
-            return reader.Read( context.Request );
+            var properties = default( ApiVersionRequestProperties );
+
+            if ( !context.Items.TryGetValue( ApiVersionPropertiesKey, out properties ) )
+            {
+                context.Items[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( context );
+            }
+
+            return properties;
         }
 
         /// <summary>
@@ -47,65 +44,7 @@
         public static ApiVersion GetRequestedApiVersion( this HttpContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-
-            var version = default( ApiVersion );
-
-            if ( context.Items.TryGetValue( ApiVersionKey, out version ) )
-            {
-                return version;
-            }
-
-            var value = context.GetRawRequestedApiVersion();
-
-            if ( !TryParse( value, out version ) )
-            {
-                version = null;
-            }
-
-            context.Items[ApiVersionKey] = version;
-            return version;
-        }
-
-        internal static void SetRequestedApiVersion( this HttpContext context, ApiVersion version )
-        {
-            Contract.Requires( context != null );
-
-            if ( version == null )
-            {
-                context.Items.Remove( ApiVersionKey );
-            }
-            else
-            {
-                context.Items[ApiVersionKey] = version;
-            }
-        }
-
-        internal static string GetRouteParameterNameAssignedByApiVersionRouteConstraint( this HttpContext context )
-        {
-            Contract.Requires( context != null );
-
-            var parameterName = default( string );
-
-            if ( context.Items.TryGetValue( ApiVersionRouteParameterName, out parameterName ) )
-            {
-                return parameterName;
-            }
-
-            return null;
-        }
-
-        internal static void SetRouteParameterName( this HttpContext context, string parameterName )
-        {
-            Contract.Requires( context != null );
-
-            if ( IsNullOrEmpty( parameterName ) )
-            {
-                context.Items.Remove( ApiVersionRouteParameterName );
-            }
-            else
-            {
-                context.Items[ApiVersionRouteParameterName] = parameterName;
-            }
+            return context.ApiVersionProperties().ApiVersion;
         }
     }
 }

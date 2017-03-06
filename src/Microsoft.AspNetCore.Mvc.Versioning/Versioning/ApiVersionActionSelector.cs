@@ -112,7 +112,7 @@
             {
                 var selectedAction = finalMatches[0];
                 selectedAction.AggregateAllVersions( selectionContext );
-                httpContext.SetRequestedApiVersion( selectionContext.RequestedVersion );
+                httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
                 return selectedAction;
             }
             else
@@ -221,7 +221,7 @@
 
             if ( parsedVersion == null )
             {
-                requestedVersion = context.HttpContext.GetRawRequestedApiVersion();
+                requestedVersion = context.HttpContext.ApiVersionProperties().RawApiVersion;
 
                 if ( IsNullOrEmpty( requestedVersion ) )
                 {

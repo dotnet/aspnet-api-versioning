@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Versioning", "Versioning", 
 		src\Common\Versioning\ApiVersionModelDebugView.cs = src\Common\Versioning\ApiVersionModelDebugView.cs
 		src\Common\Versioning\ApiVersionModelExtensions.cs = src\Common\Versioning\ApiVersionModelExtensions.cs
 		src\Common\Versioning\ApiVersionReader.cs = src\Common\Versioning\ApiVersionReader.cs
+		src\Common\Versioning\ApiVersionRequestProperties.cs = src\Common\Versioning\ApiVersionRequestProperties.cs
 		src\Common\Versioning\ApiVersionsBaseAttribute.cs = src\Common\Versioning\ApiVersionsBaseAttribute.cs
 		src\Common\Versioning\AttributeExtensions.cs = src\Common\Versioning\AttributeExtensions.cs
 		src\Common\Versioning\ConstantApiVersionSelector.cs = src\Common\Versioning\ConstantApiVersionSelector.cs

@@ -1,29 +1,23 @@
 ﻿namespace System.Web.Http
 {
-    using ComponentModel;
     using Diagnostics.CodeAnalysis;
     using Diagnostics.Contracts;
     using Microsoft;
     using Microsoft.Web.Http;
-    using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning;
     using Net;
     using Net.Http;
     using System;
-    using static ComponentModel.EditorBrowsableState;
-    using static Microsoft.Web.Http.ApiVersion;
-    using static System.String;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequestMessage"/> class.
     /// </summary>
     public static class HttpRequestMessageExtensions
     {
-        private const string ApiVersionKey = "MS_" + nameof( ApiVersion );
-        private const string ApiVersionRouteParameterName = "MS_" + nameof( ApiVersionRouteConstraint ) + "_ParameterName";
+        const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
-        private static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, Func<bool, HttpError> errorCreator )
+        static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, Func<bool, HttpError> errorCreator )
         {
             Contract.Requires( request != null );
             Contract.Requires( errorCreator != null );
@@ -75,20 +69,23 @@
         }
 
         /// <summary>
-        /// Gets the current raw, unparsed service API version requested.
+        /// Gets the current API versioning request properties.
         /// </summary>
-        /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get the API version for.</param>
-        /// <returns>The raw, unparsed service API version or <c>null</c> if no service API version was requested.</returns>
-        /// <remarks>This method is primarily meant for internal use and is generally only useful for instrumentation purposes.
-        /// It is recommended that you use the <see cref="GetRequestedApiVersion(HttpRequestMessage)"/> instead.</remarks>
-        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
-        [EditorBrowsable( Never )]
-        public static string GetRawRequestedApiVersion( this HttpRequestMessage request )
+        /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get the API versioning properties for.</param>
+        /// <returns>The current <see cref="ApiVersionRequestProperties">API versioning properties</see>.</returns>
+        public static ApiVersionRequestProperties ApiVersionProperties( this HttpRequestMessage request )
         {
             Arg.NotNull( request, nameof( request ) );
+            Contract.Ensures( Contract.Result<ApiVersionRequestProperties>() != null );
 
-            var reader = request.GetApiVersioningOptions().ApiVersionReader;
-            return reader.Read( request );
+            var properties = default( ApiVersionRequestProperties );
+
+            if ( !request.Properties.TryGetValue( ApiVersionPropertiesKey, out properties ) )
+            {
+                request.Properties[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( request );
+            }
+
+            return properties;
         }
 
         /// <summary>
@@ -103,73 +100,7 @@
         public static ApiVersion GetRequestedApiVersion( this HttpRequestMessage request )
         {
             Arg.NotNull( request, nameof( request ) );
-
-            var version = default( ApiVersion );
-
-            if ( request.Properties.TryGetValue( ApiVersionKey, out version ) )
-            {
-                return version;
-            }
-
-            var value = request.GetRawRequestedApiVersion();
-
-            if ( TryParse( value, out version ) )
-            {
-                request.Properties[ApiVersionKey] = version;
-                return version;
-            }
-
-            request.Properties[ApiVersionKey] = null;
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the current service API version requested.
-        /// </summary>
-        /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get the API version for.</param>
-        /// <param name="version">The <see cref="ApiVersion">API version</see> to be set as the requested value.</param>
-        /// <remarks>This method is for internal use and is not meant to be called directly in your code.</remarks>
-        [EditorBrowsable( Never )]
-        public static void SetRequestedApiVersion( this HttpRequestMessage request, ApiVersion version )
-        {
-            Arg.NotNull( request, nameof( request ) );
-
-            if ( version == null )
-            {
-                request.Properties.Remove( ApiVersionKey );
-            }
-            else
-            {
-                request.Properties[ApiVersionKey] = version;
-            }
-        }
-
-        internal static string GetRouteParameterNameAssignedByApiVersionRouteConstraint( this HttpRequestMessage request )
-        {
-            Contract.Requires( request != null );
-
-            var parameterName = default( string );
-
-            if ( request.Properties.TryGetValue( ApiVersionRouteParameterName, out parameterName ) )
-            {
-                return parameterName;
-            }
-
-            return null;
-        }
-
-        internal static void SetRouteParameterName( this HttpRequestMessage request, string parameterName )
-        {
-            Contract.Requires( request != null );
-
-            if ( IsNullOrEmpty( parameterName ) )
-            {
-                request.Properties.Remove( ApiVersionRouteParameterName );
-            }
-            else
-            {
-                request.Properties[ApiVersionRouteParameterName] = parameterName;
-            }
+            return request.ApiVersionProperties().ApiVersion;
         }
     }
 }

@@ -18,14 +18,17 @@
             var query = new Mock<IQueryCollection>();
             var request = new Mock<HttpRequest>();
             var httpContext = new Mock<HttpContext>();
+            var items = new Dictionary<object, object>();
 
             query.SetupGet( q => q["api-version"] ).Returns( new StringValues( "42.0" ) );
             request.SetupGet( r => r.Query ).Returns( query.Object );
             httpContext.SetupGet( c => c.Request ).Returns( request.Object );
             httpContext.SetupProperty( c => c.RequestServices, Mock.Of<IServiceProvider>() );
+            httpContext.SetupProperty( c => c.Items, items );
+            items["MS_ApiVersionRequestProperties"] = new ApiVersionRequestProperties( httpContext.Object );
 
             // act
-            var result = httpContext.Object.GetRawRequestedApiVersion();
+            var result = httpContext.Object.ApiVersionProperties().RawApiVersion;
 
             // assert
             result.Should().Be( "42.0" );
@@ -39,14 +42,17 @@
             var headers = new HeaderDictionary() { ["api-version"] = "42.0" };
             var request = new Mock<HttpRequest>();
             var httpContext = new Mock<HttpContext>();
+            var items = new Dictionary<object, object>();
 
             serviceProvider.Setup( sp => sp.GetService( typeof( IApiVersionReader ) ) ).Returns( new HeaderApiVersionReader( "api-version" ) );
             request.SetupGet( r => r.Headers ).Returns( headers );
             httpContext.SetupGet( c => c.Request ).Returns( request.Object );
             httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
+            httpContext.SetupProperty( c => c.Items, items );
+            items["MS_ApiVersionRequestProperties"] = new ApiVersionRequestProperties( httpContext.Object );
 
             // act
-            var result = httpContext.Object.GetRawRequestedApiVersion();
+            var result = httpContext.Object.ApiVersionProperties().RawApiVersion;
 
             // assert
             result.Should().Be( "42.0" );

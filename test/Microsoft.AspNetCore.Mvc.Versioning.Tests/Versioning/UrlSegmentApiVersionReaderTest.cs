@@ -28,18 +28,23 @@
         static HttpRequest RequestAfterApiVersionConstraintHasBeenMatched( string requestedVersion )
         {
             const string ParmaterName = "version";
-            const string ItemKey = "MS_ApiVersionRouteConstraint_ParameterName";
+            const string ItemKey = "MS_ApiVersionRequestProperties";
             var request = new Mock<HttpRequest>();
+
             var routeData = new RouteData() { Values = { [ParmaterName] = requestedVersion } };
             var feature = new RoutingFeature() { RouteData = routeData };
             var featureCollection = new Mock<IFeatureCollection>();
-            var items = new Dictionary<object, object>() { [ItemKey] = ParmaterName };
+            var items = new Dictionary<object, object>();
             var httpContext = new Mock<HttpContext>();
             var reader = new UrlSegmentApiVersionReader();
 
             featureCollection.SetupGet( fc => fc[typeof( IRoutingFeature )] ).Returns( feature );
             httpContext.SetupProperty( c => c.Items, items );
             httpContext.SetupGet( c => c.Features ).Returns( featureCollection.Object );
+
+            var properties = new ApiVersionRequestProperties( httpContext.Object ) { RouteParameterName = ParmaterName };
+
+            items[ItemKey] = properties;
             request.SetupGet( r => r.HttpContext ).Returns( httpContext.Object );
 
             return request.Object;
