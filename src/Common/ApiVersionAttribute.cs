@@ -20,6 +20,24 @@ namespace Microsoft.AspNetCore.Mvc
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
         /// </summary>
+        /// <param name="version">The API version string.</param>
+        public ApiVersionAttribute( string version )
+            : base( version )
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
+        /// </summary>
+        /// <param name="versions">An <see cref="Array">array</see> of API version strings.</param>
+        [CLSCompliant( false )]
+        public ApiVersionAttribute( params string[] versions )
+            : base ( versions )
+        {
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
+        /// </summary>
         /// <param name="version">The <see cref="ApiVersion">API version</see>.</param>
         protected ApiVersionAttribute( ApiVersion version )
             : base( version )
@@ -29,9 +47,9 @@ namespace Microsoft.AspNetCore.Mvc
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
         /// </summary>
-        /// <param name="version">The API version string.</param>
-        public ApiVersionAttribute( string version )
-            : base( version )
+        /// <param name="versions">An <see cref="Array">array</see> of <see cref="ApiVersion">API versions</see>.</param>
+        protected ApiVersionAttribute( params ApiVersion[] versions )
+            : base ( versions )
         {
         }
 
