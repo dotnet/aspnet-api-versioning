@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>netcoreapp1.1</TargetFramework>
+  <AssemblyName>Microsoft.AspNetCore.Mvc.Versioning.Tests</AssemblyName>
+  <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  <RuntimeFrameworkVersion>1.0.3</RuntimeFrameworkVersion>
+  <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <Content Include="xunit.runner.json">
+   <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <!--<PackageReference Include="more.xunit" Version="2.2.0-beta2-build3300" />-->
+  <!--<PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-preview2-build1029" />-->
+
+  <PackageReference Include="xunit" Version="2.2.0" />
+  <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.1" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.0.1" />
+  <PackageReference Include="FluentAssertions" Version="4.19.0" />
+  <PackageReference Include="Moq" Version="4.7.0" />
+ </ItemGroup>
+
+ <Import Project="..\Test.Common\Test.Common.projitems" Label="Shared" />
+
+</Project>

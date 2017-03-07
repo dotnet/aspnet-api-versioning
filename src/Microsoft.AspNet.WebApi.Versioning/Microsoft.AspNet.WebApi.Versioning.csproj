@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>2.0.3</VersionPrefix>
+  <AssemblyVersion>2.0.3.0</AssemblyVersion>
+  <TargetFramework>net45</TargetFramework>
+  <AssemblyName>Microsoft.AspNet.WebApi.Versioning</AssemblyName>
+  <AssemblyTitle>Microsoft ASP.NET Web API Versioning</AssemblyTitle>
+  <Description>A service API versioning library for Microsoft ASP.NET Web API.</Description>
+  <RootNamespace>Microsoft.Web.Http</RootNamespace>
+  <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
+  <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning</PackageTags>
+  <PackageReleaseNotes>• Fixed responses when a version is unspecified (Issue #62)</PackageReleaseNotes>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <Reference Include="System" />
+  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Compile Update="SR.Designer.cs">
+   <DesignTime>True</DesignTime>
+   <AutoGen>True</AutoGen>
+   <DependentUpon>SR.resx</DependentUpon>
+  </Compile>
+ </ItemGroup>
+
+ <ItemGroup>
+  <EmbeddedResource Update="SR.resx">
+   <Generator>ResXFileCodeGenerator</Generator>
+   <LastGenOutput>SR.Designer.cs</LastGenOutput>
+  </EmbeddedResource>
+ </ItemGroup>
+
+ <Import Project="..\Common\Common.projitems" Label="Shared" />
+ <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+ <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+ 
+</Project>

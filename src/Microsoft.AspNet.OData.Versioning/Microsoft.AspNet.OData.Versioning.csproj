@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>2.0.1</VersionPrefix>
+  <AssemblyVersion>2.0.1.0</AssemblyVersion>
+  <TargetFramework>net45</TargetFramework>
+  <AssemblyName>Microsoft.AspNet.OData.Versioning</AssemblyName>
+  <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
+  <Description>A service API versioning library for Microsoft ASP.NET Web API and OData v4.0.</Description>
+  <RootNamespace>Microsoft</RootNamespace>
+  <PackageTags>Microsoft;AspNet;AspNetWebAPI;OData;Versioning</PackageTags>
+  <PackageReleaseNotes>• Fixes route template parameter name binding (Issue #40)</PackageReleaseNotes>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNet.OData" Version="[5.9.1,6.0.0)" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <Reference Include="System" />
+  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+ <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+ <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+
+</Project>

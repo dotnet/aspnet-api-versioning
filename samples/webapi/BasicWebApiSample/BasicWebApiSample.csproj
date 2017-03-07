@@ -95,9 +95,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="..\..\..\src\Microsoft.AspNet.WebApi.Versioning\bin\$(Configuration)\net45\Microsoft.AspNet.WebApi.Versioning.dll">
-      <Name>WebApi</Name>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -117,6 +114,12 @@
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj">
+      <Project>{3bac97ed-1a8e-4f5a-a716-db5255f51c81}</Project>
+      <Name>Microsoft.AspNet.WebApi.Versioning</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
