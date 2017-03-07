@@ -22,12 +22,12 @@
     [Trait( "Framework", "ASP.NET Core" )]
     public abstract class AcceptanceTest : IDisposable
     {
-        private const string JsonMediaType = "application/json";
-        private static readonly HttpMethod Patch = new HttpMethod( "PATCH" );
-        private readonly Lazy<TestServer> server;
-        private readonly Lazy<HttpClient> client;
-        private readonly FilteredControllerFeatureProvider filteredControllerTypes = new FilteredControllerFeatureProvider();
-        private bool disposed;
+        const string JsonMediaType = "application/json";
+        static readonly HttpMethod Patch = new HttpMethod( "PATCH" );
+        readonly Lazy<TestServer> server;
+        readonly Lazy<HttpClient> client;
+        readonly FilteredControllerFeatureProvider filteredControllerTypes = new FilteredControllerFeatureProvider();
+        bool disposed;
 
         ~AcceptanceTest()
         {
@@ -77,7 +77,7 @@
             GC.SuppressFinalize( this );
         }
 
-        private TestServer CreateServer()
+        TestServer CreateServer()
         {
             var builder = new WebHostBuilder()
                 .Configure( app => app.UseMvc( OnConfigureRoutes ) )
@@ -86,14 +86,14 @@
             return new TestServer( builder );
         }
 
-        private HttpClient CreateAndInitializeHttpClient()
+        HttpClient CreateAndInitializeHttpClient()
         {
             var newClient = Server.CreateClient();
             newClient.BaseAddress = new Uri( "http://localhost" );
             return newClient;
         }
 
-        private void OnConfigureServices( IServiceCollection services )
+        void OnConfigureServices( IServiceCollection services )
         {
             var partManager = new ApplicationPartManager();
 
@@ -110,7 +110,7 @@
         {
         }
 
-        private HttpRequestMessage CreateRequest<TEntity>( string requestUri, TEntity entity, HttpMethod method )
+        HttpRequestMessage CreateRequest<TEntity>( string requestUri, TEntity entity, HttpMethod method )
         {
             var request = new HttpRequestMessage( method, requestUri );
 
@@ -125,13 +125,28 @@
             return request;
         }
 
+        HttpRequestMessage CreateRequest( string requestUri, HttpContent content, HttpMethod method )
+        {
+            var request = new HttpRequestMessage( method, requestUri ) { Content = content };
+
+            Client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( JsonMediaType ) );
+
+            return request;
+        }
+
         protected virtual Task<HttpResponseMessage> GetAsync( string requestUri ) => Client.SendAsync( CreateRequest( requestUri, default( object ), Get ) );
 
         protected virtual Task<HttpResponseMessage> PostAsync<TEntity>( string requestUri, TEntity entity ) => Client.SendAsync( CreateRequest( requestUri, entity, Post ) );
 
+        protected virtual Task<HttpResponseMessage> PostAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Post ) );
+
         protected virtual Task<HttpResponseMessage> PutAsync<TEntity>( string requestUri, TEntity entity ) => Client.SendAsync( CreateRequest( requestUri, entity, Put ) );
 
+        protected virtual Task<HttpResponseMessage> PutAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Put ) );
+
         protected virtual Task<HttpResponseMessage> PatchAsync<TEntity>( string requestUri, TEntity entity ) => Client.SendAsync( CreateRequest( requestUri, entity, Patch ) );
+
+        protected virtual Task<HttpResponseMessage> PatchAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Patch ) );
 
         protected virtual Task<HttpResponseMessage> DeleteAsync( string requestUri ) => Client.SendAsync( CreateRequest( requestUri, default( object ), Delete ) );
     }
