@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         public QueryStringApiVersionReader( string parameterName )
         {
             Arg.NotNullOrEmpty( parameterName, nameof( parameterName ) );
-            ParameterName = parameterName;
+            this.parameterName = parameterName;
         }
 
         /// <summary>
