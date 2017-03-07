@@ -50,7 +50,7 @@
         }
 
         [Fact]
-        public void apply_to_should_assign_empt_conventions_to_api_version_neutral_controller()
+        public void apply_to_should_assign_empty_conventions_to_api_version_neutral_controller()
         {
             // arrange
             var controllerModel = new ControllerModel( typeof( UndecoratedController ).GetTypeInfo(), new object[0] );
