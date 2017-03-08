@@ -1,9 +1,9 @@
 ﻿namespace given
 {
     using FluentAssertions;
-    using Microsoft.Web;
-    using Microsoft.Web.Http.Basic;
-    using Microsoft.Web.Http.Basic.Controllers;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Basic;
+    using Microsoft.AspNetCore.Mvc.Basic.Controllers;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -12,12 +12,12 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_url_versioned_ApiController : BasicAcceptanceTest
+    public class a_url_versioned_Controller : BasicAcceptanceTest
     {
         [Theory]
         [InlineData( "api/v1/helloworld", null )]
         [InlineData( "api/v1/helloworld/42", "42" )]
-        public async Task _get_should_return_200( string requestUrl, string id )
+        public async Task get_should_return_200( string requestUrl, string id )
         {
             // arrange
             var body = new Dictionary<string, string>()
@@ -41,7 +41,7 @@
         }
 
         [Fact]
-        public async Task _post_should_return_201()
+        public async Task post_should_return_201()
         {
             // arrange
             var entity = default( object );
@@ -50,11 +50,11 @@
             var response = await PostAsync( "api/v1/helloworld", entity ).EnsureSuccessStatusCode();
 
             // assert
-            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/v1/helloworld/42" ) );
+            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/v1/HelloWorld/42" ) );
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 

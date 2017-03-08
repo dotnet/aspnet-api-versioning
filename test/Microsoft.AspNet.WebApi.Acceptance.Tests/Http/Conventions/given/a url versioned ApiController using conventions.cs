@@ -11,13 +11,13 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_url_versioned_ApiController_using_conventions : ConventionsAcceptanceTest
+    public class a_url_versioned_ApiController_using_conventions : ConventionsAcceptanceTest
     {
         [Theory]
         [InlineData( "api/v1/helloworld", nameof( HelloWorldController ), "1" )]
         [InlineData( "api/v2/helloworld", nameof( HelloWorld2Controller ), "2" )]
         [InlineData( "api/v3/helloworld", nameof( HelloWorld2Controller ), "3" )]
-        public async Task _get_should_return_200( string requestUrl, string controllerName, string apiVersion )
+        public async Task get_should_return_200( string requestUrl, string controllerName, string apiVersion )
         {
             // arrange
             var example = new { controller = "", version = "" };
@@ -36,7 +36,7 @@
         [InlineData( "api/v1/helloworld/42", nameof( HelloWorldController ), "1" )]
         [InlineData( "api/v2/helloworld/42", nameof( HelloWorld2Controller ), "2" )]
         [InlineData( "api/v3/helloworld/42", nameof( HelloWorld2Controller ), "3" )]
-        public async Task _get_with_id_should_return_200( string requestUrl, string controllerName, string apiVersion )
+        public async Task get_with_id_should_return_200( string requestUrl, string controllerName, string apiVersion )
         {
             // arrange
             var example = new { controller = "", version = "", id = "" };
@@ -52,7 +52,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 

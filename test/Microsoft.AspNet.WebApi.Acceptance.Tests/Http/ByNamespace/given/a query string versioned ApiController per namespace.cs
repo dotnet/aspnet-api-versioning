@@ -1,24 +1,26 @@
 ﻿namespace given
 {
     using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.ByNamespace;
+    using Microsoft.Web;
+    using Microsoft.Web.Http.ByNamespace;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_query_string_versioned_Controller_per_namespace : ByNamespaceAcceptanceTest
+    public class a_query_string_versioned_ApiController_per_namespace : ByNamespaceAcceptanceTest
     {
+        public a_query_string_versioned_ApiController_per_namespace() : base( SetupKind.Agreements ) { }
+
         [Theory]
-        [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V1.AgreementsController", "1.0" )]
-        [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V2.AgreementsController", "2.0" )]
-        [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V3.AgreementsController", "3.0" )]
-        public async Task _get_should_return_200( string controller, string apiVersion )
+        [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.AgreementsController", "1.0" )]
+        [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V2.AgreementsController", "2.0" )]
+        [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V3.AgreementsController", "3.0" )]
+        public async Task get_should_return_200( string controller, string apiVersion )
         {
             // arrange
-            var example = new { controller = "", apiVersion = "", accountId = "" };
+            var example = new { Controller = "", ApiVersion = "", AccountId = "" };
 
             // act
             var response = await GetAsync( $"api/agreements/42?api-version={apiVersion}" ).EnsureSuccessStatusCode();
@@ -26,11 +28,11 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
-            content.ShouldBeEquivalentTo( new { controller = controller, apiVersion = apiVersion, accountId = "42" } );
+            content.ShouldBeEquivalentTo( new { Controller = controller, ApiVersion = apiVersion, AccountId = "42" } );
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 
@@ -45,7 +47,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unspecified()
+        public async Task get_should_return_400_when_version_is_unspecified()
         {
             // arrange
 

@@ -9,7 +9,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_query_string_versioned_ODataController_split_into_two_types_using_conventions : ConventionsAcceptanceTest
+    public class a_query_string_versioned_ODataController_split_into_two_types_using_conventions : ConventionsAcceptanceTest
     {
         [Theory]
         [InlineData( "api/people?api-version=1.0" )]
@@ -18,7 +18,7 @@
         [InlineData( "api/people(42)?api-version=2.0" )]
         [InlineData( "api/people?api-version=3.0" )]
         [InlineData( "api/people(42)?api-version=3.0" )]
-        public async Task _get_should_return_200( string requestUrl )
+        public async Task get_should_return_200( string requestUrl )
         {
             // arrange
 
@@ -31,7 +31,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 
@@ -46,7 +46,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_204()
+        public async Task patch_should_return_204()
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
@@ -61,7 +61,7 @@
         [Theory]
         [InlineData( "api/people(42)?api-version=1.0" )]
         [InlineData( "api/people(42)?api-version=3.0" )]
-        public async Task _patch_should_return_405_when_version_could_be_supported( string requestUrl )
+        public async Task patch_should_return_405_when_version_could_be_supported( string requestUrl )
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
@@ -76,7 +76,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_400_when_version_is_unsupported()
+        public async Task patch_should_return_400_when_version_is_unsupported()
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
@@ -91,7 +91,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unspecified()
+        public async Task get_should_return_400_when_version_is_unspecified()
         {
             // arrange
 

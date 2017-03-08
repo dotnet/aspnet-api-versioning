@@ -1,24 +1,24 @@
 ﻿namespace given
 {
     using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.MediaTypeNegotiation;
-    using Microsoft.AspNetCore.Mvc.MediaTypeNegotiation.Controllers;
+    using Microsoft.Web;
+    using Microsoft.Web.Http.MediaTypeNegotiation;
+    using Microsoft.Web.Http.MediaTypeNegotiation.Controllers;
     using System;
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Formatting;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.Http.Headers.MediaTypeWithQualityHeaderValue;
     using static System.Net.HttpStatusCode;
-    using static System.Text.Encoding;
 
-    public class a_Controller_versioned_by_media_type_negotiation : MediaTypeNegotiationAcceptanceTest
+    public class an_ApiController_versioned_by_media_type_negotiation : MediaTypeNegotiationAcceptanceTest
     {
         [Theory]
         [InlineData( nameof( ValuesController ), "1.0" )]
         [InlineData( nameof( Values2Controller ), "2.0" )]
-        public async Task _get_should_return_200( string controller, string apiVersion )
+        public async Task get_should_return_200( string controller, string apiVersion )
         {
             // arrange
             var example = new { controller = "", version = "" };
@@ -36,7 +36,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
             Client.DefaultRequestHeaders.Accept.Add( Parse( "application/json;v=3.0" ) );
@@ -53,7 +53,7 @@
         [Theory]
         [InlineData( "api/values", nameof( Values2Controller ), "2.0" )]
         [InlineData( "api/helloworld", nameof( HelloWorldController ), "1.0" )]
-        public async Task _get_should_return_current_version_when_version_is_unspecified( string requestUrl, string controller, string apiVersion )
+        public async Task get_should_return_current_version_when_version_is_unspecified( string requestUrl, string controller, string apiVersion )
         {
             // arrange
             var example = new { controller = "", version = "" };
@@ -67,18 +67,18 @@
         }
 
         [Fact]
-        public async Task _post_should_return_201()
+        public async Task post_should_return_201()
         {
             // arrange
-            var content = new StringContent( "{\"text\":\"Test\"}", UTF8 );
-
-            content.Headers.ContentType = Parse( "application/json;v=1.0" );
+            var entity = new { text = "Test" };
+            var mediaType = Parse( "application/json;v=1.0" );
+            var content = new ObjectContent( entity.GetType(), entity, new JsonMediaTypeFormatter(), mediaType );
 
             // act
             var response = await PostAsync( "api/helloworld", content ).EnsureSuccessStatusCode();
 
             // assert
-            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/HelloWorld/42" ) );
+            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/helloworld/42" ) );
         }
     }
 }

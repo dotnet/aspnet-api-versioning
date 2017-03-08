@@ -1,9 +1,9 @@
 ﻿namespace given
 {
     using FluentAssertions;
-    using Microsoft.Web;
-    using Microsoft.Web.Http.Basic;
-    using Microsoft.Web.Http.Basic.Controllers;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Basic;
+    using Microsoft.AspNetCore.Mvc.Basic.Controllers;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
@@ -11,12 +11,12 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_query_string_versioned_ApiController_split_into_two_types : BasicAcceptanceTest
+    public class a_query_string_versioned_Controller_split_into_two_types : BasicAcceptanceTest
     {
         [Theory]
         [InlineData( nameof( ValuesController ), "1.0" )]
         [InlineData( nameof( Values2Controller ), "2.0" )]
-        public async Task _get_should_return_200( string controller, string apiVersion )
+        public async Task get_should_return_200( string controller, string apiVersion )
         {
             // arrange
 
@@ -36,7 +36,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 
@@ -51,7 +51,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unspecified()
+        public async Task get_should_return_400_when_version_is_unspecified()
         {
             // arrange
 

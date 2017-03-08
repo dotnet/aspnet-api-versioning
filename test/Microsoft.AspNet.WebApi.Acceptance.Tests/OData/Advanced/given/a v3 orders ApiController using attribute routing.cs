@@ -7,10 +7,10 @@
     using System.Threading.Tasks;
     using Xunit;
 
-    public class _a_v3_orders_ApiController_using_attribute_routing : AdvancedAcceptanceTest
+    public class a_v3_orders_ApiController_using_attribute_routing : AdvancedAcceptanceTest
     {
         [Fact]
-        public async Task _get_should_return_200()
+        public async Task get_should_return_200()
         {
             // arrange
 
@@ -24,7 +24,7 @@
         }
 
         [Fact]
-        public async Task _get_with_key_should_return_200_without_version()
+        public async Task get_with_key_should_return_200_without_version()
         {
             // arrange
 

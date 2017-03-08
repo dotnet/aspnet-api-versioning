@@ -7,10 +7,10 @@
     using System.Threading.Tasks;
     using Xunit;
 
-    public class _a_v2_orders_ODataController : AdvancedAcceptanceTest
+    public class a_v2_orders_ODataController : AdvancedAcceptanceTest
     {
         [Fact]
-        public async Task _get_should_return_200()
+        public async Task get_should_return_200()
         {
             // arrange
 
@@ -24,7 +24,7 @@
         }
 
         [Fact]
-        public async Task _get_with_key_should_return_200()
+        public async Task get_with_key_should_return_200()
         {
             // arrange
 

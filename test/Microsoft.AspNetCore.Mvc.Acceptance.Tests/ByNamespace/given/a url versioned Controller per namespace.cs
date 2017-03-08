@@ -9,13 +9,13 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_url_versioned_Controller_per_namespace : ByNamespaceAcceptanceTest
+    public class a_url_versioned_Controller_per_namespace : ByNamespaceAcceptanceTest
     {
         [Theory]
         [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V1.AgreementsController", "1" )]
         [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V2.AgreementsController", "2" )]
         [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V3.AgreementsController", "3" )]
-        public async Task _get_should_return_200( string controller, string apiVersion )
+        public async Task get_should_return_200( string controller, string apiVersion )
         {
             // arrange
             var example = new { controller = "", apiVersion = "", accountId = "" };
@@ -30,7 +30,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 

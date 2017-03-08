@@ -2,14 +2,14 @@
 {
     using FluentAssertions;
     using Microsoft.Web;
-    using Microsoft.Web.OData.Basic;
+    using Microsoft.Web.OData.Conventions;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_url_versioned_ODataController_split_into_two_types : BasicAcceptanceTest
+    public class a_url_versioned_ODataController_split_into_two_types_using_conventions : ConventionsAcceptanceTest
     {
         [Theory]
         [InlineData( "v1/people" )]
@@ -18,7 +18,7 @@
         [InlineData( "v2/people(42)" )]
         [InlineData( "v3/people" )]
         [InlineData( "v3/people(42)" )]
-        public async Task _get_should_return_200( string requestUrl )
+        public async Task get_should_return_200( string requestUrl )
         {
             // arrange
 
@@ -31,7 +31,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_204()
+        public async Task patch_should_return_204()
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
@@ -46,7 +46,7 @@
         [Theory]
         [InlineData( "v1/people(42)" )]
         [InlineData( "v3/people(42)" )]
-        public async Task _patch_should_return_405_when_version_could_be_supported( string requestUrl )
+        public async Task patch_should_return_405_when_version_could_be_supported( string requestUrl )
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
@@ -61,7 +61,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_400_when_version_is_unsupported()
+        public async Task patch_should_return_400_when_version_is_unsupported()
         {
             // arrange
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };

@@ -5,16 +5,20 @@
   <AssemblyName>Microsoft.AspNet.WebApi.Acceptance.Tests</AssemblyName>
  </PropertyGroup>
 
+ <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+   <NoWarn>1701;1702;1705;1006</NoWarn>
+ </PropertyGroup>
+
  <ItemGroup>
   <ProjectReference Include="..\..\src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
   <ProjectReference Include="..\..\src\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.csproj" />
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="more.xunit" Version="2.2.0" />
-  <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  <PackageReference Include="more.xunit" Version="2.2.2" />
+  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.1" />
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
-  <PackageReference Include="FluentAssertions" Version="4.19.0" />
+  <PackageReference Include="FluentAssertions" Version="4.19.2" />
   <PackageReference Include="Moq" Version="4.7.0" />
  </ItemGroup>
 

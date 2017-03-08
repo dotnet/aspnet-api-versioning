@@ -2,19 +2,19 @@
 {
     using FluentAssertions;
     using Microsoft.Web;
-    using Microsoft.Web.OData.Basic;
+    using Microsoft.Web.OData.Conventions;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_url_versioned_ODataController : BasicAcceptanceTest
+    public class a_url_versioned_ODataController_using_conventions : ConventionsAcceptanceTest
     {
         [Theory]
         [InlineData( "v1/orders" )]
         [InlineData( "v1/orders(42)" )]
-        public async Task _get_should_return_200( string requestUrl )
+        public async Task get_should_return_200( string requestUrl )
         {
             // arrange
 
@@ -27,7 +27,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 

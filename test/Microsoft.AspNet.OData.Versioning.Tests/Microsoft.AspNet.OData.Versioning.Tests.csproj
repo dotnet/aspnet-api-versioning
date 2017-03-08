@@ -10,9 +10,9 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="more.xunit" Version="2.2.0" />
-  <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-  <PackageReference Include="FluentAssertions" Version="4.19.0" />
+  <PackageReference Include="more.xunit" Version="2.2.2" />
+  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.1" />
+  <PackageReference Include="FluentAssertions" Version="4.19.2" />
   <PackageReference Include="Moq" Version="4.7.0" />
  </ItemGroup>
 

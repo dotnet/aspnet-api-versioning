@@ -5,12 +5,12 @@
     using System.Threading.Tasks;
     using Xunit;
 
-    public class _a_url_versioned_and_attributeX2Drouted_ApiController_per_namespace : ByNamespaceAcceptanceTest
+    public class a_url_versioned_and_attributeX2Drouted_ApiController_per_namespace : ByNamespaceAcceptanceTest
     {
-        public _a_url_versioned_and_attributeX2Drouted_ApiController_per_namespace() : base( SetupKind.HelloWorld ) { }
+        public a_url_versioned_and_attributeX2Drouted_ApiController_per_namespace() : base( SetupKind.HelloWorld ) { }
 
         [Fact]
-        public async Task _then_get_should_should_return_200_when_a_version_is_unspecified()
+        public async Task then_get_should_should_return_200_when_a_version_is_unspecified()
         {
             // arrange
 
@@ -27,7 +27,7 @@
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.HelloWorldController", "1" )]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V2.HelloWorldController", "2" )]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V3.HelloWorldController", "3" )]
-        public async Task _get_should_return_200( string controller, string apiVersion )
+        public async Task get_should_return_200( string controller, string apiVersion )
         {
             // arrange
             var expected = $"\"V{apiVersion}\"";

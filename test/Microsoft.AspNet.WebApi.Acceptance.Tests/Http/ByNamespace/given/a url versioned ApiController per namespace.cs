@@ -9,15 +9,15 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_url_versioned_ApiController_per_namespace : ByNamespaceAcceptanceTest
+    public class a_url_versioned_ApiController_per_namespace : ByNamespaceAcceptanceTest
     {
-        public _a_url_versioned_ApiController_per_namespace() : base( SetupKind.Agreements ) { }
+        public a_url_versioned_ApiController_per_namespace() : base( SetupKind.Agreements ) { }
 
         [Theory]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.AgreementsController", "1" )]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V2.AgreementsController", "2" )]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V3.AgreementsController", "3" )]
-        public async Task _get_should_return_200( string controller, string apiVersion )
+        public async Task get_should_return_200( string controller, string apiVersion )
         {
             // arrange
             var example = new { Controller = "", ApiVersion = "", AccountId = "" };
@@ -32,7 +32,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_400_when_version_is_unsupported()
+        public async Task get_should_return_400_when_version_is_unsupported()
         {
             // arrange
 

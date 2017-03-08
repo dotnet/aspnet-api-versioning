@@ -9,12 +9,12 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class _a_mixX2Din_people_ODataController_split_into_two_types : AdvancedAcceptanceTest
+    public class a_mixX2Din_people_ODataController_split_into_two_types : AdvancedAcceptanceTest
     {
         [Theory]
         [InlineData( "api/people" )]
         [InlineData( "api/people?api-version=1.0" )]
-        public async Task _get_should_return_200_for_v1( string requestUrl )
+        public async Task get_should_return_200_for_v1( string requestUrl )
         {
             // arrange
             var example = new { value = new[] { new { id = 0, firstName = "", lastName = "" } } };
@@ -32,7 +32,7 @@
         [Theory]
         [InlineData( "api/people(42)" )]
         [InlineData( "api/people(42)?api-version=1.0" )]
-        public async Task _get_with_key_should_return_200_for_v1( string requestUrl )
+        public async Task get_with_key_should_return_200_for_v1( string requestUrl )
         {
             // arrange
             var example = new { id = 0, firstName = "", lastName = "" };
@@ -48,7 +48,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_200_for_v2()
+        public async Task get_should_return_200_for_v2()
         {
             // arrange
             var example = new { value = new[] { new { id = 0, firstName = "", lastName = "", email = "" } } };
@@ -64,7 +64,7 @@
         }
 
         [Fact]
-        public async Task _get_with_key_should_return_200_for_v2()
+        public async Task get_with_key_should_return_200_for_v2()
         {
             // arrange
             var example = new { id = 0, firstName = "", lastName = "", email = "" };
@@ -80,7 +80,7 @@
         }
 
         [Fact]
-        public async Task _get_should_return_200_for_v3()
+        public async Task get_should_return_200_for_v3()
         {
             // arrange
             var example = new { value = new[] { new { id = 0, firstName = "", lastName = "", email = "", phone = "" } } };
@@ -96,7 +96,7 @@
         }
 
         [Fact]
-        public async Task _get_with_key_should_return_200_for_v3()
+        public async Task get_with_key_should_return_200_for_v3()
         {
             // arrange
             var example = new { id = 0, firstName = "", lastName = "", email = "", phone = "" };
@@ -112,7 +112,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_204()
+        public async Task patch_should_return_204()
         {
             // arrange
             var person = new { email = "bmei@somewhere.com" };
@@ -125,7 +125,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_400_when_updating_member_that_does_not_exist_in_api_version()
+        public async Task patch_should_return_400_when_updating_member_that_does_not_exist_in_api_version()
         {
             // arrange
             var person = new { phone = "bmei@somewhere.com" };
@@ -140,7 +140,7 @@
         [Theory]
         [InlineData( "1.0" )]
         [InlineData( "3.0" )]
-        public async Task _patch_should_return_405_when_version_could_be_supported( string apiVersion )
+        public async Task patch_should_return_405_when_version_could_be_supported( string apiVersion )
         {
             // arrange
             var person = new { lastName = "Me" };
@@ -155,7 +155,7 @@
         }
 
         [Fact]
-        public async Task _patch_should_return_400_when_version_is_unsupported()
+        public async Task patch_should_return_400_when_version_is_unsupported()
         {
             // arrange
             var person = new { lastName = "Me" };
