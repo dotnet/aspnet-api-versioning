@@ -8,6 +8,7 @@
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/Microsoft/aspnet-api-versioning</RepositoryUrl>
   <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
+  <PackageProjectUrl>https://github.com/Microsoft/aspnet-api-versioning/wiki</PackageProjectUrl>
   <PackageLicenseUrl>https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE</PackageLicenseUrl>
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   <IncludeSymbols>true</IncludeSymbols>
@@ -21,6 +22,11 @@
   <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
   <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  <PackageOutputPath>$(MSBuildThisFileDirectory)\bin</PackageOutputPath>
+ </PropertyGroup>
+
+ <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
  </PropertyGroup>
 
  <PropertyGroup>

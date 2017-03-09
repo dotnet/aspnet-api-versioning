@@ -19,7 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9
 		build.targets = build.targets
 		CustomDictionary.xml = CustomDictionary.xml
 		LICENSE = LICENSE
-		pack.ps1 = pack.ps1
 		README.md = README.md
 	EndProjectSection
 EndProject
