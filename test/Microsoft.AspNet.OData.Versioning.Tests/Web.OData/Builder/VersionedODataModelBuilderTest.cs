@@ -16,9 +16,7 @@
     public class VersionedODataModelBuilderTest
     {
         [ApiVersion( "1.0" )]
-        private sealed class ControllerV1 : ODataController
-        {
-        }
+        sealed class ControllerV1 : ODataController { }
 
         [Fact]
         public void get_edm_models_should_return_expected_results()

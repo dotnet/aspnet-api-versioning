@@ -24,19 +24,19 @@
     {
         /// <summary>
         /// <para>All caching is in a dedicated cache class, which may be optionally shared across selector instances.</para>
-        /// <para>Make this a private nested class so that nobody else can conflict with our state.</para>
+        /// <para>Make this a nested class so that nobody else can conflict with our state.</para>
         /// <para>Cache is initialized during ctor on a single thread.</para>
         /// </summary>
-        private sealed class ActionSelectorCacheItem
+        sealed class ActionSelectorCacheItem
         {
-            private static readonly HttpMethod[] cacheListVerbKinds = new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Post };
-            private static readonly Type ApiControllerType = typeof( ApiController );
-            private readonly HttpControllerDescriptor controllerDescriptor;
-            private readonly CandidateAction[] combinedCandidateActions;
-            private readonly IDictionary<HttpActionDescriptor, string[]> actionParameterNames = new Dictionary<HttpActionDescriptor, string[]>();
-            private readonly ILookup<string, HttpActionDescriptor> combinedActionNameMapping;
-            private readonly HashSet<HttpMethod> allowedMethods = new HashSet<HttpMethod>();
-            private StandardActionSelectionCache standardActions;
+            static readonly HttpMethod[] cacheListVerbKinds = new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Post };
+            static readonly Type ApiControllerType = typeof( ApiController );
+            readonly HttpControllerDescriptor controllerDescriptor;
+            readonly CandidateAction[] combinedCandidateActions;
+            readonly IDictionary<HttpActionDescriptor, string[]> actionParameterNames = new Dictionary<HttpActionDescriptor, string[]>();
+            readonly ILookup<string, HttpActionDescriptor> combinedActionNameMapping;
+            readonly HashSet<HttpMethod> allowedMethods = new HashSet<HttpMethod>();
+            StandardActionSelectionCache standardActions;
 
             internal ActionSelectorCacheItem( HttpControllerDescriptor controllerDescriptor )
             {
@@ -73,7 +73,7 @@
 
             internal HttpControllerDescriptor HttpControllerDescriptor => controllerDescriptor;
 
-            private void InitializeStandardActions()
+            void InitializeStandardActions()
             {
                 if ( standardActions != null )
                 {
@@ -148,7 +148,7 @@
                 throw firstAttempt.Exception;
             }
 
-            private ActionSelectionResult FindAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor> selector, bool ignoreSubRoutes )
+            ActionSelectionResult FindAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor> selector, bool ignoreSubRoutes )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Requires( selector != null );
@@ -161,9 +161,7 @@
                     return new ActionSelectionResult( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
                 }
 
-                var action = selector( controllerContext, selectedCandidates ) as CandidateHttpActionDescriptor;
-
-                if ( action != null )
+                if ( selector( controllerContext, selectedCandidates ) is CandidateHttpActionDescriptor action )
                 {
                     ElevateRouteData( controllerContext, action.CandidateAction );
                     return new ActionSelectionResult( action );
@@ -179,9 +177,9 @@
                 return new ActionSelectionResult( new InvalidOperationException( SR.ApiControllerActionSelector_AmbiguousMatch.FormatDefault( ambiguityList ) ) );
             }
 
-            private static void ElevateRouteData( HttpControllerContext controllerContext, CandidateActionWithParams selectedCandidate ) => controllerContext.RouteData = selectedCandidate.RouteDataSource;
+            static void ElevateRouteData( HttpControllerContext controllerContext, CandidateActionWithParams selectedCandidate ) => controllerContext.RouteData = selectedCandidate.RouteDataSource;
 
-            private IReadOnlyList<CandidateHttpActionDescriptor> FindMatchingActions( HttpControllerContext controllerContext, bool ignoreSubRoutes = false, bool ignoreVerbs = false )
+            IReadOnlyList<CandidateHttpActionDescriptor> FindMatchingActions( HttpControllerContext controllerContext, bool ignoreSubRoutes = false, bool ignoreVerbs = false )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<IReadOnlyList<CandidateHttpActionDescriptor>>() != null );
@@ -201,7 +199,7 @@
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
-            private HttpResponseMessage CreateSelectionError( HttpControllerContext controllerContext )
+            HttpResponseMessage CreateSelectionError( HttpControllerContext controllerContext )
             {
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
 
@@ -220,7 +218,7 @@
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
-            private static HttpResponseMessage CreateBadRequestResponse( HttpControllerContext controllerContext )
+            static HttpResponseMessage CreateBadRequestResponse( HttpControllerContext controllerContext )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
@@ -231,7 +229,7 @@
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
-            private HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext )
+            HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
@@ -241,7 +239,7 @@
                 return controllerContext.Request.CreateErrorResponse( NotFound, message, messageDetail );
             }
 
-            private static List<CandidateActionWithParams> GetInitialCandidateWithParameterListForDirectRoutes( HttpControllerContext controllerContext, IEnumerable<IHttpRouteData> subRoutes, bool ignoreVerbs )
+            static List<CandidateActionWithParams> GetInitialCandidateWithParameterListForDirectRoutes( HttpControllerContext controllerContext, IEnumerable<IHttpRouteData> subRoutes, bool ignoreVerbs )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
@@ -261,9 +259,8 @@
                 {
                     var combinedParameterNames = GetCombinedParameterNames( queryNameValuePairs, subRouteData.Values );
                     var candidates = subRouteData.Route.GetDirectRouteCandidates();
-                    var actionName = default( string );
 
-                    subRouteData.Values.TryGetValue( RouteValueKeys.Action, out actionName );
+                    subRouteData.Values.TryGetValue( RouteValueKeys.Action, out string actionName );
 
                     foreach ( var candidate in candidates )
                     {
@@ -280,7 +277,7 @@
                 return candidateActionWithParams;
             }
 
-            private IEnumerable<CandidateActionWithParams> GetInitialCandidateWithParameterListForRegularRoutes( HttpControllerContext controllerContext, bool ignoreVerbs = false )
+            IEnumerable<CandidateActionWithParams> GetInitialCandidateWithParameterListForRegularRoutes( HttpControllerContext controllerContext, bool ignoreVerbs = false )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<IEnumerable<CandidateActionWithParams>>() != null );
@@ -289,17 +286,16 @@
                 return GetCandidateActionsWithBindings( controllerContext, candidates );
             }
 
-            private CandidateAction[] GetInitialCandidateList( HttpControllerContext controllerContext, bool ignoreVerbs = false )
+            CandidateAction[] GetInitialCandidateList( HttpControllerContext controllerContext, bool ignoreVerbs = false )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Ensures( Contract.Result<CandidateAction[]>() != null );
 
-                var actionName = default( string );
                 var incomingMethod = controllerContext.Request.Method;
                 var routeData = controllerContext.RouteData;
                 var candidates = default( CandidateAction[] );
 
-                if ( routeData.Values.TryGetValue( RouteValueKeys.Action, out actionName ) )
+                if ( routeData.Values.TryGetValue( RouteValueKeys.Action, out string actionName ) )
                 {
                     var actionsFoundByName = standardActions.StandardActionNameMapping[actionName].ToArray();
 
@@ -343,12 +339,12 @@
                 return candidates;
             }
 
-            private static CandidateAction[] FilterIncompatibleVerbs( HttpMethod incomingMethod, CandidateAction[] candidatesFoundByName ) =>
+            static CandidateAction[] FilterIncompatibleVerbs( HttpMethod incomingMethod, CandidateAction[] candidatesFoundByName ) =>
                 candidatesFoundByName.Where( c => c.ActionDescriptor.SupportedHttpMethods.Contains( incomingMethod ) ).ToArray();
 
             internal ILookup<string, HttpActionDescriptor> GetActionMapping() => combinedActionNameMapping;
 
-            private static ISet<string> GetCombinedParameterNames( IEnumerable<KeyValuePair<string, string>> queryNameValuePairs, IDictionary<string, object> routeValues )
+            static ISet<string> GetCombinedParameterNames( IEnumerable<KeyValuePair<string, string>> queryNameValuePairs, IDictionary<string, object> routeValues )
             {
                 Contract.Requires( routeValues != null );
                 Contract.Ensures( Contract.Result<ISet<string>>() != null );
@@ -371,7 +367,7 @@
                 return combinedParameterNames;
             }
 
-            private List<CandidateActionWithParams> FindActionMatchRequiredRouteAndQueryParameters( IEnumerable<CandidateActionWithParams> candidatesFound )
+            List<CandidateActionWithParams> FindActionMatchRequiredRouteAndQueryParameters( IEnumerable<CandidateActionWithParams> candidatesFound )
             {
                 Contract.Requires( candidatesFound != null );
                 Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
@@ -391,10 +387,10 @@
                 return matches;
             }
 
-            private List<CandidateActionWithParams> FindActionMatchMostRouteAndQueryParameters( List<CandidateActionWithParams> candidatesFound ) =>
+            List<CandidateActionWithParams> FindActionMatchMostRouteAndQueryParameters( List<CandidateActionWithParams> candidatesFound ) =>
                 candidatesFound.Count < 2 ? candidatesFound : candidatesFound.GroupBy( c => actionParameterNames[c.ActionDescriptor].Length ).OrderByDescending( g => g.Key ).First().ToList();
 
-            private static CandidateActionWithParams[] GetCandidateActionsWithBindings( HttpControllerContext controllerContext, CandidateAction[] candidatesFound )
+            static CandidateActionWithParams[] GetCandidateActionsWithBindings( HttpControllerContext controllerContext, CandidateAction[] candidatesFound )
             {
                 Contract.Requires( controllerContext != null );
                 Contract.Requires( candidatesFound != null );
@@ -410,7 +406,7 @@
                 return candidatesWithParams;
             }
 
-            private static bool IsSubset( string[] actionParameters, ISet<string> routeAndQueryParameters )
+            static bool IsSubset( string[] actionParameters, ISet<string> routeAndQueryParameters )
             {
                 Contract.Requires( actionParameters != null );
                 Contract.Requires( routeAndQueryParameters != null );
@@ -426,7 +422,7 @@
                 return true;
             }
 
-            private static List<CandidateActionWithParams> RunOrderFilter( List<CandidateActionWithParams> candidatesFound )
+            static List<CandidateActionWithParams> RunOrderFilter( List<CandidateActionWithParams> candidatesFound )
             {
                 Contract.Requires( candidatesFound != null );
                 Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
@@ -441,7 +437,7 @@
                 return candidatesFound.Where( c => c.CandidateAction.Order == minOrder ).AsList();
             }
 
-            private static List<CandidateActionWithParams> RunPrecedenceFilter( List<CandidateActionWithParams> candidatesFound )
+            static List<CandidateActionWithParams> RunPrecedenceFilter( List<CandidateActionWithParams> candidatesFound )
             {
                 Contract.Requires( candidatesFound != null );
                 Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
@@ -456,7 +452,7 @@
                 return candidatesFound.Where( c => c.CandidateAction.Precedence == highestPrecedence ).AsList();
             }
 
-            private static CandidateAction[] FindActionsForVerb( HttpMethod verb, CandidateAction[][] actionsByVerb, CandidateAction[] otherActions )
+            static CandidateAction[] FindActionsForVerb( HttpMethod verb, CandidateAction[][] actionsByVerb, CandidateAction[] otherActions )
             {
                 Contract.Requires( verb != null );
                 Contract.Requires( actionsByVerb != null );
@@ -474,7 +470,7 @@
                 return FindActionsForVerbWorker( verb, otherActions );
             }
 
-            private static CandidateAction[] FindActionsForVerbWorker( HttpMethod verb, CandidateAction[] candidates )
+            static CandidateAction[] FindActionsForVerbWorker( HttpMethod verb, CandidateAction[] candidates )
             {
                 Contract.Requires( verb != null );
                 Contract.Requires( candidates != null );
@@ -485,7 +481,7 @@
                 return listCandidates.ToArray();
             }
 
-            private static void FindActionsForVerbWorker( HttpMethod verb, CandidateAction[] candidates, List<CandidateAction> listCandidates )
+            static void FindActionsForVerbWorker( HttpMethod verb, CandidateAction[] candidates, List<CandidateAction> listCandidates )
             {
                 Contract.Requires( verb != null );
                 Contract.Requires( candidates != null );
@@ -530,7 +526,7 @@
                 return exceptionMessageBuilder.ToString();
             }
 
-            private static bool IsValidActionMethod( MethodInfo methodInfo )
+            static bool IsValidActionMethod( MethodInfo methodInfo )
             {
                 Contract.Requires( methodInfo != null );
 

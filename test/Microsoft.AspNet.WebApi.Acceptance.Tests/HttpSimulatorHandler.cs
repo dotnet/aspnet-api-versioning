@@ -7,12 +7,9 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    internal sealed class HttpSimulatorHandler : DelegatingHandler
+    sealed class HttpSimulatorHandler : DelegatingHandler
     {
-        internal HttpSimulatorHandler( HttpMessageHandler innerHandler )
-            : base( innerHandler )
-        {
-        }
+        internal HttpSimulatorHandler( HttpMessageHandler innerHandler ) : base( innerHandler ) { }
 
         protected override async Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken )
         {
@@ -21,7 +18,7 @@
             return await SimulateResponseOverTheWireAsync( response, cancellationToken );
         }
 
-        private async Task<HttpRequestMessage> SimulateRequestOverTheWireAsync( HttpRequestMessage request, CancellationToken cancellationToken )
+        async Task<HttpRequestMessage> SimulateRequestOverTheWireAsync( HttpRequestMessage request, CancellationToken cancellationToken )
         {
             Contract.Requires( request != null );
             Contract.Requires( Contract.Result<Task<HttpRequestMessage>>() != null );
@@ -39,7 +36,7 @@
             return await content.ReadAsHttpRequestMessageAsync( cancellationToken );
         }
 
-        private async Task<HttpResponseMessage> SimulateResponseOverTheWireAsync( HttpResponseMessage response, CancellationToken cancellationToken )
+        async Task<HttpResponseMessage> SimulateResponseOverTheWireAsync( HttpResponseMessage response, CancellationToken cancellationToken )
         {
             Contract.Requires( response != null );
             Contract.Requires( Contract.Result<Task<HttpResponseMessage>>() != null );
@@ -57,7 +54,7 @@
             return await content.ReadAsHttpResponseMessageAsync( cancellationToken );
         }
 
-        private static void SetMediaType( HttpContent content, string messageType )
+        static void SetMediaType( HttpContent content, string messageType )
         {
             Contract.Requires( content != null );
             Contract.Requires( !string.IsNullOrEmpty( messageType ) );

@@ -5,9 +5,9 @@
     using System.Diagnostics.Contracts;
     using System.Web.OData.Builder;
 
-    internal sealed class DelegatingModelConfiguration : IModelConfiguration
+    sealed class DelegatingModelConfiguration : IModelConfiguration
     {
-        private readonly Action<ODataModelBuilder, ApiVersion> action;
+        readonly Action<ODataModelBuilder, ApiVersion> action;
 
         internal DelegatingModelConfiguration( Action<ODataModelBuilder, ApiVersion> action )
         {

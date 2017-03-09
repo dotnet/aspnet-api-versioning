@@ -9,21 +9,19 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal static class ExpressionExtensions
+    static class ExpressionExtensions
     {
         internal static MethodInfo ExtractMethod<TDelegate>( this Expression<TDelegate> expression )
         {
             Contract.Requires( expression != null );
             Contract.Ensures( Contract.Result<MethodInfo>() != null );
 
-            var methodCall = expression.Body as MethodCallExpression;
-
-            if ( methodCall == null )
+            if ( expression.Body is MethodCallExpression methodCall )
             {
-                throw new InvalidOperationException( SR.InvalidActionMethodExpression.FormatDefault( expression ) );
+                return methodCall.Method;
             }
 
-            return methodCall.Method;
+            throw new InvalidOperationException( SR.InvalidActionMethodExpression.FormatDefault( expression ) );
         }
     }
 }

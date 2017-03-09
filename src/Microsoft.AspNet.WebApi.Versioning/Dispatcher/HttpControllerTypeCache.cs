@@ -8,10 +8,10 @@
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
 
-    internal sealed class HttpControllerTypeCache
+    sealed class HttpControllerTypeCache
     {
-        private readonly HttpConfiguration configuration;
-        private readonly Lazy<Dictionary<string, ILookup<string, Type>>> cache;
+        readonly HttpConfiguration configuration;
+        readonly Lazy<Dictionary<string, ILookup<string, Type>>> cache;
 
         internal HttpControllerTypeCache( HttpConfiguration configuration )
         {
@@ -21,7 +21,7 @@
             cache = new Lazy<Dictionary<string, ILookup<string, Type>>>( InitializeCache );
         }
 
-        private static string GetControllerName( Type type )
+        static string GetControllerName( Type type )
         {
             Contract.Requires( type != null );
             Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
@@ -43,7 +43,7 @@
             return name.Substring( 0, name.Length - suffixLength );
         }
 
-        private Dictionary<string, ILookup<string, Type>> InitializeCache()
+        Dictionary<string, ILookup<string, Type>> InitializeCache()
         {
             Contract.Ensures( Contract.Result<Dictionary<string, ILookup<string, Type>>>() != null );
 
@@ -57,14 +57,7 @@
                                .ToDictionary( g => g.Key, g => g.ToLookup( t => t.Namespace ?? string.Empty, comparer ), comparer );
         }
 
-        internal Dictionary<string, ILookup<string, Type>> Cache
-        {
-            get
-            {
-                Contract.Ensures( Contract.Result<Dictionary<string, ILookup<string, Type>>>() != null );
-                return cache.Value;
-            }
-        }
+        internal Dictionary<string, ILookup<string, Type>> Cache => cache.Value;
 
         internal ICollection<Type> GetControllerTypes( string controllerName )
         {
@@ -72,9 +65,8 @@
             Contract.Ensures( Contract.Result<ICollection<Type>>() != null );
 
             var set = new HashSet<Type>();
-            ILookup<string, Type> lookup;
 
-            if ( cache.Value.TryGetValue( controllerName, out lookup ) )
+            if ( cache.Value.TryGetValue( controllerName, out var lookup ) )
             {
                 foreach ( var grouping in lookup )
                 {

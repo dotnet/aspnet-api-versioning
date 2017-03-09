@@ -12,7 +12,7 @@
 
     public class ReportApiVersionsAttributeTest
     {
-        private static ActionExecutedContext CreateContext( ApiVersionModel model )
+        static ActionExecutedContext CreateContext( ApiVersionModel model )
         {
             var headers = new HeaderDictionary();
             var response = new Mock<HttpResponse>();

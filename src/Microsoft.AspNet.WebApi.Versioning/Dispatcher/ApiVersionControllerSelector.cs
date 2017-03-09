@@ -20,10 +20,10 @@
     /// </summary>
     public class ApiVersionControllerSelector : IHttpControllerSelector
     {
-        private readonly HttpConfiguration configuration;
-        private readonly ApiVersioningOptions options;
-        private readonly HttpControllerTypeCache controllerTypeCache;
-        private readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache;
+        readonly HttpConfiguration configuration;
+        readonly ApiVersioningOptions options;
+        readonly HttpControllerTypeCache controllerTypeCache;
+        readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionControllerSelector"/> class.
@@ -121,13 +121,12 @@
                 return null;
             }
 
-            object controller;
-            routeData.Values.TryGetValue( RouteDataTokenKeys.Controller, out controller );
+            routeData.Values.TryGetValue( RouteDataTokenKeys.Controller, out string controller );
 
-            return (string) controller;
+            return controller;
         }
 
-        private ConcurrentDictionary<string, HttpControllerDescriptorGroup> InitializeControllerInfoCache()
+        ConcurrentDictionary<string, HttpControllerDescriptorGroup> InitializeControllerInfoCache()
         {
             var mapping = new ConcurrentDictionary<string, HttpControllerDescriptorGroup>( OrdinalIgnoreCase );
 
@@ -154,7 +153,7 @@
             return mapping;
         }
 
-        private static void EnsureRequestHasValidApiVersion( HttpRequestMessage request )
+        static void EnsureRequestHasValidApiVersion( HttpRequestMessage request )
         {
             Contract.Requires( request != null );
 

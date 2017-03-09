@@ -12,11 +12,11 @@
     [CLSCompliant( false )]
     public static class ActionDescriptorExtensions
     {
-        private const string VersionsAggregated = "MS_" + nameof( HasAggregatedVersions );
+        const string VersionsAggregated = "MS_" + nameof( HasAggregatedVersions );
 
-        private static bool HasAggregatedVersions( this ActionDescriptor action ) => action.Properties.GetOrDefault( VersionsAggregated, false );
+        static bool HasAggregatedVersions( this ActionDescriptor action ) => action.Properties.GetOrDefault( VersionsAggregated, false );
 
-        private static void HasAggregatedVersions( this ActionDescriptor action, bool value ) => action.Properties[VersionsAggregated] = value;
+        static void HasAggregatedVersions( this ActionDescriptor action, bool value ) => action.Properties[VersionsAggregated] = value;
 
         internal static void AggregateAllVersions( this ActionDescriptor action, ActionSelectionContext context )
         {

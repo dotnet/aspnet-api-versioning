@@ -11,9 +11,9 @@
     /// </content>
     public partial class ApiVersionActionSelector
     {
-        private sealed class AggregatedActionMapping : ILookup<string, HttpActionDescriptor>
+        sealed class AggregatedActionMapping : ILookup<string, HttpActionDescriptor>
         {
-            private readonly IReadOnlyList<ILookup<string, HttpActionDescriptor>> actionMappings;
+            readonly IReadOnlyList<ILookup<string, HttpActionDescriptor>> actionMappings;
 
             internal AggregatedActionMapping( IReadOnlyList<ILookup<string, HttpActionDescriptor>> actionMappings )
             {

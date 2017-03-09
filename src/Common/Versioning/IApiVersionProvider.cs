@@ -33,4 +33,3 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         IReadOnlyList<ApiVersion> Versions { get; }
     }
 }
-

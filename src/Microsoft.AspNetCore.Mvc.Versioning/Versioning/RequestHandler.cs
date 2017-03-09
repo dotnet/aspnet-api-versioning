@@ -6,7 +6,7 @@
     using System.Diagnostics.Contracts;
     using System.Threading.Tasks;
 
-    internal abstract class RequestHandler
+    abstract class RequestHandler
     {
         protected RequestHandler( ApiVersioningOptions options, string code, string message )
         {

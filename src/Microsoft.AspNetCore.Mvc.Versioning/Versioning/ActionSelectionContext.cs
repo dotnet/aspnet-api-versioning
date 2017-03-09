@@ -12,7 +12,7 @@
     [CLSCompliant( false )]
     public class ActionSelectionContext
     {
-        private readonly Lazy<ApiVersionModel> allVersions;
+        readonly Lazy<ApiVersionModel> allVersions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionSelectionContext"/> class.
@@ -57,6 +57,6 @@
         /// implicit API version matching is allowed and a version has been selected.</remarks>
         public ApiVersion RequestedVersion { get; set; }
 
-        private ApiVersionModel CreateAggregatedModel() => MatchingActions.Select( action => action.GetProperty<ApiVersionModel>() ).Where( model => model != null ).Aggregate();
+        ApiVersionModel CreateAggregatedModel() => MatchingActions.Select( action => action.GetProperty<ApiVersionModel>() ).Where( model => model != null ).Aggregate();
     }
 }

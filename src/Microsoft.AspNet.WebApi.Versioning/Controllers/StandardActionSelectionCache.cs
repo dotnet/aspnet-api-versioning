@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
     using Routing;
-    using System;
     using System.Linq;
     using System.Web.Http.Controllers;
 
@@ -10,7 +9,7 @@
     /// </content>
     public partial class ApiVersionActionSelector
     {
-        private sealed class StandardActionSelectionCache
+        sealed class StandardActionSelectionCache
         {
             internal ILookup<string, HttpActionDescriptor> StandardActionNameMapping { get; set; }
 

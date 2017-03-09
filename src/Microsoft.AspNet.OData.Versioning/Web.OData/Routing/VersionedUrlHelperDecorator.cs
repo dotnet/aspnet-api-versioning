@@ -1,14 +1,13 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Web.Http.Routing;
 
-    internal sealed class VersionedUrlHelperDecorator : UrlHelper
+    sealed class VersionedUrlHelperDecorator : UrlHelper
     {
-        private readonly UrlHelper decorated;
-        private readonly object apiVersion;
+        readonly UrlHelper decorated;
+        readonly object apiVersion;
 
         internal VersionedUrlHelperDecorator( UrlHelper decorated, object apiVersion )
         {
@@ -24,7 +23,7 @@
             }
         }
 
-        private void EnsureApiVersionRouteValue( IDictionary<string, object> routeValues ) => routeValues[nameof( apiVersion )] = apiVersion;
+        void EnsureApiVersionRouteValue( IDictionary<string, object> routeValues ) => routeValues[nameof( apiVersion )] = apiVersion;
 
         public override string Content( string path ) => decorated.Content( path );
 

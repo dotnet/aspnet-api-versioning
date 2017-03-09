@@ -13,10 +13,7 @@
     [ApiVersion( "1.9", Deprecated = true )]
     public sealed class TestVersion2Controller : IHttpController
     {
-        public Task<HttpResponseMessage> ExecuteAsync( HttpControllerContext controllerContext, CancellationToken cancellationToken )
-        {
-            throw new NotImplementedException();
-        }
+        public Task<HttpResponseMessage> ExecuteAsync( HttpControllerContext controllerContext, CancellationToken cancellationToken ) => throw new NotImplementedException();
 
         public Task<string> Get() => Task.FromResult( "Test" );
 

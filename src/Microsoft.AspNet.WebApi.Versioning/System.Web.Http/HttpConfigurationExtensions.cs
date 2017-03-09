@@ -15,7 +15,7 @@
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        private const string ApiVersioningOptionsKey = "MS_ApiVersioningOptions";
+        const string ApiVersioningOptionsKey = "MS_ApiVersioningOptions";
 
         /// <summary>
         /// Gets the current API versioning options.
@@ -27,8 +27,7 @@
             Arg.NotNull( configuration, nameof( configuration ) );
             Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
 
-            var options = default( ApiVersioningOptions );
-            return configuration.Properties.TryGetValue( ApiVersioningOptionsKey, out options ) ? options : new ApiVersioningOptions();
+            return configuration.Properties.TryGetValue( ApiVersioningOptionsKey, out ApiVersioningOptions options ) ? options : new ApiVersioningOptions();
         }
 
         /// <summary>

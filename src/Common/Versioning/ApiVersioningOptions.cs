@@ -18,19 +18,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </summary>
     public partial class ApiVersioningOptions
     {
-        private ApiVersion defaultApiVersion = ApiVersion.Default;
-        private IApiVersionReader apiVersionReader = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
-        private IApiVersionSelector apiVersionSelector;
-        private IErrorResponseProvider errorResponseProvider = new DefaultErrorResponseProvider();
-        private ApiVersionConventionBuilder conventions = new ApiVersionConventionBuilder();
+        ApiVersion defaultApiVersion = ApiVersion.Default;
+        IApiVersionReader apiVersionReader = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
+        IApiVersionSelector apiVersionSelector;
+        IErrorResponseProvider errorResponseProvider = new DefaultErrorResponseProvider();
+        ApiVersionConventionBuilder conventions = new ApiVersionConventionBuilder();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningOptions"/> class.
         /// </summary>
-        public ApiVersioningOptions()
-        {
-            apiVersionSelector = new DefaultApiVersionSelector( this );
-        }
+        public ApiVersioningOptions() => apiVersionSelector = new DefaultApiVersionSelector( this );
 
         /// <summary>
         /// Gets or sets a value indicating whether requests report the service API version compatibility
@@ -66,10 +63,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <value>The default <see cref="ApiVersion">API version</see>. The default value is <see cref="ApiVersion.Default"/>.</value>
         public ApiVersion DefaultApiVersion
         {
-            get
-            {
-                return defaultApiVersion;
-            }
+            get => defaultApiVersion;
             set
             {
                 Arg.NotNull( value, nameof( value ) );

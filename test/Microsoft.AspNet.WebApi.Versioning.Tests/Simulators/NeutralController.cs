@@ -9,10 +9,7 @@
     [ApiVersionNeutral]
     public sealed class NeutralController : IHttpController
     {
-        public Task<HttpResponseMessage> ExecuteAsync( HttpControllerContext controllerContext, CancellationToken cancellationToken )
-        {
-            throw new NotImplementedException();
-        }
+        public Task<HttpResponseMessage> ExecuteAsync( HttpControllerContext controllerContext, CancellationToken cancellationToken ) => throw new NotImplementedException();
 
         public Task<string> Get() => Task.FromResult( "Test" );
     }

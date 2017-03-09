@@ -18,16 +18,12 @@
     public class VersionedAttributeRoutingConventionTest
     {
         [ApiVersionNeutral]
-        private sealed class NeutralController : ODataController
-        {
-        }
+        sealed class NeutralController : ODataController { }
 
         [ApiVersion( "1.0" )]
-        private sealed class ControllerV1 : ODataController
-        {
-        }
+        sealed class ControllerV1 : ODataController { }
 
-        private static IEdmModel CreateModel( HttpConfiguration configuration, Type controllerType )
+        static IEdmModel CreateModel( HttpConfiguration configuration, Type controllerType )
         {
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
             var controllerTypes = new List<Type>() { controllerType };

@@ -38,7 +38,7 @@
         }
 
         [Fact]
-        public async Task _service_document_should_return_400_for_unsupported_url_api_version()
+        public async Task service_document_should_return_400_for_unsupported_url_api_version()
         {
             // arrange
             var requestUrl = $"v4";
@@ -53,7 +53,7 @@
         }
 
         [Fact]
-        public async Task _metadata_should_return_400_for_unsupported_url_api_version()
+        public async Task metadata_should_return_400_for_unsupported_url_api_version()
         {
             // arrange
 

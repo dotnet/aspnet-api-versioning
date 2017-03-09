@@ -15,10 +15,10 @@
     /// </summary>
     public partial class ApiVersionActionSelector : IHttpActionSelector
     {
-        private readonly object cacheKey = new object();
-        private ActionSelectorCacheItem fastCache;
+        readonly object cacheKey = new object();
+        ActionSelectorCacheItem fastCache;
 
-        private ActionSelectorCacheItem GetInternalSelector( HttpControllerDescriptor controllerDescriptor )
+        ActionSelectorCacheItem GetInternalSelector( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
             Contract.Ensures( Contract.Result<ActionSelectorCacheItem>() != null );
@@ -35,9 +35,7 @@
             }
             else
             {
-                object cacheValue;
-
-                if ( controllerDescriptor.Properties.TryGetValue( cacheKey, out cacheValue ) )
+                if ( controllerDescriptor.Properties.TryGetValue( cacheKey, out var cacheValue ) )
                 {
                     return (ActionSelectorCacheItem) cacheValue;
                 }
@@ -121,7 +119,7 @@
             return null;
         }
 
-        private Exception CreateAmbiguousActionException( IEnumerable<HttpActionDescriptor> matches )
+        Exception CreateAmbiguousActionException( IEnumerable<HttpActionDescriptor> matches )
         {
             var ambiguityList = ActionSelectorCacheItem.CreateAmbiguousMatchList( matches );
             return new InvalidOperationException( SR.ApiControllerActionSelector_AmbiguousMatch.FormatDefault( ambiguityList ) );

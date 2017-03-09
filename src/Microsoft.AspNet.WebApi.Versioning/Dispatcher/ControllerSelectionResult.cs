@@ -3,7 +3,7 @@
     using System;
     using System.Web.Http.Controllers;
 
-    internal sealed class ControllerSelectionResult
+    sealed class ControllerSelectionResult
     {
         internal HttpControllerDescriptor Controller { get; set; }
 

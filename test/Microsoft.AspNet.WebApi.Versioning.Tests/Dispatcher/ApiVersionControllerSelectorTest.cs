@@ -25,7 +25,7 @@
 
     public partial class ApiVersionControllerSelectorTest
     {
-        private HttpConfiguration AttributeRoutingEnabledConfiguration
+        HttpConfiguration AttributeRoutingEnabledConfiguration
         {
             get
             {
@@ -51,7 +51,7 @@
             }
         }
 
-        private static Task<T> ReadAsErrorByExampleAsync<T>( HttpContent content, T example ) => content.ReadAsAsync<T>();
+        static Task<T> ReadAsErrorByExampleAsync<T>( HttpContent content, T example ) => content.ReadAsAsync<T>();
 
         [Theory]
         [MemberData( nameof( ControllerNameData ) )]

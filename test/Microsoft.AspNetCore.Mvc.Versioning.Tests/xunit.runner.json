@@ -1,3 +1,4 @@
 ﻿{
-    "methodDisplay": "30"
+  "methodDisplay": "method",
+  "methodDisplayOptions": "all"
 }

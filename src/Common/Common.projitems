@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6d0e834b-6422-44cd-9a85-e3be9dead1be</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Microsoft</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AdvertiseApiVersionsAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ApiVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ApiVersionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ApiVersionNeutralAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ControllerNameAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MapToApiVersionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReportApiVersionsAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\AmbiguousApiVersionException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersioningOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModelDebugView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModelExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionRequestProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionsBaseAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ConstantApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ActionApiVersionConventionBuilderCollectionT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ActionApiVersionConventionBuilderT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ActionConventionBuilderTExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\ExpressionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\IActionConventionBuilderT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\IApiVersionConventionT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\CurrentImplementationApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\DefaultApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ErrorResponseContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\HeaderApiVersionReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionNeutral.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IErrorResponseProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\LowestImplementedApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\MediaTypeApiVersionReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\QueryStringApiVersionReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\UrlSegmentApiVersionReader.cs" />
+  </ItemGroup>
+</Project>

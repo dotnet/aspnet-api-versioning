@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>1.0.3</VersionPrefix>
+  <AssemblyVersion>1.0.3.0</AssemblyVersion>
+  <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
+  <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+  <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+  <AssemblyName>Microsoft.AspNetCore.Mvc.Versioning</AssemblyName>
+  <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
+  <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
+  <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
+  <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
+  <PackageReleaseNotes>• Fixed responses when a version is unspecified (Issue #62)</PackageReleaseNotes>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="1.1.1" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <Reference Include="System" />
+  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Compile Update="SR.Designer.cs">
+   <DesignTime>True</DesignTime>
+   <AutoGen>True</AutoGen>
+   <DependentUpon>SR.resx</DependentUpon>
+  </Compile>
+ </ItemGroup>
+
+ <ItemGroup>
+  <EmbeddedResource Update="SR.resx">
+   <Generator>ResXFileCodeGenerator</Generator>
+   <LastGenOutput>SR.Designer.cs</LastGenOutput>
+  </EmbeddedResource>
+ </ItemGroup>
+
+ <Import Project="..\Common\Common.projitems" Label="Shared" />
+ <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+ <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+
+</Project>

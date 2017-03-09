@@ -1,3 +1,4 @@
 ﻿{
-    "methodDisplay": "31"
+  "methodDisplay": "classAndMethod",
+  "methodDisplayOptions": "all"
 }

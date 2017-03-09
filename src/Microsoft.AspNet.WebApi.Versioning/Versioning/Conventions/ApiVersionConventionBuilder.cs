@@ -33,9 +33,8 @@
             Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<TController>>() != null );
 
             var key = typeof( TController );
-            var convention = default( IApiVersionConvention<HttpControllerDescriptor> );
 
-            if ( !ControllerConventions.TryGetValue( key, out convention ) )
+            if ( !ControllerConventions.TryGetValue( key, out var convention ) )
             {
                 var typedConvention = new ControllerApiVersionConventionBuilder<TController>();
                 ControllerConventions[key] = typedConvention;
@@ -57,9 +56,8 @@
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
 
             var key = controllerDescriptor.ControllerType;
-            var convention = default( IApiVersionConvention<HttpControllerDescriptor> );
 
-            if ( ControllerConventions.TryGetValue( key, out convention ) )
+            if ( ControllerConventions.TryGetValue( key, out var convention ) )
             {
                 convention.ApplyTo( controllerDescriptor );
                 return true;

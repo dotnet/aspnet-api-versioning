@@ -141,6 +141,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.csproj">
+      <Project>{48a2b488-23ab-4c83-ae30-0b8b735c4562}</Project>
+      <Name>Microsoft.AspNet.OData.Versioning</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj">
+      <Project>{3bac97ed-1a8e-4f5a-a716-db5255f51c81}</Project>
+      <Name>Microsoft.AspNet.WebApi.Versioning</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

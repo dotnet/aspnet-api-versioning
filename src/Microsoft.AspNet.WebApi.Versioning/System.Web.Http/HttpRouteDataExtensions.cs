@@ -5,7 +5,7 @@
     using Microsoft.Web.Http.Routing;
     using Routing;
 
-    internal static class HttpRouteDataExtensions
+    static class HttpRouteDataExtensions
     {
         internal static CandidateAction[] GetDirectRouteCandidates( this IHttpRouteData routeData )
         {

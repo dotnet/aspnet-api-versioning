@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System.Diagnostics.Contracts;
     using System.Linq;
 
-    internal static class AttributeExtensions
+    static class AttributeExtensions
     {
         internal static IReadOnlyList<ApiVersion> GetImplementedApiVersions<T>( this IEnumerable<T> attributes ) where T : IApiVersionProvider
         {

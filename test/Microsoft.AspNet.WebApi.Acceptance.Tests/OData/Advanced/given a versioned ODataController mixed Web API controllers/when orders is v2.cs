@@ -1,0 +1,40 @@
+﻿namespace given_a_versioned_ODataController_mixed_Web_API_controllers
+{
+    using FluentAssertions;
+    using Microsoft.Web;
+    using Microsoft.Web.OData.Advanced;
+    using System;
+    using System.Threading.Tasks;
+    using Xunit;
+
+    public class when_using_OData_for_orders_in_v2 : AdvancedAcceptanceTest
+    {
+        [Fact]
+        public async Task then_get_should_return_200()
+        {
+            // arrange
+
+
+            // act
+            var response = await Client.GetAsync( "api/orders?api-version=2.0" );
+            var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { value = new[] { new { id = 0, customer = "" } } } );
+
+            // assert
+            orders.value.ShouldBeEquivalentTo( new[] { new { id = 1, customer = "Customer v2.0" } }, options => options.ExcludingMissingMembers() );
+        }
+
+        [Fact]
+        public async Task then_get_with_key_should_return_200()
+        {
+            // arrange
+
+
+            // act
+            var response = await Client.GetAsync( "api/orders(42)?api-version=2.0" );
+            var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { id = 0, customer = "" } );
+
+            // assert
+            order.ShouldBeEquivalentTo( new { id = 42, customer = "Customer v2.0" }, options => options.ExcludingMissingMembers() );
+        }
+    }
+}

@@ -3,9 +3,9 @@
     using System.Diagnostics.Contracts;
     using Versioning;
 
-    internal abstract class ControllerSelector
+    abstract class ControllerSelector
     {
-        private readonly ApiVersioningOptions options;
+        readonly ApiVersioningOptions options;
 
         protected ControllerSelector( ApiVersioningOptions options )
         {

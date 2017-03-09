@@ -14,10 +14,10 @@
     /// </summary>
     public static class HttpControllerDescriptorExtensions
     {
-        private const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
-        private const string ApiVersionInfoKey = "MS_ApiVersionInfo";
-        private const string ConventionsApiVersionInfoKey = "MS_ConventionsApiVersionInfo";
-        private const string RelatedControllerCandidatesKey = "MS_RelatedControllerCandidates";
+        const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
+        const string ApiVersionInfoKey = "MS_ApiVersionInfo";
+        const string ConventionsApiVersionInfoKey = "MS_ConventionsApiVersionInfo";
+        const string RelatedControllerCandidatesKey = "MS_RelatedControllerCandidates";
 
         internal static bool IsAttributeRouted( this HttpControllerDescriptor controllerDescriptor )
         {
@@ -66,9 +66,8 @@
             Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
 
             var properties = controllerDescriptor.Properties;
-            var versionInfo = default( ApiVersionModel );
 
-            if ( properties.TryGetValue( ApiVersionInfoKey, out versionInfo ) )
+            if ( properties.TryGetValue( ApiVersionInfoKey, out ApiVersionModel versionInfo ) )
             {
                 return versionInfo;
             }
@@ -112,9 +111,7 @@
 
         internal static IEnumerable<HttpControllerDescriptor> AsEnumerable( this HttpControllerDescriptor controllerDescriptor )
         {
-            IEnumerable<HttpControllerDescriptor> relatedCandidates;
-
-            if ( controllerDescriptor.Properties.TryGetValue( RelatedControllerCandidatesKey, out relatedCandidates ) )
+            if ( controllerDescriptor.Properties.TryGetValue( RelatedControllerCandidatesKey, out IEnumerable<HttpControllerDescriptor> relatedCandidates ) )
             {
                 using ( var relatedControllerDescriptors = relatedCandidates.GetEnumerator() )
                 {
@@ -136,18 +133,16 @@
                 }
             }
 
-            var groupedControllerDescriptors = controllerDescriptor as IEnumerable<HttpControllerDescriptor>;
-
-            if ( groupedControllerDescriptors == null )
-            {
-                yield return controllerDescriptor;
-            }
-            else
+            if ( controllerDescriptor is IEnumerable<HttpControllerDescriptor> groupedControllerDescriptors )
             {
                 foreach ( var groupedControllerDescriptor in groupedControllerDescriptors )
                 {
                     yield return groupedControllerDescriptor;
                 }
+            }
+            else
+            {
+                yield return controllerDescriptor;
             }
         }
 

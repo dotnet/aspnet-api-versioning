@@ -11,10 +11,7 @@
     [RoutePrefix( "api/neutral" )]
     public sealed class TestVersionNeutralController : IHttpController
     {
-        public Task<HttpResponseMessage> ExecuteAsync( HttpControllerContext controllerContext, CancellationToken cancellationToken )
-        {
-            throw new NotImplementedException();
-        }
+        public Task<HttpResponseMessage> ExecuteAsync( HttpControllerContext controllerContext, CancellationToken cancellationToken ) => throw new NotImplementedException();
 
         [Route]
         public Task<string> Get() => Task.FromResult( "Test" );

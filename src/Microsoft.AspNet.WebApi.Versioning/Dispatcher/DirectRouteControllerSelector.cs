@@ -11,12 +11,9 @@
     using Versioning;
     using static System.Environment;
 
-    internal sealed class DirectRouteControllerSelector : ControllerSelector
+    sealed class DirectRouteControllerSelector : ControllerSelector
     {
-        internal DirectRouteControllerSelector( ApiVersioningOptions options )
-            : base( options )
-        {
-        }
+        internal DirectRouteControllerSelector( ApiVersioningOptions options ) : base( options ) { }
 
         internal override ControllerSelectionResult SelectController( ApiVersionControllerAggregator aggregator )
         {
@@ -72,7 +69,7 @@
             return result;
         }
 
-        private static HttpControllerDescriptor GetVersionNeutralController( CandidateAction[] directRouteCandidates )
+        static HttpControllerDescriptor GetVersionNeutralController( CandidateAction[] directRouteCandidates )
         {
             Contract.Requires( directRouteCandidates != null );
             Contract.Requires( directRouteCandidates.Length > 0 );
@@ -102,7 +99,7 @@
             return controllerDescriptor;
         }
 
-        private static HttpControllerDescriptor GetVersionedController( ApiVersionControllerAggregator aggregator, ApiVersion requestedVersion )
+        static HttpControllerDescriptor GetVersionedController( ApiVersionControllerAggregator aggregator, ApiVersion requestedVersion )
         {
             Contract.Requires( aggregator != null );
             Contract.Requires( requestedVersion != null );
@@ -133,7 +130,7 @@
             return controller;
         }
 
-        private static HttpControllerDescriptor ResolveController( CandidateAction[] directRouteCandidates, ApiVersion requestedVersion )
+        static HttpControllerDescriptor ResolveController( CandidateAction[] directRouteCandidates, ApiVersion requestedVersion )
         {
             Contract.Requires( directRouteCandidates != null );
             Contract.Requires( directRouteCandidates.Length > 0 );
@@ -166,10 +163,10 @@
             return controllerDescriptor;
         }
 
-        private static Exception CreateAmbiguousControllerException( CandidateAction[] candidates ) =>
+        static Exception CreateAmbiguousControllerException( CandidateAction[] candidates ) =>
             CreateAmbiguousControllerException( candidates.Select( c => c.ActionDescriptor.ControllerDescriptor ) );
 
-        private static Exception CreateAmbiguousControllerException( IEnumerable<HttpControllerDescriptor> candidates )
+        static Exception CreateAmbiguousControllerException( IEnumerable<HttpControllerDescriptor> candidates )
         {
             Contract.Requires( candidates != null );
             Contract.Ensures( Contract.Result<Exception>() != null );

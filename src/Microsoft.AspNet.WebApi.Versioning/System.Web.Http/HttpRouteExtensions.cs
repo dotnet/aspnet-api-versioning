@@ -7,7 +7,7 @@
     using Microsoft.Web.Http.Routing;
     using Routing;
 
-    internal static class HttpRouteExtensions
+    static class HttpRouteExtensions
     {
         internal static CandidateAction[] GetDirectRouteCandidates( this IHttpRoute route )
         {
@@ -22,9 +22,8 @@
 
             var candidates = new List<CandidateAction>();
             var directRouteActions = default( HttpActionDescriptor[] );
-            var possibleDirectRouteActions = default( HttpActionDescriptor[] );
 
-            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out possibleDirectRouteActions ) )
+            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out HttpActionDescriptor[] possibleDirectRouteActions ) )
             {
                 if ( possibleDirectRouteActions != null && possibleDirectRouteActions.Length > 0 )
                 {
@@ -37,20 +36,14 @@
                 return null;
             }
 
-            var order = 0;
-            var possibleOrder = 0;
-
-            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Order, out possibleOrder ) )
+            if ( !dataTokens.TryGetValue( RouteDataTokenKeys.Order, out int order ) )
             {
-                order = possibleOrder;
+                order = 0;
             }
 
-            var precedence = 0m;
-            var possiblePrecedence = 0m;
-
-            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Precedence, out possiblePrecedence ) )
+            if ( !dataTokens.TryGetValue( RouteDataTokenKeys.Precedence, out decimal precedence ) )
             {
-                precedence = possiblePrecedence;
+                precedence = 0m;
             }
 
             foreach ( var actionDescriptor in directRouteActions )

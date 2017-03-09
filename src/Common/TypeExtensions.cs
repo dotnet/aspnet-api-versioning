@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Mvc
     using static System.Nullable;
     using static System.ComponentModel.TypeDescriptor;
 
-    internal static partial class TypeExtensions
+    static partial class TypeExtensions
     {
         internal static bool IsSimpleType( this Type type )
         {
@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
                    type.Equals( typeof( string ) ) ||
                    type.Equals( typeof( DateTime ) ) ||
-                   type.Equals( typeof( Decimal ) ) ||
+                   type.Equals( typeof( decimal ) ) ||
                    type.Equals( typeof( Guid ) ) ||
                    type.Equals( typeof( DateTimeOffset ) ) ||
                    type.Equals( typeof( TimeSpan ) );

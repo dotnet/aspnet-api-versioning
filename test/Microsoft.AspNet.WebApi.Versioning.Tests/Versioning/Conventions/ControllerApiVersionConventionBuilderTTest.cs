@@ -2,7 +2,6 @@
 {
     using FluentAssertions;
     using Moq;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
@@ -12,14 +11,14 @@
 
     public class ControllerApiVersionConventionBuilderTTest
     {
-        private sealed class TestControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilder<IHttpController>
+        sealed class TestControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilder<IHttpController>
         {
             internal bool ProtectedVersionNeutral => VersionNeutral;
 
             internal ActionApiVersionConventionBuilderCollection<IHttpController> ProtectedActionBuilders => ActionBuilders;
         }
 
-        private sealed class UndecoratedController : ApiController
+        sealed class UndecoratedController : ApiController
         {
             public IHttpActionResult Get() => Ok();
         }
@@ -28,7 +27,7 @@
         [ApiVersion( "0.9", Deprecated = true )]
         [AdvertiseApiVersions( "3.0" )]
         [AdvertiseApiVersions( "3.0-Beta", Deprecated = true )]
-        private sealed class DecoratedController : ApiController
+        sealed class DecoratedController : ApiController
         {
             public IHttpActionResult Get() => Ok();
         }

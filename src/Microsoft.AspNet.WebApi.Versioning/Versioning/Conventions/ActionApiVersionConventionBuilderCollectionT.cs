@@ -9,7 +9,7 @@
     /// <typeparam name="T">The <see cref="Type">type</see> of <see cref="IHttpController">controller</see>.</typeparam>
     public partial class ActionApiVersionConventionBuilderCollection<T> where T : IHttpController
     {
-        private sealed partial class ActionBuilderMapping<TModel> where TModel : IHttpController
+        sealed partial class ActionBuilderMapping<TModel> where TModel : IHttpController
         {
         }
     }

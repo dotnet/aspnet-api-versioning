@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Routing
 {
-    using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
@@ -9,14 +8,12 @@
     using static System.StringComparison;
 
     [DebuggerDisplay( "{DebuggerToString()}" )]
-    internal class CandidateAction
+    sealed class CandidateAction
     {
-        private const string DebugFormat = "{0}, Order={1}, Prec={2}";
+        const string DebugFormat = "{0}, Order={1}, Prec={2}";
 
         internal CandidateAction( HttpActionDescriptor actionDescriptor )
-            : this( actionDescriptor, default( int ), default( decimal ) )
-        {
-        }
+            : this( actionDescriptor, default( int ), default( decimal ) ) { }
 
         internal CandidateAction( HttpActionDescriptor actionDescriptor, int order, decimal precedence )
         {

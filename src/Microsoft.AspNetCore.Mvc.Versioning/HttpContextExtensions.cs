@@ -23,9 +23,7 @@
             Arg.NotNull( context, nameof( context ) );
             Contract.Ensures( Contract.Result<ApiVersionRequestProperties>() != null );
 
-            var properties = default( ApiVersionRequestProperties );
-
-            if ( !context.Items.TryGetValue( ApiVersionPropertiesKey, out properties ) )
+            if ( !context.Items.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
             {
                 context.Items[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( context );
             }

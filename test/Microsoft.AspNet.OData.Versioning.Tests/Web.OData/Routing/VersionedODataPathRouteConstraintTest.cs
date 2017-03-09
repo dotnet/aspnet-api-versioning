@@ -26,9 +26,9 @@
             public int Id { get; set; }
         }
 
-        private static IEdmModel EmptyModel => new ODataModelBuilder().GetEdmModel();
+        static IEdmModel EmptyModel => new ODataModelBuilder().GetEdmModel();
 
-        private static IEdmModel TestModel
+        static IEdmModel TestModel
         {
             get
             {
@@ -39,7 +39,7 @@
             }
         }
 
-        private static VersionedODataPathRouteConstraint NewVersionedODataPathRouteConstraint( HttpRequestMessage request, IEdmModel model, ApiVersion apiVersion, string routePrefix = null )
+        static VersionedODataPathRouteConstraint NewVersionedODataPathRouteConstraint( HttpRequestMessage request, IEdmModel model, ApiVersion apiVersion, string routePrefix = null )
         {
             var pathHandler = new DefaultODataPathHandler();
             var conventions = ODataRoutingConventions.CreateDefault();

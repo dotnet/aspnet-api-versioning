@@ -29,10 +29,9 @@
                 return false;
             }
 
-            var value = default( string );
             var properties = request.ApiVersionProperties();
 
-            if ( values.TryGetValue( parameterName, out value ) )
+            if ( values.TryGetValue( parameterName, out string value ) )
             {
                 properties.RouteParameterName = parameterName;
             }
@@ -46,9 +45,7 @@
                 return !IsNullOrEmpty( value );
             }
 
-            var requestedVersion = default( ApiVersion );
-
-            if ( TryParse( value, out requestedVersion ) )
+            if ( TryParse( value, out var requestedVersion ) )
             {
                 properties.ApiVersion = requestedVersion;
                 return true;

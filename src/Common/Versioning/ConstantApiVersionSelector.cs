@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
     public sealed class ConstantApiVersionSelector : IApiVersionSelector
     {
-        private readonly ApiVersion version;
+        readonly ApiVersion version;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantApiVersionSelector"/> class.

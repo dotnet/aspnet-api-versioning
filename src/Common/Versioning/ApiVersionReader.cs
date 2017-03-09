@@ -11,10 +11,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using static System.String;
 #if WEBAPI
     using HttpRequest = System.Net.Http.HttpRequestMessage;
 #endif
-    using static System.String;
 
     /// <summary>
     /// Provides utility functions for service API version readers.

@@ -18,16 +18,12 @@
     public class HttpConfigurationExtensionsTest
     {
         [ApiVersion( "1.0" )]
-        private sealed class ControllerV1 : ODataController
-        {
-        }
+        sealed class ControllerV1 : ODataController { }
 
         [ApiVersion( "2.0" )]
-        private sealed class ControllerV2 : ODataController
-        {
-        }
+        sealed class ControllerV2 : ODataController { }
 
-        private static IEnumerable<IEdmModel> CreateModels( HttpConfiguration configuration )
+        static IEnumerable<IEdmModel> CreateModels( HttpConfiguration configuration )
         {
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
             var controllerTypes = new List<Type>() { typeof( ControllerV1 ), typeof( ControllerV2 ) };

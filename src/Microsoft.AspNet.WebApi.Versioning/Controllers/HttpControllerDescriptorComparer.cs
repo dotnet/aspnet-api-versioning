@@ -1,20 +1,15 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
 
-    internal sealed class HttpControllerDescriptorComparer : IComparer<HttpControllerDescriptor>
+    sealed class HttpControllerDescriptorComparer : IComparer<HttpControllerDescriptor>
     {
-        private static readonly Lazy<HttpControllerDescriptorComparer> byVersion = new Lazy<HttpControllerDescriptorComparer>( () => new HttpControllerDescriptorComparer() );
+        HttpControllerDescriptorComparer() { }
 
-        private HttpControllerDescriptorComparer()
-        {
-        }
-
-        internal static IComparer<HttpControllerDescriptor> ByVersion => byVersion.Value;
+        internal static IComparer<HttpControllerDescriptor> ByVersion { get; } = new HttpControllerDescriptorComparer();
 
         public int Compare( HttpControllerDescriptor x, HttpControllerDescriptor y )
         {

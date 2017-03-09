@@ -9,7 +9,7 @@
     /// </content>
     public partial class ApiVersionActionSelector
     {
-        private sealed class ActionSelectionResult
+        sealed class ActionSelectionResult
         {
             internal ActionSelectionResult( HttpActionDescriptor action )
             {

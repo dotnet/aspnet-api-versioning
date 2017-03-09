@@ -19,7 +19,7 @@
         }
 
         [Fact]
-        public async Task _service_document_should_return_result_without_api_version()
+        public async Task then_the_service_document_should_allow_an_unspecified_version()
         {
             // arrange
 
@@ -35,7 +35,7 @@
         [InlineData( "1.0" )]
         [InlineData( "2.0" )]
         [InlineData( "3.0" )]
-        public async Task _service_document_should_return_api_version_specific_result( string apiVersion )
+        public async Task then_the_service_document_should_be_versionX2Dspecific( string apiVersion )
         {
             // arrange
             var requestUrl = $"api?api-version={apiVersion}";
@@ -48,7 +48,7 @@
         }
 
         [Fact]
-        public async Task _service_document_should_return_400_for_unsupported_query_string_api_version()
+        public async Task then_the_service_document_should_return_400_for_an_unsupported_version()
         {
             // arrange
 
@@ -63,7 +63,7 @@
         }
 
         [Fact]
-        public async Task _metadata_should_return_result_without_api_version()
+        public async Task then_X24metadata_should_allow_an_unspecified_version()
         {
             // arrange
 
@@ -79,7 +79,7 @@
         [InlineData( "1.0" )]
         [InlineData( "2.0" )]
         [InlineData( "3.0" )]
-        public async Task _metadata_should_return_api_version_specific_result( string apiVersion )
+        public async Task then_X24metadata_should_be_versionX2Dspecific( string apiVersion )
         {
             // arrange
             var requestUrl = $"api/$metadata?api-version={apiVersion}";
@@ -92,7 +92,7 @@
         }
 
         [Fact]
-        public async Task _metadata_should_return_400_for_unsupported_query_string_api_version()
+        public async Task then_X24metadata_should_return_400_for_an_unsupported_version()
         {
             // arrange
 

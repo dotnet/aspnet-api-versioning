@@ -9,7 +9,7 @@
 
     public class ControllerApiVersionConventionBuilderExtensionsTest
     {
-        private sealed class TestControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilder<IHttpController>
+        sealed class TestControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilder<IHttpController>
         {
             internal ICollection<ApiVersion> ProtectedSupportedVersions => SupportedVersions;
 

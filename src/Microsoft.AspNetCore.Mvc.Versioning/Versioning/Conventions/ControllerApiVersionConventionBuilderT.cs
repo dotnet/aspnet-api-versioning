@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             ApplyActionConventions( controllerModel, ApplyControllerConventions( controllerModel ) );
         }
 
-        private ControllerVersionInfo ApplyControllerConventions( ControllerModel controllerModel )
+        ControllerVersionInfo ApplyControllerConventions( ControllerModel controllerModel )
         {
             Contract.Requires( controllerModel != null );
             Contract.Ensures( Contract.Result<ControllerVersionInfo>() != null );
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             return new ControllerVersionInfo( supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions );
         }
 
-        private void MergeControllerAttributesWithConventions( ControllerModel controllerModel )
+        void MergeControllerAttributesWithConventions( ControllerModel controllerModel )
         {
             Contract.Requires( controllerModel != null );
 
@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                                                     select version );
         }
 
-        private void ApplyActionConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
+        void ApplyActionConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
         {
             Contract.Requires( controller != null );
             Contract.Requires( controllerVersionInfo != null );
@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             }
         }
 
-        private void ApplyNeutralModelToActions( ControllerModel controller )
+        void ApplyNeutralModelToActions( ControllerModel controller )
         {
             Contract.Requires( controller != null );
 
@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             }
         }
 
-        private void MergeActionAttributesWithConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
+        void MergeActionAttributesWithConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
         {
             Contract.Requires( controller != null );
             Contract.Requires( controllerVersionInfo != null );
@@ -116,11 +116,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             foreach ( var action in controller.Actions )
             {
                 var key = action.ActionMethod;
-                var actionBuilder = default( ActionApiVersionConventionBuilder<T> );
 
                 action.SetProperty( controller );
 
-                if ( ActionBuilders.TryGetValue( key, out actionBuilder ) )
+                if ( ActionBuilders.TryGetValue( key, out var actionBuilder ) )
                 {
                     action.SetProperty( controllerVersionInfo );
                     actionBuilder.ApplyTo( action );
