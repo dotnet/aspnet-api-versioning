@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
     public class CurrentImplementationApiVersionSelector : IApiVersionSelector
     {
-        private readonly ApiVersioningOptions options;
+        readonly ApiVersioningOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CurrentImplementationApiVersionSelector"/> class.

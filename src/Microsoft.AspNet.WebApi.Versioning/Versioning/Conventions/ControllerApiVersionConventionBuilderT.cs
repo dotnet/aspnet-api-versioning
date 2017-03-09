@@ -29,7 +29,7 @@
             }
         }
 
-        private void ApplyControllerConventions( HttpControllerDescriptor controllerDescriptor )
+        void ApplyControllerConventions( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
 
@@ -38,7 +38,7 @@
             controllerDescriptor.SetConventionsApiVersionModel( model );
         }
 
-        private void MergeAttributesWithConventions( HttpControllerDescriptor controllerDescriptor )
+        void MergeAttributesWithConventions( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
 
@@ -75,7 +75,7 @@
                                                     select version );
         }
 
-        private void ApplyActionConventions( HttpControllerDescriptor controllerDescriptor )
+        void ApplyActionConventions( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
 
@@ -85,9 +85,8 @@
             foreach ( var actionDescriptor in actionDescriptors )
             {
                 var key = actionDescriptor.MethodInfo;
-                var actionBuilder = default( ActionApiVersionConventionBuilder<T> );
 
-                if ( ActionBuilders.TryGetValue( key, out actionBuilder ) )
+                if ( ActionBuilders.TryGetValue( key, out var actionBuilder ) )
                 {
                     actionBuilder.ApplyTo( actionDescriptor );
                 }

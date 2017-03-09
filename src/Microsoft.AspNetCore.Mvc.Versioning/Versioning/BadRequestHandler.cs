@@ -2,7 +2,7 @@
 {
     using Http;
 
-    internal sealed class BadRequestHandler : RequestHandler
+    sealed class BadRequestHandler : RequestHandler
     {
         internal BadRequestHandler( ApiVersioningOptions options, string code, string message )
             : base( options, code, message ) { }

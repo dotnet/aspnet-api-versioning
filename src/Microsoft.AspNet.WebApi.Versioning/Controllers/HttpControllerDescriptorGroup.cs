@@ -17,8 +17,8 @@
     [SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Although the type is a collection, the term 'group' is more meaningful in this context." )]
     public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnlyList<HttpControllerDescriptor>
     {
-        private readonly HttpControllerDescriptor firstDescriptor;
-        private readonly IReadOnlyList<HttpControllerDescriptor> descriptors;
+        readonly HttpControllerDescriptor firstDescriptor;
+        readonly IReadOnlyList<HttpControllerDescriptor> descriptors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.

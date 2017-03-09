@@ -5,7 +5,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
 
-    internal static class Arg
+    static class Arg
     {
         [DebuggerStepThrough]
         [ContractArgumentValidator]

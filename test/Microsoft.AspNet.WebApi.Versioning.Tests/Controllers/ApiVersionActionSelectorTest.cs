@@ -13,13 +13,13 @@
 
     public class ApiVersionActionSelectorTest
     {
-        private sealed class TestApiVersionActionSelector : ApiVersionActionSelector
+        sealed class TestApiVersionActionSelector : ApiVersionActionSelector
         {
             internal HttpActionDescriptor InvokeSelectActionVersion( HttpControllerContext controllerContext, IReadOnlyList<HttpActionDescriptor> candidateActions ) =>
                 SelectActionVersion( controllerContext, candidateActions );
         }
 
-        private static HttpActionDescriptor CreateActionDescriptor( string version )
+        static HttpActionDescriptor CreateActionDescriptor( string version )
         {
             var configuration = new HttpConfiguration();
             var controllerType = typeof( IHttpController );

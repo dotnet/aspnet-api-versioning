@@ -29,7 +29,7 @@
             Configuration.EnsureInitialized();
         }
 
-        private void ConfigureAgreements()
+        void ConfigureAgreements()
         {
             FilteredControllerTypes.Add( typeof( Controllers.V1.AgreementsController ) );
             FilteredControllerTypes.Add( typeof( Controllers.V2.AgreementsController ) );
@@ -50,7 +50,7 @@
 
         }
 
-        private void ConfigureHelloWorld()
+        void ConfigureHelloWorld()
         {
             FilteredControllerTypes.Add( typeof( Controllers.V1.HelloWorldController ) );
             FilteredControllerTypes.Add( typeof( Controllers.V2.HelloWorldController ) );

@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
     using Routing;
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -15,7 +14,7 @@
     public partial class ApiVersionActionSelector
     {
         [DebuggerDisplay( "{DebuggerToString()}" )]
-        private sealed class CandidateActionWithParams
+        sealed class CandidateActionWithParams
         {
             internal CandidateActionWithParams( CandidateAction candidateAction, ISet<string> parameters, IHttpRouteData routeDataSource )
             {
@@ -33,7 +32,7 @@
             internal HttpActionDescriptor ActionDescriptor => CandidateAction.ActionDescriptor;
 
             [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called from DebuggerDisplay" )]
-            private string DebuggerToString()
+            string DebuggerToString()
             {
                 var sb = new StringBuilder();
 
@@ -48,7 +47,8 @@
 
                 foreach ( var param in CombinedParameterNames )
                 {
-                    sb.AppendFormat( " {0}", param );
+                    sb.Append( ' ' );
+                    sb.AppendFormat( param );
                 }
 
                 return sb.ToString();

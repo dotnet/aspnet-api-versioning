@@ -1,10 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Http;
-    using Net.Http.Headers;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
 
     /// <content>
     /// Provides the implementation for ASP.NET Core.

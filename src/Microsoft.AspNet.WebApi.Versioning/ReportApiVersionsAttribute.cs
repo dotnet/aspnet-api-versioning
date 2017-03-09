@@ -44,7 +44,7 @@
             AddApiVersionHeader( headers, ApiDeprecatedVersions, model.DeprecatedApiVersions );
         }
 
-        private static void AddApiVersionHeader( HttpHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
+        static void AddApiVersionHeader( HttpHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
         {
             Contract.Requires( headers != null );
             Contract.Requires( !IsNullOrEmpty( headerName ) );

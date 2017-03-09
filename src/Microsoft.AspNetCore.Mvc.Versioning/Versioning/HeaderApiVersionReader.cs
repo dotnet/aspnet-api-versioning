@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Extensions.Primitives;
     using Http;
     using System;
     using System.Collections.Generic;
@@ -28,9 +27,7 @@
 
             foreach ( var name in HeaderNames )
             {
-                var values = default( StringValues );
-
-                if ( headers.TryGetValue( name, out values ) )
+                if ( headers.TryGetValue( name, out var values ) )
                 {
                     versions.AddRange( values.Where( v => !IsNullOrEmpty( v ) ) );
                 }

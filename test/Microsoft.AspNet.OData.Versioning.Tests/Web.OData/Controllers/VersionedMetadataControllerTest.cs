@@ -8,7 +8,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
@@ -19,16 +18,12 @@
     {
         [ApiVersion( "1.0" )]
         [ApiVersion( "2.0" )]
-        private sealed class Controller1 : ODataController
-        {
-        }
+        sealed class Controller1 : ODataController { }
 
         [ApiVersion( "2.0", Deprecated = true )]
         [ApiVersion( "3.0-Beta", Deprecated = true )]
         [ApiVersion( "3.0" )]
-        private sealed class Controller2 : ODataController
-        {
-        }
+        sealed class Controller2 : ODataController { }
 
         [Fact]
         public async Task options_should_return_expected_headers()

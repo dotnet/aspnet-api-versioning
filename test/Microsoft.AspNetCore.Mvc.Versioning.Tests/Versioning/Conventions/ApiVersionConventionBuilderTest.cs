@@ -8,12 +8,12 @@
 
     public class ApiVersionConventionBuilderTest
     {
-        private sealed class TestApiVersionConventionBuilder : ApiVersionConventionBuilder
+        sealed class TestApiVersionConventionBuilder : ApiVersionConventionBuilder
         {
             internal IDictionary<TypeInfo, IApiVersionConvention<ControllerModel>> ProtectedControllerConventions => ControllerConventions;
         }
 
-        private sealed class StubController : Controller
+        sealed class StubController : Controller
         {
             public IActionResult Get() => Ok();
         }

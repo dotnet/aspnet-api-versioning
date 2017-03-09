@@ -7,21 +7,19 @@
 
     public class PersonModelConfiguration : IModelConfiguration
     {
-        private void ConfigureV1( ODataModelBuilder builder )
+        void ConfigureV1( ODataModelBuilder builder )
         {
             var person = ConfigureCurrent( builder );
             person.Ignore( p => p.Email );
             person.Ignore( p => p.Phone );
         }
 
-        private void ConfigureV2( ODataModelBuilder builder ) => ConfigureCurrent( builder ).Ignore( p => p.Phone );
+        void ConfigureV2( ODataModelBuilder builder ) => ConfigureCurrent( builder ).Ignore( p => p.Phone );
 
-        private EntityTypeConfiguration<Person> ConfigureCurrent( ODataModelBuilder builder )
+        EntityTypeConfiguration<Person> ConfigureCurrent( ODataModelBuilder builder )
         {
             var person = builder.EntitySet<Person>( "People" ).EntityType;
-
             person.HasKey( p => p.Id );
-
             return person;
         }
 

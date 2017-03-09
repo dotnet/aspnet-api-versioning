@@ -32,4 +32,6 @@
    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
  </ItemGroup>
 
+ <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Label="Shared" />
+
 </Project>

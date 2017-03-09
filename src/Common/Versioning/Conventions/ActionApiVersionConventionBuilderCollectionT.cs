@@ -16,8 +16,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// </summary>
     public partial class ActionApiVersionConventionBuilderCollection<T> : IReadOnlyCollection<ActionApiVersionConventionBuilder<T>>
     {
-        private readonly ControllerApiVersionConventionBuilder<T> controllerBuilder;
-        private readonly IList<ActionBuilderMapping<T>> actionBuilderMappings = new List<ActionBuilderMapping<T>>();
+        readonly ControllerApiVersionConventionBuilder<T> controllerBuilder;
+        readonly IList<ActionBuilderMapping<T>> actionBuilderMappings = new List<ActionBuilderMapping<T>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilderCollection{T}"/> class.
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private sealed partial class ActionBuilderMapping<TModel>
+        sealed partial class ActionBuilderMapping<TModel>
         {
             internal ActionBuilderMapping( MethodInfo method, ActionApiVersionConventionBuilder<TModel> builder )
             {

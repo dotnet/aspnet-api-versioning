@@ -13,15 +13,14 @@
     /// </summary>
     public static class HttpActionDescriptorExtensions
     {
-        private const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
-        private const string ApiVersionInfoKey = "MS_ApiVersionInfo";
+        const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
+        const string ApiVersionInfoKey = "MS_ApiVersionInfo";
 
         internal static bool IsAttributeRouted( this HttpActionDescriptor actionDescriptor )
         {
             Contract.Requires( actionDescriptor != null );
 
-            var value = default( bool? );
-            actionDescriptor.Properties.TryGetValue( AttributeRoutedPropertyKey, out value );
+            actionDescriptor.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
             return value ?? false;
         }
 

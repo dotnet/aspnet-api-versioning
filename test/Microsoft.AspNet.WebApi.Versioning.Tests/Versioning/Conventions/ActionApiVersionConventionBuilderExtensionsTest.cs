@@ -9,12 +9,9 @@
 
     public class ActionApiVersionConventionBuilderExtensionsTest
     {
-        private sealed class TestActionApiVersionConventionBuilder : ActionApiVersionConventionBuilder<IHttpController>
+        sealed class TestActionApiVersionConventionBuilder : ActionApiVersionConventionBuilder<IHttpController>
         {
-            internal TestActionApiVersionConventionBuilder()
-                : base( new ControllerApiVersionConventionBuilder<IHttpController>() )
-            {
-            }
+            internal TestActionApiVersionConventionBuilder() : base( new ControllerApiVersionConventionBuilder<IHttpController>() ) { }
 
             internal ICollection<ApiVersion> ProtectedMappedVersions => MappedVersions;
         }

@@ -19,8 +19,8 @@
     /// </summary>
     public class VersionedODataModelBuilder
     {
-        private readonly HttpConfiguration configuration;
-        private Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder();
+        readonly HttpConfiguration configuration;
+        Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedODataModelBuilder"/>
@@ -75,7 +75,7 @@
         /// value is <c>null</c>.</value>
         public Action<ODataModelBuilder, IEdmModel> OnModelCreated { get; set; }
 
-        private IEnumerable<IModelConfiguration> GetMergedConfigurations()
+        IEnumerable<IModelConfiguration> GetMergedConfigurations()
         {
             Contract.Ensures( Contract.Result<IEnumerable<IModelConfiguration>>() != null );
 
@@ -160,9 +160,8 @@
         protected virtual void ConfigureMetadataController( HttpConfiguration configuration, IEnumerable<ApiVersion> supportedApiVersions, IEnumerable<ApiVersion> deprecatedApiVersions )
         {
             var controllerMapping = configuration.Services.GetHttpControllerSelector().GetControllerMapping();
-            var controllerDescriptor = default( HttpControllerDescriptor );
 
-            if ( !controllerMapping.TryGetValue( "VersionedMetadata", out controllerDescriptor ))
+            if ( !controllerMapping.TryGetValue( "VersionedMetadata", out var controllerDescriptor ) )
             {
                 return;
             }

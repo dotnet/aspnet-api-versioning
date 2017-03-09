@@ -9,25 +9,27 @@ namespace Microsoft.AspNetCore.Mvc
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Text;
-    using System.Text.RegularExpressions;
+    using static System.DateTime;
+    using static System.Globalization.CultureInfo;
+    using static System.String;
+    using static System.Text.RegularExpressions.Regex;
+    using static System.Text.RegularExpressions.RegexOptions;
 
     /// <summary>
     /// Represents the application programming interface (API) version of a service.
     /// </summary>
     public class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion>, IFormattable
     {
-        private const string ParsePattern = @"^(\d{4}-\d{2}-\d{2})?\.?(\d{0,9})\.?(\d{0,9})\.?-?(.*)$";
-        private const string GroupVersionFormat = "yyyy-MM-dd";
-        private static Lazy<ApiVersion> defaultVersion = new Lazy<ApiVersion>( () => new ApiVersion( 1, 0 ) );
+        const string ParsePattern = @"^(\d{4}-\d{2}-\d{2})?\.?(\d{0,9})\.?(\d{0,9})\.?-?(.*)$";
+        const string GroupVersionFormat = "yyyy-MM-dd";
+        static Lazy<ApiVersion> defaultVersion = new Lazy<ApiVersion>( () => new ApiVersion( 1, 0 ) );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
         /// </summary>
         /// <param name="groupVersion">The group version.</param>
         public ApiVersion( DateTime groupVersion )
-            : this( new DateTime?( groupVersion ), null, null, null )
-        {
-        }
+            : this( new DateTime?( groupVersion ), null, null, null ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -102,15 +104,17 @@ namespace Microsoft.AspNetCore.Mvc
             GroupVersion = groupVersion;
             MajorVersion = majorVersion;
             MinorVersion = minorVersion;
-            Status = string.IsNullOrEmpty( status ) ? null : status;
+            Status = IsNullOrEmpty( status ) ? null : status;
         }
 
         [DebuggerStepThrough]
         [ContractArgumentValidator]
-        private static void RequireValidStatus( string status )
+        static void RequireValidStatus( string status )
         {
             if ( !IsValidStatus( status ) )
+            {
                 throw new ArgumentException( SR.ApiVersionBadStatus.FormatDefault( status ), nameof( status ) );
+            }
             Contract.EndContractBlock();
         }
 
@@ -139,7 +143,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <value>The minor version number or <c>null</c>.</value>
         public int? MinorVersion { get; }
 
-        private int ImpliedMinorVersion => MinorVersion ?? 0;
+        int ImpliedMinorVersion => MinorVersion ?? 0;
 
         /// <summary>
         /// Gets the optional version status.
@@ -157,8 +161,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <returns>True if the status is valid; otherwise, false.</returns>
         /// <remarks>The status must be alphabetic or alpanumeric, start with a letter, and contain no spaces.</remarks>
         [Pure]
-        public static bool IsValidStatus( string status ) =>
-            string.IsNullOrEmpty( status ) ? false : Regex.IsMatch( status, @"^[a-zA-Z][a-zA-Z0-9]*$", RegexOptions.Singleline );
+        public static bool IsValidStatus( string status ) => IsNullOrEmpty( status ) ? false : IsMatch( status, @"^[a-zA-Z][a-zA-Z0-9]*$", Singleline );
 
         /// <summary>
         /// Parses the specified text into an API version.
@@ -171,7 +174,7 @@ namespace Microsoft.AspNetCore.Mvc
             Arg.NotNullOrEmpty( text, nameof( text ) );
             Contract.Ensures( Contract.Result<ApiVersion>() != null );
 
-            var match = Regex.Match( text, ParsePattern, RegexOptions.Singleline );
+            var match = Match( text, ParsePattern, Singleline );
 
             if ( !match.Success )
             {
@@ -184,22 +187,20 @@ namespace Microsoft.AspNetCore.Mvc
             {
                 status = match.Groups[4].Value;
 
-                if ( !string.IsNullOrEmpty( status ) && !IsValidStatus( status ) )
+                if ( !IsNullOrEmpty( status ) && !IsValidStatus( status ) )
                 {
                     throw new FormatException( SR.ApiVersionBadStatus.FormatDefault( status ) );
                 }
             }
 
-            var culture = CultureInfo.InvariantCulture;
+            var culture = InvariantCulture;
             var group = default( DateTime? );
             var major = default( int? );
             var minor = default( int? );
 
             if ( match.Groups[1].Success )
             {
-                var temp = default( DateTime );
-
-                if ( !DateTime.TryParseExact( match.Groups[1].Value, GroupVersionFormat, culture, DateTimeStyles.None, out temp ) )
+                if ( !TryParseExact( match.Groups[1].Value, GroupVersionFormat, culture, DateTimeStyles.None, out var temp ) )
                 {
                     throw new FormatException( SR.ApiVersionBadGroupVersion.FormatDefault( match.Groups[1].Value ) );
                 }
@@ -241,12 +242,12 @@ namespace Microsoft.AspNetCore.Mvc
 
             version = null;
 
-            if ( string.IsNullOrEmpty( text ) )
+            if ( IsNullOrEmpty( text ) )
             {
                 return false;
             }
 
-            var match = Regex.Match( text, ParsePattern, RegexOptions.Singleline );
+            var match = Match( text, ParsePattern, Singleline );
 
             if ( !match.Success )
             {
@@ -259,22 +260,20 @@ namespace Microsoft.AspNetCore.Mvc
             {
                 status = match.Groups[4].Value;
 
-                if ( !string.IsNullOrEmpty( status ) && !IsValidStatus( status ) )
+                if ( !IsNullOrEmpty( status ) && !IsValidStatus( status ) )
                 {
                     return false;
                 }
             }
 
-            var culture = CultureInfo.InvariantCulture;
+            var culture = InvariantCulture;
             var group = default( DateTime? );
             var major = default( int? );
             var minor = default( int? );
 
             if ( match.Groups[1].Success )
             {
-                var temp = default( DateTime );
-
-                if ( !DateTime.TryParseExact( match.Groups[1].Value, GroupVersionFormat, culture, DateTimeStyles.None, out temp ) )
+                if ( !TryParseExact( match.Groups[1].Value, GroupVersionFormat, culture, DateTimeStyles.None, out var temp ) )
                 {
                     return false;
                 }
@@ -305,7 +304,7 @@ namespace Microsoft.AspNetCore.Mvc
             return true;
         }
 
-        private void AppendGroupVersion( StringBuilder text, IFormatProvider formatProvider )
+        void AppendGroupVersion( StringBuilder text, IFormatProvider formatProvider )
         {
             Contract.Requires( text != null );
 
@@ -315,7 +314,7 @@ namespace Microsoft.AspNetCore.Mvc
             }
         }
 
-        private void AppendMajorAndMinorVersion( StringBuilder text, IFormatProvider formatProvider )
+        void AppendMajorAndMinorVersion( StringBuilder text, IFormatProvider formatProvider )
         {
             Contract.Requires( text != null );
 
@@ -343,11 +342,11 @@ namespace Microsoft.AspNetCore.Mvc
             }
         }
 
-        private void AppendStatus( StringBuilder text )
+        void AppendStatus( StringBuilder text )
         {
             Contract.Requires( text != null );
 
-            if ( text.Length > 0 && !string.IsNullOrEmpty( Status ) )
+            if ( text.Length > 0 && !IsNullOrEmpty( Status ) )
             {
                 text.Append( '-' );
                 text.Append( Status );
@@ -387,13 +386,13 @@ namespace Microsoft.AspNetCore.Mvc
         /// </remarks>
         /// <exception cref="ArgumentNullException">The specified <paramref name="format"/> is <c>null</c> or any empty string.</exception>
         /// <exception cref="FormatException">The specified <paramref name="format"/> is not one of the supported format values.</exception>
-        public virtual string ToString( string format ) => ToString( format, CultureInfo.InvariantCulture );
+        public virtual string ToString( string format ) => ToString( format, InvariantCulture );
 
         /// <summary>
         /// Returns the text representation of the version.
         /// </summary>
         /// <returns>The <see cref="String">string</see> representation of the version.</returns>
-        public override string ToString() => ToString( null, CultureInfo.InvariantCulture );
+        public override string ToString() => ToString( null, InvariantCulture );
 
         /// <summary>
         /// Determines whether the current object equals another object.
@@ -469,7 +468,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <param name="other">The <see cref="ApiVersion">other</see> to evaluate.</param>
         /// <returns>True if the specified objet is equal to the current instance; otherwise, false.</returns>
-        public bool Equals( ApiVersion other )
+        public virtual bool Equals( ApiVersion other )
         {
             if ( other == null )
             {

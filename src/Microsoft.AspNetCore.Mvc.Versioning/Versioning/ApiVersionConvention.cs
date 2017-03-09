@@ -12,8 +12,8 @@
     [CLSCompliant( false )]
     public class ApiVersionConvention : IApplicationModelConvention
     {
-        private readonly ApiVersionConventionBuilder conventionBuilder;
-        private readonly ApiVersionModel implicitVersionModel;
+        readonly ApiVersionConventionBuilder conventionBuilder;
+        readonly ApiVersionModel implicitVersionModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionConvention"/> class.
@@ -78,7 +78,7 @@
             }
         }
 
-        private static bool IsDecoratedWithAttributes( ControllerModel controller )
+        static bool IsDecoratedWithAttributes( ControllerModel controller )
         {
             Contract.Requires( controller != null );
 
@@ -93,7 +93,7 @@
             return false;
         }
 
-        private void ApplyImplicitConventions( ControllerModel controller )
+        void ApplyImplicitConventions( ControllerModel controller )
         {
             Contract.Requires( controller != null );
 
@@ -105,7 +105,7 @@
             }
         }
 
-        private void ApplyAttributeOrImplicitConventions( ControllerModel controller )
+        void ApplyAttributeOrImplicitConventions( ControllerModel controller )
         {
             Contract.Requires( controller != null );
 

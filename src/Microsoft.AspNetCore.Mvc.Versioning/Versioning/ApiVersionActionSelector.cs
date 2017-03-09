@@ -23,11 +23,11 @@
     [CLSCompliant( false )]
     public class ApiVersionActionSelector : IActionSelector
     {
-        private static readonly IReadOnlyList<ActionDescriptor> NoMatches = new ActionDescriptor[0];
-        private readonly IActionSelectorDecisionTreeProvider decisionTreeProvider;
-        private readonly ActionConstraintCache actionConstraintCache;
-        private readonly IOptions<ApiVersioningOptions> options;
-        private readonly ILogger logger;
+        static readonly IReadOnlyList<ActionDescriptor> NoMatches = new ActionDescriptor[0];
+        readonly IActionSelectorDecisionTreeProvider decisionTreeProvider;
+        readonly ActionConstraintCache actionConstraintCache;
+        readonly IOptions<ApiVersioningOptions> options;
+        readonly ILogger logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionActionSelector"/> class.
@@ -86,10 +86,9 @@
             Arg.NotNull( candidates, nameof( candidates ) );
 
             var httpContext = context.HttpContext;
-            var apiVersion = default( ApiVersion );
             var invalidRequestHandler = default( RequestHandler );
 
-            if ( ( invalidRequestHandler = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out apiVersion ) ) != null )
+            if ( ( invalidRequestHandler = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out var apiVersion ) ) != null )
             {
                 context.Handler = invalidRequestHandler;
                 return null;
@@ -181,7 +180,7 @@
             return bestMatches;
         }
 
-        private RequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
+        RequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
         {
             Contract.Requires( httpContext != null );
 
@@ -199,7 +198,7 @@
             return null;
         }
 
-        private RequestHandler IsValidRequest( ActionSelectionContext context, IReadOnlyList<ActionDescriptor> candidates )
+        RequestHandler IsValidRequest( ActionSelectionContext context, IReadOnlyList<ActionDescriptor> candidates )
         {
             Contract.Requires( context != null );
             Contract.Requires( candidates != null );
@@ -270,13 +269,13 @@
             return newRequestHandler( Options, code, message );
         }
 
-        private static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>
+        static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>
             from action in context.MatchingActions
             let model = action.GetProperty<ApiVersionModel>()
             where model?.IsApiVersionNeutral ?? false
             select action;
 
-        private static bool ActionIsSatisfiedBy( ActionDescriptor action, ApiVersionModel model, ApiVersion version, ICollection<ActionDescriptor> implicitMatches )
+        static bool ActionIsSatisfiedBy( ActionDescriptor action, ApiVersionModel model, ApiVersion version, ICollection<ActionDescriptor> implicitMatches )
         {
             Contract.Requires( action != null );
             Contract.Requires( implicitMatches != null );
@@ -299,7 +298,7 @@
             return false;
         }
 
-        private IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
+        IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
         {
             Contract.Requires( context != null );
             Contract.Requires( actions != null );
@@ -324,7 +323,7 @@
             return matches.Select( candidate => candidate.Action ).ToArray();
         }
 
-        private IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )
+        IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )
         {
             var order = default( int? );
 
@@ -355,10 +354,11 @@
 
             var actionsWithConstraint = new List<ActionSelectorCandidate>();
             var actionsWithoutConstraint = new List<ActionSelectorCandidate>();
-            var constraintContext = new ActionConstraintContext();
-
-            constraintContext.Candidates = candidates;
-            constraintContext.RouteContext = context;
+            var constraintContext = new ActionConstraintContext()
+            {
+                Candidates = candidates,
+                RouteContext = context
+            };
 
             for ( var i = 0; i < candidates.Count; i++ )
             {

@@ -5,16 +5,16 @@
     /// <summary>
     /// Provides keys for looking up route values.
     /// </summary>
-    internal static class RouteValueKeys
+    static class RouteValueKeys
     {
         /// <summary>
         /// Used to provide the action name.
         /// </summary>
-        public const string Action = "action";
+        internal const string Action = "action";
 
         /// <summary>
         /// Used to provide the controller name.
         /// </summary>
-        public const string Controller = "controller";
+        internal const string Controller = "controller";
     }
 }

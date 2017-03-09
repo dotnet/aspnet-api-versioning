@@ -12,16 +12,14 @@ namespace Microsoft.AspNetCore.Mvc
     using static System.Globalization.CultureInfo;
     using static System.String;
 
-    internal static partial class CollectionExtensions
+    static partial class CollectionExtensions
     {
         internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, out TValue value )
         {
             Contract.Requires( dictionary != null );
             Contract.Requires( key != null );
 
-            object val;
-
-            if ( dictionary.TryGetValue( key, out val ) && ( val is TValue ) )
+            if ( dictionary.TryGetValue( key, out var val ) && ( val is TValue ) )
             {
                 value = (TValue) val;
                 return true;
@@ -38,9 +36,7 @@ namespace Microsoft.AspNetCore.Mvc
             Contract.Requires( sequence != null );
             Contract.Ensures( Contract.Result<IReadOnlyList<T>>() != null );
 
-            var list = sequence as List<T>;
-
-            if ( list != null )
+            if ( sequence is List<T> list )
             {
                 list.Sort();
                 return list;

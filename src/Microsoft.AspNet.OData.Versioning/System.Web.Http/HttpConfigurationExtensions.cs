@@ -25,13 +25,13 @@
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        private const string ResolverSettingsKey = "System.Web.OData.ResolverSettingsKey";
-        private const string UnversionedRouteSuffix = "-Unversioned";
-        private const string ApiVersionConstraintName = "apiVersion";
-        private const string ApiVersionConstraint = "{" + ApiVersionConstraintName + "}";
-        private static readonly Lazy<Action<DefaultODataPathHandler, object>> setResolverSettings = new Lazy<Action<DefaultODataPathHandler, object>>( GetResolverSettingsMutator );
+        const string ResolverSettingsKey = "System.Web.OData.ResolverSettingsKey";
+        const string UnversionedRouteSuffix = "-Unversioned";
+        const string ApiVersionConstraintName = "apiVersion";
+        const string ApiVersionConstraint = "{" + ApiVersionConstraintName + "}";
+        static readonly Lazy<Action<DefaultODataPathHandler, object>> setResolverSettings = new Lazy<Action<DefaultODataPathHandler, object>>( GetResolverSettingsMutator );
 
-        private static Action<DefaultODataPathHandler, object> GetResolverSettingsMutator()
+        static Action<DefaultODataPathHandler, object> GetResolverSettingsMutator()
         {
             Contract.Ensures( Contract.Result<Action<DefaultODataPathHandler, object>>() != null );
 
@@ -48,7 +48,7 @@
             return action;
         }
 
-        private static void SetResolverSettings( this HttpConfiguration configuration, IODataPathHandler pathHandler )
+        static void SetResolverSettings( this HttpConfiguration configuration, IODataPathHandler pathHandler )
         {
             Contract.Requires( configuration != null );
 
@@ -77,7 +77,7 @@
             setResolverSettings.Value( handler, configuration.Properties[ResolverSettingsKey] );
         }
 
-        private static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
+        static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
         {
             Contract.Requires( conventions != null );
             Contract.Ensures( Contract.Result<IList<IODataRoutingConvention>>() != null );
@@ -362,7 +362,7 @@
             return route;
         }
 
-        private static ODataPathRouteConstraint MakeVersionedODataRouteConstraint(
+        static ODataPathRouteConstraint MakeVersionedODataRouteConstraint(
             ODataPathRouteConstraint routeConstraint,
             IODataPathHandler pathHandler,
             IList<IODataRoutingConvention> routeConventions,
@@ -387,7 +387,7 @@
             return new VersionedODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray(), apiVersion );
         }
 
-        private static void AddApiVersionConstraintIfNecessary( ODataRoute route )
+        static void AddApiVersionConstraintIfNecessary( ODataRoute route )
         {
             Contract.Requires( route != null );
 
@@ -412,7 +412,7 @@
             }
         }
 
-        private static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( string routeName, string routePrefix, HttpRouteCollection routes, List<ODataRoute> odataRoutes, List<IHttpRouteConstraint> unversionedConstraints )
+        static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( string routeName, string routePrefix, HttpRouteCollection routes, List<ODataRoute> odataRoutes, List<IHttpRouteConstraint> unversionedConstraints )
         {
             Contract.Requires( !IsNullOrEmpty( routeName ) );
             Contract.Requires( routes != null );

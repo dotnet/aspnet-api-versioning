@@ -7,7 +7,7 @@
 
     public class ModelExtensionsTest
     {
-        private sealed class TestPropertyValue { }
+        sealed class TestPropertyValue { }
 
         [Fact]
         public void set_property_should_update_controller_model_properties()

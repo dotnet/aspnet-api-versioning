@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// </summary>
     public partial class ActionApiVersionConventionBuilder<T>
     {
-        private readonly HashSet<ApiVersion> mappedVersions = new HashSet<ApiVersion>();
+        readonly HashSet<ApiVersion> mappedVersions = new HashSet<ApiVersion>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilder{T}"/> class.

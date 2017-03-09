@@ -20,8 +20,8 @@ namespace Microsoft.AspNetCore.Mvc
     [AttributeUsage( Class | Method, Inherited = true, AllowMultiple = false )]
     public sealed partial class ReportApiVersionsAttribute : ActionFilterAttribute
     {
-        private const string ApiSupportedVersions = "api-supported-versions";
-        private const string ApiDeprecatedVersions = "api-deprecated-versions";
-        private const string ValueSeparator = ", ";
+        const string ApiSupportedVersions = "api-supported-versions";
+        const string ApiDeprecatedVersions = "api-deprecated-versions";
+        const string ValueSeparator = ", ";
     }
 }

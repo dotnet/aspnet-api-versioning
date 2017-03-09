@@ -40,7 +40,7 @@
             ApiVersion = apiVersion;
         }
 
-        private static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values )
+        static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values )
         {
             Contract.Requires( values != null );
             object value;

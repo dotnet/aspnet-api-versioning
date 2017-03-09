@@ -17,18 +17,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     [SuppressMessage( "Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "An accessor property is provided, but the values are typed; not strings." )]
     public abstract class ApiVersionsBaseAttribute : Attribute
     {
-        private readonly Lazy<int> computedHashCode;
-        private readonly Lazy<IReadOnlyList<ApiVersion>> versions;
+        readonly Lazy<int> computedHashCode;
+        readonly Lazy<IReadOnlyList<ApiVersion>> versions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
         /// </summary>
         /// <param name="version">The <see cref="ApiVersion">API version</see>.</param>
-        protected ApiVersionsBaseAttribute( ApiVersion version )
-            : this( new[] { version } )
-        {
-            Arg.NotNull( version, nameof( version ) );
-        }
+        protected ApiVersionsBaseAttribute( ApiVersion version ) : this( new[] { version } ) => Arg.NotNull( version, nameof( version ) );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -46,11 +42,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
         /// </summary>
         /// <param name="version">The API version string.</param>
-        public ApiVersionsBaseAttribute( string version )
-            : this( new[] { version } )
-        {
-            Arg.NotNullOrEmpty( version, nameof( version ) );
-        }
+        public ApiVersionsBaseAttribute( string version ) : this( new[] { version } ) => Arg.NotNullOrEmpty( version, nameof( version ) );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -65,7 +57,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             this.versions = new Lazy<IReadOnlyList<ApiVersion>>( () => versions.Select( Parse ).Distinct().ToSortedReadOnlyList() );
         }
 
-        private static int ComputeHashCode( IEnumerable<ApiVersion> versions )
+        static int ComputeHashCode( IEnumerable<ApiVersion> versions )
         {
             Contract.Requires( versions != null );
 

@@ -6,7 +6,7 @@
     using System.Diagnostics.Contracts;
     using System.Threading.Tasks;
 
-    internal sealed class MethodNotAllowedHandler : RequestHandler
+    sealed class MethodNotAllowedHandler : RequestHandler
     {
         readonly string[] allowedMethods;
 

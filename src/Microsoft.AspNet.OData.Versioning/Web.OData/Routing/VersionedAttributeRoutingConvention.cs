@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
-    using Http;
     using Microsoft.OData.Edm;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -20,10 +19,7 @@
         /// </summary>
         /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration )
-            : base( model, configuration )
-        {
-        }
+        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration ) : base( model, configuration ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
@@ -32,19 +28,14 @@
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
         public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler )
-            : base( model, configuration, pathTemplateHandler )
-        {
-        }
+            : base( model, configuration, pathTemplateHandler ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
         /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see></param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers )
-            : base( model, controllers )
-        {
-        }
+        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers ) : base( model, controllers ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
@@ -54,9 +45,7 @@
         /// associated with the routing convention.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
         public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler )
-            : base( model, controllers, pathTemplateHandler )
-        {
-        }
+            : base( model, controllers, pathTemplateHandler ) { }
 
         /// <summary>
         /// Returns a value indicating whether the specified controller should be mapped using attribute routing conventions.

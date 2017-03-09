@@ -1,9 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
-
     using System;
 
-    internal static partial class TypeExtensions
+    static partial class TypeExtensions
     {
         internal static bool IsPrimitive( this Type type )
         {

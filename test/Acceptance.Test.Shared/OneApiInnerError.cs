@@ -1,4 +1,8 @@
-﻿namespace Microsoft.AspNetCore.Mvc
+﻿#if WEBAPI
+namespace Microsoft.Web
+#else
+namespace Microsoft.AspNetCore.Mvc
+#endif
 {
     using System;
 

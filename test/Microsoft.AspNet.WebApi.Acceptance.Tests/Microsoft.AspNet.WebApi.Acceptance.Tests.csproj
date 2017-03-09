@@ -2,6 +2,7 @@
 
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
+  <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <AssemblyName>Microsoft.AspNet.WebApi.Acceptance.Tests</AssemblyName>
  </PropertyGroup>
 
@@ -29,5 +30,7 @@
   <Reference Include="System" />
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
+
+ <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Label="Shared" />
 
 </Project>

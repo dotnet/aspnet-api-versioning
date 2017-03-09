@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
     using Http;
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -10,10 +9,10 @@
     using System.Web.Http.Routing;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
-    internal sealed class UnversionedODataPathRouteConstraint : IHttpRouteConstraint
+    sealed class UnversionedODataPathRouteConstraint : IHttpRouteConstraint
     {
-        private readonly ApiVersion apiVersion;
-        private readonly IEnumerable<IHttpRouteConstraint> innerConstraints;
+        readonly ApiVersion apiVersion;
+        readonly IEnumerable<IHttpRouteConstraint> innerConstraints;
 
         internal UnversionedODataPathRouteConstraint( IEnumerable<IHttpRouteConstraint> innerConstraints )
         {
@@ -29,7 +28,7 @@
             this.apiVersion = apiVersion;
         }
 
-        private bool MatchAnyVersion => apiVersion == null;
+        bool MatchAnyVersion => apiVersion == null;
 
         public bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
         {

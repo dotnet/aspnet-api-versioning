@@ -6,7 +6,7 @@
     using ModelBinding;
     using ValueProviders;
 
-    internal static class HttpParameterBindingExtensions
+    static class HttpParameterBindingExtensions
     {
         internal static bool WillReadUri( this HttpParameterBinding parameterBinding )
         {

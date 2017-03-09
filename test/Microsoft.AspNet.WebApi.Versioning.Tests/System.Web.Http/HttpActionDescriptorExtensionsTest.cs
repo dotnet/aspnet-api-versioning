@@ -12,7 +12,7 @@
 
     public class HttpActionDescriptorExtensionsTest
     {
-        private static IEnumerable<object[]> CreateActionDescriptorData( Tuple<Type, string, ApiVersion[]>[] runs )
+        static IEnumerable<object[]> CreateActionDescriptorData( Tuple<Type, string, ApiVersion[]>[] runs )
         {
             foreach ( var run in runs )
             {

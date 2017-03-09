@@ -5,9 +5,9 @@
     using System.Collections.Generic;
     using System.Reflection;
 
-    internal sealed class FilteredControllerFeatureProvider : ControllerFeatureProvider, ICollection<TypeInfo>
+    sealed class FilteredControllerTypes : ControllerFeatureProvider, ICollection<TypeInfo>
     {
-        private readonly HashSet<TypeInfo> controllerTypes = new HashSet<TypeInfo>();
+        readonly HashSet<TypeInfo> controllerTypes = new HashSet<TypeInfo>();
 
         protected override bool IsController( TypeInfo typeInfo ) => base.IsController( typeInfo ) && controllerTypes.Contains( typeInfo );
 

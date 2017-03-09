@@ -1,0 +1,10 @@
+# EditorConfig is awesome
+# * http://EditorConfig.org
+# * https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+
+# TODO: enable relevant naming rules once they are supported
+# REF: https://github.com/dotnet/roslyn/pull/15065
+
+# relax rules for test class and methods names
+#[*.cs]
+#dotnet_naming_style.first_word_upper_case_style.capitalization = first_word_upper

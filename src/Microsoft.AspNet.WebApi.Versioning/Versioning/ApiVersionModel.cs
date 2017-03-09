@@ -12,7 +12,7 @@
     /// </content>
     public sealed partial class ApiVersionModel
     {
-        private ApiVersionModel()
+        ApiVersionModel()
         {
             declaredVersions = defaultVersions;
             implementedVersions = defaultVersions;
@@ -89,7 +89,7 @@
             }
         }
 
-        private static IReadOnlyList<ApiVersion> GetDeclaredControllerApiVersions( HttpControllerDescriptor controllerDescriptor )
+        static IReadOnlyList<ApiVersion> GetDeclaredControllerApiVersions( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
             Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersion>>() != null );
@@ -104,7 +104,7 @@
             return versions;
         }
 
-        private static IReadOnlyList<ApiVersion> GetSupportedControllerApiVersions( HttpControllerDescriptor controllerDescriptor )
+        static IReadOnlyList<ApiVersion> GetSupportedControllerApiVersions( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
             Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersion>>() != null );

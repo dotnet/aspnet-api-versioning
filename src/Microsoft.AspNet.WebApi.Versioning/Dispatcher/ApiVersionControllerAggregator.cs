@@ -13,13 +13,13 @@
     using System.Web.Http.Routing;
     using Versioning;
 
-    internal sealed class ApiVersionControllerAggregator
+    sealed class ApiVersionControllerAggregator
     {
-        private readonly Lazy<string> controllerName;
-        private readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache;
-        private readonly Lazy<HttpControllerDescriptorGroup> conventionRouteCandidates;
-        private readonly Lazy<CandidateAction[]> directRouteCandidates;
-        private readonly Lazy<ApiVersionModel> allVersions;
+        readonly Lazy<string> controllerName;
+        readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache;
+        readonly Lazy<HttpControllerDescriptorGroup> conventionRouteCandidates;
+        readonly Lazy<CandidateAction[]> directRouteCandidates;
+        readonly Lazy<ApiVersionModel> allVersions;
 
         internal ApiVersionControllerAggregator(
             HttpRequestMessage request,
@@ -38,16 +38,14 @@
             allVersions = new Lazy<ApiVersionModel>( AggregateAllCandiateVersions );
         }
 
-        private HttpControllerDescriptorGroup GetConventionRouteCandidates()
+        HttpControllerDescriptorGroup GetConventionRouteCandidates()
         {
-            var candidates = default( HttpControllerDescriptorGroup );
-
             if ( string.IsNullOrEmpty( ControllerName ) )
             {
                 return null;
             }
 
-            if ( controllerInfoCache.Value.TryGetValue( ControllerName, out candidates ) )
+            if ( controllerInfoCache.Value.TryGetValue( ControllerName, out var candidates ) )
             {
                 return candidates;
             }
@@ -55,7 +53,7 @@
             return null;
         }
 
-        private ApiVersionModel AggregateAllCandiateVersions() =>
+        ApiVersionModel AggregateAllCandiateVersions() =>
             ( ConventionRouteCandidates ?? Enumerable.Empty<HttpControllerDescriptor>() ).Union( EnumerateDirectRoutes() ).AggregateVersions();
 
         internal HttpRequestMessage Request { get; }
@@ -76,7 +74,7 @@
 
         internal ApiVersionModel AllVersions => allVersions.Value;
 
-        private IEnumerable<HttpControllerDescriptor> EnumerateDirectRoutes()
+        IEnumerable<HttpControllerDescriptor> EnumerateDirectRoutes()
         {
             Contract.Ensures( Contract.Result<IEnumerable<HttpControllerDescriptor>>() != null );
 
@@ -111,18 +109,14 @@
             return controllers.Distinct();
         }
 
-        private static IEnumerable<HttpControllerDescriptor> EnumerateControllersInDataTokens( IDictionary<string, object> dataTokens )
+        static IEnumerable<HttpControllerDescriptor> EnumerateControllersInDataTokens( IDictionary<string, object> dataTokens )
         {
             Contract.Requires( dataTokens != null );
             Contract.Ensures( Contract.Result<IEnumerable<HttpControllerDescriptor>>() != null );
 
-            var value = default( object );
-
-            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Controller, out value ) )
+            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Controller, out var value ) )
             {
-                var controllerDescriptor = value as HttpControllerDescriptor;
-
-                if ( controllerDescriptor != null )
+                if ( value is HttpControllerDescriptor controllerDescriptor )
                 {
                     yield return controllerDescriptor;
                 }
@@ -132,16 +126,12 @@
 
             if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out value ) )
             {
-                var actionDescriptors = value as HttpActionDescriptor[];
-
-                if ( actionDescriptors == null )
+                if ( value is HttpActionDescriptor[] actionDescriptors )
                 {
-                    yield break;
-                }
-
-                foreach ( var actionDescriptor in actionDescriptors )
-                {
-                    yield return actionDescriptor.ControllerDescriptor;
+                    foreach ( var actionDescriptor in actionDescriptors )
+                    {
+                        yield return actionDescriptor.ControllerDescriptor;
+                    }
                 }
             }
         }

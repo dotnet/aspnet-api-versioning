@@ -13,13 +13,10 @@
 
     public class WebServer : IDisposable
     {
-        private readonly TestServer server;
-        private bool disposed;
+        readonly TestServer server;
+        bool disposed;
 
-        ~WebServer()
-        {
-            Dispose( false );
-        }
+        ~WebServer() => Dispose( false );
 
         public WebServer( Action<ApiVersioningOptions> setupApiVersioning = null, Action<IRouteBuilder> setupRoutes = null )
         {
@@ -52,7 +49,7 @@
 
         public IServiceProvider Services => server.Host.Services;
 
-        private void Dispose( bool disposing )
+        void Dispose( bool disposing )
         {
             if ( disposed )
             {

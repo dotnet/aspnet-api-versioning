@@ -17,20 +17,20 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     [DebuggerTypeProxy( typeof( ApiVersionModelDebugView ) )]
     public sealed partial class ApiVersionModel
     {
-        private const int DefaultModel = 0;
-        private const int NeutralModel = 1;
-        private const int EmptyModel = 2;
-        private static readonly Lazy<ApiVersionModel> defaultVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( DefaultModel ) );
-        private static readonly Lazy<ApiVersionModel> neutralVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( NeutralModel ) );
-        private static readonly Lazy<ApiVersionModel> emptyVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( EmptyModel ) );
-        private static readonly Lazy<IReadOnlyList<ApiVersion>> emptyVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new ApiVersion[0] );
-        private static readonly Lazy<IReadOnlyList<ApiVersion>> defaultVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new[] { ApiVersion.Default } );
-        private readonly Lazy<IReadOnlyList<ApiVersion>> declaredVersions;
-        private readonly Lazy<IReadOnlyList<ApiVersion>> implementedVersions;
-        private readonly Lazy<IReadOnlyList<ApiVersion>> supportedVersions;
-        private readonly Lazy<IReadOnlyList<ApiVersion>> deprecatedVersions;
+        const int DefaultModel = 0;
+        const int NeutralModel = 1;
+        const int EmptyModel = 2;
+        static readonly Lazy<ApiVersionModel> defaultVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( DefaultModel ) );
+        static readonly Lazy<ApiVersionModel> neutralVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( NeutralModel ) );
+        static readonly Lazy<ApiVersionModel> emptyVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( EmptyModel ) );
+        static readonly Lazy<IReadOnlyList<ApiVersion>> emptyVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new ApiVersion[0] );
+        static readonly Lazy<IReadOnlyList<ApiVersion>> defaultVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new[] { ApiVersion.Default } );
+        readonly Lazy<IReadOnlyList<ApiVersion>> declaredVersions;
+        readonly Lazy<IReadOnlyList<ApiVersion>> implementedVersions;
+        readonly Lazy<IReadOnlyList<ApiVersion>> supportedVersions;
+        readonly Lazy<IReadOnlyList<ApiVersion>> deprecatedVersions;
 
-        private ApiVersionModel( int kind )
+        ApiVersionModel( int kind )
         {
             switch ( kind )
             {
@@ -162,10 +162,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             this.declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( declaredVersions.ToSortedReadOnlyList );
             this.supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.Union( advertisedVersions ).ToSortedReadOnlyList );
             this.deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecatedVersions.Union( deprecatedAdvertisedVersions ).ToSortedReadOnlyList );
-            this.implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => this.supportedVersions.Value.Union( this.deprecatedVersions.Value ).ToSortedReadOnlyList() );
+            implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => this.supportedVersions.Value.Union( this.deprecatedVersions.Value ).ToSortedReadOnlyList() );
         }
 
-        private string DebuggerDisplayText => IsApiVersionNeutral ? "*.*" : string.Join( ", ", DeclaredApiVersions );
+        string DebuggerDisplayText => IsApiVersionNeutral ? "*.*" : string.Join( ", ", DeclaredApiVersions );
 
         /// <summary>
         /// Gets the default API version information.

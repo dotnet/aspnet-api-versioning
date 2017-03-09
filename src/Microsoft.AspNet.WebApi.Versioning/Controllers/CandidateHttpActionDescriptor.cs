@@ -16,7 +16,7 @@
     /// </content>
     public partial class ApiVersionActionSelector
     {
-        private sealed class CandidateHttpActionDescriptor : HttpActionDescriptor
+        sealed class CandidateHttpActionDescriptor : HttpActionDescriptor
         {
             internal CandidateHttpActionDescriptor( CandidateActionWithParams action )
             {
@@ -34,14 +34,8 @@
 
             public override HttpActionBinding ActionBinding
             {
-                get
-                {
-                    return Inner.ActionBinding;
-                }
-                set
-                {
-                    Inner.ActionBinding = value;
-                }
+                get => Inner.ActionBinding;
+                set => Inner.ActionBinding = value;
             }
 
             public override string ActionName => Inner.ActionName;

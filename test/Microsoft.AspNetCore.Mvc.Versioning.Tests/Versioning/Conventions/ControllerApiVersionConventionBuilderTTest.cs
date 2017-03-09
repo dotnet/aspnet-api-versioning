@@ -8,7 +8,7 @@
 
     public class ControllerApiVersionConventionBuilderTTest
     {
-        private sealed class UndecoratedController : Controller
+        sealed class UndecoratedController : Controller
         {
             public IActionResult Get() => Ok();
         }
@@ -17,7 +17,7 @@
         [ApiVersion( "0.9", Deprecated = true )]
         [AdvertiseApiVersions( "3.0" )]
         [AdvertiseApiVersions( "3.0-Beta", Deprecated = true )]
-        private sealed class DecoratedController : Controller
+        sealed class DecoratedController : Controller
         {
             public IActionResult Get() => Ok();
         }

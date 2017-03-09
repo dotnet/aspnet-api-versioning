@@ -16,18 +16,15 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// </summary>
     public partial class ControllerApiVersionConventionBuilder<T>
     {
-        private readonly HashSet<ApiVersion> supportedVersions = new HashSet<ApiVersion>();
-        private readonly HashSet<ApiVersion> deprecatedVersions = new HashSet<ApiVersion>();
-        private readonly HashSet<ApiVersion> advertisedVersions = new HashSet<ApiVersion>();
-        private readonly HashSet<ApiVersion> deprecatedAdvertisedVersions = new HashSet<ApiVersion>();
+        readonly HashSet<ApiVersion> supportedVersions = new HashSet<ApiVersion>();
+        readonly HashSet<ApiVersion> deprecatedVersions = new HashSet<ApiVersion>();
+        readonly HashSet<ApiVersion> advertisedVersions = new HashSet<ApiVersion>();
+        readonly HashSet<ApiVersion> deprecatedAdvertisedVersions = new HashSet<ApiVersion>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerApiVersionConventionBuilder{T}"/> class.
         /// </summary>
-        public ControllerApiVersionConventionBuilder()
-        {
-            ActionBuilders = new ActionApiVersionConventionBuilderCollection<T>( this );
-        }
+        public ControllerApiVersionConventionBuilder() => ActionBuilders = new ActionApiVersionConventionBuilderCollection<T>( this );
 
         /// <summary>
         /// Gets or sets a value indicating whether the current controller is API version-neutral.

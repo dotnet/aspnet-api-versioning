@@ -6,10 +6,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using System;
     using System.Diagnostics.Contracts;
+    using static System.String;
 
-    internal sealed class ApiVersionModelDebugView
+    sealed class ApiVersionModelDebugView
     {
-        private readonly ApiVersionModel model;
+        const string Comma = ", ";
+        readonly ApiVersionModel model;
 
         public ApiVersionModelDebugView( ApiVersionModel model )
         {
@@ -19,12 +21,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
         public bool VersionNeutral => model.IsApiVersionNeutral;
 
-        public string Declared => string.Join( ", ", model.DeclaredApiVersions );
+        public string Declared => Join( Comma, model.DeclaredApiVersions );
 
-        public string Implemented => string.Join( ", ", model.ImplementedApiVersions );
+        public string Implemented => Join( Comma, model.ImplementedApiVersions );
 
-        public string Supported => string.Join( ", ", model.SupportedApiVersions );
+        public string Supported => Join( Comma, model.SupportedApiVersions );
 
-        public string Deprecated => string.Join( ", ", model.DeprecatedApiVersions );
+        public string Deprecated => Join( Comma, model.DeprecatedApiVersions );
     }
 }

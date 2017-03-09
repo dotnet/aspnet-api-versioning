@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26206.0
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4D09-4523-B9C9-65B1E8832AA1}"
+	ProjectSection(SolutionItems) = preProject
+		test\.editorconfig = test\.editorconfig
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
@@ -70,8 +73,11 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "src\Common\Common
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Test.Common", "test\Test.Common\Test.Common.shproj", "{F9297626-C37C-402B-AFD6-712F3E5E4D7C}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Acceptance.Test.Shared", "test\Acceptance.Test.Shared\Acceptance.Test.Shared.shproj", "{6CDFB878-2642-4F98-AE35-621BAC581181}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{6cdfb878-2642-4f98-ae35-621bac581181}*SharedItemsImports = 13
 		src\Common\Common.projitems*{6d0e834b-6422-44cd-9a85-e3be9dead1be}*SharedItemsImports = 13
 		src\Shared\Shared.projitems*{b7897873-6757-4684-83c0-39575821ae14}*SharedItemsImports = 13
 		test\Test.Common\Test.Common.projitems*{f9297626-c37c-402b-afd6-712f3e5e4d7c}*SharedItemsImports = 13
@@ -171,5 +177,6 @@ Global
 		{B7897873-6757-4684-83C0-39575821AE14} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{6D0E834B-6422-44CD-9A85-E3BE9DEAD1BE} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{F9297626-C37C-402B-AFD6-712F3E5E4D7C} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{6CDFB878-2642-4F98-AE35-621BAC581181} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 	EndGlobalSection
 EndGlobal

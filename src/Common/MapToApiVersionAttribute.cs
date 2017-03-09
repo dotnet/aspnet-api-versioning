@@ -21,19 +21,13 @@ namespace Microsoft.AspNetCore.Mvc
         /// Initializes a new instance of the <see cref="MapToApiVersionAttribute"/> class.
         /// </summary>
         /// <param name="version">The <see cref="ApiVersion">API version</see>.</param>
-        protected MapToApiVersionAttribute( ApiVersion version )
-            : base( version )
-        {
-        }
+        protected MapToApiVersionAttribute( ApiVersion version ) : base( version ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MapToApiVersionAttribute"/> class.
         /// </summary>
         /// <param name="version">The API version string.</param>
-        public MapToApiVersionAttribute( string version )
-            : base( version )
-        {
-        }
+        public MapToApiVersionAttribute( string version ) : base( version ) { }
 
         bool IApiVersionProvider.AdvertiseOnly => false;
 

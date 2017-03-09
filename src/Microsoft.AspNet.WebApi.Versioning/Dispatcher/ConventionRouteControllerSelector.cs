@@ -12,12 +12,11 @@
     using Versioning;
     using static System.Environment;
 
-    internal sealed class ConventionRouteControllerSelector : ControllerSelector
+    sealed class ConventionRouteControllerSelector : ControllerSelector
     {
-        private readonly HttpControllerTypeCache controllerTypeCache;
+        readonly HttpControllerTypeCache controllerTypeCache;
 
-        internal ConventionRouteControllerSelector( ApiVersioningOptions options, HttpControllerTypeCache controllerTypeCache )
-            : base( options )
+        internal ConventionRouteControllerSelector( ApiVersioningOptions options, HttpControllerTypeCache controllerTypeCache ) : base( options )
         {
             Contract.Requires( controllerTypeCache != null );
             this.controllerTypeCache = controllerTypeCache;
@@ -80,7 +79,7 @@
             return result;
         }
 
-        private static HttpControllerDescriptor GetVersionNeutralController( IEnumerable<HttpControllerDescriptor> candidates, Lazy<Exception> ambiguousException )
+        static HttpControllerDescriptor GetVersionNeutralController( IEnumerable<HttpControllerDescriptor> candidates, Lazy<Exception> ambiguousException )
         {
             Contract.Requires( candidates != null );
             Contract.Requires( ambiguousException != null );
@@ -110,7 +109,7 @@
             return controllerDescriptor;
         }
 
-        private static HttpControllerDescriptor GetVersionedController( ApiVersionControllerAggregator aggregator, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
+        static HttpControllerDescriptor GetVersionedController( ApiVersionControllerAggregator aggregator, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
         {
             Contract.Requires( aggregator != null );
             Contract.Requires( requestedVersion != null );
@@ -143,7 +142,7 @@
             return controller;
         }
 
-        private static HttpControllerDescriptor ResolveController( IEnumerable<HttpControllerDescriptor> candidates, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
+        static HttpControllerDescriptor ResolveController( IEnumerable<HttpControllerDescriptor> candidates, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
         {
             Contract.Requires( candidates != null );
             Contract.Requires( requestedVersion != null );
@@ -173,7 +172,7 @@
             return controllerDescriptor;
         }
 
-        private static Exception CreateAmbiguousControllerException( IHttpRoute route, string controllerName, ICollection<Type> matchingTypes )
+        static Exception CreateAmbiguousControllerException( IHttpRoute route, string controllerName, ICollection<Type> matchingTypes )
         {
             Contract.Requires( route != null );
             Contract.Requires( !string.IsNullOrEmpty( controllerName ) );
