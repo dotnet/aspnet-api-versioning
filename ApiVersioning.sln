@@ -1,110 +1,58 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{2EB04F47-AD85-4169-BA08-9104D9D29332}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4D09-4523-B9C9-65B1E8832AA1}"
 	ProjectSection(SolutionItems) = preProject
-		src\Shared\Arg.cs = src\Shared\Arg.cs
-		src\Shared\CustomDictionary.xml = src\Shared\CustomDictionary.xml
-		src\Shared\SharedAssemblyInfo.cs = src\Shared\SharedAssemblyInfo.cs
-		src\Shared\StringExtensions.cs = src\Shared\StringExtensions.cs
+		test\.editorconfig = test\.editorconfig
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4D09-4523-B9C9-65B1E8832AA1}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
-		global.json = global.json
+		build.targets = build.targets
+		CustomDictionary.xml = CustomDictionary.xml
 		LICENSE = LICENSE
-		pack.ps1 = pack.ps1
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{261B77B4-647B-4459-9FE8-4EFF910B28D0}"
-	ProjectSection(SolutionItems) = preProject
-		src\Common\AdvertiseApiVersionsAttribute.cs = src\Common\AdvertiseApiVersionsAttribute.cs
-		src\Common\ApiVersion.cs = src\Common\ApiVersion.cs
-		src\Common\ApiVersionAttribute.cs = src\Common\ApiVersionAttribute.cs
-		src\Common\ApiVersionNeutralAttribute.cs = src\Common\ApiVersionNeutralAttribute.cs
-		src\Common\CollectionExtensions.cs = src\Common\CollectionExtensions.cs
-		src\Common\ControllerNameAttribute.cs = src\Common\ControllerNameAttribute.cs
-		src\Common\MapToApiVersionAttribute.cs = src\Common\MapToApiVersionAttribute.cs
-		src\Common\ReportApiVersionsAttribute.cs = src\Common\ReportApiVersionsAttribute.cs
-		src\Common\TypeExtensions.cs = src\Common\TypeExtensions.cs
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning", "src\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj", "{C39CCCBC-6B04-406F-96BE-CA796EFF34C5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Versioning", "Versioning", "{DE4EE45F-F8EA-4B32-B16F-441F946ACEF4}"
-	ProjectSection(SolutionItems) = preProject
-		src\Common\Versioning\AmbiguousApiVersionException.cs = src\Common\Versioning\AmbiguousApiVersionException.cs
-		src\Common\Versioning\ApiVersioningOptions.cs = src\Common\Versioning\ApiVersioningOptions.cs
-		src\Common\Versioning\ApiVersionModel.cs = src\Common\Versioning\ApiVersionModel.cs
-		src\Common\Versioning\ApiVersionModelDebugView.cs = src\Common\Versioning\ApiVersionModelDebugView.cs
-		src\Common\Versioning\ApiVersionModelExtensions.cs = src\Common\Versioning\ApiVersionModelExtensions.cs
-		src\Common\Versioning\ApiVersionReader.cs = src\Common\Versioning\ApiVersionReader.cs
-		src\Common\Versioning\ApiVersionsBaseAttribute.cs = src\Common\Versioning\ApiVersionsBaseAttribute.cs
-		src\Common\Versioning\AttributeExtensions.cs = src\Common\Versioning\AttributeExtensions.cs
-		src\Common\Versioning\ConstantApiVersionSelector.cs = src\Common\Versioning\ConstantApiVersionSelector.cs
-		src\Common\Versioning\CurrentImplementationApiVersionSelector.cs = src\Common\Versioning\CurrentImplementationApiVersionSelector.cs
-		src\Common\Versioning\DefaultApiVersionSelector.cs = src\Common\Versioning\DefaultApiVersionSelector.cs
-		src\Common\Versioning\HeaderApiVersionReader.cs = src\Common\Versioning\HeaderApiVersionReader.cs
-		src\Common\Versioning\IApiVersionNeutral.cs = src\Common\Versioning\IApiVersionNeutral.cs
-		src\Common\Versioning\IApiVersionProvider.cs = src\Common\Versioning\IApiVersionProvider.cs
-		src\Common\Versioning\IApiVersionReader.cs = src\Common\Versioning\IApiVersionReader.cs
-		src\Common\Versioning\IApiVersionSelector.cs = src\Common\Versioning\IApiVersionSelector.cs
-		src\Common\Versioning\LowestImplementedApiVersionSelector.cs = src\Common\Versioning\LowestImplementedApiVersionSelector.cs
-		src\Common\Versioning\QueryStringApiVersionReader.cs = src\Common\Versioning\QueryStringApiVersionReader.cs
-		src\Common\Versioning\QueryStringOrHeaderApiVersionReader.cs = src\Common\Versioning\QueryStringOrHeaderApiVersionReader.cs
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning", "src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj", "{3BAC97ED-1A8E-4F5A-A716-DB5255F51C81}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{946F164B-5502-4629-AD75-04DD91D1128F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning", "src\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.csproj", "{48A2B488-23AB-4C83-AE30-0B8B735C4562}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Versioning", "Versioning", "{8D4E3E25-E532-4EF7-A36E-CEEC098C04B1}"
-	ProjectSection(SolutionItems) = preProject
-		test\Common\Versioning\ApiVersionModelExtensionsTest.cs = test\Common\Versioning\ApiVersionModelExtensionsTest.cs
-		test\Common\Versioning\MaxSelectVersionData.cs = test\Common\Versioning\MaxSelectVersionData.cs
-		test\Common\Versioning\MinSelectVersionData.cs = test\Common\Versioning\MinSelectVersionData.cs
-		test\Common\Versioning\SelectVersionData.cs = test\Common\Versioning\SelectVersionData.cs
-	EndProjectSection
-	ProjectSection(FolderStartupServices) = postProject
-		{82A7F48D-3B50-4B1E-B82E-3ADA8210C358} = {82A7F48D-3B50-4B1E-B82E-3ADA8210C358}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning.Tests", "test\Microsoft.AspNetCore.Mvc.Versioning.Tests\Microsoft.AspNetCore.Mvc.Versioning.Tests.csproj", "{69C59656-53D1-4ACB-92B5-8B34C8E62175}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Mvc.Versioning", "src\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.xproj", "{C39CCCBC-6B04-406F-96BE-CA796EFF34C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning.Tests", "test\Microsoft.AspNet.WebApi.Versioning.Tests\Microsoft.AspNet.WebApi.Versioning.Tests.csproj", "{AEB074E1-E57A-4DD3-A972-3625B367CE5D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.WebApi.Versioning", "src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.xproj", "{3BAC97ED-1A8E-4F5A-A716-DB5255F51C81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.Tests", "test\Microsoft.AspNet.OData.Versioning.Tests\Microsoft.AspNet.OData.Versioning.Tests.csproj", "{D87E54CC-C2D6-4AE5-806D-AE825B051C66}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.OData.Versioning", "src\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.xproj", "{48A2B488-23AB-4C83-AE30-0B8B735C4562}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Acceptance.Tests", "test\Microsoft.AspNet.WebApi.Acceptance.Tests\Microsoft.AspNet.WebApi.Acceptance.Tests.csproj", "{5C31964D-EA8B-420B-9297-5ADFEFE54962}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Mvc.Versioning.Tests", "test\Microsoft.AspNetCore.Mvc.Versioning.Tests\Microsoft.AspNetCore.Mvc.Versioning.Tests.xproj", "{69C59656-53D1-4ACB-92B5-8B34C8E62175}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Acceptance.Tests", "test\Microsoft.AspNetCore.Mvc.Acceptance.Tests\Microsoft.AspNetCore.Mvc.Acceptance.Tests.csproj", "{4EED304C-D1A6-4866-8D7F-450D084FD25D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.WebApi.Versioning.Tests", "test\Microsoft.AspNet.WebApi.Versioning.Tests\Microsoft.AspNet.WebApi.Versioning.Tests.xproj", "{AEB074E1-E57A-4DD3-A972-3625B367CE5D}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "src\Shared\Shared.shproj", "{B7897873-6757-4684-83C0-39575821AE14}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.OData.Versioning.Tests", "test\Microsoft.AspNet.OData.Versioning.Tests\Microsoft.AspNet.OData.Versioning.Tests.xproj", "{D87E54CC-C2D6-4AE5-806D-AE825B051C66}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "src\Common\Common.shproj", "{6D0E834B-6422-44CD-9A85-E3BE9DEAD1BE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conventions", "Conventions", "{B24995FB-AF48-4E5D-9327-377A599BDE2A}"
-	ProjectSection(SolutionItems) = preProject
-		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderCollectionT.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderCollectionT.cs
-		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderT.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderT.cs
-		src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ActionApiVersionConventionBuilderTExtensions.cs
-		src\Common\Versioning\Conventions\ActionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ActionConventionBuilderTExtensions.cs
-		src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs = src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderT.cs
-		src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs = src\Common\Versioning\Conventions\ControllerApiVersionConventionBuilderTExtensions.cs
-		src\Common\Versioning\Conventions\ExpressionExtensions.cs = src\Common\Versioning\Conventions\ExpressionExtensions.cs
-		src\Common\Versioning\Conventions\IActionConventionBuilderT.cs = src\Common\Versioning\Conventions\IActionConventionBuilderT.cs
-		src\Common\Versioning\Conventions\IApiVersionConventionT.cs = src\Common\Versioning\Conventions\IApiVersionConventionT.cs
-	EndProjectSection
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Test.Common", "test\Test.Common\Test.Common.shproj", "{F9297626-C37C-402B-AFD6-712F3E5E4D7C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNet.WebApi.Acceptance.Tests", "test\Microsoft.AspNet.WebApi.Acceptance.Tests\Microsoft.AspNet.WebApi.Acceptance.Tests.xproj", "{5C31964D-EA8B-420B-9297-5ADFEFE54962}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.AspNetCore.Mvc.Acceptance.Tests", "test\Microsoft.AspNetCore.Mvc.Acceptance.Tests\Microsoft.AspNetCore.Mvc.Acceptance.Tests.xproj", "{4EED304C-D1A6-4866-8D7F-450D084FD25D}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Acceptance.Test.Shared", "test\Acceptance.Test.Shared\Acceptance.Test.Shared.shproj", "{6CDFB878-2642-4F98-AE35-621BAC581181}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{6cdfb878-2642-4f98-ae35-621bac581181}*SharedItemsImports = 13
+		src\Common\Common.projitems*{6d0e834b-6422-44cd-9a85-e3be9dead1be}*SharedItemsImports = 13
+		src\Shared\Shared.projitems*{b7897873-6757-4684-83c0-39575821ae14}*SharedItemsImports = 13
+		test\Test.Common\Test.Common.projitems*{f9297626-c37c-402b-afd6-712f3e5e4d7c}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -147,19 +95,17 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2EB04F47-AD85-4169-BA08-9104D9D29332} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
-		{261B77B4-647B-4459-9FE8-4EFF910B28D0} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
-		{DE4EE45F-F8EA-4B32-B16F-441F946ACEF4} = {261B77B4-647B-4459-9FE8-4EFF910B28D0}
-		{946F164B-5502-4629-AD75-04DD91D1128F} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
-		{8D4E3E25-E532-4EF7-A36E-CEEC098C04B1} = {946F164B-5502-4629-AD75-04DD91D1128F}
 		{C39CCCBC-6B04-406F-96BE-CA796EFF34C5} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{3BAC97ED-1A8E-4F5A-A716-DB5255F51C81} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{48A2B488-23AB-4C83-AE30-0B8B735C4562} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{69C59656-53D1-4ACB-92B5-8B34C8E62175} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{AEB074E1-E57A-4DD3-A972-3625B367CE5D} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{D87E54CC-C2D6-4AE5-806D-AE825B051C66} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
-		{B24995FB-AF48-4E5D-9327-377A599BDE2A} = {DE4EE45F-F8EA-4B32-B16F-441F946ACEF4}
 		{5C31964D-EA8B-420B-9297-5ADFEFE54962} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{B7897873-6757-4684-83C0-39575821AE14} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+		{6D0E834B-6422-44CD-9A85-E3BE9DEAD1BE} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+		{F9297626-C37C-402B-AFD6-712F3E5E4D7C} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{6CDFB878-2642-4F98-AE35-621BAC581181} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 	EndGlobalSection
 EndGlobal

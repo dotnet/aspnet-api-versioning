@@ -6,10 +6,6 @@
   <AssemblyName>Microsoft.AspNet.WebApi.Acceptance.Tests</AssemblyName>
  </PropertyGroup>
 
- <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-   <NoWarn>1701;1702;1705;1006</NoWarn>
- </PropertyGroup>
-
  <ItemGroup>
   <ProjectReference Include="..\..\src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
   <ProjectReference Include="..\..\src\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.csproj" />
