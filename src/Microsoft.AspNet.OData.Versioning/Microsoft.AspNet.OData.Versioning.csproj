@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.0.1</VersionPrefix>
-  <AssemblyVersion>2.0.1.0</AssemblyVersion>
+  <VersionPrefix>2.1.0</VersionPrefix>
+  <AssemblyVersion>2.1.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyName>Microsoft.AspNet.OData.Versioning</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API and OData v4.0.</Description>
   <RootNamespace>Microsoft</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;OData;Versioning</PackageTags>
-  <PackageReleaseNotes>• Fixes route template parameter name binding (Issue #40)</PackageReleaseNotes>
+  <PackageReleaseNotes>https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>

@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.0.3</VersionPrefix>
-  <AssemblyVersion>1.0.3.0</AssemblyVersion>
+  <VersionPrefix>1.1.0</VersionPrefix>
+  <AssemblyVersion>1.1.0.0</AssemblyVersion>
   <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
   <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
   <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
@@ -11,7 +11,7 @@
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
-  <PackageReleaseNotes>• Fixed responses when a version is unspecified (Issue #62)</PackageReleaseNotes>
+  <PackageReleaseNotes>https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>

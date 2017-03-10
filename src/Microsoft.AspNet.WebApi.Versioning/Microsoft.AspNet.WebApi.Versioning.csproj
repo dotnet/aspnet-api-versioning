@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.0.3</VersionPrefix>
-  <AssemblyVersion>2.0.3.0</AssemblyVersion>
+  <VersionPrefix>2.1.0</VersionPrefix>
+  <AssemblyVersion>2.1.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyName>Microsoft.AspNet.WebApi.Versioning</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning</AssemblyTitle>
@@ -10,7 +10,7 @@
   <RootNamespace>Microsoft.Web.Http</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning</PackageTags>
-  <PackageReleaseNotes>• Fixed responses when a version is unspecified (Issue #62)</PackageReleaseNotes>
+  <PackageReleaseNotes>https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>
