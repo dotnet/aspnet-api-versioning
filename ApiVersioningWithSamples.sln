@@ -74,6 +74,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Test.Common", "test\Test.Co
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Acceptance.Test.Shared", "test\Acceptance.Test.Shared\Acceptance.Test.Shared.shproj", "{6CDFB878-2642-4F98-AE35-621BAC581181}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByNamespaceSample", "samples\aspnetcore\ByNamespaceSample\ByNamespaceSample.csproj", "{83B21A5B-0779-4391-9700-58AEFEBFA615}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{6cdfb878-2642-4f98-ae35-621bac581181}*SharedItemsImports = 13
@@ -150,6 +152,10 @@ Global
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83B21A5B-0779-4391-9700-58AEFEBFA615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83B21A5B-0779-4391-9700-58AEFEBFA615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83B21A5B-0779-4391-9700-58AEFEBFA615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83B21A5B-0779-4391-9700-58AEFEBFA615}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,5 +183,6 @@ Global
 		{6D0E834B-6422-44CD-9A85-E3BE9DEAD1BE} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{F9297626-C37C-402B-AFD6-712F3E5E4D7C} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{6CDFB878-2642-4F98-AE35-621BAC581181} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{83B21A5B-0779-4391-9700-58AEFEBFA615} = {900DD210-8500-4D89-A05D-C9526935A719}
 	EndGlobalSection
 EndGlobal
