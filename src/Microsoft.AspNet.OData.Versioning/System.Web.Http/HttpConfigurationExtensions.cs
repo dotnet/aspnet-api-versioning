@@ -6,6 +6,8 @@
     using Diagnostics.Contracts;
     using Linq;
     using Microsoft;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Routing;
@@ -16,7 +18,10 @@
     using OData.Routing;
     using OData.Routing.Conventions;
     using Routing;
-    using static Linq.Expressions.Expression;
+    using System.Collections.Concurrent;
+    using System.Net.Http;
+    using System.Web.OData;
+    using static Microsoft.OData.ServiceLifetime;
     using static System.String;
     using static System.StringComparison;
 
@@ -25,86 +30,132 @@
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        const string ResolverSettingsKey = "System.Web.OData.ResolverSettingsKey";
+        const string ContainerBuilderFactoryKey = "System.Web.OData.ContainerBuilderFactoryKey";
+        const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
+        const string UrlKeyDelimiterKey = "System.Web.OData.UrlKeyDelimiterKey";
         const string UnversionedRouteSuffix = "-Unversioned";
         const string ApiVersionConstraintName = "apiVersion";
         const string ApiVersionConstraint = "{" + ApiVersionConstraintName + "}";
-        static readonly Lazy<Action<DefaultODataPathHandler, object>> setResolverSettings = new Lazy<Action<DefaultODataPathHandler, object>>( GetResolverSettingsMutator );
 
-        static Action<DefaultODataPathHandler, object> GetResolverSettingsMutator()
+        /// <summary>
+        /// Maps the specified versioned OData routes.
+        /// </summary>
+        /// <param name="configuration">The extended <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see> to use for parsing OData paths.</param>
+        /// <param name="configureAction">The configuring action to add the services to the root container.</param>
+        /// <returns>The <see cref="IReadOnlyList{T}">read-only list</see> of added <see cref="ODataRoute">OData routes</see>.</returns>
+        /// <remarks>The specified <paramref name="models"/> must contain the <see cref="ApiVersionAnnotation">API version annotation</see>.  This annotation is
+        /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
+        /// create the <paramref name="models"/>.</remarks>
+        public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEnumerable<IEdmModel> models,
+            Action<IContainerBuilder> configureAction ) =>
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, configureAction, null );
+
+        /// <summary>
+        /// Maps the specified versioned OData routes.
+        /// </summary>
+        /// <param name="configuration">The extended <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see> to use for parsing OData paths.</param>
+        /// <param name="configureAction">The configuring action to add the services to the root container.</param>
+        /// <param name="batchHandler">The <see cref="ODataBatchHandler">OData batch handler</see>.</param>
+        /// <returns>The <see cref="IReadOnlyList{T}">read-only list</see> of added <see cref="ODataRoute">OData routes</see>.</returns>
+        /// <remarks>The specified <paramref name="models"/> must contain the <see cref="ApiVersionAnnotation">API version annotation</see>.  This annotation is
+        /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
+        /// create the <paramref name="models"/>.</remarks>
+        public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEnumerable<IEdmModel> models,
+            Action<IContainerBuilder> configureAction,
+            ODataBatchHandler batchHandler )
         {
-            Contract.Ensures( Contract.Result<Action<DefaultODataPathHandler, object>>() != null );
+            Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNull( models, nameof( models ) );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
 
-            // build a strong-typed delegate to the DefaultODataPathHandler.ResolverSettings property mutator
-            var handlerType = typeof( DefaultODataPathHandler );
-            var resolverSettingsType = handlerType.Assembly.GetType( "System.Web.OData.ODataUriResolverSetttings" );
-            var h = Parameter( handlerType, "h" );
-            var rs = Parameter( typeof( object ), "rs" );
-            var property = Property( h, "ResolverSetttings" );
-            var body = Assign( property, Convert( rs, resolverSettingsType ) );
-            var lambda = Lambda<Action<DefaultODataPathHandler, object>>( body, h, rs );
-            var action = lambda.Compile();
-
-            return action;
-        }
-
-        static void SetResolverSettings( this HttpConfiguration configuration, IODataPathHandler pathHandler )
-        {
-            Contract.Requires( configuration != null );
-
-            // REMARKS: the DefaultODataPathHandler.ResolverSettings property is internal as is the ODataUriResolverSetttings class.
-            // The MapODataServiceRoute normally hooks this up, but we are replacing that process. in order to retain functional
-            // fidelity we'll build and compile a strong-typed delegate that can be used to set the property.
-            //
-            // in additional, the ODataUriResolverSetttings are created lazy-initialized from the property bag. instead of using
-            // Reflection, we'll test for the known key. if the key is not present, we'll use a public extension method
-            // (e.g. EnableCaseInsensitive) with the default, unconfigured value. this will trigger the creation of the
-            // settings and populate the property.
-
-            var handler = pathHandler as DefaultODataPathHandler;
-
-            if ( handler == null )
+            object ConfigureRoutingConventions( IEdmModel model, string versionedRouteName, ApiVersion apiVersion )
             {
-                return;
+                var routingConventions = EnsureConventions( ODataRoutingConventions.CreateDefault() );
+
+                model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
+                routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( versionedRouteName, configuration, apiVersion ) );
+
+                return routingConventions.ToArray();
             }
 
-            // REMARKS: this creates and populates the ODataUriResolverSetttings; OData URLs are case-sensitive by default.
-            if ( !configuration.Properties.ContainsKey( ResolverSettingsKey ) )
+            if ( !IsNullOrEmpty( routePrefix ) )
             {
-                configuration.EnableCaseInsensitive( false );
+                routePrefix = routePrefix.TrimEnd( '/' );
             }
 
-            setResolverSettings.Value( handler, configuration.Properties[ResolverSettingsKey] );
-        }
+            var routes = configuration.Routes;
+            var unversionedRouteName = routeName + UnversionedRouteSuffix;
 
-        static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
-        {
-            Contract.Requires( conventions != null );
-            Contract.Ensures( Contract.Result<IList<IODataRoutingConvention>>() != null );
-
-            var discovered = new BitVector32( 0 );
-
-            for ( var i = 0; i < conventions.Count; i++ )
+            if ( batchHandler != null )
             {
-                var convention = conventions[i];
+                batchHandler.ODataRouteName = unversionedRouteName;
+                var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
+                routes.MapHttpBatchRoute( routeName + nameof( ODataRouteConstants.Batch ), batchTemplate, batchHandler );
+            }
 
-                if ( convention is MetadataRoutingConvention )
+            var odataRoutes = new List<ODataRoute>();
+            var unversionedConstraints = new List<IHttpRouteConstraint>();
+
+            foreach ( var model in models )
+            {
+                var versionedRouteName = routeName;
+                var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+                var routeConstraint = MakeVersionedODataRouteConstraint( apiVersion, ref versionedRouteName );
+
+                unversionedConstraints.Add( new ODataPathRouteConstraint( versionedRouteName ) );
+
+                var rootContainer = configuration.CreateODataRootContainer(
+                                        versionedRouteName,
+                                        builder =>
+                                        {
+                                            builder.AddService( Singleton, typeof( IEdmModel ), sp => model )
+                                                   .AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), sp => ConfigureRoutingConventions( model, versionedRouteName, apiVersion ) );
+                                            configureAction?.Invoke( builder );
+                                        } );
+
+                var pathHandler = rootContainer.GetRequiredService<IODataPathHandler>();
+
+                if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
                 {
-                    conventions[i] = new VersionedMetadataRoutingConvention();
-                    discovered[1] = true;
+                    pathHandler.UrlKeyDelimiter = configuration.GetUrlKeyDelimiter();
                 }
-                else if ( convention is VersionedMetadataRoutingConvention )
+
+                rootContainer.InitializeAttributeRouting();
+
+                var route = default( ODataRoute );
+                var messageHandler = rootContainer.GetService<HttpMessageHandler>();
+
+                if ( messageHandler == null )
                 {
-                    discovered[1] = true;
+                    route = new ODataRoute( routePrefix, routeConstraint );
                 }
+                else
+                {
+                    route = new ODataRoute( routePrefix, routeConstraint, defaults: null, constraints: null, dataTokens: null, handler: messageHandler );
+                }
+
+                routes.Add( versionedRouteName, route );
+                AddApiVersionConstraintIfNecessary( route );
+                odataRoutes.Add( route );
             }
 
-            if ( !discovered[1] )
-            {
-                conventions.Insert( 0, new VersionedMetadataRoutingConvention() );
-            }
+            configuration.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( unversionedRouteName, routePrefix, odataRoutes, unversionedConstraints, configureAction );
 
-            return conventions;
+            return odataRoutes;
         }
 
         /// <summary>
@@ -119,7 +170,7 @@
         /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
         /// create the <paramref name="models"/>.</remarks>
         public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes( this HttpConfiguration configuration, string routeName, string routePrefix, IEnumerable<IEdmModel> models ) =>
-            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, null );
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null );
 
         /// <summary>
         /// Maps the specified versioned OData routes. When the <paramref name="batchHandler"/> is provided, it will create a
@@ -198,6 +249,7 @@
 
             var routeConventions = EnsureConventions( routingConventions.ToList() );
             var routes = configuration.Routes;
+            var unversionedRouteName = routeName + UnversionedRouteSuffix;
 
             if ( !IsNullOrEmpty( routePrefix ) )
             {
@@ -206,11 +258,16 @@
 
             if ( batchHandler != null )
             {
+                batchHandler.ODataRouteName = unversionedRouteName;
                 var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
-                routes.MapHttpBatchRoute( routeName + "Batch", batchTemplate, batchHandler );
+                routes.MapHttpBatchRoute( routeName + nameof( ODataRouteConstants.Batch ), batchTemplate, batchHandler );
             }
 
-            configuration.SetResolverSettings( pathHandler );
+            if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
+            {
+                pathHandler.UrlKeyDelimiter = configuration.GetUrlKeyDelimiter();
+            }
+
             routeConventions.Insert( 0, null );
 
             var odataRoutes = new List<ODataRoute>();
@@ -219,23 +276,130 @@
             foreach ( var model in models )
             {
                 var versionedRouteName = routeName;
-                var routeConstraint = default( ODataPathRouteConstraint );
+                var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+                var routeConstraint = MakeVersionedODataRouteConstraint( apiVersion, ref versionedRouteName );
 
-                routeConventions[0] = new VersionedAttributeRoutingConvention( model, configuration );
-                routeConstraint = new ODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray() );
-                unversionedConstraints.Add( routeConstraint );
-                routeConstraint = MakeVersionedODataRouteConstraint( routeConstraint, pathHandler, routeConventions, model, ref versionedRouteName );
+                routeConventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName, configuration, apiVersion );
+                unversionedConstraints.Add( new ODataPathRouteConstraint( versionedRouteName ) );
 
-                var route = new ODataRoute( routePrefix, routeConstraint );
+                var rootContainer = configuration.CreateODataRootContainer(
+                                        versionedRouteName,
+                                        builder => builder.AddService( Singleton, typeof( IEdmModel ), sp => model )
+                                                          .AddService( Singleton, typeof( IODataPathHandler ), sp => pathHandler )
+                                                          .AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), sp => routeConventions.ToArray() )
+                                                          .AddService( Singleton, typeof( ODataBatchHandler ), sp => batchHandler ) );
 
-                AddApiVersionConstraintIfNecessary( route );
+                rootContainer.InitializeAttributeRouting();
+
+                var route = default( ODataRoute );
+                var messageHandler = rootContainer.GetService<HttpMessageHandler>();
+
+
+                if ( messageHandler == null )
+                {
+                    route = new ODataRoute( routePrefix, routeConstraint );
+                }
+                else
+                {
+                    route = new ODataRoute( routePrefix, routeConstraint, defaults: null, constraints: null, dataTokens: null, handler: messageHandler );
+                }
+
                 routes.Add( versionedRouteName, route );
+                AddApiVersionConstraintIfNecessary( route );
                 odataRoutes.Add( route );
             }
 
-            AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, routes, odataRoutes, unversionedConstraints );
+            configuration.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( unversionedRouteName, routePrefix, odataRoutes, unversionedConstraints, _ => { } );
 
             return odataRoutes;
+        }
+
+        /// <summary>
+        /// Maps the specified OData route and the OData route attributes.
+        /// </summary>
+        /// <param name="configuration">The server configuration.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the model.</param>
+        /// <param name="configureAction">The configuring action to add the services to the root container.</param>
+        /// <returns>The added <see cref="ODataRoute"/>.</returns>
+        public static ODataRoute MapVersionedODataRoute( this HttpConfiguration configuration, string routeName, string routePrefix, ApiVersion apiVersion, Action<IContainerBuilder> configureAction )
+        {
+            Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            Contract.Ensures( Contract.Result<ODataRoute>() != null );
+
+            object ConfigureRoutingConventions( IServiceProvider serviceProvider )
+            {
+                var model = serviceProvider.GetRequiredService<IEdmModel>();
+                var routingConventions = EnsureConventions( ODataRoutingConventions.CreateDefault() );
+
+                model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
+                routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, configuration, apiVersion ) );
+
+                return routingConventions.ToArray();
+            }
+
+            if ( !IsNullOrEmpty( routePrefix ) )
+            {
+                routePrefix = routePrefix.TrimEnd( '/' );
+            }
+
+            var rootContainer = configuration.CreateODataRootContainer(
+                                    routeName,
+                                    builder =>
+                                    {
+                                        builder.AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), ConfigureRoutingConventions );
+                                        configureAction?.Invoke( builder );
+                                    } );
+            var pathHandler = rootContainer.GetRequiredService<IODataPathHandler>();
+
+            if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
+            {
+                pathHandler.UrlKeyDelimiter = configuration.GetUrlKeyDelimiter();
+            }
+
+            rootContainer.InitializeAttributeRouting();
+
+            var routeConstraint = new VersionedODataPathRouteConstraint( routeName, apiVersion );
+            var route = default( ODataRoute );
+            var routes = configuration.Routes;
+            var messageHandler = rootContainer.GetService<HttpMessageHandler>();
+
+            if ( messageHandler != null )
+            {
+                route = new ODataRoute(
+                    routePrefix,
+                    routeConstraint,
+                    defaults: null,
+                    constraints: null,
+                    dataTokens: null,
+                    handler: messageHandler );
+            }
+            else
+            {
+                var batchHandler = rootContainer.GetService<ODataBatchHandler>();
+
+                if ( batchHandler != null )
+                {
+                    batchHandler.ODataRouteName = routeName;
+                    var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
+                    routes.MapHttpBatchRoute( routeName + nameof( ODataRouteConstants.Batch ), batchTemplate, batchHandler );
+                }
+
+                route = new ODataRoute( routePrefix, routeConstraint );
+            }
+
+            routes.Add( routeName, route );
+            AddApiVersionConstraintIfNecessary( route );
+
+            var unversionedRouteConstraint = new ODataPathRouteConstraint( routeName );
+            var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedRouteConstraint, apiVersion ) );
+
+            AddApiVersionConstraintIfNecessary( unversionedRoute );
+            configuration.Routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
+
+            return route;
         }
 
         /// <summary>
@@ -250,7 +414,7 @@
         /// <remarks>The <see cref="ApiVersionAnnotation">API version annotation</see> will be added or updated on the specified <paramref name="model"/> using
         /// the provided <paramref name="apiVersion">API version</paramref>.</remarks>
         public static ODataRoute MapVersionedODataRoute( this HttpConfiguration configuration, string routeName, string routePrefix, IEdmModel model, ApiVersion apiVersion ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null, null );
 
         /// <summary>
         /// Maps a versioned OData route.
@@ -271,7 +435,27 @@
             IEdmModel model,
             ApiVersion apiVersion,
             ODataBatchHandler batchHandler ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), batchHandler );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), batchHandler, null );
+
+        /// <summary>
+        /// Maps the specified OData route and the OData route attributes. When the <paramref name="defaultHandler"/>
+        /// is non-<c>null</c>, it will map it as the default handler for the route.
+        /// </summary>
+        /// <param name="configuration">The server configuration.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="model">The EDM model to use for parsing OData paths.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the model.</param>
+        /// <param name="defaultHandler">The default <see cref="HttpMessageHandler"/> for this route.</param>
+        /// <returns>The added <see cref="ODataRoute"/>.</returns>
+        public static ODataRoute MapVersionedODataRoute(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEdmModel model,
+            ApiVersion apiVersion,
+            HttpMessageHandler defaultHandler ) =>
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null, defaultHandler );
 
         /// <summary>
         /// Maps a versioned OData route.
@@ -295,7 +479,7 @@
             ApiVersion apiVersion,
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, null );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, null, null );
 
         /// <summary>
         /// Maps a versioned OData route. When the <paramref name="batchHandler"/> is provided, it will create a '$batch' endpoint to handle the batch requests.
@@ -322,7 +506,45 @@
             ApiVersion apiVersion,
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions,
-            ODataBatchHandler batchHandler )
+            ODataBatchHandler batchHandler ) =>
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, batchHandler, null );
+
+        /// <summary>
+        /// Maps the specified OData route. When the <paramref name="defaultHandler"/> is non-<c>null</c>, it will map
+        /// it as the handler for the route.
+        /// </summary>
+        /// <param name="configuration">The server configuration.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="model">The EDM model to use for parsing OData paths.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the model.</param>
+        /// <param name="pathHandler">The <see cref="IODataPathHandler" /> to use for parsing the OData path.</param>
+        /// <param name="routingConventions">The OData routing conventions to use for controller and action selection.</param>
+        /// <param name="defaultHandler">The default <see cref="HttpMessageHandler"/> for this route.</param>
+        /// <returns>The added <see cref="ODataRoute"/>.</returns>
+        public static ODataRoute MapVersionedODataRoute(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEdmModel model,
+            ApiVersion apiVersion,
+            IODataPathHandler pathHandler,
+            IEnumerable<IODataRoutingConvention> routingConventions,
+            HttpMessageHandler defaultHandler ) =>
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, null, defaultHandler );
+
+        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
+        [SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "The specified handler must be the batch handler." )]
+        static ODataRoute MapVersionedODataRoute(
+            HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEdmModel model,
+            ApiVersion apiVersion,
+            IODataPathHandler pathHandler,
+            IEnumerable<IODataRoutingConvention> routingConventions,
+            ODataBatchHandler batchHandler,
+            HttpMessageHandler defaultHandler )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
             Arg.NotNull( model, nameof( model ) );
@@ -337,23 +559,47 @@
                 routePrefix = routePrefix.TrimEnd( '/' );
             }
 
-            if ( batchHandler != null )
+            if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
             {
-                var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
-                routes.MapHttpBatchRoute( routeName + "Batch", batchTemplate, batchHandler );
+                pathHandler.UrlKeyDelimiter = configuration.GetUrlKeyDelimiter();
             }
 
-            configuration.SetResolverSettings( pathHandler );
             model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
-            routeConventions.Insert( 0, new VersionedAttributeRoutingConvention( model, configuration ) );
+            routeConventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, configuration, apiVersion ) );
 
-            var routeConstraint = new VersionedODataPathRouteConstraint( pathHandler, model, routeName, routeConventions.ToArray(), apiVersion );
-            var route = new ODataRoute( routePrefix, routeConstraint );
+            var rootContainer = configuration.CreateODataRootContainer(
+                                    routeName,
+                                    builder => builder.AddService( Singleton, typeof( IEdmModel ), sp => model )
+                                                        .AddService( Singleton, typeof( IODataPathHandler ), sp => pathHandler )
+                                                        .AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), sp => routeConventions.ToArray() )
+                                                        .AddService( Singleton, typeof( ODataBatchHandler ), sp => batchHandler )
+                                                        .AddService( Singleton, typeof( HttpMessageHandler ), sp => defaultHandler ) );
 
-            AddApiVersionConstraintIfNecessary( route );
+            rootContainer.InitializeAttributeRouting();
+
+            var routeConstraint = new VersionedODataPathRouteConstraint( routeName, apiVersion );
+            var route = default( ODataRoute );
+
+            if ( defaultHandler != null )
+            {
+                route = new ODataRoute( routePrefix, routeConstraint, defaults: null, constraints: null, dataTokens: null, handler: defaultHandler );
+            }
+            else
+            {
+                if ( batchHandler != null )
+                {
+                    batchHandler.ODataRouteName = routeName;
+                    var batchTemplate = IsNullOrEmpty( routePrefix ) ? ODataRouteConstants.Batch : routePrefix + '/' + ODataRouteConstants.Batch;
+                    routes.MapHttpBatchRoute( routeName + nameof( ODataRouteConstants.Batch ), batchTemplate, batchHandler );
+                }
+
+                route = new ODataRoute( routePrefix, routeConstraint );
+            }
+
             routes.Add( routeName, route );
+            AddApiVersionConstraintIfNecessary( route );
 
-            var unversionedRouteConstraint = new ODataPathRouteConstraint( pathHandler, model, routeName, routeConventions.ToArray() );
+            var unversionedRouteConstraint = new ODataPathRouteConstraint( routeName );
             var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedRouteConstraint, apiVersion ) );
 
             AddApiVersionConstraintIfNecessary( unversionedRoute );
@@ -362,29 +608,48 @@
             return route;
         }
 
-        static ODataPathRouteConstraint MakeVersionedODataRouteConstraint(
-            ODataPathRouteConstraint routeConstraint,
-            IODataPathHandler pathHandler,
-            IList<IODataRoutingConvention> routeConventions,
-            IEdmModel model,
-            ref string versionedRouteName )
+        static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
         {
-            Contract.Requires( routeConstraint != null );
-            Contract.Requires( pathHandler != null );
-            Contract.Requires( routeConventions != null );
-            Contract.Requires( model != null );
+            Contract.Requires( conventions != null );
+            Contract.Ensures( Contract.Result<IList<IODataRoutingConvention>>() != null );
+
+            var discovered = new BitVector32( 0 );
+
+            for ( var i = 0; i < conventions.Count; i++ )
+            {
+                var convention = conventions[i];
+
+                if ( convention is MetadataRoutingConvention )
+                {
+                    conventions[i] = new VersionedMetadataRoutingConvention();
+                    discovered[1] = true;
+                }
+                else if ( convention is VersionedMetadataRoutingConvention )
+                {
+                    discovered[1] = true;
+                }
+            }
+
+            if ( !discovered[1] )
+            {
+                conventions.Insert( 0, new VersionedMetadataRoutingConvention() );
+            }
+
+            return conventions;
+        }
+
+        static ODataPathRouteConstraint MakeVersionedODataRouteConstraint( ApiVersion apiVersion, ref string versionedRouteName )
+        {
             Contract.Requires( !IsNullOrEmpty( versionedRouteName ) );
             Contract.Ensures( Contract.Result<ODataPathRouteConstraint>() != null );
 
-            var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
-
             if ( apiVersion == null )
             {
-                return routeConstraint;
+                return new ODataPathRouteConstraint( versionedRouteName );
             }
 
             versionedRouteName += "-" + apiVersion.ToString();
-            return new VersionedODataPathRouteConstraint( pathHandler, model, versionedRouteName, routeConventions.ToArray(), apiVersion );
+            return new VersionedODataPathRouteConstraint( versionedRouteName, apiVersion );
         }
 
         static void AddApiVersionConstraintIfNecessary( ODataRoute route )
@@ -412,18 +677,96 @@
             }
         }
 
-        static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( string routeName, string routePrefix, HttpRouteCollection routes, List<ODataRoute> odataRoutes, List<IHttpRouteConstraint> unversionedConstraints )
+        static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            List<ODataRoute> odataRoutes,
+            List<IHttpRouteConstraint> unversionedConstraints,
+            Action<IContainerBuilder> configureAction )
         {
             Contract.Requires( !IsNullOrEmpty( routeName ) );
-            Contract.Requires( routes != null );
+            Contract.Requires( configuration != null );
             Contract.Requires( odataRoutes != null );
             Contract.Requires( unversionedConstraints != null );
+            Contract.Requires( configureAction != null );
 
             var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedConstraints ) );
 
             AddApiVersionConstraintIfNecessary( unversionedRoute );
-            routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
+            configuration.Routes.Add( routeName, unversionedRoute );
             odataRoutes.Add( unversionedRoute );
+            configuration.CreateODataRootContainer( routeName, configureAction );
+        }
+
+        static ODataUrlKeyDelimiter GetUrlKeyDelimiter( this HttpConfiguration configuration )
+        {
+            Contract.Requires( configuration != null );
+
+            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) )
+            {
+                return value as ODataUrlKeyDelimiter;
+            }
+
+            configuration.Properties[UrlKeyDelimiterKey] = null;
+            return null;
+        }
+
+        static IServiceProvider CreateODataRootContainer( this HttpConfiguration configuration, string routeName, Action<IContainerBuilder> configureAction )
+        {
+            var rootContainer = configuration.CreateRootContainerImplementation( configureAction );
+            configuration.SetODataRootContainer( routeName, rootContainer );
+            return rootContainer;
+        }
+
+        static void SetODataRootContainer( this HttpConfiguration configuration, string routeName, IServiceProvider rootContainer ) =>
+            configuration.GetRootContainerMappings()[routeName] = rootContainer;
+
+        static ConcurrentDictionary<string, IServiceProvider> GetRootContainerMappings( this HttpConfiguration configuration ) =>
+            (ConcurrentDictionary<string, IServiceProvider>) configuration.Properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
+
+        static IServiceProvider CreateRootContainerImplementation( this HttpConfiguration configuration, Action<IContainerBuilder> configureAction )
+        {
+            var builder = configuration.CreateContainerBuilderWithDefaultServices();
+
+            configureAction?.Invoke( builder );
+
+            var rootContainer = builder.BuildContainer();
+
+            if ( rootContainer == null )
+            {
+                throw new InvalidOperationException( SR.NullContainer );
+            }
+
+            return rootContainer;
+        }
+
+        static IContainerBuilder CreateContainerBuilderWithDefaultServices( this HttpConfiguration configuration )
+        {
+            IContainerBuilder builder;
+
+            if ( configuration.Properties.TryGetValue( ContainerBuilderFactoryKey, out var value ) )
+            {
+                var builderFactory = (Func<IContainerBuilder>) value;
+
+                builder = builderFactory();
+
+                if ( builder == null )
+                {
+                    throw new InvalidOperationException( SR.NullContainerBuilder );
+                }
+            }
+            else
+            {
+                builder = new DefaultContainerBuilder();
+            }
+
+            builder.AddService( Singleton, sp => configuration );
+            builder.AddService( Singleton, sp => configuration.GetDefaultQuerySettings() );
+            builder.AddDefaultODataServices();
+            builder.AddDefaultWebApiServices();
+
+            return builder;
         }
     }
 }

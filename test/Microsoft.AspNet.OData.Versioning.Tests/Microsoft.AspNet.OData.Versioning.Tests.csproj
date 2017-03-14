@@ -3,6 +3,7 @@
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
   <AssemblyName>Microsoft.AspNet.OData.Versioning.Tests</AssemblyName>
+  <RootNamespace>Microsoft</RootNamespace>
  </PropertyGroup>
 
  <ItemGroup>

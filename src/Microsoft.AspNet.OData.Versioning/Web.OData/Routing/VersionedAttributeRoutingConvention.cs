@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
-    using Microsoft.OData.Edm;
+    using Microsoft.Web.Http;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -14,38 +14,62 @@
     /// </summary>
     public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
-        /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
-        /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration ) : base( model, configuration ) { }
+        readonly ApiVersion apiVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">The name of the route.</param>
+        /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
+        public VersionedAttributeRoutingConvention( string routeName, HttpConfiguration configuration, ApiVersion apiVersion )
+            : base( routeName, configuration )
+        {
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            this.apiVersion = apiVersion;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
+        /// </summary>
+        /// <param name="routeName">The name of the route.</param>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler )
-            : base( model, configuration, pathTemplateHandler ) { }
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
+        public VersionedAttributeRoutingConvention( string routeName, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
+            : base( routeName, configuration, pathTemplateHandler )
+        {
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            this.apiVersion = apiVersion;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">The name of the route.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see></param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers ) : base( model, controllers ) { }
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
+        public VersionedAttributeRoutingConvention( string routeName, IEnumerable<HttpControllerDescriptor> controllers, ApiVersion apiVersion )
+            : base( routeName, controllers )
+        {
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            this.apiVersion = apiVersion;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
+        /// <param name="routeName">The name of the route.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see>
         /// associated with the routing convention.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler )
-            : base( model, controllers, pathTemplateHandler ) { }
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
+        public VersionedAttributeRoutingConvention( string routeName, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
+            : base( routeName, controllers, pathTemplateHandler )
+        {
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            this.apiVersion = apiVersion;
+        }
 
         /// <summary>
         /// Returns a value indicating whether the specified controller should be mapped using attribute routing conventions.
@@ -64,8 +88,6 @@
             {
                 return true;
             }
-
-            var apiVersion = Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion;
 
             return apiVersion != null && versionModel.DeclaredApiVersions.Contains( apiVersion );
         }

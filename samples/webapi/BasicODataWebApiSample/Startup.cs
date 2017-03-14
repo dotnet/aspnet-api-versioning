@@ -4,11 +4,13 @@ namespace Microsoft.Examples
 {
     using Configuration;
     using global::Owin;
+    using Microsoft.OData;
+    using Microsoft.OData.UriParser;
     using Microsoft.Web.OData.Builder;
     using System.Web.Http;
     using System.Web.OData.Batch;
     using System.Web.OData.Builder;
-    using System.Web.OData.Extensions;
+    using static Microsoft.OData.ServiceLifetime;
 
     public class Startup
     {
@@ -19,8 +21,6 @@ namespace Microsoft.Examples
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
             configuration.AddApiVersioning( o => o.ReportApiVersions = true );
-            configuration.EnableCaseInsensitive( true );
-            configuration.EnableUnqualifiedNameCall( true );
 
             var modelBuilder = new VersionedODataModelBuilder( configuration )
             {
@@ -34,9 +34,14 @@ namespace Microsoft.Examples
             var models = modelBuilder.GetEdmModels();
             var batchHandler = new DefaultODataBatchHandler( httpServer );
 
-            configuration.MapVersionedODataRoutes( "odata", "api", models, batchHandler );
-            configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, batchHandler );
+            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureODataServices, batchHandler );
+            configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, ConfigureODataServices );
             appBuilder.UseWebApi( httpServer );
+        }
+
+        static void ConfigureODataServices( IContainerBuilder builder )
+        {
+            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => new CaseInsensitiveODataUriResolver() );
         }
     }
 }
