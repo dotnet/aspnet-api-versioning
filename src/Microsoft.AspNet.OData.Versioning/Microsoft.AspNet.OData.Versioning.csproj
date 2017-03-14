@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.0.5</VersionPrefix>
-  <AssemblyVersion>2.0.5.0</AssemblyVersion>
+  <VersionPrefix>2.1.0</VersionPrefix>
+  <AssemblyVersion>2.1.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyName>Microsoft.AspNet.OData.Versioning</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
@@ -17,12 +17,27 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.OData" Version="[5.9.1,6.0.0)" />
+  <PackageReference Include="Microsoft.AspNet.OData" Version="6.0.0" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
   <Reference Include="System" />
   <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+ <ItemGroup>
+   <Compile Update="SR.Designer.cs">
+     <DependentUpon>SR.resx</DependentUpon>
+     <DesignTime>True</DesignTime>
+     <AutoGen>True</AutoGen>
+   </Compile>
+ </ItemGroup>
+
+ <ItemGroup>
+   <EmbeddedResource Update="SR.resx">
+     <LastGenOutput>SR.Designer.cs</LastGenOutput>
+     <Generator>ResXFileCodeGenerator</Generator>
+   </EmbeddedResource>
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />

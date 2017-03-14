@@ -2,8 +2,7 @@
 {
     using Http;
     using Http.Versioning;
-    using Microsoft.OData.Core;
-    using Microsoft.OData.Edm;
+    using Microsoft.OData;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
@@ -11,7 +10,6 @@
     using System.Web.Http;
     using System.Web.Http.Routing;
     using System.Web.OData.Routing;
-    using System.Web.OData.Routing.Conventions;
     using static System.Net.HttpStatusCode;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
@@ -23,28 +21,12 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedODataPathRouteConstraint" /> class.
         /// </summary>
-        /// <param name="pathHandler">The OData path handler to use for parsing.</param>
-        /// <param name="model">The EDM model to use for parsing the path.</param>
         /// <param name="routeName">The name of the route this constraint is associated with.</param>
-        /// <param name="routingConventions">The OData routing conventions to use for selecting the controller name.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the route constraint.</param>
-        public VersionedODataPathRouteConstraint(
-            IODataPathHandler pathHandler,
-            IEdmModel model,
-            string routeName,
-            IEnumerable<IODataRoutingConvention> routingConventions,
-            ApiVersion apiVersion )
-            : base( pathHandler, model, routeName, routingConventions )
+        public VersionedODataPathRouteConstraint( string routeName, ApiVersion apiVersion ) : base( routeName )
         {
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             ApiVersion = apiVersion;
-        }
-
-        static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values )
-        {
-            Contract.Requires( values != null );
-            object value;
-            return values.TryGetValue( "odataPath", out value ) && ( value == null || Equals( value, "$metadata" ) );
         }
 
         /// <summary>
@@ -102,6 +84,9 @@
 
             return false;
         }
+
+        static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values ) =>
+            values.TryGetValue( "odataPath", out var value ) && ( value == null || Equals( value, "$metadata" ) );
 
         static ApiVersion GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request, ApiVersionRequestProperties properties )
         {

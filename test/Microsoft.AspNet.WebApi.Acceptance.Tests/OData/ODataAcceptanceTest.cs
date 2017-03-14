@@ -1,22 +1,19 @@
 ﻿namespace Microsoft.Web.OData
 {
     using FluentAssertions;
+    using Microsoft.OData.UriParser;
     using OData.Controllers;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using System.Web.OData.Extensions;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
     [Trait( "Framework", "OData" )]
     public abstract class ODataAcceptanceTest : AcceptanceTest
     {
-        protected ODataAcceptanceTest()
-        {
-            FilteredControllerTypes.Add( typeof( VersionedMetadataController ) );
-            Configuration.EnableCaseInsensitive( true );
-            Configuration.EnableUnqualifiedNameCall( true );
-        }
+        protected ODataAcceptanceTest() => FilteredControllerTypes.Add( typeof( VersionedMetadataController ) );
+
+        protected ODataUriResolver TestUriResolver { get; } = new CustomUriResolver();
 
         [Fact]
         public async Task then_the_service_document_should_allow_an_unspecified_version()
@@ -104,6 +101,13 @@
             // assert
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
+        }
+
+        // HACK: required due to bug in ODL
+        // REF: https://github.com/OData/odata.net/issues/695
+        sealed class CustomUriResolver : UnqualifiedODataUriResolver
+        {
+            public override bool EnableCaseInsensitive { get => true; set { } }
         }
     }
 }

@@ -4,9 +4,9 @@
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.OData;
-    using static Microsoft.OData.Core.ODataConstants;
-    using static Microsoft.OData.Core.ODataUtils;
-    using static Microsoft.OData.Core.ODataVersion;
+    using static Microsoft.OData.ODataConstants;
+    using static Microsoft.OData.ODataUtils;
+    using static Microsoft.OData.ODataVersion;
     using static System.Net.HttpStatusCode;
     using static System.String;
 

@@ -4,11 +4,13 @@
     using Configuration;
     using Controllers;
     using FluentAssertions;
+    using Microsoft.OData.UriParser;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.OData.Builder;
     using Xunit;
+    using static Microsoft.OData.ServiceLifetime;
     using static System.Net.HttpStatusCode;
 
     public abstract class BasicAcceptanceTest : ODataAcceptanceTest
@@ -32,8 +34,8 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models );
+            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
             Configuration.EnsureInitialized();
         }
 

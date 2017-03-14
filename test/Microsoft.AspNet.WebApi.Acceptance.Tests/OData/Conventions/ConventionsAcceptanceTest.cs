@@ -4,9 +4,10 @@
     using Configuration;
     using Controllers;
     using Http.Versioning.Conventions;
+    using Microsoft.OData.UriParser;
     using System.Web.Http;
     using System.Web.OData.Builder;
-    using System.Web.OData.Extensions;
+    using static Microsoft.OData.ServiceLifetime;
 
     public abstract class ConventionsAcceptanceTest : ODataAcceptanceTest
     {
@@ -41,8 +42,8 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models );
+            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
             Configuration.EnsureInitialized();
         }
     }
