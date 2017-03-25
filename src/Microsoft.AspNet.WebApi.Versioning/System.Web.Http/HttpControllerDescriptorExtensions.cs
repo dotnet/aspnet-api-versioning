@@ -23,8 +23,7 @@
         {
             Contract.Requires( controllerDescriptor != null );
 
-            var value = default( bool? );
-            controllerDescriptor.Properties.TryGetValue( AttributeRoutedPropertyKey, out value );
+            controllerDescriptor.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
             return value ?? false;
         }
 
@@ -91,9 +90,7 @@
                 ApiVersionInfoKey,
                 key =>
                 {
-                    var value = default( object );
-
-                    if ( properties.TryRemove( ConventionsApiVersionInfoKey, out value ) )
+                    if ( properties.TryRemove( ConventionsApiVersionInfoKey, out var value ) )
                     {
                         return ( (ApiVersionModel) value ).Aggregate( model );
                     }
