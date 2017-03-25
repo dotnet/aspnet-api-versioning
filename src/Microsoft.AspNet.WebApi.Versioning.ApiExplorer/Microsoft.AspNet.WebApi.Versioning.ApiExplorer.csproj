@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>1.0.0</VersionPrefix>
+  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  <TargetFramework>net45</TargetFramework>
+  <AssemblyName>Microsoft.AspNet.WebApi.Versioning.ApiExplorer</AssemblyName>
+  <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer</AssemblyTitle>
+  <Description>The API Explorer for Microsoft ASP.NET Web API Versioning.</Description>
+  <RootNamespace>Microsoft.Web.Http</RootNamespace>
+  <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
+  <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning;ApiExplorer</PackageTags>
+  <PackageReleaseNotes></PackageReleaseNotes>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <Reference Include="System" />
+  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+ <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+
+</Project>

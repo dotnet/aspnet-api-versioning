@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
@@ -45,6 +45,10 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Test.Common", "test\Test.Common\Test.Common.shproj", "{F9297626-C37C-402B-AFD6-712F3E5E4D7C}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Acceptance.Test.Shared", "test\Acceptance.Test.Shared\Acceptance.Test.Shared.shproj", "{6CDFB878-2642-4F98-AE35-621BAC581181}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer", "src\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj", "{271C9E76-06EF-4D72-847A-AA27D793FE55}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests.csproj", "{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -90,6 +94,14 @@ Global
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EED304C-D1A6-4866-8D7F-450D084FD25D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{271C9E76-06EF-4D72-847A-AA27D793FE55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{271C9E76-06EF-4D72-847A-AA27D793FE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{271C9E76-06EF-4D72-847A-AA27D793FE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{271C9E76-06EF-4D72-847A-AA27D793FE55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,5 +119,7 @@ Global
 		{6D0E834B-6422-44CD-9A85-E3BE9DEAD1BE} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{F9297626-C37C-402B-AFD6-712F3E5E4D7C} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{6CDFB878-2642-4F98-AE35-621BAC581181} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{271C9E76-06EF-4D72-847A-AA27D793FE55} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+		{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 	EndGlobalSection
 EndGlobal
