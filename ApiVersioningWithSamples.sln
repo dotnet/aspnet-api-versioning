@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
@@ -79,6 +79,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer", "src\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj", "{91E1F0B5-905D-446C-A2DD-4C1EDABFAF6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests.csproj", "{19A2C130-46B4-4CA3-B655-B7547BC414AC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer", "src\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.csproj", "{F7784C3A-5569-4590-AE28-B721C0426045}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests.csproj", "{15461DBB-95AD-4CA7-AF41-E70F54860FE3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaggerSample", "samples\aspnetcore\SwaggerSample\SwaggerSample.csproj", "{D95BC932-50F7-4014-970E-0C6E8400BE25}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -168,6 +174,18 @@ Global
 		{19A2C130-46B4-4CA3-B655-B7547BC414AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19A2C130-46B4-4CA3-B655-B7547BC414AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19A2C130-46B4-4CA3-B655-B7547BC414AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7784C3A-5569-4590-AE28-B721C0426045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7784C3A-5569-4590-AE28-B721C0426045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7784C3A-5569-4590-AE28-B721C0426045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7784C3A-5569-4590-AE28-B721C0426045}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15461DBB-95AD-4CA7-AF41-E70F54860FE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15461DBB-95AD-4CA7-AF41-E70F54860FE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15461DBB-95AD-4CA7-AF41-E70F54860FE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15461DBB-95AD-4CA7-AF41-E70F54860FE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D95BC932-50F7-4014-970E-0C6E8400BE25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D95BC932-50F7-4014-970E-0C6E8400BE25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D95BC932-50F7-4014-970E-0C6E8400BE25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D95BC932-50F7-4014-970E-0C6E8400BE25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -198,5 +216,8 @@ Global
 		{83B21A5B-0779-4391-9700-58AEFEBFA615} = {900DD210-8500-4D89-A05D-C9526935A719}
 		{91E1F0B5-905D-446C-A2DD-4C1EDABFAF6C} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{19A2C130-46B4-4CA3-B655-B7547BC414AC} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{F7784C3A-5569-4590-AE28-B721C0426045} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+		{15461DBB-95AD-4CA7-AF41-E70F54860FE3} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{D95BC932-50F7-4014-970E-0C6E8400BE25} = {900DD210-8500-4D89-A05D-C9526935A719}
 	EndGlobalSection
 EndGlobal
