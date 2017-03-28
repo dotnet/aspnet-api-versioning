@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>netcoreapp1.1</TargetFramework>
+  <AssemblyName>Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests</AssemblyName>
+  <RootNamespace>Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer</RootNamespace>
+  <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <Content Include="xunit.runner.json">
+   <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="more.xunit" Version="2.2.2" />
+  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.1" />
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.1" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="1.1.1" />
+  <PackageReference Include="FluentAssertions" Version="4.19.2" />
+  <PackageReference Include="Moq" Version="4.7.0" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Folder Include="Models\" />
+  <Folder Include="Simulators\" />
+ </ItemGroup>
+
+</Project>
