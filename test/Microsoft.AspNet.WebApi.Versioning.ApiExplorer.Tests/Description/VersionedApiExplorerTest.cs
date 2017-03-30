@@ -126,7 +126,7 @@
 
             parameterDescriptorMock.SetupGet( p => p.ParameterType ).Returns( typeof( ClassWithId ) );
 
-            var apiExplorer = new VersionedApiExplorer( new HttpConfiguration() );
+            var apiExplorer = new TestApiExplorer( new HttpConfiguration() );
             var descriptions = new List<ApiParameterDescription>()
             {
                 new ApiParameterDescription() { Source = FromUri, Name = "id" },
@@ -158,7 +158,7 @@
         public void try_expand_uri_parameters_should_expand_parameter( string expectedPath, Type parameterType, string parameterName )
         {
             // arrange
-            var apiExplorer = new VersionedApiExplorer( new HttpConfiguration() );
+            var apiExplorer = new TestApiExplorer( new HttpConfiguration() );
             var descriptions = new List<ApiParameterDescription>()
             {
                 CreateApiParameterDescription( parameterType, parameterName )
@@ -176,7 +176,7 @@
         public void try_expand_uri_parameters_should_expand_composite_parameters()
         {
             // arrange
-            var apiExplorer = new VersionedApiExplorer( new HttpConfiguration() );
+            var apiExplorer = new TestApiExplorer( new HttpConfiguration() );
             var descriptions = new List<ApiParameterDescription>()
             {
                 CreateApiParameterDescription( typeof( int[] ), "id" ),
@@ -228,7 +228,7 @@
             var descriptions = apiExplorer.ApiDescriptions;
 
             // assert
-            descriptions.Versions.Should().Equal(
+            descriptions.ApiVersions.Should().Equal(
                 new ApiVersion( 1, 0 ),
                 new ApiVersion( 2, 0 ),
                 new ApiVersion( 3, 0 ),
@@ -446,6 +446,18 @@
                 ParameterDescriptor = parameterDescriptorMock.Object,
                 Name = name
             };
+        }
+
+        sealed class TestApiExplorer : VersionedApiExplorer
+        {
+            public TestApiExplorer( HttpConfiguration configuration ) : base( configuration ) { }
+
+            new public bool TryExpandUriParameters(
+                IHttpRoute route,
+                IParsedRoute parsedRoute,
+                ICollection<ApiParameterDescription> parameterDescriptions,
+                out string expandedRouteTemplate ) =>
+                base.TryExpandUriParameters( route, parsedRoute, parameterDescriptions, out expandedRouteTemplate );
         }
 
         static class New

@@ -19,7 +19,7 @@
             };
 
             // act
-            var versions = collection.Versions;
+            var versions = collection.ApiVersions;
 
             // assert
             versions.Should().BeEquivalentTo( new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) );
@@ -35,25 +35,25 @@
                 {
                     ApiDescriptions =
                     {
-                        new VersionedApiDescription() { Version = new ApiVersion( 3, 0 ), RelativePath = "api/values" },
-                        new VersionedApiDescription() { Version = new ApiVersion( 3, 0 ), RelativePath = "api/orders" }
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 3, 0 ), RelativePath = "api/values" },
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 3, 0 ), RelativePath = "api/orders" }
                     }
                 },
                 new ApiDescriptionGroup( new ApiVersion( 1, 0 ) )
                 {
                     ApiDescriptions =
                     {
-                        new VersionedApiDescription() { Version = new ApiVersion( 1, 0 ), RelativePath = "api/people" },
-                        new VersionedApiDescription() { Version = new ApiVersion( 1, 0 ), RelativePath = "api/orders" }
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 1, 0 ), RelativePath = "api/people" },
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 1, 0 ), RelativePath = "api/orders" }
                     }
                 },
                 new ApiDescriptionGroup( new ApiVersion( 2, 0 ) )
                 {
                     ApiDescriptions =
                     {
-                        new VersionedApiDescription() { Version = new ApiVersion( 2, 0 ), RelativePath = "api/values" },
-                        new VersionedApiDescription() { Version = new ApiVersion( 2, 0 ), RelativePath = "api/people" },
-                        new VersionedApiDescription() { Version = new ApiVersion( 2, 0 ), RelativePath = "api/orders" }
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 2, 0 ), RelativePath = "api/values" },
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 2, 0 ), RelativePath = "api/people" },
+                        new VersionedApiDescription() { ApiVersion = new ApiVersion( 2, 0 ), RelativePath = "api/orders" }
                     }
                 }
             };
@@ -65,13 +65,13 @@
             descriptions.ShouldBeEquivalentTo(
                 new Collection<VersionedApiDescription>()
                 {
-                    new VersionedApiDescription() { Version = new ApiVersion( 1, 0 ), RelativePath = "api/people" },
-                    new VersionedApiDescription() { Version = new ApiVersion( 1, 0 ), RelativePath = "api/orders" },
-                    new VersionedApiDescription() { Version = new ApiVersion( 2, 0 ), RelativePath = "api/values" },
-                    new VersionedApiDescription() { Version = new ApiVersion( 2, 0 ), RelativePath = "api/people" },
-                    new VersionedApiDescription() { Version = new ApiVersion( 2, 0 ), RelativePath = "api/orders" },
-                    new VersionedApiDescription() { Version = new ApiVersion( 3, 0 ), RelativePath = "api/values" },
-                    new VersionedApiDescription() { Version = new ApiVersion( 3, 0 ), RelativePath = "api/orders" }
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 1, 0 ), RelativePath = "api/people" },
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 1, 0 ), RelativePath = "api/orders" },
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 2, 0 ), RelativePath = "api/values" },
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 2, 0 ), RelativePath = "api/people" },
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 2, 0 ), RelativePath = "api/orders" },
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 3, 0 ), RelativePath = "api/values" },
+                    new VersionedApiDescription() { ApiVersion = new ApiVersion( 3, 0 ), RelativePath = "api/orders" }
                 } );
         }
     }

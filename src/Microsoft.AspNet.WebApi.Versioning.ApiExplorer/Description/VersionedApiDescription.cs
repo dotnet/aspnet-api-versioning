@@ -21,7 +21,7 @@
         /// </summary>
         /// <value>The unique identifier of the API description.</value>
         /// <remarks>This property should be preferred over <see cref="ID"/> because it will be unique by version.</remarks>
-        public virtual string UniqueID => $"{base.ID}-{Version}";
+        public virtual string UniqueID => $"{base.ID}-{ApiVersion}";
 
         /// <summary>
         /// Gets the unique API description identifier.
@@ -31,10 +31,22 @@
         new public string ID => UniqueID;
 
         /// <summary>
-        /// Gets or sets the version associated with the API.
+        /// Gets or sets the name of the group for the API description.
         /// </summary>
-        /// <value>An <see cref="ApiVersion">API version</see>.</value>
-        public ApiVersion Version { get; set; }
+        /// <value>The API version description group name.</value>
+        public string GroupName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the API version.
+        /// </summary>
+        /// <value>The described <see cref="Http.ApiVersion">API version</see>.</value>
+        public ApiVersion ApiVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether API is deprecated.
+        /// </summary>
+        /// <value>True if the API is deprecated; otherwise, false. The default value is <c>false</c>.</value>
+        public bool IsDeprecated { get; set; }
 
         /// <summary>
         /// Gets or sets the response description.
@@ -64,6 +76,6 @@
             return lambda.Compile();
         }
 
-        private string DebuggerDisplay => $"{HttpMethod.Method} {RelativePath} ({Version})";
+        string DebuggerDisplay => $"{HttpMethod.Method} {RelativePath} ({ApiVersion})";
     }
 }

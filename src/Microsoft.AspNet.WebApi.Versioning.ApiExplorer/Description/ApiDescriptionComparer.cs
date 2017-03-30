@@ -24,7 +24,7 @@
 
             if ( string.Equals( x.UniqueID, y.UniqueID, OrdinalIgnoreCase ) )
             {
-                return x.Version == y.Version;
+                return x.ApiVersion == y.ApiVersion;
             }
 
             return false;
@@ -45,7 +45,7 @@
             }
 
             var hash = comparer.GetHashCode( id );
-            var apiVersion = obj.Version;
+            var apiVersion = obj.ApiVersion;
 
             return ( hash * 397 ) ^ apiVersion?.GetHashCode() ?? 0;
         }
@@ -118,7 +118,7 @@
 
                 if ( result == 0 )
                 {
-                    result = CompareVersions( x.Version, y.Version );
+                    result = CompareVersions( x.ApiVersion, y.ApiVersion );
                 }
             }
 
