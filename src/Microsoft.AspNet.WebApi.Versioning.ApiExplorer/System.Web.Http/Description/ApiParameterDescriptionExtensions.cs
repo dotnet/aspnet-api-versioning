@@ -1,9 +1,9 @@
-﻿namespace Microsoft.Web.Http.Description
+﻿namespace System.Web.Http.Description
 {
+    using Microsoft.Web.Http;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Web.Http.Description;
 
     static class ApiParameterDescriptionExtensions
     {

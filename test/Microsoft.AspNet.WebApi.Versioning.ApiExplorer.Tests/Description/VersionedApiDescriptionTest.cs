@@ -16,7 +16,7 @@
             {
                 HttpMethod = Get,
                 RelativePath = "Values",
-                Version = new ApiVersion( 1, 0 )
+                ApiVersion = new ApiVersion( 1, 0 )
             };
 
             // act
