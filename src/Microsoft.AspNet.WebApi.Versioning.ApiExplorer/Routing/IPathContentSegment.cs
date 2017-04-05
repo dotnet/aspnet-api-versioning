@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Routing
 {
     using System.Collections.Generic;
+
     /// <summary>
     /// Defines the behavior of a path content segment.
     /// </summary>

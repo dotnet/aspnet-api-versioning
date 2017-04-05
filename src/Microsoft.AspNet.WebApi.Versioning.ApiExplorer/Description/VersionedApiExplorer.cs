@@ -61,10 +61,8 @@
         /// <summary>
         /// Gets the comparer used to compare API descriptions.
         /// </summary>
-        /// <value>An <see cref="IEqualityComparer{T}">equality comparer</see> for <see cref="ApiDescription">API descriptions</see>.</value>
-        /// <remarks>The defined <see cref="IEqualityComparer{T}">equality comparer</see> should expect to handle instances of
-        /// type <see cref="VersionedApiDescription"/>.</remarks>
-        protected virtual IEqualityComparer<ApiDescription> Comparer { get; } = ApiDescriptionComparer.Instance;
+        /// <value>A <see cref="ApiDescriptionComparer">comparer</see> for <see cref="ApiDescription">API descriptions</see>.</value>
+        protected virtual ApiDescriptionComparer Comparer { get; } = new ApiDescriptionComparer();
 
         /// <summary>
         /// Gets the object used to parse routes.
@@ -310,7 +308,7 @@
 
             var items = apiDescriptionGroup.ApiDescriptions.ToArray();
 
-            Array.Sort( items, ApiDescriptionComparer.Instance );
+            Array.Sort( items, Comparer );
 
             apiDescriptionGroup.ApiDescriptions.Clear();
             apiDescriptionGroup.ApiDescriptions.AddRange( items );
@@ -943,7 +941,7 @@
 
             foreach ( var description in apiDescriptions )
             {
-                var apiDescriptionId = description.UniqueID;
+                var apiDescriptionId = description.GetUniqueID();
 
                 if ( visitedApiDescriptionIds.Contains( apiDescriptionId ) )
                 {
@@ -959,7 +957,7 @@
 
             foreach ( var apiDescription in apiDescriptions )
             {
-                var apiDescriptionId = apiDescription.UniqueID;
+                var apiDescriptionId = apiDescription.GetUniqueID();
 
                 if ( !duplicateApiDescriptionIds.Contains( apiDescriptionId ) )
                 {

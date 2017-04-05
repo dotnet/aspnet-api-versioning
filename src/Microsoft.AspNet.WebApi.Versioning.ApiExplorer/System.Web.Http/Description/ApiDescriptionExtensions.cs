@@ -2,6 +2,7 @@
 {
     using Microsoft;
     using Microsoft.Web.Http.Description;
+    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Provides extension methods for the <see cref="ApiDescription"/> class.
@@ -25,6 +26,26 @@
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets the unique API description identifier.
+        /// </summary>
+        /// <value>The unique identifier of the API description.</value>
+        /// <remarks>If the <paramref name="apiDescription">API description</paramref> is of type <see cref="VersionedApiDescription"/>
+        /// the return value will be in the format of "{<see cref="ApiDescription.ID"/>}-{<see cref="VersionedApiDescription.ApiVersion"/>}";
+        /// otherwise, the return value will be "{<see cref="ApiDescription.ID"/>}".</remarks>
+        public static string GetUniqueID( this ApiDescription apiDescription )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+
+            if ( apiDescription is VersionedApiDescription versionedApiDescription )
+            {
+                return $"{versionedApiDescription.ID}-{versionedApiDescription.ApiVersion}";
+            }
+
+            return apiDescription.ID;
         }
     }
 }
