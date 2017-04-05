@@ -5,6 +5,7 @@
     using static System.Net.HttpStatusCode;
 
     [ApiVersion( "4.0" )]
+    [AdvertiseApiVersions( "5.0" )]
     [RoutePrefix( "values" )]
     public class AttributeValues3Controller : ApiController
     {

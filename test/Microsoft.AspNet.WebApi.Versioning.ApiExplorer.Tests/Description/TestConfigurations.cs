@@ -2,9 +2,7 @@
 {
     using Microsoft.Web.Http.Versioning.Conventions;
     using Models;
-    using Moq;
     using Simulators;
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Web.Http;
@@ -24,7 +22,7 @@
         static HttpConfiguration NewConventionRouteConfiguration()
         {
             var configuration = new HttpConfiguration();
-            var controllerTypeResolver = NewControllerTypeResolver(
+            var controllerTypeResolver = new ControllerTypeCollection(
                 typeof( ValuesController ),
                 typeof( Values2Controller ),
                 typeof( Values3Controller ) );
@@ -38,9 +36,12 @@
                                        .HasApiVersion( 1, 0 );
                     options.Conventions.Controller<Values2Controller>()
                                        .HasApiVersion( 2, 0 )
+                                       .HasDeprecatedApiVersion( 3, 0, "beta" )
                                        .HasApiVersion( 3, 0 )
                                        .Action( c => c.Post( default( ClassWithId ) ) ).MapToApiVersion( 3, 0 );
-                    options.Conventions.Controller<Values3Controller>().HasApiVersion( 4, 0 );
+                    options.Conventions.Controller<Values3Controller>()
+                                       .HasApiVersion( 4, 0 )
+                                       .AdvertisesApiVersion( 5, 0 );
                 } );
 
             return configuration;
@@ -49,7 +50,7 @@
         static HttpConfiguration NewDirectRouteConfiguration()
         {
             var configuration = new HttpConfiguration();
-            var controllerTypeResolver = NewControllerTypeResolver(
+            var controllerTypeResolver = new ControllerTypeCollection(
                 typeof( AttributeValues1Controller ),
                 typeof( AttributeValues2Controller ),
                 typeof( AttributeValues3Controller ) );
@@ -59,13 +60,6 @@
             configuration.AddApiVersioning();
 
             return configuration;
-        }
-
-        static IHttpControllerTypeResolver NewControllerTypeResolver( params Type[] controllerTypes )
-        {
-            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
-            controllerTypeResolver.Setup( c => c.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
-            return controllerTypeResolver.Object;
         }
     }
 }

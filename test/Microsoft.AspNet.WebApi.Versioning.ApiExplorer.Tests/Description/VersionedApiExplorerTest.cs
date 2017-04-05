@@ -231,6 +231,7 @@
             descriptions.ApiVersions.Should().Equal(
                 new ApiVersion( 1, 0 ),
                 new ApiVersion( 2, 0 ),
+                new ApiVersion( 3, 0, "beta" ),
                 new ApiVersion( 3, 0 ),
                 new ApiVersion( 4, 0 ) );
         }
@@ -371,6 +372,42 @@
                         ID = $"POST{relativePaths[2]}-3.0",
                         HttpMethod = Post,
                         RelativePath = relativePaths[2],
+                        Version = apiVersion
+                    }
+                },
+                options => options.ExcludingMissingMembers() );
+        }
+
+        [Theory]
+        [ClassData( typeof( TestConfigurations ) )]
+        public void api_description_group_should_explore_v3_beta_actions( HttpConfiguration configuration )
+        {
+            // arrange
+            var apiExplorer = new VersionedApiExplorer( configuration );
+            var apiVersion = new ApiVersion( 3, 0, "beta" );
+            var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
+
+            // act
+            var descriptions = descriptionGroup.ApiDescriptions;
+            var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
+
+            // assert
+            descriptionGroup.IsDeprecated.Should().BeTrue();
+            descriptions.ShouldBeEquivalentTo(
+                new[]
+                {
+                    new
+                    {
+                        ID = $"GET{relativePaths[0]}-3.0-beta",
+                        HttpMethod = Get,
+                        RelativePath = relativePaths[0],
+                        Version = apiVersion
+                    },
+                    new
+                    {
+                        ID = $"GET{relativePaths[1]}-3.0-beta",
+                        HttpMethod = Get,
+                        RelativePath = relativePaths[1],
                         Version = apiVersion
                     }
                 },
