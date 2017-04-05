@@ -1,11 +1,9 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Web.Http.Description;
-    using static System.ComponentModel.EditorBrowsableState;
 
     /// <summary>
     /// Represents a versioned API description.
@@ -15,20 +13,6 @@
     {
         static readonly Lazy<Action<ApiDescription, ResponseDescription>> setResponseDescription =
             new Lazy<Action<ApiDescription, ResponseDescription>>( CreateSetResponseDescriptionMutator );
-
-        /// <summary>
-        /// Gets the unique API description identifier.
-        /// </summary>
-        /// <value>The unique identifier of the API description.</value>
-        /// <remarks>This property should be preferred over <see cref="ID"/> because it will be unique by version.</remarks>
-        public virtual string UniqueID => $"{base.ID}-{ApiVersion}";
-
-        /// <summary>
-        /// Gets the unique API description identifier.
-        /// </summary>
-        /// <value>The unique identifier of the API description.</value>
-        [EditorBrowsable( Never )]
-        new public string ID => UniqueID;
 
         /// <summary>
         /// Gets or sets the name of the group for the API description.

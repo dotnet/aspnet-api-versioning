@@ -293,7 +293,7 @@
             description.ShouldBeEquivalentTo(
                 new
                 {
-                    ID = $"GET{relativePath}-1.0",
+                    ID = $"GET{relativePath}",
                     HttpMethod = Get,
                     RelativePath = relativePath,
                     Version = apiVersion
@@ -320,14 +320,14 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}-2.0",
+                        ID = $"GET{relativePaths[0]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[0],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}-2.0",
+                        ID = $"GET{relativePaths[1]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[1],
                         Version = apiVersion
@@ -355,21 +355,21 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}-3.0",
+                        ID = $"GET{relativePaths[0]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[0],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}-3.0",
+                        ID = $"GET{relativePaths[1]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[1],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"POST{relativePaths[2]}-3.0",
+                        ID = $"POST{relativePaths[2]}",
                         HttpMethod = Post,
                         RelativePath = relativePaths[2],
                         Version = apiVersion
@@ -398,14 +398,14 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}-3.0-beta",
+                        ID = $"GET{relativePaths[0]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[0],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}-3.0-beta",
+                        ID = $"GET{relativePaths[1]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[1],
                         Version = apiVersion
@@ -433,28 +433,28 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}-4.0",
+                        ID = $"GET{relativePaths[0]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[0],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}-4.0",
+                        ID = $"GET{relativePaths[1]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[1],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"POST{relativePaths[2]}-4.0",
+                        ID = $"POST{relativePaths[2]}",
                         HttpMethod = Post,
                         RelativePath = relativePaths[2],
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"DELETE{relativePaths[3]}-4.0",
+                        ID = $"DELETE{relativePaths[3]}",
                         HttpMethod = Delete,
                         RelativePath = relativePaths[3],
                         Version = apiVersion

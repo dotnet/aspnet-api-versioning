@@ -1,31 +1,11 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using FluentAssertions;
-    using System;
     using System.Web.Http.Description;
     using Xunit;
-    using static System.Net.Http.HttpMethod;
 
     public class VersionedApiDescriptionTest
     {
-        [Fact]
-        public void shadowed_ID_property_should_return_expected_value()
-        {
-            // arrange
-            var apiDescription = new VersionedApiDescription()
-            {
-                HttpMethod = Get,
-                RelativePath = "Values",
-                ApiVersion = new ApiVersion( 1, 0 )
-            };
-
-            // act
-            var id = apiDescription.ID;
-
-            // assert
-            id.Should().Be( "GETValues-1.0" );
-        }
-
         [Fact]
         public void shadowed_ResponseDescription_property_should_set_internal_value()
         {
