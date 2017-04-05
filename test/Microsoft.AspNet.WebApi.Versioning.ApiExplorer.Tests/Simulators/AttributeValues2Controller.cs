@@ -4,6 +4,7 @@
     using System.Web.Http;
 
     [ApiVersion( "2.0" )]
+    [ApiVersion( "3.0-beta", Deprecated = true )]
     [ApiVersion( "3.0" )]
     [RoutePrefix( "values" )]
     public class AttributeValues2Controller : ApiController
