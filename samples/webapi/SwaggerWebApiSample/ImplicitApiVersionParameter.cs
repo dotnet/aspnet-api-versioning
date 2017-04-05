@@ -54,7 +54,6 @@
                 {
                     name = "api-version",
                     required = true,
-                    description = "The requested API version",
                     @in = "query",
                     type = "string"
                 };
@@ -65,6 +64,7 @@
             // update the default value with the current API version so that
             // the route can be invoked in the "Try It!" feature
             parameter.@default = description.ApiVersion.ToString();
+            parameter.description = "The requested API version";
         }
     }
 }
