@@ -54,7 +54,6 @@
                     Name = "api-version",
                     Required = true,
                     Default = apiVersion.ToString(),
-                    Description = "The requested API version",
                     In = "query",
                     Type = "string"
                 };
@@ -67,6 +66,8 @@
                 // the route can be invoked in the "Try It!" feature
                 pathParameter.Default = apiVersion.ToString();
             }
+
+            parameter.Description = "The requested API version";
         }
     }
 }
