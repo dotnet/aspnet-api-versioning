@@ -499,23 +499,47 @@ namespace Microsoft.AspNetCore.Mvc
 
             var result = Nullable.Compare( GroupVersion, other.GroupVersion );
 
-            if ( result == 0 )
+            if ( result != 0 )
             {
-                result = Nullable.Compare( MajorVersion, other.MajorVersion );
+                return result;
+            }
 
-                if ( result == 0 )
+            result = Nullable.Compare( MajorVersion, other.MajorVersion );
+
+            if ( result != 0 )
+            {
+                return result;
+            }
+
+            result = ImpliedMinorVersion.CompareTo( other.ImpliedMinorVersion );
+
+            if ( result != 0 )
+            {
+                return result;
+            }
+
+            if ( IsNullOrEmpty( Status ) )
+            {
+                if ( !IsNullOrEmpty( other.Status ) )
                 {
-                    result = ImpliedMinorVersion.CompareTo( other.ImpliedMinorVersion );
+                    result = 1;
+                }
+            }
+            else if ( IsNullOrEmpty( other.Status ) )
+            {
+                result = -1;
+            }
+            else
+            {
+                result = StringComparer.OrdinalIgnoreCase.Compare( Status, other.Status );
 
-                    if ( result == 0 )
-                    {
-                        result = StringComparer.OrdinalIgnoreCase.Compare( Status, other.Status );
-
-                        if ( result != 0 )
-                        {
-                            result = result < 0 ? -1 : 1;
-                        }
-                    }
+                if ( result < 0 )
+                {
+                    result = -1;
+                }
+                else if ( result > 0 )
+                {
+                    result = 1;
                 }
             }
 
