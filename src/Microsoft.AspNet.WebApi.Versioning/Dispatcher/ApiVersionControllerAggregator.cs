@@ -12,6 +12,7 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
     using Versioning;
+    using static System.StringComparison;
 
     sealed class ApiVersionControllerAggregator
     {
@@ -100,14 +101,16 @@
             }
 
             var template = subroute.Route.RouteTemplate;
-            var comparer = StringComparer.OrdinalIgnoreCase;
             var controllers = from route in routes
-                              where comparer.Equals( route.RouteTemplate, template )
+                              where RouteTemplatesIntersect( route.RouteTemplate, template )
                               from controller in EnumerateControllersInDataTokens( route.DataTokens )
                               select controller;
 
             return controllers.Distinct();
         }
+
+        static bool RouteTemplatesIntersect( string template1, string template2 ) =>
+            template1.StartsWith( template2, OrdinalIgnoreCase ) || template2.StartsWith( template1, OrdinalIgnoreCase );
 
         static IEnumerable<HttpControllerDescriptor> EnumerateControllersInDataTokens( IDictionary<string, object> dataTokens )
         {
