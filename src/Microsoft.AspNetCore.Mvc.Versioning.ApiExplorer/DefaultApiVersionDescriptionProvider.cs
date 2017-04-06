@@ -85,7 +85,7 @@
             AppendDescriptions( descriptions, supported, deprecated: false );
             AppendDescriptions( descriptions, deprecated, deprecated: true );
 
-            return descriptions.OrderBy( d => d.ApiVersion ).ThenBy( o => o.IsDeprecated ).ToArray();
+            return descriptions.OrderBy( d => d.ApiVersion ).ToArray();
         }
 
         static void BucketizeApiVersions( IReadOnlyList<ActionDescriptor> actions, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )

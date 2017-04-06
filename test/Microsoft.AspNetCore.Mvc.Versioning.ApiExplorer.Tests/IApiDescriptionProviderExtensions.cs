@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer
+﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;

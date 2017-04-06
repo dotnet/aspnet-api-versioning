@@ -3,7 +3,7 @@
  <PropertyGroup>
   <TargetFramework>netcoreapp1.1</TargetFramework>
   <AssemblyName>Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests</AssemblyName>
-  <RootNamespace>Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer</RootNamespace>
+  <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
   <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
  </PropertyGroup>
 
@@ -28,8 +28,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <Folder Include="Models\" />
-  <Folder Include="Simulators\" />
+   <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
  </ItemGroup>
 
 </Project>

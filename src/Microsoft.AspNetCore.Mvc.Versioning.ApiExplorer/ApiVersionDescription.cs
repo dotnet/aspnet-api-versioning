@@ -27,7 +27,7 @@
         public ApiVersion ApiVersion { get; }
 
         /// <summary>
-        /// Gets the API version group name.
+        /// Gets the API version group name.f
         /// </summary>
         /// <value>The group name for the API version.</value>
         public string GroupName { get; }
