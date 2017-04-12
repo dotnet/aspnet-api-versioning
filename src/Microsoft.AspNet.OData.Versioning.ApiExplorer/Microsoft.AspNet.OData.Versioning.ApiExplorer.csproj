@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>1.0.0</VersionPrefix>
+  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  <TargetFramework>net45</TargetFramework>
+  <AssemblyName>Microsoft.AspNet.OData.Versioning.ApiExplorer</AssemblyName>
+  <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer for OData v4.0</AssemblyTitle>
+  <Description>The API Explorer for Microsoft ASP.NET Web API Versioning and OData v4.0.</Description>
+  <RootNamespace>Microsoft.Web.Http</RootNamespace>
+  <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
+  <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning;ApiExplorer;OData</PackageTags>
+  <PackageReleaseNotes></PackageReleaseNotes>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.csproj" />
+  <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <Reference Include="System" />
+  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+ <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+ <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+
+</Project>

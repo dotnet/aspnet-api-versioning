@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net452</TargetFramework>
+  <AssemblyName>Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests</AssemblyName>
+  <RootNamespace>Microsoft.Web.Http</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="FluentAssertions" Version="4.19.2" />
+  <PackageReference Include="Moq" Version="4.7.0" />
+  <PackageReference Include="more.xunit" Version="2.2.2" />
+  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.1" />
+  <PackageReference Include="System.Runtime" Version="4.1.0" />
+  <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Reference Include="System" />
+  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+
+</Project>
