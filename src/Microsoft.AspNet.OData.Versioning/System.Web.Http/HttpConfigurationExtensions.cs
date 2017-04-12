@@ -768,5 +768,52 @@
 
             return builder;
         }
+
+        /// <summary>
+        /// Gets the configured entity data model (EDM) for the specified API version.
+        /// </summary>
+        /// <param name="configuration">The server configuration.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to get the model for.</param>
+        /// <returns>The matching <see cref="IEdmModel">EDM model</see> or <c>null</c>.</returns>
+        public static IEdmModel GetEdmModel( this HttpConfiguration configuration, ApiVersion apiVersion )
+        {
+            Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+
+            var allRoutes = configuration.Routes;
+            var routes = new KeyValuePair<string, IHttpRoute>[allRoutes.Count];
+            var containers = configuration.GetRootContainerMappings();
+
+            allRoutes.CopyTo( routes, 0 );
+
+            foreach ( var route in routes )
+            {
+                if ( !( route.Value is ODataRoute odataRoute ) )
+                {
+                    continue;
+                }
+
+                if ( !containers.TryGetValue( route.Key, out var serviceProvider ) )
+                {
+                    continue;
+                }
+
+                var model = serviceProvider.GetService<IEdmModel>();
+
+                if ( model?.EntityContainer == null )
+                {
+                    continue;
+                }
+
+                var modelApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+
+                if ( modelApiVersion == apiVersion )
+                {
+                    return model;
+                }
+            }
+
+            return null;
+        }
     }
 }
