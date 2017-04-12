@@ -96,6 +96,25 @@
             batchRoute.RouteTemplate.Should().Be( "api/$batch" );
         }
 
+        [Theory]
+        [InlineData( 0, "1.0" )]
+        [InlineData( 1, "2.0" )]
+        public void get_edm_model_should_retrieve_configured_model_by_api_version( int modelIndex, string apiVersionValue )
+        {
+            // arrange
+            var apiVersion = ApiVersion.Parse( apiVersionValue );
+            var configuration = new HttpConfiguration();
+            var models = CreateModels( configuration ).ToArray();
+
+            configuration.MapVersionedODataRoutes( "odata", "api", models );
+
+            // act
+            var model = configuration.GetEdmModel( apiVersion );
+
+            // assert
+            model.Should().BeSameAs( models[modelIndex] );
+        }
+
         static IEnumerable<IEdmModel> CreateModels( HttpConfiguration configuration )
         {
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();

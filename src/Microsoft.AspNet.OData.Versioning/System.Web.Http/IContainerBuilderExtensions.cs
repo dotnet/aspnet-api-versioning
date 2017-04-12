@@ -12,7 +12,7 @@
     using System.Web.OData.Routing.Conventions;
     using static Microsoft.OData.ServiceLifetime;
 
-    internal static class IContainerBuilderExtensions
+    static class IContainerBuilderExtensions
     {
         internal static void InitializeAttributeRouting( this IServiceProvider serviceProvider ) => serviceProvider.GetServices<IODataRoutingConvention>();
 
