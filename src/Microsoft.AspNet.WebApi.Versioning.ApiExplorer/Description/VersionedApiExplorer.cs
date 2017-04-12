@@ -84,7 +84,7 @@
         /// <value>The <see cref="IDocumentationProvider">documentation provider</see> used to document APIs.</value>
         public IDocumentationProvider DocumentationProvider
         {
-            get => documentationProvider ?? Configuration.Services.GetDocumentationProvider();
+            get => documentationProvider ?? ( documentationProvider = Configuration.Services.GetDocumentationProvider() );
             set => documentationProvider = value;
         }
 
@@ -258,7 +258,7 @@
                     var directRouteController = GetDirectRouteController( directRouteCandidates, apiVersion );
                     var apiDescriptionGroup = newApiDescriptions.GetOrAdd( apiVersion, GetGroupName );
                     var descriptionsFromRoute = ( directRouteController != null && directRouteCandidates != null ) ?
-                            ExploreDirectRoute( directRouteController, directRouteCandidates, route, apiVersion ) :
+                            ExploreDirectRouteControllers( directRouteController, directRouteCandidates.Select( c => c.ActionDescriptor ).ToArray(), route, apiVersion ) :
                             ExploreRouteControllers( controllerMappings, route, apiVersion );
 
                     // Remove ApiDescription that will lead to ambiguous action matching.
@@ -532,12 +532,24 @@
             return controllerDescriptor;
         }
 
-        Collection<VersionedApiDescription> ExploreDirectRoute( HttpControllerDescriptor controllerDescriptor, CandidateAction[] candidates, IHttpRoute route, ApiVersion apiVersion )
+        /// <summary>
+        /// Explores a controller that uses direct routes (aka "attribute" routing).
+        /// </summary>
+        /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller</see> to explore.</param>
+        /// <param name="candidateActionDescriptors">The <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="HttpActionDescriptor">actions</see> to explore.</param>
+        /// <param name="route">The <see cref="IHttpRoute">route</see> to explore.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to explore.</param>
+        /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
+        protected virtual Collection<VersionedApiDescription> ExploreDirectRouteControllers(
+            HttpControllerDescriptor controllerDescriptor,
+            IReadOnlyList<HttpActionDescriptor> candidateActionDescriptors,
+            IHttpRoute route,
+            ApiVersion apiVersion )
         {
-            Contract.Requires( controllerDescriptor != null );
-            Contract.Requires( candidates != null );
-            Contract.Requires( route != null );
-            Contract.Requires( apiVersion != null );
+            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
+            Arg.NotNull( candidateActionDescriptors, nameof( candidateActionDescriptors ) );
+            Arg.NotNull( route, nameof( route ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
 
             var descriptions = new Collection<VersionedApiDescription>();
@@ -547,9 +559,8 @@
                 return descriptions;
             }
 
-            foreach ( var action in candidates )
+            foreach ( var actionDescriptor in candidateActionDescriptors )
             {
-                var actionDescriptor = action.ActionDescriptor;
                 var actionName = actionDescriptor.ActionName;
 
                 if ( !ShouldExploreAction( actionName, actionDescriptor, route, apiVersion ) )
@@ -571,11 +582,18 @@
             return descriptions;
         }
 
-        Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
+        /// <summary>
+        /// Explores controllers that do not use direct routes (aka "attribute" routing)
+        /// </summary>
+        /// <param name="controllerMappings">The <see cref="IDictionary{TKey, TValue}">collection</see> of controller mappings.</param>
+        /// <param name="route">The <see cref="IHttpRoute">route</see> to explore.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to explore.</param>
+        /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
+        protected virtual Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
         {
-            Contract.Requires( controllerMappings != null );
-            Contract.Requires( route != null );
-            Contract.Requires( apiVersion != null );
+            Arg.NotNull( controllerMappings, nameof( controllerMappings ) );
+            Arg.NotNull( route, nameof( route ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
 
             var apiDescriptions = new Collection<VersionedApiDescription>();
@@ -706,7 +724,6 @@
             Contract.Requires( apiDescriptions != null );
             Contract.Requires( apiVersion != null );
 
-            var apiDocumentation = DocumentationProvider?.GetResponseDocumentation( actionDescriptor );
             var parsedRoute = RouteParser.Parse( localPath );
             var parameterDescriptions = CreateParameterDescriptions( actionDescriptor, parsedRoute, route.Defaults );
 
@@ -715,14 +732,17 @@
                 return;
             }
 
+            var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
             var bodyParameter = parameterDescriptions.FirstOrDefault( description => description.Source == FromBody );
-            var supportedRequestBodyFormatters = bodyParameter != null ?
+            var supportedRequestBodyFormatters =
+                bodyParameter != null ?
                 Configuration.Formatters.Where( f => f.CanReadType( bodyParameter.ParameterDescriptor.ParameterType ) ) :
                 Enumerable.Empty<MediaTypeFormatter>();
 
             var responseDescription = CreateResponseDescription( actionDescriptor );
             var returnType = responseDescription.ResponseType ?? responseDescription.DeclaredType;
-            var supportedResponseFormatters = ( returnType != null && returnType != typeof( void ) ) ?
+            var supportedResponseFormatters =
+                ( returnType != null && returnType != typeof( void ) ) ?
                 Configuration.Formatters.Where( f => f.CanWriteType( returnType ) ) :
                 Enumerable.Empty<MediaTypeFormatter>();
 
@@ -736,7 +756,7 @@
             {
                 var apiDescription = new VersionedApiDescription()
                 {
-                    Documentation = apiDocumentation,
+                    Documentation = documentation,
                     HttpMethod = method,
                     RelativePath = finalPath,
                     ActionDescriptor = actionDescriptor,
@@ -753,9 +773,14 @@
             }
         }
 
-        ResponseDescription CreateResponseDescription( HttpActionDescriptor actionDescriptor )
+        /// <summary>
+        /// Creates a description for the response of the action.
+        /// </summary>
+        /// <param name="actionDescriptor">The <see cref="HttpActionDescriptor">action</see> to create a response description for.</param>
+        /// <returns>A new <see cref="ResponseDescription">response description</see>.</returns>
+        protected virtual ResponseDescription CreateResponseDescription( HttpActionDescriptor actionDescriptor )
         {
-            Contract.Requires( actionDescriptor != null );
+            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
             Contract.Ensures( Contract.Result<ResponseDescription>() != null );
 
             var responseType = actionDescriptor.GetCustomAttributes<ResponseTypeAttribute>().FirstOrDefault()?.ResponseType;
@@ -857,7 +882,7 @@
                 {
                     foreach ( var parameter in parameters )
                     {
-                        parameterDescriptions.Add( CreateParameterDescriptionFromDescriptor( parameter ) );
+                        parameterDescriptions.Add( CreateParameterDescription( parameter ) );
                     }
                 }
             }
@@ -894,16 +919,21 @@
             }
         }
 
-        ApiParameterDescription CreateParameterDescriptionFromDescriptor( HttpParameterDescriptor parameter )
+        /// <summary>
+        /// Creates a parameter description from the speicfied descriptor.
+        /// </summary>
+        /// <param name="parameterDescriptor">The <see cref="HttpParameterDescriptor">parameter descriptor</see> to create a description from.</param>
+        /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
+        protected virtual ApiParameterDescription CreateParameterDescription( HttpParameterDescriptor parameterDescriptor )
         {
-            Contract.Requires( parameter != null );
+            Arg.NotNull( parameterDescriptor, nameof( parameterDescriptor ) );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
 
             return new ApiParameterDescription()
             {
-                ParameterDescriptor = parameter,
-                Name = parameter.Prefix ?? parameter.ParameterName,
-                Documentation = DocumentationProvider?.GetDocumentation( parameter ),
+                ParameterDescriptor = parameterDescriptor,
+                Name = parameterDescriptor.Prefix ?? parameterDescriptor.ParameterName,
+                Documentation = DocumentationProvider?.GetDocumentation( parameterDescriptor ),
                 Source = Unknown,
             };
         }
@@ -913,7 +943,7 @@
             Contract.Requires( parameterBinding != null );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
 
-            var parameterDescription = CreateParameterDescriptionFromDescriptor( parameterBinding.Descriptor );
+            var parameterDescription = CreateParameterDescription( parameterBinding.Descriptor );
 
             if ( parameterBinding.WillReadBody )
             {
@@ -926,10 +956,6 @@
 
             return parameterDescription;
         }
-
-        string GetApiDocumentation( HttpActionDescriptor actionDescriptor ) => DocumentationProvider?.GetDocumentation( actionDescriptor );
-
-        string GetApiResponseDocumentation( HttpActionDescriptor actionDescriptor ) => DocumentationProvider?.GetResponseDocumentation( actionDescriptor );
 
         static Collection<VersionedApiDescription> RemoveInvalidApiDescriptions( Collection<VersionedApiDescription> apiDescriptions )
         {
