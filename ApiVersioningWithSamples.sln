@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
@@ -87,6 +87,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaggerSample", "samples\aspnetcore\SwaggerSample\SwaggerSample.csproj", "{D95BC932-50F7-4014-970E-0C6E8400BE25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerWebApiSample", "samples\webapi\SwaggerWebApiSample\SwaggerWebApiSample.csproj", "{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerODataWebApiSample", "samples\webapi\SwaggerODataWebApiSample\SwaggerODataWebApiSample.csproj", "{F3986F7B-AF76-43D1-A44F-303023A08CD3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer", "src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj", "{1B255310-A2B7-437F-804F-6E1D8C940A17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests.csproj", "{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -192,6 +198,18 @@ Global
 		{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3986F7B-AF76-43D1-A44F-303023A08CD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3986F7B-AF76-43D1-A44F-303023A08CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3986F7B-AF76-43D1-A44F-303023A08CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3986F7B-AF76-43D1-A44F-303023A08CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B255310-A2B7-437F-804F-6E1D8C940A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B255310-A2B7-437F-804F-6E1D8C940A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B255310-A2B7-437F-804F-6E1D8C940A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B255310-A2B7-437F-804F-6E1D8C940A17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -226,5 +244,8 @@ Global
 		{15461DBB-95AD-4CA7-AF41-E70F54860FE3} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{D95BC932-50F7-4014-970E-0C6E8400BE25} = {900DD210-8500-4D89-A05D-C9526935A719}
 		{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
+		{F3986F7B-AF76-43D1-A44F-303023A08CD3} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
+		{1B255310-A2B7-437F-804F-6E1D8C940A17} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 	EndGlobalSection
 EndGlobal
