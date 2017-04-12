@@ -14,6 +14,10 @@
  </PropertyGroup>
 
  <ItemGroup>
+   <Compile Include="..\Shared\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+ </ItemGroup>
+
+ <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
  </ItemGroup>
 
