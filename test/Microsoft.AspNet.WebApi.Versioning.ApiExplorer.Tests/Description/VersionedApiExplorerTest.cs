@@ -220,8 +220,6 @@
         public void api_descriptions_should_collate_expected_versions( HttpConfiguration configuration )
         {
             // arrange
-            var assembliesResolver = configuration.Services.GetAssembliesResolver();
-            var controllerTypes = configuration.Services.GetHttpControllerTypeResolver().GetControllerTypes( assembliesResolver );
             var apiExplorer = new VersionedApiExplorer( configuration );
 
             // act

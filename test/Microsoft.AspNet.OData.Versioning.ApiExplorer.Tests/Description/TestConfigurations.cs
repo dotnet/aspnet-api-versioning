@@ -1,0 +1,75 @@
+﻿namespace Microsoft.Web.Http.Description
+{
+    using Microsoft.Web.Http.Simulators.Configuration;
+    using Microsoft.Web.Http.Simulators.Models;
+    using Microsoft.Web.Http.Versioning.Conventions;
+    using Microsoft.Web.OData.Builder;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Web.Http;
+    using System.Web.Http.Dispatcher;
+
+    public class TestConfigurations : IEnumerable<object[]>
+    {
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            yield return new object[] { NewOrdersConfiguration() };
+            yield return new object[] { NewPeopleConfiguration() };
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public static HttpConfiguration NewOrdersConfiguration()
+        {
+            var configuration = new HttpConfiguration();
+            var controllerTypeResolver = new ControllerTypeCollection(
+                typeof( Simulators.V1.OrdersController ),
+                typeof( Simulators.V2.OrdersController ),
+                typeof( Simulators.V3.OrdersController ) );
+
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+            configuration.AddApiVersioning(
+                options =>
+                {
+                    options.Conventions.Controller<Simulators.V1.OrdersController>()
+                                       .HasApiVersion( 1, 0 )
+                                       .HasDeprecatedApiVersion( 0, 9 )
+                                       .Action( c => c.Post( default( Order ) ) ).MapToApiVersion( 1, 0 );
+                    options.Conventions.Controller<Simulators.V2.OrdersController>()
+                                       .HasApiVersion( 2, 0 );
+                    options.Conventions.Controller<Simulators.V3.OrdersController>()
+                                       .HasApiVersion( 3, 0 )
+                                       .AdvertisesApiVersion( 4, 0 );
+                } );
+            var builder = new VersionedODataModelBuilder( configuration )
+            {
+                ModelConfigurations = { new OrderModelConfiguration() }
+            };
+            var models = builder.GetEdmModels();
+
+            configuration.MapVersionedODataRoutes( "odata", "api", models );
+
+            return configuration;
+        }
+
+        public static HttpConfiguration NewPeopleConfiguration()
+        {
+            var configuration = new HttpConfiguration();
+            var controllerTypeResolver = new ControllerTypeCollection(
+               typeof( Simulators.V1.PeopleController ),
+               typeof( Simulators.V2.PeopleController ),
+               typeof( Simulators.V3.PeopleController ) );
+            var builder = new VersionedODataModelBuilder( configuration )
+            {
+                ModelConfigurations = { new PersonModelConfiguration() }
+            };
+            var models = builder.GetEdmModels();
+
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+            configuration.AddApiVersioning();
+            configuration.MapVersionedODataRoutes( "odata", "api/v{apiVersion}", models );
+
+            return configuration;
+        }
+    }
+}
