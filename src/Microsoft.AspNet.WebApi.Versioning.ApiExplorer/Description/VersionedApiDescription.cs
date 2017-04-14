@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Web.Http.Description;
@@ -48,6 +49,13 @@
                 setResponseDescription.Value( this, value );
             }
         }
+
+        /// <summary>
+        /// Gets arbitrary metadata properties associated with the API description.
+        /// </summary>
+        /// <value>A <see cref="IDictionary{TKey, TValue}">collection</see> of arbitrary metadata properties
+        /// associated with the <see cref="VersionedApiDescription">API description</see>.</value>
+        public IDictionary<object, object> Properties { get; } = new Dictionary<object, object>();
 
         static Action<ApiDescription, ResponseDescription> CreateSetResponseDescriptionMutator()
         {
