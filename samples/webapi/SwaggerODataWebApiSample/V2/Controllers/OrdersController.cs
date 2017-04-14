@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Examples.V2.Controllers
 {
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Description;
     using Models;
     using System;
     using System.Collections.Generic;
@@ -23,7 +24,7 @@
         /// <response code="200">The successfully retrieved orders.</response>
         [HttpGet]
         [ODataRoute]
-        [ResponseType( typeof( IEnumerable<Order> ) )]
+        [ResponseType( typeof( ODataValue<IEnumerable<Order>> ) )]
         public IHttpActionResult Get()
         {
             var orders = new[]

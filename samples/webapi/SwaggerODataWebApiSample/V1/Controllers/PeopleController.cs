@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Examples.V1.Controllers
 {
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Description;
     using Models;
     using System.Web.Http;
     using System.Web.Http.Description;

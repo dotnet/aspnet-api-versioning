@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Examples.Models
+﻿namespace Microsoft.Examples.Configuration
 {
     using Microsoft.Web.Http;
     using System;
