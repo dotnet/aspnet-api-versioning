@@ -128,19 +128,23 @@
   <ItemGroup>
     <Compile Include="CaseInsensitiveODataUriResolver.cs" />
     <Compile Include="ImplicitApiVersionParameter.cs" />
-    <Compile Include="Models\ApiVersions.cs" />
+    <Compile Include="Configuration\ApiVersions.cs" />
     <Compile Include="Configuration\OrderModelConfiguration.cs" />
     <Compile Include="Configuration\PersonModelConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="V1\OrdersController.cs" />
-    <Compile Include="V1\PeopleController.cs" />
-    <Compile Include="V2\OrdersController.cs" />
-    <Compile Include="V2\PeopleController.cs" />
-    <Compile Include="V3\OrdersController.cs" />
-    <Compile Include="V3\PeopleController.cs" />
-    <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\Person.cs" />
+    <Compile Include="V1\Models\Order.cs" />
+    <Compile Include="V1\Models\Person.cs" />
+    <Compile Include="V1\Controllers\OrdersController.cs" />
+    <Compile Include="V1\Controllers\PeopleController.cs" />
+    <Compile Include="V2\Models\Order.cs" />
+    <Compile Include="V2\Models\Person.cs" />
+    <Compile Include="V2\Controllers\OrdersController.cs" />
+    <Compile Include="V2\Controllers\PeopleController.cs" />
+    <Compile Include="V3\Models\Order.cs" />
+    <Compile Include="V3\Models\Person.cs" />
+    <Compile Include="V3\Controllers\OrdersController.cs" />
+    <Compile Include="V3\Controllers\PeopleController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj">
@@ -160,6 +164,7 @@
       <Name>Microsoft.AspNet.WebApi.Versioning</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

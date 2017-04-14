@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Examples.V3.Controllers
 {
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Description;
     using Models;
     using System;
     using System.Collections.Generic;
@@ -25,7 +26,7 @@
         /// <response code="400">The order is invalid.</response>
         [HttpGet]
         [ODataRoute]
-        [ResponseType( typeof( IEnumerable<Order> ) )]
+        [ResponseType( typeof( ODataValue<IEnumerable<Order>> ) )]
         public IHttpActionResult Get()
         {
             var orders = new[]
@@ -76,9 +77,10 @@
         /// Cancels an order.
         /// </summary>
         /// <param name="id">The order to cancel.</param>
+        /// <param name="suspendOnly">Indicates if the order should only be suspended.</param>
         /// <returns>None</returns>
         [HttpDelete]
         [ODataRoute( "({id})" )]
-        public IHttpActionResult Delete( int id ) => StatusCode( NoContent );
+        public IHttpActionResult Delete( int id, bool suspendOnly ) => StatusCode( NoContent );
     }
 }

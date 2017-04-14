@@ -1,6 +1,7 @@
-﻿namespace Microsoft.Examples.V2.Controllers
+﻿namespace Microsoft.Examples.V3.Controllers
 {
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Description;
     using Models;
     using System.Collections.Generic;
     using System.Web.Http;
@@ -11,7 +12,7 @@
     /// <summary>
     /// Represents a RESTful people service.
     /// </summary>
-    [ApiVersion( "2.0" )]
+    [ApiVersion( "3.0" )]
     [ODataRoutePrefix( "People" )]
     public class PeopleController : ODataController
     {
@@ -22,7 +23,7 @@
         /// <response code="200">The successfully retrieved people.</response>
         [HttpGet]
         [ODataRoute]
-        [ResponseType( typeof( IEnumerable<Person> ) )]
+        [ResponseType( typeof( ODataValue<IEnumerable<Person>> ) )]
         public IHttpActionResult Get()
         {
             var people = new[]
@@ -32,21 +33,24 @@
                     Id = 1,
                     FirstName = "John",
                     LastName = "Doe",
-                    Email = "john.doe@somewhere.com"
+                    Email = "john.doe@somewhere.com",
+                    Phone = "555-987-1234"
                 },
                 new Person()
                 {
                     Id = 2,
                     FirstName = "Bob",
                     LastName = "Smith",
-                    Email = "bob.smith@somewhere.com"
+                    Email = "bob.smith@somewhere.com",
+                    Phone = "555-654-4321"
                 },
                 new Person()
                 {
                     Id = 3,
                     FirstName = "Jane",
                     LastName = "Doe",
-                    Email = "jane.doe@somewhere.com"
+                    Email = "jane.doe@somewhere.com",
+                    Phone = "555-789-3456"
                 }
             };
 
@@ -65,12 +69,35 @@
         [ResponseType( typeof( Person ) )]
         public IHttpActionResult Get( int id ) =>
             Ok( new Person()
-                {
-                    Id = id,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Email = "john.doe@somewhere.com"
-                }
+            {
+                Id = id,
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@somewhere.com",
+                Phone = "555-987-1234"
+            }
             );
+
+        /// <summary>
+        /// Creates a new person.
+        /// </summary>
+        /// <param name="person">The person to create.</param>
+        /// <returns>The created person.</returns>
+        /// <response code="201">The person was successfully created.</response>
+        /// <response code="400">The person was invalid.</response>
+        [HttpPost]
+        [ODataRoute]
+        [ResponseType( typeof( Person ) )]
+        public IHttpActionResult Post( [FromBody] Person person )
+        {
+            if ( !ModelState.IsValid )
+            {
+                return BadRequest( ModelState );
+            }
+
+            person.Id = 42;
+
+            return Created( person );
+        }
     }
 }
