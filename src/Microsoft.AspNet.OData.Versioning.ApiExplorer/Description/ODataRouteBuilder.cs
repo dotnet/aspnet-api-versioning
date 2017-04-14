@@ -1,65 +1,238 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Web.Http.Controllers;
-    using System.Web.Http.Routing;
+    using System.Text;
+    using System.Web.Http.Description;
+    using System.Web.OData;
+    using System.Web.OData.Query;
     using System.Web.OData.Routing;
     using static System.Linq.Enumerable;
     using static System.String;
+    using static System.StringComparison;
+    using static System.Web.Http.Description.ApiParameterSource;
 
     sealed class ODataRouteBuilder
     {
-        readonly string routeTemplate;
-        readonly IHttpRoute route;
-        readonly HttpActionDescriptor actionDescriptor;
-
-        internal ODataRouteBuilder( string routeTemplate, IHttpRoute route, HttpActionDescriptor actionDescriptor )
+        static readonly Type GeographyType = typeof( Spatial.Geography );
+        static readonly Type GeometryType = typeof( Spatial.Geometry );
+        static readonly Dictionary<Type, string> quotedTypes = new Dictionary<Type, string>()
         {
-            Contract.Requires( !IsNullOrEmpty( routeTemplate ) );
-            Contract.Requires( route != null );
-            Contract.Requires( actionDescriptor != null );
+            [typeof( string )] = "",
+            [typeof( TimeSpan )] = "duration",
+            [typeof( byte[] )] = "binary"
+        };
 
-            this.routeTemplate = routeTemplate;
-            this.route = route;
-            this.actionDescriptor = actionDescriptor;
+        internal ODataRouteBuilder( ODataRouteBuilderContext context )
+        {
+            Contract.Requires( context != null );
+            Context = context;
         }
 
         internal string Build()
         {
-            if ( !( route is ODataRoute odataRoute ) )
-            {
-                return routeTemplate;
-            }
+            var builder = new StringBuilder();
+
+            BuildPath( builder );
+            BuildQuery( builder );
+
+            return builder.ToString();
+        }
+
+        ODataRouteBuilderContext Context { get; }
+
+        void BuildPath( StringBuilder builder )
+        {
+            Contract.Requires( builder != null );
 
             var segments = new List<string>();
-            var prefix = odataRoute.RoutePrefix?.Trim( '/' );
+            var prefix = Context.Route.RoutePrefix?.Trim( '/' );
 
             if ( !IsNullOrEmpty( prefix ) )
             {
                 segments.Add( prefix );
             }
 
-            var controllerDescriptor = actionDescriptor.ControllerDescriptor;
-            var path = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>().FirstOrDefault()?.Prefix?.Trim( '/' );
+            var path = GetEntitySetSegment() + GetEntityKeySegment();
 
-            if ( IsNullOrEmpty( path ) )
+            segments.Add( path );
+            builder.Append( Join( "/", segments ) );
+        }
+
+        void BuildQuery( StringBuilder builder )
+        {
+            Contract.Requires( builder != null );
+
+            var queryParameters = FilterQueryParameters( Context.ParameterDescriptions );
+
+            if ( queryParameters.Count == 0 )
             {
-                path = controllerDescriptor.ControllerName;
+                return;
             }
 
-            var template = actionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault()?.PathTemplate;
+            var queryString = new StringBuilder();
+
+            using ( var iterator = queryParameters.GetEnumerator() )
+            {
+                iterator.MoveNext();
+                var name = iterator.Current.Name;
+
+                queryString.Append( name );
+                queryString.Append( "={" );
+                queryString.Append( name );
+                queryString.Append( '}' );
+
+                while ( iterator.MoveNext() )
+                {
+                    name = iterator.Current.Name;
+                    queryString.Append( '&' );
+                    queryString.Append( name );
+                    queryString.Append( "={" );
+                    queryString.Append( name );
+                    queryString.Append( '}' );
+                }
+            }
+
+            if ( queryString.Length > 0 )
+            {
+                builder.Append( '?' );
+                builder.Append( queryString );
+            }
+        }
+
+        string GetEntitySetSegment()
+        {
+            var controllerDescriptor = Context.ActionDescriptor.ControllerDescriptor;
+            var prefix = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>().FirstOrDefault()?.Prefix?.Trim( '/' );
+            return IsNullOrEmpty( prefix ) ? controllerDescriptor.ControllerName : prefix;
+        }
+
+        string GetEntityKeySegment()
+        {
+            var template = Context.ActionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault()?.PathTemplate;
 
             if ( !IsNullOrEmpty( template ) )
             {
-                path += template;
+                return template;
             }
 
-            segments.Add( path );
+            var keys = Context.EntityKeys.Where( key => Context.ParameterDescriptions.Any( p => key.Name.Equals( p.Name, OrdinalIgnoreCase ) ) );
+            var convention = new StringBuilder();
 
-            return Join( "/", segments );
+            using ( var iterator = keys.GetEnumerator() )
+            {
+                if ( iterator.MoveNext() )
+                {
+                    convention.Append( '(' );
+
+                    var key = iterator.Current;
+
+                    if ( iterator.MoveNext() )
+                    {
+                        convention.Append( key.Name );
+                        convention.Append( '=' );
+                        ExpandParameterTemplate( convention, key );
+
+                        while ( iterator.MoveNext() )
+                        {
+                            convention.Append( ',' );
+                            convention.Append( key.Name );
+                            convention.Append( '=' );
+                            ExpandParameterTemplate( convention, key );
+                        }
+                    }
+                    else
+                    {
+                        ExpandParameterTemplate( convention, key );
+                    }
+
+                    convention.Append( ')' );
+                }
+            }
+
+            return convention.ToString();
+        }
+
+        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key )
+        {
+            Contract.Requires( template != null );
+            Contract.Requires( key != null );
+
+            var name = key.Name;
+            var typeDef = key.Type.Definition;
+
+            template.Append( "{" );
+            template.Append( name );
+            template.Append( "}" );
+
+            if ( typeDef.TypeKind == EdmTypeKind.Enum )
+            {
+                template.Insert( 0, '\'' );
+
+                if ( !Context.AllowUnqualifiedEnum )
+                {
+                    template.Insert( 0, key.Type.FullName() );
+                }
+
+                template.Append( '\'' );
+                return;
+            }
+
+            var type = typeDef.GetClrType( Context.AssembliesResolver );
+
+            if ( quotedTypes.TryGetValue( type, out var prefix ) )
+            {
+                template.Insert( 0, '\'' );
+                template.Insert( 0, prefix );
+                template.Append( '\'' );
+            }
+            else if ( GeographyType.IsAssignableFrom( type ) )
+            {
+                template.Insert( 0, "geography'" );
+                template.Append( '\'' );
+            }
+            else if ( GeometryType.IsAssignableFrom( type ) )
+            {
+                template.Insert( 0, "geometry'" );
+                template.Append( '\'' );
+            }
+        }
+
+        IReadOnlyList<ApiParameterDescription> FilterQueryParameters( IReadOnlyList<ApiParameterDescription> parameterDescriptions )
+        {
+            Contract.Requires( parameterDescriptions != null );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ApiParameterDescription>>() != null );
+
+            var queryParameters = new List<ApiParameterDescription>();
+            var queryOptions = typeof( ODataQueryOptions );
+            var actionParameters = typeof( ODataActionParameters );
+
+            foreach ( var parameter in parameterDescriptions )
+            {
+                if ( parameter.Source != FromUri )
+                {
+                    continue;
+                }
+
+                var parameterType = parameter.ParameterDescriptor?.ParameterType;
+
+                if ( parameterType == null ||
+                     queryOptions.IsAssignableFrom( parameterType ) ||
+                     actionParameters.IsAssignableFrom( parameterType ) )
+                {
+                    continue;
+                }
+
+                if ( !Context.EntityKeys.Any( key => key.Name.Equals( parameter.Name, OrdinalIgnoreCase ) ) )
+                {
+                    queryParameters.Add( parameter );
+                }
+            }
+
+            return queryParameters;
         }
     }
 }

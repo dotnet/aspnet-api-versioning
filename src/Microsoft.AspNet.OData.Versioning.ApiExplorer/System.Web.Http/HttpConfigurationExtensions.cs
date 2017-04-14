@@ -1,15 +1,20 @@
 ﻿namespace System.Web.Http
 {
     using Microsoft;
+    using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
+    using System.Collections.Concurrent;
     using System.Diagnostics.Contracts;
     using System.Web.Http.Description;
+    using System.Web.Http.Routing;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
     /// </summary>
     public static class HttpConfigurationExtensions
     {
+        const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
+
         /// <summary>
         /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.
         /// </summary>
@@ -36,6 +41,23 @@
             var apiExplorer = new ODataApiExplorer( configuration ) { UseApiExplorerSettings = useApiExplorerSettings };
             configuration.Services.Replace( typeof( IApiExplorer ), apiExplorer );
             return apiExplorer;
+        }
+
+        internal static IServiceProvider GetODataRootContainer( this HttpConfiguration configuration, IHttpRoute route )
+        {
+            Contract.Requires( configuration != null );
+            Contract.Requires( route != null );
+            Contract.Ensures( Contract.Result<IServiceProvider>() != null );
+
+            var containers = (ConcurrentDictionary<string, IServiceProvider>) configuration.Properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
+            var routeName = configuration.Routes.GetRouteName( route );
+
+            if ( containers.TryGetValue( routeName, out var serviceProvider ) )
+            {
+                return serviceProvider;
+            }
+
+            throw new InvalidOperationException( SR.NullContainer );
         }
     }
 }

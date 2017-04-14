@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections.Generic;
@@ -230,19 +232,19 @@
 
             if ( parameterBinding.WillReadBody )
             {
-                description.Source = ApiParameterSource.FromBody;
+                description.Source = FromBody;
                 return description;
             }
 
             if ( WillReadUri( parameterBinding ) )
             {
-                description.Source = ApiParameterSource.FromUri;
+                description.Source = FromUri;
             }
 
             return description;
         }
 
-        IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route )
+        IReadOnlyList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route )
         {
             Contract.Requires( actionDescriptor != null );
             Contract.Requires( route != null );
@@ -292,7 +294,7 @@
 
         void PopulateMediaTypeFormatters(
            HttpActionDescriptor actionDescriptor,
-           IList<ApiParameterDescription> parameterDescriptions,
+           IReadOnlyList<ApiParameterDescription> parameterDescriptions,
            IHttpRoute route,
            Type responseType,
            IList<MediaTypeFormatter> requestFormatters,
@@ -331,11 +333,18 @@
 
         void PopulateActionDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route, string localPath, Collection<VersionedApiDescription> apiDescriptions, ApiVersion apiVersion )
         {
-            var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
             var parameterDescriptions = CreateParameterDescriptions( actionDescriptor, route );
+            var context = new ODataRouteBuilderContext( Configuration, localPath, (ODataRoute) route, actionDescriptor, parameterDescriptions );
+
+            if ( context.EdmModel.EntityContainer == null )
+            {
+                return;
+            }
+
+            var relativePath = new ODataRouteBuilder( context ).Build();
+            var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
             var responseDescription = CreateResponseDescription( actionDescriptor );
             var responseType = responseDescription.ResponseType ?? responseDescription.DeclaredType;
-            var relativePath = new ODataRouteBuilder( localPath, route, actionDescriptor ).Build();
             var requestFormatters = new List<MediaTypeFormatter>();
             var responseFormatters = new List<MediaTypeFormatter>();
             var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
@@ -354,7 +363,11 @@
                     Route = route,
                     ResponseDescription = responseDescription,
                     ApiVersion = apiVersion,
-                    IsDeprecated = deprecated
+                    IsDeprecated = deprecated,
+                    Properties =
+                    {
+                        [typeof( IEdmModel )] = context.EdmModel
+                    }
                 };
 
                 apiDescription.ParameterDescriptions.AddRange( parameterDescriptions );
