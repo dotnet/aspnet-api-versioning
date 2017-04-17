@@ -18,9 +18,20 @@
         public virtual HttpResponseMessage CreateResponse( ErrorResponseContext context )
         {
             Arg.NotNull( context, nameof( context ) );
+            return context.Request.CreateErrorResponse( context.StatusCode, CreateErrorContent( context ) );
+        }
 
-            var error = IsODataRequest( context ) ? CreateODataError( context ) : CreateWebApiError( context );
-            return context.Request.CreateErrorResponse( context.StatusCode, error );
+        /// <summary>
+        /// Creates the default error content using the given context.
+        /// </summary>
+        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to create the error content.</param>
+        /// <returns>A <see cref="HttpError">HTTP error</see> representing the error content.</returns>
+        protected virtual HttpError CreateErrorContent( ErrorResponseContext context )
+        {
+            Arg.NotNull( context, nameof( context ) );
+            Contract.Ensures( Contract.Result<HttpError>() != null );
+
+            return IsODataRequest( context ) ? CreateODataError( context ) : CreateWebApiError( context );
         }
 
         static bool IsODataRequest( ErrorResponseContext context )

@@ -15,7 +15,7 @@
         /// <summary>
         /// Creates and returns a new error response given the provided context.
         /// </summary>
-        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate response.</param>
+        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate the response.</param>
         /// <returns>The generated <see cref="IActionResult">response</see>.</returns>
         public virtual IActionResult CreateResponse( ErrorResponseContext context )
         {
@@ -23,13 +23,20 @@
             return new ObjectResult( CreateErrorContent( context ) ) { StatusCode = context.StatusCode };
         }
 
-        static object CreateErrorContent( ErrorResponseContext context )
+        /// <summary>
+        /// Creates the default error content using the given context.
+        /// </summary>
+        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to create the error content.</param>
+        /// <returns>A <see cref="IDictionary{TKey, TValue}">collection</see> of <see cref="KeyValuePair{TKey, TValue}">key/value pairs</see>
+        /// representing the error content.</returns>
+        protected virtual IDictionary<string, object> CreateErrorContent( ErrorResponseContext context )
         {
-            Contract.Requires( context != null );
-            Contract.Ensures( Contract.Result<object>() != null );
+            Arg.NotNull( context, nameof( context ) );
+            Contract.Ensures( Contract.Result<IDictionary<string, object>>() != null );
 
-            var error = new Dictionary<string, object>();
-            var root = new Dictionary<string, object>() { ["Error"] = error };
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            var error = new Dictionary<string, object>( comparer );
+            var root = new Dictionary<string, object>( comparer ) { ["Error"] = error };
 
             if ( !IsNullOrEmpty( context.ErrorCode ) )
             {
@@ -47,7 +54,7 @@
 
                 if ( environment?.IsDevelopment() == true )
                 {
-                    error["InnerError"] = new Dictionary<string, object>() { ["Message"] = context.MessageDetail };
+                    error["InnerError"] = new Dictionary<string, object>( comparer ) { ["Message"] = context.MessageDetail };
                 }
             }
 
