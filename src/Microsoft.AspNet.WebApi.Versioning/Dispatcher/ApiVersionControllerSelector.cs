@@ -14,6 +14,7 @@
     using Versioning;
     using static Controllers.HttpControllerDescriptorComparer;
     using static System.StringComparer;
+    using static Versioning.ErrorCodes;
 
     /// <summary>
     /// Represents the logic for selecting a versioned controller.
@@ -164,8 +165,7 @@
             catch ( AmbiguousApiVersionException ex )
             {
                 var options = request.GetApiVersioningOptions();
-                var context = new ErrorResponseContext( request, "AmbiguousApiVersion", ex.Message, messageDetail: null );
-                throw new HttpResponseException( options.ErrorResponses.BadRequest( context ) );
+                throw new HttpResponseException( options.ErrorResponses.BadRequest( request, AmbiguousApiVersion, ex.Message ) );
             }
         }
     }

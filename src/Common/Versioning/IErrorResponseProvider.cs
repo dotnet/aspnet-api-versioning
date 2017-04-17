@@ -20,17 +20,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     public interface IErrorResponseProvider
     {
         /// <summary>
-        /// Creates and returns a new HTTP 400 (Bad Request) given the provided context.
+        /// Creates and returns a new error response given the provided context.
         /// </summary>
         /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate response.</param>
         /// <returns>The generated <see cref="IActionResult">response</see>.</returns>
-        IActionResult BadRequest( ErrorResponseContext context );
-
-        /// <summary>
-        /// Creates and returns a new HTTP 405 (Method Not Allowed) given the provided context.
-        /// </summary>
-        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate response.</param>
-        /// <returns>The generated <see cref="IActionResult">response</see>.</returns>
-        IActionResult MethodNotAllowed( ErrorResponseContext context );
+        IActionResult CreateResponse( ErrorResponseContext context );
     }
 }

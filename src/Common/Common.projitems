@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\IApiVersionConventionT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\CurrentImplementationApiVersionSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\DefaultApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ErrorCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ErrorResponseContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\HeaderApiVersionReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionNeutral.cs" />

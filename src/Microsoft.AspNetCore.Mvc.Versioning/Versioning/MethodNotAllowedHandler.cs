@@ -19,8 +19,7 @@
 
         protected override IActionResult CreateResult( HttpContext context )
         {
-            var errorContext = new ErrorResponseContext( context.Request, Code, Message, messageDetail: null );
-            var result = Options.ErrorResponses.MethodNotAllowed( errorContext );
+            var result = Options.ErrorResponses.MethodNotAllowed( context, Code, Message );
             return allowedMethods.Length == 0 ? result : new AllowHeaderResult( result, allowedMethods );
         }
 
