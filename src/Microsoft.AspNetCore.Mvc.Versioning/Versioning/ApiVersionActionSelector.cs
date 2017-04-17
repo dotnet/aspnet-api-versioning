@@ -16,6 +16,7 @@
     using static ApiVersion;
     using static System.Environment;
     using static System.String;
+    using static ErrorCodes;
 
     /// <summary>
     /// Represents the logic for selecting an API-versioned, action method.
@@ -192,7 +193,7 @@
             {
                 logger.LogInformation( ex.Message );
                 apiVersion = default( ApiVersion );
-                return new BadRequestHandler( Options, "AmbiguousApiVersion", ex.Message );
+                return new BadRequestHandler( Options, AmbiguousApiVersion, ex.Message );
             }
 
             return null;
@@ -224,13 +225,13 @@
 
                 if ( IsNullOrEmpty( requestedVersion ) )
                 {
-                    code = "ApiVersionUnspecified";
+                    code = ApiVersionUnspecified;
                     logger.ApiVersionUnspecified( actionNames.Value );
                     return new BadRequestHandler( Options, code, SR.ApiVersionUnspecified );
                 }
                 else if ( TryParse( requestedVersion, out parsedVersion ) )
                 {
-                    code = "UnsupportedApiVersion";
+                    code = UnsupportedApiVersion;
                     logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
 
                     if ( allowedMethods.Value.Contains( context.HttpContext.Request.Method ) )
@@ -244,7 +245,7 @@
                 }
                 else
                 {
-                    code = "InvalidApiVersion";
+                    code = InvalidApiVersion;
                     logger.ApiVersionInvalid( requestedVersion );
                     newRequestHandler = ( o, c, m ) => new BadRequestHandler( o, c, m );
                 }
@@ -252,7 +253,7 @@
             else
             {
                 requestedVersion = parsedVersion.ToString();
-                code = "UnsupportedApiVersion";
+                code = UnsupportedApiVersion;
                 logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
 
                 if ( allowedMethods.Value.Contains( context.HttpContext.Request.Method ) )

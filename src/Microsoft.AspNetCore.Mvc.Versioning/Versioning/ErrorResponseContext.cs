@@ -12,16 +12,18 @@
         /// Initializes a new instance of the <see cref="ErrorResponseContext"/> class.
         /// </summary>
         /// <param name="request">The current <see cref="HttpRequest">HTTP request</see>.</param>
-        /// <param name="code">The associated error code.</param>
+        /// <param name="statusCode">The associated HTTP status code.</param>
+        /// <param name="errorCode">The associated error code.</param>
         /// <param name="message">The error message.</param>
         /// <param name="messageDetail">The detailed error message, if any.</param>
         [CLSCompliant( false )]
-        public ErrorResponseContext( HttpRequest request, string code, string message, string messageDetail )
+        public ErrorResponseContext( HttpRequest request, int statusCode, string errorCode, string message, string messageDetail )
         {
             Arg.NotNull( request, nameof( request ) );
 
             Request = request;
-            Code = code;
+            StatusCode = statusCode;
+            ErrorCode = errorCode;
             Message = message;
             MessageDetail = messageDetail;
         }

@@ -12,6 +12,7 @@
     using static ApiVersion;
     using static System.Net.HttpStatusCode;
     using static System.String;
+    using static Versioning.ErrorCodes;
 
     sealed class HttpResponseExceptionFactory
     {
@@ -69,7 +70,6 @@
         {
             var requestedVersion = request.ApiVersionProperties().RawApiVersion;
             var message = default( string );
-            var context = default( ErrorResponseContext );
 
             if ( IsNullOrEmpty( requestedVersion ) )
             {
@@ -80,8 +80,7 @@
 
                 message = SR.ApiVersionUnspecified;
                 TraceWriter.Info( request, ControllerSelectorCategory, message );
-                context = new ErrorResponseContext( request, "ApiVersionUnspecified", message, messageDetail: null );
-                return Options.ErrorResponses.BadRequest( context );
+                return Options.ErrorResponses.BadRequest( request, ApiVersionUnspecified, message );
             }
             else if ( TryParse( requestedVersion, out var parsedVersion ) )
             {
@@ -90,11 +89,10 @@
 
             message = SR.VersionedResourceNotSupported.FormatDefault( request.RequestUri, requestedVersion );
             var messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( request.RequestUri, requestedVersion );
-            context = new ErrorResponseContext( request, "InvalidApiVersion", message, messageDetail );
 
             TraceWriter.Info( request, ControllerSelectorCategory, message );
 
-            return Options.ErrorResponses.BadRequest( context );
+            return Options.ErrorResponses.BadRequest( request, InvalidApiVersion, message, messageDetail );
         }
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
@@ -105,11 +103,10 @@
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( request.RequestUri, requestedVersion );
             var messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( request.RequestUri, requestedVersion );
-            var context = new ErrorResponseContext( request, "UnsupportedApiVersion", message, messageDetail );
 
             TraceWriter.Info( request, ControllerSelectorCategory, message );
 
-            return Options.ErrorResponses.BadRequest( context );
+            return Options.ErrorResponses.BadRequest( request, UnsupportedApiVersion, message, messageDetail );
         }
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
@@ -141,10 +138,7 @@
             }
 
             TraceWriter.Info( request, ControllerSelectorCategory, message );
-
-            var context = new ErrorResponseContext( request, "UnsupportedApiVersion", message, messageDetail );
-
-            response = Options.ErrorResponses.MethodNotAllowed( context );
+            response = Options.ErrorResponses.MethodNotAllowed( request, UnsupportedApiVersion, message, messageDetail );
 
             if ( response.Content == null )
             {

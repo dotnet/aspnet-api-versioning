@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using static Http.StatusCodes;
     using static System.String;
 
     /// <summary>
@@ -14,38 +13,34 @@
     public class DefaultErrorResponseProvider : IErrorResponseProvider
     {
         /// <summary>
-        /// Creates and returns a new HTTP 400 (Bad Request) given the provided context.
+        /// Creates and returns a new error response given the provided context.
         /// </summary>
-        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate response.</param>
+        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate the response.</param>
         /// <returns>The generated <see cref="IActionResult">response</see>.</returns>
-        public virtual IActionResult BadRequest( ErrorResponseContext context )
+        public virtual IActionResult CreateResponse( ErrorResponseContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-            return new BadRequestObjectResult( CreateErrorContent( context ) );
+            return new ObjectResult( CreateErrorContent( context ) ) { StatusCode = context.StatusCode };
         }
 
         /// <summary>
-        /// Creates and returns a new HTTP 405 (Method Not Allowed) given the provided context.
+        /// Creates the default error content using the given context.
         /// </summary>
-        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to generate response.</param>
-        /// <returns>The generated <see cref="IActionResult">response</see>.</returns>
-        public virtual IActionResult MethodNotAllowed( ErrorResponseContext context )
+        /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to create the error content.</param>
+        /// <returns>A <see cref="IDictionary{TKey, TValue}">collection</see> of <see cref="KeyValuePair{TKey, TValue}">key/value pairs</see>
+        /// representing the error content.</returns>
+        protected virtual IDictionary<string, object> CreateErrorContent( ErrorResponseContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-            return new ObjectResult( CreateErrorContent( context ) ) { StatusCode = Status405MethodNotAllowed };
-        }
+            Contract.Ensures( Contract.Result<IDictionary<string, object>>() != null );
 
-        static object CreateErrorContent( ErrorResponseContext context )
-        {
-            Contract.Requires( context != null );
-            Contract.Ensures( Contract.Result<object>() != null );
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            var error = new Dictionary<string, object>( comparer );
+            var root = new Dictionary<string, object>( comparer ) { ["Error"] = error };
 
-            var error = new Dictionary<string, object>();
-            var root = new Dictionary<string, object>() { ["Error"] = error };
-
-            if ( !IsNullOrEmpty( context.Code ) )
+            if ( !IsNullOrEmpty( context.ErrorCode ) )
             {
-                error["Code"] = context.Code;
+                error["Code"] = context.ErrorCode;
             }
 
             if ( !IsNullOrEmpty( context.Message ) )
@@ -59,7 +54,7 @@
 
                 if ( environment?.IsDevelopment() == true )
                 {
-                    error["InnerError"] = new Dictionary<string, object>() { ["Message"] = context.MessageDetail };
+                    error["InnerError"] = new Dictionary<string, object>( comparer ) { ["Message"] = context.MessageDetail };
                 }
             }
 
