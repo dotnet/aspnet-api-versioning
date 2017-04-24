@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
@@ -74,11 +74,11 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Test.Common", "test\Test.Co
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Acceptance.Test.Shared", "test\Acceptance.Test.Shared\Acceptance.Test.Shared.shproj", "{6CDFB878-2642-4F98-AE35-621BAC581181}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByNamespaceSample", "samples\aspnetcore\ByNamespaceSample\ByNamespaceSample.csproj", "{83B21A5B-0779-4391-9700-58AEFEBFA615}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByNamespaceSample", "samples\aspnetcore\ByNamespaceSample\ByNamespaceSample.csproj", "{83B21A5B-0779-4391-9700-58AEFEBFA615}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer", "src\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj", "{91E1F0B5-905D-446C-A2DD-4C1EDABFAF6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer", "src\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj", "{91E1F0B5-905D-446C-A2DD-4C1EDABFAF6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests.csproj", "{19A2C130-46B4-4CA3-B655-B7547BC414AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests.csproj", "{19A2C130-46B4-4CA3-B655-B7547BC414AC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer", "src\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.csproj", "{F7784C3A-5569-4590-AE28-B721C0426045}"
 EndProject
@@ -90,9 +90,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerWebApiSample", "samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerODataWebApiSample", "samples\webapi\SwaggerODataWebApiSample\SwaggerODataWebApiSample.csproj", "{F3986F7B-AF76-43D1-A44F-303023A08CD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer", "src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj", "{1B255310-A2B7-437F-804F-6E1D8C940A17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer", "src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj", "{1B255310-A2B7-437F-804F-6E1D8C940A17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests.csproj", "{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests.csproj", "{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerSampleHeader", "samples\aspnetcore\SwaggerSampleHeader\SwaggerSampleHeader.csproj", "{EF7A7C26-D5F1-4911-AB2F-8A7AB7981BB3}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -210,6 +212,10 @@ Global
 		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF7A7C26-D5F1-4911-AB2F-8A7AB7981BB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF7A7C26-D5F1-4911-AB2F-8A7AB7981BB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF7A7C26-D5F1-4911-AB2F-8A7AB7981BB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF7A7C26-D5F1-4911-AB2F-8A7AB7981BB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -247,5 +253,6 @@ Global
 		{F3986F7B-AF76-43D1-A44F-303023A08CD3} = {F446ED94-368F-4F67-913B-16E82CA80DFC}
 		{1B255310-A2B7-437F-804F-6E1D8C940A17} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{EF7A7C26-D5F1-4911-AB2F-8A7AB7981BB3} = {900DD210-8500-4D89-A05D-C9526935A719}
 	EndGlobalSection
 EndGlobal
