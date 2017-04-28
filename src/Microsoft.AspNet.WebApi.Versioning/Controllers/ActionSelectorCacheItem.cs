@@ -377,8 +377,9 @@
                 foreach ( var candidate in candidatesFound )
                 {
                     var descriptor = candidate.ActionDescriptor;
+                    var candidateControllerDescriptor = Decorator.GetInner( descriptor.ControllerDescriptor );
 
-                    if ( descriptor.ControllerDescriptor == controllerDescriptor && IsSubset( actionParameterNames[descriptor], candidate.CombinedParameterNames ) )
+                    if ( candidateControllerDescriptor == controllerDescriptor && IsSubset( actionParameterNames[descriptor], candidate.CombinedParameterNames ) )
                     {
                         matches.Add( candidate );
                     }
