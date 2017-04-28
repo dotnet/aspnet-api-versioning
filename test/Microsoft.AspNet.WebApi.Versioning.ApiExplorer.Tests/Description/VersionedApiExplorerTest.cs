@@ -356,21 +356,24 @@
                         ID = $"GET{relativePaths[0]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[0],
-                        Version = apiVersion
+                        Version = apiVersion,
+                        ActionDescriptor = new { ActionName = "GetV3" }
                     },
                     new
                     {
                         ID = $"GET{relativePaths[1]}",
                         HttpMethod = Get,
                         RelativePath = relativePaths[1],
-                        Version = apiVersion
+                        Version = apiVersion,
+                        ActionDescriptor = new { ActionName = "Get" }
                     },
                     new
                     {
                         ID = $"POST{relativePaths[2]}",
                         HttpMethod = Post,
                         RelativePath = relativePaths[2],
-                        Version = apiVersion
+                        Version = apiVersion,
+                        ActionDescriptor = new { ActionName = "Post" }
                     }
                 },
                 options => options.ExcludingMissingMembers() );
