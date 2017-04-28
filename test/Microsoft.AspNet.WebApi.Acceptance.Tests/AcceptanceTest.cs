@@ -6,6 +6,7 @@
     using System.Net.Http.Headers;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
+    using System.Web.Http.Tracing;
     using Xunit;
     using static System.String;
     using static System.Web.Http.IncludeErrorDetailPolicy;
@@ -17,6 +18,7 @@
         {
             Configuration.IncludeErrorDetailPolicy = Always;
             Configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), FilteredControllerTypes );
+            Configuration.Services.Replace( typeof( ITraceWriter ), new TraceWriter() );
             Server = new HttpServer( Configuration );
             Client = new HttpClient( new HttpSimulatorHandler( Server ) )
             {

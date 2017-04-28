@@ -3,10 +3,13 @@
     using Microsoft.Web.Http.Versioning.Conventions;
     using Models;
     using Simulators;
+    using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
+    using System.Web.Http.Tracing;
     using static System.Web.Http.RouteParameter;
 
     public class TestConfigurations : IEnumerable<object[]>
@@ -28,6 +31,7 @@
                 typeof( Values3Controller ) );
 
             configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+            configuration.Services.Replace( typeof( ITraceWriter ), new TraceWriter() );
             configuration.Routes.MapHttpRoute( "Default", "{controller}/{id}", new { id = Optional } );
             configuration.AddApiVersioning(
                 options =>
@@ -57,10 +61,16 @@
                 typeof( AttributeValues3Controller ) );
 
             configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+            configuration.Services.Replace( typeof( ITraceWriter ), new TraceWriter() );
             configuration.MapHttpAttributeRoutes();
             configuration.AddApiVersioning();
 
             return configuration;
+        }
+
+        sealed class TraceWriter : ITraceWriter
+        {
+            public void Trace( HttpRequestMessage request, string category, TraceLevel level, Action<TraceRecord> traceAction ) { }
         }
     }
 }
