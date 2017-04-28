@@ -38,6 +38,7 @@
                                        .HasApiVersion( 2, 0 )
                                        .HasDeprecatedApiVersion( 3, 0, "beta" )
                                        .HasApiVersion( 3, 0 )
+                                       .Action( c => c.GetV3() ).MapToApiVersion( 3, 0 )
                                        .Action( c => c.Post( default( ClassWithId ) ) ).MapToApiVersion( 3, 0 );
                     options.Conventions.Controller<Values3Controller>()
                                        .HasApiVersion( 4, 0 )

@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.Web.Http.Description.Simulators
 {
     using Microsoft.Web.Http.Description.Models;
+    using System;
+    using System.Web.Http.Description;
     using System.Web.Http;
 
     [ApiVersion( "2.0" )]
@@ -10,7 +12,12 @@
     public class AttributeValues2Controller : ApiController
     {
         [Route]
-        public IHttpActionResult Get() => Ok();
+        public string Get() => "Test";
+
+        [Route]
+        [MapToApiVersion( "3.0" )]
+        [ResponseType( typeof( string ) )]
+        public IHttpActionResult GetV3() => Ok( "Test" );
 
         [Route( "{id:int}" )]
         public IHttpActionResult Get( int id ) => Ok();

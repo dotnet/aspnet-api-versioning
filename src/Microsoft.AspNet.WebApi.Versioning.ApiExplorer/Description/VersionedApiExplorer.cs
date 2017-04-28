@@ -268,17 +268,31 @@
 
                     // Remove ApiDescription that will lead to ambiguous action matching.
                     // E.g. a controller with Post() and PostComment(). When the route template is {controller}, it produces POST /controller and POST /controller.
-                    descriptionsFromRoute = RemoveInvalidApiDescriptions( descriptionsFromRoute );
+                    descriptionsFromRoute = RemoveInvalidApiDescriptions( descriptionsFromRoute, apiVersion );
 
                     foreach ( var description in descriptionsFromRoute )
                     {
                         // Do not add the description if the previous route has a matching description with the same HTTP method and relative path.
                         // E.g. having two routes with the templates "api/Values/{id}" and "api/{controller}/{id}" can potentially produce the same
                         // relative path "api/Values/{id}" but only the first one matters.
-                        if ( !apiDescriptionGroup.ApiDescriptions.Contains( description, Comparer ) )
+
+                        var index = apiDescriptionGroup.ApiDescriptions.IndexOf( description, Comparer );
+
+                        if ( index < 0 )
                         {
                             description.GroupName = apiDescriptionGroup.Name;
                             apiDescriptionGroup.ApiDescriptions.Add( description );
+                        }
+                        else
+                        {
+                            var model = description.ActionDescriptor.GetApiVersionModel();
+                            var overrideImplicitlyMappedApiDescription = model.DeclaredApiVersions.Contains( apiVersion );
+
+                            if ( overrideImplicitlyMappedApiDescription )
+                            {
+                                description.GroupName = apiDescriptionGroup.Name;
+                                apiDescriptionGroup.ApiDescriptions[index] = description;
+                            }
                         }
                     }
 
@@ -969,41 +983,34 @@
             return parameterDescription;
         }
 
-        static Collection<VersionedApiDescription> RemoveInvalidApiDescriptions( Collection<VersionedApiDescription> apiDescriptions )
+        static Collection<VersionedApiDescription> RemoveInvalidApiDescriptions( Collection<VersionedApiDescription> apiDescriptions, ApiVersion apiVersion )
         {
             Contract.Requires( apiDescriptions != null );
+            Contract.Requires( apiVersion != null );
             Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
 
-            var duplicateApiDescriptionIds = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
-            var visitedApiDescriptionIds = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+            var filteredDescriptions = new Dictionary<string, VersionedApiDescription>( StringComparer.OrdinalIgnoreCase );
 
             foreach ( var description in apiDescriptions )
             {
                 var apiDescriptionId = description.GetUniqueID();
 
-                if ( visitedApiDescriptionIds.Contains( apiDescriptionId ) )
+                if ( filteredDescriptions.ContainsKey( apiDescriptionId ) )
                 {
-                    duplicateApiDescriptionIds.Add( apiDescriptionId );
+                    var model = description.ActionDescriptor.GetApiVersionModel();
+
+                    if ( model.DeclaredApiVersions.Contains( apiVersion ) )
+                    {
+                        filteredDescriptions[apiDescriptionId] = description;
+                    }
                 }
                 else
                 {
-                    visitedApiDescriptionIds.Add( apiDescriptionId );
+                    filteredDescriptions.Add( apiDescriptionId, description );
                 }
             }
 
-            var filteredApiDescriptions = new Collection<VersionedApiDescription>();
-
-            foreach ( var apiDescription in apiDescriptions )
-            {
-                var apiDescriptionId = apiDescription.GetUniqueID();
-
-                if ( !duplicateApiDescriptionIds.Contains( apiDescriptionId ) )
-                {
-                    filteredApiDescriptions.Add( apiDescription );
-                }
-            }
-
-            return filteredApiDescriptions;
+            return new Collection<VersionedApiDescription>( filteredDescriptions.Values.ToList() );
         }
 
         static bool MatchRegexConstraint( IHttpRoute route, string parameterName, string parameterValue )
