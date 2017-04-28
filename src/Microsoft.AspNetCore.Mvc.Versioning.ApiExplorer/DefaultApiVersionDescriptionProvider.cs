@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -16,19 +17,26 @@
     public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvider
     {
         readonly Lazy<IReadOnlyList<ApiVersionDescription>> apiVersionDescriptions;
+        readonly IOptions<ApiVersioningOptions> options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultApiVersionDescriptionProvider"/> class.
         /// </summary>
         /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider">provider</see> used to enumerate the actions within an application.</param>
         /// <param name="groupNameFormatter">The <see cref="IApiVersionGroupNameFormatter">formatter</see> used to get group names for API versions.</param>
-        public DefaultApiVersionDescriptionProvider( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider, IApiVersionGroupNameFormatter groupNameFormatter )
+        /// <param name="apiVersioningOptions">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
+        public DefaultApiVersionDescriptionProvider(
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+            IApiVersionGroupNameFormatter groupNameFormatter,
+            IOptions<ApiVersioningOptions> apiVersioningOptions )
         {
             Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
             Arg.NotNull( groupNameFormatter, nameof( groupNameFormatter ) );
+            Arg.NotNull( apiVersioningOptions, nameof( apiVersioningOptions ) );
 
             apiVersionDescriptions = new Lazy<IReadOnlyList<ApiVersionDescription>>( () => EnumerateApiVersions( actionDescriptorCollectionProvider ) );
             GroupNameFormatter = groupNameFormatter;
+            options = apiVersioningOptions;
         }
 
         /// <summary>
@@ -36,6 +44,12 @@
         /// </summary>
         /// <value>The <see cref="IApiVersionGroupNameFormatter">group name formatter</see> used to format group names.</value>
         protected IApiVersionGroupNameFormatter GroupNameFormatter { get; }
+
+        /// <summary>
+        /// Gets the current API versioning options associated with the API explorer.
+        /// </summary>
+        /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
+        protected ApiVersioningOptions Options => options.Value;
 
         /// <summary>
         /// Gets a read-only list of discovered API version descriptions.
@@ -88,7 +102,7 @@
             return descriptions.OrderBy( d => d.ApiVersion ).ToArray();
         }
 
-        static void BucketizeApiVersions( IReadOnlyList<ActionDescriptor> actions, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )
+        void BucketizeApiVersions( IReadOnlyList<ActionDescriptor> actions, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )
         {
             Contract.Requires( actions != null );
             Contract.Requires( supported != null );
@@ -125,6 +139,11 @@
             advertisedDeprecated.ExceptWith( declared );
             supported.ExceptWith( advertisedSupported );
             deprecated.ExceptWith( supported.Concat( advertisedDeprecated ) );
+
+            if ( supported.Count == 0 && deprecated.Count == 0 )
+            {
+                supported.Add( Options.DefaultApiVersion );
+            }
         }
 
         void AppendDescriptions( ICollection<ApiVersionDescription> descriptions, IEnumerable<ApiVersion> versions, bool deprecated )
