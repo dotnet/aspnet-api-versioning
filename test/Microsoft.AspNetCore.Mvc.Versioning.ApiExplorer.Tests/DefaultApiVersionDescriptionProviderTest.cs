@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.Options;
     using Moq;
     using System.Reflection;
     using Xunit;
@@ -18,7 +19,8 @@
             // arrange
             var actionProvider = new TestActionDescriptorCollectionProvider();
             var groupNameFormatter = new DefaultApiVersionGroupNameFormatter();
-            var descriptionProvider = new DefaultApiVersionDescriptionProvider( actionProvider, groupNameFormatter );
+            var apiVersioningOptions = new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() );
+            var descriptionProvider = new DefaultApiVersionDescriptionProvider( actionProvider, groupNameFormatter, apiVersioningOptions );
 
             // act
             var descriptions = descriptionProvider.ApiVersionDescriptions;
@@ -40,7 +42,8 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new Mock<IApiVersionGroupNameFormatter>().Object );
+                new Mock<IApiVersionGroupNameFormatter>().Object,
+                new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() ) );
             var action = new ActionDescriptor();
 
             // act
@@ -56,7 +59,8 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new Mock<IApiVersionGroupNameFormatter>().Object );
+                new Mock<IApiVersionGroupNameFormatter>().Object,
+                new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() ) );
             var action = new ActionDescriptor();
             var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
 
@@ -78,7 +82,8 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new Mock<IApiVersionGroupNameFormatter>().Object );
+                new Mock<IApiVersionGroupNameFormatter>().Object,
+                new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() ) );
             var action = new ActionDescriptor();
             var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
             var model = new ApiVersionModel(

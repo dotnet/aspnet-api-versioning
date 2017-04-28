@@ -133,14 +133,18 @@
 
             if ( ( setting == null || !setting.IgnoreApi ) && MatchRegexConstraint( route, RouteValueKeys.Action, actionRouteParameterValue ) )
             {
-                var versions = actionDescriptor.GetApiVersions();
+                var model = actionDescriptor.GetApiVersionModel();
 
-                if ( versions.Contains( apiVersion ) )
+                if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion ) )
                 {
                     return true;
                 }
 
-                return versions.Count == 0 && actionDescriptor.ControllerDescriptor.GetDeclaredApiVersions().Contains( apiVersion );
+                if ( model.DeclaredApiVersions.Count == 0 )
+                {
+                    model = actionDescriptor.ControllerDescriptor.GetApiVersionModel();
+                    return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
+                }
             }
 
             return false;
@@ -164,7 +168,8 @@
 
             if ( ( setting == null || !setting.IgnoreApi ) && MatchRegexConstraint( route, RouteValueKeys.Controller, controllerRouteParameterValue ) )
             {
-                return controllerDescriptor.GetDeclaredApiVersions().Contains( apiVersion );
+                var model = controllerDescriptor.GetApiVersionModel();
+                return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
             }
 
             return false;
@@ -478,8 +483,15 @@
             advertisedDeprecated.ExceptWith( declared );
             supported.ExceptWith( advertisedSupported );
             deprecated.ExceptWith( supported.Concat( advertisedDeprecated ) );
+            supported.UnionWith( deprecated );
 
-            return supported.Union( deprecated ).OrderBy( v => v );
+            if ( supported.Count == 0 )
+            {
+                supported.Add( options.DefaultApiVersion );
+                return supported;
+            }
+
+            return supported.OrderBy( v => v );
         }
 
         static HttpControllerDescriptor GetDirectRouteController( CandidateAction[] directRouteCandidates, ApiVersion apiVersion )

@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -20,18 +21,26 @@
     [CLSCompliant( false )]
     public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     {
+        readonly IOptions<ApiVersioningOptions> options;
+
         /// <summary>
         /// Initializes a new instance of <see cref="VersionedApiDescriptionProvider"/> class.
         /// </summary>
         /// <param name="groupNameFormatter">The <see cref="IApiVersionGroupNameFormatter">formatter</see> used to get group names for API versions.</param>
         /// <param name="metadadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
-        public VersionedApiDescriptionProvider( IApiVersionGroupNameFormatter groupNameFormatter, IModelMetadataProvider metadadataProvider )
+        /// <param name="apiVersioningOptions">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
+        public VersionedApiDescriptionProvider(
+            IApiVersionGroupNameFormatter groupNameFormatter,
+            IModelMetadataProvider metadadataProvider,
+            IOptions<ApiVersioningOptions> apiVersioningOptions )
         {
             Arg.NotNull( groupNameFormatter, nameof( groupNameFormatter ) );
             Arg.NotNull( metadadataProvider, nameof( metadadataProvider ) );
+            Arg.NotNull( apiVersioningOptions, nameof( apiVersioningOptions ) );
 
             GroupNameFormatter = groupNameFormatter;
             MetadadataProvider = metadadataProvider;
+            options = apiVersioningOptions;
         }
 
         /// <summary>
@@ -45,6 +54,12 @@
         /// </summary>
         /// <value>The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</value>
         protected IModelMetadataProvider MetadadataProvider { get; }
+
+        /// <summary>
+        /// Gets the current API versioning options associated with the API explorer.
+        /// </summary>
+        /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
+        protected ApiVersioningOptions Options => options.Value;
 
         /// <summary>
         /// Gets the order prescendence of the current API description provider.
@@ -139,7 +154,7 @@
         /// <remarks>The default implementation performs no operation.</remarks>
         public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context ) { }
 
-        static IEnumerable<ApiVersion> FlattenApiVersions( IEnumerable<ApiDescription> descriptions )
+        IEnumerable<ApiVersion> FlattenApiVersions( IEnumerable<ApiDescription> descriptions )
         {
             Contract.Requires( descriptions != null );
             Contract.Ensures( Contract.Result<IEnumerable<ApiVersion>>() != null );
@@ -156,6 +171,12 @@
                 {
                     versions.Add( version );
                 }
+            }
+
+            if ( versions.Count == 0 )
+            {
+                versions.Add( Options.DefaultApiVersion );
+                return versions;
             }
 
             return versions.OrderBy( v => v );
