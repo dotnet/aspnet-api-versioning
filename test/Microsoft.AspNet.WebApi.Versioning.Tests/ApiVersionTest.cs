@@ -306,30 +306,20 @@
         }
 
         [Theory]
-        [InlineData( "F", "2013-08-06", "2013-08-06" )]
-        [InlineData( "F", "2013-08-06-Alpha", "2013-08-06-Alpha" )]
-        [InlineData( "F", "1.1", "1.1" )]
-        [InlineData( "F", "1.1-Alpha", "1.1-Alpha" )]
-        [InlineData( "F", "2013-08-06.1.1", "2013-08-06.1.1" )]
-        [InlineData( "F", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" )]
+        [InlineData( null, "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" )]
+        [InlineData( "", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" )]
         [InlineData( "G", "2013-08-06", "2013-08-06" )]
-        [InlineData( "G", "2013-08-06-Alpha", "2013-08-06" )]
+        [InlineData( "GG", "2013-08-06-Alpha", "2013-08-06-Alpha" )]
         [InlineData( "G", "1.1", "" )]
         [InlineData( "G", "1.1-Alpha", "" )]
         [InlineData( "G", "2013-08-06.1.1", "2013-08-06" )]
-        [InlineData( "G", "2013-08-06.1.1-Alpha", "2013-08-06" )]
+        [InlineData( "GG", "2013-08-06.1.1-Alpha", "2013-08-06-Alpha" )]
         [InlineData( "V", "2013-08-06", "" )]
-        [InlineData( "V", "2013-08-06-Alpha", "" )]
-        [InlineData( "V", "1.1", "1.1" )]
-        [InlineData( "V", "1.1-Alpha", "1.1" )]
-        [InlineData( "V", "2013-08-06.1.1", "1.1" )]
-        [InlineData( "V", "2013-08-06.1.1-Alpha", "1.1" )]
-        [InlineData( "S", "2013-08-06", "2013-08-06" )]
-        [InlineData( "S", "2013-08-06-Alpha", "2013-08-06" )]
-        [InlineData( "S", "1.1", "1.1" )]
-        [InlineData( "S", "1.1-Alpha", "1.1" )]
-        [InlineData( "S", "2013-08-06.1.1", "2013-08-06.1.1" )]
-        [InlineData( "S", "2013-08-06.1.1-Alpha", "2013-08-06.1.1" )]
+        [InlineData( "VVVV", "2013-08-06-Alpha", "" )]
+        [InlineData( "VV", "1.1", "1.1" )]
+        [InlineData( "VVVV", "1.1-Alpha", "1.1-Alpha" )]
+        [InlineData( "VV", "2013-08-06.1.1", "1.1" )]
+        [InlineData( "VVVV", "2013-08-06.1.1-Alpha", "1.1-Alpha" )]
         public void to_string_with_format_should_return_expected_string( string format, string text, string formattedString )
         {
             // arrange
@@ -340,34 +330,6 @@
 
             // assert
             @string.Should().Be( formattedString );
-        }
-
-        [Fact]
-        public void to_string_should_throw_format_exception_when_format_code_is_invalid()
-        {
-            // arrange
-            var apiVersion = ApiVersion.Default;
-            Action toString = () => apiVersion.ToString( "x" );
-
-            // act
-
-
-            // assert
-            toString.ShouldThrow<FormatException>();
-        }
-
-        [Fact]
-        public void to_string_with_format_provider_should_throw_format_exception_when_format_code_is_invalid()
-        {
-            // arrange
-            var apiVersion = ApiVersion.Default;
-            Action toString = () => apiVersion.ToString( "x", CurrentCulture );
-
-            // act
-
-
-            // assert
-            toString.ShouldThrow<FormatException>();
         }
 
         [Theory]

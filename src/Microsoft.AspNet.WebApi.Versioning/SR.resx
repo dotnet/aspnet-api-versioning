@@ -165,6 +165,9 @@
   <data name="InvalidActionMethodExpression" xml:space="preserve">
     <value>The expression '{0}' must refer to a controller action method.</value>
   </data>
+  <data name="InvalidFormatString" xml:space="preserve">
+    <value>Input string was not in a correct format.</value>
+  </data>
   <data name="MultipleDifferentApiVersionsRequested" xml:space="preserve">
     <value>The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request.</value>
   </data>
