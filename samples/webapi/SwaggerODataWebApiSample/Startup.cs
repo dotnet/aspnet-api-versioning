@@ -47,7 +47,8 @@ namespace Microsoft.Examples
             configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
-            var apiExplorer = configuration.AddODataApiExplorer();
+            // note: the specified format code will format the version as "'v'major[.minor][-status]"
+            var apiExplorer = configuration.AddODataApiExplorer( o => o.GroupNameFormat = "'v'VVV" );
 
             configuration.EnableSwagger(
                            "{apiVersion}/swagger",

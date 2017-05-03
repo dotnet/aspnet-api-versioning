@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
@@ -58,8 +58,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Vers
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests.csproj", "{280C3B03-5EED-40E9-A826-83C9F3C6EEDC}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.ApiExplorer", "src\Common.ApiExplorer\Common.ApiExplorer.shproj", "{26A67334-F6E6-49B8-8C5A-F88F28770966}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Common.ApiExplorer\Common.ApiExplorer.projitems*{26a67334-f6e6-49b8-8c5a-f88f28770966}*SharedItemsImports = 13
 		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{6cdfb878-2642-4f98-ae35-621bac581181}*SharedItemsImports = 13
 		src\Common\Common.projitems*{6d0e834b-6422-44cd-9a85-e3be9dead1be}*SharedItemsImports = 13
 		src\Shared\Shared.projitems*{b7897873-6757-4684-83c0-39575821ae14}*SharedItemsImports = 13
@@ -149,5 +152,6 @@ Global
 		{C8D29CB1-C541-4579-A1B8-AFD4B4F5F4A3} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{6ED07FE1-95D3-41E9-A0F1-AEF1BBD6A474} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{280C3B03-5EED-40E9-A826-83C9F3C6EEDC} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{26A67334-F6E6-49B8-8C5A-F88F28770966} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 	EndGlobalSection
 EndGlobal

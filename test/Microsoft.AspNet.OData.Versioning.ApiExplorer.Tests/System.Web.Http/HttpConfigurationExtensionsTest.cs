@@ -1,6 +1,7 @@
 ﻿namespace System.Web.Http
 {
     using FluentAssertions;
+    using Microsoft.Web.Http.Description;
     using System;
     using Xunit;
 
@@ -11,12 +12,13 @@
         {
             // arrange
             var configuration = new HttpConfiguration();
+            var options = default( ODataApiExplorerOptions );
 
             // act
-            var apiExplorer = configuration.AddODataApiExplorer();
+            configuration.AddODataApiExplorer( o => options = o );
 
             // assert
-            apiExplorer.UseApiExplorerSettings.Should().BeFalse();
+            options.UseApiExplorerSettings.Should().BeFalse();
         }
 
         [Fact]
@@ -24,12 +26,13 @@
         {
             // arrange
             var configuration = new HttpConfiguration();
+            var options = default( ODataApiExplorerOptions );
 
             // act
-            var apiExplorer = configuration.AddODataApiExplorer( useApiExplorerSettings: true );
+            configuration.AddODataApiExplorer( o => { o.UseApiExplorerSettings = true; options = o; } );
 
             // assert
-            apiExplorer.UseApiExplorerSettings.Should().BeTrue();
+            options.UseApiExplorerSettings.Should().BeTrue();
         }
     }
 }

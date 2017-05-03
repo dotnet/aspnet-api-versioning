@@ -43,11 +43,9 @@
         /// <param name="services">The collection of services to configure the application with.</param>
         public void ConfigureServices( IServiceCollection services )
         {
-            // add the versioned api explorer, which also adds the following services:
-            //
-            // * IApiVersionDescriptionProvider
-            // * IApiVersionGroupNameFormatter
-            services.AddMvcCore().AddVersionedApiExplorer();
+            // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+            // note: the specified format code will format the version as "'v'major[.minor][-status]"
+            services.AddMvcCore().AddVersionedApiExplorer( o => o.GroupNameFormat = "'v'VVV" );
 
             services.AddMvc();
             services.AddApiVersioning( o => o.ReportApiVersions = true );
@@ -79,7 +77,8 @@
         /// <param name="app">The current application builder.</param>
         /// <param name="env">The current hosting environment.</param>
         /// <param name="loggerFactory">The logging factory used for instrumentation.</param>
-        public void Configure( IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory )
+        /// <param name="provider">The API version descriptor provider used to enumerate defined API versions.</param>
+        public void Configure( IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApiVersionDescriptionProvider provider )
         {
             loggerFactory.AddConsole( Configuration.GetSection( "Logging" ) );
             loggerFactory.AddDebug();
@@ -89,9 +88,6 @@
             app.UseSwaggerUI(
                 options =>
                 {
-                    // resolve the IApiVersionDescriptionProvider service
-                    var provider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
-
                     // build a swagger endpoint for each discovered API version
                     foreach ( var description in provider.ApiVersionDescriptions )
                     {

@@ -12,6 +12,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using static System.Globalization.CultureInfo;
     using static System.Linq.Enumerable;
 
     /// <summary>
@@ -21,33 +22,21 @@
     [CLSCompliant( false )]
     public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     {
-        readonly IOptions<ApiVersioningOptions> options;
+        readonly IOptions<ApiExplorerOptions> options;
 
         /// <summary>
         /// Initializes a new instance of <see cref="VersionedApiDescriptionProvider"/> class.
         /// </summary>
-        /// <param name="groupNameFormatter">The <see cref="IApiVersionGroupNameFormatter">formatter</see> used to get group names for API versions.</param>
         /// <param name="metadadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
-        /// <param name="apiVersioningOptions">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
-        public VersionedApiDescriptionProvider(
-            IApiVersionGroupNameFormatter groupNameFormatter,
-            IModelMetadataProvider metadadataProvider,
-            IOptions<ApiVersioningOptions> apiVersioningOptions )
+        /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiExplorerOptions">API explorer options</see>.</param>
+        public VersionedApiDescriptionProvider( IModelMetadataProvider metadadataProvider, IOptions<ApiExplorerOptions> options )
         {
-            Arg.NotNull( groupNameFormatter, nameof( groupNameFormatter ) );
             Arg.NotNull( metadadataProvider, nameof( metadadataProvider ) );
-            Arg.NotNull( apiVersioningOptions, nameof( apiVersioningOptions ) );
+            Arg.NotNull( options, nameof( options ) );
 
-            GroupNameFormatter = groupNameFormatter;
             MetadadataProvider = metadadataProvider;
-            options = apiVersioningOptions;
+            this.options = options;
         }
-
-        /// <summary>
-        /// Gets the group name formatter associated with the API description provider.
-        /// </summary>
-        /// <value>The <see cref="IApiVersionGroupNameFormatter">group name formatter</see> used to format group names.</value>
-        protected IApiVersionGroupNameFormatter GroupNameFormatter { get; }
 
         /// <summary>
         /// Gets the model metadata provider associated with the API description provider.
@@ -56,10 +45,10 @@
         protected IModelMetadataProvider MetadadataProvider { get; }
 
         /// <summary>
-        /// Gets the current API versioning options associated with the API explorer.
+        /// Gets the options associated with the API explorer.
         /// </summary>
-        /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
-        protected ApiVersioningOptions Options => options.Value;
+        /// <value>The current <see cref="ApiExplorerOptions">API explorer options</see>.</value>
+        protected ApiExplorerOptions Options => options.Value;
 
         /// <summary>
         /// Gets the order prescendence of the current API description provider.
@@ -117,7 +106,7 @@
 
             foreach ( var version in FlattenApiVersions( results ) )
             {
-                var groupName = GroupNameFormatter.GetGroupName( version );
+                var groupName = version.ToString( Options.GroupNameFormat, CurrentCulture );
 
                 foreach ( var result in results )
                 {

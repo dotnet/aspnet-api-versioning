@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using static System.Globalization.CultureInfo;
 
     /// <summary>
     /// Represents the default implementation of an object that discovers and describes the API version information within an application.
@@ -17,39 +18,27 @@
     public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvider
     {
         readonly Lazy<IReadOnlyList<ApiVersionDescription>> apiVersionDescriptions;
-        readonly IOptions<ApiVersioningOptions> options;
+        readonly IOptions<ApiExplorerOptions> options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultApiVersionDescriptionProvider"/> class.
         /// </summary>
         /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider">provider</see> used to enumerate the actions within an application.</param>
-        /// <param name="groupNameFormatter">The <see cref="IApiVersionGroupNameFormatter">formatter</see> used to get group names for API versions.</param>
-        /// <param name="apiVersioningOptions">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
-        public DefaultApiVersionDescriptionProvider(
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
-            IApiVersionGroupNameFormatter groupNameFormatter,
-            IOptions<ApiVersioningOptions> apiVersioningOptions )
+        /// <param name="apiExplorerOptions">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiExplorerOptions">API explorer options</see>.</param>
+        public DefaultApiVersionDescriptionProvider( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider, IOptions<ApiExplorerOptions> apiExplorerOptions )
         {
             Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
-            Arg.NotNull( groupNameFormatter, nameof( groupNameFormatter ) );
-            Arg.NotNull( apiVersioningOptions, nameof( apiVersioningOptions ) );
+            Arg.NotNull( apiExplorerOptions, nameof( apiExplorerOptions ) );
 
             apiVersionDescriptions = new Lazy<IReadOnlyList<ApiVersionDescription>>( () => EnumerateApiVersions( actionDescriptorCollectionProvider ) );
-            GroupNameFormatter = groupNameFormatter;
-            options = apiVersioningOptions;
+            options = apiExplorerOptions;
         }
 
         /// <summary>
-        /// Gets the group name formatter associated with the provider.
+        /// Gets the options associated with the API explorer.
         /// </summary>
-        /// <value>The <see cref="IApiVersionGroupNameFormatter">group name formatter</see> used to format group names.</value>
-        protected IApiVersionGroupNameFormatter GroupNameFormatter { get; }
-
-        /// <summary>
-        /// Gets the current API versioning options associated with the API explorer.
-        /// </summary>
-        /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
-        protected ApiVersioningOptions Options => options.Value;
+        /// <value>The current <see cref="ApiExplorerOptions">API explorer options</see>.</value>
+        protected ApiExplorerOptions Options => options.Value;
 
         /// <summary>
         /// Gets a read-only list of discovered API version descriptions.
@@ -153,7 +142,7 @@
 
             foreach ( var version in versions )
             {
-                var groupName = GroupNameFormatter.GetGroupName( version );
+                var groupName = version.ToString( Options.GroupNameFormat, CurrentCulture );
                 descriptions.Add( new ApiVersionDescription( version, groupName, deprecated ) );
             }
         }

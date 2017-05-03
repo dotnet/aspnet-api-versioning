@@ -17,10 +17,9 @@
             // arrange
             var actionProvider = new TestActionDescriptorCollectionProvider();
             var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
-            var groupNameFormatter = new DefaultApiVersionGroupNameFormatter();
             var modelMetadataProvider = NewModelMetadataProvider();
-            var apiVersioningOptions = new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() );
-            var apiExplorer = new VersionedApiDescriptionProvider( groupNameFormatter, modelMetadataProvider, apiVersioningOptions );
+            var apiExplorerOptions = new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } );
+            var apiExplorer = new VersionedApiDescriptionProvider( modelMetadataProvider, apiExplorerOptions );
 
             foreach ( var action in context.Actions )
             {

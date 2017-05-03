@@ -23,22 +23,26 @@
         /// <remarks>This method always replaces the <see cref="IApiExplorer"/> with a new instance of <see cref="ODataApiExplorer"/>. This method also
         /// configures the <see cref="ODataApiExplorer"/> to not use <see cref="ApiExplorerSettingsAttribute"/>, which enables exploring all OData
         /// controllers without additional configuration.</remarks>
-        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration ) => configuration.AddODataApiExplorer( useApiExplorerSettings: false );
+        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration ) => configuration.AddODataApiExplorer( _ => { } );
 
         /// <summary>
         /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.
         /// </summary>
         /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> used to add the API explorer.</param>
-        /// <param name="useApiExplorerSettings">Indicates whether the <see cref="ODataApiExplorer">OData API explorer</see> will use the
-        /// <see cref="ApiExplorerSettingsAttribute"/> when present.</param>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
         /// <returns>The newly registered <see cref="ODataApiExplorer">versioned API explorer</see>.</returns>
         /// <remarks>This method always replaces the <see cref="IApiExplorer"/> with a new instance of <see cref="ODataApiExplorer"/>.</remarks>
-        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration, bool useApiExplorerSettings )
+        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration, Action<ODataApiExplorerOptions> setupAction )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNull( setupAction, nameof( setupAction ) );
             Contract.Ensures( Contract.Result<ODataApiExplorer>() != null );
 
-            var apiExplorer = new ODataApiExplorer( configuration ) { UseApiExplorerSettings = useApiExplorerSettings };
+            var options = new ODataApiExplorerOptions( configuration );
+
+            setupAction( options );
+
+            var apiExplorer = new ODataApiExplorer( configuration, options );
             configuration.Services.Replace( typeof( IApiExplorer ), apiExplorer );
             return apiExplorer;
         }

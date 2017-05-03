@@ -26,6 +26,7 @@
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
 
+ <Import Project="..\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
 
 </Project>

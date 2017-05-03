@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Routing;
     using System;
@@ -34,18 +33,23 @@
         /// Initializes a new instance of the <see cref="ODataApiExplorer"/> class.
         /// </summary>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-        public ODataApiExplorer( HttpConfiguration configuration ) : base( configuration ) { }
+        public ODataApiExplorer( HttpConfiguration configuration ) : this( configuration, new ODataApiExplorerOptions( configuration ) ) { }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the API explorer settings are honored.
+        /// Initializes a new instance of the <see cref="ODataApiExplorer"/> class.
         /// </summary>
-        /// <value>True if the <see cref="ApiExplorerSettingsAttribute"/> is ignored; otherwise, false.
-        /// The default value is <c>false</c>.</value>
-        /// <remarks>Most OData services inherit from the <see cref="ODataController"/>, which excludes the controller
-        /// from the <see cref="IApiExplorer">API explorer</see> by setting <see cref="ApiExplorerSettingsAttribute.IgnoreApi"/>
-        /// to <c>true</c>. By setting this property to <c>false</c>, these settings are ignored instead of reapplying
-        /// <see cref="ApiExplorerSettingsAttribute.IgnoreApi"/> with a value of <c>false</c> to all OData controllers.</remarks>
-        public bool UseApiExplorerSettings { get; set; }
+        /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="options">The associated <see cref="ODataApiExplorerOptions">API explorer options</see>.</param>
+        public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options ) : base( configuration, options )
+        {
+            Options = options;
+        }
+
+        /// <summary>
+        /// Gets the options associated with the API explorer.
+        /// </summary>
+        /// <value>The <see cref="ODataApiExplorerOptions">API explorer options</see>.</value>
+        new protected virtual ODataApiExplorerOptions Options { get; }
 
         /// <summary>
         /// Determines whether the action should be considered.
@@ -66,7 +70,7 @@
                 return base.ShouldExploreAction( actionRouteParameterValue, actionDescriptor, route, apiVersion );
             }
 
-            if ( UseApiExplorerSettings )
+            if ( Options.UseApiExplorerSettings )
             {
                 var setting = actionDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
 
@@ -112,7 +116,7 @@
                 return base.ShouldExploreController( controllerRouteParameterValue, controllerDescriptor, route, apiVersion );
             }
 
-            if ( UseApiExplorerSettings )
+            if ( Options.UseApiExplorerSettings )
             {
                 var setting = controllerDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
 
