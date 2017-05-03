@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ReportApiVersionsAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\AmbiguousApiVersionException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionFormatProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersioningOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModelDebugView.cs" />

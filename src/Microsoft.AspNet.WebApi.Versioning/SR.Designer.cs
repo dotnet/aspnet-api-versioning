@@ -205,6 +205,15 @@ namespace Microsoft.Web.Http {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Input string was not in a correct format..
+        /// </summary>
+        internal static string InvalidFormatString {
+            get {
+                return ResourceManager.GetString("InvalidFormatString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request..
         /// </summary>
         internal static string MultipleDifferentApiVersionsRequested {
