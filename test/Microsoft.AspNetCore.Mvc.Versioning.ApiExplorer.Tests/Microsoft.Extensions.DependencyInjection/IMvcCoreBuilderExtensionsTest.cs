@@ -25,7 +25,7 @@
             mvcConfiguration.Configure( mvcOptions );
 
             // assert
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionGroupNameFormatter ) ).ImplementationType.Should().Be( typeof( DefaultApiVersionGroupNameFormatter ) );
+            services.Single( sd => sd.ServiceType == typeof( IOptions<ApiExplorerOptions> ) ).ImplementationFactory.Should().NotBeNull();
             services.Single( sd => sd.ServiceType == typeof( IApiVersionDescriptionProvider ) ).ImplementationType.Should().Be( typeof( DefaultApiVersionDescriptionProvider ) );
             services.Single( sd => sd.ServiceType == typeof( IApiDescriptionGroupCollectionProvider ) ).ImplementationType.Should().Be( typeof( ApiDescriptionGroupCollectionProvider ) );
             services.Single( sd => sd.ServiceType == typeof( IApiDescriptionProvider ) ).ImplementationType.Should().Be( typeof( VersionedApiDescriptionProvider ) );

@@ -22,6 +22,7 @@
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+ <Import Project="..\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
 
 </Project>

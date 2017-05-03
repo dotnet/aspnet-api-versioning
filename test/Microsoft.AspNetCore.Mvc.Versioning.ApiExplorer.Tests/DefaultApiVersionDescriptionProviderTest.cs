@@ -18,9 +18,8 @@
         {
             // arrange
             var actionProvider = new TestActionDescriptorCollectionProvider();
-            var groupNameFormatter = new DefaultApiVersionGroupNameFormatter();
-            var apiVersioningOptions = new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() );
-            var descriptionProvider = new DefaultApiVersionDescriptionProvider( actionProvider, groupNameFormatter, apiVersioningOptions );
+            var apiExplorerOptions = new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } );
+            var descriptionProvider = new DefaultApiVersionDescriptionProvider( actionProvider, apiExplorerOptions );
 
             // act
             var descriptions = descriptionProvider.ApiVersionDescriptions;
@@ -42,8 +41,7 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new Mock<IApiVersionGroupNameFormatter>().Object,
-                new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() ) );
+                new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
 
             // act
@@ -59,8 +57,7 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new Mock<IApiVersionGroupNameFormatter>().Object,
-                new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() ) );
+                new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
             var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
 
@@ -82,8 +79,7 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new Mock<IApiVersionGroupNameFormatter>().Object,
-                new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() ) );
+                new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
             var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
             var model = new ApiVersionModel(

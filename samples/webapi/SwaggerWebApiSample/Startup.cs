@@ -32,7 +32,8 @@ namespace Microsoft.Examples
             configuration.MapHttpAttributeRoutes( constraintResolver );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. VersionedApiExplorer vs IApiExplorer)
-            var apiExplorer = configuration.AddVersionedApiExplorer();
+            // note: the specified format code will format the version as "'v'major[.minor][-status]"
+            var apiExplorer = configuration.AddVersionedApiExplorer( o => o.GroupNameFormat = "'v'VVV" );
 
             configuration.EnableSwagger(
                             "{apiVersion}/swagger",

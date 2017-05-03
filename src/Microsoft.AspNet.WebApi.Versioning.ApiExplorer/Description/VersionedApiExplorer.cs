@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using Microsoft.Web.Http.Versioning;
     using Routing;
     using System;
     using System.Collections;
@@ -38,11 +37,20 @@
         /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
         /// </summary>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-        public VersionedApiExplorer( HttpConfiguration configuration )
+        public VersionedApiExplorer( HttpConfiguration configuration ) : this( configuration, new ApiExplorerOptions( configuration ) ) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
+        /// </summary>
+        /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="options">The associated <see cref="ApiExplorerOptions">API explorer options</see>.</param>
+        public VersionedApiExplorer( HttpConfiguration configuration, ApiExplorerOptions options )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNull( options, nameof( options ) );
 
             Configuration = configuration;
+            Options = options;
             apiDescriptions = new Lazy<ApiDescriptionGroupCollection>( InitializeApiDescriptions );
         }
 
@@ -53,10 +61,10 @@
         protected HttpConfiguration Configuration { get; }
 
         /// <summary>
-        /// Gets the current API versioning options associated with the API explorer.
+        /// Gets the options associated with the API explorer.
         /// </summary>
-        /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
-        protected virtual ApiVersioningOptions Options => Configuration.GetApiVersioningOptions();
+        /// <value>The <see cref="ApiExplorerOptions">API explorer options</see>.</value>
+        protected virtual ApiExplorerOptions Options { get; }
 
         /// <summary>
         /// Gets the comparer used to compare API descriptions.
@@ -460,7 +468,7 @@
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
             var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver );
-            var options = Options;
+            var options = Configuration.GetApiVersioningOptions();
             var declared = new HashSet<ApiVersion>();
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
