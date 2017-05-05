@@ -27,6 +27,34 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     ///         <description>Examples</description>
     ///     </listheader>
     ///     <item>
+    ///         <term>"F"</term>
+    ///         <description>The full, formatted API version where optional, absent components are ommitted.</description>
+    ///         <description>
+    ///             <para>2017-01-01 -> 2017-01-01</para>
+    ///             <para>2017-01-01.1 -> 2017-01-01.1</para>
+    ///             <para>2017-01-01.1.5-RC -> 2017-01-01.1.5-RC</para>
+    ///             <para>2017-01-01-Beta -> 2017-01-01-Beta</para>
+    ///             <para>1 -> 1</para>
+    ///             <para>1.5 -> 1.5</para>
+    ///             <para>1-Beta -> 1-Beta</para>
+    ///             <para>0.9-Alpha -> 0.9-Alpha</para>
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <term>"FF"</term>
+    ///         <description>The full, formatted API version where optional components have default values.</description>
+    ///         <description>
+    ///             <para>2017-01-01 -> 2017-01-01</para>
+    ///             <para>2017-01-01.1 -> 2017-01-01.1.0</para>
+    ///             <para>2017-01-01.1.5-RC -> 2017-01-01.1.5-RC</para>
+    ///             <para>2017-01-01-Beta -> 2017-01-01-Beta</para>
+    ///             <para>1 -> 1.0</para>
+    ///             <para>1.5 -> 1.5</para>
+    ///             <para>1-Beta -> 1.0-Beta</para>
+    ///             <para>0.9-Alpha -> 0.9-Alpha</para>
+    ///         </description>
+    ///     </item>
+    ///     <item>
     ///         <term>"G"</term>
     ///         <description>The group version of the API group version.</description>
     ///         <description>
@@ -111,6 +139,38 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     ///             <para>1.5 -> 1.5</para>
     ///             <para>1-Alpha -> 1.0-Alpha</para>
     ///             <para>1.5-Alpha -> 1.5-Alpha</para>
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <term>"p"</term>
+    ///         <description>The minor version of the API version with padded zeros. The default padding is for two digits.</description>
+    ///         <description>
+    ///             <para>1.5 -> 05</para>
+    ///             <para>1.5-Alpha -> 05</para>
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <term>"p(n)"</term>
+    ///         <description>The minor version of the API version with padded zeros where "n" is the total number of digits.</description>
+    ///         <description>
+    ///             <para>p3 -> 1.5 -> 005</para>
+    ///             <para>p3 -> 1.5-Alpha -> 005</para>
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <term>"P"</term>
+    ///         <description>The major version of the API version with padded zeros. The default padding is for two digits.</description>
+    ///         <description>
+    ///             <para>1.5 -> 01</para>
+    ///             <para>1.5-Alpha -> 01</para>
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <term>"P(n)"</term>
+    ///         <description>The major version of the API version with padded zeros where "n" is the total number of digits.</description>
+    ///         <description>
+    ///             <para>P3 -> 1.5 -> 001</para>
+    ///             <para>P3 -> 1.5-Alpha -> 001</para>
     ///         </description>
     ///     </item>
     ///     <item>
@@ -223,10 +283,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Formats all parts using the default format.
         /// </summary>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to format.</param>
+        /// <param name="format">The format string for the API version. This parameter can be <c>null</c> or empty.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to apply the format.</param>
         /// <returns>A formatted <see cref="string">string</see> representing the API version.</returns>
         [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract" )]
-        protected virtual string FormatAllParts( ApiVersion apiVersion, IFormatProvider formatProvider )
+        protected virtual string FormatAllParts( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
         {
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Arg.NotNull( formatProvider, nameof( formatProvider ) );
@@ -248,7 +309,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
                 text.Append( apiVersion.MajorVersion.Value.ToString( formatProvider ) );
 
-                if ( apiVersion.MinorVersion != null )
+                if ( apiVersion.MinorVersion == null )
+                {
+                    if ( format == "FF" )
+                    {
+                        text.Append( ".0" );
+                    }
+                }
+                else
                 {
                     text.Append( '.' );
                     text.Append( apiVersion.MinorVersion.Value.ToString( formatProvider ) );
@@ -367,48 +435,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             Arg.NotNull( formatProvider, nameof( formatProvider ) );
             Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
 
-            if ( format.Length == 1 && format[0] == 'v' )
+            switch ( format[0] )
             {
-                return apiVersion.MinorVersion == null ? Empty : apiVersion.MinorVersion.Value.ToString( formatProvider );
+                case 'V':
+                case 'v':
+                    return FormatVersionWithoutPadding( apiVersion, format, formatProvider );
+                case 'P':
+                case 'p':
+                    return FormatVersionWithPadding( apiVersion, format, formatProvider );
             }
 
-            if ( apiVersion.MajorVersion == null || format[0] != 'V' )
-            {
-                return Empty;
-            }
-
-            // V*
-            var text = new StringBuilder( apiVersion.MajorVersion.Value.ToString( formatProvider ) );
-
-            if ( format.Length == 1 )
-            {
-                return text.ToString();
-            }
-
-            var minor = apiVersion.MinorVersion ?? 0;
-
-            switch ( format.Length )
-            {
-                case 2: // VV
-                    text.Append( '.' );
-                    text.Append( minor.ToString( formatProvider ) );
-                    break;
-                case 3: // VVV
-                    if ( minor > 0 )
-                    {
-                        text.Append( '.' );
-                        text.Append( minor.ToString( formatProvider ) );
-                    }
-                    AppendStatus( text, apiVersion.Status );
-                    break;
-                case 4: // VVVV
-                    text.Append( '.' );
-                    text.Append( minor.ToString( formatProvider ) );
-                    AppendStatus( text, apiVersion.Status );
-                    break;
-            }
-
-            return text.ToString();
+            return Empty;
         }
 
         /// <summary>
@@ -467,7 +504,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             if ( IsNullOrEmpty( format ) )
             {
-                return FormatAllParts( value, formatProvider );
+                return FormatAllParts( value, null, formatProvider );
             }
 
             var tokens = FormatTokenizer.Tokenize( format );
@@ -512,12 +549,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             switch ( format[0] )
             {
+                case 'F':
+                    return FormatAllParts( value, format, formatProvider );
                 case 'G':
                 case 'M':
                 case 'd':
                 case 'y':
                     return FormatGroupVersionPart( value, format, formatProvider );
+                case 'P':
                 case 'V':
+                case 'p':
                 case 'v':
                     return FormatVersionPart( value, format, formatProvider );
                 case 'S':
@@ -527,8 +568,164 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             return Empty;
         }
 
-        void AppendStatus( StringBuilder text, string status )
+        static string FormatVersionWithoutPadding( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
         {
+            Contract.Requires( apiVersion != null );
+            Contract.Requires( !IsNullOrEmpty( format ) );
+            Contract.Requires( formatProvider != null );
+            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+
+            if ( format.Length == 1 && format[0] == 'v' )
+            {
+                return apiVersion.MinorVersion == null ? Empty : apiVersion.MinorVersion.Value.ToString( formatProvider );
+            }
+
+            if ( apiVersion.MajorVersion == null || format[0] != 'V' )
+            {
+                return Empty;
+            }
+
+            // V*
+            var text = new StringBuilder( apiVersion.MajorVersion.Value.ToString( formatProvider ) );
+
+            if ( format.Length == 1 )
+            {
+                return text.ToString();
+            }
+
+            var minor = apiVersion.MinorVersion ?? 0;
+
+            switch ( format.Length )
+            {
+                case 2: // VV
+                    text.Append( '.' );
+                    text.Append( minor.ToString( formatProvider ) );
+                    break;
+                case 3: // VVV
+                    if ( minor > 0 )
+                    {
+                        text.Append( '.' );
+                        text.Append( minor.ToString( formatProvider ) );
+                    }
+                    AppendStatus( text, apiVersion.Status );
+                    break;
+                case 4: // VVVV
+                    text.Append( '.' );
+                    text.Append( minor.ToString( formatProvider ) );
+                    AppendStatus( text, apiVersion.Status );
+                    break;
+            }
+
+            return text.ToString();
+        }
+
+        static string FormatVersionWithPadding( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
+        {
+            Contract.Requires( apiVersion != null );
+            Contract.Requires( !IsNullOrEmpty( format ) );
+            Contract.Requires( formatProvider != null );
+            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+
+            SplitFormatSpecifierWithNumber( format, formatProvider, out var specifier, out var count );
+
+            const string TwoDigits = "D2";
+            const string LeadingZeros = "'D'0";
+
+            // p, p(n)
+            if ( specifier == "p" )
+            {
+                format = count.ToString( LeadingZeros, InvariantCulture );
+                return apiVersion.MinorVersion == null ? Empty : apiVersion.MinorVersion.Value.ToString( format, formatProvider );
+            }
+
+            if ( apiVersion.MajorVersion == null || format[0] != 'P' )
+            {
+                return Empty;
+            }
+
+            // P, P(n)
+            if ( specifier == "P" )
+            {
+                format = count.ToString( LeadingZeros, InvariantCulture );
+                return apiVersion.MajorVersion.Value.ToString( format, formatProvider );
+            }
+
+            var text = new StringBuilder( apiVersion.MajorVersion.Value.ToString( TwoDigits, formatProvider ) );
+            var minor = apiVersion.MinorVersion ?? 0;
+
+            switch ( format.Length )
+            {
+                case 2: // PP
+                    text.Append( '.' );
+                    text.Append( minor.ToString( TwoDigits, formatProvider ) );
+                    break;
+                case 3: // PPP
+                    if ( minor > 0 )
+                    {
+                        text.Append( '.' );
+                        text.Append( minor.ToString( TwoDigits, formatProvider ) );
+                    }
+                    AppendStatus( text, apiVersion.Status );
+                    break;
+                case 4: // PPPP
+                    text.Append( '.' );
+                    text.Append( minor.ToString( TwoDigits, formatProvider ) );
+                    AppendStatus( text, apiVersion.Status );
+                    break;
+            }
+
+            return text.ToString();
+        }
+
+        static void SplitFormatSpecifierWithNumber( string format, IFormatProvider formatProvider, out string specifier, out int count )
+        {
+            Contract.Requires( !IsNullOrEmpty( format ) );
+            Contract.Requires( formatProvider != null );
+            Contract.Ensures( !IsNullOrEmpty( Contract.ValueAtReturn( out specifier ) ) );
+            Contract.Ensures( Contract.ValueAtReturn( out count ) >= 0 );
+
+            count = 2;
+
+            if ( format.Length == 1 )
+            {
+                specifier = format;
+                return;
+            }
+
+            var start = 0;
+            var end = 0;
+
+            for ( ; end < format.Length; end++ )
+            {
+                var ch = format[end];
+
+                if ( ch != 'P' && ch != 'p' )
+                {
+                    break;
+                }
+            }
+
+            specifier = format.Substring( start, end );
+            start = end;
+
+            for ( ; end < format.Length; end++ )
+            {
+                if ( !char.IsNumber( format[end] ) )
+                {
+                    break;
+                }
+            }
+
+            if ( end > start )
+            {
+                count = int.Parse( format.Substring( start, end - start ), formatProvider );
+            }
+        }
+
+        static void AppendStatus( StringBuilder text, string status )
+        {
+            Contract.Requires( text != null );
+
             if ( !IsNullOrEmpty( status ) )
             {
                 text.Append( '-' );
@@ -564,11 +761,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                 switch ( ch )
                 {
+                    case 'F':
                     case 'G':
                     case 'M':
+                    case 'P':
                     case 'S':
                     case 'V':
                     case 'd':
+                    case 'p':
                     case 'v':
                     case 'y':
                         return true;
@@ -586,11 +786,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 {
                     case @"\'":
                     case @"\\":
+                    case @"\F":
                     case @"\G":
                     case @"\M":
+                    case @"\P":
                     case @"\S":
                     case @"\V":
                     case @"\d":
+                    case @"\p":
                     case @"\v":
                     case @"\y":
                         return true;
@@ -606,12 +809,15 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
                 switch ( sequence )
                 {
+                    case "%F":
                     case "%G":
                     case "%M":
+                    case "%P":
                     case "%S":
                     case "%V":
                     case "%d":
                     case "%v":
+                    case "%p":
                     case "%y":
                         return true;
                 }
@@ -672,7 +878,19 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 Contract.Requires( i >= 0 );
 
                 EnsureCurrentLiteralSequenceTerminated( tokens, token );
-                tokens.Add( new FormatToken( format.Substring( ++i, 1 ) ) );
+
+                var start = ++i;
+                var end = start + 1;
+
+                for ( ; end < format.Length; end++ )
+                {
+                    if ( !char.IsNumber( format[end] ) )
+                    {
+                        break;
+                    }
+                }
+
+                tokens.Add( new FormatToken( format.Substring( start, end - start ) ) );
                 token.Length = 0;
             }
 
@@ -691,6 +909,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 while ( ( ++i < format.Length ) && ( ( ch = format[i] ) == last ) )
                 {
                     token.Append( ch );
+                }
+
+                for ( var j = i; j < format.Length; j++, i++ )
+                {
+                    if ( char.IsNumber( ch = format[i] ) )
+                    {
+                        token.Append( ch );
+                    }
+
+                    break;
                 }
 
                 tokens.Add( new FormatToken( token.ToString() ) );
