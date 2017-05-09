@@ -41,6 +41,7 @@
             services.Add( new ServiceDescriptor( typeof( IApiVersionSelector ), options.ApiVersionSelector ) );
             services.Add( Singleton<IOptions<ApiVersioningOptions>>( new OptionsWrapper<ApiVersioningOptions>( options ) ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
+            services.TryAddSingleton<IApiVersionRoutePolicy, ApiVersionRoutePolicy>();
 
             if ( options.ReportApiVersions )
             {
@@ -58,7 +59,7 @@
                     mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
                 } );
 
-            services.AddRouting( mvcOptions => mvcOptions.ConstraintMap.Add( "apiVersion", typeof( ApiVersionRouteConstraint ) ) );
+            services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( "apiVersion", typeof( ApiVersionRouteConstraint ) ) );
 
             return services;
         }

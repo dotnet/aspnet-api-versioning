@@ -101,19 +101,27 @@
 
             if ( finalMatches == null || finalMatches.Count == 0 )
             {
-                if ( ( invalidRequestHandler = IsValidRequest( selectionContext, candidates ) ) != null )
-                {
-                    context.Handler = invalidRequestHandler;
-                }
+                //if ( ( invalidRequestHandler = IsValidRequest( selectionContext, candidates ) ) != null )
+                //{
+                //    context.Handler = invalidRequestHandler;
+                //}
 
                 return null;
             }
             else if ( finalMatches.Count == 1 )
             {
-                var selectedAction = finalMatches[0];
-                selectedAction.AggregateAllVersions( selectionContext );
-                httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
-                return selectedAction;
+                var actionCandidates = httpContext.ActionCandidates();
+
+                actionCandidates.Actions.AddRange( candidates );
+                actionCandidates.MatchingActions.AddRange( finalMatches );
+                actionCandidates.RequestedVersion = selectionContext.RequestedVersion;
+
+                //var selectedAction = finalMatches[0];
+                //selectedAction.AggregateAllVersions( selectionContext );
+                //httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
+                //return selectedAction;
+
+                return null;
             }
             else
             {

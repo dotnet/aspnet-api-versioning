@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
     using Http;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using System;
     using System.Diagnostics.Contracts;
     using Versioning;
@@ -12,6 +13,20 @@
     public static class HttpContextExtensions
     {
         const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
+        const string ApiVersionSelectionCriteriaKey = "MS_" + nameof( ApiVersionRouteCandidates );
+
+        internal static ApiVersionRouteCandidates ActionCandidates( this HttpContext context )
+        {
+            Contract.Requires( context != null );
+            Contract.Ensures( Contract.Result<ApiVersionRouteCandidates>() != null );
+
+            if ( !context.Items.TryGetValue( ApiVersionSelectionCriteriaKey, out ApiVersionRouteCandidates criteria ) )
+            {
+                context.Items[ApiVersionSelectionCriteriaKey] = criteria = new ApiVersionRouteCandidates();
+            }
+
+            return criteria;
+        }
 
         /// <summary>
         /// Gets the current API versioning request properties.

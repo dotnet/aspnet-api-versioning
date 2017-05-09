@@ -2,6 +2,7 @@
 {
     using ApplicationModels;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using Versioning;
@@ -17,6 +18,24 @@
         static bool HasAggregatedVersions( this ActionDescriptor action ) => action.Properties.GetOrDefault( VersionsAggregated, false );
 
         static void HasAggregatedVersions( this ActionDescriptor action, bool value ) => action.Properties[VersionsAggregated] = value;
+
+        internal static void AggregateAllVersions( this ActionDescriptor action, IEnumerable<ActionDescriptor> matchingActions )
+        {
+            Contract.Requires( action != null );
+            Contract.Requires( matchingActions != null );
+
+            if ( action.HasAggregatedVersions() )
+            {
+                return;
+            }
+
+            action.HasAggregatedVersions( true );
+
+            var model = action.GetProperty<ApiVersionModel>();
+            Contract.Assume( model != null );
+
+            action.SetProperty( model.Aggregate( matchingActions.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) ) );
+        }
 
         internal static void AggregateAllVersions( this ActionDescriptor action, ActionSelectionContext context )
         {
