@@ -53,47 +53,47 @@
         /// <returns>A <see cref="Task">task</see> representing the asynchonrous operation.</returns>
         public virtual Task RouteAsync( RouteContext context )
         {
-            var candidates = context.HttpContext.ActionCandidates();
+            var selectionResult = context.HttpContext.ApiVersionProperties().SelectionResult;
 
-            switch ( candidates.MatchingActions.Count )
+            switch ( selectionResult.MatchingActions.Count )
             {
                 case 0:
-                    OnUnmatched( context, candidates );
+                    OnUnmatched( context, selectionResult );
                     break;
                 case 1:
-                    OnSingleMatch( context, candidates, candidates.MatchingActions.First() );
+                    OnSingleMatch( context, selectionResult, selectionResult.MatchingActions.First() );
                     break;
                 default:
-                    OnMultipleMatches( context, candidates );
+                    OnMultipleMatches( context, selectionResult );
                     break;
             }
 
             return Task.FromResult( false );
         }
 
-        protected virtual void OnSingleMatch( RouteContext context, ApiVersionRouteCandidates candidates, ActionDescriptor actionDescriptor )
+        protected virtual void OnSingleMatch( RouteContext context, ApiVersionSelectionResult selectionResult, ActionDescriptor actionDescriptor )
         {
             Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            Arg.NotNull( selectionResult, nameof( selectionResult ) );
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
             var handler = new DefaultActionHandler( actionInvokerFactory, actionContextAccessor, actionDescriptor );
 
-            actionDescriptor.AggregateAllVersions( candidates.MatchingActions );
-            context.HttpContext.ApiVersionProperties().ApiVersion = candidates.RequestedVersion;
+            actionDescriptor.AggregateAllVersions( selectionResult.MatchingActions );
+            context.HttpContext.ApiVersionProperties().ApiVersion = selectionResult.RequestedVersion;
             context.Handler = handler.Invoke;
         }
 
-        protected virtual void OnUnmatched( RouteContext context, ApiVersionRouteCandidates candidates )
+        protected virtual void OnUnmatched( RouteContext context, ApiVersionSelectionResult selectionResult )
         {
             Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            Arg.NotNull( selectionResult, nameof( selectionResult ) );
         }
 
-        protected virtual void OnMultipleMatches( RouteContext context, ApiVersionRouteCandidates candidates )
+        protected virtual void OnMultipleMatches( RouteContext context, ApiVersionSelectionResult selectionResult )
         {
             Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            Arg.NotNull( selectionResult, nameof( selectionResult ) );
         }
 
         sealed class DefaultActionHandler

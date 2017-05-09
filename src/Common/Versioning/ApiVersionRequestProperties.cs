@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         readonly Lazy<string> rawApiVersion;
         bool apiVersionInitialized;
         ApiVersion apiVersion;
+        ActionSelectionResult selectionResult;
 
         /// <summary>
         /// Gets the raw, unparsed API version for the current request.
@@ -58,5 +59,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// and is not meant to be directly used in your code.</remarks>
         [EditorBrowsable( Never )]
         public string RouteParameterName { get; set; }
+
+        /// <summary>
+        /// Gets the action selection result associated with the current request.
+        /// </summary>
+        /// <value>The <see cref="ActionSelectionResult">action selection result</see> associated with the current request.</value>
+        public ActionSelectionResult SelectionResult => selectionResult ?? ( selectionResult = new ActionSelectionResult() );
     }
 }
