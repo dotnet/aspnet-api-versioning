@@ -38,7 +38,8 @@
         {
             loggerFactory.AddConsole( Configuration.GetSection( "Logging" ) );
             loggerFactory.AddDebug();
-            app.UseMvc().UseApiVersioning();
+            app.UseMvc();
+            app.UseApiVersioning();
         }
     }
 }

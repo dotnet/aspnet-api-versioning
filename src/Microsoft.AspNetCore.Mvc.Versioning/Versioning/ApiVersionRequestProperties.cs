@@ -10,6 +10,7 @@
     public partial class ApiVersionRequestProperties
     {
         readonly HttpContext context;
+        ActionSelectionResult selectionResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionRequestProperties"/> class.
@@ -23,6 +24,12 @@
             this.context = context;
             rawApiVersion = new Lazy<string>( GetRawApiVersion );
         }
+
+        /// <summary>
+        /// Gets the action selection result associated with the current request.
+        /// </summary>
+        /// <value>The <see cref="ActionSelectionResult">action selection result</see> associated with the current request.</value>
+        public ActionSelectionResult SelectionResult => selectionResult ?? ( selectionResult = new ActionSelectionResult() );
 
         string GetRawApiVersion()
         {
