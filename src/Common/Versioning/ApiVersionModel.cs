@@ -197,7 +197,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// </summary>
         /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersion">API versions</see>
         /// declared by the controller or action.</value>
-        /// <remarks>The declared API versions are constrainted to the versions declared explicitly by the specified controller or action.</remarks>
+        /// <remarks>The declared API versions are constrained to the versions declared explicitly by the specified controller or action.</remarks>
         public IReadOnlyList<ApiVersion> DeclaredApiVersions => declaredVersions.Value;
 
         /// <summary>
