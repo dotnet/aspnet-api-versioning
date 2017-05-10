@@ -23,27 +23,27 @@
     /// Represents the default API versioning route policy.
     /// </summary>
     [CLSCompliant( false )]
-    public class ApiVersionRoutePolicy : IApiVersionRoutePolicy
+    public class DefaultApiVersionRoutePolicy : IApiVersionRoutePolicy
     {
         static readonly Task CompletedTask = Task.FromResult( default( object ) );
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiVersionRoutePolicy"/> class.
+        /// Initializes a new instance of the <see cref="DefaultApiVersionRoutePolicy"/> class.
         /// </summary>
         /// <param name="actionInvokerFactory">The underlying <see cref="IActionInvokerFactory">action invoker factory</see>.</param>
         /// <param name="errorResponseProvider">The <see cref="IErrorResponseProvider">provider</see> used to create error responses.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public ApiVersionRoutePolicy( IActionInvokerFactory actionInvokerFactory, IErrorResponseProvider errorResponseProvider, ILoggerFactory loggerFactory )
+        public DefaultApiVersionRoutePolicy( IActionInvokerFactory actionInvokerFactory, IErrorResponseProvider errorResponseProvider, ILoggerFactory loggerFactory )
             : this( actionInvokerFactory, errorResponseProvider, loggerFactory, null ) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiVersionRoutePolicy"/> class.
+        /// Initializes a new instance of the <see cref="DefaultApiVersionRoutePolicy"/> class.
         /// </summary>
         /// <param name="actionInvokerFactory">The underlying <see cref="IActionInvokerFactory">action invoker factory</see>.</param>
         /// <param name="errorResponseProvider">The <see cref="IErrorResponseProvider">provider</see> used to create error responses.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="actionContextAccessor">The associated <see cref="IActionContextAccessor">action context accessor</see>.</param>
-        public ApiVersionRoutePolicy(
+        public DefaultApiVersionRoutePolicy(
             IActionInvokerFactory actionInvokerFactory,
             IErrorResponseProvider errorResponseProvider,
             ILoggerFactory loggerFactory,

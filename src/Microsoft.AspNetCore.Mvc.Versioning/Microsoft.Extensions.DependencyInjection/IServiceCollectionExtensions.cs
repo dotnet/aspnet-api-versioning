@@ -42,7 +42,7 @@
             services.Add( new ServiceDescriptor( typeof( IErrorResponseProvider ), options.ErrorResponses ) );
             services.Add( Singleton<IOptions<ApiVersioningOptions>>( new OptionsWrapper<ApiVersioningOptions>( options ) ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
-            services.TryAddSingleton<IApiVersionRoutePolicy, ApiVersionRoutePolicy>();
+            services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
 
             if ( options.ReportApiVersions )
             {
