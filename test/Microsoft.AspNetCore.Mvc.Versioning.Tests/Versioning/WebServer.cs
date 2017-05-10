@@ -31,7 +31,7 @@
             }
 
             var hostBuilder = new WebHostBuilder()
-                .Configure( app => app.UseMvc( setupRoutes ) )
+                .Configure( app => app.UseMvc( setupRoutes ).UseApiVersioning() )
                 .ConfigureServices(
                     services =>
                     {

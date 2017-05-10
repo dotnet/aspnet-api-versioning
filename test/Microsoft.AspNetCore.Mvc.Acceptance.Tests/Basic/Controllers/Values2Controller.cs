@@ -9,5 +9,8 @@
     {
         [HttpGet]
         public IActionResult Get() => Ok( new { Controller = nameof( Values2Controller ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+
+        [HttpGet( "{id:int}" )]
+        public IActionResult Get( int id ) => Ok( new { Controller = nameof( Values2Controller ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
     }
 }

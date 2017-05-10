@@ -125,6 +125,15 @@ namespace Microsoft.AspNetCore.Mvc {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An action invoker could not be created for action &apos;{0}&apos;..
+        /// </summary>
+        internal static string CouldNotCreateInvoker {
+            get {
+                return ResourceManager.GetString("CouldNotCreateInvoker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The expression &apos;{0}&apos; must refer to a controller action method..
         /// </summary>
         internal static string InvalidActionMethodExpression {

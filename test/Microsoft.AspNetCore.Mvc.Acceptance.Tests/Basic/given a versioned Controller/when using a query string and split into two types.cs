@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Basic;
     using Microsoft.AspNetCore.Mvc.Basic.Controllers;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -19,20 +18,45 @@
         public async Task then_get_should_return_200( string controller, string apiVersion )
         {
             // arrange
-
+            var example = new { controller = "", version = "" };
 
             // act
             var response = await GetAsync( $"api/values?api-version={apiVersion}" ).EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsAsync<IDictionary<string, string>>();
+            var content = await response.Content.ReadAsExampleAsync( example );
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo(
-                new Dictionary<string, string>()
-                {
-                    ["controller"] = controller,
-                    ["version"] = apiVersion
-                } );
+            content.ShouldBeEquivalentTo( new { controller = controller, version = apiVersion } );
+        }
+
+        [Fact]
+        public async Task then_get_with_string_id_should_return_200()
+        {
+            // arrange
+            var example = new { controller = "", id = "", version = "" };
+
+            // act
+            var response = await GetAsync( $"api/values/42?api-version=1.0" ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
+
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
+            content.ShouldBeEquivalentTo( new { controller = nameof( ValuesController ), id = "42", version = "1.0" } );
+        }
+
+        [Fact]
+        public async Task then_get_with_integer_id_should_return_200()
+        {
+            // arrange
+            var example = new { controller = "", id = 0, version = "" };
+
+            // act
+            var response = await GetAsync( $"api/values/42?api-version=2.0" ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
+
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
+            content.ShouldBeEquivalentTo( new { controller = nameof( Values2Controller ), id = 42, version = "2.0" } );
         }
 
         [Fact]

@@ -8,17 +8,17 @@
 
     abstract class RequestHandler
     {
-        protected RequestHandler( ApiVersioningOptions options, string code, string message )
+        protected RequestHandler( IErrorResponseProvider errorResponseProvider, string code, string message )
         {
-            Contract.Requires( options != null );
+            Contract.Requires( errorResponseProvider != null );
             Contract.Requires( !string.IsNullOrEmpty( message ) );
 
-            Options = options;
+            ErrorResponses = errorResponseProvider;
             Message = message;
             Code = code;
         }
 
-        protected ApiVersioningOptions Options { get; }
+        protected IErrorResponseProvider ErrorResponses { get; }
 
         protected string Code { get; }
 
@@ -41,6 +41,7 @@
             return result.ExecuteResultAsync( actionContext );
         }
 
-        public static implicit operator RequestDelegate( RequestHandler handler ) => handler.ExecuteAsync;
+        public static implicit operator RequestDelegate( RequestHandler handler ) =>
+            handler == null ? default( RequestDelegate ) : handler.ExecuteAsync;
     }
 }

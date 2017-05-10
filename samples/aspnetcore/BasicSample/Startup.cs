@@ -10,6 +10,8 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.AspNetCore.Mvc.Routing;
+
     public class Startup
     {
         public Startup( IHostingEnvironment env )
@@ -27,7 +29,7 @@
         public void ConfigureServices( IServiceCollection services )
         {
             services.AddMvc();
-
+            
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
             services.AddApiVersioning( o => o.ReportApiVersions = true );
         }
@@ -37,6 +39,7 @@
             loggerFactory.AddConsole( Configuration.GetSection( "Logging" ) );
             loggerFactory.AddDebug();
             app.UseMvc();
+            app.UseApiVersioning();
         }
     }
 }

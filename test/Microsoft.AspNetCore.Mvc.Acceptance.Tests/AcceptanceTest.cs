@@ -60,7 +60,7 @@
         TestServer CreateServer()
         {
             var builder = new WebHostBuilder()
-                .Configure( app => app.UseMvc( OnConfigureRoutes ) )
+                .Configure( app => app.UseMvc( OnConfigureRoutes ).UseApiVersioning() )
                 .ConfigureServices( OnConfigureServices );
 
             return new TestServer( builder );

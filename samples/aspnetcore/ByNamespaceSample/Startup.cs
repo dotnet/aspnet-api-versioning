@@ -28,6 +28,7 @@ namespace Microsoft.Examples
             }
 
             app.UseMvc();
+            app.UseApiVersioning();
         }
     }
 }

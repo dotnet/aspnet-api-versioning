@@ -10,8 +10,8 @@
     {
         readonly string[] allowedMethods;
 
-        internal MethodNotAllowedHandler( ApiVersioningOptions options, string code, string message, string[] allowedMethods )
-            : base( options, code, message )
+        internal MethodNotAllowedHandler( IErrorResponseProvider errorResponseProvider, string code, string message, string[] allowedMethods )
+            : base( errorResponseProvider, code, message )
         {
             Contract.Requires( allowedMethods != null );
             this.allowedMethods = allowedMethods;
@@ -19,7 +19,7 @@
 
         protected override IActionResult CreateResult( HttpContext context )
         {
-            var result = Options.ErrorResponses.MethodNotAllowed( context, Code, Message );
+            var result = ErrorResponses.MethodNotAllowed( context, Code, Message );
             return allowedMethods.Length == 0 ? result : new AllowHeaderResult( result, allowedMethods );
         }
 
