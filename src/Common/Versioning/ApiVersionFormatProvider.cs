@@ -12,6 +12,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System.Globalization;
     using System.Reflection;
     using System.Text;
+    using static System.Char;
     using static System.Globalization.DateTimeFormatInfo;
     using static System.String;
 
@@ -492,7 +493,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="format">The format string to apply to the argument.</param>
         /// <param name="arg">The argument to format.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to format the argument.</param>
-        /// <returns>A <see cref="String">string</see> represeting the formatted argument.</returns>
+        /// <returns>A <see cref="string">string</see> represeting the formatted argument.</returns>
         public virtual string Format( string format, object arg, IFormatProvider formatProvider )
         {
             if ( !( arg is ApiVersion value ) )
@@ -911,14 +912,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                     token.Append( ch );
                 }
 
-                for ( var j = i; j < format.Length; j++, i++ )
+                for ( ; i < format.Length; i++ )
                 {
-                    if ( char.IsNumber( ch = format[i] ) )
+                    if ( IsNumber( ch = format[i] ) )
                     {
                         token.Append( ch );
                     }
-
-                    break;
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 tokens.Add( new FormatToken( token.ToString() ) );
