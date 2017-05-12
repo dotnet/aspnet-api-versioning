@@ -61,7 +61,6 @@ namespace Microsoft.Examples
                                   {
                                       foreach ( var group in apiExplorer.ApiDescriptions )
                                       {
-                                          var apiVersion = group.ApiVersion;
                                           var description = "A sample application with Swagger, Swashbuckle, OData, and API versioning.";
 
                                           if ( group.IsDeprecated )
@@ -69,7 +68,7 @@ namespace Microsoft.Examples
                                               description += " This API version has been deprecated.";
                                           }
 
-                                          info.Version( apiExplorer.GetGroupName( apiVersion ), $"Sample API {apiVersion}" )
+                                          info.Version( group.Name, $"Sample API {group.ApiVersion}" )
                                               .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
                                               .Description( description )
                                               .License( l => l.Name( "MIT" ).Url( "https://opensource.org/licenses/MIT" ) )

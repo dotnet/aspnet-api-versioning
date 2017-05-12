@@ -23,7 +23,7 @@
         /// </summary>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to get a description group for.</param>
         /// <returns>A new or existing <see cref="ApiDescriptionGroup">API description group</see>.</returns>
-        public virtual ApiDescriptionGroup GetOrAdd( ApiVersion apiVersion ) => GetOrAdd( apiVersion, _ => null );
+        public virtual ApiDescriptionGroup GetOrAdd( ApiVersion apiVersion ) => GetOrAdd( apiVersion, v => v.ToString() );
 
         /// <summary>
         /// Gets or adds a new API description group for the specified API version.
