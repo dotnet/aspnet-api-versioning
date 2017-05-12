@@ -108,7 +108,24 @@
             properties.ApiVersion = selectionContext.RequestedVersion;
             selectionResult.CandidateActions.AddRange( candidates );
 
-            if ( finalMatches?.Count > 0 )
+            if ( finalMatches == null )
+            {
+                return null;
+            }
+
+            if ( finalMatches.Count == 1 )
+            {
+                var selectedAction = finalMatches[0];
+
+                // note: short-circuit if the api version policy has already been applied to the match
+                if ( selectedAction.VersionPolicyIsApplied() )
+                {
+                    httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
+                    return selectedAction;
+                }
+            }
+
+            if ( finalMatches.Count > 0 )
             {
                 var routeData = new RouteData( context.RouteData );
                 selectionResult.MatchingActions.AddRange( finalMatches.Select( action => new ActionDescriptorMatch( action, routeData ) ) );
