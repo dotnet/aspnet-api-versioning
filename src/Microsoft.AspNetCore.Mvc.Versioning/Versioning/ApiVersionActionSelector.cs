@@ -106,10 +106,11 @@
             var selectionResult = properties.SelectionResult;
 
             properties.ApiVersion = selectionContext.RequestedVersion;
-            selectionResult.CandidateActions.AddRange( candidates );
+            selectionResult.AddCandidates( candidates );
 
             if ( finalMatches == null )
             {
+                selectionResult.EndIteration();
                 return null;
             }
 
@@ -128,12 +129,12 @@
             if ( finalMatches.Count > 0 )
             {
                 var routeData = new RouteData( context.RouteData );
-                selectionResult.MatchingActions.AddRange( finalMatches.Select( action => new ActionDescriptorMatch( action, routeData ) ) );
+                selectionResult.AddMatches( finalMatches.Select( action => new ActionDescriptorMatch( action, routeData ) ) );
             }
 
-            // note: even though we may have had a successful match, this method could be called multiple times.
-            // the final decision is made by the IApiVersionRoutePolicy. we return here to make sure all candidates
-            // have been considered.
+            // note: even though we may have had a successful match, this method could be called multiple times. the final decision
+            // is made by the IApiVersionRoutePolicy. we return here to make sure all candidates have been considered.
+            selectionResult.EndIteration();
             return null;
         }
 

@@ -12,5 +12,8 @@
 
         [HttpGet( "{id:int}" )]
         public IActionResult Get( int id ) => Ok( new { Controller = nameof( Values2Controller ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+
+        [HttpGet( "search" )]
+        public IActionResult Search( string query ) => Ok( new { Controller = nameof( Values2Controller ), Query = query, Version = HttpContext.GetRequestedApiVersion().ToString() } );
     }
 }

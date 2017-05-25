@@ -5,14 +5,20 @@
     using Builder;
     using Extensions.DependencyInjection;
     using Hosting;
+    using Microsoft.AspNetCore.Mvc.Razor;
+    using Microsoft.Extensions.PlatformAbstractions;
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Net.Http;
     using System.Reflection;
     using TestHost;
     using Versioning;
     using Xunit;
+    using static Microsoft.CodeAnalysis.MetadataReference;
     using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
+    using static System.Reflection.Assembly;
 
     [Trait( "Framework", "ASP.NET Core" )]
     public abstract partial class AcceptanceTest : IDisposable
@@ -60,8 +66,9 @@
         TestServer CreateServer()
         {
             var builder = new WebHostBuilder()
-                .Configure( app => app.UseMvc( OnConfigureRoutes ).UseApiVersioning() )
-                .ConfigureServices( OnConfigureServices );
+                .Configure( app => app.UseMvc( OnConfigureRoutes ).UseMvcWithDefaultRoute().UseApiVersioning() )
+                .ConfigureServices( OnConfigureServices )
+                .UseContentRoot( GetContentRoot() );
 
             return new TestServer( builder );
         }
@@ -82,6 +89,33 @@
             services.Add( Singleton( partManager ) );
             services.AddMvc();
             services.AddApiVersioning( OnAddApiVersioning );
+            services.Configure<RazorViewEngineOptions>( options =>
+            {
+                options.CompilationCallback += context =>
+                {
+                    var assembly = GetType().GetTypeInfo().Assembly;
+                    var assemblies = assembly.GetReferencedAssemblies().Select( x => CreateFromFile( Load( x ).Location ) ).ToList();
+
+                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "mscorlib" ) ).Location ) );
+                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "System.Private.Corelib" ) ).Location ) );
+                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "System.Dynamic.Runtime" ) ).Location ) );
+                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "Microsoft.AspNetCore.Razor" ) ).Location ) );
+                    context.Compilation = context.Compilation.AddReferences( assemblies );
+                };
+            } );
+        }
+
+        string GetContentRoot()
+        {
+            var startupAssembly = GetType().GetTypeInfo().Assembly.GetName().Name;
+            var contentRoot = new DirectoryInfo( PlatformServices.Default.Application.ApplicationBasePath );
+
+            while ( contentRoot.Name != startupAssembly )
+            {
+                contentRoot = contentRoot.Parent;
+            }
+
+            return contentRoot.FullName;
         }
 
         protected abstract void OnAddApiVersioning( ApiVersioningOptions options );

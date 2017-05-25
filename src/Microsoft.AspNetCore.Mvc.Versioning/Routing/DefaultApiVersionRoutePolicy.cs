@@ -98,18 +98,24 @@
         public virtual Task RouteAsync( RouteContext context )
         {
             var selectionResult = context.HttpContext.ApiVersionProperties().SelectionResult;
+            var match = selectionResult.BestMatch;
 
-            switch ( selectionResult.MatchingActions.Count )
+            if ( match == null )
             {
-                case 0:
-                    OnUnmatched( context, selectionResult );
-                    break;
-                case 1:
-                    OnSingleMatch( context, selectionResult, selectionResult.MatchingActions.First() );
-                    break;
-                default:
+                var hasAnyMatches = selectionResult.MatchingActions.SelectMany( i => i.Value ).Any();
+
+                if ( hasAnyMatches )
+                {
                     OnMultipleMatches( context, selectionResult );
-                    break;
+                }
+                else
+                {
+                    OnUnmatched( context, selectionResult );
+                }
+            }
+            else
+            {
+                OnSingleMatch( context, selectionResult, selectionResult.BestMatch );
             }
 
             return CompletedTask;
@@ -128,8 +134,9 @@
             Arg.NotNull( match, nameof( match ) );
 
             var handler = new DefaultActionHandler( ActionInvokerFactory, ActionContextAccessor, selectionResult, match );
+            var candidates = selectionResult.CandidateActions.SelectMany( kvp => kvp.Value );
 
-            match.Action.AggregateAllVersions( selectionResult.CandidateActions );
+            match.Action.AggregateAllVersions( candidates );
             context.Handler = handler.Invoke;
         }
 
@@ -157,7 +164,8 @@
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( selectionResult, nameof( selectionResult ) );
 
-            var actionNames = Join( NewLine, selectionResult.MatchingActions.Select( match => match.Action.DisplayName ) );
+            var matchingActions = selectionResult.MatchingActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct();
+            var actionNames = Join( NewLine, matchingActions.Select( match => match.Action.DisplayName ) );
 
             Logger.AmbiguousActions( actionNames );
 
@@ -172,9 +180,9 @@
             Contract.Requires( selectionResult != null );
 
             const RequestHandler NotFound = default( RequestHandler );
-            var candidates = selectionResult.CandidateActions;
+            var candidates = selectionResult.CandidateActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct().ToArray();
 
-            if ( candidates.Count == 0 )
+            if ( candidates.Length == 0 )
             {
                 return NotFound;
             }
