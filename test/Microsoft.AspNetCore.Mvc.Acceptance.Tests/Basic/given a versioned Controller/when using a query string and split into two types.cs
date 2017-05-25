@@ -88,5 +88,22 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
+
+        [Theory]
+        [InlineData( nameof( ValuesController ), "1.0" )]
+        [InlineData( nameof( Values2Controller ), "2.0" )]
+        public async Task then_action_segment_should_not_be_ambiguous_with_route_parameter( string controller, string apiVersion )
+        {
+            // arrange
+            var example = new { controller = "", query = "", version = "" };
+
+            // act
+            var response = await GetAsync( $"api/values/search?query=Foo&api-version={apiVersion}" ).EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsExampleAsync( example );
+
+            // assert
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
+            content.ShouldBeEquivalentTo( new { controller = controller, query = "Foo", version = apiVersion } );
+        }
     }
 }

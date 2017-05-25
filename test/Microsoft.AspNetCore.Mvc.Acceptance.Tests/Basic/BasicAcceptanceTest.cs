@@ -11,6 +11,8 @@
             FilteredControllerTypes.Add( typeof( ValuesController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( Values2Controller ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( HelloWorldController ).GetTypeInfo() );
+            FilteredControllerTypes.Add( typeof( HelloWorld2Controller ).GetTypeInfo() );
+            FilteredControllerTypes.Add( typeof( HomeController ).GetTypeInfo() );
         }
 
         protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;

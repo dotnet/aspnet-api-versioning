@@ -20,7 +20,11 @@
         public override ActionDescriptor SelectBestCandidate( RouteContext context, IReadOnlyList<ActionDescriptor> candidates )
         {
             var bestCandidate = base.SelectBestCandidate( context, candidates );
-            SelectedCandidate = context.HttpContext.ApiVersionProperties().SelectionResult.MatchingActions.FirstOrDefault()?.Action;
+            var selectionResult = context.HttpContext.ApiVersionProperties().SelectionResult;
+            var matchingActions = selectionResult.MatchingActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct();
+
+            SelectedCandidate = matchingActions.FirstOrDefault()?.Action;
+
             return bestCandidate;
         }
 
