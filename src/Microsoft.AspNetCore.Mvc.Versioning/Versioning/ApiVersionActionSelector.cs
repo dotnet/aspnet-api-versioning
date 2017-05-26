@@ -13,6 +13,7 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using static ErrorCodes;
+    using System.Collections;
 
     /// <summary>
     /// Represents the logic for selecting an API-versioned, action method.
@@ -129,7 +130,10 @@
             if ( finalMatches.Count > 0 )
             {
                 var routeData = new RouteData( context.RouteData );
-                selectionResult.AddMatches( finalMatches.Select( action => new ActionDescriptorMatch( action, routeData ) ) );
+                var matchingActions = new MatchingActionSequence( finalMatches, routeData );
+
+                selectionResult.AddMatches( matchingActions );
+                selectionResult.TrySetBestMatch( matchingActions.BestMatch );
             }
 
             // note: even though we may have had a successful match, this method could be called multiple times. the final decision
@@ -359,6 +363,42 @@
             {
                 return EvaluateActionConstraintsCore( context, actionsWithoutConstraint, order );
             }
+        }
+
+        sealed class MatchingActionSequence : IEnumerable<ActionDescriptorMatch>
+        {
+            readonly IReadOnlyList<ActionDescriptor> matches;
+            readonly RouteData routeData;
+
+            internal MatchingActionSequence( IReadOnlyList<ActionDescriptor> matches, RouteData routeData )
+            {
+                Contract.Requires( matches != null );
+                Contract.Requires( matches.Count > 0 );
+                Contract.Requires( routeData != null );
+
+                this.matches = matches;
+                this.routeData = routeData;
+            }
+
+            internal ActionDescriptorMatch BestMatch { get; private set; }
+
+            public IEnumerator<ActionDescriptorMatch> GetEnumerator()
+            {
+                if ( matches.Count == 1 )
+                {
+                    BestMatch = new ActionDescriptorMatch( matches[0], routeData );
+                    yield return BestMatch;
+                }
+                else
+                {
+                    for ( var i = 0; i < matches.Count; i++ )
+                    {
+                        yield return new ActionDescriptorMatch( matches[i], routeData );
+                    }
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

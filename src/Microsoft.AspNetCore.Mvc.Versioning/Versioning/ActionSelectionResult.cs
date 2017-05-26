@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using static System.Threading.Interlocked;
 
     /// <summary>
     /// Represents an API versioning action selection result for which a versioning policy can be applied.
@@ -12,6 +13,7 @@
     {
         readonly Dictionary<int, ICollection<ActionDescriptor>> candidateActions = new Dictionary<int, ICollection<ActionDescriptor>>();
         readonly Dictionary<int, ICollection<ActionDescriptorMatch>> matchingActions = new Dictionary<int, ICollection<ActionDescriptorMatch>>();
+        ActionDescriptorMatch bestMatch;
 
         /// <summary>
         /// Gets the number of action selection iterations that have occurred.
@@ -26,26 +28,7 @@
         /// <remarks>This property returns the first occurrence of a single match in the earliest iteration. If
         /// no matches exist in any iteration or multiple matches exist, this property returns <c>null</c>.</remarks>
         [CLSCompliant( false )]
-        public ActionDescriptorMatch BestMatch
-        {
-            get
-            {
-                foreach ( var iteration in matchingActions )
-                {
-                    switch ( iteration.Value.Count )
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                            return iteration.Value.ElementAt( 0 );
-                        default:
-                            return null;
-                    }
-                }
-
-                return null;
-            }
-        }
+        public ActionDescriptorMatch BestMatch => bestMatch;
 
         /// <summary>
         /// Gets a collection of candidate actions grouped by action selection iteration.
@@ -159,6 +142,24 @@
             }
 
             ++Iterations;
+        }
+
+        /// <summary>
+        /// Attempts to update the best match.
+        /// </summary>
+        /// <param name="match">The <see cref="ActionDescriptorMatch">match</see> to attempt to set as the best match.
+        /// This value can be <c>null</c>.</param>
+        /// <returns>True if the match is successfully set; otherwise, false.</returns>
+        [CLSCompliant( false )]
+        public bool TrySetBestMatch( ActionDescriptorMatch match )
+        {
+            if ( match == null )
+            {
+                return false;
+            }
+
+            const ActionDescriptorMatch NoMatch = default( ActionDescriptorMatch );
+            return CompareExchange( ref bestMatch, match, NoMatch ) == NoMatch;
         }
     }
 }

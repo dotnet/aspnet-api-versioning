@@ -21,9 +21,8 @@
         {
             var bestCandidate = base.SelectBestCandidate( context, candidates );
             var selectionResult = context.HttpContext.ApiVersionProperties().SelectionResult;
-            var matchingActions = selectionResult.MatchingActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct();
 
-            SelectedCandidate = matchingActions.FirstOrDefault()?.Action;
+            SelectedCandidate = selectionResult.BestMatch?.Action;
 
             return bestCandidate;
         }
