@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Basic.Controllers
+﻿namespace Microsoft.AspNetCore.Mvc.Basic.Controllers.WithViewsUsingConventions
 {
     using System;
 
