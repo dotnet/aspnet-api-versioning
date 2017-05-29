@@ -382,18 +382,39 @@
 
             internal ActionDescriptorMatch BestMatch { get; private set; }
 
+            RouteData NewMatchRouteData( ActionDescriptor match )
+            {
+                Contract.Requires( match != null );
+                Contract.Ensures( Contract.Result<RouteData>() != null );
+
+                var matchedRouteData = new RouteData( routeData );
+                var matchedRouteValues = matchedRouteData.Values;
+
+                foreach ( var entry in match.RouteValues )
+                {
+                    if ( !matchedRouteValues.ContainsKey( entry.Key ) )
+                    {
+                        matchedRouteValues.Add( entry.Key, entry.Value );
+                    }
+                }
+
+                return matchedRouteData;
+            }
+
             public IEnumerator<ActionDescriptorMatch> GetEnumerator()
             {
                 if ( matches.Count == 1 )
                 {
-                    BestMatch = new ActionDescriptorMatch( matches[0], routeData );
+                    var match = matches[0];
+                    BestMatch = new ActionDescriptorMatch( match, NewMatchRouteData( match ) );
                     yield return BestMatch;
                 }
                 else
                 {
                     for ( var i = 0; i < matches.Count; i++ )
                     {
-                        yield return new ActionDescriptorMatch( matches[i], routeData );
+                        var match = matches[i];
+                        yield return new ActionDescriptorMatch( match, NewMatchRouteData( match ) );
                     }
                 }
             }
