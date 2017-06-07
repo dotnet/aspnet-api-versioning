@@ -60,10 +60,9 @@ namespace Microsoft.Examples
                                                 .TermsOfService( "Shareware" );
                                         }
                                     } );
-
-
-                                // add a custom operation filter which documents the implicit API version parameter
-                                swagger.OperationFilter<ImplicitApiVersionParameter>();
+                                
+                                // add a custom operation filter which sets default values
+                                swagger.OperationFilter<SwaggerDefaultValues>();
 
                                 // integrate xml comments
                                 swagger.IncludeXmlComments( XmlCommentsFilePath );

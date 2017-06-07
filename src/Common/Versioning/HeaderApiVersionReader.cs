@@ -7,6 +7,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System;
     using System.Collections.Generic;
     using static System.StringComparer;
+    using static ApiVersionParameterLocation;
 
     /// <summary>
     /// Represents a service API version reader that reads the value from a HTTP header.
@@ -44,5 +45,19 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <value>A <see cref="ICollection{T}">collection</see> of HTTP header names.</value>
         /// <remarks>HTTP header names are evaluated in a case-insensitive manner.</remarks>
         public ICollection<string> HeaderNames { get; } = new HashSet<string>( OrdinalIgnoreCase );
+
+        /// <summary>
+        /// Provides API version parameter descriptions supported by the current reader using the supplied provider.
+        /// </summary>
+        /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
+        public virtual void AddParmeters( IApiVersionParameterDescriptionContext context )
+        {
+            Arg.NotNull( context, nameof( context ) );
+
+            foreach ( var name in HeaderNames )
+            {
+                context.AddParameter( name, Header );
+            }
+        }
     }
 }

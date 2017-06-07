@@ -63,8 +63,8 @@
                         options.SwaggerDoc( description.GroupName, CreateInfoForApiVersion( description ) );
                     }
 
-                    // add a custom operation filter which documents the implicit API version parameter
-                    options.OperationFilter<ImplicitApiVersionParameter>();
+                    // add a custom operation filter which sets default values
+                    options.OperationFilter<SwaggerDefaultValues>();
 
                     // integrate xml comments
                     options.IncludeXmlComments( XmlCommentsFilePath );

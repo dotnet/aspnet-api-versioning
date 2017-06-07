@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.Web.Http.Versioning
 {
     using FluentAssertions;
+    using Moq;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using Xunit;
+    using static ApiVersionParameterLocation;
+    using static System.Net.Http.Headers.MediaTypeWithQualityHeaderValue;
     using static System.Net.Http.HttpMethod;
     using static System.Text.Encoding;
-    using static System.Net.Http.Headers.MediaTypeWithQualityHeaderValue;
 
     public class MediaTypeApiVersionReaderTest
     {
@@ -153,6 +155,22 @@
 
             // assert
             version.Should().Be( "3.0" );
+        }
+
+        [Fact]
+        public void add_parameters_should_add_parameter_for_media_type()
+        {
+            // arrange
+            var reader = new MediaTypeApiVersionReader();
+            var context = new Mock<IApiVersionParameterDescriptionContext>();
+
+            context.Setup( c => c.AddParameter( It.IsAny<string>(), It.IsAny<ApiVersionParameterLocation>() ) );
+
+            // act
+            reader.AddParmeters( context.Object );
+
+            // assert
+            context.Verify( c => c.AddParameter( "v", MediaTypeParameter ), Times.Once() );
         }
     }
 }

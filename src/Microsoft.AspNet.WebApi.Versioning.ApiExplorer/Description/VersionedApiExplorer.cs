@@ -625,6 +625,22 @@
             return apiDescriptions;
         }
 
+        /// <summary>
+        /// Populates the API version parameters for the specified API description.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to populate parameters for.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> used to populate parameters with.</param>
+        protected virtual void PopulateApiVersionParameters( ApiDescription apiDescription, ApiVersion apiVersion )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+
+            var parameterSource = Options.ApiVersionParameterSource;
+            var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, Options );
+
+            parameterSource.AddParmeters( context );
+        }
+
         void ExploreRouteActions(
             IHttpRoute route,
             string localPath,
@@ -758,6 +774,7 @@
                 apiDescription.SupportedResponseFormatters.AddRange( supportedResponseFormatters );
                 apiDescription.SupportedRequestBodyFormatters.AddRange( supportedRequestBodyFormatters );
                 apiDescription.ParameterDescriptions.AddRange( parameterDescriptions );
+                PopulateApiVersionParameters( apiDescription, apiVersion );
                 apiDescriptions.Add( apiDescription );
             }
         }
