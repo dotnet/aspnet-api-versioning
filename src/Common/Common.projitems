@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModelDebugView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModelExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionParameterLocation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionRequestProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionsBaseAttribute.cs" />
@@ -44,6 +45,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ErrorResponseContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\HeaderApiVersionReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionNeutral.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionParameterDescriptionContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionParameterSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionSelector.cs" />

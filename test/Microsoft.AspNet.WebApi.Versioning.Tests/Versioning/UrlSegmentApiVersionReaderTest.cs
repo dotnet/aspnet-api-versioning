@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.Web.Http.Versioning
 {
     using FluentAssertions;
+    using Moq;
     using Routing;
     using System;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
     using Xunit;
+    using static ApiVersionParameterLocation;
     using static System.Net.Http.HttpMethod;
 
     public class UrlSegmentApiVersionReaderTest
@@ -45,6 +47,22 @@
             configuration.MapHttpAttributeRoutes( constraintResolver );
 
             return configuration;
+        }
+
+        [Fact]
+        public void add_parameters_should_add_parameter_for_url_segment()
+        {
+            // arrange
+            var reader = new UrlSegmentApiVersionReader();
+            var context = new Mock<IApiVersionParameterDescriptionContext>();
+
+            context.Setup( c => c.AddParameter( It.IsAny<string>(), It.IsAny<ApiVersionParameterLocation>() ) );
+
+            // act
+            reader.AddParmeters( context.Object );
+
+            // assert
+            context.Verify( c => c.AddParameter( null, Path ), Times.Once() );
         }
     }
 }

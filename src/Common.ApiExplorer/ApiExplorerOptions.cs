@@ -6,6 +6,9 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using System;
     using Versioning;
+#if !WEBAPI
+    using LocalSR = SR;
+#endif
 
     /// <summary>
     /// Represents the possible API versioning options for the API explorer.
@@ -21,5 +24,12 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// as well as the <see cref="ApiVersion.ToString(string)"/> and <see cref="ApiVersion.ToString(string, IFormatProvider)"/>
         /// methods.</remarks>
         public string GroupNameFormat { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the default description used for API version parameters.
+        /// </summary>
+        /// <value>The default description for API version parameters. The default value
+        /// is "The requested API version".</value>
+        public string DefaultApiVersionParameterDescription { get; set; } = LocalSR.DefaultApiVersionParamDesc;
     }
 }

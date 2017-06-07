@@ -4,9 +4,7 @@
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
-    using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
@@ -23,6 +21,7 @@
     public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     {
         readonly IOptions<ApiExplorerOptions> options;
+        readonly Lazy<ModelMetadata> modelMetadata;
 
         /// <summary>
         /// Initializes a new instance of <see cref="VersionedApiDescriptionProvider"/> class.
@@ -34,15 +33,16 @@
             Arg.NotNull( metadadataProvider, nameof( metadadataProvider ) );
             Arg.NotNull( options, nameof( options ) );
 
-            MetadadataProvider = metadadataProvider;
+            MetadataProvider = metadadataProvider;
             this.options = options;
+            modelMetadata = new Lazy<ModelMetadata>( NewModelMetadata );
         }
 
         /// <summary>
         /// Gets the model metadata provider associated with the API description provider.
         /// </summary>
         /// <value>The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</value>
-        protected IModelMetadataProvider MetadadataProvider { get; }
+        protected IModelMetadataProvider MetadataProvider { get; }
 
         /// <summary>
         /// Gets the options associated with the API explorer.
@@ -88,6 +88,22 @@
         }
 
         /// <summary>
+        /// Populates the API version parameters for the specified API description.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to populate parameters for.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> used to populate parameters with.</param>
+        protected virtual void PopulateApiVersionParameters( ApiDescription apiDescription, ApiVersion apiVersion )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+
+            var parameterSource = Options.ApiVersionParameterSource;
+            var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
+
+            parameterSource.AddParmeters( context );
+        }
+
+        /// <summary>
         /// Occurs after the providers have been executed.
         /// </summary>
         /// <param name="context">The current <see cref="ApiDescriptionProviderContext">execution context</see>.</param>
@@ -102,7 +118,7 @@
             }
 
             var groupResults = new List<ApiDescription>();
-            var stringModelMetadata = new Lazy<ModelMetadata>( () => MetadadataProvider.GetMetadataForType( typeof( string ) ) );
+            var parameterSource = Options.ApiVersionParameterSource;
 
             foreach ( var version in FlattenApiVersions( results ) )
             {
@@ -112,19 +128,17 @@
                 {
                     var action = result.ActionDescriptor;
 
-                    if ( ShouldExploreAction( action, version ) )
+                    if ( !ShouldExploreAction( action, version ) )
                     {
-                        foreach ( var parameter in result.ParameterDescriptions )
-                        {
-                            ApplyModelMetadataIfNecessary( parameter, stringModelMetadata );
-                        }
-
-                        var groupResult = result.Clone();
-
-                        groupResult.GroupName = groupName;
-                        groupResult.SetApiVersion( version );
-                        groupResults.Add( groupResult );
+                        continue;
                     }
+
+                    var groupResult = result.Clone();
+
+                    groupResult.GroupName = groupName;
+                    groupResult.SetApiVersion( version );
+                    PopulateApiVersionParameters( groupResult, version );
+                    groupResults.Add( groupResult );
                 }
             }
 
@@ -171,27 +185,9 @@
             return versions.OrderBy( v => v );
         }
 
-        static void ApplyModelMetadataIfNecessary( ApiParameterDescription parameter, Lazy<ModelMetadata> stringModelMetadata )
-        {
-            if ( parameter.ModelMetadata != null )
-            {
-                return;
-            }
-
-            var constraints = parameter?.RouteInfo.Constraints ?? Empty<IRouteConstraint>();
-
-            // versioning by URL path segment is the only method that the built-in api explorer will detect as a parameter.
-            // since the route parameter likely has no counterpart in model binding, fill in what the model metadata "should"
-            // be. this is only required when the ApiVersionRouteConstraint is found. all other methods such as versioning
-            // by query string, header, or media type will require service authors to add the corresponding parameter in
-            // tools such as Swagger. treat the api version as a string for the purposes of api exploration.
-            if ( constraints.OfType<ApiVersionRouteConstraint>().Any() )
-            {
-                var modelMetadata = stringModelMetadata.Value;
-
-                parameter.ModelMetadata = modelMetadata;
-                parameter.Type = modelMetadata.ModelType;
-            }
-        }
+        ModelMetadata NewModelMetadata() =>
+            new ApiVersionModelMetadata(
+                MetadataProvider.GetMetadataForType( typeof( string ) ),
+                Options.DefaultApiVersionParameterDescription );
     }
 }

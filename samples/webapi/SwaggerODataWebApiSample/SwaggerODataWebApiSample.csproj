@@ -127,7 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaseInsensitiveODataUriResolver.cs" />
-    <Compile Include="ImplicitApiVersionParameter.cs" />
+    <Compile Include="SwaggerDefaultValues.cs" />
     <Compile Include="Configuration\ApiVersions.cs" />
     <Compile Include="Configuration\OrderModelConfiguration.cs" />
     <Compile Include="Configuration\PersonModelConfiguration.cs" />

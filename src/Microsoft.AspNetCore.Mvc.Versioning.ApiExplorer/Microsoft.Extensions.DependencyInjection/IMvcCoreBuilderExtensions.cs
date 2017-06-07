@@ -46,12 +46,14 @@
             Contract.Requires( setupAction != null );
             Contract.Ensures( Contract.Result<IOptions<ApiExplorerOptions>>() != null );
 
-            var versioningOptions = serviceProvider.GetService<IOptions<ApiVersioningOptions>>();
+            var versioningOptions = serviceProvider.GetService<IOptions<ApiVersioningOptions>>()?.Value;
             var options = new ApiExplorerOptions();
 
             if ( versioningOptions != null )
             {
-                options.DefaultApiVersion = versioningOptions.Value.DefaultApiVersion;
+                options.DefaultApiVersion = versioningOptions.DefaultApiVersion;
+                options.ApiVersionParameterSource = versioningOptions.ApiVersionReader;
+                options.AssumeDefaultVersionWhenUnspecified = versioningOptions.AssumeDefaultVersionWhenUnspecified;
             }
 
             setupAction( options );

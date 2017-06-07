@@ -377,6 +377,7 @@
                 apiDescription.ParameterDescriptions.AddRange( parameterDescriptions );
                 apiDescription.SupportedRequestBodyFormatters.AddRange( requestFormatters );
                 apiDescription.SupportedResponseFormatters.AddRange( responseFormatters );
+                PopulateApiVersionParameters( apiDescription, apiVersion );
                 apiDescriptions.Add( apiDescription );
             }
         }

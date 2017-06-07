@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #else
     using MediaTypeWithQualityHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 #endif
-
+    using static ApiVersionParameterLocation;
 
     /// <summary>
     /// Represents a service API version reader that reads the value from a media type HTTP header in the request.
@@ -117,6 +117,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Provides API version parameter descriptions supported by the current reader using the supplied provider.
+        /// </summary>
+        /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
+        public virtual void AddParmeters( IApiVersionParameterDescriptionContext context )
+        {
+            Arg.NotNull( context, nameof( context ) );
+            context.AddParameter( ParameterName, MediaTypeParameter );
         }
     }
 }

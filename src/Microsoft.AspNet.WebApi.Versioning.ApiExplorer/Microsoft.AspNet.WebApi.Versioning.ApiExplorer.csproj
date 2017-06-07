@@ -26,6 +26,21 @@
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
 
+ <ItemGroup>
+   <Compile Update="LocalSR.Designer.cs">
+     <DesignTime>True</DesignTime>
+     <AutoGen>True</AutoGen>
+     <DependentUpon>LocalSR.resx</DependentUpon>
+   </Compile>
+ </ItemGroup>
+
+ <ItemGroup>
+   <EmbeddedResource Update="LocalSR.resx">
+     <Generator>ResXFileCodeGenerator</Generator>
+     <LastGenOutput>LocalSR.Designer.cs</LastGenOutput>
+   </EmbeddedResource>
+ </ItemGroup>
+
  <Import Project="..\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
 

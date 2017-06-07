@@ -66,5 +66,49 @@
 
             return clone;
         }
+
+        internal static ApiRequestFormat Clone( this ApiRequestFormat requestFormat )
+        {
+            Contract.Requires( requestFormat != null );
+            Contract.Ensures( Contract.Result<ApiRequestFormat>() != null );
+
+            return new ApiRequestFormat()
+            {
+                Formatter = requestFormat.Formatter,
+                MediaType = requestFormat.MediaType
+            };
+        }
+
+        internal static ApiResponseType Clone( this ApiResponseType responseType )
+        {
+            Contract.Requires( responseType != null );
+            Contract.Ensures( Contract.Result<ApiResponseType>() != null );
+
+            var clone = new ApiResponseType()
+            {
+                ModelMetadata = responseType.ModelMetadata,
+                StatusCode = responseType.StatusCode,
+                Type = responseType.Type
+            };
+
+            foreach ( var responseFormat in responseType.ApiResponseFormats )
+            {
+                clone.ApiResponseFormats.Add( responseFormat.Clone() );
+            }
+
+            return clone;
+        }
+
+        static ApiResponseFormat Clone( this ApiResponseFormat responseFormat )
+        {
+            Contract.Requires( responseFormat != null );
+            Contract.Ensures( Contract.Result<ApiResponseFormat>() != null );
+
+            return new ApiResponseFormat()
+            {
+                Formatter = responseFormat.Formatter,
+                MediaType = responseFormat.MediaType
+            };
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
     [CLSCompliant( false )]
 #endif
-    public interface IApiVersionReader
+    public interface IApiVersionReader : IApiVersionParameterSource
     {
         /// <summary>
         /// Reads the service API version value from a request.

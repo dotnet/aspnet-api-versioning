@@ -1,9 +1,11 @@
 ﻿namespace Microsoft.Web.Http.Versioning
 {
     using FluentAssertions;
+    using Moq;
     using System;
     using System.Net.Http;
     using Xunit;
+    using static ApiVersionParameterLocation;
     using static System.Net.Http.HttpMethod;
 
     public class QueryStringOrHeaderApiVersionReaderTest
@@ -56,6 +58,24 @@
 
             // assert
             version.Should().Be( "1.0" );
+        }
+
+        [Fact]
+        public void add_parameters_should_add_parameter_for_source()
+        {
+            // arrange
+            var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
+            var context = new Mock<IApiVersionParameterDescriptionContext>();
+
+            context.Setup( c => c.AddParameter( It.IsAny<string>(), It.IsAny<ApiVersionParameterLocation>() ) );
+
+            // act
+            reader.AddParmeters( context.Object );
+
+            // assert
+            context.Verify( c => c.AddParameter( "api-version", Query ), Times.Once() );
+            context.Verify( c => c.AddParameter( "api-version", Header ), Times.Once() );
+            context.Verify( c => c.AddParameter( "x-ms-version", Header ), Times.Once() );
         }
     }
 }
