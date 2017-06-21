@@ -3,7 +3,6 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ActionConstraints;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Routing;
@@ -16,6 +15,7 @@
     using Versioning;
     using static ApiVersion;
     using static System.Environment;
+    using static System.Linq.Enumerable;
     using static System.String;
     using static Versioning.ErrorCodes;
 
@@ -193,10 +193,7 @@
             var requestedVersion = default( string );
             var parsedVersion = properties.ApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
-            var allowedMethods = new Lazy<HashSet<string>>(
-                () => new HashSet<string>( candidates.SelectMany( c => c.ActionConstraints.OfType<HttpMethodActionConstraint>() )
-                                                     .SelectMany( ac => ac.HttpMethods ),
-                                           StringComparer.OrdinalIgnoreCase ) );
+            var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates ) );
             var newRequestHandler = default( Func<IErrorResponseProvider, string, string, RequestHandler> );
 
             if ( parsedVersion == null )
@@ -248,6 +245,29 @@
 
             var message = SR.VersionedResourceNotSupported.FormatDefault( httpContext.Request.GetDisplayUrl(), requestedVersion );
             return newRequestHandler( ErrorResponseProvider, code, message );
+        }
+
+        static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates )
+        {
+            Contract.Requires( candidates != null );
+            Contract.Ensures( Contract.Result<HashSet<string>>() != null );
+
+            var httpMethods = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+
+            foreach ( var candidate in candidates )
+            {
+                if ( candidate.ActionConstraints == null )
+                {
+                    continue;
+                }
+
+                foreach ( var constraint in candidate.ActionConstraints.OfType<HttpMethodActionConstraint>() )
+                {
+                    httpMethods.AddRange( constraint.HttpMethods );
+                }
+            }
+
+            return httpMethods;
         }
 
         sealed class DefaultActionHandler
