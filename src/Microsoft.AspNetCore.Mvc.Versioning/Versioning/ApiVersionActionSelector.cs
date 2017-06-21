@@ -120,7 +120,8 @@
                 var selectedAction = finalMatches[0];
 
                 // note: short-circuit if the api version policy has already been applied to the match
-                if ( selectedAction.VersionPolicyIsApplied() )
+                // and no other better match has already been selected
+                if ( selectedAction.VersionPolicyIsApplied() && selectionResult.BestMatch == null )
                 {
                     httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
                     return selectedAction;
@@ -137,7 +138,7 @@
             }
 
             // note: even though we may have had a successful match, this method could be called multiple times. the final decision
-            // is made by the IApiVersionRoutePolicy. we return here to make sure all candidates have been considered.
+            // is made by the IApiVersionRoutePolicy. we return here to make sure all candidates have been considered at least once.
             selectionResult.EndIteration();
             return null;
         }
