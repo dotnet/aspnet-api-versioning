@@ -10,43 +10,43 @@ The supported flavors of ASP.NET are:
 
 * **ASP.NET Web API** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Versioning) |
-  [quick start](/wiki/New-Services-Quick-Start#aspnet-web-api) |
-  [samples](/tree/master/samples/webapi) )
+  [quick start](../../wiki/New-Services-Quick-Start#aspnet-web-api) |
+  [samples](../../tree/master/samples/webapi) )
   <br>Adds service API versioning to your Web API applications<br>
 
 * **ASP.NET Web API and OData** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNet.OData.Versioning) |
   [quick start](/wiki/New-Services-Quick-Start#aspnet-web-api-with-odata-v40) |
-  [samples](/tree/master/samples/webapi) )
+  [samples](../../tree/master/samples/webapi) )
   <br>Adds service API versioning to your Web API applications using OData v4.0<br>
 
 * **ASP.NET Core** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Versioning) |
-  [quick start](https://github.com/Microsoft/aspnet-api-versioning/wiki/New-Services-Quick-Start#aspnet-core) |
-  [samples](/tree/master/samples/aspnetcore) )
+  [quick start](../../wiki/New-Services-Quick-Start#aspnet-core) |
+  [samples](../../tree/master/samples/aspnetcore) )
   <br>Adds service API versioning to your ASP.NET Core applications
 
 This is also the home of the ASP.NET API versioning API explorers that you can use to easily document your REST APIs with Swagger:
 
 * **ASP.NET Web API Versioned API Explorer** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Versioning.ApiExplorer) |
-  [quick start](/wiki/API-Documentation#aspnet-web-api) |
-  [samples](/tree/master/samples/webapi/SwaggerWebApiSample) )
+  [quick start](../../wiki/API-Documentation#aspnet-web-api) |
+  [samples](../../tree/master/samples/webapi/SwaggerWebApiSample) )
   <br> Replaces the default API explorer in your Web API applications<br>
 
 * **ASP.NET Web API with OData API Explorer** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNet.OData.Versioning.ApiExplorer) |
-  [quick start](/wiki/API-Documentation#aspnet-web-api-with-odata) |
-  [samples](/tree/master/samples/webapi/SwaggerODataWebApiSample) )
+  [quick start](../../wiki/API-Documentation#aspnet-web-api-with-odata) |
+  [samples](../../tree/master/samples/webapi/SwaggerODataWebApiSample) )
   <br>Adds an API explorer to your Web API applications using OData v4.0<br>
 
 * **ASP.NET Core Versioned API Explorer** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer) |
-  [quick start](/wiki/API-Documentation#aspnet-core) |
-  [samples](/tree/master/samples/aspnetcore/SwaggerSample) )
+  [quick start](../../wiki/API-Documentation#aspnet-core) |
+  [samples](../../tree/master/samples/aspnetcore/SwaggerSample) )
   <br>Adds additional API explorer support to your ASP.NET Core applications
 
-You can additional find samples, documentation, and getting started instructions in the [wiki](/wiki).
+You can additional find samples, documentation, and getting started instructions in the [wiki](../../wiki).
 
 ----
-> If you are an existing user, please makes sure you review the [release notes](/releases) between all major and minor package releases.
+> If you are an existing user, please makes sure you review the [release notes](../../releases) between all major and minor package releases.
