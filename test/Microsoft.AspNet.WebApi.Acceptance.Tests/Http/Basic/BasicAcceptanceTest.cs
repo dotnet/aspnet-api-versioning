@@ -17,6 +17,8 @@
             FilteredControllerTypes.Add( typeof( ValuesController ) );
             FilteredControllerTypes.Add( typeof( Values2Controller ) );
             FilteredControllerTypes.Add( typeof( HelloWorldController ) );
+            FilteredControllerTypes.Add( typeof( PingController ) );
+            FilteredControllerTypes.Add( typeof( OverlappingRouteTemplateController ) );
             Configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             Configuration.MapHttpAttributeRoutes( constraintResolver );
             Configuration.EnsureInitialized();
