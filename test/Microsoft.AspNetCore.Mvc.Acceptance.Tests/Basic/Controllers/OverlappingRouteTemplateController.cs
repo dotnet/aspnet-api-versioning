@@ -12,5 +12,11 @@
 
         [HttpGet( "{id:int}/children" )]
         public IActionResult Get( int id ) => Ok( new { id } );
+
+        [HttpGet( "{id:int}/ambiguous" )]
+        public IActionResult Ambiguous( int id ) => Ok();
+
+        [HttpGet( "{id:int}/ambiguous" )]
+        public IActionResult Ambiguous2( int id ) => Ok();
     }
 }

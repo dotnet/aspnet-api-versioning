@@ -22,6 +22,13 @@
         public int Iterations { get; private set; }
 
         /// <summary>
+        /// Gets a value indicating whether are higher precendence matches in previous iterations.
+        /// </summary>
+        /// <value>True if there are higher precendence matches in one or more previous iterations;
+        /// otherwise, false. The default value is <c>false</c>.</value>
+        public bool HasMatchesInPreviousIterations { get; private set; }
+
+        /// <summary>
         /// Gets the best action descriptor match.
         /// </summary>
         /// <value>The best <see cref="ActionDescriptorMatch">action descriptor match</see> or <c>null</c>.</value>
@@ -142,6 +149,7 @@
             }
 
             ++Iterations;
+            HasMatchesInPreviousIterations |= matchingActions[key].Count > 0;
         }
 
         /// <summary>
@@ -153,7 +161,7 @@
         [CLSCompliant( false )]
         public bool TrySetBestMatch( ActionDescriptorMatch match )
         {
-            if ( match == null )
+            if ( match == null || HasMatchesInPreviousIterations )
             {
                 return false;
             }

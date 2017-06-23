@@ -120,8 +120,8 @@
                 var selectedAction = finalMatches[0];
 
                 // note: short-circuit if the api version policy has already been applied to the match
-                // and no other better match has already been selected
-                if ( selectedAction.VersionPolicyIsApplied() && selectionResult.BestMatch == null )
+                // and there are no other matches in a previous iteration which would take precendence
+                if ( selectedAction.VersionPolicyIsApplied() && !selectionResult.HasMatchesInPreviousIterations )
                 {
                     httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
                     return selectedAction;
