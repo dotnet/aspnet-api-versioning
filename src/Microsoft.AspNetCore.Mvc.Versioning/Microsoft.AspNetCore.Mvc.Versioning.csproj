@@ -15,7 +15,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="1.1.1" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="[1.1.1,2.0.0)" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
