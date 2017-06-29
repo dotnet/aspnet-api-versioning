@@ -7,10 +7,9 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http.Formatting;
-    using System.Reflection;
-    using static System.Reflection.BindingFlags;
     using static System.Linq.Expressions.Expression;
     using static System.Net.Http.Headers.MediaTypeHeaderValue;
+    using static System.Reflection.BindingFlags;
 
     static class MediaTypeFormatterAdapterFactory
     {
@@ -42,21 +41,55 @@
             Contract.Requires( type != null );
             Contract.Ensures( Contract.Result<Func<MediaTypeFormatter, MediaTypeFormatter>>() != null );
 
-            var clone = NewActivator( type );
+            var clone = NewCopyConstructorActivator( type ) ??
+                        NewParameterlessConstructorActivator( type ) ??
+                        throw new InvalidOperationException( LocalSR.MediaTypeFormatterNotCloneable.FormatDefault( type.Name, typeof( ICloneable ).Name ) );
+
             return instance => CloneMediaTypes( clone( instance ) );
         }
 
-        static Func<MediaTypeFormatter, MediaTypeFormatter> NewActivator( Type type )
+        static Func<MediaTypeFormatter, MediaTypeFormatter> NewCopyConstructorActivator( Type type )
         {
             Contract.Requires( type != null );
-            Contract.Ensures( Contract.Result<Func<MediaTypeFormatter, MediaTypeFormatter>>() != null );
 
-            var ctor = ResolveConstructor( type );
+            var constructors = from ctor in type.GetConstructors( Public | NonPublic | Instance )
+                               let args = ctor.GetParameters()
+                               where args.Length == 1 && type.Equals( args[0].ParameterType )
+                               select ctor;
+            var constructor = constructors.SingleOrDefault();
+
+            if ( constructor == null )
+            {
+                return null;
+            }
+
             var formatter = Parameter( typeof( MediaTypeFormatter ), "formatter" );
-            var @new = New( ctor, Convert( formatter, type ) );
+            var @new = New( constructor, Convert( formatter, type ) );
             var lambda = Lambda<Func<MediaTypeFormatter, MediaTypeFormatter>>( @new, formatter );
 
-            return lambda.Compile();
+            return lambda.Compile();  // formatter => new MediaTypeFormatter( formatter );
+        }
+
+        static Func<MediaTypeFormatter, MediaTypeFormatter> NewParameterlessConstructorActivator( Type type )
+        {
+            Contract.Requires( type != null );
+
+            var constructors = from ctor in type.GetConstructors( Public | NonPublic | Instance )
+                               let args = ctor.GetParameters()
+                               where args.Length == 0
+                               select ctor;
+            var constructor = constructors.SingleOrDefault();
+
+            if ( constructor == null )
+            {
+                return null;
+            }
+
+            var formatter = Parameter( typeof( MediaTypeFormatter ), "formatter" );
+            var @new = New( constructor );
+            var lambda = Lambda<Func<MediaTypeFormatter, MediaTypeFormatter>>( @new, formatter );
+
+            return lambda.Compile(); // formatter => new MediaTypeFormatter();
         }
 
         static MediaTypeFormatter CloneMediaTypes( MediaTypeFormatter instance )
@@ -74,22 +107,6 @@
             }
 
             return instance;
-        }
-
-        static ConstructorInfo ResolveConstructor( Type type )
-        {
-            var constructors = from ctor in type.GetConstructors( Public | NonPublic | Instance )
-                               let args = ctor.GetParameters()
-                               where args.Length == 1 && type.Equals( args[0].ParameterType )
-                               select ctor;
-            var constructor = constructors.SingleOrDefault();
-
-            if ( constructor == null )
-            {
-                throw new InvalidOperationException( LocalSR.MediaTypeFormatterNotCloneable.FormatDefault( type.Name, typeof( ICloneable ).Name ) );
-            }
-
-            return constructor;
         }
     }
 }

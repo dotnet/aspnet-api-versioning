@@ -70,7 +70,7 @@ namespace Microsoft.Web.Http {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The media type formatter {0} could not be cloned. The type must either implement {1} or define a copy constructor with the signature &apos;{0}({0} formatter)&apos;..
+        ///   Looks up a localized string similar to The media type formatter {0} could not be cloned. The type must either implement {1}, define a copy constructor with the signature &apos;{0}({0} formatter)&apos;, or have a parameterless constructor..
         /// </summary>
         internal static string MediaTypeFormatterNotCloneable {
             get {
