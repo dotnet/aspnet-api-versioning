@@ -6,11 +6,11 @@
     using System.Linq;
     using System.Net.Http.Formatting;
     using System.Net.Http.Headers;
+    using System.Web.Http;
     using System.Web.Http.Description;
     using static Microsoft.Web.Http.Versioning.ApiVersionParameterLocation;
-    using static System.Web.Http.Description.ApiParameterSource;
     using static System.StringComparison;
-    using System.Web.Http;
+    using static System.Web.Http.Description.ApiParameterSource;
 
     /// <summary>
     /// Represents an object that contains API version parameter descriptions.

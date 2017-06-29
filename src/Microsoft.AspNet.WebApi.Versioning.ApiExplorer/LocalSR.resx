@@ -121,6 +121,6 @@
     <value>The requested API version</value>
   </data>
   <data name="MediaTypeFormatterNotCloneable" xml:space="preserve">
-    <value>The media type formatter {0} could not be cloned. The type must either implement {1} or define a copy constructor with the signature '{0}({0} formatter)'.</value>
+    <value>The media type formatter {0} could not be cloned. The type must either implement {1}, define a copy constructor with the signature '{0}({0} formatter)', or have a parameterless constructor.</value>
   </data>
 </root>
