@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.1.1</VersionPrefix>
-  <AssemblyVersion>1.1.0.0</AssemblyVersion>
+  <VersionPrefix>1.2.0</VersionPrefix>
+  <AssemblyVersion>1.2.0.0</AssemblyVersion>
   <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
   <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
   <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
@@ -11,7 +11,7 @@
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
-  <PackageReleaseNotes>• Fixed overlapped route action selection (Issue #148)</PackageReleaseNotes>
+  <PackageReleaseNotes>• Remove need for UseApiVersioning (Issue #152)</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>
