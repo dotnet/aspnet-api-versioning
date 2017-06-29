@@ -84,7 +84,6 @@
             loggerFactory.AddDebug();
 
             app.UseMvc();
-            app.UseApiVersioning();
             app.UseSwagger();
             app.UseSwaggerUI(
                 options =>
