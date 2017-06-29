@@ -5,6 +5,8 @@
     using AspNetCore.Mvc.Routing;
     using AspNetCore.Mvc.Versioning;
     using Extensions;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
     using Options;
     using System;
     using System.Diagnostics.Contracts;
@@ -43,26 +45,38 @@
             services.Add( Singleton<IOptions<ApiVersioningOptions>>( new OptionsWrapper<ApiVersioningOptions>( options ) ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
             services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
-
-            if ( options.ReportApiVersions )
-            {
-                services.AddSingleton<ReportApiVersionsAttribute>();
-            }
-
-            services.AddMvcCore(
-                mvcOptions =>
-                {
-                    if ( options.ReportApiVersions )
-                    {
-                        mvcOptions.Filters.Add( typeof( ReportApiVersionsAttribute ) );
-                    }
-
-                    mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
-                } );
-
+            services.AddTransient<IStartupFilter, InjectApiVersionRoutePolicy>();
+            services.AddMvcCore( mvcOptions => AddMvcOptions( mvcOptions, options ) );
             services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( "apiVersion", typeof( ApiVersionRouteConstraint ) ) );
 
             return services;
+        }
+
+        static void AddMvcOptions( MvcOptions mvcOptions, ApiVersioningOptions options )
+        {
+            Contract.Requires( mvcOptions != null );
+            Contract.Requires( options != null );
+
+            if ( options.ReportApiVersions )
+            {
+                mvcOptions.Filters.Add( new ReportApiVersionsAttribute() );
+            }
+
+            mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
+        }
+
+        sealed class InjectApiVersionRoutePolicy : IStartupFilter
+        {
+            public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
+            {
+                Contract.Requires( next != null );
+
+                return app =>
+                {
+                    next( app );
+                    app.UseRouter( builder => builder.Routes.Add( builder.ServiceProvider.GetRequiredService<IApiVersionRoutePolicy>() ) );
+                };
+            }
         }
     }
 }
