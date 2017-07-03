@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.0.0</VersionPrefix>
+  <VersionPrefix>1.0.1</VersionPrefix>
   <AssemblyVersion>1.0.0.0</AssemblyVersion>
   <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
   <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
@@ -11,6 +11,7 @@
   <Description>ASP.NET Core MVC API explorer functionality for discovering metadata such as the list of API-versioned controllers and actions, and their URLs and allowed HTTP methods.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning;ApiExplorer</PackageTags>
+  <PackageReleaseNotes></PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>
