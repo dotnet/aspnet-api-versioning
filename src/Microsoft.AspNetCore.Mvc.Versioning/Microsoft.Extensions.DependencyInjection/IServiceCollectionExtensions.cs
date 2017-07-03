@@ -67,14 +67,19 @@
 
         sealed class InjectApiVersionRoutePolicy : IStartupFilter
         {
+            readonly IApiVersionRoutePolicy routePolicy;
+
+            public InjectApiVersionRoutePolicy( IApiVersionRoutePolicy routePolicy ) => this.routePolicy = routePolicy;
+
             public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
             {
                 Contract.Requires( next != null );
+                Contract.Ensures( Contract.Result<Action<IApplicationBuilder>>() != null );
 
                 return app =>
                 {
                     next( app );
-                    app.UseRouter( builder => builder.Routes.Add( builder.ServiceProvider.GetRequiredService<IApiVersionRoutePolicy>() ) );
+                    app.UseRouter( builder => builder.Routes.Add( routePolicy ) );
                 };
             }
         }
