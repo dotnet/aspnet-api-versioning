@@ -190,6 +190,7 @@
             var httpContext = context.HttpContext;
             var properties = httpContext.ApiVersionProperties();
             var code = default( string );
+            var message = default( string );
             var requestedVersion = default( string );
             var parsedVersion = properties.ApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
@@ -198,9 +199,11 @@
 
             if ( parsedVersion == null )
             {
+                var versionNeutral = new Lazy<bool>( () => candidates.Any( c => c.IsApiVersionNeutral() ) );
+
                 requestedVersion = properties.RawApiVersion;
 
-                if ( IsNullOrEmpty( requestedVersion ) )
+                if ( IsNullOrEmpty( requestedVersion ) && !versionNeutral.Value )
                 {
                     code = ApiVersionUnspecified;
                     Logger.ApiVersionUnspecified( actionNames.Value );
@@ -219,6 +222,18 @@
                     {
                         newRequestHandler = ( e, c, m ) => new MethodNotAllowedHandler( e, c, m, allowedMethods.Value.ToArray() );
                     }
+                }
+                else if ( versionNeutral.Value )
+                {
+                    Logger.ApiVersionUnspecified( actionNames.Value );
+                    message = SR.VersionNeutralResourceNotSupported.FormatDefault( httpContext.Request.GetDisplayUrl() );
+
+                    if ( allowedMethods.Value.Contains( httpContext.Request.Method ) )
+                    {
+                        return new BadRequestHandler( ErrorResponseProvider, UnsupportedApiVersion, message );
+                    }
+
+                    return new MethodNotAllowedHandler( ErrorResponseProvider, UnsupportedApiVersion, message, allowedMethods.Value.ToArray() );
                 }
                 else
                 {
@@ -243,7 +258,7 @@
                 }
             }
 
-            var message = SR.VersionedResourceNotSupported.FormatDefault( httpContext.Request.GetDisplayUrl(), requestedVersion );
+            message = SR.VersionedResourceNotSupported.FormatDefault( httpContext.Request.GetDisplayUrl(), requestedVersion );
             return newRequestHandler( ErrorResponseProvider, code, message );
         }
 

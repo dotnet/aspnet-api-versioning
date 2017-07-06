@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.2.0</VersionPrefix>
+  <VersionPrefix>1.2.1</VersionPrefix>
   <AssemblyVersion>1.2.0.0</AssemblyVersion>
   <TargetFrameworks>net451;netstandard1.6</TargetFrameworks>
   <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
@@ -11,7 +11,7 @@
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
-  <PackageReleaseNotes>• Remove need for UseApiVersioning (Issue #152)</PackageReleaseNotes>
+  <PackageReleaseNotes>• Fix 405 for API version-neutral routes (Issue #159)</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>

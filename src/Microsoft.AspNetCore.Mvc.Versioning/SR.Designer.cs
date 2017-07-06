@@ -170,6 +170,15 @@ namespace Microsoft.AspNetCore.Mvc {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string VersionNeutralResourceNotSupported {
+            get {
+                return ResourceManager.GetString("VersionNeutralResourceNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to At least one IApiVersionReader must be specified..
         /// </summary>
         internal static string ZeroApiVersionReaders {
