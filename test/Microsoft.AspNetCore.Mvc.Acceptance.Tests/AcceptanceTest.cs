@@ -6,7 +6,6 @@
     using Extensions.DependencyInjection;
     using Hosting;
     using Microsoft.AspNetCore.Mvc.Razor;
-    using Microsoft.Extensions.PlatformAbstractions;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -108,7 +107,7 @@
         string GetContentRoot()
         {
             var startupAssembly = GetType().GetTypeInfo().Assembly.GetName().Name;
-            var contentRoot = new DirectoryInfo( PlatformServices.Default.Application.ApplicationBasePath );
+            var contentRoot = new DirectoryInfo( AppContext.BaseDirectory );
 
             while ( contentRoot.Name != startupAssembly )
             {

@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
     sealed class ApiVersionModelMetadata : ModelMetadata
     {
@@ -65,7 +65,7 @@
 
         public override bool IsRequired => inner.IsRequired;
 
-        public override IModelBindingMessageProvider ModelBindingMessageProvider => inner.ModelBindingMessageProvider;
+        public override ModelBindingMessageProvider ModelBindingMessageProvider => inner.ModelBindingMessageProvider;
 
         public override int Order => inner.Order;
 

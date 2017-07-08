@@ -86,10 +86,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 {
                     foreach ( var parameter in entry.Parameters )
                     {
+#if WEBAPI
                         if ( comparer.Equals( parameter.Name, ParameterName ) )
                         {
                             return parameter.Value;
                         }
+#else
+                        if ( comparer.Equals( parameter.Name.Value, ParameterName ) )
+                        {
+                            return parameter.Value.Value;
+                        }
+#endif
                     }
                 }
             }
@@ -110,10 +117,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             foreach ( var parameter in contentType.Parameters )
             {
+#if WEBAPI
                 if ( comparer.Equals( parameter.Name, ParameterName ) )
                 {
                     return parameter.Value;
                 }
+#else
+                if ( comparer.Equals( parameter.Name.Value, ParameterName ) )
+                {
+                    return parameter.Value.Value;
+                }
+#endif
             }
 
             return null;

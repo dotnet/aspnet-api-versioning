@@ -5,17 +5,18 @@
     using Extensions.Logging;
     using Extensions.Options;
     using Internal;
+    using Infrastructure;
     using System.Collections.Generic;
     using System.Linq;
 
     public class TestApiVersionActionSelector : ApiVersionActionSelector
     {
         public TestApiVersionActionSelector(
-            IActionSelectorDecisionTreeProvider decisionTreeProvider,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
             ActionConstraintCache actionConstraintCache,
             IOptions<ApiVersioningOptions> options,
             ILoggerFactory loggerFactory )
-            : base( decisionTreeProvider, actionConstraintCache, options, loggerFactory ) { }
+            : base( actionDescriptorCollectionProvider, actionConstraintCache, options, loggerFactory ) { }
 
         public override ActionDescriptor SelectBestCandidate( RouteContext context, IReadOnlyList<ActionDescriptor> candidates )
         {

@@ -3,6 +3,8 @@
     using ActionConstraints;
     using Extensions.Logging;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using static Extensions.Logging.LoggerMessage;
     using static Extensions.Logging.LogLevel;
 
@@ -26,6 +28,9 @@
         static readonly Action<ILogger, string, Exception> apiVersionInvalid =
             Define<string>( Information, 6, "Request contained the service API version '{ApiVersion}', which is not valid" );
 
+        static readonly Action<ILogger, string[], Exception> noActionsMatched =
+            Define<string[]>( Debug, 3, "No actions matched the current request. Route values: {RouteValues}" );
+
         internal static void AmbiguousActions( this ILogger logger, string actionNames ) => ambiguousActions( logger, actionNames, null );
 
         internal static void ConstraintMismatch( this ILogger logger, string actionName, string actionId, IActionConstraint actionConstraint ) =>
@@ -38,5 +43,22 @@
         internal static void ApiVersionUnmatched( this ILogger logger, ApiVersion apiVersion, string actionNames ) => apiVersionUnmatched( logger, apiVersion, actionNames, null );
 
         internal static void ApiVersionInvalid( this ILogger logger, string apiVersion ) => apiVersionInvalid( logger, apiVersion, null );
+
+        internal static void NoActionsMatched( this ILogger logger, IDictionary<string, object> routeValueDictionary )
+        {
+            if ( !logger.IsEnabled( Debug ) )
+            {
+                return;
+            }
+
+            var routeValues = default( string[] );
+
+            if ( routeValueDictionary != null )
+            {
+                routeValues = routeValueDictionary.Select( pair => pair.Key + "=" + Convert.ToString( pair.Value ) ).ToArray();
+            }
+
+            noActionsMatched( logger, routeValues, null );
+        }
     }
 }
