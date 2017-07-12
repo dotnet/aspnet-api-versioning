@@ -158,9 +158,13 @@
 
             CloneFormattersAndAddMediaTypeParameter( parameter, ApiDescription.SupportedRequestBodyFormatters );
             CloneFormattersAndAddMediaTypeParameter( parameter, ApiDescription.SupportedResponseFormatters );
+            parameters.Add( NewApiVersionParameter( name, Unknown, allowOptional: false ) );
         }
 
-        ApiParameterDescription NewApiVersionParameter( string name, ApiParameterSource source )
+        ApiParameterDescription NewApiVersionParameter( string name, ApiParameterSource source ) =>
+            NewApiVersionParameter( name, source, optional );
+
+        ApiParameterDescription NewApiVersionParameter( string name, ApiParameterSource source, bool allowOptional )
         {
             Contract.Requires( !string.IsNullOrEmpty( name ) );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
@@ -170,7 +174,7 @@
             {
                 Name = name,
                 Documentation = Options.DefaultApiVersionParameterDescription,
-                ParameterDescriptor = new ApiVersionParameterDescriptor( name, ApiVersion.ToString(), optional )
+                ParameterDescriptor = new ApiVersionParameterDescriptor( name, ApiVersion.ToString(), allowOptional )
                 {
                     Configuration = action.Configuration,
                     ActionDescriptor = action
