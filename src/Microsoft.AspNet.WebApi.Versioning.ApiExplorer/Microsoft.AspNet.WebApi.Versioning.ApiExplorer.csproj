@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.0.1</VersionPrefix>
+  <VersionPrefix>1.0.2</VersionPrefix>
   <AssemblyVersion>1.0.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyName>Microsoft.AspNet.WebApi.Versioning.ApiExplorer</AssemblyName>
@@ -10,7 +10,7 @@
   <RootNamespace>Microsoft.Web.Http</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning;ApiExplorer</PackageTags>
-  <PackageReleaseNotes>• Improve cloning of MediaTypeFormatter (Issue #156)</PackageReleaseNotes>
+  <PackageReleaseNotes>• Fix cloning MediaTypeFormatter.SupportedMediaTypes (Issue #164)</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>

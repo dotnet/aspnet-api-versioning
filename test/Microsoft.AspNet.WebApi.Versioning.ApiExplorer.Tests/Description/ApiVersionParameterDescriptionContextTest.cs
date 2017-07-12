@@ -169,14 +169,20 @@
         {
             // arrange
             var configuration = new HttpConfiguration();
+            var action = new Mock<HttpActionDescriptor>() { CallBase = true }.Object;
             var json = new JsonMediaTypeFormatter();
             var formUrlEncoded = new FormUrlEncodedMediaTypeFormatter();
 
             configuration.Formatters.Clear();
             configuration.Formatters.Add( json );
             configuration.Formatters.Add( formUrlEncoded );
+            action.Configuration = configuration;
 
-            var description = new ApiDescription() { SupportedRequestBodyFormatters = { json, formUrlEncoded } };
+            var description = new ApiDescription()
+            {
+                ActionDescriptor = action,
+                SupportedRequestBodyFormatters = { json, formUrlEncoded }
+            };
             var version = new ApiVersion( 1, 0 );
             var options = new ApiExplorerOptions( configuration );
             var context = new ApiVersionParameterDescriptionContext( description, version, options );
