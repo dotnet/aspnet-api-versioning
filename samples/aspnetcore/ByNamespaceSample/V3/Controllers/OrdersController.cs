@@ -7,7 +7,7 @@
     [Route( "v{version:apiVersion}/[controller]" )]
     public class OrdersController : Controller
     {
-        // GET ~/v1/orders/{accountId}
+        // GET ~/v3/orders/{accountId}
         [HttpGet( "{accountId}" )]
         public IActionResult Get( string accountId ) => Ok( new Order( GetType().FullName, accountId, HttpContext.GetRequestedApiVersion().ToString() ) );
     }
