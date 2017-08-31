@@ -15,7 +15,7 @@
  </PropertyGroup>
 
  <ItemGroup Condition=" '$(AdditionalReleaseNotes)' != '' ">
-  <ReleaseNotes Include="$(AdditionalReleaseNotes)" />
+  <ReleaseNotes Include="$(AdditionalReleaseNotes.Split('|'))" />
  </ItemGroup>
 
  <PropertyGroup Label="NuGet">
@@ -30,7 +30,6 @@
   <IncludeBuildOutput>true</IncludeBuildOutput>
   <MinClientVersion>2.5</MinClientVersion>
   <PackageOutputPath>$(MSBuildThisFileDirectory)\bin</PackageOutputPath>
-  <PackageReleaseNotes>@(ReleaseNotes->'• %(Identity)','%0D%0A')</PackageReleaseNotes>
  </PropertyGroup>
 
  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -49,5 +48,15 @@
  <ItemGroup>
   <CodeAnalysisDictionary Include="$(MSBuildThisFileDirectory)CustomDictionary.xml" Link="CustomDictionary.xml" />
  </ItemGroup>
+
+  <Target Name="GenerateReleaseNotes" AfterTargets="BeforeBuild">
+
+   <PropertyGroup>
+    <ReleaseNoteCount>@(ReleaseNotes->Count())</ReleaseNoteCount>
+    <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &lt; 2 " >@(ReleaseNotes->'%(Identity)')</PackageReleaseNotes>
+    <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &gt; 1 " >@(ReleaseNotes->'• %(Identity)','%0D%0A')</PackageReleaseNotes>
+   </PropertyGroup>
+    
+  </Target>
 
 </Project>
