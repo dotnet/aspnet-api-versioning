@@ -6,20 +6,22 @@
   <TargetFramework>netstandard2.0</TargetFramework>
   <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
   <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
-  <AssemblyName>Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
   <Description>ASP.NET Core MVC API explorer functionality for discovering metadata such as the list of API-versioned controllers and actions, and their URLs and allowed HTTP methods.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning;ApiExplorer</PackageTags>
-  <PackageReleaseNotes>Complementary release for ASP.NET Core 2.0 (Preview 2)</PackageReleaseNotes>
  </PropertyGroup>
+
+ <ItemGroup>
+  <ReleaseNotes Include="Complementary release for ASP.NET Core 2.0" />
+ </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.0.0-preview2-final" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.0.0" />
  </ItemGroup>
 
  <ItemGroup>
@@ -39,6 +41,6 @@
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
  <Import Project="..\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+ <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
 
 </Project>

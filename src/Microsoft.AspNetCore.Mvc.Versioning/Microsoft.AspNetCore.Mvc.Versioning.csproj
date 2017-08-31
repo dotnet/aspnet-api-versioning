@@ -6,16 +6,18 @@
   <TargetFramework>netstandard2.0</TargetFramework>
   <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
   <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
-  <AssemblyName>Microsoft.AspNetCore.Mvc.Versioning</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
-  <PackageReleaseNotes>Complementary release for ASP.NET Core 2.0 (Preview 2)</PackageReleaseNotes>
  </PropertyGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0-preview2-final" />
+  <ReleaseNotes Include="Complementary release for ASP.NET Core 2.0" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0" />
  </ItemGroup>
 
  <ItemGroup>
@@ -35,6 +37,6 @@
 
  <Import Project="..\Common\Common.projitems" Label="Shared" />
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+ <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
 
 </Project>
