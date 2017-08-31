@@ -137,6 +137,7 @@
             var candidates = selectionResult.CandidateActions.SelectMany( kvp => kvp.Value );
 
             match.Action.AggregateAllVersions( candidates );
+            context.RouteData = match.RouteData;
             context.Handler = handler.Invoke;
         }
 
