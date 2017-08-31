@@ -13,7 +13,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Complementary release for ASP.NET Core 2.0" />
+  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v2.0.0" />
  </ItemGroup>
 
  <ItemGroup>
