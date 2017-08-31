@@ -4,14 +4,16 @@
   <VersionPrefix>2.1.0</VersionPrefix>
   <AssemblyVersion>2.1.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
-  <AssemblyName>Microsoft.AspNet.WebApi.Versioning</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API.</Description>
   <RootNamespace>Microsoft.Web.Http</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning</PackageTags>
-  <PackageReleaseNotes>https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0</PackageReleaseNotes>
  </PropertyGroup>
+
+ <ItemGroup>
+  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0" />
+ </ItemGroup>
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
@@ -39,6 +41,6 @@
 
  <Import Project="..\Common\Common.projitems" Label="Shared" />
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+ <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
  
 </Project>

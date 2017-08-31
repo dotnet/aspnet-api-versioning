@@ -2,7 +2,6 @@
 
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
-  <AssemblyName>Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests</AssemblyName>
   <RootNamespace>Microsoft.Web.Http</RootNamespace>
  </PropertyGroup>
 
@@ -11,18 +10,18 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="FluentAssertions" Version="4.19.2" />
-  <PackageReference Include="Moq" Version="4.7.0" />
-  <PackageReference Include="more.xunit" Version="2.2.2" />
-  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.1" />
-  <PackageReference Include="System.Runtime" Version="4.1.0" />
-  <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
- </ItemGroup>
-
- <ItemGroup>
+  <Reference Include="Microsoft.CSharp" />
   <Reference Include="System" />
   <Reference Include="System.ComponentModel.DataAnnotations" />
-  <Reference Include="Microsoft.CSharp" />
+ </ItemGroup>
+ 
+ <ItemGroup>
+  <PackageReference Include="FluentAssertions" Version="4.19.2" />
+  <PackageReference Include="Moq" Version="4.7.0" />
+  <PackageReference Include="more.xunit" Version="2.2.3" />
+  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.3" />
+  <PackageReference Include="System.Runtime" Version="4.1.0" />
+  <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
  </ItemGroup>
 
 </Project>

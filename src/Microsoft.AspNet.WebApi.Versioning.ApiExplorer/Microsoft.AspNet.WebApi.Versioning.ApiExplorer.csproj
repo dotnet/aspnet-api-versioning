@@ -4,14 +4,16 @@
   <VersionPrefix>1.0.2</VersionPrefix>
   <AssemblyVersion>1.0.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
-  <AssemblyName>Microsoft.AspNet.WebApi.Versioning.ApiExplorer</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer</AssemblyTitle>
   <Description>The API Explorer for Microsoft ASP.NET Web API Versioning.</Description>
   <RootNamespace>Microsoft.Web.Http</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning;ApiExplorer</PackageTags>
-  <PackageReleaseNotes>• Fix cloning MediaTypeFormatter.SupportedMediaTypes (Issue #164)</PackageReleaseNotes>
  </PropertyGroup>
+
+ <ItemGroup>
+  <ReleaseNotes Include="Fix cloning MediaTypeFormatter.SupportedMediaTypes (Issue #164)" />
+ </ItemGroup>
 
  <ItemGroup>
    <Compile Include="..\Shared\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
@@ -42,6 +44,6 @@
  </ItemGroup>
 
  <Import Project="..\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+ <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
 
 </Project>
