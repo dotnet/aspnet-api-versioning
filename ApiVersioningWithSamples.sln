@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 EndProject
@@ -251,5 +251,8 @@ Global
 		{1B255310-A2B7-437F-804F-6E1D8C940A17} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{3B7E0FEF-8019-4A17-A55F-A6FA378DA856} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{26A67334-F6E6-49B8-8C5A-F88F28770966} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A38B7FA-17BC-4D3C-977F-7379653DC67C}
 	EndGlobalSection
 EndGlobal
