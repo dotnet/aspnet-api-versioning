@@ -4,13 +4,15 @@
   <VersionPrefix>2.1.0</VersionPrefix>
   <AssemblyVersion>2.1.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
-  <AssemblyName>Microsoft.AspNet.OData.Versioning</AssemblyName>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API and OData v4.0.</Description>
   <RootNamespace>Microsoft</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;OData;Versioning</PackageTags>
-  <PackageReleaseNotes>https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0</PackageReleaseNotes>
  </PropertyGroup>
+
+ <ItemGroup>
+  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v1.1.0" />
+ </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
@@ -41,6 +43,6 @@
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.targets))\build.targets" />
+ <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
 
 </Project>

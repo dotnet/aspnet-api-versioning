@@ -2,8 +2,8 @@
 
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
+  <RootNamespace>Microsoft.Web.Http</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
-  <AssemblyName>Microsoft.AspNet.WebApi.Versioning.Tests</AssemblyName>
  </PropertyGroup>
 
  <ItemGroup>
@@ -11,17 +11,17 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="more.xunit" Version="2.2.2" />
-  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.1" />
+  <Reference Include="Microsoft.CSharp" />
+  <Reference Include="System" />
+ </ItemGroup>
+ 
+ <ItemGroup>
   <PackageReference Include="FluentAssertions" Version="4.19.2" />
   <PackageReference Include="Moq" Version="4.7.0" />
- </ItemGroup>
-
- <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <PackageReference Include="more.xunit" Version="2.2.3" />
+  <PackageReference Include="more.xunit.runner.visualstudio" Version="2.2.3" />
   <PackageReference Include="System.Runtime" Version="4.1.0" />
   <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
-  <Reference Include="System" />
-  <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
 
  <Import Project="..\Test.Common\Test.Common.projitems" Label="Shared" />
