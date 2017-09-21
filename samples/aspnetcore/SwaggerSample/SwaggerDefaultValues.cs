@@ -26,7 +26,7 @@
                 
                 if ( parameter.Description == null )
                 {
-                    parameter.Description = description.ModelMetadata.Description;
+                    parameter.Description = description.ModelMetadata?.Description;
                 }
 
                 if ( parameter.Default == null )
