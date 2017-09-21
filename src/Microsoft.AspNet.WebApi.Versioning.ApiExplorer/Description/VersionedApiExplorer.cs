@@ -323,15 +323,15 @@
                         // Undeclared route parameter handling generates query string like "?name={name}"
                         AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
                     }
-                    else if ( TypeHelper.CanConvertFromString( parameterDescription.ParameterDescriptor.ParameterType ) )
+                    else if ( TypeHelper.CanConvertFromString( parameterDescription.ParameterDescriptor?.ParameterType ) )
                     {
                         // Simple type generates query string like "?name={name}"
                         AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
                     }
-                    else if ( IsBindableCollection( parameterDescription.ParameterDescriptor.ParameterType ) )
+                    else if ( IsBindableCollection( parameterDescription.ParameterDescriptor?.ParameterType ) )
                     {
-                        var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
-                        var innerType = GetCollectionElementType( parameterDescription.ParameterDescriptor.ParameterType );
+                        var parameterName = parameterDescription.ParameterDescriptor?.ParameterName;
+                        var innerType = GetCollectionElementType( parameterDescription.ParameterDescriptor?.ParameterType );
                         var innerTypeProperties = innerType.GetBindableProperties().ToArray();
 
                         if ( innerTypeProperties.Any() )
@@ -352,17 +352,17 @@
                             AddPlaceholder( parameterValuesForRoute, parameterName + "[1]" );
                         }
                     }
-                    else if ( IsBindableKeyValuePair( parameterDescription.ParameterDescriptor.ParameterType ) )
+                    else if ( IsBindableKeyValuePair( parameterDescription.ParameterDescriptor?.ParameterType ) )
                     {
                         // KeyValuePair generates query string like "?key={key}&value={value}"
                         AddPlaceholder( parameterValuesForRoute, "key" );
                         AddPlaceholder( parameterValuesForRoute, "value" );
                     }
-                    else if ( IsBindableDictionry( parameterDescription.ParameterDescriptor.ParameterType ) )
+                    else if ( IsBindableDictionry( parameterDescription.ParameterDescriptor?.ParameterType ) )
                     {
                         // Dictionary generates query string like
                         // "?dict[0].key={dict[0].key}&dict[0].value={dict[0].value}&dict[1].key={dict[1].key}&dict[1].value={dict[1].value}"
-                        var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
+                        var parameterName = parameterDescription.ParameterDescriptor?.ParameterName;
                         AddPlaceholder( parameterValuesForRoute, parameterName + "[0].key" );
                         AddPlaceholder( parameterValuesForRoute, parameterName + "[0].value" );
                         AddPlaceholder( parameterValuesForRoute, parameterName + "[1].key" );
@@ -741,7 +741,7 @@
             var bodyParameter = parameterDescriptions.FirstOrDefault( description => description.Source == FromBody );
             var supportedRequestBodyFormatters =
                 bodyParameter != null ?
-                Configuration.Formatters.Where( f => f.CanReadType( bodyParameter.ParameterDescriptor.ParameterType ) ) :
+                Configuration.Formatters.Where( f => f.CanReadType( bodyParameter.ParameterDescriptor?.ParameterType ) ) :
                 Enumerable.Empty<MediaTypeFormatter>();
 
             var responseDescription = CreateResponseDescription( actionDescriptor );
@@ -809,7 +809,7 @@
             return parameterDescriptions.Count( parameter =>
                          parameter.Source == FromUri &&
                          parameter.ParameterDescriptor != null &&
-                         !TypeHelper.CanConvertFromString( parameter.ParameterDescriptor.ParameterType ) &&
+                         !TypeHelper.CanConvertFromString( parameter.ParameterDescriptor?.ParameterType ) &&
                          parameter.CanConvertPropertiesFromString() ) > 1;
         }
 

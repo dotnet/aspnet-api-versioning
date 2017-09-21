@@ -38,7 +38,7 @@
                 // REF: https://github.com/domaindrivendev/Swashbuckle/pull/1090
                 if ( parameter.@default == null )
                 {
-                    parameter.@default = description.ParameterDescriptor.DefaultValue;
+                    parameter.@default = description.ParameterDescriptor?.DefaultValue;
                 }
             }
         }

@@ -325,7 +325,7 @@
 
             if ( bodyParameter != null )
             {
-                var paramType = bodyParameter.ParameterDescriptor.ParameterType;
+                var paramType = bodyParameter.ParameterDescriptor?.ParameterType;
                 requestFormatters.AddRange( GetInnerFormatters( actionDescriptor.Configuration.Formatters.Where( f => f.CanReadType( paramType ) ) ) );
             }
 
