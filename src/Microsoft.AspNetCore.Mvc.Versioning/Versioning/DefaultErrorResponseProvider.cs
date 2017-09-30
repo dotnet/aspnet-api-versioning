@@ -2,7 +2,6 @@
 {
     using Hosting;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using static System.String;
 
@@ -27,38 +26,43 @@
         /// Creates the default error content using the given context.
         /// </summary>
         /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to create the error content.</param>
-        /// <returns>A <see cref="IDictionary{TKey, TValue}">collection</see> of <see cref="KeyValuePair{TKey, TValue}">key/value pairs</see>
-        /// representing the error content.</returns>
-        protected virtual IDictionary<string, object> CreateErrorContent( ErrorResponseContext context )
+        /// <returns>An <see cref="object"/> representing the error content.</returns>
+        protected virtual object CreateErrorContent( ErrorResponseContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( Contract.Result<IDictionary<string, object>>() != null );
+            Contract.Ensures( Contract.Result<object>() != null );
 
-            var comparer = StringComparer.OrdinalIgnoreCase;
-            var error = new Dictionary<string, object>( comparer );
-            var root = new Dictionary<string, object>( comparer ) { ["Error"] = error };
-
-            if ( !IsNullOrEmpty( context.ErrorCode ) )
+            return new
             {
-                error["Code"] = context.ErrorCode;
-            }
-
-            if ( !IsNullOrEmpty( context.Message ) )
-            {
-                error["Message"] = context.Message;
-            }
-
-            if ( !IsNullOrEmpty( context.MessageDetail ) )
-            {
-                var environment = (IHostingEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IHostingEnvironment ) );
-
-                if ( environment?.IsDevelopment() == true )
+                Error = new
                 {
-                    error["InnerError"] = new Dictionary<string, object>( comparer ) { ["Message"] = context.MessageDetail };
+                    Code = NullIfEmpty( context.ErrorCode ),
+                    Message = NullIfEmpty( context.Message ),
+                    InnerError = NewInnerError( context, c => new { Message = c.MessageDetail } )
                 }
+            };
+        }
+
+        static string NullIfEmpty( string @string ) => IsNullOrEmpty( @string ) ? null : @string;
+
+        static TError NewInnerError<TError>( ErrorResponseContext context, Func<ErrorResponseContext, TError> create )
+        {
+            Contract.Requires( context != null );
+            Contract.Requires( create != null );
+
+            if ( IsNullOrEmpty( context.MessageDetail ) )
+            {
+                return default( TError );
             }
 
-            return root;
+            var environment = (IHostingEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IHostingEnvironment ) );
+
+            if ( environment?.IsDevelopment() == true )
+            {
+                return create( context );
+            }
+
+            return default( TError );
         }
     }
 }
