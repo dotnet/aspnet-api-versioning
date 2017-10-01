@@ -10,9 +10,8 @@
 
 namespace Microsoft.AspNetCore.Mvc {
     using System;
-    using System.Reflection;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -20,7 +19,7 @@ namespace Microsoft.AspNetCore.Mvc {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SR {
@@ -40,7 +39,7 @@ namespace Microsoft.AspNetCore.Mvc {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.AspNetCore.Mvc.SR", typeof(SR).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.AspNetCore.Mvc.SR", typeof(SR).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,11 +61,29 @@ namespace Microsoft.AspNetCore.Mvc {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An action method with the name &apos;{0}&apos; could not be found. The method must be public, non-static, and not have the NonActionAttribute applied..
+        /// </summary>
+        internal static string ActionMethodNotFound {
+            get {
+                return ResourceManager.GetString("ActionMethodNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple actions matched. The following actions matched route data and had all constraints satisfied:{0}{0}{1}.
         /// </summary>
         internal static string ActionSelector_AmbiguousActions {
             get {
                 return ResourceManager.GetString("ActionSelector_AmbiguousActions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple action methods with the name &apos;{0}&apos; were found, but could not be resolved using the provided arguments..
+        /// </summary>
+        internal static string AmbiguousActionMethod {
+            get {
+                return ResourceManager.GetString("AmbiguousActionMethod", resourceCulture);
             }
         }
         
@@ -121,6 +138,15 @@ namespace Microsoft.AspNetCore.Mvc {
         internal static string ApiVersionUnspecified {
             get {
                 return ResourceManager.GetString("ApiVersionUnspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to API version conventions cannot be applied to the controller type {0} using both typed and untyped convention builders..
+        /// </summary>
+        internal static string ConventionStyleMismatch {
+            get {
+                return ResourceManager.GetString("ConventionStyleMismatch", resourceCulture);
             }
         }
         

@@ -9,14 +9,14 @@
     using Xunit;
     using static Moq.Times;
 
-    public class ActionApiVersionConventionBuilderTTest
+    public class ActionApiVersionConventionBuilderTest
     {
         [Fact]
         public void apply_to_should_assign_empty_model_without_api_versions_from_mapped_convention()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder );
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
 
             actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
@@ -40,8 +40,8 @@
         public void apply_to_should_assign_model_with_declared_api_versions_from_mapped_convention()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder );
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
 
             actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
@@ -66,8 +66,8 @@
         public void apply_to_should_assign_model_with_declared_api_versions_from_mapped_convention_and_attributes()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<DecoratedController>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<DecoratedController>( controllerBuilder );
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( DecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var controllerDescriptor = new HttpControllerDescriptor() { ControllerType = typeof( DecoratedController ) };
             var method = typeof( DecoratedController ).GetMethod( nameof( DecoratedController.Get ) );
             var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, method );
@@ -94,8 +94,8 @@
         public void action_should_call_action_on_controller_builder()
         {
             // arrange
-            var controllerBuilder = new Mock<ControllerApiVersionConventionBuilder<UndecoratedController>>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder.Object );
+            var controllerBuilder = new Mock<ControllerApiVersionConventionBuilder>( typeof( UndecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder.Object );
             var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
 
             controllerBuilder.Setup( cb => cb.Action( It.IsAny<MethodInfo>() ) );

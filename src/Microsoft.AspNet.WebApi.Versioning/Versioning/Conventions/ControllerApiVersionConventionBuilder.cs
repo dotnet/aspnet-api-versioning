@@ -7,8 +7,7 @@
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Web API.
     /// </content>
-    /// <typeparam name="T">The <see cref="Type">type</see> of <see cref="IHttpController">controller</see>.</typeparam>
-    public partial class ControllerApiVersionConventionBuilder<T> : IActionConventionBuilder<T> where T : IHttpController
+    public partial class ControllerApiVersionConventionBuilder : IActionConventionBuilder
     {
         /// <summary>
         /// Gets a value indicating whether the builder has any related action conventions.

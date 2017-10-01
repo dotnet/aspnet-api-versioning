@@ -160,4 +160,13 @@
   <data name="ZeroApiVersionReaders" xml:space="preserve">
     <value>At least one IApiVersionReader must be specified.</value>
   </data>
+  <data name="ConventionStyleMismatch" xml:space="preserve">
+    <value>API version conventions cannot be applied to the controller type {0} using both typed and untyped convention builders.</value>
+  </data>
+  <data name="ActionMethodNotFound" xml:space="preserve">
+    <value>An action method with the name '{0}' could not be found. The method must be public, non-static, and not have the NonActionAttribute applied.</value>
+  </data>
+  <data name="AmbiguousActionMethod" xml:space="preserve">
+    <value>Multiple action methods with the name '{0}' were found, but could not be resolved using the provided arguments.</value>
+  </data>
 </root>

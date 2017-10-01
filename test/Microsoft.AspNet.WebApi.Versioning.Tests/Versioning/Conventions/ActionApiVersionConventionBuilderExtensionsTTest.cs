@@ -7,7 +7,7 @@
     using System.Web.Http.Controllers;
     using Xunit;
 
-    public class ActionApiVersionConventionBuilderExtensionsTest
+    public class ActionApiVersionConventionBuilderExtensionsTTest
     {
         [Fact]
         public void map_to_api_version_should_add_major_version()
@@ -129,9 +129,9 @@
             actionBuilder.ProtectedMappedVersions.Should().BeEquivalentTo( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) } );
         }
 
-        sealed class TestActionApiVersionConventionBuilder : ActionApiVersionConventionBuilder
+        sealed class TestActionApiVersionConventionBuilder : ActionApiVersionConventionBuilder<IHttpController>
         {
-            internal TestActionApiVersionConventionBuilder() : base( new ControllerApiVersionConventionBuilder( typeof( IHttpController ) ) ) { }
+            internal TestActionApiVersionConventionBuilder() : base( new ControllerApiVersionConventionBuilder<IHttpController>() ) { }
 
             internal ICollection<ApiVersion> ProtectedMappedVersions => MappedVersions;
         }

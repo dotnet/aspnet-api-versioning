@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using System.Reflection;
@@ -14,10 +13,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a builder for API versions applied to a controller action.
     /// </summary>
-    public partial class ActionApiVersionConventionBuilder<T>
+    public partial class ActionApiVersionConventionBuilder<T> : ActionApiVersionConventionBuilderBase
     {
-        readonly HashSet<ApiVersion> mappedVersions = new HashSet<ApiVersion>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilder{T}"/> class.
         /// </summary>
@@ -36,12 +33,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         protected ControllerApiVersionConventionBuilder<T> ControllerBuilder { get; }
 
         /// <summary>
-        /// Gets the collection of API versions mapped to the current action.
-        /// </summary>
-        /// <value>A <see cref="ICollection{T}">collection</see> of mapped <see cref="ApiVersion">API versions</see>.</value>
-        protected ICollection<ApiVersion> MappedVersions => mappedVersions;
-
-        /// <summary>
         /// Maps the specified API version to the configured controller action.
         /// </summary>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to map to the action.</param>
@@ -51,7 +42,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder<T>>() != null );
 
-            mappedVersions.Add( apiVersion );
+            MappedVersions.Add( apiVersion );
             return this;
         }
 

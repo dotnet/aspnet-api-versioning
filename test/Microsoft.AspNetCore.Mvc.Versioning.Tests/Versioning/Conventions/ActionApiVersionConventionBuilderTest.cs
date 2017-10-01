@@ -12,14 +12,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using static Moq.Times;
     using ControllerVersionInfo = Tuple<IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>>;
 
-    public class ActionApiVersionConventionBuilderTTest
+    public class ActionApiVersionConventionBuilderTest
     {
         [Fact]
         public void apply_to_should_assign_empty_model_without_api_versions_from_mapped_convention()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder );
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
             var actionModel = new ActionModel( method, new object[0] );
             var empty = Enumerable.Empty<ApiVersion>();
@@ -46,8 +46,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         public void apply_to_should_assign_model_with_declared_api_versions_from_mapped_convention()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder );
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
             var attributes = new object[] { new MapToApiVersionAttribute( "2.0" ) };
             var actionModel = new ActionModel( method, attributes );
@@ -76,8 +76,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         public void apply_to_should_assign_model_with_declared_api_versions_from_mapped_convention_and_attributes()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<DecoratedController>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<DecoratedController>( controllerBuilder );
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( DecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var method = typeof( DecoratedController ).GetMethod( nameof( DecoratedController.Get ) );
             var attributes = method.GetCustomAttributes().Cast<object>().ToArray();
             var actionModel = new ActionModel( method, attributes );
@@ -107,8 +107,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         public void action_should_call_action_on_controller_builder()
         {
             // arrange
-            var controllerBuilder = new Mock<ControllerApiVersionConventionBuilder<UndecoratedController>>();
-            var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder.Object );
+            var controllerBuilder = new Mock<ControllerApiVersionConventionBuilder>( typeof( UndecoratedController ) );
+            var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder.Object );
             var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
 
             controllerBuilder.Setup( cb => cb.Action( It.IsAny<MethodInfo>() ) );

@@ -2,6 +2,7 @@
 {
     using FluentAssertions;
     using Moq;
+    using System;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
@@ -9,7 +10,7 @@
     using System.Web.Http.Controllers;
     using Xunit;
 
-    public class ControllerApiVersionConventionBuilderTTest
+    public class ControllerApiVersionConventionBuilderTest
     {
         [Fact]
         public void version_neutral_should_be_false_by_default()
@@ -74,12 +75,12 @@
             var configuration = new HttpConfiguration();
             var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var controllerDescriptor = mock.Object;
-            var controllerBuilder = default( ControllerApiVersionConventionBuilder<UndecoratedController> );
+            var controllerBuilder = default( ControllerApiVersionConventionBuilder );
 
             mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
             controllerDescriptor.Configuration = configuration;
             controllerDescriptor.ControllerType = typeof( UndecoratedController );
-            configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller<UndecoratedController>() );
+            configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller( typeof( UndecoratedController ) ) );
             controllerBuilder.HasDeprecatedApiVersion( 0, 9 )
                              .HasApiVersion( 2, 0 )
                              .AdvertisesApiVersion( 3, 0 )
@@ -107,12 +108,12 @@
             var configuration = new HttpConfiguration();
             var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var controllerDescriptor = mock.Object;
-            var controllerBuilder = default( ControllerApiVersionConventionBuilder<UndecoratedController> );
+            var controllerBuilder = default( ControllerApiVersionConventionBuilder );
 
             mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
             controllerDescriptor.Configuration = configuration;
             controllerDescriptor.ControllerType = typeof( UndecoratedController );
-            configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller<UndecoratedController>() );
+            configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller( typeof( UndecoratedController ) ) );
             controllerBuilder.HasDeprecatedApiVersion( 0, 9 )
                              .HasApiVersion( 2, 0 )
                              .AdvertisesApiVersion( 3, 0 )
@@ -142,12 +143,12 @@
             var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var controllerDescriptor = mock.Object;
             var attributes = new Collection<IApiVersionProvider>( typeof( DecoratedController ).GetCustomAttributes().OfType<IApiVersionProvider>().ToList() );
-            var controllerBuilder = default( ControllerApiVersionConventionBuilder<DecoratedController> );
+            var controllerBuilder = default( ControllerApiVersionConventionBuilder );
 
             mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( attributes );
             controllerDescriptor.Configuration = configuration;
             controllerDescriptor.ControllerType = typeof( DecoratedController );
-            configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller<DecoratedController>() );
+            configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller( typeof( DecoratedController ) ) );
             controllerBuilder.HasApiVersion( 1, 0 )
                              .AdvertisesApiVersion( 4, 0 );
 
@@ -166,11 +167,15 @@
                 } );
         }
 
-        sealed class TestControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilder<IHttpController>
+        sealed class TestControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilder
         {
+            internal TestControllerApiVersionConventionBuilder() : base( typeof( IHttpController ) ) { }
+
+            internal TestControllerApiVersionConventionBuilder( Type controllerType ) : base( controllerType ) { }
+
             internal bool ProtectedVersionNeutral => VersionNeutral;
 
-            internal ActionApiVersionConventionBuilderCollection<IHttpController> ProtectedActionBuilders => ActionBuilders;
+            internal ActionApiVersionConventionBuilderCollection ProtectedActionBuilders => ActionBuilders;
         }
 
         sealed class UndecoratedController : ApiController
