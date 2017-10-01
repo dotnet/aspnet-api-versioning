@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using System.Reflection;
@@ -14,47 +13,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a builder for API versions applied to a controller.
     /// </summary>
-    public partial class ControllerApiVersionConventionBuilder<T>
+    public partial class ControllerApiVersionConventionBuilder<T> : ControllerApiVersionConventionBuilderBase
     {
-        readonly HashSet<ApiVersion> supportedVersions = new HashSet<ApiVersion>();
-        readonly HashSet<ApiVersion> deprecatedVersions = new HashSet<ApiVersion>();
-        readonly HashSet<ApiVersion> advertisedVersions = new HashSet<ApiVersion>();
-        readonly HashSet<ApiVersion> deprecatedAdvertisedVersions = new HashSet<ApiVersion>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerApiVersionConventionBuilder{T}"/> class.
         /// </summary>
         public ControllerApiVersionConventionBuilder() => ActionBuilders = new ActionApiVersionConventionBuilderCollection<T>( this );
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the current controller is API version-neutral.
-        /// </summary>
-        /// <value>True if the current controller is API version-neutral; otherwise, false. The default value is <c>false</c>.</value>
-        protected bool VersionNeutral { get; set; }
-
-        /// <summary>
-        /// Gets the collection of API versions supported by the current controller.
-        /// </summary>
-        /// <value>A <see cref="ICollection{T}">collection</see> of supported <see cref="ApiVersion">API versions</see>.</value>
-        protected ICollection<ApiVersion> SupportedVersions => supportedVersions;
-
-        /// <summary>
-        /// Gets the collection of API versions deprecated by the current controller.
-        /// </summary>
-        /// <value>A <see cref="ICollection{T}">collection</see> of deprecated <see cref="ApiVersion">API versions</see>.</value>
-        protected ICollection<ApiVersion> DeprecatedVersions => deprecatedVersions;
-
-        /// <summary>
-        /// Gets the collection of API versions advertised by the current controller.
-        /// </summary>
-        /// <value>A <see cref="ICollection{T}">collection</see> of advertised <see cref="ApiVersion">API versions</see>.</value>
-        protected ICollection<ApiVersion> AdvertisedVersions => advertisedVersions;
-
-        /// <summary>
-        /// Gets the collection of API versions advertised and deprecated by the current controller.
-        /// </summary>
-        /// <value>A <see cref="ICollection{T}">collection</see> of advertised and deprecated <see cref="ApiVersion">API versions</see>.</value>
-        protected ICollection<ApiVersion> DeprecatedAdvertisedVersions => deprecatedAdvertisedVersions;
 
         /// <summary>
         /// Gets a collection of controller action convention builders.
@@ -84,7 +48,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
 
-            supportedVersions.Add( apiVersion );
+            SupportedVersions.Add( apiVersion );
             return this;
         }
 
@@ -98,7 +62,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
 
-            deprecatedVersions.Add( apiVersion );
+            DeprecatedVersions.Add( apiVersion );
             return this;
         }
 
@@ -112,7 +76,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
 
-            advertisedVersions.Add( apiVersion );
+            AdvertisedVersions.Add( apiVersion );
             return this;
         }
 
@@ -126,7 +90,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
 
-            deprecatedAdvertisedVersions.Add( apiVersion );
+            DeprecatedAdvertisedVersions.Add( apiVersion );
             return this;
         }
 

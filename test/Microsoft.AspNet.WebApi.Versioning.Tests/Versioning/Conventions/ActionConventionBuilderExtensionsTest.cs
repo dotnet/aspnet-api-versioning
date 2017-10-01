@@ -3,21 +3,13 @@
     using FluentAssertions;
     using Moq;
     using System;
+    using System.Linq;
     using System.Web.Http;
     using Xunit;
     using static Moq.Times;
 
     public class ActionConventionBuilderExtensionsTest
     {
-        public sealed class StubController : ApiController
-        {
-            public IHttpActionResult Get() => Ok();
-
-            public void Delete() {  }
-
-            public TimeSpan Timeout { get; set; }
-        }
-
         [Fact]
         public void action_should_map_method_from_action_delegate_expression()
         {
@@ -58,6 +50,74 @@
             // assert
             action.ShouldThrow<InvalidOperationException>().And
                   .Message.Should().Be( "The expression 'c => c.Timeout' must refer to a controller action method." );
+        }
+
+        [Fact]
+        public void action_should_map_method_from_name()
+        {
+            // arrange
+            const string methodName = nameof( StubController.Post );
+            var controllerType = typeof( StubController );
+            var method = controllerType.GetMethods().Single( m => m.Name == methodName && m.GetParameters().Length == 0 );
+            var builder = new Mock<IActionConventionBuilder>();
+
+            builder.SetupGet( b => b.ControllerType ).Returns( controllerType );
+
+            // act
+            builder.Object.Action( methodName );
+
+            // assert
+            builder.Verify( b => b.Action( method ), Once() );
+        }
+
+        [Fact]
+        public void action_should_map_method_from_name_and_argument_type()
+        {
+            // arrange
+            const string methodName = nameof( StubController.Post );
+            var controllerType = typeof( StubController );
+            var method = controllerType.GetMethods().Single( m => m.Name == methodName && m.GetParameters().Length == 1 );
+            var builder = new Mock<IActionConventionBuilder>();
+
+            builder.SetupGet( b => b.ControllerType ).Returns( controllerType );
+
+            // act
+            builder.Object.Action( methodName, typeof( int ) );
+
+            // assert
+            builder.Verify( b => b.Action( method ), Once() );
+        }
+
+        [Fact]
+        public void action_should_throw_exception_when_method_does_not_exist()
+        {
+            // arrange
+            var message = "An action method with the name 'NoSuchMethod' could not be found. The method must be public, non-static, and not have the NonActionAttribute applied.";
+            var builder = new Mock<IActionConventionBuilder>();
+
+            builder.SetupGet( b => b.ControllerType ).Returns( typeof( StubController ) );
+
+            // act
+            Action actionConvention = () => builder.Object.Action( "NoSuchMethod" );
+
+            // assert
+            actionConvention.ShouldThrow<MissingMethodException>().And.Message.Should().Be( message );
+        }
+
+        public sealed class StubController : ApiController
+        {
+            public IHttpActionResult Get() => Ok();
+
+            public void Delete() { }
+
+            public TimeSpan Timeout { get; set; }
+
+            public IHttpActionResult Post() => Post( 42, "stubs/42" );
+
+            public IHttpActionResult Post( int id ) => Ok();
+
+            [NonAction]
+            public IHttpActionResult Post( int id, string location ) => Created( location, new { id = id } );
         }
     }
 }

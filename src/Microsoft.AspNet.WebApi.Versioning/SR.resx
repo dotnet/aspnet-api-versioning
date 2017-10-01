@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ActionMethodNotFound" xml:space="preserve">
+    <value>An action method with the name '{0}' could not be found. The method must be public, non-static, and not have the NonActionAttribute applied.</value>
+  </data>
   <data name="ActionSelector_AmbiguousMatchType" xml:space="preserve">
     <value>{0} on type {1}</value>
+  </data>
+  <data name="AmbiguousActionMethod" xml:space="preserve">
+    <value>Multiple action methods with the name '{0}' were found, but could not be resolved using the provided arguments.</value>
   </data>
   <data name="ApiControllerActionSelector_ActionNameNotFound" xml:space="preserve">
     <value>No action was found on the controller '{0}' that matches the name '{1}'.</value>
@@ -153,6 +159,9 @@
   <data name="ControllerNameNotFound" xml:space="preserve">
     <value>No route providing a controller name was found to match request URI '{0}'.</value>
   </data>
+  <data name="ConventionStyleMismatch" xml:space="preserve">
+    <value>API version conventions cannot be applied to the controller type {0} using both typed and untyped convention builders.</value>
+  </data>
   <data name="DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate" xml:space="preserve">
     <value>Multiple types were found that match the controller named '{0}'. This can happen if the route that services this request ('{1}') found multiple controllers defined with the same name but differing namespaces, which is not supported.{3}{3}The request for '{0}' has found the following matching controllers:{2}</value>
   </data>
@@ -170,6 +179,9 @@
   </data>
   <data name="MultipleDifferentApiVersionsRequested" xml:space="preserve">
     <value>The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request.</value>
+  </data>
+  <data name="RequiredInterfaceNotImplemented" xml:space="preserve">
+    <value>The type {0} does not implement the {1} interface.</value>
   </data>
   <data name="ResourceNotFound" xml:space="preserve">
     <value>No HTTP resource was found that matches the request URI '{0}'.</value>

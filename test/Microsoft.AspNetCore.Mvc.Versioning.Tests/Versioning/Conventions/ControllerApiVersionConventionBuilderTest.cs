@@ -6,14 +6,14 @@
     using System.Reflection;
     using Xunit;
 
-    public class ControllerApiVersionConventionBuilderTTest
+    public class ControllerApiVersionConventionBuilderTest
     {
         [Fact]
         public void apply_to_should_assign_conventions_to_controller()
         {
             // arrange
             var controllerModel = new ControllerModel( typeof( UndecoratedController ).GetTypeInfo(), new object[0] );
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
 
             controllerBuilder.HasDeprecatedApiVersion( 0, 9 )
                              .HasApiVersion( 2, 0 )
@@ -40,7 +40,7 @@
         {
             // arrange
             var controllerModel = new ControllerModel( typeof( UndecoratedController ).GetTypeInfo(), new object[0] );
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
 
             controllerBuilder.HasDeprecatedApiVersion( 0, 9 )
                              .HasApiVersion( 2, 0 )
@@ -69,7 +69,7 @@
             // arrange
             var attributes = typeof( DecoratedController ).GetTypeInfo().GetCustomAttributes().Cast<object>().ToArray();
             var controllerModel = new ControllerModel( typeof( DecoratedController ).GetTypeInfo(), attributes );
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<DecoratedController>();
+            var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( DecoratedController ) );
 
             controllerBuilder.HasApiVersion( 1, 0 )
                              .AdvertisesApiVersion( 4, 0 );

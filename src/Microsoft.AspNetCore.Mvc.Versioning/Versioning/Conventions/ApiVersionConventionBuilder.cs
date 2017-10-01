@@ -43,7 +43,39 @@
                 return typedConvention;
             }
 
-            return (ControllerApiVersionConventionBuilder<TController>) convention;
+            if ( convention is ControllerApiVersionConventionBuilder<TController> builder )
+            {
+                return builder;
+            }
+
+            throw new InvalidOperationException( SR.ConventionStyleMismatch.FormatDefault( key.Name ) );
+        }
+
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller.
+        /// </summary>
+        /// <param name="controllerType">The <see cref="Type">type</see> of controller to build conventions for.</param>
+        /// <returns>A new or existing <see cref="ControllerApiVersionConventionBuilder"/>.</returns>
+        public virtual ControllerApiVersionConventionBuilder Controller( Type controllerType )
+        {
+            Arg.NotNull( controllerType, nameof( controllerType ) );
+            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder>() != null );
+
+            var key = controllerType.GetTypeInfo();
+
+            if ( !ControllerConventions.TryGetValue( key, out var convention ) )
+            {
+                var typedConvention = new ControllerApiVersionConventionBuilder( controllerType );
+                ControllerConventions[key] = typedConvention;
+                return typedConvention;
+            }
+
+            if ( convention is ControllerApiVersionConventionBuilder builder )
+            {
+                return builder;
+            }
+
+            throw new InvalidOperationException( SR.ConventionStyleMismatch.FormatDefault( key.Name ) );
         }
 
         /// <summary>

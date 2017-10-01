@@ -19,7 +19,7 @@ namespace Microsoft.Web.Http {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SR {
@@ -61,11 +61,29 @@ namespace Microsoft.Web.Http {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An action method with the name &apos;{0}&apos; could not be found. The method must be public, non-static, and not have the NonActionAttribute applied..
+        /// </summary>
+        internal static string ActionMethodNotFound {
+            get {
+                return ResourceManager.GetString("ActionMethodNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} on type {1}.
         /// </summary>
         internal static string ActionSelector_AmbiguousMatchType {
             get {
                 return ResourceManager.GetString("ActionSelector_AmbiguousMatchType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple action methods with the name &apos;{0}&apos; were found, but could not be resolved using the provided arguments..
+        /// </summary>
+        internal static string AmbiguousActionMethod {
+            get {
+                return ResourceManager.GetString("AmbiguousActionMethod", resourceCulture);
             }
         }
         
@@ -169,6 +187,15 @@ namespace Microsoft.Web.Http {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to API version conventions cannot be applied to the controller type {0} using both typed and untyped convention builders..
+        /// </summary>
+        internal static string ConventionStyleMismatch {
+            get {
+                return ResourceManager.GetString("ConventionStyleMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple types were found that match the controller named &apos;{0}&apos;. This can happen if the route that services this request (&apos;{1}&apos;) found multiple controllers defined with the same name but differing namespaces, which is not supported.{3}{3}The request for &apos;{0}&apos; has found the following matching controllers:{2}.
         /// </summary>
         internal static string DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate {
@@ -219,6 +246,15 @@ namespace Microsoft.Web.Http {
         internal static string MultipleDifferentApiVersionsRequested {
             get {
                 return ResourceManager.GetString("MultipleDifferentApiVersionsRequested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type {0} does not implement the {1} interface..
+        /// </summary>
+        internal static string RequiredInterfaceNotImplemented {
+            get {
+                return ResourceManager.GetString("RequiredInterfaceNotImplemented", resourceCulture);
             }
         }
         
