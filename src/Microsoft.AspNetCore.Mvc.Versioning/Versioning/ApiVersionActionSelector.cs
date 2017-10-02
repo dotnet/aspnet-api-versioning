@@ -142,6 +142,13 @@
             }
 
             var matches = EvaluateActionConstraints( context, candidates );
+            var selectedAction = SelectActionWithoutApiVersionConvention( matches );
+
+            if ( selectedAction != null )
+            {
+                return selectedAction;
+            }
+
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
             var properties = httpContext.ApiVersionProperties();
@@ -150,32 +157,16 @@
             properties.ApiVersion = selectionContext.RequestedVersion;
             selectionResult.AddCandidates( candidates );
 
-            if ( finalMatches == null )
+            if ( finalMatches != null )
             {
-                selectionResult.EndIteration();
-                return null;
-            }
-
-            if ( finalMatches.Count == 1 )
-            {
-                var selectedAction = finalMatches[0];
-
-                // note: short-circuit if the api version policy has already been applied to the match
-                // and there are no other matches in a previous iteration which would take precendence
-                if ( selectedAction.VersionPolicyIsApplied() && !selectionResult.HasMatchesInPreviousIterations )
+                if ( ( selectedAction = SelectActionWithApiVersionPolicyApplied( finalMatches, selectionResult ) ) == null )
                 {
-                    httpContext.ApiVersionProperties().ApiVersion = selectionContext.RequestedVersion;
+                    AppendPossibleMatches( finalMatches, context, selectionResult );
+                }
+                else
+                {
                     return selectedAction;
                 }
-            }
-
-            if ( finalMatches.Count > 0 )
-            {
-                var routeData = new RouteData( context.RouteData );
-                var matchingActions = new MatchingActionSequence( finalMatches, routeData );
-
-                selectionResult.AddMatches( matchingActions );
-                selectionResult.TrySetBestMatch( matchingActions.BestMatch );
             }
 
             // note: even though we may have had a successful match, this method could be called multiple times. the final decision
@@ -236,6 +227,63 @@
             }
 
             return bestMatches;
+        }
+
+        ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
+        {
+            Contract.Requires( matches != null );
+
+            if ( matches.Count != 1 )
+            {
+                return null;
+            }
+
+            var selectedAction = matches[0];
+
+            if ( selectedAction.GetProperty<ApiVersionModel>() == null )
+            {
+                return selectedAction;
+            }
+
+            return null;
+        }
+
+        ActionDescriptor SelectActionWithApiVersionPolicyApplied( IReadOnlyList<ActionDescriptor> matches, ActionSelectionResult result )
+        {
+            Contract.Requires( matches != null );
+            Contract.Requires( result != null );
+
+            if ( matches.Count != 1 )
+            {
+                return null;
+            }
+
+            var match = matches[0];
+
+            if ( match.VersionPolicyIsApplied() && !result.HasMatchesInPreviousIterations )
+            {
+                return match;
+            }
+
+            return null;
+        }
+
+        void AppendPossibleMatches( IReadOnlyList<ActionDescriptor> matches, RouteContext context, ActionSelectionResult result )
+        {
+            Contract.Requires( matches != null );
+            Contract.Requires( context != null );
+            Contract.Requires( result != null );
+
+            if ( matches.Count == 0 )
+            {
+                return;
+            }
+
+            var routeData = new RouteData( context.RouteData );
+            var matchingActions = new MatchingActionSequence( matches, routeData );
+
+            result.AddMatches( matchingActions );
+            result.TrySetBestMatch( matchingActions.BestMatch );
         }
 
         RequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
@@ -474,8 +522,8 @@
                 Contract.Requires( actions != null );
 
                 Version = actions.Version;
-                OrdinalEntries = new Dictionary<string[], List<ActionDescriptor>>(StringArrayComparer.Ordinal);
-                OrdinalIgnoreCaseEntries = new Dictionary<string[], List<ActionDescriptor>>(StringArrayComparer.OrdinalIgnoreCase);
+                OrdinalEntries = new Dictionary<string[], List<ActionDescriptor>>( StringArrayComparer.Ordinal );
+                OrdinalIgnoreCaseEntries = new Dictionary<string[], List<ActionDescriptor>>( StringArrayComparer.OrdinalIgnoreCase );
                 RouteKeys = IdentifyRouteKeysForActionSelection( actions );
                 BuildOrderedSetOfKeysForRouteValues( actions );
             }
@@ -500,7 +548,7 @@
                     {
                         foreach ( var kvp in action.RouteValues )
                         {
-                            routeKeys.Add(kvp.Key);
+                            routeKeys.Add( kvp.Key );
                         }
                     }
                 }
@@ -526,7 +574,7 @@
                     for ( var j = 0; j < RouteKeys.Length; j++ )
                     {
 
-                        action.RouteValues.TryGetValue(RouteKeys[j], out routeValues[j]);
+                        action.RouteValues.TryGetValue( RouteKeys[j], out routeValues[j] );
                     }
 
                     if ( !OrdinalIgnoreCaseEntries.TryGetValue( routeValues, out var entries ) )
@@ -535,7 +583,7 @@
                         OrdinalIgnoreCaseEntries.Add( routeValues, entries );
                     }
 
-                    entries.Add(action);
+                    entries.Add( action );
 
                     if ( !OrdinalEntries.ContainsKey( routeValues ) )
                     {
