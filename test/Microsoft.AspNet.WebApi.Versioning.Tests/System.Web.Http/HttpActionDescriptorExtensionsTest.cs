@@ -32,7 +32,7 @@
                 var runs = new[]
                 {
                     Tuple.Create( typeof( TestController ), nameof( TestController.Get ), new ApiVersion[0] ),
-                    Tuple.Create( typeof( TestVersion2Controller ), nameof( TestVersion2Controller.Get3 ), new[] { new ApiVersion( 3, 0 ), new ApiVersion( 3, 0, "Alpha" ) } )
+                    Tuple.Create( typeof( TestVersion2Controller ), nameof( TestVersion2Controller.Get3 ), new[] { new ApiVersion( 3, 0 ) } )
                 };
                 return CreateActionDescriptorData( runs );
             }

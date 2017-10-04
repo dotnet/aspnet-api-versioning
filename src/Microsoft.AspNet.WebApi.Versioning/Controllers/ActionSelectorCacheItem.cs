@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
     using Dispatcher;
+    using Microsoft.Web.Http.Versioning;
     using Routing;
     using System;
     using System.Collections.Generic;
@@ -211,10 +212,10 @@
                 }
 
                 var request = controllerContext.Request;
-                var versionNeutral = controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral;
-                var exceptionFactory = new HttpResponseExceptionFactory( request );
+                var model = controllerContext.ControllerDescriptor.GetApiVersionModel();
+                var exceptionFactory = new HttpResponseExceptionFactory( request, new Lazy<ApiVersionModel>( () => model ) );
 
-                return exceptionFactory.CreateMethodNotAllowedResponse( versionNeutral, allowedMethods );
+                return exceptionFactory.CreateMethodNotAllowedResponse( model.IsApiVersionNeutral, allowedMethods );
             }
 
             [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
@@ -224,7 +225,8 @@
                 Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
 
                 var request = controllerContext.Request;
-                var exceptionFactory = new HttpResponseExceptionFactory( request );
+                var model = new Lazy<ApiVersionModel>( controllerContext.ControllerDescriptor.GetApiVersionModel );
+                var exceptionFactory = new HttpResponseExceptionFactory( request, model );
                 return exceptionFactory.CreateBadRequestResponse( request.GetRequestedApiVersion() );
             }
 
@@ -302,10 +304,10 @@
                     if ( actionsFoundByName.Length == 0 )
                     {
                         var request = controllerContext.Request;
-                        var versionNeutral = controllerContext.ControllerDescriptor.GetApiVersionModel().IsApiVersionNeutral;
-                        var exceptionFactory = new HttpResponseExceptionFactory( request );
+                        var model = controllerContext.ControllerDescriptor.GetApiVersionModel();
+                        var exceptionFactory = new HttpResponseExceptionFactory( request, new Lazy<ApiVersionModel>( () => model ) );
 
-                        throw exceptionFactory.NewMethodNotAllowedException( versionNeutral, allowedMethods );
+                        throw exceptionFactory.NewMethodNotAllowedException( model.IsApiVersionNeutral, allowedMethods );
                     }
 
                     var candidatesFoundByName = new CandidateAction[actionsFoundByName.Length];

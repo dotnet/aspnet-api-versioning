@@ -48,7 +48,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\IActionConventionBuilderT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\Conventions\IApiVersionConventionT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\CurrentImplementationApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\DefaultApiVersionReporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\DefaultApiVersionSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\DoNotReportApiVersions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ErrorCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ErrorResponseContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\HeaderApiVersionReader.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IErrorResponseProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IReportApiVersions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\LowestImplementedApiVersionSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\MediaTypeApiVersionReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\QueryStringApiVersionReader.cs" />

@@ -69,7 +69,7 @@
             services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().NotBeNull();
             services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationInstance.Should().BeOfType<ConstantApiVersionSelector>();
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ApiVersionActionSelector ) );
-            mvcOptions.Filters.Single().Should().BeOfType<ReportApiVersionsAttribute>();
+            mvcOptions.Filters.OfType<ServiceFilterAttribute>().Single().ServiceType.Should().Be( typeof( ReportApiVersionsAttribute ) );
             mvcOptions.Conventions.Single().Should().BeOfType<ApiVersionConvention>();
             routeOptions.ConstraintMap["apiVersion"].Should().Be( typeof( ApiVersionRouteConstraint ) );
         }

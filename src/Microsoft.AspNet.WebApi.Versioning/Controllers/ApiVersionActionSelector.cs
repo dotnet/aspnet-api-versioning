@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
     using Dispatcher;
+    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -70,7 +71,8 @@
 
             var request = controllerContext.Request;
             var requestedVersion = request.GetRequestedApiVersion();
-            var exceptionFactory = new HttpResponseExceptionFactory( request );
+            var model = new Lazy<ApiVersionModel>( controllerContext.ControllerDescriptor.GetApiVersionModel );
+            var exceptionFactory = new HttpResponseExceptionFactory( request, model );
 
             if ( candidateActions.Count == 1 )
             {

@@ -1,13 +1,9 @@
 ﻿namespace Microsoft.Web.Http
 {
-    using System.Collections.Generic;
+    using Microsoft.Web.Http.Versioning;
     using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
-    using System.Net.Http.Headers;
     using System.Web.Http;
     using System.Web.Http.Filters;
-    using static System.String;
 
     /// <content>
     /// Provides the implementation for ASP.NET Web API.
@@ -33,26 +29,12 @@
             var controller = actionExecutedContext.ActionContext.ActionDescriptor.ControllerDescriptor;
             var model = controller.GetApiVersionModel();
 
-            if ( model.IsApiVersionNeutral )
+            if ( model?.IsApiVersionNeutral == false )
             {
-                return;
-            }
+                var dependencyResolver = actionExecutedContext.ActionContext.ControllerContext.Configuration.DependencyResolver;
+                var reporter = ( (IReportApiVersions) dependencyResolver.GetService( typeof( IReportApiVersions ) ) ) ?? DefaultApiVersionReporter.Instance;
 
-            var headers = response.Headers;
-
-            AddApiVersionHeader( headers, ApiSupportedVersions, model.SupportedApiVersions );
-            AddApiVersionHeader( headers, ApiDeprecatedVersions, model.DeprecatedApiVersions );
-        }
-
-        static void AddApiVersionHeader( HttpHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
-        {
-            Contract.Requires( headers != null );
-            Contract.Requires( !IsNullOrEmpty( headerName ) );
-            Contract.Requires( versions != null );
-
-            if ( versions.Count > 0 && !headers.Contains( headerName ) )
-            {
-                headers.Add( headerName, Join( ValueSeparator, versions.Select( v => v.ToString() ) ) );
+                reporter.Report( response.Headers, model );
             }
         }
     }

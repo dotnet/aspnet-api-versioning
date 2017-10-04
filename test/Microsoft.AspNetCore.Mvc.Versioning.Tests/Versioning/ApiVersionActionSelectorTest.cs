@@ -107,13 +107,15 @@
         public async Task select_best_candidate_should_return_400_for_unmatchedX2C_attributeX2Dbased_controller_version()
         {
             // arrange
-            using ( var server = new WebServer() )
+            using ( var server = new WebServer( options => options.ReportApiVersions = true ) )
             {
                 // act
                 var response = await server.Client.GetAsync( "http://localhost/api/attributed?api-version=42.0" );
 
                 // assert
                 response.StatusCode.Should().Be( BadRequest );
+                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
             }
         }
 
@@ -121,13 +123,15 @@
         public async Task select_best_candidate_should_return_400_for_attributeX2Dbased_controller_with_bad_version()
         {
             // arrange
-            using ( var server = new WebServer() )
+            using ( var server = new WebServer( options => options.ReportApiVersions = true ) )
             {
                 // act
                 var response = await server.Client.GetAsync( "http://localhost/api/attributed?api-version=2016-06-32" );
 
                 // assert
                 response.StatusCode.Should().Be( BadRequest );
+                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
             }
         }
 
@@ -135,13 +139,15 @@
         public async Task select_best_candidate_should_return_400_for_unmatchedX2C_conventionX2Dbased_controller_version()
         {
             // arrange
-            using ( var server = new WebServer( setupRoutes: routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
+            using ( var server = new WebServer( options => options.ReportApiVersions = true, routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 // act
                 var response = await server.Client.GetAsync( "http://localhost/api/test?api-version=4.0" );
 
                 // assert
                 response.StatusCode.Should().Be( BadRequest );
+                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
+                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
             }
         }
 
@@ -149,13 +155,15 @@
         public async Task select_best_candidate_should_return_400_for_conventionX2Dbased_controller_with_bad_version()
         {
             // arrange
-            using ( var server = new WebServer( setupRoutes: routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
+            using ( var server = new WebServer( options => options.ReportApiVersions = true, routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 // act
                 var response = await server.Client.GetAsync( "http://localhost/api/test?api-version=2016-06-32" );
 
                 // assert
                 response.StatusCode.Should().Be( BadRequest );
+                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
+                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
             }
         }
 
@@ -181,13 +189,15 @@
             // arrange
             var request = new HttpRequestMessage( Post, "api/attributed?api-version=1.0" );
 
-            using ( var server = new WebServer() )
+            using ( var server = new WebServer( options => options.ReportApiVersions = true ) )
             {
                 // act
                 var response = await server.Client.SendAsync( request );
 
                 // assert
                 response.StatusCode.Should().Be( MethodNotAllowed );
+                response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+                response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
             }
         }
 

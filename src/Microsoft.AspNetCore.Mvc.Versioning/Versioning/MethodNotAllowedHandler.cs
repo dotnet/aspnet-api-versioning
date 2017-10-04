@@ -8,19 +8,13 @@
 
     sealed class MethodNotAllowedHandler : RequestHandler
     {
-        readonly string[] allowedMethods;
+        internal MethodNotAllowedHandler( RequestHandlerContext context ) : base( context ) { }
 
-        internal MethodNotAllowedHandler( IErrorResponseProvider errorResponseProvider, string code, string message, string[] allowedMethods )
-            : base( errorResponseProvider, code, message )
+        protected override IActionResult CreateResult( HttpContext httpContext )
         {
-            Contract.Requires( allowedMethods != null );
-            this.allowedMethods = allowedMethods;
-        }
-
-        protected override IActionResult CreateResult( HttpContext context )
-        {
-            var result = ErrorResponses.MethodNotAllowed( context, Code, Message );
-            return allowedMethods.Length == 0 ? result : new AllowHeaderResult( result, allowedMethods );
+            var result = Context.ErrorResponses.MethodNotAllowed( httpContext, Context.Code, Context.Message );
+            var allowedMethods = Context.AllowedMethods;
+            return allowedMethods?.Length > 0 ? new AllowHeaderResult( result, allowedMethods ) : result;
         }
 
         sealed class AllowHeaderResult : IActionResult
