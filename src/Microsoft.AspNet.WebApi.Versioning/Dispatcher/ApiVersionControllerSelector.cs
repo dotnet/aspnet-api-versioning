@@ -74,7 +74,7 @@
             var aggregator = new ApiVersionControllerAggregator( request, GetControllerName, controllerInfoCache );
             var conventionRouteSelector = new ConventionRouteControllerSelector( options, controllerTypeCache );
             var conventionRouteResult = default( ControllerSelectionResult );
-            var exceptionFactory = new HttpResponseExceptionFactory( request );
+            var exceptionFactory = new HttpResponseExceptionFactory( request, new Lazy<ApiVersionModel>( () => aggregator.AllVersions ) );
 
             if ( aggregator.RouteData == null )
             {

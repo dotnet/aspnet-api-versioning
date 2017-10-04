@@ -4,10 +4,9 @@
 
     sealed class BadRequestHandler : RequestHandler
     {
-        internal BadRequestHandler( IErrorResponseProvider errorResponseProvider, string code, string message )
-            : base( errorResponseProvider, code, message ) { }
+        internal BadRequestHandler( RequestHandlerContext context ) : base( context ) { }
 
-        protected override IActionResult CreateResult( HttpContext context ) =>
-            ErrorResponses.BadRequest( context, Code, Message );
+        protected override IActionResult CreateResult( HttpContext httpContext ) =>
+            Context.ErrorResponses.BadRequest( httpContext, Context.Code, Context.Message );
     }
 }

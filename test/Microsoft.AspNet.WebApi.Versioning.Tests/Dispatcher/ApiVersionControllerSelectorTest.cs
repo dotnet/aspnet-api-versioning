@@ -208,7 +208,7 @@
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=42.0" );
 
             configuration.IncludeErrorDetailPolicy = Always;
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -225,6 +225,8 @@
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
             content.ShouldBeEquivalentTo(
                 new
                 {
@@ -248,7 +250,7 @@
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=2016-06-32" );
 
             configuration.IncludeErrorDetailPolicy = Always;
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -265,6 +267,8 @@
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
             content.ShouldBeEquivalentTo(
                 new
                 {
@@ -288,7 +292,7 @@
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=4.0" );
 
             configuration.IncludeErrorDetailPolicy = Always;
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();
 
@@ -306,6 +310,8 @@
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
             content.ShouldBeEquivalentTo(
                 new
                 {
@@ -329,7 +335,7 @@
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=2016-06-32" );
 
             configuration.IncludeErrorDetailPolicy = Always;
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();
 
@@ -347,6 +353,8 @@
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
             content.ShouldBeEquivalentTo(
                 new
                 {
@@ -401,7 +409,7 @@
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, "http://localhost/api/test" );
 
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -418,6 +426,8 @@
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
         }
 
         [Fact]
@@ -427,7 +437,7 @@
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, "http://localhost/api/test/1?api-version=2.0" );
 
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -442,6 +452,8 @@
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
         }
 
         [Fact]
@@ -451,7 +463,7 @@
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Post, "http://localhost/api/test?api-version=1.0" );
 
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -477,6 +489,8 @@
 
             // assert
             response.StatusCode.Should().Be( MethodNotAllowed );
+            response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
+            response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
         }
 
         [Fact]

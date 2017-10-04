@@ -17,7 +17,6 @@
 
         public Task<string> Get() => Task.FromResult( "Test" );
 
-        [MapToApiVersion( "3.0-Alpha" )]
         [MapToApiVersion( "3.0" )]
         public Task<string> Get3() => Task.FromResult( "Test" );
     }

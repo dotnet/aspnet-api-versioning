@@ -298,7 +298,12 @@
             {
                 Logger.LogInformation( ex.Message );
                 apiVersion = default( ApiVersion );
-                return new BadRequestHandler( Options.ErrorResponses, AmbiguousApiVersion, ex.Message );
+                var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
+                {
+                    Code = AmbiguousApiVersion,
+                    Message = ex.Message
+                };
+                return new BadRequestHandler( handlerContext );
             }
 
             return null;

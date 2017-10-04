@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
@@ -19,25 +20,52 @@
         const string Allow = nameof( Allow );
         static readonly string ControllerSelectorCategory = typeof( IHttpControllerSelector ).FullName;
         readonly HttpRequestMessage request;
+        readonly Lazy<ApiVersionModel> allApiVersions;
 
-        internal HttpResponseExceptionFactory( HttpRequestMessage request )
+        internal HttpResponseExceptionFactory( HttpRequestMessage request, Lazy<ApiVersionModel> allApiVersions )
         {
             Contract.Requires( request != null );
+            Contract.Requires( allApiVersions != null );
+
             this.request = request;
+            this.allApiVersions = allApiVersions;
         }
+
+        ApiVersioningOptions Options => request.GetApiVersioningOptions();
 
         ITraceWriter TraceWriter => request.GetConfiguration().Services.GetTraceWriter() ?? NullTraceWriter.Instance;
 
-        ApiVersioningOptions Options => request.GetApiVersioningOptions();
+        IReportApiVersions ApiVersionReporter
+        {
+            get
+            {
+                var dependencyResolver = request.GetConfiguration().DependencyResolver;
+                var reporter = ( (IReportApiVersions) dependencyResolver.GetService( typeof( IReportApiVersions ) ) );
+
+                if ( reporter == null )
+                {
+                    reporter = Options.ReportApiVersions ? DefaultApiVersionReporter.Instance : DoNotReportApiVersions.Instance;
+                }
+
+                return reporter;
+            }
+        }
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
         internal HttpResponseException NewNotFoundOrBadRequestException( ControllerSelectionResult conventionRouteResult, ControllerSelectionResult directRouteResult ) =>
             CreateBadRequest( conventionRouteResult, directRouteResult ) ?? CreateNotFound( conventionRouteResult );
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
-        internal HttpResponseMessage CreateBadRequestResponse( ApiVersion requestedVersion ) => requestedVersion == null ?
-                                                                                                CreateBadRequestForUnspecifiedApiVersionOrInvalidApiVersion( versionNeutral: false ) :
-                                                                                                CreateBadRequestForUnsupportedApiVersion( requestedVersion );
+        internal HttpResponseMessage CreateBadRequestResponse( ApiVersion requestedVersion )
+        {
+            var response = requestedVersion == null ?
+                           CreateBadRequestForUnspecifiedApiVersionOrInvalidApiVersion( versionNeutral: false ) :
+                           CreateBadRequestForUnsupportedApiVersion( requestedVersion );
+
+            ApiVersionReporter.Report( response.Headers, allApiVersions );
+
+            return response;
+        }
 
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
         internal HttpResponseException CreateBadRequest( ApiVersion requestedVersion ) => new HttpResponseException( CreateBadRequestResponse( requestedVersion ) );
@@ -118,6 +146,7 @@
 
             if ( response != null )
             {
+                ApiVersionReporter.Report( response.Headers, allApiVersions );
                 return response;
             }
 
@@ -152,6 +181,8 @@
             {
                 headers.Allow.AddRange( allowedMethods.Select( m => m.Method ) );
             }
+
+            ApiVersionReporter.Report( response.Headers, allApiVersions );
 
             return response;
         }

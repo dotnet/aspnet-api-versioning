@@ -3,13 +3,8 @@
     using Abstractions;
     using ApplicationModels;
     using Filters;
-    using Http;
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
     using Versioning;
-    using static System.String;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -17,6 +12,23 @@
     [CLSCompliant( false )]
     public partial class ReportApiVersionsAttribute
     {
+        readonly IReportApiVersions reporter;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportApiVersionsAttribute"/> class.
+        /// </summary>
+        public ReportApiVersionsAttribute() => reporter = new DefaultApiVersionReporter();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportApiVersionsAttribute"/> class.
+        /// </summary>
+        /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
+        public ReportApiVersionsAttribute( IReportApiVersions reportApiVersions )
+        {
+            Arg.NotNull( reportApiVersions, nameof( reportApiVersions ) );
+            reporter = reportApiVersions;
+        }
+
         /// <summary>
         /// Reports the discovered service API versions for the given context after an action has executed.
         /// </summary>
@@ -34,26 +46,9 @@
 
             var model = context.ActionDescriptor.GetProperty<ApiVersionModel>();
 
-            if ( model == null || model.IsApiVersionNeutral )
+            if ( model?.IsApiVersionNeutral == false )
             {
-                return;
-            }
-
-            var headers = response.Headers;
-
-            AddApiVersionHeader( headers, ApiSupportedVersions, model.SupportedApiVersions );
-            AddApiVersionHeader( headers, ApiDeprecatedVersions, model.DeprecatedApiVersions );
-        }
-
-        static void AddApiVersionHeader( IHeaderDictionary headers, string headerName, IReadOnlyList<ApiVersion> versions )
-        {
-            Contract.Requires( headers != null );
-            Contract.Requires( !IsNullOrEmpty( headerName ) );
-            Contract.Requires( versions != null );
-
-            if ( versions.Count > 0 && !headers.ContainsKey( headerName ) )
-            {
-                headers.Add( headerName, Join( ValueSeparator, versions.Select( v => v.ToString() ).ToArray() ) );
+                reporter.Report( response.Headers, model );
             }
         }
     }
