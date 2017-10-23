@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Provides API version parameter descriptions supported by the current reader using the supplied provider.
         /// </summary>
         /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
-        public virtual void AddParmeters( IApiVersionParameterDescriptionContext context )
+        public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
         {
             Arg.NotNull( context, nameof( context ) );
             context.AddParameter( ParameterName, MediaTypeParameter );
