@@ -97,11 +97,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 return versions.EnsureZeroOrOneApiVersions();
             }
 
-            public void AddParmeters( IApiVersionParameterDescriptionContext context )
+            public void AddParameters( IApiVersionParameterDescriptionContext context )
             {
                 foreach ( var apiVersionReader in apiVersionReaders )
                 {
-                    apiVersionReader.AddParmeters( context );
+                    apiVersionReader.AddParameters( context );
                 }
             }
         }

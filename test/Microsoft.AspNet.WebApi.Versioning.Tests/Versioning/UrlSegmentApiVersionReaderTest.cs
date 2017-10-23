@@ -59,7 +59,7 @@
             context.Setup( c => c.AddParameter( It.IsAny<string>(), It.IsAny<ApiVersionParameterLocation>() ) );
 
             // act
-            reader.AddParmeters( context.Object );
+            reader.AddParameters( context.Object );
 
             // assert
             context.Verify( c => c.AddParameter( null, Path ), Times.Once() );
