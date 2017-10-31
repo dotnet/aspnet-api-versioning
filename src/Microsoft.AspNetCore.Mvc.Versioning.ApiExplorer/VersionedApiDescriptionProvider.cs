@@ -100,7 +100,7 @@
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
-            parameterSource.AddParmeters( context );
+            parameterSource.AddParameters( context );
         }
 
         /// <summary>

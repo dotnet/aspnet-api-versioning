@@ -638,7 +638,7 @@
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, Options );
 
-            parameterSource.AddParmeters( context );
+            parameterSource.AddParameters( context );
         }
 
         void ExploreRouteActions(

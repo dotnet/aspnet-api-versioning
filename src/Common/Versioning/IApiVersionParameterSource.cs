@@ -13,6 +13,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Provides API version parameter descriptions supported by the current source using the supplied context.
         /// </summary>
         /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
-        void AddParmeters( IApiVersionParameterDescriptionContext context );
+        void AddParameters( IApiVersionParameterDescriptionContext context );
     }
 }
