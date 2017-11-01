@@ -460,7 +460,13 @@
                 var action = ( (TestApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
 
                 // assert
-                action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType.GetTypeInfo() );
+                action.As<ControllerActionDescriptor>().ShouldBeEquivalentTo(
+                    new
+                    {
+                        ActionName = actionName,
+                        ControllerTypeInfo = controllerType.GetTypeInfo(),
+                    },
+                    options => options.ExcludingMissingMembers() );
                 action.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
                      new
                      {

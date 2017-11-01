@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Label="Common">
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  
+ <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\file-version.targets" />
+ <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\nuget.targets" />
+  
+</Project>

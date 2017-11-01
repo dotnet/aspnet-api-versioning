@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
+	ProjectSection(SolutionItems) = preProject
+		src\directory.build.props = src\directory.build.props
+		src\directory.build.targets = src\directory.build.targets
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4D09-4523-B9C9-65B1E8832AA1}"
 	ProjectSection(SolutionItems) = preProject
 		test\.editorconfig = test\.editorconfig
+		test\directory.build.props = test\directory.build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"
@@ -17,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9
 		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
 		build.targets = build.targets
-		CustomDictionary.xml = CustomDictionary.xml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -50,15 +54,32 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Ver
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.Tests.csproj", "{AAFE5030-DF0A-4156-9AF5-1AAA53CA1FF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer", "src\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.csproj", "{FE19225D-6564-4FCF-BA1C-0ED5CA336C44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer", "src\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.csproj", "{FE19225D-6564-4FCF-BA1C-0ED5CA336C44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests.csproj", "{C8D29CB1-C541-4579-A1B8-AFD4B4F5F4A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.Tests.csproj", "{C8D29CB1-C541-4579-A1B8-AFD4B4F5F4A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer", "src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj", "{6ED07FE1-95D3-41E9-A0F1-AEF1BBD6A474}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests.csproj", "{280C3B03-5EED-40E9-A826-83C9F3C6EEDC}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.ApiExplorer", "src\Common.ApiExplorer\Common.ApiExplorer.shproj", "{26A67334-F6E6-49B8-8C5A-F88F28770966}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F5D670F0-EDA8-4817-94CF-6353FC9A91FF}"
+	ProjectSection(SolutionItems) = preProject
+		build\code-analysis.props = build\code-analysis.props
+		build\common.props = build\common.props
+		build\file-version.targets = build\file-version.targets
+		build\nuget.props = build\nuget.props
+		build\nuget.targets = build\nuget.targets
+		build\signing.props = build\signing.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{B18106DB-41F5-47F7-900B-AB98052E301D}"
+	ProjectSection(SolutionItems) = preProject
+		tools\custom-dictionary.xml = tools\custom-dictionary.xml
+		tools\key.snk = tools\key.snk
+		tools\stylecop.json = tools\stylecop.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -153,5 +174,8 @@ Global
 		{6ED07FE1-95D3-41E9-A0F1-AEF1BBD6A474} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{280C3B03-5EED-40E9-A826-83C9F3C6EEDC} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 		{26A67334-F6E6-49B8-8C5A-F88F28770966} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E4F85AF-8BFF-4EB4-9CB7-9BBD65A8A815}
 	EndGlobalSection
 EndGlobal

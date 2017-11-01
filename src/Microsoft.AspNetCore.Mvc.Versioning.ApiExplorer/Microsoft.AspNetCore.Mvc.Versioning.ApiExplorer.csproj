@@ -41,6 +41,5 @@
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
  <Import Project="..\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
 
 </Project>

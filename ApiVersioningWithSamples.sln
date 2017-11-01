@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
+	ProjectSection(SolutionItems) = preProject
+		src\directory.build.props = src\directory.build.props
+		src\directory.build.targets = src\directory.build.targets
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4D09-4523-B9C9-65B1E8832AA1}"
 	ProjectSection(SolutionItems) = preProject
 		test\.editorconfig = test\.editorconfig
+		test\directory.build.props = test\directory.build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"
@@ -95,6 +100,23 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNet.OData.Versioning.ApiExplorer.Tests.csproj", "{3B7E0FEF-8019-4A17-A55F-A6FA378DA856}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.ApiExplorer", "src\Common.ApiExplorer\Common.ApiExplorer.shproj", "{26A67334-F6E6-49B8-8C5A-F88F28770966}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{2BB57808-14AF-4209-9842-1D6E76A99C3F}"
+	ProjectSection(SolutionItems) = preProject
+		build\code-analysis.props = build\code-analysis.props
+		build\common.props = build\common.props
+		build\file-version.targets = build\file-version.targets
+		build\nuget.props = build\nuget.props
+		build\nuget.targets = build\nuget.targets
+		build\signing.props = build\signing.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{3BDDAF5E-4148-4D7F-9B9A-EA11D0110FEB}"
+	ProjectSection(SolutionItems) = preProject
+		tools\custom-dictionary.xml = tools\custom-dictionary.xml
+		tools\key.snk = tools\key.snk
+		tools\stylecop.json = tools\stylecop.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

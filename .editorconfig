@@ -1,6 +1,4 @@
-# EditorConfig is awesome
-# * http://EditorConfig.org
-# * https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
 
 # top-most .editorconfig file
 root = true
@@ -26,7 +24,7 @@ indent_size = 2
 indent_size = 2
 
 # whitespace handling
-trim_trailing_whitespace = true
+trim_trailing_whitespace = true:error
 insert_final_newline = false
 
 # .net code style settings:
@@ -34,14 +32,14 @@ insert_final_newline = false
 dotnet_sort_system_directives_first = false
 
 # avoid "this." and "me." if not necessary
-dotnet_style_qualification_for_field = false:suggestion
-dotnet_style_qualification_for_property = false:suggestion
-dotnet_style_qualification_for_method = false:suggestion
-dotnet_style_qualification_for_event = false:suggestion
+dotnet_style_qualification_for_field = false:error
+dotnet_style_qualification_for_property = false:error
+dotnet_style_qualification_for_method = false:error
+dotnet_style_qualification_for_event = false:error
 
 # use language keywords instead of framework type names for type references
-dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
-dotnet_style_predefined_type_for_member_access = true:suggestion
+dotnet_style_predefined_type_for_locals_parameters_members = true:error
+dotnet_style_predefined_type_for_member_access = true:error
 
 # suggest more modern language features when available
 dotnet_style_object_initializer = true:suggestion

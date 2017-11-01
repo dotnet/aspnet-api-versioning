@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\common.props" />
+  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\signing.props" />
+  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\code-analysis.props" />
+  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\nuget.props" />
+
+</Project>

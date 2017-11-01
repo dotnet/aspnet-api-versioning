@@ -41,6 +41,5 @@
 
  <Import Project="..\Common\Common.projitems" Label="Shared" />
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
- <Import Project="$([MSBuild]::GetPathOfFileAbove(build.targets))" />
  
 </Project>

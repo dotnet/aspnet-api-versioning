@@ -24,10 +24,10 @@
         }
 
         [Theory]
-        [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.HelloWorldController", "1" )]
-        [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V2.HelloWorldController", "2" )]
-        [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V3.HelloWorldController", "3" )]
-        public async Task then_get_should_return_200( string controller, string apiVersion )
+        [InlineData( "1" )]
+        [InlineData( "2" )]
+        [InlineData( "3" )]
+        public async Task then_get_should_return_200( string apiVersion )
         {
             // arrange
             var expected = $"\"V{apiVersion}\"";

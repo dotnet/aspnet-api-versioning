@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <Target Name="GenerateReleaseNotes" AfterTargets="BeforeBuild" Label="NuGet">
+
+  <PropertyGroup>
+   <ReleaseNoteCount>@(ReleaseNotes->Count())</ReleaseNoteCount>
+   <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &lt; 2 " >@(ReleaseNotes->'%(Identity)')</PackageReleaseNotes>
+   <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &gt; 1 " >@(ReleaseNotes->'• %(Identity)','%0D%0A')</PackageReleaseNotes>
+  </PropertyGroup>
+
+ </Target>
+
+</Project>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup Label="NuGet">
+  <RepositoryType>git</RepositoryType>
+  <RepositoryUrl>https://github.com/Microsoft/aspnet-api-versioning</RepositoryUrl>
+  <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
+  <PackageProjectUrl>https://github.com/Microsoft/aspnet-api-versioning/wiki</PackageProjectUrl>
+  <PackageLicenseUrl>https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE</PackageLicenseUrl>
+  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  <IncludeSymbols>true</IncludeSymbols>
+  <IncludeSource>true</IncludeSource>
+  <IncludeBuildOutput>true</IncludeBuildOutput>
+  <MinClientVersion>2.5</MinClientVersion>
+  <PackageOutputPath>$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
+ </PropertyGroup>
+
+ <ItemGroup Label="NuGet">
+  <!-- allow build-specific, one-time release notes from the command-line without modifying the source project -->
+  <ReleaseNotes Include="$(BuildReleaseNotes.Split('|'))" />
+ </ItemGroup>
+
+ <PropertyGroup Condition=" '$(Configuration)' == 'Release' " Label="NuGet">
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+ </PropertyGroup>
+
+</Project>
