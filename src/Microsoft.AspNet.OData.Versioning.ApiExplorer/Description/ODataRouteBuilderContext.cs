@@ -51,7 +51,7 @@
 
         internal ODataRoute Route { get; }
 
-        internal HttpActionDescriptor ActionDescriptor;
+        internal HttpActionDescriptor ActionDescriptor { get; }
 
         internal IReadOnlyList<ApiParameterDescription> ParameterDescriptions { get; }
 

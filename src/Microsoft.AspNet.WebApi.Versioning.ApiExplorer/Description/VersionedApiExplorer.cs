@@ -81,7 +81,7 @@
         Collection<ApiDescription> IApiExplorer.ApiDescriptions => ApiDescriptions.Flatten();
 
         /// <summary>
-        /// Get a collection of descriptions grouped by API version.
+        /// Gets a collection of descriptions grouped by API version.
         /// </summary>
         /// <value>An <see cref="ApiDescriptionGroupCollection">API description group collection</see>.</value>
         public virtual ApiDescriptionGroupCollection ApiDescriptions => apiDescriptions.Value;
@@ -238,7 +238,6 @@
                         // Do not add the description if the previous route has a matching description with the same HTTP method and relative path.
                         // E.g. having two routes with the templates "api/Values/{id}" and "api/{controller}/{id}" can potentially produce the same
                         // relative path "api/Values/{id}" but only the first one matters.
-
                         var index = apiDescriptionGroup.ApiDescriptions.IndexOf( description, Comparer );
 
                         if ( index < 0 )
@@ -338,12 +337,8 @@
                         {
                             // Complex array and collection generate query string like
                             // "?name[0].foo={name[0].foo}&name[0].bar={name[0].bar}&name[1].foo={name[1].foo}&name[1].bar={name[1].bar}"
-                            AddPlaceholderForProperties( parameterValuesForRoute,
-                                                        innerTypeProperties,
-                                                        parameterName + "[0]." );
-                            AddPlaceholderForProperties( parameterValuesForRoute,
-                                                        innerTypeProperties,
-                                                        parameterName + "[1]." );
+                            AddPlaceholderForProperties( parameterValuesForRoute, innerTypeProperties, parameterName + "[0]." );
+                            AddPlaceholderForProperties( parameterValuesForRoute, innerTypeProperties, parameterName + "[1]." );
                         }
                         else
                         {
@@ -768,7 +763,7 @@
                     Route = route,
                     ResponseDescription = responseDescription,
                     ApiVersion = apiVersion,
-                    IsDeprecated = deprecated
+                    IsDeprecated = deprecated,
                 };
 
                 apiDescription.SupportedResponseFormatters.AddRange( supportedResponseFormatters );
@@ -795,7 +790,7 @@
             {
                 DeclaredType = actionDescriptor.ReturnType,
                 ResponseType = responseType,
-                Documentation = DocumentationProvider?.GetResponseDocumentation( actionDescriptor )
+                Documentation = DocumentationProvider?.GetResponseDocumentation( actionDescriptor ),
             };
         }
 

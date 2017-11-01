@@ -76,6 +76,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F5D670F0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{B18106DB-41F5-47F7-900B-AB98052E301D}"
 	ProjectSection(SolutionItems) = preProject
+		tools\code-analysis.ruleset = tools\code-analysis.ruleset
 		tools\custom-dictionary.xml = tools\custom-dictionary.xml
 		tools\key.snk = tools\key.snk
 		tools\stylecop.json = tools\stylecop.json

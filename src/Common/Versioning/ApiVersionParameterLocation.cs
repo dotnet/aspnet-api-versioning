@@ -29,6 +29,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <summary>
         /// Indicates the API version is expressed as a media type parameter.
         /// </summary>
-        MediaTypeParameter
+        MediaTypeParameter,
     }
 }

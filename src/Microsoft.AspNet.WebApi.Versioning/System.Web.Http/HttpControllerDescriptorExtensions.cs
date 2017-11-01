@@ -185,7 +185,7 @@
         /// deprecated by the controller.</returns>
         /// <remarks>A deprecated API version does not mean it is not supported by the controller. A deprecated API
         /// version is typically advertised six months or more before it becomes unsupported; in which case, the
-        /// controller would no longer indicate that it is an <see cref="P:ImplementedVersions">implemented version</see>.</remarks>
+        /// controller would no longer indicate that it is an <see cref="GetImplementedApiVersions(HttpControllerDescriptor)">implemented version</see>.</remarks>
         public static IReadOnlyList<ApiVersion> GetDeprecatedApiVersions( this HttpControllerDescriptor controllerDescriptor ) => controllerDescriptor.GetApiVersionModel().DeprecatedApiVersions;
     }
 }

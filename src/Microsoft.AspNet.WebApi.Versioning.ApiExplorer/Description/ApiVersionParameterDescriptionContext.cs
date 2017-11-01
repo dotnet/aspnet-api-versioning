@@ -141,7 +141,7 @@
             parameter.ParameterDescriptor = new ApiVersionParameterDescriptor( parameter.Name, ApiVersion.ToString(), fromPath: true )
             {
                 Configuration = action.Configuration,
-                ActionDescriptor = action
+                ActionDescriptor = action,
             };
             RemoveAllParametersExcept( parameter );
         }
@@ -177,9 +177,9 @@
                 ParameterDescriptor = new ApiVersionParameterDescriptor( name, ApiVersion.ToString(), allowOptional )
                 {
                     Configuration = action.Configuration,
-                    ActionDescriptor = action
+                    ActionDescriptor = action,
                 },
-                Source = source
+                Source = source,
             };
 
             optional = true;
@@ -192,7 +192,6 @@
         {
             // note: in a scenario where multiple api version parameters are allowed, we can remove all other parameters because
             // the api version must be specified in the path. this will avoid unwanted, duplicate api version parameters
-
             var collections = new ICollection<ApiParameterDescription>[] { ApiDescription.ParameterDescriptions, parameters };
 
             foreach ( var collection in collections )

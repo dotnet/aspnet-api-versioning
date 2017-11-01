@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="request">The <see cref="HttpRequest">HTTP request</see> to select the version for.</param>
         /// <param name="model">The <see cref="ApiVersionModel">model</see> to select the version from.</param>
         /// <returns>The selected <see cref="ApiVersion">API version</see>.</returns>
-        /// <remarks>This method always returns the default <see cref="P:ApiVersion.Default">API version</see>.</remarks>
+        /// <remarks>This method always returns the default <see cref="ApiVersion.Default">API version</see>.</remarks>
         [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract." )]
         public virtual ApiVersion SelectVersion( HttpRequest request, ApiVersionModel model )
         {

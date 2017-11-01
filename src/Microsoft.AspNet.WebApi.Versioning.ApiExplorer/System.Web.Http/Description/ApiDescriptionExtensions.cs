@@ -31,7 +31,8 @@
         /// <summary>
         /// Gets the unique API description identifier.
         /// </summary>
-        /// <value>The unique identifier of the API description.</value>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the unique identifier for.</param>
+        /// <returns>The unique identifier of the API description.</returns>
         /// <remarks>If the <paramref name="apiDescription">API description</paramref> is of type <see cref="VersionedApiDescription"/>
         /// the return value will be in the format of "{<see cref="ApiDescription.ID"/>}-{<see cref="VersionedApiDescription.ApiVersion"/>}";
         /// otherwise, the return value will be "{<see cref="ApiDescription.ID"/>}".</remarks>

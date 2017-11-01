@@ -17,6 +17,8 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
+  <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1" PrivateAssets="All" />
+  <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="All" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -41,5 +43,5 @@
 
  <Import Project="..\Common\Common.projitems" Label="Shared" />
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
- 
+
 </Project>

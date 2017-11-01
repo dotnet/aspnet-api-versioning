@@ -23,7 +23,7 @@
         Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VersionedODataModelBuilder"/>
+        /// Initializes a new instance of the <see cref="VersionedODataModelBuilder"/> class.
         /// </summary>
         /// <param name="configuration">The <see cref="HttpConfiguration">HTTP configuration</see> associated with the builder.</param>
         /// <remarks>This constructor resolves the current <see cref="IHttpControllerSelector"/> from the

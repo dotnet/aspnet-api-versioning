@@ -78,9 +78,7 @@
             Arg.NotNull( request, nameof( request ) );
             Contract.Ensures( Contract.Result<ApiVersionRequestProperties>() != null );
 
-            var properties = default( ApiVersionRequestProperties );
-
-            if ( !request.Properties.TryGetValue( ApiVersionPropertiesKey, out properties ) )
+            if ( !request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
             {
                 request.Properties[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( request );
             }

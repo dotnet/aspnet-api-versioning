@@ -140,12 +140,12 @@
 
             if ( !candidateActions.ContainsKey( key ) )
             {
-                candidateActions.Add( key, new ActionDescriptor[0] );
+                candidateActions.Add( key, Array.Empty<ActionDescriptor>() );
             }
 
             if ( !matchingActions.ContainsKey( key ) )
             {
-                matchingActions.Add( key, new ActionDescriptorMatch[0] );
+                matchingActions.Add( key, Array.Empty<ActionDescriptorMatch>() );
             }
 
             ++Iterations;

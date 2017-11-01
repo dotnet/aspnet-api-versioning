@@ -29,7 +29,9 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version">The API version string.</param>
         public ApiVersionAttribute( string version ) : base( version ) { }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types
         bool IApiVersionProvider.AdvertiseOnly => false;
+#pragma warning restore CA1033 // Interface methods should be callable by child types
 
         /// <summary>
         /// Gets or sets a value indicating whether the specified set of API versions are deprecated.

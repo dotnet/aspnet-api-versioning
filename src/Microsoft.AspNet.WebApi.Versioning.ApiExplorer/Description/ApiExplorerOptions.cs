@@ -22,7 +22,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the default API version applied to services that do not have explicit versions.
+        /// Gets the default API version applied to services that do not have explicit versions.
         /// </summary>
         /// <value>The default <see cref="ApiVersion">API version</see>.</value>
         public ApiVersion DefaultApiVersion => versioningOptions.Value.DefaultApiVersion;

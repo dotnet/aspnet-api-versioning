@@ -48,7 +48,7 @@
                 foreach ( var param in CombinedParameterNames )
                 {
                     sb.Append( ' ' );
-                    sb.AppendFormat( param );
+                    sb.Append( param );
                 }
 
                 return sb.ToString();

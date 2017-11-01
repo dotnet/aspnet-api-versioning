@@ -20,7 +20,9 @@
             set => boundTemplateMutator.Value( adapted, value );
         }
 
+#pragma warning disable CA2227 // Collection properties should be read only
         public HttpRouteValueDictionary Values
+#pragma warning restore CA2227
         {
             get => valuesAccessor.Value( adapted );
             set => valuesMutator.Value( adapted, value );

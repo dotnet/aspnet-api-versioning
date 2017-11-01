@@ -4,10 +4,9 @@ namespace Microsoft.Web.Http.Versioning
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
-    using System;
     using System.Collections.Generic;
-    using static System.StringComparer;
     using static ApiVersionParameterLocation;
+    using static System.StringComparer;
 
     /// <summary>
     /// Represents a service API version reader that reads the value from a HTTP header.

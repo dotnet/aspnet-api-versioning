@@ -15,7 +15,7 @@
         /// <param name="values">The current <see cref="IDictionary{TKey, TValue}">collection</see> to bind.</param>
         /// <param name="defaultValues">The <see cref="HttpRouteValueDictionary">dictionary</see> of default values.</param>
         /// <param name="constraints">The <see cref="HttpRouteValueDictionary">dictionary</see> of constraints.</param>
-        /// <returns></returns>
+        /// <returns>A new <see cref="IBoundRouteTemplate">bound route template</see>.</returns>
         IBoundRouteTemplate Bind( IDictionary<string, object> currentValues, IDictionary<string, object> values, HttpRouteValueDictionary defaultValues, HttpRouteValueDictionary constraints );
 
         /// <summary>

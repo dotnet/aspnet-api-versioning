@@ -24,7 +24,7 @@
         readonly Lazy<ModelMetadata> modelMetadata;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="VersionedApiDescriptionProvider"/> class.
+        /// Initializes a new instance of the <see cref="VersionedApiDescriptionProvider"/> class.
         /// </summary>
         /// <param name="metadadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
         /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiExplorerOptions">API explorer options</see>.</param>

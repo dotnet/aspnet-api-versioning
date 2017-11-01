@@ -20,6 +20,8 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.OData" Version="6.0.0" />
+  <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1" PrivateAssets="All" />
+  <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="All" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">

@@ -30,7 +30,7 @@
             Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
             Arg.NotNull( apiExplorerOptions, nameof( apiExplorerOptions ) );
 
-            apiVersionDescriptions = new Lazy<IReadOnlyList<ApiVersionDescription>>( () => EnumerateApiVersions( actionDescriptorCollectionProvider ) );
+            apiVersionDescriptions = LazyApiVersionDescriptions.Create( this, actionDescriptorCollectionProvider );
             options = apiExplorerOptions;
         }
 
@@ -145,6 +145,33 @@
                 var groupName = version.ToString( Options.GroupNameFormat, CurrentCulture );
                 descriptions.Add( new ApiVersionDescription( version, groupName, deprecated ) );
             }
+        }
+
+        sealed class LazyApiVersionDescriptions : Lazy<IReadOnlyList<ApiVersionDescription>>
+        {
+            readonly DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider;
+            readonly IActionDescriptorCollectionProvider actionDescriptorCollectionProvider;
+
+            LazyApiVersionDescriptions( DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
+            {
+                Contract.Requires( apiVersionDescriptionProvider != null );
+                Contract.Requires( actionDescriptorCollectionProvider != null );
+
+                this.apiVersionDescriptionProvider = apiVersionDescriptionProvider;
+                this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
+            }
+
+            internal static Lazy<IReadOnlyList<ApiVersionDescription>> Create( DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
+            {
+                Contract.Requires( apiVersionDescriptionProvider != null );
+                Contract.Requires( actionDescriptorCollectionProvider != null );
+                Contract.Ensures( Contract.Result<Lazy<IReadOnlyList<ApiVersionDescription>>>() != null );
+
+                var descriptions = new LazyApiVersionDescriptions( apiVersionDescriptionProvider, actionDescriptorCollectionProvider );
+                return new Lazy<IReadOnlyList<ApiVersionDescription>>( descriptions.EnumerateApiVersions );
+            }
+
+            IReadOnlyList<ApiVersionDescription> EnumerateApiVersions() => apiVersionDescriptionProvider.EnumerateApiVersions( actionDescriptorCollectionProvider );
         }
     }
 }

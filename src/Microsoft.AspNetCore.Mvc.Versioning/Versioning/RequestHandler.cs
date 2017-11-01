@@ -23,14 +23,16 @@
             {
                 HttpContext = httpContext,
                 RouteData = httpContext.GetRouteData(),
-                ActionDescriptor = new ActionDescriptor()
+                ActionDescriptor = new ActionDescriptor(),
             };
 
             Context.ReportApiVersions( httpContext.Response );
             return result.ExecuteResultAsync( actionContext );
         }
 
+#pragma warning disable CA2225 // Operator overloads have named alternates; intentionally one-way
         public static implicit operator RequestDelegate( RequestHandler handler ) =>
             handler == null ? default( RequestDelegate ) : handler.ExecuteAsync;
+#pragma warning restore CA2225
     }
 }

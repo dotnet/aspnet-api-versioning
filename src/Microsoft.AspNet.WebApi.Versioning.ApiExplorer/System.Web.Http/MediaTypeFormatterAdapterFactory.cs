@@ -118,6 +118,7 @@
             return target;
         }
 
+#pragma warning disable RS0010 // Avoid using cref tags with a prefix; false positive - it's a href not a cref
         /// <summary>
         /// Supports cloning with a copy constructor.
         /// </summary>
@@ -126,12 +127,15 @@
         /// <seealso cref="!:https://github.com/ASP-NET-MVC/aspnetwebstack/blob/4e40cdef9c8a8226685f95ef03b746bc8322aa92/src/System.Net.Http.Formatting/Formatting/MediaTypeFormatter.cs#L62"/>
         /// </remarks>
         static class SupportedMediaTypesInitializer
+#pragma warning restore RS0010
         {
+            static readonly ConstructorInfo newCollection;
             static FieldInfo field;
             static PropertyInfo property;
-            static readonly ConstructorInfo newCollection;
 
+#pragma warning disable CA1810 // Initialize reference type static fields inline; cannot be inlined
             static SupportedMediaTypesInitializer()
+#pragma warning restore CA1810
             {
                 var flags = Public | NonPublic | Instance;
                 var mediaTypeFormatter = typeof( MediaTypeFormatter );

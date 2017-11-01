@@ -7,8 +7,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Routing;
     using System;
     using System.ComponentModel;
-    using static System.ComponentModel.EditorBrowsableState;
     using static ApiVersion;
+    using static System.ComponentModel.EditorBrowsableState;
 
     /// <summary>
     /// Represents current API versioning request properties.
@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         public string RawApiVersion => rawApiVersion.Value;
 
         /// <summary>
-        /// Gets the API version for the current request.
+        /// Gets or sets the API version for the current request.
         /// </summary>
         /// <value>The current <see cref="ApiVersion">API version</see> for the current request.</value>
         /// <remarks>If an API version was not provided for the current request or the value
@@ -37,7 +37,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                 if ( !apiVersionInitialized )
                 {
+#pragma warning disable CA1806 // Do not ignore method results
                     TryParse( RawApiVersion, out apiVersion );
+#pragma warning restore CA1806
                     apiVersionInitialized = true;
                 }
 

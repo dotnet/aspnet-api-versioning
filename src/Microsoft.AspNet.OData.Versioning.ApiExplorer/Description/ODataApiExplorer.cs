@@ -49,7 +49,7 @@
         /// Gets the options associated with the API explorer.
         /// </summary>
         /// <value>The <see cref="ODataApiExplorerOptions">API explorer options</see>.</value>
-        new protected virtual ODataApiExplorerOptions Options { get; }
+        protected new virtual ODataApiExplorerOptions Options { get; }
 
         /// <summary>
         /// Determines whether the action should be considered.
@@ -368,10 +368,7 @@
                     ResponseDescription = responseDescription,
                     ApiVersion = apiVersion,
                     IsDeprecated = deprecated,
-                    Properties =
-                    {
-                        [typeof( IEdmModel )] = context.EdmModel
-                    }
+                    Properties = { [typeof( IEdmModel )] = context.EdmModel },
                 };
 
                 apiDescription.ParameterDescriptions.AddRange( parameterDescriptions );

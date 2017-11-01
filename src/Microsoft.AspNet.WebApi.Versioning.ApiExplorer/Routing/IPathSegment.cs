@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Routing
 {
-    using System;
+#pragma warning disable CA1040 // Avoid empty interfaces
 
     /// <summary>
     /// Defines the behavior of a path segment.

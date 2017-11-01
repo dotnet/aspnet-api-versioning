@@ -7,6 +7,7 @@
     using System.Linq;
     using static Extensions.Logging.LoggerMessage;
     using static Extensions.Logging.LogLevel;
+    using static System.Globalization.CultureInfo;
 
     static class ILoggerExtensions
     {
@@ -55,7 +56,7 @@
 
             if ( routeValueDictionary != null )
             {
-                routeValues = routeValueDictionary.Select( pair => pair.Key + "=" + Convert.ToString( pair.Value ) ).ToArray();
+                routeValues = routeValueDictionary.Select( pair => pair.Key + "=" + Convert.ToString( pair.Value, InvariantCulture ) ).ToArray();
             }
 
             noActionsMatched( logger, routeValues, null );

@@ -41,12 +41,14 @@
                             adapter = (IPathSubsegment) Activator.CreateInstance( adapterType, subsegment );
                             break;
                         }
+
                     case "PathParameterSubsegment":
                         {
                             var adapterType = typeof( PathParameterSubsegmentAdapter<> ).MakeGenericType( type );
                             adapter = (IPathSubsegment) Activator.CreateInstance( adapterType, subsegment );
                             break;
                         }
+
                     default:
                         throw new InvalidOperationException( $"Encountered the {type.Name} path subsegment, which was not expected." );
                 }

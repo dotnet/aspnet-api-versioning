@@ -37,7 +37,7 @@
         /// Gets or sets the response description.
         /// </summary>
         /// <value>The <see cref="ResponseDescription">response description</see>.</value>
-        new public ResponseDescription ResponseDescription
+        public new ResponseDescription ResponseDescription
         {
             get
             {

@@ -4,6 +4,10 @@ namespace Microsoft.Web.Http.Versioning
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
+// disable warnings for false positives targeting netstandard2.0
+#pragma warning disable CA1032 // Implement standard exception constructors
+#pragma warning disable CA2235 // Mark all non-serializable fields
+
     using System;
     using System.Collections.Generic;
     using System.Linq;

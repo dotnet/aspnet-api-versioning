@@ -40,21 +40,18 @@
             {
                 var type = pathSegment.GetType();
                 var adapter = default( IPathSegment );
+                var adapterType = default( Type );
 
                 switch ( type.Name )
                 {
                     case "PathContentSegment":
-                        {
-                            var adapterType = typeof( PathContentSegmentAdapter<> ).MakeGenericType( type );
-                            adapter = (IPathSegment) Activator.CreateInstance( adapterType, pathSegment );
-                            break;
-                        }
+                        adapterType = typeof( PathContentSegmentAdapter<> ).MakeGenericType( type );
+                        adapter = (IPathSegment) Activator.CreateInstance( adapterType, pathSegment );
+                        break;
                     case "PathSeparatorSegment":
-                        {
-                            var adapterType = typeof( PathSeparatorSegmentAdapter<> ).MakeGenericType( type );
-                            adapter = (IPathSegment) Activator.CreateInstance( adapterType, pathSegment );
-                            break;
-                        }
+                        adapterType = typeof( PathSeparatorSegmentAdapter<> ).MakeGenericType( type );
+                        adapter = (IPathSegment) Activator.CreateInstance( adapterType, pathSegment );
+                        break;
                     default:
                         throw new InvalidOperationException( $"Encountered the {type.Name} path segment, which was not expected." );
                 }

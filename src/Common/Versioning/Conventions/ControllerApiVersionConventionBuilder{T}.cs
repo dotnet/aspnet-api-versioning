@@ -13,7 +13,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a builder for API versions applied to a controller.
     /// </summary>
+#pragma warning disable SA1619 // Generic type parameters should be documented partial class; false positive
     public partial class ControllerApiVersionConventionBuilder<T> : ControllerApiVersionConventionBuilderBase
+#pragma warning restore SA1619
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerApiVersionConventionBuilder{T}"/> class.

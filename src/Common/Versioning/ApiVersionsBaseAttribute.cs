@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <summary>
         /// Returns a value indicating whether the specified object is equal to the current instance.
         /// </summary>
-        /// <param name="obj">The <see cref="Object">object</see> to be evaluated.</param>
+        /// <param name="obj">The <see cref="object">object</see> to be evaluated.</param>
         /// <returns>True if the current instance equals the specified object; otherwise, false.</returns>
         public override bool Equals( object obj ) => ( obj is ApiVersionsBaseAttribute ) && GetHashCode() == obj.GetHashCode();
 

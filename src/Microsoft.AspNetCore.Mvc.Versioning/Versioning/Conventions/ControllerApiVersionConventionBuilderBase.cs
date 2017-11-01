@@ -1,5 +1,7 @@
-﻿using System;
+﻿#pragma warning disable SA1200 // Using directives should be placed correctly; false positive - required for inner, short-hand type aliasing
+using System;
 using System.Collections.Generic;
+#pragma warning restore SA1200
 
 namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
@@ -31,7 +33,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// </summary>
         /// <param name="method">The <see cref="MethodInfo">method</see> representing the action to retrieve the convention for.</param>
         /// <param name="convention">The retrieved <see cref="IApiVersionConvention{T}">convention</see> or <c>null</c>.</param>
-        /// <returns></returns>
+        /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
         protected abstract bool TryGetConvention( MethodInfo method, out IApiVersionConvention<ActionModel> convention );
 
         ControllerVersionInfo ApplyControllerConventions( ControllerModel controllerModel )

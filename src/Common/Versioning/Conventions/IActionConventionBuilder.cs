@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     public interface IActionConventionBuilder
     {
         /// <summary>
-        /// Gets the type of controller the convention builder is for. 
+        /// Gets the type of controller the convention builder is for.
         /// </summary>
         /// <value>The corresponding controller <see cref="Type">type</see>.</value>
         Type ControllerType { get; }

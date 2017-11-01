@@ -37,7 +37,9 @@
 
         public override string DisplayFormatString => inner.DisplayFormatString;
 
+#pragma warning disable CA1721 // Property names should not match get methods; inherited member
         public override string DisplayName => SR.ApiVersionDisplayName;
+#pragma warning restore CA1721
 
         public override string EditFormatString => inner.EditFormatString;
 

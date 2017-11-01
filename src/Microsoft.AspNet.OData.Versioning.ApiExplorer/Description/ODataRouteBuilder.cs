@@ -21,9 +21,9 @@
         static readonly Type GeometryType = typeof( Spatial.Geometry );
         static readonly Dictionary<Type, string> quotedTypes = new Dictionary<Type, string>()
         {
-            [typeof( string )] = "",
+            [typeof( string )] = string.Empty,
             [typeof( TimeSpan )] = "duration",
-            [typeof( byte[] )] = "binary"
+            [typeof( byte[] )] = "binary",
         };
 
         internal ODataRouteBuilder( ODataRouteBuilderContext context )

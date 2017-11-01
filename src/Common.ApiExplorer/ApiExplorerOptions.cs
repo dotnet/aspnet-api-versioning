@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// as well as the <see cref="ApiVersion.ToString(string)"/> and <see cref="ApiVersion.ToString(string, IFormatProvider)"/>
         /// methods.</remarks>
         public string GroupNameFormat { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the default description used for API version parameters.
         /// </summary>

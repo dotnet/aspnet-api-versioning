@@ -14,7 +14,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a collection of controller action convention builders.
     /// </summary>
+#pragma warning disable SA1619 // Generic type parameters should be documented partial class; false positive
     public partial class ActionApiVersionConventionBuilderCollection<T> : IReadOnlyCollection<ActionApiVersionConventionBuilder<T>>
+#pragma warning restore SA1619
     {
         readonly ControllerApiVersionConventionBuilder<T> controllerBuilder;
         readonly IList<ActionBuilderMapping<T>> actionBuilderMappings = new List<ActionBuilderMapping<T>>();

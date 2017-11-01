@@ -30,18 +30,8 @@
 
         static void AddServicePrototypes( IContainerBuilder builder )
         {
-            builder.AddServicePrototype( new ODataMessageReaderSettings()
-            {
-                EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = long.MaxValue },
-
-            } );
-
-            builder.AddServicePrototype( new ODataMessageWriterSettings
-            {
-                EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = long.MaxValue },
-            } );
+            builder.AddServicePrototype( new ODataMessageReaderSettings() { EnableMessageStreamDisposal = false, MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = long.MaxValue } } );
+            builder.AddServicePrototype( new ODataMessageWriterSettings() { EnableMessageStreamDisposal = false, MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = long.MaxValue } } );
         }
 
         static void AddQueryValidators( IContainerBuilder builder )

@@ -111,6 +111,7 @@
                         default:
                             throw CreateAmbiguousActionException( implicitMatches );
                     }
+
                     break;
                 case 1:
                     return explicitMatches[0];

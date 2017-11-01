@@ -6,8 +6,8 @@ namespace Microsoft.AspNetCore.Mvc
 {
     using System;
     using System.Diagnostics.Contracts;
-    using static System.Nullable;
     using static System.ComponentModel.TypeDescriptor;
+    using static System.Nullable;
 
     static partial class TypeExtensions
     {

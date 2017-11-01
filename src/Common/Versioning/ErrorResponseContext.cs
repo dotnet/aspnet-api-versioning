@@ -22,6 +22,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #else
         public int StatusCode { get; }
 #endif
+
         /// <summary>
         /// Gets the associated error code.
         /// </summary>

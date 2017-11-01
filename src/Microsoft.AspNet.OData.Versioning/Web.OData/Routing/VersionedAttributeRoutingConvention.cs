@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -77,7 +78,7 @@
         /// <param name="controller">The <see cref="HttpControllerDescriptor">controller descriptor</see> to evaluate.</param>
         /// <returns>True if the <paramref name="controller"/> should be mapped as an OData controller; otherwise, false.</returns>
         /// <remarks>This method will match any OData controller that is API version-neutral or has a declared API version that
-        /// matches the API version applied to the associated <see cref="P:Model">model</see>.</remarks>
+        /// matches the API version applied to the associated <see cref="ApiVersionModel">model</see>.</remarks>
         public override bool ShouldMapController( HttpControllerDescriptor controller )
         {
             Contract.Assume( controller != null );

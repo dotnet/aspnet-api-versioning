@@ -608,6 +608,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                         text.Append( '.' );
                         text.Append( minor.ToString( formatProvider ) );
                     }
+
                     AppendStatus( text, apiVersion.Status );
                     break;
                 case 4: // VVVV
@@ -666,6 +667,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                         text.Append( '.' );
                         text.Append( minor.ToString( TwoDigits, formatProvider ) );
                     }
+
                     AppendStatus( text, apiVersion.Status );
                     break;
                 case 4: // PPPP
@@ -737,9 +739,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         [DebuggerDisplay( "Token = {Token,nq}, Invalid = {IsInvalid,nq}, Literal = {IsLiteral,nq}" )]
         sealed class FormatToken
         {
+#pragma warning disable SA1401 // Fields should be private
             internal readonly string Format;
             internal readonly bool IsLiteral;
             internal readonly bool IsInvalid;
+#pragma warning restore SA1401 // Fields should be private
 
             internal FormatToken( string format ) : this( format, false, false ) { }
 

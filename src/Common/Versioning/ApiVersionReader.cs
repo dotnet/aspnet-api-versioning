@@ -8,9 +8,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Http;
 #endif
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
     using static System.String;
 #if WEBAPI
     using HttpRequest = System.Net.Http.HttpRequestMessage;

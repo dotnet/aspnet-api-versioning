@@ -1,5 +1,7 @@
-﻿using System;
+﻿#pragma warning disable SA1200 // Using directives should be placed correctly; false positive - required for inner, short-hand type aliasing
+using System;
 using System.Collections.Generic;
+#pragma warning restore SA1200
 
 namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {

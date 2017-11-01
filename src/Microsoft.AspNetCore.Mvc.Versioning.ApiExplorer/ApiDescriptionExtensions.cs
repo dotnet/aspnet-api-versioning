@@ -41,7 +41,7 @@
                 ActionDescriptor = apiDescription.ActionDescriptor,
                 GroupName = apiDescription.GroupName,
                 HttpMethod = apiDescription.HttpMethod,
-                RelativePath = apiDescription.RelativePath
+                RelativePath = apiDescription.RelativePath,
             };
 
             foreach ( var property in apiDescription.Properties )
@@ -75,7 +75,7 @@
             return new ApiRequestFormat()
             {
                 Formatter = requestFormat.Formatter,
-                MediaType = requestFormat.MediaType
+                MediaType = requestFormat.MediaType,
             };
         }
 
@@ -88,7 +88,7 @@
             {
                 ModelMetadata = responseType.ModelMetadata,
                 StatusCode = responseType.StatusCode,
-                Type = responseType.Type
+                Type = responseType.Type,
             };
 
             foreach ( var responseFormat in responseType.ApiResponseFormats )
@@ -107,7 +107,7 @@
             return new ApiResponseFormat()
             {
                 Formatter = responseFormat.Formatter,
-                MediaType = responseFormat.MediaType
+                MediaType = responseFormat.MediaType,
             };
         }
     }

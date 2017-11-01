@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         protected ControllerApiVersionConventionBuilder ControllerBuilder { get; }
 
         /// <summary>
-        /// Gets the type of controller the convention builder is for. 
+        /// Gets the type of controller the convention builder is for.
         /// </summary>
         /// <value>The corresponding controller <see cref="Type">type</see>.</value>
         public Type ControllerType => ControllerBuilder.ControllerType;

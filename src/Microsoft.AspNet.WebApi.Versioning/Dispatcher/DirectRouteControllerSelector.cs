@@ -25,7 +25,7 @@
             var result = new ControllerSelectionResult()
             {
                 HasCandidates = aggregator.HasAttributeBasedRoutes,
-                RequestedVersion = requestedVersion
+                RequestedVersion = requestedVersion,
             };
 
             if ( !result.HasCandidates )

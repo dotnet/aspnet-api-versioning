@@ -35,7 +35,7 @@
             {
                 RequestedVersion = requestedVersion,
                 ControllerName = controllerName,
-                HasCandidates = aggregator.HasConventionBasedRoutes
+                HasCandidates = aggregator.HasConventionBasedRoutes,
             };
 
             if ( !result.HasCandidates )

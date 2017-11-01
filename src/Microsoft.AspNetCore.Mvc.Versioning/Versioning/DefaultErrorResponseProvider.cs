@@ -38,12 +38,12 @@
                 {
                     Code = NullIfEmpty( context.ErrorCode ),
                     Message = NullIfEmpty( context.Message ),
-                    InnerError = NewInnerError( context, c => new { Message = c.MessageDetail } )
-                }
+                    InnerError = NewInnerError( context, c => new { Message = c.MessageDetail } ),
+                },
             };
         }
 
-        static string NullIfEmpty( string @string ) => IsNullOrEmpty( @string ) ? null : @string;
+        static string NullIfEmpty( string value ) => IsNullOrEmpty( value ) ? null : value;
 
         static TError NewInnerError<TError>( ErrorResponseContext context, Func<ErrorResponseContext, TError> create )
         {

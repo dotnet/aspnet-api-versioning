@@ -116,6 +116,7 @@ namespace Microsoft.AspNetCore.Mvc
             {
                 throw new ArgumentException( SR.ApiVersionBadStatus.FormatDefault( status ), nameof( status ) );
             }
+
             Contract.EndContractBlock();
         }
 
@@ -322,7 +323,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <summary>
         /// Determines whether the current object equals another object.
         /// </summary>
-        /// <param name="obj">The <see cref="Object">object</see> to evaluate.</param>
+        /// <param name="obj">The <see cref="object">object</see> to evaluate.</param>
         /// <returns>True if the specified objet is equal to the current instance; otherwise, false.</returns>
         public override bool Equals( object obj ) => Equals( obj as ApiVersion );
 
@@ -331,7 +332,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <returns>A hash code.</returns>
         /// <remarks>The hash code is based on the uppercase, invariant hash of the
-        /// <see cref="M:ToString">text representation</see> of the object.</remarks>
+        /// <see cref="ToString()">text representation</see> of the object.</remarks>
         public override int GetHashCode() => ToString().ToUpperInvariant().GetHashCode();
 
         /// <summary>
@@ -414,7 +415,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <returns>Zero if the objects are equal, one if the current object is greater than the
         /// <paramref name="other"/> object, or negative one if the current object is less than the
         /// <paramref name="other"/> object.</returns>
-        /// <remarks>The version <see cref="P:Status">status</see> is not included in comparisons.</remarks>
+        /// <remarks>The version <see cref="Status">status</see> is not included in comparisons.</remarks>
         public virtual int CompareTo( ApiVersion other )
         {
             if ( other == null )

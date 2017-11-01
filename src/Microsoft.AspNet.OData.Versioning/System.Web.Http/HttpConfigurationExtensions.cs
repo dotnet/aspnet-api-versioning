@@ -294,7 +294,6 @@
                 var route = default( ODataRoute );
                 var messageHandler = rootContainer.GetService<HttpMessageHandler>();
 
-
                 if ( messageHandler == null )
                 {
                     route = new ODataRoute( routePrefix, routeConstraint );

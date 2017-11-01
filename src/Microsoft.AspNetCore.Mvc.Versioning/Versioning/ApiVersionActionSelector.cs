@@ -15,6 +15,7 @@
     using System.Linq;
     using System.Threading;
     using static ErrorCodes;
+    using static System.Globalization.CultureInfo;
 
     /// <summary>
     /// Represents the logic for selecting an API-versioned, action method.
@@ -109,7 +110,7 @@
 
                 if ( value != null )
                 {
-                    values[i] = value as string ?? Convert.ToString( value );
+                    values[i] = value as string ?? Convert.ToString( value, InvariantCulture );
                 }
             }
 
@@ -301,7 +302,7 @@
                 var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
                 {
                     Code = AmbiguousApiVersion,
-                    Message = ex.Message
+                    Message = ex.Message,
                 };
                 return new BadRequestHandler( handlerContext );
             }
@@ -400,7 +401,7 @@
             var constraintContext = new ActionConstraintContext()
             {
                 Candidates = candidates,
-                RouteContext = context
+                RouteContext = context,
             };
 
             for ( var i = 0; i < candidates.Count; i++ )
@@ -520,7 +521,9 @@
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
+#pragma warning disable CA1724 // private type and will not cause a conflict
         sealed class Cache
+#pragma warning restore CA1724
         {
             public Cache( ActionDescriptorCollection actions )
             {
@@ -578,7 +581,6 @@
 
                     for ( var j = 0; j < RouteKeys.Length; j++ )
                     {
-
                         action.RouteValues.TryGetValue( RouteKeys[j], out routeValues[j] );
                     }
 

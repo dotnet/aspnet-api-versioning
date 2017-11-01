@@ -23,7 +23,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         static readonly Lazy<ApiVersionModel> defaultVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( DefaultModel ) );
         static readonly Lazy<ApiVersionModel> neutralVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( NeutralModel ) );
         static readonly Lazy<ApiVersionModel> emptyVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( EmptyModel ) );
+#if WEBAPI
         static readonly Lazy<IReadOnlyList<ApiVersion>> emptyVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new ApiVersion[0] );
+#else
+        static readonly Lazy<IReadOnlyList<ApiVersion>> emptyVersions = new Lazy<IReadOnlyList<ApiVersion>>( Array.Empty<ApiVersion> );
+#endif
         static readonly Lazy<IReadOnlyList<ApiVersion>> defaultVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new[] { ApiVersion.Default } );
         readonly Lazy<IReadOnlyList<ApiVersion>> declaredVersions;
         readonly Lazy<IReadOnlyList<ApiVersion>> implementedVersions;
@@ -59,7 +63,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             Contract.Requires( supported != null );
             Contract.Requires( deprecated != null );
 
-            if ( IsApiVersionNeutral = ( implemented.Count == 0 ) )
+            if ( IsApiVersionNeutral = implemented.Count == 0 )
             {
                 declaredVersions = emptyVersions;
                 implementedVersions = emptyVersions;

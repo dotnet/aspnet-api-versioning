@@ -40,7 +40,7 @@
             get
             {
                 var dependencyResolver = request.GetConfiguration().DependencyResolver;
-                var reporter = ( (IReportApiVersions) dependencyResolver.GetService( typeof( IReportApiVersions ) ) );
+                var reporter = (IReportApiVersions) dependencyResolver.GetService( typeof( IReportApiVersions ) );
 
                 if ( reporter == null )
                 {
