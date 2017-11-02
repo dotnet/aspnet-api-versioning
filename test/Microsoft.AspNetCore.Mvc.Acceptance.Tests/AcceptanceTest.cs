@@ -96,7 +96,11 @@
                     var assemblies = assembly.GetReferencedAssemblies().Select( x => CreateFromFile( Load( x ).Location ) ).ToList();
 
                     assemblies.Add( CreateFromFile( Load( new AssemblyName( "mscorlib" ) ).Location ) );
+#if NET461
+                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "netstandard" ) ).Location ) );
+#else
                     assemblies.Add( CreateFromFile( Load( new AssemblyName( "System.Private.Corelib" ) ).Location ) );
+#endif
                     assemblies.Add( CreateFromFile( Load( new AssemblyName( "System.Dynamic.Runtime" ) ).Location ) );
                     assemblies.Add( CreateFromFile( Load( new AssemblyName( "Microsoft.AspNetCore.Razor" ) ).Location ) );
                     context.Compilation = context.Compilation.AddReferences( assemblies );
