@@ -1,4 +1,4 @@
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/ho6w0yc612i6jmnp?svg=true)](https://ci.appveyor.com/project/Microsoft/aspnet-api-versioning)
+[![VSTS Build Status](https://mrtechnocal.visualstudio.com/_apis/public/build/definitions/f0b1168c-671a-4dd1-ac55-2f0e25c4a405/1/badge)](https://mrtechnocal.visualstudio.com/ApiVersioning/_build/index?definitionId=1)
 
 # ASP.NET API Versioning
 
