@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
     using Conventions;
-    using System;
     using System.Diagnostics.Contracts;
 #if WEBAPI
     using static Microsoft.Web.Http.Versioning.ApiVersionReader;
@@ -27,7 +26,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningOptions"/> class.
         /// </summary>
-        public ApiVersioningOptions() => apiVersionSelector = new DefaultApiVersionSelector( this );
+        public ApiVersioningOptions( ) => apiVersionSelector = new DefaultApiVersionSelector( this );
 
         /// <summary>
         /// Gets or sets a value indicating whether requests report the service API version compatibility
@@ -56,11 +55,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>When a default API version is assumed, the version used is based up the
         /// result of the <see cref="IApiVersionSelector.SelectVersion"/> method.</remarks>
         public bool AssumeDefaultVersionWhenUnspecified { get; set; }
-        
+
         /// <summary>
-        /// Set tu <c>true</c> if lower version of API should be included when using versioning inheritance.
+        /// Gets or sets a value indicating whether the versioning should look fow lower versions implemtations.
         /// </summary>
-        public bool LookForLowerVesions {get;set;}
+        /// <value><c>true</c> if lower version of API should be included when using versioning inheritance.</value>
+        public bool LookForLowerVersions { get; set; }
 
         /// <summary>
         /// Gets or sets the default API version applied to services that do not have explicit versions.
