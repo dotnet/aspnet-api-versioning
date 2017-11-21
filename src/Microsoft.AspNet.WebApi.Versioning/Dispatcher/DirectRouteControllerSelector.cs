@@ -52,6 +52,23 @@
 
             var versionedController = GetVersionedController( aggregator, requestedVersion );
 
+           var versionedController = GetVersionedController( aggregator, requestedVersion );
+
+            if ( versionedController == null )
+            {
+                if(options.LookForLowerVesions && requestedVersion.MajorVersion.HasValue)
+                {
+                    for ( int i = requestedVersion.MajorVersion.Value - 1; i > 0; i-- )
+                    {
+                        versionedController = GetVersionedController( aggregator, new ApiVersion( i, 0 ) );
+                        if ( versionedController != null )
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
             if ( versionedController == null )
             {
                 return result;
