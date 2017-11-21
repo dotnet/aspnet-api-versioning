@@ -56,6 +56,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>When a default API version is assumed, the version used is based up the
         /// result of the <see cref="IApiVersionSelector.SelectVersion"/> method.</remarks>
         public bool AssumeDefaultVersionWhenUnspecified { get; set; }
+        
+        /// <summary>
+        /// Set tu <c>true</c> if lower version of API should be included when using versioning inheritance.
+        /// </summary>
+        public bool LookForLowerVesions {get;set;}
 
         /// <summary>
         /// Gets or sets the default API version applied to services that do not have explicit versions.
