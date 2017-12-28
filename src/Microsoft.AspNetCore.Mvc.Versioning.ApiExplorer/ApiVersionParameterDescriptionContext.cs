@@ -249,7 +249,7 @@
 
                 foreach ( var otherParameter in otherParameters )
                 {
-                    if ( otherParameter.ModelMetadata.DataTypeName == nameof( ApiVersion ) )
+                    if ( otherParameter.ModelMetadata?.DataTypeName == nameof( ApiVersion ) )
                     {
                         collection.Remove( otherParameter );
                     }

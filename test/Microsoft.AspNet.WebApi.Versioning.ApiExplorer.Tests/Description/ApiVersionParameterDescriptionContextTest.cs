@@ -264,8 +264,8 @@
             context.AddParameter( "api-version", Header );
 
             // assert
-            description.ParameterDescriptions[0].ParameterDescriptor.IsOptional.Should().BeFalse();
-            description.ParameterDescriptions[1].ParameterDescriptor.IsOptional.Should().BeTrue();
+            description.ParameterDescriptions[0].ParameterDescriptor?.IsOptional.Should().BeFalse();
+            description.ParameterDescriptions[1].ParameterDescriptor?.IsOptional.Should().BeTrue();
         }
     }
 }

@@ -8,7 +8,7 @@
     static class ApiParameterDescriptionExtensions
     {
         internal static IEnumerable<PropertyInfo> GetBindableProperties( this ApiParameterDescription description ) =>
-            description.ParameterDescriptor.ParameterType.GetBindableProperties();
+            description.ParameterDescriptor?.ParameterType.GetBindableProperties();
 
         internal static bool CanConvertPropertiesFromString( this ApiParameterDescription description ) =>
             description.GetBindableProperties().All( p => TypeHelper.CanConvertFromString( p.PropertyType ) );
