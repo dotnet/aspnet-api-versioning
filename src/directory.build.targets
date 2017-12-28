@@ -4,8 +4,10 @@
   <PropertyGroup Label="Common">
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
-  
- <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\file-version.targets" />
- <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\nuget.targets" />
+
+  <ImportGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+    <Import Project="..\build\file-version.targets" />
+    <Import Project="..\build\nuget.targets" />
+  </ImportGroup>
   
 </Project>
