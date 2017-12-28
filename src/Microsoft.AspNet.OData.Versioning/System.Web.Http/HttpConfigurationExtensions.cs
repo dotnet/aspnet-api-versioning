@@ -282,9 +282,10 @@
                 routeConventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName, configuration, apiVersion );
                 unversionedConstraints.Add( new ODataPathRouteConstraint( versionedRouteName ) );
 
+                var edm = model;
                 var rootContainer = configuration.CreateODataRootContainer(
                                         versionedRouteName,
-                                        builder => builder.AddService( Singleton, typeof( IEdmModel ), sp => model )
+                                        builder => builder.AddService( Singleton, typeof( IEdmModel ), sp => edm )
                                                           .AddService( Singleton, typeof( IODataPathHandler ), sp => pathHandler )
                                                           .AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), sp => routeConventions.ToArray() )
                                                           .AddService( Singleton, typeof( ODataBatchHandler ), sp => batchHandler ) );
@@ -532,6 +533,68 @@
             HttpMessageHandler defaultHandler ) =>
             MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, null, defaultHandler );
 
+        /// <summary>
+        /// Gets the configured entity data model (EDM) for the specified API version.
+        /// </summary>
+        /// <param name="configuration">The server configuration.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to get the model for.</param>
+        /// <returns>The matching <see cref="IEdmModel">EDM model</see> or <c>null</c>.</returns>
+        public static IEdmModel GetEdmModel( this HttpConfiguration configuration, ApiVersion apiVersion )
+        {
+            Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+
+            var allRoutes = configuration.Routes;
+            var routes = new KeyValuePair<string, IHttpRoute>[allRoutes.Count];
+            var containers = configuration.GetRootContainerMappings();
+
+            allRoutes.CopyTo( routes, 0 );
+
+            foreach ( var route in routes )
+            {
+                if ( !( route.Value is ODataRoute odataRoute ) )
+                {
+                    continue;
+                }
+
+                if ( !containers.TryGetValue( route.Key, out var serviceProvider ) )
+                {
+                    continue;
+                }
+
+                var model = serviceProvider.GetService<IEdmModel>();
+
+                if ( model?.EntityContainer == null )
+                {
+                    continue;
+                }
+
+                var modelApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+
+                if ( modelApiVersion == apiVersion )
+                {
+                    return model;
+                }
+            }
+
+            return null;
+        }
+
+        internal static IServiceProvider GetODataRootContainer( this HttpConfiguration configuration, string routeName ) => configuration.GetRootContainerMappings()[routeName];
+
+        internal static ODataUrlKeyDelimiter GetUrlKeyDelimiter( this HttpConfiguration configuration )
+        {
+            Contract.Requires( configuration != null );
+
+            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) )
+            {
+                return value as ODataUrlKeyDelimiter;
+            }
+
+            configuration.Properties[UrlKeyDelimiterKey] = null;
+            return null;
+        }
+
         [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         [SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "The specified handler must be the batch handler." )]
         static ODataRoute MapVersionedODataRoute(
@@ -569,10 +632,10 @@
             var rootContainer = configuration.CreateODataRootContainer(
                                     routeName,
                                     builder => builder.AddService( Singleton, typeof( IEdmModel ), sp => model )
-                                                        .AddService( Singleton, typeof( IODataPathHandler ), sp => pathHandler )
-                                                        .AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), sp => routeConventions.ToArray() )
-                                                        .AddService( Singleton, typeof( ODataBatchHandler ), sp => batchHandler )
-                                                        .AddService( Singleton, typeof( HttpMessageHandler ), sp => defaultHandler ) );
+                                                      .AddService( Singleton, typeof( IODataPathHandler ), sp => pathHandler )
+                                                      .AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), sp => routeConventions.ToArray() )
+                                                      .AddService( Singleton, typeof( ODataBatchHandler ), sp => batchHandler )
+                                                      .AddService( Singleton, typeof( HttpMessageHandler ), sp => defaultHandler ) );
 
             rootContainer.InitializeAttributeRouting();
 
@@ -698,19 +761,6 @@
             configuration.CreateODataRootContainer( routeName, configureAction );
         }
 
-        static ODataUrlKeyDelimiter GetUrlKeyDelimiter( this HttpConfiguration configuration )
-        {
-            Contract.Requires( configuration != null );
-
-            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) )
-            {
-                return value as ODataUrlKeyDelimiter;
-            }
-
-            configuration.Properties[UrlKeyDelimiterKey] = null;
-            return null;
-        }
-
         static IServiceProvider CreateODataRootContainer( this HttpConfiguration configuration, string routeName, Action<IContainerBuilder> configureAction )
         {
             var rootContainer = configuration.CreateRootContainerImplementation( configureAction );
@@ -766,53 +816,6 @@
             builder.AddDefaultWebApiServices();
 
             return builder;
-        }
-
-        /// <summary>
-        /// Gets the configured entity data model (EDM) for the specified API version.
-        /// </summary>
-        /// <param name="configuration">The server configuration.</param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to get the model for.</param>
-        /// <returns>The matching <see cref="IEdmModel">EDM model</see> or <c>null</c>.</returns>
-        public static IEdmModel GetEdmModel( this HttpConfiguration configuration, ApiVersion apiVersion )
-        {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-
-            var allRoutes = configuration.Routes;
-            var routes = new KeyValuePair<string, IHttpRoute>[allRoutes.Count];
-            var containers = configuration.GetRootContainerMappings();
-
-            allRoutes.CopyTo( routes, 0 );
-
-            foreach ( var route in routes )
-            {
-                if ( !( route.Value is ODataRoute odataRoute ) )
-                {
-                    continue;
-                }
-
-                if ( !containers.TryGetValue( route.Key, out var serviceProvider ) )
-                {
-                    continue;
-                }
-
-                var model = serviceProvider.GetService<IEdmModel>();
-
-                if ( model?.EntityContainer == null )
-                {
-                    continue;
-                }
-
-                var modelApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
-
-                if ( modelApiVersion == apiVersion )
-                {
-                    return model;
-                }
-            }
-
-            return null;
         }
     }
 }
