@@ -151,17 +151,37 @@
 
                     convention.Append( ')' );
                 }
+                else
+                {
+                    TryAddEntityKeySegmentByConvention( convention );
+                }
             }
 
             return convention.ToString();
         }
 
-        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key )
+        void TryAddEntityKeySegmentByConvention( StringBuilder convention )
+        {
+            var keys = Context.EntityKeys.ToArray();
+
+            if ( keys.Length != 1 || !Context.ParameterDescriptions.Any( p => ODataRouteConstants.Key.Equals( p.Name, OrdinalIgnoreCase ) ) )
+            {
+                return;
+            }
+
+            convention.Append( '(' );
+            ExpandParameterTemplate( convention, keys[0], ODataRouteConstants.Key );
+            convention.Append( ')' );
+        }
+
+        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key ) => ExpandParameterTemplate( template, key, key?.Name );
+
+        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key, string name )
         {
             Contract.Requires( template != null );
             Contract.Requires( key != null );
+            Contract.Requires( !IsNullOrEmpty( name ) );
 
-            var name = key.Name;
             var typeDef = key.Type.Definition;
 
             template.Append( "{" );
