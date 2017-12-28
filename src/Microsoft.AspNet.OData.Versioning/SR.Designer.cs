@@ -19,7 +19,7 @@ namespace Microsoft {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SR {
@@ -61,6 +61,15 @@ namespace Microsoft {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The path template &apos;{0}&apos; on the action &apos;{1}&apos; in controller &apos;{2}&apos; is not a valid OData path template. {3}.
+        /// </summary>
+        internal static string InvalidODataRouteOnAction {
+            get {
+                return ResourceManager.GetString("InvalidODataRouteOnAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The container built by the container builder must not be null..
         /// </summary>
         internal static string NullContainer {
@@ -75,6 +84,24 @@ namespace Microsoft {
         internal static string NullContainerBuilder {
             get {
                 return ResourceManager.GetString("NullContainerBuilder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The object has not yet been initialized. Ensure that HttpConfiguration.EnsureInitialized() is called in the application&apos;s startup code after all other initialization code..
+        /// </summary>
+        internal static string ObjectNotYetInitialized {
+            get {
+                return ResourceManager.GetString("ObjectNotYetInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The OData route prefix &apos;{0}&apos; on the controller &apos;{1}&apos; starts with a &apos;/&apos;. Route prefixes cannot start with a &apos;/&apos;..
+        /// </summary>
+        internal static string RoutePrefixStartsWithSlash {
+            get {
+                return ResourceManager.GetString("RoutePrefixStartsWithSlash", resourceCulture);
             }
         }
     }

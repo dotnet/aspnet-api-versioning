@@ -117,10 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="InvalidODataRouteOnAction" xml:space="preserve">
+    <value>The path template '{0}' on the action '{1}' in controller '{2}' is not a valid OData path template. {3}</value>
+  </data>
   <data name="NullContainer" xml:space="preserve">
     <value>The container built by the container builder must not be null.</value>
   </data>
   <data name="NullContainerBuilder" xml:space="preserve">
     <value>The container builder created by the container builder factory must not be null.</value>
+  </data>
+  <data name="ObjectNotYetInitialized" xml:space="preserve">
+    <value>The object has not yet been initialized. Ensure that HttpConfiguration.EnsureInitialized() is called in the application's startup code after all other initialization code.</value>
+  </data>
+  <data name="RoutePrefixStartsWithSlash" xml:space="preserve">
+    <value>The OData route prefix '{0}' on the controller '{1}' starts with a '/'. Route prefixes cannot start with a '/'.</value>
   </data>
 </root>
