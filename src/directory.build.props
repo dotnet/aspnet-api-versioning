@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\common.props" />
-  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\signing.props" />
-  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\code-analysis.props" />
-  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\nuget.props" />
+  <ImportGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+    <Import Project="..\build\common.props" />
+    <Import Project="..\build\signing.props" />
+    <Import Project="..\build\code-analysis.props" />
+    <Import Project="..\build\nuget.props" />
+  </ImportGroup>
 
 </Project>

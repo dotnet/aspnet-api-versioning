@@ -20,11 +20,6 @@
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj" />
  </ItemGroup>
 
- <ItemGroup>
-  <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1" PrivateAssets="All" />
-  <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="All" />
- </ItemGroup>
-
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
   <Reference Include="System" />
   <Reference Include="Microsoft.CSharp" />
