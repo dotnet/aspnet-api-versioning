@@ -162,15 +162,29 @@
 
         void TryAddEntityKeySegmentByConvention( StringBuilder convention )
         {
-            var keys = Context.EntityKeys.ToArray();
+            // REF: http://odata.github.io/WebApi/#13-06-KeyValueBinding
+            var entityKeys = Context.EntityKeys.ToArray();
+            var parameterKeys = Context.ParameterDescriptions.Where( p => p.Name.StartsWith( ODataRouteConstants.Key, OrdinalIgnoreCase ) ).ToArray();
 
-            if ( keys.Length != 1 || !Context.ParameterDescriptions.Any( p => ODataRouteConstants.Key.Equals( p.Name, OrdinalIgnoreCase ) ) )
+            if ( entityKeys.Length == parameterKeys.Length )
             {
                 return;
             }
 
             convention.Append( '(' );
-            ExpandParameterTemplate( convention, keys[0], ODataRouteConstants.Key );
+
+            if ( entityKeys.Length == 1 )
+            {
+                ExpandParameterTemplate( convention, entityKeys[0], ODataRouteConstants.Key );
+            }
+            else
+            {
+                for ( var i = 0; i < entityKeys.Length; i++ )
+                {
+                    ExpandParameterTemplate( convention, entityKeys[i], parameterKeys[i].Name );
+                }
+            }
+
             convention.Append( ')' );
         }
 
