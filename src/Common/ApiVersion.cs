@@ -5,6 +5,7 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Globalization;
@@ -333,7 +334,35 @@ namespace Microsoft.AspNetCore.Mvc
         /// <returns>A hash code.</returns>
         /// <remarks>The hash code is based on the uppercase, invariant hash of the
         /// <see cref="ToString()">text representation</see> of the object.</remarks>
-        public override int GetHashCode() => ToString().ToUpperInvariant().GetHashCode();
+        public override int GetHashCode()
+        {
+            var hashes = new List<int>( 4 );
+
+            if ( GroupVersion != null )
+            {
+                hashes.Add( GroupVersion.Value.GetHashCode() );
+            }
+
+            if ( MajorVersion != null )
+            {
+                hashes.Add( MajorVersion.Value.GetHashCode() );
+                hashes.Add( ImpliedMinorVersion.GetHashCode() );
+            }
+
+            if ( !IsNullOrEmpty( Status ) )
+            {
+                hashes.Add( StringComparer.OrdinalIgnoreCase.GetHashCode( Status ) );
+            }
+
+            var hash = hashes[0];
+
+            for ( var i = 1; i < hashes.Count; i++ )
+            {
+                hash = ( hash * 397 ) ^ hashes[i];
+            }
+
+            return hash;
+        }
 
         /// <summary>
         /// Overloads the equality operator.

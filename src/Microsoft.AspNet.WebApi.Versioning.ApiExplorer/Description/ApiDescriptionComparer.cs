@@ -63,7 +63,12 @@
             var hash = comparer.GetHashCode( id );
             var apiVersion = obj.ApiVersion;
 
-            return ( hash * 397 ) ^ apiVersion?.GetHashCode() ?? 0;
+            if ( apiVersion != null )
+            {
+                hash = ( hash * 397 ) ^ apiVersion.GetHashCode();
+            }
+
+            return hash;
         }
 
         /// <summary>
