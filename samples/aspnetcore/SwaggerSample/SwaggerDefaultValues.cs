@@ -23,18 +23,24 @@
             foreach ( var parameter in operation.Parameters.OfType<NonBodyParameter>() )
             {
                 var description = context.ApiDescription.ParameterDescriptions.First( p => p.Name == parameter.Name );
-                
+                var routeInfo = description.RouteInfo;
+
                 if ( parameter.Description == null )
                 {
-                    parameter.Description = description.ModelMetadata.Description;
+                    parameter.Description = description.ModelMetadata?.Description;
+                }
+
+                if ( routeInfo == null )
+                {
+                    continue;
                 }
 
                 if ( parameter.Default == null )
                 {
-                    parameter.Default = description.RouteInfo.DefaultValue;
+                    parameter.Default = routeInfo.DefaultValue;
                 }
 
-                parameter.Required |= !description.RouteInfo.IsOptional;
+                parameter.Required |= !routeInfo.IsOptional;
             }
         }
     }
