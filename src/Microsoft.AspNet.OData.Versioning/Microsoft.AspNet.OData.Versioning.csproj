@@ -27,21 +27,6 @@
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
 
- <ItemGroup>
-   <Compile Update="SR.Designer.cs">
-     <DependentUpon>SR.resx</DependentUpon>
-     <DesignTime>True</DesignTime>
-     <AutoGen>True</AutoGen>
-   </Compile>
- </ItemGroup>
-
- <ItemGroup>
-   <EmbeddedResource Update="SR.resx">
-     <LastGenOutput>SR.Designer.cs</LastGenOutput>
-     <Generator>ResXFileCodeGenerator</Generator>
-   </EmbeddedResource>
- </ItemGroup>
-
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
 
 </Project>
