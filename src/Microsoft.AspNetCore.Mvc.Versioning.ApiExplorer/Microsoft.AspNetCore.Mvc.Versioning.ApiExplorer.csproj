@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.0.0</VersionPrefix>
-  <AssemblyVersion>2.0.0.0</AssemblyVersion>
+  <VersionPrefix>2.1.0</VersionPrefix>
+  <AssemblyVersion>2.1.0.0</AssemblyVersion>
   <TargetFramework>netstandard2.0</TargetFramework>
   <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
   <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
@@ -13,7 +13,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v2.0.0" />
+  <!--<ReleaseNotes Include="" />-->
  </ItemGroup>
 
  <ItemGroup>
