@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <ItemGroup>
+  <Compile Update="*.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="$([System.IO.Path]::GetFileNameWithoutExtension('%(Filename)')).resx" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <EmbeddedResource Update="*.resx" Generator="ResXFileCodeGenerator" LastGenOutput="%(Filename).Designer.cs" />
+ </ItemGroup>
+
+</Project>

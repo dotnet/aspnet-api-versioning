@@ -6,8 +6,9 @@
   </PropertyGroup>
 
   <ImportGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+    <Import Project="..\build\resource.targets" />
     <Import Project="..\build\file-version.targets" />
     <Import Project="..\build\nuget.targets" />
   </ImportGroup>
-  
+
 </Project>
