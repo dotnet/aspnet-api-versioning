@@ -24,9 +24,10 @@
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-  <Reference Include="System" />
+ <ItemGroup>
   <Reference Include="Microsoft.CSharp" />
+  <Reference Include="System" />
+  <Reference Include="System.ComponentModel.DataAnnotations" />
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
