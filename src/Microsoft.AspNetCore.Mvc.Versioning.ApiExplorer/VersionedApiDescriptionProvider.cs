@@ -97,6 +97,23 @@
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
+            var action = apiDescription.ActionDescriptor;
+            var model = action.GetProperty<ApiVersionModel>();
+
+            if ( model.IsApiVersionNeutral )
+            {
+                return;
+            }
+            else if ( model.DeclaredApiVersions.Count == 0 )
+            {
+                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
+
+                if ( model?.IsApiVersionNeutral == true )
+                {
+                    return;
+                }
+            }
+
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
