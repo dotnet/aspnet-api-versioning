@@ -117,6 +117,11 @@
         [HttpPost]
         public IHttpActionResult Promote( int key, ODataActionParameters parameters )
         {
+            if ( !ModelState.IsValid )
+            {
+                return BadRequest( ModelState );
+            }
+
             var title = (string) parameters["title"];
             return StatusCode( NoContent );
         }
