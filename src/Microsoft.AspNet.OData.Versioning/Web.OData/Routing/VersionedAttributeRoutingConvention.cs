@@ -129,8 +129,8 @@
         {
             Arg.NotNull( controller, nameof( controller ) );
 
-            var versionModel = controller.GetApiVersionModel();
-            return versionModel.IsApiVersionNeutral || versionModel.DeclaredApiVersions.Contains( ApiVersion );
+            var model = controller.GetApiVersionModel();
+            return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( ApiVersion );
         }
 
         /// <summary>
@@ -143,8 +143,19 @@
         public virtual bool ShouldMapAction( HttpActionDescriptor action )
         {
             Arg.NotNull( action, nameof( action ) );
-            var apiVersions = action.GetApiVersions();
-            return apiVersions.Count == 0 || apiVersions.Contains( ApiVersion );
+
+            var model = action.GetApiVersionModel();
+
+            if ( model.IsApiVersionNeutral )
+            {
+                return true;
+            }
+            else if ( model.DeclaredApiVersions.Count == 0 )
+            {
+                return ShouldMapController( action.ControllerDescriptor );
+            }
+
+            return model.DeclaredApiVersions.Contains( ApiVersion );
         }
 
         /// <summary>
