@@ -1,6 +1,7 @@
 ﻿namespace System.Web.Http
 {
     using Microsoft;
+    using Microsoft.OData;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
     using System.Collections.Concurrent;
@@ -14,6 +15,7 @@
     public static class HttpConfigurationExtensions
     {
         const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
+        const string UrlKeyDelimiterKey = "System.Web.OData.UrlKeyDelimiterKey";
 
         /// <summary>
         /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.
@@ -62,6 +64,18 @@
             }
 
             throw new InvalidOperationException( SR.NullContainer );
+        }
+
+        internal static ODataUrlKeyDelimiter GetUrlKeyDelimiter( this HttpConfiguration configuration )
+        {
+            Contract.Requires( configuration != null );
+
+            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) && value is ODataUrlKeyDelimiter delimiter )
+            {
+                return delimiter;
+            }
+
+            return ODataUrlKeyDelimiter.Parentheses;
         }
     }
 }

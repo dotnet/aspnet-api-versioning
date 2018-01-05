@@ -13,6 +13,10 @@
 
  <ItemGroup>
   <ReleaseNotes Include="Fix convention-based 'key' parameter binding (#226)" />
+  <ReleaseNotes Include="Version-neutral actions exclude the API version parameter" />
+  <ReleaseNotes Include="Added full support for actions" />
+  <ReleaseNotes Include="Added full support for functions" />
+  <ReleaseNotes Include="Added support for partial types using EDM" />
  </ItemGroup>
 
  <ItemGroup>
