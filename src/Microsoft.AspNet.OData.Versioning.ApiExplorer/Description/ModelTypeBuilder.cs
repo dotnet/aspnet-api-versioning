@@ -58,7 +58,7 @@
             Contract.Requires( apiVersion != null );
             Contract.Ensures( Contract.Result<Type>() != null );
 
-            var name = action.FullName();
+            var name = action.FullName() + "Parameters";
             var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( assembliesResolver, p ) );
             var signature = new ClassSignature( name, properties, apiVersion );
 
