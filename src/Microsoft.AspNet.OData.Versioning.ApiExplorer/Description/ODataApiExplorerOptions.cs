@@ -26,5 +26,11 @@
         /// to <c>true</c>. By setting this property to <c>false</c>, these settings are ignored instead of reapplying
         /// <see cref="ApiExplorerSettingsAttribute.IgnoreApi"/> with a value of <c>false</c> to all OData controllers.</remarks>
         public bool UseApiExplorerSettings { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether qualified names are used when building URLs for operations (e.g. actions and functions).
+        /// </summary>
+        /// <value>True if qualified names are used when building URLs for operations; otherwise, false. The default value is <c>false</c>.</value>
+        public bool UseQualifiedOperationNames { get; set; }
     }
 }
