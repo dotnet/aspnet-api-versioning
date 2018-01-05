@@ -630,6 +630,14 @@
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
+            var action = apiDescription.ActionDescriptor;
+            var model = action.GetApiVersionModel();
+
+            if ( model.IsApiVersionNeutral || ( model.DeclaredApiVersions.Count == 0 && action.ControllerDescriptor.IsApiVersionNeutral() ) )
+            {
+                return;
+            }
+
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, Options );
 

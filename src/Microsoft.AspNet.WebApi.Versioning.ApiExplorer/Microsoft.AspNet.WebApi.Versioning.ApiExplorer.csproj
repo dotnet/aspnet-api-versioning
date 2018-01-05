@@ -12,7 +12,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <!--<ReleaseNotes Include="" />-->
+  <ReleaseNotes Include="Version-neutral actions exclude the API version parameter" />
  </ItemGroup>
 
  <ItemGroup>
