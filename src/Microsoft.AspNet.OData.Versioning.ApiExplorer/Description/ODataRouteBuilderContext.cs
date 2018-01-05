@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData;
     using Microsoft.OData.Edm;
     using Microsoft.OData.UriParser;
     using System;
@@ -10,37 +11,58 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
     using System.Web.Http.Dispatcher;
+    using System.Web.OData;
     using System.Web.OData.Routing;
     using static System.Linq.Enumerable;
 
     sealed class ODataRouteBuilderContext
     {
         readonly IServiceProvider serviceProvider;
-        readonly Lazy<IEdmEntityType> entityType;
-        readonly Lazy<IEnumerable<IEdmStructuralProperty>> entityKeys;
+        readonly ODataRouteAttribute routeAttribute;
 
         internal ODataRouteBuilderContext(
             HttpConfiguration configuration,
-            string routeTemplate,
             ODataRoute route,
             HttpActionDescriptor actionDescriptor,
-            IReadOnlyList<ApiParameterDescription> parameterDescriptions )
+            IReadOnlyList<ApiParameterDescription> parameterDescriptions,
+            ModelTypeBuilder modelTypeBuilder,
+            ODataApiExplorerOptions options )
         {
             Contract.Requires( configuration != null );
-            Contract.Requires( !string.IsNullOrEmpty( routeTemplate ) );
             Contract.Requires( route != null );
             Contract.Requires( actionDescriptor != null );
             Contract.Requires( parameterDescriptions != null );
+            Contract.Requires( modelTypeBuilder != null );
+            Contract.Requires( options != null );
 
             serviceProvider = configuration.GetODataRootContainer( route );
-            AssembliesResolver = configuration.Services.GetAssembliesResolver();
             EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
-            RouteTemplate = routeTemplate;
+            AssembliesResolver = configuration.Services.GetAssembliesResolver();
+            routeAttribute = actionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
+            RouteTemplate = routeAttribute?.PathTemplate;
             Route = route;
             ActionDescriptor = actionDescriptor;
             ParameterDescriptions = parameterDescriptions;
-            entityType = new Lazy<IEdmEntityType>( ResolveEntityType );
-            entityKeys = new Lazy<IEnumerable<IEdmStructuralProperty>>( () => EntityType?.Key() ?? Empty<IEdmStructuralProperty>() );
+            Options = options;
+            UrlKeyDelimiter = configuration.GetUrlKeyDelimiter();
+
+            var container = EdmModel.EntityContainer;
+
+            if ( container == null )
+            {
+                IsRouteExcluded = true;
+                return;
+            }
+
+            EntitySet = container.FindEntitySet( actionDescriptor.ControllerDescriptor.ControllerName );
+            Operation = container.FindOperationImports( actionDescriptor.ActionName ).FirstOrDefault()?.Operation ??
+                        EdmModel.FindDeclaredOperations( container.Namespace + "." + actionDescriptor.ActionName ).FirstOrDefault();
+            ActionType = GetActionType( EntitySet, Operation );
+
+            if ( Operation?.IsAction() == true )
+            {
+                ConvertODataActionParametersToTypedModel( modelTypeBuilder, (IEdmAction) Operation );
+            }
         }
 
         internal IAssembliesResolver AssembliesResolver { get; }
@@ -55,16 +77,73 @@
 
         internal IReadOnlyList<ApiParameterDescription> ParameterDescriptions { get; }
 
-        internal IEdmEntityType EntityType => entityType.Value;
+        internal IEdmEntitySet EntitySet { get; }
 
-        internal IEnumerable<IEdmStructuralProperty> EntityKeys => entityKeys.Value;
+        internal IEdmOperation Operation { get; }
+
+        internal ODataRouteActionType ActionType { get; }
+
+        internal ODataApiExplorerOptions Options { get; }
+
+        internal ODataUrlKeyDelimiter UrlKeyDelimiter { get; }
+
+        internal bool IsRouteExcluded { get; }
+
+        internal bool IsAttributeRouted => routeAttribute != null;
+
+        internal bool IsOperation => Operation != null;
+
+        internal bool IsBound => IsOperation && EntitySet != null;
 
         internal bool AllowUnqualifiedEnum => serviceProvider.GetRequiredService<ODataUriResolver>() is StringAsEnumResolver;
 
-        IEdmEntityType ResolveEntityType()
+        static ODataRouteActionType GetActionType( IEdmEntitySet entitySet, IEdmOperation operation )
         {
-            var entitySetName = ActionDescriptor.ControllerDescriptor.ControllerName;
-            return EdmModel.EntityContainer?.FindEntitySet( entitySetName )?.EntityType();
+            if ( entitySet == null )
+            {
+                if ( operation == null )
+                {
+                    return ODataRouteActionType.Unknown;
+                }
+                else if ( !operation.IsBound )
+                {
+                    return ODataRouteActionType.UnboundOperation;
+                }
+            }
+            else
+            {
+                if ( operation == null )
+                {
+                    return ODataRouteActionType.EntitySet;
+                }
+                else if ( operation.IsBound )
+                {
+                    return ODataRouteActionType.BoundOperation;
+                }
+            }
+
+            return ODataRouteActionType.Unknown;
+        }
+
+        void ConvertODataActionParametersToTypedModel( ModelTypeBuilder modelTypeBuilder, IEdmAction action )
+        {
+            Contract.Requires( modelTypeBuilder != null );
+            Contract.Requires( action != null );
+
+            var actionParameters = typeof( ODataActionParameters );
+            var apiVersion = new Lazy<ApiVersion>( () => EdmModel.GetAnnotationValue<ApiVersionAnnotation>( EdmModel ).ApiVersion );
+
+            for ( var i = 0; i < ParameterDescriptions.Count; i++ )
+            {
+                var description = ParameterDescriptions[i];
+                var parameter = description.ParameterDescriptor;
+
+                if ( actionParameters.IsAssignableFrom( parameter.ParameterType ) )
+                {
+                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( action, apiVersion.Value ) );
+                    break;
+                }
+            }
         }
     }
 }

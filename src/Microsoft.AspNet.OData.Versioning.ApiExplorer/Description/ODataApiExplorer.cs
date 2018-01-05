@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Routing;
     using System;
@@ -12,6 +13,7 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
+    using System.Web.Http.Dispatcher;
     using System.Web.Http.ModelBinding;
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
@@ -28,6 +30,7 @@
     public class ODataApiExplorer : VersionedApiExplorer
     {
         static readonly Regex odataVariableRegex = new Regex( $"{{\\*{ODataRouteConstants.ODataPath}}}", CultureInvariant | Compiled | IgnoreCase );
+        readonly ModelTypeBuilder modelTypeBuilder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataApiExplorer"/> class.
@@ -43,6 +46,7 @@
         public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options ) : base( configuration, options )
         {
             Options = options;
+            modelTypeBuilder = new ModelTypeBuilder( configuration.Services.GetAssembliesResolver() );
         }
 
         /// <summary>
@@ -80,14 +84,20 @@
                 }
             }
 
-            var versions = actionDescriptor.GetApiVersions();
+            var model = actionDescriptor.GetApiVersionModel();
 
-            if ( versions.Contains( apiVersion ) )
+            if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion ) )
             {
                 return true;
             }
 
-            return versions.Count == 0 && actionDescriptor.ControllerDescriptor.GetDeclaredApiVersions().Contains( apiVersion );
+            if ( model.DeclaredApiVersions.Count == 0 )
+            {
+                model = actionDescriptor.ControllerDescriptor.GetApiVersionModel();
+                return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -126,7 +136,8 @@
                 }
             }
 
-            return controllerDescriptor.GetDeclaredApiVersions().Contains( apiVersion );
+            var model = controllerDescriptor.GetApiVersionModel();
+            return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
         }
 
         /// <summary>
@@ -144,6 +155,14 @@
             }
 
             var apiDescriptions = new Collection<VersionedApiDescription>();
+            var edmModel = Configuration.GetODataRootContainer( route ).GetRequiredService<IEdmModel>();
+            var routeApiVersion = edmModel.GetAnnotationValue<ApiVersionAnnotation>( edmModel )?.ApiVersion;
+
+            if ( routeApiVersion != apiVersion )
+            {
+                return apiDescriptions;
+            }
+
             var actionSelector = Configuration.Services.GetActionSelector();
 
             foreach ( var controllerMapping in controllerMappings )
@@ -154,8 +173,7 @@
                 {
                     if ( ShouldExploreController( controllerVariableValue, controllerDescriptor, route, apiVersion ) )
                     {
-                        var localPath = odataVariableRegex.Replace( route.RouteTemplate, controllerVariableValue );
-                        ExploreRouteActions( route, localPath, controllerDescriptor, actionSelector, apiDescriptions, apiVersion );
+                        ExploreRouteActions( route, controllerDescriptor, actionSelector, apiDescriptions, apiVersion );
                     }
                 }
             }
@@ -163,9 +181,24 @@
             return apiDescriptions;
         }
 
+        ResponseDescription CreateResponseDescriptionWithRoute( HttpActionDescriptor actionDescriptor, IHttpRoute route )
+        {
+            Contract.Requires( actionDescriptor != null );
+            Contract.Requires( actionDescriptor != null );
+            Contract.Ensures( Contract.Result<ResponseDescription>() != null );
+
+            var description = CreateResponseDescription( actionDescriptor );
+            var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
+            var assembliesResolver = actionDescriptor.Configuration.Services.GetAssembliesResolver();
+            var returnType = description.ResponseType ?? description.DeclaredType;
+
+            description.ResponseType = returnType.SubstituteIfNecessary( serviceProvider, assembliesResolver, modelTypeBuilder );
+
+            return description;
+        }
+
         void ExploreRouteActions(
             IHttpRoute route,
-            string localPath,
             HttpControllerDescriptor controllerDescriptor,
             IHttpActionSelector actionSelector,
             Collection<VersionedApiDescription> apiDescriptions,
@@ -190,10 +223,22 @@
             {
                 foreach ( var action in grouping )
                 {
-                    if ( ShouldExploreAction( ActionRouteParameterName, action, route, apiVersion ) )
+                    if ( !ShouldExploreAction( ActionRouteParameterName, action, route, apiVersion ) )
                     {
-                        PopulateActionDescriptions( action, route, localPath, apiDescriptions, apiVersion );
+                        continue;
                     }
+
+                    var parameterDescriptions = CreateParameterDescriptions( action, route );
+                    var context = new ODataRouteBuilderContext( Configuration, (ODataRoute) route, action, parameterDescriptions, modelTypeBuilder, Options );
+
+                    if ( context.IsRouteExcluded )
+                    {
+                        continue;
+                    }
+
+                    var relativePath = new ODataRouteBuilder( context ).Build();
+
+                    PopulateActionDescriptions( action, route, context, relativePath, apiDescriptions, apiVersion );
                 }
             }
         }
@@ -227,16 +272,28 @@
             return willReadUri;
         }
 
-        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding )
+        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver )
         {
             Contract.Requires( parameterBinding != null );
+            Contract.Requires( serviceProvider != null );
+            Contract.Requires( assembliesResolver != null );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
 
-            var description = CreateParameterDescription( parameterBinding.Descriptor );
+            var descriptor = parameterBinding.Descriptor;
+            var description = CreateParameterDescription( descriptor );
 
             if ( parameterBinding.WillReadBody )
             {
                 description.Source = FromBody;
+
+                var parameterType = descriptor.ParameterType;
+                var substitutedType = parameterType.SubstituteIfNecessary( serviceProvider, assembliesResolver, modelTypeBuilder );
+
+                if ( parameterType != substitutedType )
+                {
+                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( descriptor, substitutedType );
+                }
+
                 return description;
             }
 
@@ -259,13 +316,16 @@
 
             if ( actionBinding != null )
             {
+                var configuration = actionDescriptor.Configuration;
+                var serviceProvider = configuration.GetODataRootContainer( route );
+                var assembliesResolver = configuration.Services.GetAssembliesResolver();
                 var parameterBindings = actionBinding.ParameterBindings;
 
                 if ( parameterBindings != null )
                 {
                     foreach ( var binding in parameterBindings )
                     {
-                        list.Add( CreateParameterDescriptionFromBinding( binding ) );
+                        list.Add( CreateParameterDescriptionFromBinding( binding, serviceProvider, assembliesResolver ) );
                     }
                 }
             }
@@ -335,26 +395,29 @@
             }
         }
 
-        void PopulateActionDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route, string localPath, Collection<VersionedApiDescription> apiDescriptions, ApiVersion apiVersion )
+        void PopulateActionDescriptions(
+            HttpActionDescriptor actionDescriptor,
+            IHttpRoute route,
+            ODataRouteBuilderContext routeBuilderContext,
+            string relativePath,
+            Collection<VersionedApiDescription> apiDescriptions,
+            ApiVersion apiVersion )
         {
-            var parameterDescriptions = CreateParameterDescriptions( actionDescriptor, route );
-            var context = new ODataRouteBuilderContext( Configuration, localPath, (ODataRoute) route, actionDescriptor, parameterDescriptions );
+            Contract.Requires( actionDescriptor != null );
+            Contract.Requires( route != null );
+            Contract.Requires( relativePath != null );
+            Contract.Requires( apiDescriptions != null );
+            Contract.Requires( apiVersion != null );
 
-            if ( context.EdmModel.EntityContainer == null )
-            {
-                return;
-            }
-
-            var relativePath = new ODataRouteBuilder( context ).Build();
             var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
-            var responseDescription = CreateResponseDescription( actionDescriptor );
+            var responseDescription = CreateResponseDescriptionWithRoute( actionDescriptor, route );
             var responseType = responseDescription.ResponseType ?? responseDescription.DeclaredType;
             var requestFormatters = new List<MediaTypeFormatter>();
             var responseFormatters = new List<MediaTypeFormatter>();
             var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
             var deprecated = actionDescriptor.ControllerDescriptor.GetApiVersionModel().DeprecatedApiVersions.Contains( apiVersion );
 
-            PopulateMediaTypeFormatters( actionDescriptor, parameterDescriptions, route, responseType, requestFormatters, responseFormatters );
+            PopulateMediaTypeFormatters( actionDescriptor, routeBuilderContext.ParameterDescriptions, route, responseType, requestFormatters, responseFormatters );
 
             foreach ( var method in supportedMethods )
             {
@@ -368,10 +431,10 @@
                     ResponseDescription = responseDescription,
                     ApiVersion = apiVersion,
                     IsDeprecated = deprecated,
-                    Properties = { [typeof( IEdmModel )] = context.EdmModel },
+                    Properties = { [typeof( IEdmModel )] = routeBuilderContext.EdmModel },
                 };
 
-                apiDescription.ParameterDescriptions.AddRange( parameterDescriptions );
+                apiDescription.ParameterDescriptions.AddRange( routeBuilderContext.ParameterDescriptions );
                 apiDescription.SupportedRequestBodyFormatters.AddRange( requestFormatters );
                 apiDescription.SupportedResponseFormatters.AddRange( responseFormatters );
                 PopulateApiVersionParameters( apiDescription, apiVersion );
