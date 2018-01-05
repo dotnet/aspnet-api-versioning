@@ -119,6 +119,11 @@
         [ODataRoute( "({key})/Rate" )]
         public IHttpActionResult Rate( int key, ODataActionParameters parameters )
         {
+            if ( !ModelState.IsValid )
+            {
+                return BadRequest( ModelState );
+            }
+
             var rating = (int) parameters["rating"];
             return StatusCode( NoContent );
         }
