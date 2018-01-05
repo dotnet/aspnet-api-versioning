@@ -15,7 +15,7 @@
         public IHttpActionResult Get() => Ok( Empty<Person>() );
 
         [ResponseType( typeof( ODataValue<Order> ) )]
-        public IHttpActionResult Get( int id ) => Ok( new Order() { Id = id } );
+        public IHttpActionResult Get( int key ) => Ok( new Order() { Id = key } );
 
         [ResponseType( typeof( ODataValue<Order> ) )]
         public IHttpActionResult Post( [FromBody] Order order )
@@ -24,6 +24,6 @@
             return Created( order );
         }
 
-        public IHttpActionResult Delete( int id ) => StatusCode( NoContent );
+        public IHttpActionResult Delete( int key ) => StatusCode( NoContent );
     }
 }
