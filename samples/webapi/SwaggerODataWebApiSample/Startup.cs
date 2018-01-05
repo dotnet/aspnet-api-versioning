@@ -7,6 +7,7 @@ namespace Microsoft.Examples
     using Microsoft.OData;
     using Microsoft.OData.UriParser;
     using Microsoft.Web.OData.Builder;
+    using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
     using System.IO;
     using System.Reflection;
@@ -26,25 +27,35 @@ namespace Microsoft.Examples
         /// <param name="builder">The current application builder.</param>
         public void Configuration( IAppBuilder builder )
         {
+            const string routePrefix = default( string );
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
             configuration.AddApiVersioning( o => o.ReportApiVersions = true );
 
+            // note: this is required to make the default swagger json settings match the odata conventions applied by EnableLowerCamelCase()
+            configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
             var modelBuilder = new VersionedODataModelBuilder( configuration )
             {
                 ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
                 ModelConfigurations =
                 {
+                    new AllConfigurations(),
                     new PersonModelConfiguration(),
-                    new OrderModelConfiguration()
+                    new OrderModelConfiguration(),
                 }
             };
             var models = modelBuilder.GetEdmModels();
 
-            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureODataServices );
-            configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
+            // TODO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
+
+            // WHEN VERSIONING BY: query string, header, or media type
+            configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureODataServices );
+
+            // WHEN VERSIONING BY: url segment
+            // configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
             // note: the specified format code will format the version as "'v'major[.minor][-status]"

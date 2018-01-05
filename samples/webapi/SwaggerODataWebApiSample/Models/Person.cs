@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Examples.V3.Models
+﻿namespace Microsoft.Examples.Models
 {
     using System;
     using System.ComponentModel.DataAnnotations;

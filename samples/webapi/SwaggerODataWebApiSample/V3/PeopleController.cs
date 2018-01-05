@@ -1,19 +1,19 @@
-﻿namespace Microsoft.Examples.V3.Controllers
+﻿namespace Microsoft.Examples.V3
 {
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
     using Models;
+    using System;
     using System.Collections.Generic;
     using System.Web.Http;
     using System.Web.Http.Description;
     using System.Web.OData;
-    using System.Web.OData.Routing;
+    using static System.Net.HttpStatusCode;
 
     /// <summary>
     /// Represents a RESTful people service.
     /// </summary>
     [ApiVersion( "3.0" )]
-    [ODataRoutePrefix( "People" )]
     public class PeopleController : ODataController
     {
         /// <summary>
@@ -22,7 +22,6 @@
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
         [HttpGet]
-        [ODataRoute]
         [ResponseType( typeof( ODataValue<IEnumerable<Person>> ) )]
         public IHttpActionResult Get()
         {
@@ -60,17 +59,16 @@
         /// <summary>
         /// Gets a single person.
         /// </summary>
-        /// <param name="id">The requested person identifier.</param>
+        /// <param name="key">The requested person identifier.</param>
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({id})" )]
         [ResponseType( typeof( Person ) )]
-        public IHttpActionResult Get( int id ) =>
+        public IHttpActionResult Get( int key ) =>
             Ok( new Person()
             {
-                Id = id,
+                Id = key,
                 FirstName = "John",
                 LastName = "Doe",
                 Email = "john.doe@somewhere.com",
@@ -86,7 +84,6 @@
         /// <response code="201">The person was successfully created.</response>
         /// <response code="400">The person was invalid.</response>
         [HttpPost]
-        [ODataRoute]
         [ResponseType( typeof( Person ) )]
         public IHttpActionResult Post( [FromBody] Person person )
         {
@@ -98,6 +95,30 @@
             person.Id = 42;
 
             return Created( person );
+        }
+
+        /// <summary>
+        /// Gets the new hires since the specified date.
+        /// </summary>
+        /// <param name="since">The date and time since people were hired.</param>
+        /// <returns>The matching new hires.</returns>
+        /// <response code="200">The people were successfully retrieved.</response>
+        [HttpGet]
+        [ResponseType( typeof( ODataValue<IEnumerable<Order>> ) )]
+        public IHttpActionResult NewHires( DateTime since ) => Get();
+
+        /// <summary>
+        /// Promotes a person.
+        /// </summary>
+        /// <param name="key">The identifier of the person to promote.</param>
+        /// <param name="parameters">The action parameters.</param>
+        /// <returns>None</returns>
+        /// <response code="204">The person was successfully promoted.</response>
+        [HttpPost]
+        public IHttpActionResult Promote( int key, ODataActionParameters parameters )
+        {
+            var title = (string) parameters["title"];
+            return StatusCode( NoContent );
         }
     }
 }

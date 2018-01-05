@@ -23,6 +23,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -127,24 +128,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaseInsensitiveODataUriResolver.cs" />
+    <Compile Include="Configuration\AllConfigurations.cs" />
+    <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="FunctionsController.cs" />
     <Compile Include="SwaggerDefaultValues.cs" />
     <Compile Include="Configuration\ApiVersions.cs" />
     <Compile Include="Configuration\OrderModelConfiguration.cs" />
     <Compile Include="Configuration\PersonModelConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="V1\Models\Order.cs" />
-    <Compile Include="V1\Models\Person.cs" />
-    <Compile Include="V1\Controllers\OrdersController.cs" />
-    <Compile Include="V1\Controllers\PeopleController.cs" />
-    <Compile Include="V2\Models\Order.cs" />
-    <Compile Include="V2\Models\Person.cs" />
-    <Compile Include="V2\Controllers\OrdersController.cs" />
-    <Compile Include="V2\Controllers\PeopleController.cs" />
-    <Compile Include="V3\Models\Order.cs" />
-    <Compile Include="V3\Models\Person.cs" />
-    <Compile Include="V3\Controllers\OrdersController.cs" />
-    <Compile Include="V3\Controllers\PeopleController.cs" />
+    <Compile Include="V1\OrdersController.cs" />
+    <Compile Include="V1\PeopleController.cs" />
+    <Compile Include="V2\OrdersController.cs" />
+    <Compile Include="V2\PeopleController.cs" />
+    <Compile Include="V3\OrdersController.cs" />
+    <Compile Include="V3\PeopleController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj">

@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Examples.Configuration
 {
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
     using Microsoft.Web.OData.Builder;
     using System.Web.OData.Builder;
@@ -16,17 +17,26 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the <paramref name="builder"/>.</param>
         public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
         {
-            if ( apiVersion <= ApiVersions.V1 )
+            var order = builder.EntitySet<Order>( "Orders" ).EntityType.HasKey( o => o.Id );
+
+            if ( apiVersion < ApiVersions.V2 )
             {
-                builder.EntitySet<V1.Models.Order>( "Orders" ).EntityType.HasKey( o => o.Id );
+                order.Ignore( o => o.EffectiveDate );
             }
-            else if ( apiVersion == ApiVersions.V2 )
+
+            if ( apiVersion < ApiVersions.V3 )
             {
-                builder.EntitySet<V2.Models.Order>( "Orders" ).EntityType.HasKey( o => o.Id );
+                order.Ignore( o => o.Description );
             }
-            else if ( apiVersion == ApiVersions.V3 )
+
+            if ( apiVersion >= ApiVersions.V1 )
             {
-                builder.EntitySet<V3.Models.Order>( "Orders" ).EntityType.HasKey( o => o.Id );
+                order.Collection.Function( "MostExpensive" ).ReturnsFromEntitySet<Order>( "Orders" );
+            }
+
+            if ( apiVersion >= ApiVersions.V2 )
+            {
+                order.Action( "Rate" ).Parameter<int>( "rating" );
             }
         }
     }

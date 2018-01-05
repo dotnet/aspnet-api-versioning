@@ -1,7 +1,7 @@
-﻿namespace Microsoft.Examples.V1.Controllers
+﻿namespace Microsoft.Examples.V1
 {
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Models;
     using System.Web.Http;
     using System.Web.Http.Description;
     using System.Web.OData;
@@ -18,14 +18,14 @@
         /// <summary>
         /// Gets a single order.
         /// </summary>
-        /// <param name="id">The requested order identifier.</param>
+        /// <param name="key">The requested order identifier.</param>
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({id})" )]
         [ResponseType( typeof( Order ) )]
-        public IHttpActionResult Get( int id ) => Ok( new Order() { Id = id, Customer = "John Doe" } );
+        [ODataRoute( "({key})" )]
+        public IHttpActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
 
         /// <summary>
         /// Places a new order.
@@ -35,9 +35,9 @@
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
         [HttpPost]
-        [ODataRoute]
         [MapToApiVersion( "1.0" )]
         [ResponseType( typeof( Order ) )]
+        [ODataRoute]
         public IHttpActionResult Post( [FromBody] Order order )
         {
             if ( !ModelState.IsValid )
@@ -49,5 +49,17 @@
 
             return Created( order );
         }
+
+        /// <summary>
+        /// Gets the most expensive order.
+        /// </summary>
+        /// <returns>The most expensive order.</returns>
+        /// <response code="200">The order was successfully retrieved.</response>
+        /// <response code="404">The no orders exist.</response>
+        [HttpGet]
+        [MapToApiVersion( "1.0" )]
+        [ResponseType( typeof( Order ) )]
+        [ODataRoute( "MostExpensive" )]
+        public IHttpActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
     }
 }
