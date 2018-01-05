@@ -1,19 +1,18 @@
-﻿namespace Microsoft.Examples.V2.Controllers
+﻿namespace Microsoft.Examples.V2
 {
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
     using Models;
+    using System;
     using System.Collections.Generic;
     using System.Web.Http;
     using System.Web.Http.Description;
     using System.Web.OData;
-    using System.Web.OData.Routing;
 
     /// <summary>
     /// Represents a RESTful people service.
     /// </summary>
     [ApiVersion( "2.0" )]
-    [ODataRoutePrefix( "People" )]
     public class PeopleController : ODataController
     {
         /// <summary>
@@ -22,7 +21,6 @@
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
         [HttpGet]
-        [ODataRoute]
         [ResponseType( typeof( ODataValue<IEnumerable<Person>> ) )]
         public IHttpActionResult Get()
         {
@@ -57,21 +55,30 @@
         /// <summary>
         /// Gets a single person.
         /// </summary>
-        /// <param name="id">The requested person identifier.</param>
+        /// <param name="key">The requested person identifier.</param>
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({id})" )]
         [ResponseType( typeof( Person ) )]
-        public IHttpActionResult Get( int id ) =>
+        public IHttpActionResult Get( int key ) =>
             Ok( new Person()
-                {
-                    Id = id,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Email = "john.doe@somewhere.com"
-                }
+            {
+                Id = key,
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@somewhere.com"
+            }
             );
+
+        /// <summary>
+        /// Gets the new hires since the specified date.
+        /// </summary>
+        /// <param name="since">The date and time since people were hired.</param>
+        /// <returns>The matching new hires.</returns>
+        /// <response code="200">The people were successfully retrieved.</response>
+        [HttpGet]
+        [ResponseType( typeof( ODataValue<IEnumerable<Order>> ) )]
+        public IHttpActionResult NewHires( DateTime since ) => Get();
     }
 }
