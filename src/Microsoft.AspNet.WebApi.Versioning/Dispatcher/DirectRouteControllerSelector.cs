@@ -13,16 +13,20 @@
 
     sealed class DirectRouteControllerSelector : ControllerSelector
     {
-        internal DirectRouteControllerSelector( ApiVersioningOptions options ) : base( options ) { }
+        private ApiVersioningOptions options;
+        internal DirectRouteControllerSelector( ApiVersioningOptions options ) : base( options )
+        {
+            this.options = options;
+        }
 
         internal override ControllerSelectionResult SelectController( ApiVersionControllerAggregator aggregator )
         {
             Contract.Requires( aggregator != null );
-            Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
+            Contract.Ensures( Contract.Result<ControllerSelectionResult>( ) != null );
 
             var request = aggregator.Request;
             var requestedVersion = aggregator.RequestedApiVersion;
-            var result = new ControllerSelectionResult()
+            var result = new ControllerSelectionResult( )
             {
                 HasCandidates = aggregator.HasAttributeBasedRoutes,
                 RequestedVersion = requestedVersion,
@@ -54,6 +58,21 @@
 
             if ( versionedController == null )
             {
+                if ( options.LookForLowerVersions && requestedVersion.MajorVersion.HasValue )
+                {
+                    for ( int i = requestedVersion.MajorVersion.Value - 1; i > 0; i-- )
+                    {
+                        versionedController = GetVersionedController( aggregator, new ApiVersion( i, 0 ) );
+                        if ( versionedController != null )
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ( versionedController == null )
+            {
                 return result;
             }
 
@@ -62,7 +81,7 @@
                 throw CreateAmbiguousControllerException( new[] { versionNeutralController, versionedController } );
             }
 
-            request.ApiVersionProperties().ApiVersion = requestedVersion;
+            request.ApiVersionProperties( ).ApiVersion = requestedVersion;
             result.RequestedVersion = requestedVersion;
             result.Controller = versionedController;
 
@@ -76,16 +95,16 @@
 
             HttpControllerDescriptor controllerDescriptor = null;
 
-            using ( var iterator = directRouteCandidates.Where( c => c.ActionDescriptor.IsApiVersionNeutral() ).GetEnumerator() )
+            using ( var iterator = directRouteCandidates.Where( c => c.ActionDescriptor.IsApiVersionNeutral( ) ).GetEnumerator( ) )
             {
-                if ( !iterator.MoveNext() )
+                if ( !iterator.MoveNext( ) )
                 {
                     return controllerDescriptor;
                 }
 
                 controllerDescriptor = iterator.Current.ActionDescriptor.ControllerDescriptor;
 
-                while ( iterator.MoveNext() )
+                while ( iterator.MoveNext( ) )
                 {
                     var candidate = iterator.Current;
 
@@ -109,7 +128,7 @@
 
             if ( directRouteCandidates.Length == 1 )
             {
-                if ( !controller.GetDeclaredApiVersions().Contains( requestedVersion ) )
+                if ( !controller.GetDeclaredApiVersions( ).Contains( requestedVersion ) )
                 {
                     return null;
                 }
@@ -122,7 +141,7 @@
                 }
             }
 
-            if ( !controller.HasApiVersionInfo() )
+            if ( !controller.HasApiVersionInfo( ) )
             {
                 controller.SetApiVersionModel( aggregator.AllVersions );
             }
@@ -139,19 +158,19 @@
             var controllerDescriptor = default( HttpControllerDescriptor );
             var matches = from candidate in directRouteCandidates
                           let controller = candidate.ActionDescriptor.ControllerDescriptor
-                          where controller.GetDeclaredApiVersions().Contains( requestedVersion )
+                          where controller.GetDeclaredApiVersions( ).Contains( requestedVersion )
                           select controller;
 
-            using ( var iterator = matches.GetEnumerator() )
+            using ( var iterator = matches.GetEnumerator( ) )
             {
-                if ( !iterator.MoveNext() )
+                if ( !iterator.MoveNext( ) )
                 {
                     return null;
                 }
 
                 controllerDescriptor = iterator.Current;
 
-                while ( iterator.MoveNext() )
+                while ( iterator.MoveNext( ) )
                 {
                     if ( iterator.Current != controllerDescriptor )
                     {
@@ -169,14 +188,14 @@
         static Exception CreateAmbiguousControllerException( IEnumerable<HttpControllerDescriptor> candidates )
         {
             Contract.Requires( candidates != null );
-            Contract.Ensures( Contract.Result<Exception>() != null );
+            Contract.Ensures( Contract.Result<Exception>( ) != null );
 
             var set = new HashSet<Type>( candidates.Select( c => c.ControllerType ) );
-            var builder = new StringBuilder();
+            var builder = new StringBuilder( );
 
             foreach ( var type in set )
             {
-                builder.AppendLine();
+                builder.AppendLine( );
                 builder.Append( type.FullName );
             }
 
