@@ -122,7 +122,7 @@
             return null;
         }
 
-        Exception CreateAmbiguousActionException( IEnumerable<HttpActionDescriptor> matches )
+        static Exception CreateAmbiguousActionException( IEnumerable<HttpActionDescriptor> matches )
         {
             var ambiguityList = ActionSelectorCacheItem.CreateAmbiguousMatchList( matches );
             return new InvalidOperationException( SR.ApiControllerActionSelector_AmbiguousMatch.FormatDefault( ambiguityList ) );

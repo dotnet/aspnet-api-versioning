@@ -356,7 +356,7 @@
 
         static IEnumerable<MediaTypeFormatter> GetInnerFormatters( IEnumerable<MediaTypeFormatter> mediaTypeFormatters ) => mediaTypeFormatters.Select( Decorator.GetInner );
 
-        void PopulateMediaTypeFormatters(
+        static void PopulateMediaTypeFormatters(
            HttpActionDescriptor actionDescriptor,
            IReadOnlyList<ApiParameterDescription> parameterDescriptions,
            IHttpRoute route,

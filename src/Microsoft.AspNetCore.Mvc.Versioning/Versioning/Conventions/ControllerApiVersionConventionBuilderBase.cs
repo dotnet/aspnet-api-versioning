@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             }
         }
 
-        void ApplyNeutralModelToActions( ControllerModel controller )
+        static void ApplyNeutralModelToActions( ControllerModel controller )
         {
             Contract.Requires( controller != null );
 

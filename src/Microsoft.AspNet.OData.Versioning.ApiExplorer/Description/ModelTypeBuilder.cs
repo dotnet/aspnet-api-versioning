@@ -104,7 +104,7 @@
             return typeBuilder.CreateType();
         }
 
-        ModuleBuilder CreateModuleForApiVersion( ApiVersion apiVersion )
+        static ModuleBuilder CreateModuleForApiVersion( ApiVersion apiVersion )
         {
             var name = new AssemblyName( $"T{NewGuid().ToString( "n", InvariantCulture )}.DynamicModels" );
             var assemblyBuilder = CurrentDomain.DefineDynamicAssembly( name, Run );

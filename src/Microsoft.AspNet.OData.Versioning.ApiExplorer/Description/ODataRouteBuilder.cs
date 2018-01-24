@@ -333,9 +333,9 @@
             return queryParameters;
         }
 
-        bool IsBuiltInParameter( Type parameterType ) => ODataQueryOptionsType.IsAssignableFrom( parameterType ) || ODataActionParametersType.IsAssignableFrom( parameterType );
+        static bool IsBuiltInParameter( Type parameterType ) => ODataQueryOptionsType.IsAssignableFrom( parameterType ) || ODataActionParametersType.IsAssignableFrom( parameterType );
 
-        bool IsKey( IReadOnlyList<IEdmStructuralProperty> keys, ApiParameterDescription parameter )
+        static bool IsKey( IReadOnlyList<IEdmStructuralProperty> keys, ApiParameterDescription parameter )
         {
             Contract.Requires( keys != null );
             Contract.Requires( parameter != null );
@@ -351,7 +351,7 @@
             return parameter.Name.StartsWith( ODataRouteConstants.Key, OrdinalIgnoreCase );
         }
 
-        bool IsFunctionParameter( IEdmOperation operation, ApiParameterDescription parameter )
+        static bool IsFunctionParameter( IEdmOperation operation, ApiParameterDescription parameter )
         {
             Contract.Requires( parameter != null );
 

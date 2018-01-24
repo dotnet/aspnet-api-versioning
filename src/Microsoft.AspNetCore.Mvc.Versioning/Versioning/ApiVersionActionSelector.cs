@@ -230,7 +230,7 @@
             return bestMatches;
         }
 
-        ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
+        static ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
         {
             Contract.Requires( matches != null );
 
@@ -249,7 +249,7 @@
             return null;
         }
 
-        ActionDescriptor SelectActionWithApiVersionPolicyApplied( IReadOnlyList<ActionDescriptor> matches, ActionSelectionResult result )
+        static ActionDescriptor SelectActionWithApiVersionPolicyApplied( IReadOnlyList<ActionDescriptor> matches, ActionSelectionResult result )
         {
             Contract.Requires( matches != null );
             Contract.Requires( result != null );
@@ -269,7 +269,7 @@
             return null;
         }
 
-        void AppendPossibleMatches( IReadOnlyList<ActionDescriptor> matches, RouteContext context, ActionSelectionResult result )
+        static void AppendPossibleMatches( IReadOnlyList<ActionDescriptor> matches, RouteContext context, ActionSelectionResult result )
         {
             Contract.Requires( matches != null );
             Contract.Requires( context != null );

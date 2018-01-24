@@ -124,7 +124,7 @@
         /// </summary>
         /// <remarks>
         /// The <see cref="MediaTypeFormatter"/> copy constructor does not clone the SupportedMediaTypes property or backing field.
-        /// <seealso cref="!:https://github.com/ASP-NET-MVC/aspnetwebstack/blob/4e40cdef9c8a8226685f95ef03b746bc8322aa92/src/System.Net.Http.Formatting/Formatting/MediaTypeFormatter.cs#L62"/>
+        /// <seealso href="https://github.com/ASP-NET-MVC/aspnetwebstack/blob/4e40cdef9c8a8226685f95ef03b746bc8322aa92/src/System.Net.Http.Formatting/Formatting/MediaTypeFormatter.cs#L62"/>
         /// </remarks>
         static class SupportedMediaTypesInitializer
 #pragma warning restore RS0010
