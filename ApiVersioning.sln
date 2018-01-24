@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,7 +12,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4D09-4523-B9C9-65B1E8832AA1}"
 	ProjectSection(SolutionItems) = preProject
 		test\.editorconfig = test\.editorconfig
+		test\acceptance.xunit.runner.json = test\acceptance.xunit.runner.json
 		test\directory.build.props = test\directory.build.props
+		test\xunit.runner.json = test\xunit.runner.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9E50-4D82-B732-A34345C4A8F2}"

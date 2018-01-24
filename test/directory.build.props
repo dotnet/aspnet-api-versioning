@@ -2,5 +2,20 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\common.props" />
+  
+  <PropertyGroup>
+    <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+    <None Include="$(MSBuildThisFileDirectory)$(AcceptanceTestPrefix)xunit.runner.json" Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+    <PackageReference Include="FluentAssertions" Version="4.19.4" />
+    <PackageReference Include="Moq" Version="4.8.1" />
+    <PackageReference Include="more.xunit" Version="2.3.1" />
+    <PackageReference Include="more.xunit.runner.visualstudio" Version="2.3.1" />
+  </ItemGroup>
 
 </Project>
