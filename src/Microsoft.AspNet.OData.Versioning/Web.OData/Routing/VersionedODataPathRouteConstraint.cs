@@ -2,14 +2,17 @@
 {
     using Http;
     using Http.Versioning;
-    using Microsoft.OData;
+    using Microsoft.OData.Core;
+    using Microsoft.OData.Edm;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
+    using System.Web.OData.Extensions;
     using System.Web.OData.Routing;
+    using System.Web.OData.Routing.Conventions;
     using static System.Net.HttpStatusCode;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
@@ -21,9 +24,18 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedODataPathRouteConstraint" /> class.
         /// </summary>
+        /// <param name="pathHandler">The OData path handler to use for parsing.</param>
+        /// <param name="model">The EDM model to use for parsing the path.</param>
         /// <param name="routeName">The name of the route this constraint is associated with.</param>
+        /// <param name="routingConventions">The OData routing conventions to use for selecting the controller name.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the route constraint.</param>
-        public VersionedODataPathRouteConstraint( string routeName, ApiVersion apiVersion ) : base( routeName )
+        public VersionedODataPathRouteConstraint(
+            IODataPathHandler pathHandler,
+            IEdmModel model,
+            string routeName,
+            IEnumerable<IODataRoutingConvention> routingConventions,
+            ApiVersion apiVersion )
+            : base( pathHandler, model, routeName, routingConventions )
         {
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             ApiVersion = apiVersion;

@@ -4,13 +4,12 @@
     using Configuration;
     using Controllers;
     using FluentAssertions;
-    using Microsoft.OData.UriParser;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.OData.Builder;
+    using System.Web.OData.Extensions;
     using Xunit;
-    using static Microsoft.OData.ServiceLifetime;
     using static System.Net.HttpStatusCode;
 
     public abstract class BasicAcceptanceTest : ODataAcceptanceTest
@@ -21,6 +20,7 @@
             FilteredControllerTypes.Add( typeof( PeopleController ) );
             FilteredControllerTypes.Add( typeof( People2Controller ) );
 
+            Configuration.EnableCaseInsensitive( true );
             Configuration.AddApiVersioning( options => options.ReportApiVersions = true );
 
             var modelBuilder = new VersionedODataModelBuilder( Configuration )
@@ -34,8 +34,8 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata", "api", models );
+            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models );
             Configuration.EnsureInitialized();
         }
 

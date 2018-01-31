@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
-    using Microsoft.OData;
+    using Microsoft.OData.Core;
+    using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System;
@@ -10,11 +11,11 @@
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Controllers;
+    using System.Web.Http.Routing;
     using System.Web.OData;
     using System.Web.OData.Extensions;
     using System.Web.OData.Routing;
     using System.Web.OData.Routing.Conventions;
-    using System.Web.OData.Routing.Template;
 
     /// <summary>
     /// Represents an OData attribute routing convention with additional support for API versioning.
@@ -22,41 +23,31 @@
     public class VersionedAttributeRoutingConvention : IODataRoutingConvention
     {
         static readonly DefaultODataPathHandler defaultPathHandler = new DefaultODataPathHandler();
-        readonly string routeName;
         IDictionary<ODataPathTemplate, HttpActionDescriptor> attributeMappings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="routeName">The name of the route.</param>
+        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
-        public VersionedAttributeRoutingConvention( string routeName, HttpConfiguration configuration, ApiVersion apiVersion )
-            : this( routeName, configuration, defaultPathHandler, apiVersion ) { }
+        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration ) : this( model, configuration, defaultPathHandler ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="routeName">The name of the route.</param>
+        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
         /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
-        public VersionedAttributeRoutingConvention( string routeName, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
+        public VersionedAttributeRoutingConvention( IEdmModel model, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler )
         {
-            Arg.NotNull( routeName, nameof( routeName ) );
+            Arg.NotNull( model, nameof( model ) );
             Arg.NotNull( configuration, nameof( configuration ) );
             Arg.NotNull( pathTemplateHandler, nameof( pathTemplateHandler ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
-            this.routeName = routeName;
+            Model = model;
+            ApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
             ODataPathTemplateHandler = pathTemplateHandler;
-            ApiVersion = apiVersion;
-
-            if ( pathTemplateHandler is IODataPathHandler pathHandler && pathHandler.UrlKeyDelimiter == null )
-            {
-                var urlKeyDelimiter = configuration.GetUrlKeyDelimiter();
-                pathHandler.UrlKeyDelimiter = urlKeyDelimiter;
-            }
+            configuration.SetResolverSettings( pathTemplateHandler );
 
             var initialized = false;
             var initializer = configuration.Initializer;
@@ -79,32 +70,34 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="routeName">The name of the route.</param>
+        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see></param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
-        public VersionedAttributeRoutingConvention( string routeName, IEnumerable<HttpControllerDescriptor> controllers, ApiVersion apiVersion )
-            : this( routeName, controllers, defaultPathHandler, apiVersion ) { }
+        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers ) : this( model, controllers, defaultPathHandler ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
-        /// <param name="routeName">The name of the route.</param>
+        /// <param name="model">The <see cref="IEdmModel">EDM model</see> associated with the routing convention.</param>
         /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see>
         /// associated with the routing convention.</param>
         /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
-        public VersionedAttributeRoutingConvention( string routeName, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
+        public VersionedAttributeRoutingConvention( IEdmModel model, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler )
         {
-            Arg.NotNull( routeName, nameof( routeName ) );
+            Arg.NotNull( model, nameof( model ) );
             Arg.NotNull( controllers, nameof( controllers ) );
             Arg.NotNull( pathTemplateHandler, nameof( pathTemplateHandler ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
-            this.routeName = routeName;
+            Model = model;
+            ApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
             ODataPathTemplateHandler = pathTemplateHandler;
-            ApiVersion = apiVersion;
             attributeMappings = BuildAttributeMappings( controllers );
         }
+
+        /// <summary>
+        /// Gets the EDM model to be used for parsing the route templates.
+        /// </summary>
+        /// <value>The <see cref="IEdmModel">EDM model</see> to be used for parsing the route templates.</value>
+        public IEdmModel Model { get; }
 
         /// <summary>
         /// Gets the <see cref="IODataPathTemplateHandler"/> to be used for parsing the route templates.
@@ -215,6 +208,8 @@
                             routeData.Values.Add( item );
                         }
                     }
+
+                    EnsureVersionedRouteName( controllerContext, ApiVersion );
 
                     return attributeRouteData["action"] as string;
                 }
@@ -335,7 +330,7 @@
 
             try
             {
-                odataPathTemplate = ODataPathTemplateHandler.ParseTemplate( pathTemplate, action.Configuration.GetODataRootContainer( routeName ) );
+                odataPathTemplate = ODataPathTemplateHandler.ParseTemplate( Model, pathTemplate );
             }
             catch ( ODataException e )
             {
@@ -343,6 +338,27 @@
             }
 
             return odataPathTemplate;
+        }
+
+        static void EnsureVersionedRouteName( HttpControllerContext controllerContext, ApiVersion apiVersion )
+        {
+            Contract.Requires( controllerContext != null );
+            Contract.Requires( apiVersion != null );
+
+            // note: this seems to only happen for version-neutral matches in which case any versioned route name is valid
+            var routes = controllerContext.Configuration.Routes;
+            var pairs = new KeyValuePair<string, IHttpRoute>[routes.Count];
+            var route = controllerContext.RouteData.Route;
+
+            routes.CopyTo( pairs, 0 );
+
+            var routeName = pairs.FirstOrDefault( pair => pair.Value == route ).Key ??
+                            pairs.FirstOrDefault( pair => pair.Value is ODataRoute odataRoute && odataRoute.RouteConstraint is ODataPathRouteConstraint ).Key;
+
+            if ( !string.IsNullOrEmpty( routeName ) )
+            {
+                controllerContext.Request.ODataProperties().RouteName = routeName;
+            }
         }
     }
 }

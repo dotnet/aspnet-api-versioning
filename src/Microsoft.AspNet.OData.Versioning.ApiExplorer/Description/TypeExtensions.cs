@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -21,9 +20,9 @@
         static readonly Type DeltaType = typeof( IDelta );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
 
-        internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver, ModelTypeBuilder modelTypeBuilder )
+        internal static Type SubstituteIfNecessary( this Type type, IEdmModel model, IAssembliesResolver assembliesResolver, ModelTypeBuilder modelTypeBuilder )
         {
-            Contract.Requires( serviceProvider != null );
+            Contract.Requires( model != null );
             Contract.Requires( assembliesResolver != null );
             Contract.Requires( modelTypeBuilder != null );
             Contract.Ensures( Contract.Result<Type>() != null );
@@ -36,7 +35,6 @@
             }
 
             var innerType = result.InnerType;
-            var model = serviceProvider.GetRequiredService<IEdmModel>();
             var structuredType = innerType.GetStructuredType( model, assembliesResolver );
 
             if ( structuredType == null )

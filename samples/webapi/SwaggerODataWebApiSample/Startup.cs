@@ -4,8 +4,6 @@ namespace Microsoft.Examples
 {
     using global::Owin;
     using Microsoft.Examples.Configuration;
-    using Microsoft.OData;
-    using Microsoft.OData.UriParser;
     using Microsoft.Web.OData.Builder;
     using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
@@ -14,7 +12,7 @@ namespace Microsoft.Examples
     using System.Web.Http;
     using System.Web.Http.Description;
     using System.Web.OData.Builder;
-    using static Microsoft.OData.ServiceLifetime;
+    using System.Web.OData.Extensions;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -31,11 +29,13 @@ namespace Microsoft.Examples
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
 
-            // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
-
             // note: this is required to make the default swagger json settings match the odata conventions applied by EnableLowerCamelCase()
             configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            configuration.EnableCaseInsensitive( true );
+            configuration.EnableUnqualifiedNameCall( true );
+
+            // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
 
             var modelBuilder = new VersionedODataModelBuilder( configuration )
             {
@@ -52,10 +52,10 @@ namespace Microsoft.Examples
             // TODO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
 
             // WHEN VERSIONING BY: query string, header, or media type
-            configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureODataServices );
+            configuration.MapVersionedODataRoutes( "odata", routePrefix, models );
 
             // WHEN VERSIONING BY: url segment
-            // configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
+            // configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
@@ -96,11 +96,6 @@ namespace Microsoft.Examples
                         .EnableSwaggerUi( swagger => swagger.EnableDiscoveryUrlSelector() );
 
             builder.UseWebApi( httpServer );
-        }
-
-        static void ConfigureODataServices( IContainerBuilder builder )
-        {
-            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => new CaseInsensitiveODataUriResolver() );
         }
 
         static string XmlCommentsFilePath

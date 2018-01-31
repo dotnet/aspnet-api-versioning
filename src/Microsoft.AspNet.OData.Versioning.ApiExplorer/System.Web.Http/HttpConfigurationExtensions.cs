@@ -1,21 +1,23 @@
 ﻿namespace System.Web.Http
 {
     using Microsoft;
-    using Microsoft.OData;
-    using Microsoft.Web.Http;
+    using Microsoft.OData.Core.UriParser;
     using Microsoft.Web.Http.Description;
-    using System.Collections.Concurrent;
     using System.Diagnostics.Contracts;
     using System.Web.Http.Description;
-    using System.Web.Http.Routing;
+    using System.Web.OData.Extensions;
+    using System.Web.OData.Routing;
+    using static Linq.Expressions.Expression;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
-        const string UrlKeyDelimiterKey = "System.Web.OData.UrlKeyDelimiterKey";
+        const string ResolverSettingsKey = "System.Web.OData.ResolverSettingsKey";
+        const string ResolverSettingsTypeName = "System.Web.OData.ODataUriResolverSetttings";
+        static readonly Lazy<Func<HttpConfiguration, bool>> getEnumPrefix = new Lazy<Func<HttpConfiguration, bool>>( CreateEnumPrefixFreeGetter );
+        static readonly Lazy<Func<HttpConfiguration, ODataUrlConventions>> getUrlConventions = new Lazy<Func<HttpConfiguration, ODataUrlConventions>>( CreateUrlConventionsGetter );
 
         /// <summary>
         /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.
@@ -49,33 +51,66 @@
             return apiExplorer;
         }
 
-        internal static IServiceProvider GetODataRootContainer( this HttpConfiguration configuration, IHttpRoute route )
+        internal static ODataUrlConventions GetUrlKeyDelimiter( this HttpConfiguration configuration )
         {
             Contract.Requires( configuration != null );
-            Contract.Requires( route != null );
-            Contract.Ensures( Contract.Result<IServiceProvider>() != null );
 
-            var containers = (ConcurrentDictionary<string, IServiceProvider>) configuration.Properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
-            var routeName = configuration.Routes.GetRouteName( route );
-
-            if ( containers.TryGetValue( routeName, out var serviceProvider ) )
+            // REMARKS: this creates and populates the ODataUriResolverSetttings; OData URLs are case-sensitive by default.
+            if ( !configuration.Properties.ContainsKey( ResolverSettingsKey ) )
             {
-                return serviceProvider;
+                configuration.EnableCaseInsensitive( false );
             }
 
-            throw new InvalidOperationException( SR.NullContainer );
+            return getUrlConventions.Value( configuration );
         }
 
-        internal static ODataUrlKeyDelimiter GetUrlKeyDelimiter( this HttpConfiguration configuration )
+        internal static bool EnumPrefixFreeEnabled( this HttpConfiguration configuration )
         {
             Contract.Requires( configuration != null );
 
-            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) && value is ODataUrlKeyDelimiter delimiter )
+            // REMARKS: this creates and populates the ODataUriResolverSetttings; OData URLs are case-sensitive by default.
+            if ( !configuration.Properties.ContainsKey( ResolverSettingsKey ) )
             {
-                return delimiter;
+                configuration.EnableCaseInsensitive( false );
             }
 
-            return ODataUrlKeyDelimiter.Parentheses;
+            return getEnumPrefix.Value( configuration );
+        }
+
+        /// <summary>
+        /// Build: ((ODataUriResolverSetttings) HttpConfiguration.Properties["System.Web.OData.ResolverSettingsKey"]).UrlConventions
+        /// </summary>
+        /// <returns>A strongly-typed delegate.</returns>
+        static Func<HttpConfiguration, ODataUrlConventions> CreateUrlConventionsGetter()
+        {
+            Contract.Ensures( Contract.Result<Func<HttpConfiguration, ODataUrlConventions>>() != null );
+            return CreateODataUriResolverSetttingsGetter<ODataUrlConventions>( "UrlConventions" );
+        }
+
+        /// <summary>
+        /// Build: ((ODataUriResolverSetttings) HttpConfiguration.Properties["System.Web.OData.ResolverSettingsKey"]).EnumPrefixFree
+        /// </summary>
+        /// <returns>A strongly-typed delegate.</returns>
+        static Func<HttpConfiguration, bool> CreateEnumPrefixFreeGetter()
+        {
+            Contract.Ensures( Contract.Result<Func<HttpConfiguration, bool>>() != null );
+            return CreateODataUriResolverSetttingsGetter<bool>( "EnumPrefixFree" );
+        }
+
+        static Func<HttpConfiguration, TValue> CreateODataUriResolverSetttingsGetter<TValue>( string propertyName )
+        {
+            Contract.Requires( !string.IsNullOrEmpty( propertyName ) );
+            Contract.Ensures( Contract.Result<Func<HttpConfiguration, TValue>>() != null );
+
+            var configurationType = typeof( HttpConfiguration );
+            var resolverSettingsType = typeof( DefaultODataPathHandler ).Assembly.GetType( ResolverSettingsTypeName );
+            var c = Parameter( configurationType, "c" );
+            var property = Property( Property( c, "Properties" ), "Item", Constant( ResolverSettingsKey ) );
+            var body = Property( Convert( property, resolverSettingsType ), propertyName );
+            var lambda = Lambda<Func<HttpConfiguration, TValue>>( body, c );
+            var func = lambda.Compile();
+
+            return func;
         }
     }
 }

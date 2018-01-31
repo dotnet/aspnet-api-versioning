@@ -5,11 +5,10 @@
     using Controllers;
     using Http;
     using Http.Versioning;
-    using Microsoft.OData.UriParser;
     using System.Web.Http;
     using System.Web.OData.Builder;
+    using System.Web.OData.Extensions;
     using static System.Web.Http.RouteParameter;
-    using static Microsoft.OData.ServiceLifetime;
 
     public abstract class AdvancedAcceptanceTest : ODataAcceptanceTest
     {
@@ -21,6 +20,7 @@
             FilteredControllerTypes.Add( typeof( PeopleController ) );
             FilteredControllerTypes.Add( typeof( People2Controller ) );
 
+            Configuration.EnableCaseInsensitive( true );
             Configuration.AddApiVersioning(
                 options =>
                 {
@@ -42,7 +42,7 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata", "api", models );
             Configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{key}", new { key = Optional } );
             Configuration.EnsureInitialized();
         }

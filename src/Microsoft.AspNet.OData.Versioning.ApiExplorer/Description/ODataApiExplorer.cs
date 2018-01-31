@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Routing;
     using System;
@@ -149,13 +148,24 @@
         /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
         protected override Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
         {
-            if ( !( route is ODataRoute ) )
+            if ( !( route is ODataRoute odataRoute ) )
             {
                 return base.ExploreRouteControllers( controllerMappings, route, apiVersion );
             }
 
             var apiDescriptions = new Collection<VersionedApiDescription>();
-            var edmModel = Configuration.GetODataRootContainer( route ).GetRequiredService<IEdmModel>();
+            var edmModel = default( IEdmModel );
+
+            if ( odataRoute.RouteConstraint is ODataPathRouteConstraint odataRouteConstraint )
+            {
+                edmModel = odataRouteConstraint.EdmModel;
+            }
+
+            if ( edmModel == null )
+            {
+                return apiDescriptions;
+            }
+
             var routeApiVersion = edmModel.GetAnnotationValue<ApiVersionAnnotation>( edmModel )?.ApiVersion;
 
             if ( routeApiVersion != apiVersion )
@@ -188,11 +198,11 @@
             Contract.Ensures( Contract.Result<ResponseDescription>() != null );
 
             var description = CreateResponseDescription( actionDescriptor );
-            var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
+            var edmModel = ( (ODataPathRouteConstraint) ( (ODataRoute) route ).RouteConstraint ).EdmModel;
             var assembliesResolver = actionDescriptor.Configuration.Services.GetAssembliesResolver();
             var returnType = description.ResponseType ?? description.DeclaredType;
 
-            description.ResponseType = returnType.SubstituteIfNecessary( serviceProvider, assembliesResolver, modelTypeBuilder );
+            description.ResponseType = returnType.SubstituteIfNecessary( edmModel, assembliesResolver, modelTypeBuilder );
 
             return description;
         }
@@ -272,10 +282,10 @@
             return willReadUri;
         }
 
-        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver )
+        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IEdmModel edmModel, IAssembliesResolver assembliesResolver )
         {
             Contract.Requires( parameterBinding != null );
-            Contract.Requires( serviceProvider != null );
+            Contract.Requires( edmModel != null );
             Contract.Requires( assembliesResolver != null );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
 
@@ -287,7 +297,7 @@
                 description.Source = FromBody;
 
                 var parameterType = descriptor.ParameterType;
-                var substitutedType = parameterType.SubstituteIfNecessary( serviceProvider, assembliesResolver, modelTypeBuilder );
+                var substitutedType = parameterType.SubstituteIfNecessary( edmModel, assembliesResolver, modelTypeBuilder );
 
                 if ( parameterType != substitutedType )
                 {
@@ -317,7 +327,7 @@
             if ( actionBinding != null )
             {
                 var configuration = actionDescriptor.Configuration;
-                var serviceProvider = configuration.GetODataRootContainer( route );
+                var edmModel = ( (ODataPathRouteConstraint) ( (ODataRoute) route ).RouteConstraint ).EdmModel;
                 var assembliesResolver = configuration.Services.GetAssembliesResolver();
                 var parameterBindings = actionBinding.ParameterBindings;
 
@@ -325,7 +335,7 @@
                 {
                     foreach ( var binding in parameterBindings )
                     {
-                        list.Add( CreateParameterDescriptionFromBinding( binding, serviceProvider, assembliesResolver ) );
+                        list.Add( CreateParameterDescriptionFromBinding( binding, edmModel, assembliesResolver ) );
                     }
                 }
             }

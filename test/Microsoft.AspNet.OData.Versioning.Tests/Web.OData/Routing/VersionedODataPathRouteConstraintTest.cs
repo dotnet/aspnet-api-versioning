@@ -21,18 +21,35 @@
 
     public class VersionedODataPathRouteConstraintTest
     {
+        public class Test
+        {
+            public int Id { get; set; }
+        }
+
+        static IEdmModel EmptyModel => new ODataModelBuilder().GetEdmModel();
+
+        static IEdmModel TestModel
+        {
+            get
+            {
+                var builder = new ODataModelBuilder();
+                var tests = builder.EntitySet<Test>( "Tests" ).EntityType;
+                tests.HasKey( t => t.Id );
+                return builder.GetEdmModel();
+            }
+        }
+
         static VersionedODataPathRouteConstraint NewVersionedODataPathRouteConstraint( HttpRequestMessage request, IEdmModel model, ApiVersion apiVersion, string routePrefix = null )
         {
             var pathHandler = new DefaultODataPathHandler();
             var conventions = ODataRoutingConventions.CreateDefault();
             var configuration = new HttpConfiguration();
             var routingConventions = Enumerable.Empty<IODataRoutingConvention>();
-            var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
+            var constraint = new VersionedODataPathRouteConstraint( pathHandler, model, "odata", routingConventions, apiVersion );
 
             configuration.AddApiVersioning();
             configuration.MapVersionedODataRoute( "odata", routePrefix, model, apiVersion );
             request.SetConfiguration( configuration );
-            configuration.EnsureInitialized();
 
             return constraint;
         }
@@ -49,7 +66,7 @@
             var pathHandler = new Mock<IODataPathHandler>().Object;
             var model = new Mock<IEdmModel>().Object;
             var routingConventions = Enumerable.Empty<IODataRoutingConvention>();
-            var constraint = new VersionedODataPathRouteConstraint( "odata", Default );
+            var constraint = new VersionedODataPathRouteConstraint( pathHandler, model, "odata", routingConventions, Default );
 
             // act
             var result = constraint.Match( request, route, parameterName, values, routeDirection );
@@ -64,9 +81,10 @@
         public void match_should_be_true_when_api_version_is_requested_in_query_string( string apiVersion )
         {
             // arrange
+            var model = TestModel;
             var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)?api-version={apiVersion}" );
             var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, Test.Model, Parse( apiVersion ) );
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, Parse( apiVersion ) );
 
             // act
             var result = constraint.Match( request, null, null, values, UriResolution );
@@ -84,9 +102,10 @@
         {
             // arrange
             var apiVersion = Parse( apiVersionValue );
+            var model = EmptyModel;
             var request = new HttpRequestMessage( Get, requestUri );
             var values = new Dictionary<string, object>() { { "odataPath", odataPath } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, Test.EmptyModel, apiVersion );
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, apiVersion );
 
             // act
             var result = constraint.Match( request, null, null, values, UriResolution );
@@ -102,9 +121,10 @@
         {
             // arrange
             var apiVersion = new ApiVersion( 2, 0 );
+            var model = TestModel;
             var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)" );
             var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, Test.Model, apiVersion );
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, apiVersion );
 
             request.GetConfiguration().AddApiVersioning(
                 o =>
@@ -124,9 +144,10 @@
         public void match_should_return_400_when_requested_api_version_is_ambiguous()
         {
             // arrange
+            var model = TestModel;
             var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)?api-version=1.0&api-version=2.0" );
             var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, Test.Model, new ApiVersion( 1, 0 ) );
+            var constraint = NewVersionedODataPathRouteConstraint( request, model, new ApiVersion( 1, 0 ) );
 
             // act
             Action match = () => constraint.Match( request, null, null, values, UriResolution );

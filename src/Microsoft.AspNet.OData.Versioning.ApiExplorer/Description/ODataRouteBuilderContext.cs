@@ -1,9 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.OData;
+    using Microsoft.OData.Core.UriParser;
     using Microsoft.OData.Edm;
-    using Microsoft.OData.UriParser;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -17,7 +15,7 @@
 
     sealed class ODataRouteBuilderContext
     {
-        readonly IServiceProvider serviceProvider;
+        readonly HttpConfiguration configuration;
         readonly ODataRouteAttribute routeAttribute;
 
         internal ODataRouteBuilderContext(
@@ -35,8 +33,8 @@
             Contract.Requires( modelTypeBuilder != null );
             Contract.Requires( options != null );
 
-            serviceProvider = configuration.GetODataRootContainer( route );
-            EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
+            this.configuration = configuration;
+            EdmModel = ( (ODataPathRouteConstraint) route.RouteConstraint ).EdmModel;
             AssembliesResolver = configuration.Services.GetAssembliesResolver();
             routeAttribute = actionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
@@ -85,7 +83,7 @@
 
         internal ODataApiExplorerOptions Options { get; }
 
-        internal ODataUrlKeyDelimiter UrlKeyDelimiter { get; }
+        internal ODataUrlConventions UrlKeyDelimiter { get; }
 
         internal bool IsRouteExcluded { get; }
 
@@ -95,7 +93,7 @@
 
         internal bool IsBound => IsOperation && EntitySet != null;
 
-        internal bool AllowUnqualifiedEnum => serviceProvider.GetRequiredService<ODataUriResolver>() is StringAsEnumResolver;
+        internal bool AllowUnqualifiedEnum => configuration.EnumPrefixFreeEnabled();
 
         static ODataRouteActionType GetActionType( IEdmEntitySet entitySet, IEdmOperation operation )
         {

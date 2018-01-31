@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.2.0</VersionPrefix>
-  <AssemblyVersion>2.2.0.0</AssemblyVersion>
+  <VersionPrefix>2.0.2</VersionPrefix>
+  <AssemblyVersion>2.0.2.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API and OData v4.0.</Description>
@@ -11,7 +11,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Fix attribute-route, versioned functions (#201)" />
+  <ReleaseNotes Include="Adds backward compatibilty support for OData 5" />
  </ItemGroup>
 
  <ItemGroup>
@@ -19,10 +19,11 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.OData" Version="6.0.0" />
+  <PackageReference Include="Microsoft.AspNet.OData" Version="[5.9.1,6.0.0)" />
+  <PackageReference Include="Microsoft.OData.Core" Version="[6.15.0,7.0.0)" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+ <ItemGroup>
   <Reference Include="System" />
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>

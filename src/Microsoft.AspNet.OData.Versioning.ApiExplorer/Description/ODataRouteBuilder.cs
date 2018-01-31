@@ -10,7 +10,7 @@
     using System.Web.OData;
     using System.Web.OData.Query;
     using System.Web.OData.Routing;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
+    using static Microsoft.OData.Core.UriParser.ODataUrlConventions;
     using static ODataRouteActionType;
     using static System.Linq.Enumerable;
     using static System.String;
@@ -93,7 +93,7 @@
                     {
                         segments.Add( prefix );
                     }
-                    else if ( template[0] == '(' && Context.UrlKeyDelimiter == Parentheses )
+                    else if ( template[0] == '(' && Context.UrlKeyDelimiter != KeyAsSegment )
                     {
                         segments.Add( prefix + template );
                     }
