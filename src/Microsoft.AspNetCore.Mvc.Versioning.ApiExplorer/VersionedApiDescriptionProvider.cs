@@ -155,6 +155,12 @@
                     groupResult.GroupName = groupName;
                     groupResult.SetApiVersion( version );
                     PopulateApiVersionParameters( groupResult, version );
+
+                    if ( Options.SubstituteApiVersionInUrl )
+                    {
+                        UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( groupResult, Options.SubstitutionFormat );
+                    }
+
                     groupResults.Add( groupResult );
                 }
             }
@@ -173,6 +179,29 @@
         /// <param name="context">The current <see cref="ApiDescriptionProviderContext">execution context</see>.</param>
         /// <remarks>The default implementation performs no operation.</remarks>
         public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context ) { }
+
+        static void UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( ApiDescription apiDescription, string apiVersionFormat )
+        {
+            Contract.Requires( apiDescription != null );
+
+            var parameter = apiDescription.ParameterDescriptions.FirstOrDefault( pd => pd.Source == BindingSource.Path && pd.ModelMetadata?.DataTypeName == nameof( ApiVersion ) );
+
+            if ( parameter == null )
+            {
+                return;
+            }
+
+            var relativePath = apiDescription.RelativePath;
+            var token = '{' + parameter.Name + '}';
+            var value = apiDescription.GetApiVersion().ToString( apiVersionFormat, InvariantCulture );
+            var newRelativePath = relativePath.Replace( token, value );
+
+            if ( relativePath != newRelativePath )
+            {
+                apiDescription.RelativePath = newRelativePath;
+                apiDescription.ParameterDescriptions.Remove( parameter );
+            }
+        }
 
         IEnumerable<ApiVersion> FlattenApiVersions( IEnumerable<ApiDescription> descriptions )
         {
