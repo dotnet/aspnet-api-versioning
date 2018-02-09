@@ -45,7 +45,15 @@
         {
             // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
-            services.AddMvcCore().AddVersionedApiExplorer( o => o.GroupNameFormat = "'v'VVV" );
+            services.AddMvcCore().AddVersionedApiExplorer(
+                options =>
+                {
+                    options.GroupNameFormat = "'v'VVV";
+
+                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                    // can also be used to control the format of the API version in route templates
+                    options.SubstituteApiVersionInUrl = true;
+                } );
 
             services.AddMvc();
             services.AddApiVersioning( o => o.ReportApiVersions = true );
