@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.1.0</VersionPrefix>
-  <AssemblyVersion>1.1.0.0</AssemblyVersion>
+  <VersionPrefix>1.2.0</VersionPrefix>
+  <AssemblyVersion>1.2.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer for OData v4.0</AssemblyTitle>
   <Description>The API Explorer for Microsoft ASP.NET Web API Versioning and OData v4.0.</Description>
@@ -12,11 +12,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Fix convention-based 'key' parameter binding (#226)" />
-  <ReleaseNotes Include="Version-neutral actions exclude the API version parameter" />
-  <ReleaseNotes Include="Added full support for actions" />
-  <ReleaseNotes Include="Added full support for functions" />
-  <ReleaseNotes Include="Added support for partial types using EDM" />
+  <ReleaseNotes Include="Support substituting API version parameter in route templates (Issue 247)" />
  </ItemGroup>
 
  <ItemGroup>

@@ -268,6 +268,11 @@
             foreach ( var apiDescriptionGroup in newApiDescriptions )
             {
                 SortApiDescriptionGroup( apiDescriptionGroup );
+
+                if ( Options.SubstituteApiVersionInUrl )
+                {
+                    UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( apiDescriptionGroup, Options.SubstitutionFormat );
+                }
             }
 
             return newApiDescriptions;
@@ -387,6 +392,32 @@
 
             expandedRouteTemplate = Uri.UnescapeDataString( boundRouteTemplate.BoundTemplate );
             return true;
+        }
+
+        static void UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( ApiDescriptionGroup apiDescriptionGroup, string apiVersionFormat )
+        {
+            Contract.Requires( apiDescriptionGroup != null );
+
+            foreach ( var apiDescription in apiDescriptionGroup.ApiDescriptions )
+            {
+                var parameter = apiDescription.ParameterDescriptions.FirstOrDefault( p => p.ParameterDescriptor is ApiVersionParameterDescriptor pd && pd.FromPath );
+
+                if ( parameter == null )
+                {
+                    continue;
+                }
+
+                var relativePath = apiDescription.RelativePath;
+                var token = '{' + parameter.ParameterDescriptor.ParameterName + '}';
+                var value = apiDescription.ApiVersion.ToString( apiVersionFormat, InvariantCulture );
+                var newRelativePath = relativePath.Replace( token, value );
+
+                if ( relativePath != newRelativePath )
+                {
+                    apiDescription.RelativePath = newRelativePath;
+                    apiDescription.ParameterDescriptions.Remove( parameter );
+                }
+            }
         }
 
         static IEnumerable<IHttpRoute> FlattenRoutes( IEnumerable<IHttpRoute> routes )
