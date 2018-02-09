@@ -14,6 +14,7 @@
 
  <ItemGroup>
   <ReleaseNotes Include="Support substituting API version parameter in route templates (Issue 247)" />
+  <ReleaseNotes Include="Fix NullReferenceException when parameter without metadata is encountered (Issue 250)" />
  </ItemGroup>
 
  <ItemGroup>
