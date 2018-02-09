@@ -55,11 +55,19 @@ namespace Microsoft.Examples
             configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureODataServices );
 
             // WHEN VERSIONING BY: url segment
-            // configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
+            //configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
-            var apiExplorer = configuration.AddODataApiExplorer( o => o.GroupNameFormat = "'v'VVV" );
+            var apiExplorer = configuration.AddODataApiExplorer(
+                options =>
+                {
+                    options.GroupNameFormat = "'v'VVV";
+
+                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                    // can also be used to control the format of the API version in route templates
+                    options.SubstituteApiVersionInUrl = true;
+                } );
 
             configuration.EnableSwagger(
                            "{apiVersion}/swagger",
