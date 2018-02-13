@@ -12,11 +12,10 @@
   </ItemGroup>
 
   <ItemGroup Label="Code Analysis">
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\tools\stylecop.json" Link="stylecop.json" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\tools\stylecop.json" Link="stylecop.json" Visible="false" />
   </ItemGroup>
 
   <ItemGroup Label="NuGet">
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="All" />
   </ItemGroup>
