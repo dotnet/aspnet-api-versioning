@@ -20,9 +20,7 @@
         public ApiVersionRequestProperties( HttpContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-
             this.context = context;
-            rawApiVersion = new Lazy<string>( GetRawApiVersion );
         }
 
         /// <summary>

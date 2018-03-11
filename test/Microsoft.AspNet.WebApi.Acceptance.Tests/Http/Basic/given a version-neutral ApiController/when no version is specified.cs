@@ -43,9 +43,9 @@
                     InnerError = new
                     {
                         Code = default( string ),
-                        Message = "No route providing a controller name with API version '(null)' was found to match request URI 'http://localhost/api/ping'."
+                        Message = "No route providing a controller name with API version '(null)' was found to match HTTP method 'POST' and request URI 'http://localhost/api/ping'."
                     },
-                    Message = "The HTTP resource that matches the request URI 'http://localhost/api/ping' does not support the API version '(null)'."
+                    Message = "The requested resource with API version '(null)' does not support HTTP method 'POST'."
                 } );
         }
     }

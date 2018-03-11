@@ -169,4 +169,10 @@
   <data name="AmbiguousActionMethod" xml:space="preserve">
     <value>Multiple action methods with the name '{0}' were found, but could not be resolved using the provided arguments.</value>
   </data>
+  <data name="VersionedMethodNotSupported" xml:space="preserve">
+    <value>The HTTP resource that matches the request URI '{0}' with API version '{1}' does not support HTTP method '{2}'.</value>
+  </data>
+  <data name="VersionNeutralMethodNotSupported" xml:space="preserve">
+    <value>The HTTP resource that matches the request URI '{0}' does not support HTTP method '{1}'.</value>
+  </data>
 </root>

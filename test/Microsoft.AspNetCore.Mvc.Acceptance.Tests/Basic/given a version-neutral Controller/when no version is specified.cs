@@ -41,7 +41,7 @@
                 {
                     Code = "UnsupportedApiVersion",
                     InnerError = default( OneApiInnerError ),
-                    Message = "The HTTP resource that matches the request URI 'http://localhost/api/ping' is not supported."
+                    Message = "The HTTP resource that matches the request URI 'http://localhost/api/ping' does not support HTTP method 'POST'."
                 } );
         }
     }

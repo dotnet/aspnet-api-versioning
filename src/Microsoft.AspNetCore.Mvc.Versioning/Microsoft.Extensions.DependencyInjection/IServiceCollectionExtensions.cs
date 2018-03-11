@@ -34,6 +34,7 @@
         public static IServiceCollection AddApiVersioning( this IServiceCollection services, Action<ApiVersioningOptions> setupAction )
         {
             Arg.NotNull( services, nameof( services ) );
+            Arg.NotNull( setupAction, nameof( setupAction ) );
             Contract.Ensures( Contract.Result<IServiceCollection>() != null );
 
             var options = new ApiVersioningOptions();

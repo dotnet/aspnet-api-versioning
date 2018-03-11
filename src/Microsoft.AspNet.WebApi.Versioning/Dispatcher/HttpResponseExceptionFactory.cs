@@ -142,7 +142,7 @@
         {
             Contract.Requires( allowedMethods != null );
 
-            var response = CreateBadRequestForUnspecifiedApiVersionOrInvalidApiVersion( versionNeutral );
+            var response = CreateBadRequestForUnspecifiedApiVersionOrInvalidApiVersion( versionNeutral || Options.AssumeDefaultVersionWhenUnspecified );
 
             if ( response != null )
             {
@@ -152,19 +152,8 @@
 
             var requestedMethod = request.Method;
             var version = request.GetRequestedApiVersion()?.ToString() ?? "(null)";
-            var message = default( string );
-            var messageDetail = default( string );
-
-            if ( versionNeutral )
-            {
-                message = SR.VersionedResourceNotSupported.FormatDefault( request.RequestUri, version );
-                messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( request.RequestUri, version );
-            }
-            else
-            {
-                message = SR.VersionedMethodNotSupported.FormatDefault( version, requestedMethod );
-                messageDetail = SR.VersionedActionNameNotFound.FormatDefault( request.RequestUri, requestedMethod, version );
-            }
+            var message = SR.VersionedMethodNotSupported.FormatDefault( version, requestedMethod );
+            var messageDetail = SR.VersionedActionNameNotFound.FormatDefault( request.RequestUri, requestedMethod, version );
 
             TraceWriter.Info( request, ControllerSelectorCategory, message );
             response = Options.ErrorResponses.MethodNotAllowed( request, UnsupportedApiVersion, message, messageDetail );

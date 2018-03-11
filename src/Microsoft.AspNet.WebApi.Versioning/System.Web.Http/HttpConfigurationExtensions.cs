@@ -27,7 +27,7 @@
             Arg.NotNull( configuration, nameof( configuration ) );
             Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
 
-            return configuration.Properties.TryGetValue( ApiVersioningOptionsKey, out ApiVersioningOptions options ) ? options : new ApiVersioningOptions();
+            return (ApiVersioningOptions) configuration.Properties.GetOrAdd( ApiVersioningOptionsKey, key => new ApiVersioningOptions() );
         }
 
         /// <summary>

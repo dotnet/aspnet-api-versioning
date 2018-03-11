@@ -33,7 +33,7 @@
 
             if ( values.TryGetValue( routeKey, out string value ) )
             {
-                properties.RouteParameterName = routeKey;
+                properties.RawApiVersion = value;
             }
             else
             {

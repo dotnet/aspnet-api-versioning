@@ -187,11 +187,29 @@ namespace Microsoft.AspNetCore.Mvc {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; with API version &apos;{1}&apos; does not support HTTP method &apos;{2}&apos;..
+        /// </summary>
+        internal static string VersionedMethodNotSupported {
+            get {
+                return ResourceManager.GetString("VersionedMethodNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; does not support the API version &apos;{1}&apos;..
         /// </summary>
         internal static string VersionedResourceNotSupported {
             get {
                 return ResourceManager.GetString("VersionedResourceNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; does not support HTTP method &apos;{1}&apos;..
+        /// </summary>
+        internal static string VersionNeutralMethodNotSupported {
+            get {
+                return ResourceManager.GetString("VersionNeutralMethodNotSupported", resourceCulture);
             }
         }
         

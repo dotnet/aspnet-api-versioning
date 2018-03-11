@@ -33,7 +33,7 @@
 
             if ( values.TryGetValue( parameterName, out string value ) )
             {
-                properties.RouteParameterName = parameterName;
+                properties.RawApiVersion = value;
             }
             else
             {

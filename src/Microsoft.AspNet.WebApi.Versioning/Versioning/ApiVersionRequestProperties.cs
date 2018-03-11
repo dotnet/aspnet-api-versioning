@@ -20,7 +20,6 @@
             Arg.NotNull( request, nameof( request ) );
 
             this.request = request;
-            rawApiVersion = new Lazy<string>( GetRawApiVersion );
         }
 
         string GetRawApiVersion()
