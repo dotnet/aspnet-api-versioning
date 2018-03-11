@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// Applies the builder conventions to the specified controller.
         /// </summary>
         /// <param name="controllerModel">The <see cref="ControllerModel">controller model</see> to apply the conventions to.</param>
-        public void ApplyTo( ControllerModel controllerModel )
+        public virtual void ApplyTo( ControllerModel controllerModel )
         {
             Arg.NotNull( controllerModel, nameof( controllerModel ) );
             ApplyActionConventions( controllerModel, ApplyControllerConventions( controllerModel ) );
@@ -35,6 +35,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="convention">The retrieved <see cref="IApiVersionConvention{T}">convention</see> or <c>null</c>.</param>
         /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
         protected abstract bool TryGetConvention( MethodInfo method, out IApiVersionConvention<ActionModel> convention );
+
+        static void ApplyNeutralModelToActions( ControllerModel controller )
+        {
+            Contract.Requires( controller != null );
+
+            foreach ( var action in controller.Actions )
+            {
+                action.SetProperty( controller );
+                action.SetProperty( ApiVersionModel.Neutral );
+            }
+        }
 
         ControllerVersionInfo ApplyControllerConventions( ControllerModel controllerModel )
         {
@@ -104,17 +115,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             else
             {
                 MergeActionAttributesWithConventions( controller, controllerVersionInfo );
-            }
-        }
-
-        static void ApplyNeutralModelToActions( ControllerModel controller )
-        {
-            Contract.Requires( controller != null );
-
-            foreach ( var action in controller.Actions )
-            {
-                action.SetProperty( controller );
-                action.SetProperty( ApiVersionModel.Neutral );
             }
         }
 

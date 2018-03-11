@@ -15,7 +15,7 @@
         /// </summary>
         /// <param name="actionDescriptor">The <see cref="HttpActionDescriptor">action descriptor</see>
         /// to apply the conventions to.</param>
-        public void ApplyTo( HttpActionDescriptor actionDescriptor )
+        public virtual void ApplyTo( HttpActionDescriptor actionDescriptor )
         {
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
