@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.2.0</VersionPrefix>
-  <AssemblyVersion>2.2.0.0</AssemblyVersion>
+  <VersionPrefix>2.3.0</VersionPrefix>
+  <AssemblyVersion>2.3.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API.</Description>
@@ -12,9 +12,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Add IReportApiVersions service (#187)" />
-  <ReleaseNotes Include="Added support for non-generic conventions (#196)" />
-  <ReleaseNotes Include="Fix ApiVersion.GetHashCode (#201)" />
+  <ReleaseNotes Include="Fix 405 error message (#254)" />
  </ItemGroup>
 
  <ItemGroup>

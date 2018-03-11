@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq.Expressions;
     using System.Web.Http.Description;
+    using static System.Linq.Expressions.Expression;
 
     /// <summary>
     /// Represents a versioned API description.
@@ -39,15 +39,8 @@
         /// <value>The <see cref="ResponseDescription">response description</see>.</value>
         public new ResponseDescription ResponseDescription
         {
-            get
-            {
-                return base.ResponseDescription;
-            }
-            set
-            {
-                // HACK: the base setter is only internally assignable
-                setResponseDescription.Value( this, value );
-            }
+            get => base.ResponseDescription;
+            set => setResponseDescription.Value( this, value ); // HACK: the base setter is only internally assignable
         }
 
         /// <summary>
@@ -59,11 +52,11 @@
 
         static Action<ApiDescription, ResponseDescription> CreateSetResponseDescriptionMutator()
         {
-            var api = Expression.Parameter( typeof( ApiDescription ), "api" );
-            var value = Expression.Parameter( typeof( ResponseDescription ), "value" );
-            var property = Expression.Property( api, nameof( ResponseDescription ) );
-            var body = Expression.Assign( property, value );
-            var lambda = Expression.Lambda<Action<ApiDescription, ResponseDescription>>( body, api, value );
+            var api = Parameter( typeof( ApiDescription ), "api" );
+            var value = Parameter( typeof( ResponseDescription ), "value" );
+            var property = Property( api, nameof( ResponseDescription ) );
+            var body = Assign( property, value );
+            var lambda = Lambda<Action<ApiDescription, ResponseDescription>>( body, api, value );
 
             return lambda.Compile();
         }

@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -26,6 +27,7 @@
     public class DefaultApiVersionRoutePolicy : IApiVersionRoutePolicy
     {
         static readonly Task CompletedTask = Task.FromResult( default( object ) );
+        readonly IOptions<ApiVersioningOptions> options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultApiVersionRoutePolicy"/> class.
@@ -34,12 +36,14 @@
         /// <param name="errorResponseProvider">The <see cref="IErrorResponseProvider">provider</see> used to create error responses.</param>
         /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the route policy.</param>
         public DefaultApiVersionRoutePolicy(
             IActionInvokerFactory actionInvokerFactory,
             IErrorResponseProvider errorResponseProvider,
             IReportApiVersions reportApiVersions,
-            ILoggerFactory loggerFactory )
-            : this( actionInvokerFactory, errorResponseProvider, reportApiVersions, loggerFactory, null ) { }
+            ILoggerFactory loggerFactory,
+            IOptions<ApiVersioningOptions> options = null )
+            : this( actionInvokerFactory, errorResponseProvider, reportApiVersions, loggerFactory, null, options ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultApiVersionRoutePolicy"/> class.
@@ -49,12 +53,14 @@
         /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="actionContextAccessor">The associated <see cref="IActionContextAccessor">action context accessor</see>.</param>
+        /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the route policy.</param>
         public DefaultApiVersionRoutePolicy(
             IActionInvokerFactory actionInvokerFactory,
             IErrorResponseProvider errorResponseProvider,
             IReportApiVersions reportApiVersions,
             ILoggerFactory loggerFactory,
-            IActionContextAccessor actionContextAccessor )
+            IActionContextAccessor actionContextAccessor,
+            IOptions<ApiVersioningOptions> options = null )
         {
             Arg.NotNull( actionInvokerFactory, nameof( actionInvokerFactory ) );
             Arg.NotNull( errorResponseProvider, nameof( errorResponseProvider ) );
@@ -66,6 +72,7 @@
             ApiVersionReporter = reportApiVersions;
             Logger = loggerFactory.CreateLogger( GetType() );
             ActionContextAccessor = actionContextAccessor;
+            this.options = options ?? new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() );
         }
 
         /// <summary>
@@ -97,6 +104,12 @@
         /// </summary>
         /// <value>The associated <see cref="ILogger">logger</see>.</value>
         protected ILogger Logger { get; }
+
+        /// <summary>
+        /// Gets the configuration options associated with the route policy.
+        /// </summary>
+        /// <value>The associated <see cref="ApiVersioningOptions">service versioning options</see>.</value>
+        protected ApiVersioningOptions Options => options.Value;
 
         /// <summary>
         /// Gets the virtual path given the specified context.
@@ -204,82 +217,41 @@
             }
 
             var properties = httpContext.ApiVersionProperties();
-            var requestedVersion = default( string );
+            var method = httpContext.Request.Method;
+            var requestUrl = new Lazy<string>( httpContext.Request.GetDisplayUrl );
+            var requestedVersion = properties.RawApiVersion;
             var parsedVersion = properties.ApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
             var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates ) );
-            var newRequestHandler = default( Func<RequestHandlerContext, RequestHandler> );
             var apiVersions = new Lazy<ApiVersionModel>( selectionResult.CandidateActions.SelectMany( l => l.Value.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) ).Aggregate );
             var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter, apiVersions );
 
             if ( parsedVersion == null )
             {
-                var versionNeutral = new Lazy<bool>( () => candidates.Any( c => c.IsApiVersionNeutral() ) );
-
-                requestedVersion = properties.RawApiVersion;
-
-                if ( IsNullOrEmpty( requestedVersion ) && !versionNeutral.Value )
+                if ( IsNullOrEmpty( requestedVersion ) )
                 {
-                    Logger.ApiVersionUnspecified( actionNames.Value );
-                    handlerContext.Code = ApiVersionUnspecified;
-                    handlerContext.Message = SR.ApiVersionUnspecified;
-                    return new BadRequestHandler( handlerContext );
-                }
-                else if ( TryParse( requestedVersion, out parsedVersion ) )
-                {
-                    Logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
-                    handlerContext.Code = UnsupportedApiVersion;
-
-                    if ( allowedMethods.Value.Contains( httpContext.Request.Method ) )
+                    if ( Options.AssumeDefaultVersionWhenUnspecified || candidates.Any( c => c.IsApiVersionNeutral() ) )
                     {
-                        newRequestHandler = c => new BadRequestHandler( c );
-                    }
-                    else
-                    {
-                        handlerContext.AllowedMethods = allowedMethods.Value.ToArray();
-                        newRequestHandler = c => new MethodNotAllowedHandler( c );
-                    }
-                }
-                else if ( versionNeutral.Value )
-                {
-                    Logger.ApiVersionUnspecified( actionNames.Value );
-                    handlerContext.Code = UnsupportedApiVersion;
-                    handlerContext.Message = SR.VersionNeutralResourceNotSupported.FormatDefault( httpContext.Request.GetDisplayUrl() );
-
-                    if ( allowedMethods.Value.Contains( httpContext.Request.Method ) )
-                    {
-                        return new BadRequestHandler( handlerContext );
+                        return VersionNeutralUnmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value );
                     }
 
-                    handlerContext.AllowedMethods = allowedMethods.Value.ToArray();
-                    return new MethodNotAllowedHandler( handlerContext );
+                    return UnspecifiedApiVersion( handlerContext, actionNames.Value );
                 }
-                else
+                else if ( !TryParse( requestedVersion, out parsedVersion ) )
                 {
-                    Logger.ApiVersionInvalid( requestedVersion );
-                    handlerContext.Code = InvalidApiVersion;
-                    newRequestHandler = c => new BadRequestHandler( c );
+                    return MalformedApiVersion( handlerContext, requestUrl.Value, requestedVersion );
                 }
+            }
+            else if ( IsNullOrEmpty( requestedVersion ) )
+            {
+                return VersionNeutralUnmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value );
             }
             else
             {
-                Logger.ApiVersionUnmatched( parsedVersion, actionNames.Value );
                 requestedVersion = parsedVersion.ToString();
-                handlerContext.Code = UnsupportedApiVersion;
-
-                if ( allowedMethods.Value.Contains( httpContext.Request.Method ) )
-                {
-                    newRequestHandler = c => new BadRequestHandler( c );
-                }
-                else
-                {
-                    handlerContext.AllowedMethods = allowedMethods.Value.ToArray();
-                    newRequestHandler = c => new MethodNotAllowedHandler( c );
-                }
             }
 
-            handlerContext.Message = SR.VersionedResourceNotSupported.FormatDefault( httpContext.Request.GetDisplayUrl(), requestedVersion );
-            return newRequestHandler( handlerContext );
+            return Unmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value, parsedVersion, requestedVersion );
         }
 
         static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates )
@@ -303,6 +275,86 @@
             }
 
             return httpMethods;
+        }
+
+        RequestHandler VersionNeutralUnmatched( RequestHandlerContext context, string requestUrl, string method, IReadOnlyCollection<string> allowedMethods, string actionNames )
+        {
+            Contract.Requires( context != null );
+            Contract.Requires( !IsNullOrEmpty( requestUrl ) );
+            Contract.Requires( !IsNullOrEmpty( method ) );
+            Contract.Requires( allowedMethods != null );
+
+            Logger.ApiVersionUnspecified( actionNames );
+            context.Code = UnsupportedApiVersion;
+
+            if ( allowedMethods.Contains( method ) )
+            {
+                context.Message = SR.VersionNeutralResourceNotSupported.FormatDefault( requestUrl );
+                return new BadRequestHandler( context );
+            }
+
+            context.Message = SR.VersionNeutralMethodNotSupported.FormatDefault( requestUrl, method );
+            context.AllowedMethods = allowedMethods.ToArray();
+
+            return new MethodNotAllowedHandler( context );
+        }
+
+        RequestHandler UnspecifiedApiVersion( RequestHandlerContext context, string actionNames )
+        {
+            Contract.Requires( context != null );
+
+            Logger.ApiVersionUnspecified( actionNames );
+
+            context.Code = ApiVersionUnspecified;
+            context.Message = SR.ApiVersionUnspecified;
+
+            return new BadRequestHandler( context );
+        }
+
+        RequestHandler MalformedApiVersion( RequestHandlerContext context, string requestUrl, string requestedVersion )
+        {
+            Contract.Requires( context != null );
+            Contract.Requires( !IsNullOrEmpty( requestUrl ) );
+            Contract.Requires( !IsNullOrEmpty( requestedVersion ) );
+
+            Logger.ApiVersionInvalid( requestedVersion );
+
+            context.Code = InvalidApiVersion;
+            context.Message = SR.VersionedResourceNotSupported.FormatDefault( requestUrl, requestedVersion );
+
+            return new BadRequestHandler( context );
+        }
+
+        RequestHandler Unmatched(
+            RequestHandlerContext context,
+            string requestUrl,
+            string method,
+            IReadOnlyCollection<string> allowedMethods,
+            string actionNames,
+            ApiVersion parsedVersion,
+            string requestedVersion )
+        {
+            Contract.Requires( context != null );
+            Contract.Requires( !IsNullOrEmpty( requestUrl ) );
+            Contract.Requires( !IsNullOrEmpty( method ) );
+            Contract.Requires( allowedMethods != null );
+            Contract.Requires( parsedVersion != null );
+            Contract.Requires( !IsNullOrEmpty( requestedVersion ) );
+
+            Logger.ApiVersionUnmatched( parsedVersion, actionNames );
+
+            context.Code = UnsupportedApiVersion;
+
+            if ( allowedMethods.Contains( method ) )
+            {
+                context.Message = SR.VersionedResourceNotSupported.FormatDefault( requestUrl, requestedVersion );
+                return new BadRequestHandler( context );
+            }
+
+            context.Message = SR.VersionedMethodNotSupported.FormatDefault( requestUrl, requestedVersion, method );
+            context.AllowedMethods = allowedMethods.ToArray();
+
+            return new MethodNotAllowedHandler( context );
         }
 
         sealed class DefaultActionHandler

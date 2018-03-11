@@ -1,9 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using AspNetCore.Routing;
     using Http;
     using System;
-    using static System.String;
 
     /// <content>
     /// Provides the implementation for ASP.NET Core.
@@ -21,15 +19,16 @@
         {
             Arg.NotNull( request, nameof( request ) );
 
-            var context = request.HttpContext;
-            var key = context.ApiVersionProperties().RouteParameterName;
-
-            if ( IsNullOrEmpty( key ) )
+            if ( reentrant )
             {
                 return null;
             }
 
-            return context.GetRouteValue( key )?.ToString();
+            reentrant = true;
+            var value = request.HttpContext.ApiVersionProperties().RawApiVersion;
+            reentrant = false;
+
+            return value;
         }
     }
 }

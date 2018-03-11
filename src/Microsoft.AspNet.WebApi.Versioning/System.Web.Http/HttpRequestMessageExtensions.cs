@@ -65,7 +65,14 @@
             Arg.NotNull( request, nameof( request ) );
             Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
 
-            return request.GetConfiguration()?.GetApiVersioningOptions() ?? new ApiVersioningOptions();
+            var configuration = request.GetConfiguration();
+
+            if ( configuration == null )
+            {
+                request.SetConfiguration( configuration = new HttpConfiguration() );
+            }
+
+            return configuration.GetApiVersioningOptions();
         }
 
         /// <summary>

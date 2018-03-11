@@ -18,6 +18,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </summary>
     public partial class UrlSegmentApiVersionReader : IApiVersionReader
     {
+        volatile bool reentrant;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlSegmentApiVersionReader"/> class.
         /// </summary>
