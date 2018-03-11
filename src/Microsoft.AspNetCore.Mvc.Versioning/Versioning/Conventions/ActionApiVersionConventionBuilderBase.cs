@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// Applies the builder conventions to the specified controller action.
         /// </summary>
         /// <param name="actionModel">The <see cref="ActionModel">action model</see> to apply the conventions to.</param>
-        public void ApplyTo( ActionModel actionModel )
+        public virtual void ApplyTo( ActionModel actionModel )
         {
             Arg.NotNull( actionModel, nameof( actionModel ) );
 

@@ -17,7 +17,7 @@
         /// </summary>
         /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller descriptor</see>
         /// to apply the conventions to.</param>
-        public void ApplyTo( HttpControllerDescriptor controllerDescriptor )
+        public virtual void ApplyTo( HttpControllerDescriptor controllerDescriptor )
         {
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
 
@@ -48,15 +48,22 @@
             Contract.Requires( controllerDescriptor != null );
 
             MergeAttributesWithConventions( controllerDescriptor );
-            var model = new ApiVersionModel( VersionNeutral, supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions );
-            controllerDescriptor.SetConventionsApiVersionModel( model );
+
+            if ( VersionNeutral )
+            {
+                controllerDescriptor.SetConventionsApiVersionModel( ApiVersionModel.Neutral );
+            }
+            else
+            {
+                controllerDescriptor.SetConventionsApiVersionModel( new ApiVersionModel( VersionNeutral, supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions ) );
+            }
         }
 
         void MergeAttributesWithConventions( HttpControllerDescriptor controllerDescriptor )
         {
             Contract.Requires( controllerDescriptor != null );
 
-            if ( VersionNeutral )
+            if ( VersionNeutral |= controllerDescriptor.GetCustomAttributes<IApiVersionNeutral>().Any() )
             {
                 return;
             }
