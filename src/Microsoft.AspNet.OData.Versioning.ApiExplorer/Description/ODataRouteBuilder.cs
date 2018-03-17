@@ -21,13 +21,13 @@
     {
         static readonly Type ODataQueryOptionsType = typeof( ODataQueryOptions );
         static readonly Type ODataActionParametersType = typeof( ODataActionParameters );
-        static readonly Type GeographyType = typeof( Spatial.Geography );
-        static readonly Type GeometryType = typeof( Spatial.Geometry );
-        static readonly Dictionary<Type, string> quotedTypes = new Dictionary<Type, string>()
+        static readonly Dictionary<Type, string> quotedTypes = new Dictionary<Type, string>( new TypeComparer() )
         {
             [typeof( string )] = string.Empty,
             [typeof( TimeSpan )] = "duration",
             [typeof( byte[] )] = "binary",
+            [typeof( Spatial.Geography )] = "geography",
+            [typeof( Spatial.Geometry )] = "geometry",
         };
 
         internal ODataRouteBuilder( ODataRouteBuilderContext context )
@@ -220,6 +220,7 @@
             Contract.Requires( !IsNullOrEmpty( name ) );
 
             var typeDef = typeReference.Definition;
+            var offset = template.Length;
 
             template.Append( "{" );
             template.Append( name );
@@ -227,13 +228,15 @@
 
             if ( typeDef.TypeKind == EdmTypeKind.Enum )
             {
-                template.Insert( 0, '\'' );
+                var fullName = typeReference.FullName();
 
                 if ( !Context.AllowUnqualifiedEnum )
                 {
-                    template.Insert( 0, typeReference.FullName() );
+                    template.Insert( offset, fullName );
+                    offset += fullName.Length;
                 }
 
+                template.Insert( offset, '\'' );
                 template.Append( '\'' );
                 return;
             }
@@ -242,18 +245,9 @@
 
             if ( quotedTypes.TryGetValue( type, out var prefix ) )
             {
-                template.Insert( 0, '\'' );
-                template.Insert( 0, prefix );
-                template.Append( '\'' );
-            }
-            else if ( GeographyType.IsAssignableFrom( type ) )
-            {
-                template.Insert( 0, "geography'" );
-                template.Append( '\'' );
-            }
-            else if ( GeometryType.IsAssignableFrom( type ) )
-            {
-                template.Insert( 0, "geometry'" );
+                template.Insert( offset, prefix );
+                offset += prefix.Length;
+                template.Insert( offset, '\'' );
                 template.Append( '\'' );
             }
         }
@@ -363,6 +357,28 @@
             var name = parameter.Name;
 
             return operation.Parameters.Any( p => p.Name.Equals( name, OrdinalIgnoreCase ) );
+        }
+
+        sealed class TypeComparer : IEqualityComparer<Type>
+        {
+            public bool Equals( Type x, Type y ) => x.IsAssignableFrom( y );
+
+            public int GetHashCode( Type obj )
+            {
+                if ( obj.BaseType.Equals( typeof( ValueType ) ) || obj.BaseType.Equals( typeof( Array ) ) )
+                {
+                    return obj.GetHashCode();
+                }
+
+                var baseType = typeof( object );
+
+                while ( !obj.BaseType.Equals( baseType ) )
+                {
+                    obj = obj.BaseType;
+                }
+
+                return obj.GetHashCode();
+            }
         }
     }
 }
