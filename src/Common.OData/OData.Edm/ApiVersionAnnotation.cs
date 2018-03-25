@@ -1,7 +1,13 @@
 ﻿namespace Microsoft.OData.Edm
 {
+#if WEBAPI
+    using Microsoft.Web.Http;
     using System;
-    using Web.Http;
+    using System.Web.Http;
+#else
+    using Microsoft.AspNetCore.Mvc;
+    using System;
+#endif
 
     /// <summary>
     /// Represents an annotation for <see cref="ApiVersion">API version</see>.

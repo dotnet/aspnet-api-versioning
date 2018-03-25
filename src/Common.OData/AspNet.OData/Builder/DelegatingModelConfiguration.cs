@@ -1,9 +1,19 @@
-﻿namespace Microsoft.Web.OData.Builder
+﻿#if WEBAPI
+namespace Microsoft.Web.OData.Builder
+#else
+namespace Microsoft.AspNet.OData.Builder
+#endif
 {
-    using Http;
+#if WEBAPI
+    using Microsoft.Web.Http;
+#else
+    using Microsoft.AspNetCore.Mvc;
+#endif
     using System;
     using System.Diagnostics.Contracts;
+#if WEBAPI
     using System.Web.OData.Builder;
+#endif
 
     sealed class DelegatingModelConfiguration : IModelConfiguration
     {

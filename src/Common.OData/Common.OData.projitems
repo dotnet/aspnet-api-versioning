@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>1599a30d-d37f-443c-b935-290144910be3</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Microsoft</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\DelegatingModelConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IModelConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\VersionedODataModelBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\VersionedAttributeRoutingConvention.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OData.Edm\ApiVersionAnnotation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SR.Designer.cs">
+      <DependentUpon>$([System.IO.Path]::GetFileNameWithoutExtension('%(Filename)')).resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)SR.resx">
+      <LastGenOutput>%(Filename).Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
