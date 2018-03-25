@@ -1,11 +1,21 @@
-﻿namespace Microsoft.Web.OData.Builder
+﻿#if WEBAPI
+namespace Microsoft.Web.OData.Builder
 {
-    using Http;
+    using Microsoft.Web.Http;
     using System.Web.OData.Builder;
+#else
+namespace Microsoft.AspNet.OData.Builder
+{
+    using Microsoft.AspNetCore.Mvc;
+    using System;
+#endif
 
     /// <summary>
     /// Defines the behavior of a model configuration.
     /// </summary>
+#if !WEBAPI
+    [CLSCompliant( false )]
+#endif
     public interface IModelConfiguration
     {
         /// <summary>

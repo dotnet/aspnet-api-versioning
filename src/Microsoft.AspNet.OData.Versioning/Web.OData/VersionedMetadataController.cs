@@ -1,4 +1,5 @@
-﻿namespace Microsoft.Web.OData.Controllers
+﻿// TODO: drop '.Controllers' in 7.0 to be congruent with OData library
+namespace Microsoft.Web.OData.Controllers
 {
     using Http;
     using System.Net.Http;
@@ -11,7 +12,7 @@
     using static System.String;
 
     /// <summary>
-    /// Represents a <see cref="ApiController">controller</see> for generating versioned OData service and metadata documents.
+    /// Represents a <see cref="MetadataController">controller</see> for generating versioned OData service and metadata documents.
     /// </summary>
     [ReportApiVersions]
     public class VersionedMetadataController : MetadataController
