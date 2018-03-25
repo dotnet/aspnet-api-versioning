@@ -147,7 +147,7 @@
 
             var httpContext = context.HttpContext;
 
-            if ( ( context.Handler = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out var apiVersion ) ) != null )
+            if ( IsRequestedApiVersionAmbiguous( context, out var apiVersion ) )
             {
                 return null;
             }
@@ -233,9 +233,17 @@
             return bestMatches;
         }
 
-        static ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
+        /// <summary>
+        /// Selects a matched action based on all matches and the current selection result.
+        /// </summary>
+        /// <param name="matches">The current <see cref="IReadOnlyList{T}">read-only list</see> of
+        /// matching <see cref="ActionDescriptor">action</see>.</param>
+        /// <param name="result">The current <see cref="ActionSelectionResult">selection result</see>.</param>
+        /// <returns>A matched <see cref="ActionDescriptor"/> with an API versioning policy applied or <c>null</c>.</returns>
+        protected virtual ActionDescriptor SelectActionWithApiVersionPolicyApplied( IReadOnlyList<ActionDescriptor> matches, ActionSelectionResult result )
         {
-            Contract.Requires( matches != null );
+            Arg.NotNull( matches, nameof( matches ) );
+            Arg.NotNull( result, nameof( result ) );
 
             if ( matches.Count != 1 )
             {
@@ -252,9 +260,20 @@
             return null;
         }
 
-        RequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
+
+        /// <summary>
+        /// Verifies the requested API version is not ambiguous.
+        /// </summary>
+        /// <param name="context">The current <see cref="RouteContext">route context</see>.</param>
+        /// <param name="apiVersion">The requested <see cref="ApiVersion">API version</see> or <c>null</c>.</param>
+        /// <returns>True if the requested API version is ambiguous; otherwise, false.</returns>
+        /// <remarks>This method will also change the <see cref="RouteContext.Handler"/> to an appropriate
+        /// error response if the API version is ambiguous.</remarks>
+        protected virtual bool IsRequestedApiVersionAmbiguous( RouteContext context, out ApiVersion apiVersion )
         {
-            Contract.Requires( httpContext != null );
+            Arg.NotNull( context, nameof( context ) );
+
+            var httpContext = context.HttpContext;
 
             try
             {
@@ -264,12 +283,34 @@
             {
                 Logger.LogInformation( ex.Message );
                 apiVersion = default;
+
                 var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
                 {
                     Code = AmbiguousApiVersion,
                     Message = ex.Message,
                 };
-                return new BadRequestHandler( handlerContext );
+
+                context.Handler = new BadRequestHandler( handlerContext );
+                return true;
+            }
+
+            return false;
+        }
+
+        static ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
+        {
+            Contract.Requires( matches != null );
+
+            if ( matches.Count != 1 )
+            {
+                return null;
+            }
+
+            var selectedAction = matches[0];
+
+            if ( selectedAction.GetProperty<ApiVersionModel>() == null )
+            {
+                return selectedAction;
             }
 
             return null;
