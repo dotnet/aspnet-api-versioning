@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.OData.Routing
 {
-    using Microsoft.OData;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System;
@@ -16,14 +15,12 @@
     using System.Web.OData.Routing.Conventions;
     using System.Web.OData.Routing.Template;
 
-    /// <summary>
-    /// Represents an OData attribute routing convention with additional support for API versioning.
-    /// </summary>
-    public class VersionedAttributeRoutingConvention : IODataRoutingConvention
+    /// <content>
+    /// Provides additional implementation specific to ASP.NET Web API.
+    /// </content>
+    public partial class VersionedAttributeRoutingConvention : IODataRoutingConvention
     {
         static readonly DefaultODataPathHandler defaultPathHandler = new DefaultODataPathHandler();
-        readonly string routeName;
-        IDictionary<ODataPathTemplate, HttpActionDescriptor> attributeMappings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
@@ -106,17 +103,7 @@
             attributeMappings = BuildAttributeMappings( controllers );
         }
 
-        /// <summary>
-        /// Gets the <see cref="IODataPathTemplateHandler"/> to be used for parsing the route templates.
-        /// </summary>
-        /// <value>The <see cref="IODataPathTemplateHandler"/> to be used for parsing the route templates.</value>
-        public IODataPathTemplateHandler ODataPathTemplateHandler { get; }
-
-        /// <summary>
-        /// Gets the API version associated with the route convention.
-        /// </summary>
-        /// <value>The associated <see cref="ApiVersion">API version</see>.</value>
-        public ApiVersion ApiVersion { get; }
+        IDictionary<ODataPathTemplate, HttpActionDescriptor> AttributeMappings => attributeMappings ?? throw new InvalidOperationException( SR.ObjectNotYetInitialized );
 
         /// <summary>
         /// Returns a value indicating whether the specified controller should be mapped using attribute routing conventions.
@@ -194,36 +181,31 @@
         /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected action</returns>
         public virtual string SelectAction( ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap )
         {
-            // REF: https://github.com/OData/WebApi/blob/88c5f01f2ee2d685d873b2ab075909b7da6651f1/src/System.Web.OData/OData/Routing/ODataParameterValue.cs
-            const string ParameterValuePrefix = "DF908045-6922-46A0-82F2-2F6E7F43D1B1_";
+            var request = controllerContext.Request;
+            var properties = request.Properties;
 
-            var routeData = controllerContext.Request.GetRouteData();
-            var routingConventionsStore = controllerContext.Request.ODataProperties().RoutingConventionsStore;
-
-            if ( controllerContext.Request.Properties.TryGetValue( "AttributeRouteData", out var value ) )
+            if ( !properties.TryGetValue( (string) "AttributeRouteData", out var value ) || !( value is IDictionary<string, object> attributeRouteData ) )
             {
-                if ( value is IDictionary<string, object> attributeRouteData )
-                {
-                    foreach ( var item in attributeRouteData )
-                    {
-                        if ( item.Key.StartsWith( ParameterValuePrefix, StringComparison.Ordinal ) && item.Value?.GetType().Name == "ODataParameterValue" )
-                        {
-                            routingConventionsStore.Add( item );
-                        }
-                        else
-                        {
-                            routeData.Values.Add( item );
-                        }
-                    }
+                return null;
+            }
 
-                    return attributeRouteData["action"] as string;
+            var routeData = request.GetRouteData();
+            var routingConventionsStore = request.ODataProperties().RoutingConventionsStore;
+
+            foreach ( var item in attributeRouteData )
+            {
+                if ( IsODataRouteParameter( item ) )
+                {
+                    routingConventionsStore.Add( item );
+                }
+                else
+                {
+                    routeData.Values.Add( item );
                 }
             }
 
-            return null;
+            return attributeRouteData["action"] as string;
         }
-
-        IDictionary<ODataPathTemplate, HttpActionDescriptor> AttributeMappings => attributeMappings ?? throw new InvalidOperationException( SR.ObjectNotYetInitialized );
 
         IDictionary<ODataPathTemplate, HttpActionDescriptor> BuildAttributeMappings( IEnumerable<HttpControllerDescriptor> controllers )
         {
@@ -270,30 +252,7 @@
             Contract.Ensures( Contract.Result<IEnumerable<string>>() != null );
 
             var prefixAttributes = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>( inherit: false );
-
-            if ( prefixAttributes.Count == 0 )
-            {
-                yield return null;
-            }
-            else
-            {
-                foreach ( var prefixAttribute in prefixAttributes )
-                {
-                    var prefix = prefixAttribute.Prefix;
-
-                    if ( prefix != null && prefix.StartsWith( "/", StringComparison.Ordinal ) )
-                    {
-                        throw new InvalidOperationException( SR.RoutePrefixStartsWithSlash.FormatDefault( prefix, controllerDescriptor.ControllerType.FullName ) );
-                    }
-
-                    if ( prefix != null && prefix.EndsWith( "/", StringComparison.Ordinal ) )
-                    {
-                        prefix = prefix.TrimEnd( '/' );
-                    }
-
-                    yield return prefix;
-                }
-            }
+            return GetODataRoutePrefixes( prefixAttributes, controllerDescriptor.ControllerType.FullName );
         }
 
         IEnumerable<ODataPathTemplate> GetODataPathTemplates( string prefix, HttpActionDescriptor action )
@@ -301,48 +260,11 @@
             Contract.Assert( action != null );
 
             var routeAttributes = action.GetCustomAttributes<ODataRouteAttribute>( inherit: false );
-            return routeAttributes.Select( route => GetODataPathTemplate( prefix, route.PathTemplate, action ) );
-        }
+            var serviceProvider = action.Configuration.GetODataRootContainer( routeName );
+            var controllerName = action.ControllerDescriptor.ControllerName;
+            var actionName = action.ActionName;
 
-        ODataPathTemplate GetODataPathTemplate( string prefix, string pathTemplate, HttpActionDescriptor action )
-        {
-            Contract.Requires( pathTemplate != null );
-            Contract.Requires( action != null );
-            Contract.Ensures( Contract.Result<ODataPathTemplate>() != null );
-
-            if ( prefix != null && !pathTemplate.StartsWith( "/", StringComparison.Ordinal ) )
-            {
-                if ( string.IsNullOrEmpty( pathTemplate ) )
-                {
-                    pathTemplate = prefix;
-                }
-                else if ( pathTemplate.StartsWith( "(", StringComparison.Ordinal ) )
-                {
-                    pathTemplate = prefix + pathTemplate;
-                }
-                else
-                {
-                    pathTemplate = prefix + "/" + pathTemplate;
-                }
-            }
-
-            if ( pathTemplate.StartsWith( "/", StringComparison.Ordinal ) )
-            {
-                pathTemplate = pathTemplate.Substring( 1 );
-            }
-
-            var odataPathTemplate = default( ODataPathTemplate );
-
-            try
-            {
-                odataPathTemplate = ODataPathTemplateHandler.ParseTemplate( pathTemplate, action.Configuration.GetODataRootContainer( routeName ) );
-            }
-            catch ( ODataException e )
-            {
-                throw new InvalidOperationException( SR.InvalidODataRouteOnAction.FormatDefault( pathTemplate, action.ActionName, action.ControllerDescriptor.ControllerName, e.Message ) );
-            }
-
-            return odataPathTemplate;
+            return routeAttributes.Select( route => GetODataPathTemplate( prefix, route.PathTemplate, serviceProvider, controllerName, actionName ) ).Where( template => template != null );
         }
     }
 }

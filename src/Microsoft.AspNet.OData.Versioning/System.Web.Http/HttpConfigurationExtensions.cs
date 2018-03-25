@@ -122,6 +122,7 @@
             ODataBatchHandler batchHandler )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
             Arg.NotNull( models, nameof( models ) );
             Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
 
@@ -289,6 +290,7 @@
             ODataBatchHandler batchHandler )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
             Arg.NotNull( models, nameof( models ) );
             Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
 
@@ -391,6 +393,7 @@
             Action<ODataConventionConfigurationContext> configureRoutingConventions )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ODataRoute>() != null );
 
@@ -675,6 +678,7 @@
             HttpMessageHandler defaultHandler )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
+            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
             Arg.NotNull( model, nameof( model ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ODataRoute>() != null );
