@@ -1,9 +1,10 @@
 ﻿namespace Microsoft.Web.OData.Builder
 {
-    using Controllers;
-    using Http;
-    using Http.Versioning.Conventions;
     using Microsoft.OData.Edm;
+    using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
+    using Microsoft.Web.Http.Versioning.Conventions;
+    using Microsoft.Web.OData.Controllers;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -12,16 +13,12 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
-    using System.Web.OData.Builder;
 
-    /// <summary>
-    /// Represents a versioned variant of the <see cref="ODataModelBuilder"/>.
-    /// </summary>
-    public class VersionedODataModelBuilder
+    /// <content>
+    /// Provides additional implementation specific to ASP.NET Web API.
+    /// </content>
+    public partial class VersionedODataModelBuilder
     {
-        readonly HttpConfiguration configuration;
-        Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedODataModelBuilder"/> class.
         /// </summary>
@@ -33,62 +30,20 @@
         public VersionedODataModelBuilder( HttpConfiguration configuration )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
-            this.configuration = configuration;
+            Configuration = configuration;
         }
 
         /// <summary>
-        /// Gets or sets the factory method used to create model builders.
+        /// Gets the associated HTTP configuration.
         /// </summary>
-        /// <value>The factory <see cref="Func{TResult}">method</see> used to create <see cref="ODataModelBuilder">model builders</see>.</value>
-        /// <remarks>The default implementation creates default instances of the <see cref="ODataConventionModelBuilder"/> class.</remarks>
-        public Func<ODataModelBuilder> ModelBuilderFactory
-        {
-            get
-            {
-                Contract.Ensures( modelBuilderFactory != null );
-                return modelBuilderFactory;
-            }
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                modelBuilderFactory = value;
-            }
-        }
+        /// <value>The <see cref="HttpConfiguration">HTTP configuration</see> associated with the builder.</value>
+        protected HttpConfiguration Configuration { get; }
 
         /// <summary>
-        /// Gets or sets the default model configuration.
+        /// Gets the API versioning options associated with the builder.
         /// </summary>
-        /// <value>The <see cref="Action{T1, T2}">method</see> for the default model configuration.
-        /// The default value is <c>null</c>.</value>
-        public Action<ODataModelBuilder, ApiVersion> DefaultModelConfiguration { get; set; }
-
-        /// <summary>
-        /// Gets the list of model configurations associated with the builder.
-        /// </summary>
-        /// <value>A <see cref="IList{T}">list</see> of model configurations associated with the builder.</value>
-        public IList<IModelConfiguration> ModelConfigurations { get; } = new List<IModelConfiguration>();
-
-        /// <summary>
-        /// Gets or sets the action that is invoked after the <see cref="IEdmModel">EDM model</see> has been created.
-        /// </summary>
-        /// <value>The <see cref="Action{T1,T2}">action</see> to run after the model has been created. The default
-        /// value is <c>null</c>.</value>
-        public Action<ODataModelBuilder, IEdmModel> OnModelCreated { get; set; }
-
-        IEnumerable<IModelConfiguration> GetMergedConfigurations()
-        {
-            Contract.Ensures( Contract.Result<IEnumerable<IModelConfiguration>>() != null );
-
-            var configurations = ModelConfigurations.ToList();
-            var defaultConfiguration = DefaultModelConfiguration;
-
-            if ( defaultConfiguration != null )
-            {
-                configurations.Insert( 0, new DelegatingModelConfiguration( defaultConfiguration ) );
-            }
-
-            return configurations;
-        }
+        /// <value>The configured <see cref="ApiVersioningOptions">API versioning options</see>.</value>
+        protected ApiVersioningOptions Options => Configuration.GetApiVersioningOptions();
 
         /// <summary>
         /// Builds and returns the sequence of EDM models based on the define model configurations.
@@ -97,21 +52,23 @@
         [SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Matches plural form of ODataModelBuilder.GetEdmModel(). A property would also not be appropriate." )]
         public virtual IEnumerable<IEdmModel> GetEdmModels()
         {
+            Contract.Ensures( Contract.Result<IEnumerable<IEdmModel>>() != null );
+
             var configurations = GetMergedConfigurations();
             var models = new List<IEdmModel>();
-            var services = configuration.Services;
+            var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
             var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver ).Where( c => c.IsODataController() );
-            var options = configuration.GetApiVersioningOptions();
+            var conventions = Options.Conventions;
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
 
             foreach ( var controllerType in controllerTypes )
             {
-                var descriptor = new HttpControllerDescriptor( configuration, string.Empty, controllerType );
+                var descriptor = new HttpControllerDescriptor( Configuration, string.Empty, controllerType );
 
-                options.Conventions.ApplyTo( descriptor );
+                conventions.ApplyTo( descriptor );
 
                 var model = descriptor.GetApiVersionModel();
 
@@ -127,24 +84,8 @@
             }
 
             deprecated.ExceptWith( supported );
-
-            foreach ( var apiVersion in supported.Union( deprecated ) )
-            {
-                var builder = ModelBuilderFactory();
-
-                foreach ( var configuration in configurations )
-                {
-                    configuration.Apply( builder, apiVersion );
-                }
-
-                var model = builder.GetEdmModel();
-
-                model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
-                OnModelCreated?.Invoke( builder, model );
-                models.Add( model );
-            }
-
-            ConfigureMetadataController( configuration, supported, deprecated );
+            BuildModelPerApiVersion( supported.Union( deprecated ), configurations, models );
+            ConfigureMetadataController( supported, deprecated );
 
             return models;
         }
@@ -152,24 +93,23 @@
         /// <summary>
         /// Configures the metadata controller using the specified configuration and API versions.
         /// </summary>
-        /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
         /// <param name="supportedApiVersions">The discovered <see cref="IEnumerable{T}">sequence</see> of
         /// supported OData controller <see cref="ApiVersion">API versions</see>.</param>
         /// <param name="deprecatedApiVersions">The discovered <see cref="IEnumerable{T}">sequence</see> of
         /// deprecated OData controller <see cref="ApiVersion">API versions</see>.</param>
-        protected virtual void ConfigureMetadataController( HttpConfiguration configuration, IEnumerable<ApiVersion> supportedApiVersions, IEnumerable<ApiVersion> deprecatedApiVersions )
+        protected virtual void ConfigureMetadataController( IEnumerable<ApiVersion> supportedApiVersions, IEnumerable<ApiVersion> deprecatedApiVersions )
         {
-            var controllerMapping = configuration.Services.GetHttpControllerSelector().GetControllerMapping();
+            var controllerMapping = Configuration.Services.GetHttpControllerSelector().GetControllerMapping();
 
             if ( !controllerMapping.TryGetValue( "VersionedMetadata", out var controllerDescriptor ) )
             {
                 return;
             }
 
-            var options = configuration.GetApiVersioningOptions();
-            var controllerBuilder = options.Conventions.Controller<VersionedMetadataController>()
-                                                       .HasApiVersions( supportedApiVersions )
-                                                       .HasDeprecatedApiVersions( deprecatedApiVersions );
+            var conventions = Options.Conventions;
+            var controllerBuilder = conventions.Controller<VersionedMetadataController>()
+                                               .HasApiVersions( supportedApiVersions )
+                                               .HasDeprecatedApiVersions( deprecatedApiVersions );
 
             controllerBuilder.ApplyTo( controllerDescriptor );
         }
