@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "BasicSample": {
+    "SwaggerSample": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:5000/swagger",
