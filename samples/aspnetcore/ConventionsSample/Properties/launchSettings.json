@@ -19,7 +19,7 @@
     "ConventionsSample": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/values",
+      "launchUrl": "http://localhost:5000/api/values?api-version=1.0",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
