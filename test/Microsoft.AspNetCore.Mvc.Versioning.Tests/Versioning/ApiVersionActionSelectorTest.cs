@@ -313,8 +313,8 @@
         {
             // arrange
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguous2Controller.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguous3Controller.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguous2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguous3Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( o => o.AssumeDefaultVersionWhenUnspecified = true ) )
             {
@@ -334,8 +334,8 @@
             Action<ApiVersioningOptions> versioningSetup = o => o.AssumeDefaultVersionWhenUnspecified = true;
             Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousToo2Controller.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousTooController.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousToo2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousTooController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( versioningSetup, routesSetup ) )
             {
@@ -353,8 +353,8 @@
         {
             // arrange
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousNeutralController.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousController.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( o => o.AssumeDefaultVersionWhenUnspecified = true ) )
             {
@@ -374,8 +374,8 @@
             Action<ApiVersioningOptions> versioningSetup = o => o.AssumeDefaultVersionWhenUnspecified = true;
             Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousNeutralController.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousController.Get (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( versioningSetup, routesSetup ) )
             {

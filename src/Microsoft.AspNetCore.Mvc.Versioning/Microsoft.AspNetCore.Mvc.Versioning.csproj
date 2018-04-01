@@ -14,6 +14,7 @@
 
  <ItemGroup>
   <ReleaseNotes Include="Fix 405 error message (#254)" />
+  <ReleaseNotes Include="Improve logging for ambiguous actions" />
  </ItemGroup>
 
  <ItemGroup>

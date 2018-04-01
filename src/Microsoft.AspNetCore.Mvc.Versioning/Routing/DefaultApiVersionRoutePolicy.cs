@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Routing;
@@ -12,6 +13,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using Versioning;
     using static ApiVersion;
@@ -194,13 +196,55 @@
             Arg.NotNull( selectionResult, nameof( selectionResult ) );
 
             var matchingActions = selectionResult.MatchingActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct();
-            var actionNames = Join( NewLine, matchingActions.Select( match => match.Action.DisplayName ) );
+            var actionNames = Join( NewLine, matchingActions.Select( ExpandActionSignature ) );
 
             Logger.AmbiguousActions( actionNames );
 
             var message = SR.ActionSelector_AmbiguousActions.FormatDefault( NewLine, actionNames );
 
             throw new AmbiguousActionException( message );
+        }
+
+        static string ExpandActionSignature( ActionDescriptorMatch match )
+        {
+            Contract.Requires( match != null );
+            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+
+            if ( !( match.Action is ControllerActionDescriptor action ) )
+            {
+                return match.Action.DisplayName;
+            }
+
+            var signature = new StringBuilder();
+            var controllerType = action.ControllerTypeInfo;
+
+            signature.Append( controllerType.GetTypeDisplayName() );
+            signature.Append( '.' );
+            signature.Append( action.MethodInfo.Name );
+            signature.Append( '(' );
+
+            using ( var parameter = action.Parameters.GetEnumerator() )
+            {
+                if ( parameter.MoveNext() )
+                {
+                    var parameterType = parameter.Current.ParameterType;
+
+                    signature.Append( parameterType.GetTypeDisplayName( false ) );
+
+                    while ( parameter.MoveNext() )
+                    {
+                        parameterType = parameter.Current.ParameterType;
+                        signature.Append( ", " );
+                        signature.Append( parameterType.GetTypeDisplayName( false ) );
+                    }
+                }
+            }
+
+            signature.Append( ") (" );
+            signature.Append( controllerType.Assembly.GetName().Name );
+            signature.Append( ')' );
+
+            return signature.ToString();
         }
 
         RequestHandler ClientError( HttpContext httpContext, ActionSelectionResult selectionResult )
