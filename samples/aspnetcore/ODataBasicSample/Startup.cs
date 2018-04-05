@@ -10,9 +10,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
-    using Microsoft.OData.Edm;
-    using Microsoft.OData.UriParser;
-    using System.Linq;
     using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
     public class Startup

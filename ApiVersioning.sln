@@ -130,12 +130,17 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.OData", "src\Common.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataBasicSample", "samples\aspnetcore\ODataBasicSample\ODataBasicSample.csproj", "{409F7DC6-56FF-4F54-ACA0-499AE58E7BC9}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "OData.Test.Shared", "test\OData.Test.Shared\OData.Test.Shared.shproj", "{9A635D55-7547-4DF6-B7BD-840E16EBDE28}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Versioning.Tests", "test\Microsoft.AspNetCore.OData.Versioning.Tests\Microsoft.AspNetCore.OData.Versioning.Tests.csproj", "{BA0C8652-FEF6-4004-A779-CD6DCF2996F7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Common.OData\Common.OData.projitems*{1599a30d-d37f-443c-b935-290144910be3}*SharedItemsImports = 13
 		src\Common.ApiExplorer\Common.ApiExplorer.projitems*{26a67334-f6e6-49b8-8c5a-f88f28770966}*SharedItemsImports = 13
 		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{6cdfb878-2642-4f98-ae35-621bac581181}*SharedItemsImports = 13
 		src\Common\Common.projitems*{6d0e834b-6422-44cd-9a85-e3be9dead1be}*SharedItemsImports = 13
+		test\OData.Test.Shared\OData.Test.Shared.projitems*{9a635d55-7547-4df6-b7bd-840e16ebde28}*SharedItemsImports = 13
 		src\Shared\Shared.projitems*{b7897873-6757-4684-83c0-39575821ae14}*SharedItemsImports = 13
 		test\Test.Common\Test.Common.projitems*{f9297626-c37c-402b-afd6-712f3e5e4d7c}*SharedItemsImports = 13
 	EndGlobalSection
@@ -256,6 +261,10 @@ Global
 		{409F7DC6-56FF-4F54-ACA0-499AE58E7BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{409F7DC6-56FF-4F54-ACA0-499AE58E7BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{409F7DC6-56FF-4F54-ACA0-499AE58E7BC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA0C8652-FEF6-4004-A779-CD6DCF2996F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA0C8652-FEF6-4004-A779-CD6DCF2996F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA0C8652-FEF6-4004-A779-CD6DCF2996F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA0C8652-FEF6-4004-A779-CD6DCF2996F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -297,6 +306,8 @@ Global
 		{59D9CEC0-F8E5-4A1A-B8DD-5117E6A409D5} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{1599A30D-D37F-443C-B935-290144910BE3} = {4D5F5F21-0CB7-4B4E-A42F-732BD4AFD0FF}
 		{409F7DC6-56FF-4F54-ACA0-499AE58E7BC9} = {900DD210-8500-4D89-A05D-C9526935A719}
+		{9A635D55-7547-4DF6-B7BD-840E16EBDE28} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
+		{BA0C8652-FEF6-4004-A779-CD6DCF2996F7} = {0987757E-4D09-4523-B9C9-65B1E8832AA1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A38B7FA-17BC-4D3C-977F-7379653DC67C}
