@@ -63,6 +63,7 @@
 
             this.routeName = routeName;
             this.serviceProvider = serviceProvider;
+            ApiVersion = apiVersion;
 
             if ( ( ODataPathTemplateHandler = pathTemplateHandler ) == null )
             {
