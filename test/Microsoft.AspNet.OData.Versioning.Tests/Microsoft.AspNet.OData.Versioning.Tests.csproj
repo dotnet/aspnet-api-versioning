@@ -3,6 +3,7 @@
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
   <RootNamespace>Microsoft</RootNamespace>
+  <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
  </PropertyGroup>
 
  <ItemGroup>
@@ -18,5 +19,7 @@
   <PackageReference Include="System.Runtime" Version="4.1.0" />
   <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
  </ItemGroup>
+ 
+ <Import Project="..\OData.Test.Shared\OData.Test.Shared.projitems" Label="Shared" />
  
 </Project>
