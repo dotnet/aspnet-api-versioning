@@ -11,9 +11,6 @@
     using System;
     using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Routing.RouteDirection;
-#if WEBAPI
-    using static System.Net.HttpStatusCode;
-#endif
 
     /// <summary>
     /// Represents an <see cref="ODataPathRouteConstraint">OData path route constraint</see> which supports versioning.
@@ -108,12 +105,8 @@
             {
                 var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
 
-#if WEBAPI
-                throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
-#else
                 // TODO: how do we fail here?
                 throw;
-#endif
             }
         }
     }
