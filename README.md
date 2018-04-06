@@ -1,4 +1,4 @@
-[![VSTS Build Status](https://mrtechnocal.visualstudio.com/_apis/public/build/definitions/f0b1168c-671a-4dd1-ac55-2f0e25c4a405/1/badge)](https://mrtechnocal.visualstudio.com/ApiVersioning/_build/index?definitionId=1)
+[![VSTS Build Status](https://microsoft.visualstudio.com/_apis/public/build/definitions/8d47e068-03c8-4cdc-aa9b-fc6929290322/25012/badge)
 
 # ASP.NET API Versioning
 
