@@ -3,8 +3,8 @@
 
  <PropertyGroup Label="Common">
   <Company>Microsoft Corporation</Company>
-  <Authors>$(Company)</Authors>
-  <Copyright>Copyright © 2016. $(Company). All rights reserved.</Copyright>
+  <Authors>Microsoft</Authors>
+  <Copyright>© $(Company). All rights reserved.</Copyright>
   <NeutralLanguage>en</NeutralLanguage>
   <DefaultLanguage>en-US</DefaultLanguage>
  </PropertyGroup>

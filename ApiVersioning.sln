@@ -29,6 +29,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{915BB224-B1D0-4E27-A348-67FCC77AAA44}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "webapi", "webapi", "{F446ED94-368F-4F67-913B-16E82CA80DFC}"
+	ProjectSection(SolutionItems) = preProject
+		samples\webapi\directory.build.targets = samples\webapi\directory.build.targets
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspnetcore", "aspnetcore", "{900DD210-8500-4D89-A05D-C9526935A719}"
 EndProject
@@ -102,6 +105,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.ApiExplorer", "src\C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{2BB57808-14AF-4209-9842-1D6E76A99C3F}"
 	ProjectSection(SolutionItems) = preProject
+		after.apiversioning.sln.targets = after.apiversioning.sln.targets
 		build\code-analysis.props = build\code-analysis.props
 		build\common.props = build\common.props
 		build\file-version.targets = build\file-version.targets
@@ -109,6 +113,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{2BB57808
 		build\nuget.targets = build\nuget.targets
 		build\resource.targets = build\resource.targets
 		build\signing.props = build\signing.props
+		build\signing.targets = build\signing.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{3BDDAF5E-4148-4D7F-9B9A-EA11D0110FEB}"
