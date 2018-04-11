@@ -1,42 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTarget="Build">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <!-- REF: https://microsoft.sharepoint.com/teams/prss/esrp/info/ESRP%20Onboarding%20Wiki/Integrate%20the%20ESRP%20CodeSign%20Task%20into%20VSO.aspx -->
   <PropertyGroup>
-    <!-- REF: https://osgwiki.com/wiki/PackageES_Code_Signing#SignConfig.xml -->
-    <!-- note: escape ';' with %3B to ensure msbuild doesn't treat it as a list separator. an empty value applies default system signers -->
-    <!--<SignApprovers></SignApprovers>-->
-
-    <SignJobName Condition=" '$(SignJobName)' == '' ">ASP.NET API Versioning</SignJobName>
-    
-    <!-- REF: https://osgwiki.com/wiki/PackageES_Code_Signing#Package_ES_Certificate_Name_Mapping -->
-    <SignType Condition=" '$(SignType)' == '' ">Authenticode</SignType>
-    
     <SignConfigPath Condition=" '$(SignConfigPath)' == '' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\bin'))</SignConfigPath>
-    
   </PropertyGroup>
 
-  <!-- REF: https://osgwiki.com/wiki/PackageES_Code_Signing -->
-  <Target Name="WriteCodeSigningConfiguration">
-
-    <PropertyGroup>
-      <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    </PropertyGroup>
+  <Target Name="WriteCodeSigningFileList">
 
     <ItemGroup>
       <FilesToSign Include="$(FilesToSign.Split('|'))" />
     </ItemGroup>
 
-    <ItemGroup>
-      <SignConfigXml Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;" />
-      <SignConfigXml Include="&lt;SignConfigXML&gt;" />
-      <SignConfigXml Include="%20&lt;job platform=&quot;$(Platform)&quot; configuration=&quot;$(Configuration)&quot; dest=&quot;$(SignConfigPath)&quot; jobname=&quot;$(SignJobName)&quot; approvers=&quot;$(SignApprovers)&quot;&gt;" />
-      <SignConfigXml Include="@(FilesToSign->'  &lt;file signType=&quot;$(SignType)&quot; src=&quot;%(FullPath)&quot; dest=&quot;%(FullPath)&quot; /&gt;')" />
-      <SignConfigXml Include="%20&lt;/job&gt;" />
-      <SignConfigXml Include="&lt;/SignConfigXML&gt;" />
-    </ItemGroup>
-
     <MakeDir Directories="$(SignConfigPath)" Condition="!Exists('$(SignConfigPath)')" />
-    <WriteLinesToFile File="$(SignConfigPath)\signconfig.xml" Encoding="ascii" Lines="@(SignConfigXml)" Overwrite="true" />
+    <WriteLinesToFile File="$(SignConfigPath)\signing-file-list.txt" Encoding="ascii" Lines="@(FilesToSign->'%(Identity)'->Substring($(SourceDir.Length)),',')" Overwrite="true" />
 
   </Target>
 
