@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- REF: https://microsoft.sharepoint.com/teams/prss/esrp/info/ESRP%20Onboarding%20Wiki/Integrate%20the%20ESRP%20CodeSign%20Task%20into%20VSO.aspx -->
+  <PropertyGroup>
+    <SignConfigPath Condition=" '$(SignConfigPath)' == '' ">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\bin'))</SignConfigPath>
+  </PropertyGroup>
+
+  <Target Name="WriteCodeSigningFileList">
+
+    <ItemGroup>
+      <FilesToSign Include="$(FilesToSign.Split('|'))" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(SignConfigPath)" Condition="!Exists('$(SignConfigPath)')" />
+    <WriteLinesToFile File="$(SignConfigPath)\signing-file-list.txt" Encoding="ascii" Lines="@(FilesToSign->'%(Identity)'->Substring($(SourceDir.Length)),',')" Overwrite="true" />
+
+  </Target>
+
+</Project>

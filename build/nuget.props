@@ -12,17 +12,12 @@
   <IncludeSource>true</IncludeSource>
   <IncludeBuildOutput>true</IncludeBuildOutput>
   <MinClientVersion>2.5</MinClientVersion>
-  <PackageOutputPath>$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
+  <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
  </PropertyGroup>
 
  <ItemGroup Label="NuGet">
   <!-- allow build-specific, one-time release notes from the command-line without modifying the source project -->
   <ReleaseNotes Include="$(BuildReleaseNotes.Split('|'))" />
  </ItemGroup>
-
- <PropertyGroup Condition=" '$(Configuration)' == 'Release' " Label="NuGet">
-  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
- </PropertyGroup>
 
 </Project>
