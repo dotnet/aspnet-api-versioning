@@ -1,0 +1,127 @@
+﻿namespace Microsoft.AspNet.OData.Extensions
+{
+    using FluentAssertions;
+    using Microsoft.AspNet.OData.Batch;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNet.OData.Routing.Conventions;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Builder.Internal;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Extensions.Options;
+    using Microsoft.Simulators;
+    using Microsoft.Web.OData.Routing;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using Xunit;
+    using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
+
+    public class IRouteBuilderExtensionsTest
+    {
+        [Fact]
+        public void map_versioned_odata_route_should_return_expected_result()
+        {
+            // arrange
+            var routeName = "odata";
+            var routePrefix = "api/v3";
+            var model = new ODataModelBuilder().GetEdmModel();
+            var apiVersion = new ApiVersion( 3, 0 );
+            var batchHandler = new DefaultODataBatchHandler();
+            var app = NewApplicationBuilder();
+            var route = default( ODataRoute );
+
+            // act
+            app.UseMvc( r => route = r.MapVersionedODataRoute( routeName, routePrefix, model, apiVersion, batchHandler ) );
+            app.Build();
+
+            var perRequestContainer = app.ApplicationServices.GetRequiredService<IPerRouteContainer>();
+            var serviceProvider = perRequestContainer.GetODataRootContainer( route.Name );
+
+            // TODO: https://github.com/OData/WebApi/issues/1388
+            // var constraint = route.PathRouteConstraint;
+            var constraint = (VersionedODataPathRouteConstraint) route.RouteConstraint;
+
+            var routingConventions = serviceProvider.GetRequiredService<IEnumerable<IODataRoutingConvention>>().ToArray();
+
+            //var batchRoute = configuration.Routes["odataBatch"];
+
+            // assert
+            routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
+            routingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
+            routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
+            constraint.RouteName.Should().Be( routeName );
+            route.RoutePrefix.Should().Be( routePrefix );
+            //batchRoute.Handler.Should().Be( batchHandler );
+            //batchRoute.RouteTemplate.Should().Be( "api/v3/$batch" );
+        }
+
+        [Fact]
+        public void map_versioned_odata_routes_should_return_expected_results()
+        {
+            // arrange
+            var routeName = "odata";
+            var routePrefix = "api";
+            var batchHandler = new DefaultODataBatchHandler();
+            var app = NewApplicationBuilder();
+            var routes = default( IReadOnlyList<ODataRoute> );
+            var perRequestContainer = app.ApplicationServices.GetRequiredService<IPerRouteContainer>();
+            var modelBuilder = app.ApplicationServices.GetRequiredService<VersionedODataModelBuilder>();
+
+            modelBuilder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
+
+            var models = modelBuilder.GetEdmModels();
+
+            // act
+            app.UseMvc( r => routes = r.MapVersionedODataRoutes( routeName, routePrefix, models, batchHandler ) );
+            app.Build();
+            
+            // assert
+            foreach ( var route in routes )
+            {
+                var rootContainer = perRequestContainer.GetODataRootContainer( route.Name );
+                var routingConventions = rootContainer.GetRequiredService<IEnumerable<IODataRoutingConvention>>().ToArray();
+                //var batchRoute = configuration.Routes["odataBatch"];
+
+                // TODO: https://github.com/OData/WebApi/issues/1388
+                // if ( !( route.PathRouteConstraint is VersionedODataPathRouteConstraint constrant ) )
+                if ( !( route.RouteConstraint is VersionedODataPathRouteConstraint constraint ) )
+                {
+                    continue;
+                }
+
+                var apiVersion = constraint.ApiVersion;
+                var versionedRouteName = routeName + "-" + apiVersion.ToString();
+
+                routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
+                routingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
+                routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
+                constraint.RouteName.Should().Be( versionedRouteName );
+                route.RoutePrefix.Should().Be( routePrefix );
+            }
+
+            //batchRoute.Handler.Should().Be( batchHandler );
+            //batchRoute.RouteTemplate.Should().Be( "api/$batch" );
+        }
+
+        static ApplicationBuilder NewApplicationBuilder()
+        {
+            var services = new ServiceCollection();
+            var testControllers = new TestApplicationPart(
+                    typeof( TestsController ),
+                    typeof( TestsController2 ),
+                    typeof( TestsController3 ) );
+
+            services.AddLogging();
+            services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
+            services.Add( Singleton<IOptions<MvcOptions>>( new OptionsWrapper<MvcOptions>( new MvcOptions() ) ) );
+            services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );
+            services.AddApiVersioning();
+            services.AddOData().EnableApiVersioning();
+
+            return new ApplicationBuilder( services.BuildServiceProvider() );
+        }
+    }
+}

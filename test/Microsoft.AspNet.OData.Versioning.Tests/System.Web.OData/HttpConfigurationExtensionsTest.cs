@@ -29,7 +29,7 @@
         sealed class ControllerV2 : ODataController { }
 
         [Fact]
-        public void map_versioned_odata_routes_should_return_expected_result()
+        public void map_versioned_odata_route_should_return_expected_result()
         {
             // arrange
             var configuration = new HttpConfiguration();

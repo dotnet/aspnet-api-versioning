@@ -16,11 +16,6 @@
   <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
  </ItemGroup>
  
- <ItemGroup>
-   <Folder Include="AspNetCore.Mvc\Versioning\" />
-   <Folder Include="Extensions.DependencyInjection\" />
- </ItemGroup>
- 
  <Import Project="..\OData.Test.Shared\OData.Test.Shared.projitems" Label="Shared" />
  
 </Project>
