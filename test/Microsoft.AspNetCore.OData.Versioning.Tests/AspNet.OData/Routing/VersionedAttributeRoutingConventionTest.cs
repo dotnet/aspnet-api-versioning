@@ -10,7 +10,6 @@
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
@@ -18,8 +17,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
-    using Microsoft.OData.Edm;
-    using Microsoft.OData.UriParser;
+    using Microsoft.Simulators;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -54,7 +52,7 @@
         public void select_action_should_return_expected_result_for_controller_version( int majorVersion, string expected )
         {
             // arrange
-            var routeContext = NewRouteContext( typeof( VersionedController ) );
+            var routeContext = NewRouteContext( typeof( TestsController ) );
             var serviceProvider = routeContext.HttpContext.RequestServices;
             var convention = NewRoutingConvention( serviceProvider, new ApiVersion( majorVersion, 0 ) );
 
@@ -66,12 +64,14 @@
         }
 
         static VersionedAttributeRoutingConvention NewRoutingConvention( IServiceProvider serviceProvider, ApiVersion apiVersion ) =>
-            new VersionedAttributeRoutingConvention( "Tests", serviceProvider, new DefaultODataPathHandler(), apiVersion );
+            new VersionedAttributeRoutingConvention( "odata", serviceProvider, new DefaultODataPathHandler(), apiVersion );
 
         static IActionDescriptorCollectionProvider NewActionDescriptorProvider( MethodInfo method )
         {
             var controllerType = method.DeclaringType.GetTypeInfo();
             var provider = new Mock<IActionDescriptorCollectionProvider>();
+            var attribute = method.DeclaringType.GetCustomAttributes<ApiVersionAttribute>().FirstOrDefault();
+            var model = attribute == null ? ApiVersionModel.Neutral : new ApiVersionModel( attribute.Versions.First() );
             var items = new ActionDescriptor[]
             {
                 new ControllerActionDescriptor()
@@ -81,6 +81,7 @@
                     ControllerTypeInfo = controllerType,
                     DisplayName = $"{controllerType.FullName}.{method.Name} ({controllerType.Assembly.GetName().Name})",
                     MethodInfo = method,
+                    Properties = { [typeof(ApiVersionModel)] = model }
                 }
             };
 
@@ -111,14 +112,19 @@
             services.AddApiVersioning();
             services.AddOData().EnableApiVersioning();
             services.Replace( Singleton( apiVersionProvider.Object ) );
-            services.Replace( Singleton( NewActionDescriptorProvider( controllerType.GetRuntimeMethod( "Get", Type.EmptyTypes ) ) ) );
+            services.Replace( Singleton( NewActionDescriptorProvider( controllerType.GetRuntimeMethod( "Get", new[] { typeof( int ) } ) ) ) );
 
             var serviceProvider = services.BuildServiceProvider();
             var app = new ApplicationBuilder( serviceProvider );
             var modelBuilder = serviceProvider.GetRequiredService<VersionedODataModelBuilder>();
 
-            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, Test.Model, supported[0] ) );
-            odataFeature.Path = new ODataPath( new EntitySetSegment( entitySet ), new KeySegment( new[] { new KeyValuePair<string, object>( "Id", 1 ) }, entitySet.EntityType(), null ) );
+            modelBuilder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
+            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, modelBuilder.GetEdmModels().First(), supported[0] ) );
+            odataFeature.Path = new DefaultODataPathHandler().Parse(
+                url.GetLeftPart( UriPartial.Authority ),
+                url.GetComponents( Path, Unescaped ),
+                serviceProvider.GetRequiredService<IPerRouteContainer>().GetODataRootContainer( "odata" ) );
+            odataFeature.RoutingConventionsStore = new Dictionary<string, object>();
             features.SetupGet( f => f[typeof( IODataFeature )] ).Returns( odataFeature );
             features.Setup( f => f.Get<IODataFeature>() ).Returns( odataFeature );
             httpContext.SetupGet( c => c.Features ).Returns( features.Object );
@@ -131,36 +137,7 @@
             httpRequest.SetupProperty( r => r.Path, new PathString( '/' + url.GetComponents( Path, Unescaped ) ) );
             httpRequest.SetupProperty( r => r.QueryString, new QueryString( url.Query ) );
 
-            var modelProviders = serviceProvider.GetServices<IApplicationModelProvider>();
-            var context = new ApplicationModelProviderContext( new[] { controllerType.GetTypeInfo() } );
-
-            foreach ( var provider in modelProviders )
-            {
-                provider.OnProvidersExecuting( context );
-            }
-
-            foreach ( var provider in modelProviders.Reverse() )
-            {
-                provider.OnProvidersExecuted( context );
-            }
-
             return new RouteContext( httpContext.Object );
-        }
-
-        [ApiVersionNeutral]
-        [ODataRoutePrefix( "Tests" )]
-        sealed class VersionNeutralController : ODataController
-        {
-            [ODataRoute]
-            public IActionResult Get() => Ok();
-        }
-
-        [ApiVersion( "1.0" )]
-        [ODataRoutePrefix( "Tests" )]
-        sealed class VersionedController : ODataController
-        {
-            [ODataRoute]
-            public IActionResult Get() => Ok();
         }
     }
 };

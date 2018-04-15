@@ -18,7 +18,7 @@
     [CLSCompliant( false )]
     public class VersionedODataPathRouteConstraint : IRouteConstraint
     {
-        // HACK: ODataPathRouteConstraint.Match is not virtual so use the adapter pattern
+        // HACK: [BUG] https://github.com/OData/WebApi/issues/1388
         readonly ODataPathRouteConstraint @base;
 
         /// <summary>
@@ -32,6 +32,13 @@
             ApiVersion = apiVersion;
             @base = new ODataPathRouteConstraint( routeName );
         }
+
+        /// <summary>
+        /// Gets the name of the route associated with the constraint.
+        /// </summary>
+        /// <value>The name of the route associated with the constraint.</value>
+        // HACK: [BUG] https://github.com/OData/WebApi/issues/1388
+        public string RouteName => @base.RouteName;
 
         /// <summary>
         /// Gets the API version matched by the current OData path route constraint.
@@ -61,7 +68,13 @@
 
             var request = httpContext.Request;
             var properties = httpContext.ApiVersionProperties();
-            var requestedVersion = GetRequestedApiVersionOrReturnBadRequest( httpContext, properties );
+
+            if ( !TryGetRequestedApiVersion( httpContext, properties, out var requestedVersion ) )
+            {
+                // note: if an error occurs reading the api version, still let the base constraint
+                // match the request. the IActionSelector will produce 400 during action selection.
+                return @base.Match( httpContext, route, routeKey, values, routeDirection );
+            }
 
             if ( requestedVersion != null )
             {
@@ -92,22 +105,22 @@
         static bool IsServiceDocumentOrMetadataRoute( RouteValueDictionary values ) =>
             values.TryGetValue( "odataPath", out var value ) && ( value == null || Equals( value, "$metadata" ) );
 
-        static ApiVersion GetRequestedApiVersionOrReturnBadRequest( HttpContext httpContext, ApiVersionRequestProperties properties )
+        static bool TryGetRequestedApiVersion( HttpContext httpContext, ApiVersionRequestProperties properties, out ApiVersion apiVersion )
         {
             Contract.Requires( httpContext != null );
             Contract.Requires( properties != null );
 
             try
             {
-                return properties.ApiVersion;
+                apiVersion = properties.ApiVersion;
             }
-            catch ( AmbiguousApiVersionException ex )
+            catch ( AmbiguousApiVersionException )
             {
-                var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
-
-                // TODO: how do we fail here?
-                throw;
+                apiVersion = default( ApiVersion );
+                return false;
             }
+
+            return true;
         }
     }
 }

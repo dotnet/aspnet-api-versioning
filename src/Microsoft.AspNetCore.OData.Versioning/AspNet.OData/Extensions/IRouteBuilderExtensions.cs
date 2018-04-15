@@ -1,12 +1,12 @@
-﻿namespace Microsoft.AspNetCore.Routing
+﻿namespace Microsoft.AspNet.OData.Extensions
 {
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Batch;
     using Microsoft.AspNet.OData.Builder;
-    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
@@ -437,7 +437,7 @@
             {
                 var conventions = EnsureConventions( routingConventions.ToList() );
                 conventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, builder.ServiceProvider, apiVersion ) );
-                return routingConventions.ToArray();
+                return conventions.ToArray();
             }
 
             var perRouteContainer = builder.ServiceProvider.GetRequiredService<IPerRouteContainer>();

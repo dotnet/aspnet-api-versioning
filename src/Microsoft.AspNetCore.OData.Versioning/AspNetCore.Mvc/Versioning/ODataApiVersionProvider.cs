@@ -1,6 +1,5 @@
-﻿namespace Microsoft.Extensions.DependencyInjection
+﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using AspNetCore.Mvc.Versioning;
     using Microsoft.AspNet.OData;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
