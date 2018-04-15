@@ -58,6 +58,7 @@
             public void ConfigureServices( IServiceCollection services )
             {
                 var testControllers = new TestApplicationPart(
+                    typeof( VersionedMetadataController ),
                     typeof( TestsController ),
                     typeof( TestsController2 ),
                     typeof( TestsController3 ) );
