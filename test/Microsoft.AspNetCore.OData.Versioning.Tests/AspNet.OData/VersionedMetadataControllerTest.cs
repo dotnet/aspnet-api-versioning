@@ -7,10 +7,10 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Versioning;
-    using Microsoft.AspNetCore.Routing;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Simulators;
     using Moq;
     using System;
     using System.Linq;
@@ -26,8 +26,8 @@
         {
             // arrange
             var apiVersionProvider = new Mock<IODataApiVersionProvider>();
-            var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 3, 0 ) };
-            var deprecated = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0, "Beta" ) };
+            var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
+            var deprecated = new[] { new ApiVersion( 3, 0, "Beta" ) };
             var request = new HttpRequestMessage( new HttpMethod( "OPTIONS" ), "http://localhost/$metadata" );
             var response = default( HttpResponseMessage );
 
@@ -57,15 +57,23 @@
         {
             public void ConfigureServices( IServiceCollection services )
             {
-                services.AddMvc();
-                services.AddApiVersioning();
-                services.AddOData().EnableApiVersioning();
+                var testControllers = new TestApplicationPart(
+                    typeof( TestsController ),
+                    typeof( TestsController2 ),
+                    typeof( TestsController3 ) );
+
+                services.AddMvc()
+                        .ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );
+
+                services.AddApiVersioning()
+                        .AddOData()
+                        .EnableApiVersioning();
             }
 
             public void Configure( IApplicationBuilder app, VersionedODataModelBuilder builder )
             {
                 builder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
-                app.UseMvc( r => r.MapVersionedODataRoutes( "odata", "api", builder.GetEdmModels() ) );
+                app.UseMvc( r => r.MapVersionedODataRoutes( "odata", null, builder.GetEdmModels() ) );
             }
         }
     }

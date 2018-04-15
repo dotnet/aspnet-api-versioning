@@ -40,18 +40,19 @@
             };
 
             feature.SetupProperty( f => f.Path, odataPath );
-            features.SetupGet( f => f.Get<IODataFeature>() ).Returns( feature.Object );
+            features.Setup( f => f.Get<IODataFeature>() ).Returns( feature.Object );
             actionDescriptorCollectionProvider.SetupGet( p => p.ActionDescriptors ).Returns( new ActionDescriptorCollection( items, 0 ) );
             serviceProvider.Setup( sp => sp.GetService( typeof( IActionDescriptorCollectionProvider ) ) ).Returns( actionDescriptorCollectionProvider.Object );
             request.Method = verb;
             httpContext.SetupGet( c => c.Features ).Returns( features.Object );
+            httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
             httpContext.SetupGet( c => c.Request ).Returns( request );
 
             // act
-            var actions = routingConvention.SelectAction( new RouteContext( httpContext.Object ) );
+            var actionName = routingConvention.SelectAction( new RouteContext( httpContext.Object ) )?.SingleOrDefault()?.ActionName;
 
             // assert
-            actions.Single().ActionName.Should().Be( expected );
+            actionName.Should().Be( expected );
         }
 
         readonly IODataPathHandler pathHandler = new DefaultODataPathHandler();
