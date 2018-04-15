@@ -59,6 +59,7 @@
             {
                 var routingConventions = EnsureConventions( ODataRoutingConventions.CreateDefault() );
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
+                routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, builder.ServiceProvider, apiVersion ) );
                 return routingConventions;
             }
 
@@ -245,7 +246,7 @@
                 {
                     var conventions = new IODataRoutingConvention[routeConventions.Count + 1];
                     conventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName, builder.ServiceProvider, apiVersion );
-                    routeConventions.CopyTo( conventions, 0 );
+                    routeConventions.CopyTo( conventions, 1 );
                     return conventions;
                 }
 
