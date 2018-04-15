@@ -103,7 +103,7 @@
 
             if ( model != null )
             {
-                if ( model.DeclaredApiVersions.Contains( ApiVersion ) )
+                if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( ApiVersion ) )
                 {
                     return true;
                 }
