@@ -64,11 +64,11 @@
         /// <returns>True if the objects are equal; otherwise, false.</returns>
         public static bool operator ==( ActionDescriptorMatch match1, ActionDescriptorMatch match2 )
         {
-            if ( ReferenceEquals( match1, null ) )
+            if ( match1 is null )
             {
-                return ReferenceEquals( match2, null );
+                return match2 is null;
             }
-            else if ( ReferenceEquals( match2, null ) )
+            else if ( match2 is null )
             {
                 return false;
             }
@@ -84,11 +84,11 @@
         /// <returns>True if the objects are not equal; otherwise, false.</returns>
         public static bool operator !=( ActionDescriptorMatch match1, ActionDescriptorMatch match2 )
         {
-            if ( ReferenceEquals( match1, null ) )
+            if ( match1 is null )
             {
-                return !ReferenceEquals( match2, null );
+                return !( match2 is null );
             }
-            else if ( ReferenceEquals( match2, null ) )
+            else if ( match2 is null )
             {
                 return true;
             }
