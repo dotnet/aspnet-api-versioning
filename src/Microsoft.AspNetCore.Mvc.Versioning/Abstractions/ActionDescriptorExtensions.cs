@@ -24,11 +24,17 @@
             Contract.Requires( matchingActions != null );
 
             var properties = action.Properties;
+
+            if ( properties.TryGetValue( VersionPolicyIsAppliedKey, out bool applied ) && applied )
+            {
+                return;
+            }
+
             var syncRoot = properties is ICollection collection ? collection.SyncRoot : properties;
 
             lock ( syncRoot )
             {
-                if ( !properties.TryGetValue( typeof( ApiVersionModel ), out ApiVersionModel model ) || ( properties.TryGetValue( VersionPolicyIsAppliedKey, out bool applied ) && applied ) )
+                if ( !properties.TryGetValue( typeof( ApiVersionModel ), out ApiVersionModel model ) || ( properties.TryGetValue( VersionPolicyIsAppliedKey, out applied ) && applied ) )
                 {
                     return;
                 }
