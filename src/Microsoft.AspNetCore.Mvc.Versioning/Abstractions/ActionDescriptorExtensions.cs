@@ -2,6 +2,7 @@
 {
     using ApplicationModels;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -15,8 +16,6 @@
     {
         const string VersionPolicyIsAppliedKey = "MS_" + nameof( VersionPolicyIsApplied );
 
-        static void VersionPolicyIsApplied( this ActionDescriptor action, bool value ) => action.Properties[VersionPolicyIsAppliedKey] = value;
-
         internal static bool VersionPolicyIsApplied( this ActionDescriptor action ) => action.Properties.GetOrDefault( VersionPolicyIsAppliedKey, false );
 
         internal static void AggregateAllVersions( this ActionDescriptor action, IEnumerable<ActionDescriptor> matchingActions )
@@ -24,17 +23,19 @@
             Contract.Requires( action != null );
             Contract.Requires( matchingActions != null );
 
-            if ( action.VersionPolicyIsApplied() )
+            var properties = action.Properties;
+            var syncRoot = properties is ICollection collection ? collection.SyncRoot : properties;
+
+            lock ( syncRoot )
             {
-                return;
+                if ( !properties.TryGetValue( typeof( ApiVersionModel ), out ApiVersionModel model ) || ( properties.TryGetValue( VersionPolicyIsAppliedKey, out bool applied ) && applied ) )
+                {
+                    return;
+                }
+
+                properties[typeof( ApiVersionModel )] = model.Aggregate( matchingActions.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) );
+                properties[VersionPolicyIsAppliedKey] = true;
             }
-
-            action.VersionPolicyIsApplied( true );
-
-            var model = action.GetProperty<ApiVersionModel>();
-            Contract.Assume( model != null );
-
-            action.SetProperty( model.Aggregate( matchingActions.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) ) );
         }
 
         /// <summary>
