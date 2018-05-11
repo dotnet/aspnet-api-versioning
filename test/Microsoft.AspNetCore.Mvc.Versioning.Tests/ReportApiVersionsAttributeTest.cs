@@ -6,29 +6,33 @@
     using FluentAssertions;
     using Http;
     using Moq;
+    using System.Collections.Generic;
     using System.Linq;
     using Versioning;
     using Xunit;
 
     public class ReportApiVersionsAttributeTest
     {
-        static ActionExecutedContext CreateContext( ApiVersionModel model )
+        static ActionExecutingContext CreateContext( ApiVersionModel model )
         {
             var headers = new HeaderDictionary();
             var response = new Mock<HttpResponse>();
             var httpContext = new Mock<HttpContext>();
             var action = new ActionDescriptor();
             var actionContext = new ActionContext( httpContext.Object, new RouteData(), action  );
+            var filters = new IFilterMetadata[0];
+            var actionArguments = new Dictionary<string, object>();
+            var controller = default( object );
 
             response.SetupGet( r => r.Headers ).Returns( headers );
             httpContext.SetupGet( c => c.Response ).Returns( response.Object );
             action.SetProperty( model );
 
-            return new ActionExecutedContext( actionContext, new IFilterMetadata[0], null );
+            return new ActionExecutingContext( actionContext, filters, actionArguments, controller );
         }
 
         [Fact]
-        public void on_action_executed_should_add_version_headers()
+        public void on_action_executing_should_add_version_headers()
         {
             // arrange
             var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) };
@@ -38,7 +42,7 @@
             var attribute = new ReportApiVersionsAttribute();
 
             // act
-            attribute.OnActionExecuted( context );
+            attribute.OnActionExecuting( context );
 
             // assert
             context.HttpContext.Response.Headers["api-supported-versions"].Single().Should().Be( "1.0, 2.0" );
@@ -53,7 +57,7 @@
             var attribute = new ReportApiVersionsAttribute();
 
             // act
-            attribute.OnActionExecuted( context );
+            attribute.OnActionExecuting( context );
 
 
             // assert
