@@ -30,12 +30,14 @@
         }
 
         /// <summary>
-        /// Reports the discovered service API versions for the given context after an action has executed.
+        /// Reports the discovered service API versions for the given context before an action has executed.
         /// </summary>
-        /// <param name="context">The <see cref="ActionExecutedContext">context</see> for the executed action.</param>
+        /// <param name="context">The <see cref="ActionExecutingContext">context</see> for the executing action.</param>
         /// <remarks>This method will write the "api-supported-versions" and "api-deprecated-versions" HTTP headers into the
-        /// response provided that there is a response and the executed action was not version-neutral.</remarks>
-        public override void OnActionExecuted( ActionExecutedContext context )
+        /// response provided the executing action is not version-neutral. This operation should be performed before the
+        /// action is executed instead of after as HTTP headers cannot be specified after the response body has started
+        /// streaming to the client.</remarks>
+        public override void OnActionExecuting( ActionExecutingContext context )
         {
             var response = context.HttpContext.Response;
 
