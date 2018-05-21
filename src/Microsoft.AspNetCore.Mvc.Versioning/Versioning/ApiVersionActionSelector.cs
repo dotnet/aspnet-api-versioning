@@ -166,6 +166,7 @@
                 }
                 else
                 {
+                    AppendPossibleMatches( new[] { selectedAction }, context, selectionResult );
                     return selectedAction;
                 }
             }
@@ -261,7 +262,7 @@
 
             var match = matches[0];
 
-            if ( match.VersionPolicyIsApplied() && !result.HasMatchesInPreviousIterations )
+            if ( !result.HasMatchesInPreviousIterations )
             {
                 return match;
             }

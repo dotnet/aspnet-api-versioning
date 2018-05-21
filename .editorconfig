@@ -13,11 +13,11 @@ indent_size = 4
 
 # xml project files
 [*.{csproj,vbproj,proj,projitems,shproj}]
-indent_size = 2
+indent_size = 1
 
 # xml config files
 [*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
-indent_size = 2
+indent_size = 1
 
 # json files
 [*.json]

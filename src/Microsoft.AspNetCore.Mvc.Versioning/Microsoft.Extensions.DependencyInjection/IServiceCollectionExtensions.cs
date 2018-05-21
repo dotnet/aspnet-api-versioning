@@ -7,6 +7,7 @@
     using Extensions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Options;
     using System;
     using System.Diagnostics.Contracts;
@@ -54,6 +55,7 @@
             if ( options.ReportApiVersions )
             {
                 services.TryAddSingleton<IReportApiVersions, DefaultApiVersionReporter>();
+                services.AddTransient<IActionDescriptorProvider, ApiVersionCollator>();
             }
             else
             {
