@@ -164,9 +164,7 @@
             Arg.NotNull( match, nameof( match ) );
 
             var handler = new DefaultActionHandler( ActionInvokerFactory, ActionContextAccessor, selectionResult, match );
-            var candidates = selectionResult.CandidateActions.SelectMany( kvp => kvp.Value );
 
-            match.Action.AggregateAllVersions( candidates );
             context.RouteData = match.RouteData;
             context.Handler = handler.Invoke;
         }

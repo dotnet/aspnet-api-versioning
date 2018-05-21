@@ -7,6 +7,10 @@
   <Copyright>© $(Company). All rights reserved.</Copyright>
   <NeutralLanguage>en</NeutralLanguage>
   <DefaultLanguage>en-US</DefaultLanguage>
+  </PropertyGroup>
+
+ <PropertyGroup Label="C#">
+  <LangVersion>latest</LangVersion>
  </PropertyGroup>
 
 </Project>

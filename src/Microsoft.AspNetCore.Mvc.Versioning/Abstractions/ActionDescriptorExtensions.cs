@@ -2,8 +2,6 @@
 {
     using ApplicationModels;
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using Versioning;
 
@@ -13,30 +11,6 @@
     [CLSCompliant( false )]
     public static class ActionDescriptorExtensions
     {
-        const string VersionPolicyIsAppliedKey = "MS_" + nameof( VersionPolicyIsApplied );
-
-        static void VersionPolicyIsApplied( this ActionDescriptor action, bool value ) => action.Properties[VersionPolicyIsAppliedKey] = value;
-
-        internal static bool VersionPolicyIsApplied( this ActionDescriptor action ) => action.Properties.GetOrDefault( VersionPolicyIsAppliedKey, false );
-
-        internal static void AggregateAllVersions( this ActionDescriptor action, IEnumerable<ActionDescriptor> matchingActions )
-        {
-            Contract.Requires( action != null );
-            Contract.Requires( matchingActions != null );
-
-            if ( action.VersionPolicyIsApplied() )
-            {
-                return;
-            }
-
-            action.VersionPolicyIsApplied( true );
-
-            var model = action.GetProperty<ApiVersionModel>();
-            Contract.Assume( model != null );
-
-            action.SetProperty( model.Aggregate( matchingActions.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) ) );
-        }
-
         /// <summary>
         /// Returns a value indicating whether the provided action implicitly maps to the specified version.
         /// </summary>

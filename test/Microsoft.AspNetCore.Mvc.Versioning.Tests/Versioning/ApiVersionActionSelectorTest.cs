@@ -452,7 +452,7 @@
             var deprecated = new[] { new ApiVersion( 4, 0 ) };
             var implemented = supported.Union( deprecated ).OrderBy( v => v ).ToArray();
 
-            using ( var server = new WebServer() )
+            using ( var server = new WebServer( o => o.ReportApiVersions = true ) )
             {
                 await server.Client.GetAsync( $"api/{versionSegment}/attributed" );
 
