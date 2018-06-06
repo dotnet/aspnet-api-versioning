@@ -6,49 +6,64 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Routing;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using static ApiVersionParameterLocation;
+    using static System.StringComparer;
 
     /// <summary>
     /// Represents a service API version reader that reads the value from the query string in a URL.
     /// </summary>
     public partial class QueryStringApiVersionReader : IApiVersionReader
     {
-        string parameterName = "api-version";
+        const string DefaultQueryParameterName = "api-version";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryStringApiVersionReader"/> class.
         /// </summary>
-        public QueryStringApiVersionReader() { }
+        /// <remarks>This constructor always adds the "api-version" query string parameter.</remarks>
+        public QueryStringApiVersionReader() => ParameterNames.Add( DefaultQueryParameterName );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryStringApiVersionReader"/> class.
         /// </summary>
-        /// <param name="parameterName">The name of the query string parameter to read the service API version from.</param>
-        public QueryStringApiVersionReader( string parameterName )
+        /// <param name="parameterNames">A <see cref="IEnumerable{T}">sequence</see> of query string parameter names to read the service API version from.</param>
+        /// <remarks>This constructor adds the "api-version" query string parameter if no other query parameter names are specified.</remarks>
+        public QueryStringApiVersionReader( IEnumerable<string> parameterNames )
         {
-            Arg.NotNullOrEmpty( parameterName, nameof( parameterName ) );
-            this.parameterName = parameterName;
+            Arg.NotNull( parameterNames, nameof( parameterNames ) );
+
+            ParameterNames.AddRange( parameterNames );
+
+            if ( ParameterNames.Count == 0 )
+            {
+                ParameterNames.Add( DefaultQueryParameterName );
+            }
         }
 
         /// <summary>
-        /// Gets or sets the name of the query parameter to read the service API version from.
+        /// Initializes a new instance of the <see cref="QueryStringApiVersionReader"/> class.
         /// </summary>
-        /// <value>The name of the query parameter to read the service API version from.
-        /// The default value is "api-version".</value>
-        public string ParameterName
+        /// <param name="parameterNames">An array of query string parameter names to read the service API version from.</param>
+        /// <remarks>This constructor adds the "api-version" query string parameter if no other query parameter names are specified.</remarks>
+        public QueryStringApiVersionReader( params string[] parameterNames )
         {
-            get
+            Arg.NotNull( parameterNames, nameof( parameterNames ) );
+
+            ParameterNames.AddRange( parameterNames );
+
+            if ( ParameterNames.Count == 0 )
             {
-                Contract.Ensures( !string.IsNullOrEmpty( parameterName ) );
-                return parameterName;
-            }
-            set
-            {
-                Arg.NotNullOrEmpty( value, nameof( value ) );
-                parameterName = value;
+                ParameterNames.Add( DefaultQueryParameterName );
             }
         }
+
+        /// <summary>
+        /// Gets a collection of HTTP header names that the service API version can be read from.
+        /// </summary>
+        /// <value>A <see cref="ICollection{T}">collection</see> of HTTP header names.</value>
+        /// <remarks>HTTP header names are evaluated in a case-insensitive manner.</remarks>
+        public ICollection<string> ParameterNames { get; } = new HashSet<string>( OrdinalIgnoreCase );
 
         /// <summary>
         /// Provides API version parameter descriptions supported by the current reader using the supplied provider.
@@ -57,7 +72,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-            context.AddParameter( ParameterName, Query );
+
+            foreach ( var name in ParameterNames )
+            {
+                context.AddParameter( name, Query );
+            }
         }
     }
 }

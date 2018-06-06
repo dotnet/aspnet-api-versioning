@@ -26,9 +26,7 @@
 
             foreach ( var name in HeaderNames )
             {
-                var values = default( IEnumerable<string> );
-
-                if ( headers.TryGetValues( name, out values ) )
+                if ( headers.TryGetValues( name, out var values ) )
                 {
                     versions.AddRange( values.Where( v => !IsNullOrEmpty( v ) ) );
                 }
