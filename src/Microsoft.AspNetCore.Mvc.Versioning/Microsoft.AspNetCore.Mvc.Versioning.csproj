@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>2.2.0</VersionPrefix>
-  <AssemblyVersion>2.2.0.0</AssemblyVersion>
+  <VersionPrefix>2.3.0</VersionPrefix>
+  <AssemblyVersion>2.3.0.0</AssemblyVersion>
   <TargetFramework>netstandard2.0</TargetFramework>
   <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
   <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
@@ -13,8 +13,11 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Fix 405 error message (#254)" />
-  <ReleaseNotes Include="Improve logging for ambiguous actions" />
+  <ReleaseNotes Include="Improve logging for ambiguous matches (#248)" />
+  <ReleaseNotes Include="ApplyTo methods are now virtual (#258)" />
+  <ReleaseNotes Include="Fix convention-based link generation (#265)" />
+  <ReleaseNotes Include="Fix reporting API versions (#273, #290)" />
+  <ReleaseNotes Include="Fix 100% CPU utilization (#306)" />
  </ItemGroup>
 
  <ItemGroup>
