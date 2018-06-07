@@ -4,6 +4,11 @@ namespace Microsoft.Web.Http.Versioning
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
+#if WEBAPI
+    using Microsoft.Web.Http.Routing;
+#else
+    using Microsoft.AspNetCore.Mvc.Routing;
+#endif
     using Conventions;
     using System;
     using System.Diagnostics.Contracts;
@@ -18,6 +23,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </summary>
     public partial class ApiVersioningOptions
     {
+        string routeConstraintName = "apiVersion";
         ApiVersion defaultApiVersion = ApiVersion.Default;
         IApiVersionReader apiVersionReader = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
         IApiVersionSelector apiVersionSelector;
@@ -28,6 +34,24 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ApiVersioningOptions"/> class.
         /// </summary>
         public ApiVersioningOptions() => apiVersionSelector = new DefaultApiVersionSelector( this );
+
+        /// <summary>
+        /// Gets or sets the name associated with the API version route constraint.
+        /// </summary>
+        /// <value>The name associated with the <see cref="ApiVersionRouteConstraint">API version route constraint.</see>
+        /// The default value is "apiVersion".</value>
+        /// <remarks>The route constraint name is only applicable when versioning using the URL segment method. Changing
+        /// this property is only necessary if you prefer an alternate name in for the constraint in your route templates;
+        /// for example, "api-version" or simply "version".</remarks>
+        public string RouteConstraintName
+        {
+            get => routeConstraintName;
+            set
+            {
+                Arg.NotNullOrEmpty( value, nameof( value ) );
+                routeConstraintName = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether requests report the service API version compatibility

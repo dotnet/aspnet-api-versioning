@@ -50,7 +50,7 @@
             services.TryAddSingleton<ReportApiVersionsAttribute>();
             services.AddTransient<IStartupFilter, InjectApiVersionRoutePolicy>();
             services.AddMvcCore( mvcOptions => AddMvcOptions( mvcOptions, options ) );
-            services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( "apiVersion", typeof( ApiVersionRouteConstraint ) ) );
+            services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( options.RouteConstraintName, typeof( ApiVersionRouteConstraint ) ) );
 
             if ( options.ReportApiVersions )
             {
