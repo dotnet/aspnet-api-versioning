@@ -177,6 +177,9 @@
   <data name="InvalidFormatString" xml:space="preserve">
     <value>Input string was not in a correct format.</value>
   </data>
+  <data name="MultipleApiVersionsInferredFromNamespaces" xml:space="preserve">
+    <value>Multiple API versions were inferred from the namespace '{0}'. The convention must match exactly zero or one API versions.</value>
+  </data>
   <data name="MultipleDifferentApiVersionsRequested" xml:space="preserve">
     <value>The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request.</value>
   </data>

@@ -26,7 +26,7 @@
                 return true;
             }
 
-            convention = default( IApiVersionConvention<ActionModel> );
+            convention = default;
             return false;
         }
     }
