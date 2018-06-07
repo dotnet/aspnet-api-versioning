@@ -178,6 +178,15 @@ namespace Microsoft.AspNetCore.Mvc {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple API versions were inferred from the namespace &apos;{0}&apos;. The convention must match exactly zero or one API versions..
+        /// </summary>
+        internal static string MultipleApiVersionsInferredFromNamespaces {
+            get {
+                return ResourceManager.GetString("MultipleApiVersionsInferredFromNamespaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following API versions were requested: {0}. At most, only a single API version may be specified. Please update the intended API version and retry the request..
         /// </summary>
         internal static string MultipleDifferentApiVersionsRequested {

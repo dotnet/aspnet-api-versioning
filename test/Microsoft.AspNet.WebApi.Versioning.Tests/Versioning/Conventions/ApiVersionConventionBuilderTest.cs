@@ -3,6 +3,7 @@
     using FluentAssertions;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using Xunit;
@@ -19,7 +20,7 @@
             var controllerBuilder = conventionBuilder.Controller<StubController>();
 
             // assert
-            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventionBuilders.Should().BeEquivalentTo(
                 new Dictionary<Type, IApiVersionConvention<HttpControllerDescriptor>>()
                 {
                     [typeof( StubController )] = controllerBuilder
@@ -36,7 +37,7 @@
             var controllerBuilder = conventionBuilder.Controller( typeof( StubController ) );
 
             // assert
-            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventionBuilders.Should().BeEquivalentTo(
                 new Dictionary<Type, IApiVersionConvention<HttpControllerDescriptor>>()
                 {
                     [typeof( StubController )] = controllerBuilder
@@ -55,7 +56,7 @@
 
             // assert
             controllerBuilder.Should().BeSameAs( originalControllerBuilder );
-            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventionBuilders.Should().BeEquivalentTo(
                 new Dictionary<Type, IApiVersionConvention<HttpControllerDescriptor>>()
                 {
                     [typeof( StubController )] = controllerBuilder
@@ -74,7 +75,7 @@
 
             // assert
             controllerBuilder.Should().BeSameAs( originalControllerBuilder );
-            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventionBuilders.Should().BeEquivalentTo(
                 new Dictionary<Type, IApiVersionConvention<HttpControllerDescriptor>>()
                 {
                     [typeof( StubController )] = controllerBuilder
@@ -111,12 +112,38 @@
             controllerConvention.Should().Throw<InvalidOperationException>();
         }
 
+        [Fact]
+        public void apply_should_apply_configured_conventions()
+        {
+            // arrange
+            var configuration = new HttpConfiguration();
+            var controllerDescriptor = new HttpControllerDescriptor( configuration, "Undecorated", typeof( v2.UndecoratedController ) );
+            var conventionBuilder = new ApiVersionConventionBuilder();
+
+            conventionBuilder.Add( new VersionByNamespaceConvention() );
+            configuration.AddApiVersioning( o => o.Conventions = conventionBuilder );
+
+            // act
+            conventionBuilder.ApplyTo( controllerDescriptor );
+
+            // assert
+            controllerDescriptor.GetApiVersionModel().DeclaredApiVersions.Single().Should().Be( new ApiVersion( 2, 0 ) );
+        }
+
         sealed class TestApiVersionConventionBuilder : ApiVersionConventionBuilder
         {
-            internal IDictionary<Type, IApiVersionConvention<HttpControllerDescriptor>> ProtectedControllerConventions => ControllerConventions;
+            internal IDictionary<Type, IControllerConventionBuilder> ProtectedControllerConventionBuilders => ControllerConventionBuilders;
         }
 
         sealed class StubController : ApiController
+        {
+            public IHttpActionResult Get() => Ok();
+        }
+    }
+
+    namespace v2
+    {
+        sealed class UndecoratedController : ApiController
         {
             public IHttpActionResult Get() => Ok();
         }
