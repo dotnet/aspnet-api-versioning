@@ -20,7 +20,7 @@
             var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { value = new[] { new { id = 0, customer = "" } } } );
 
             // assert
-            orders.value.ShouldBeEquivalentTo( new[] { new { id = 1, customer = "Customer v2.0" } }, options => options.ExcludingMissingMembers() );
+            orders.value.Should().BeEquivalentTo( new[] { new { id = 1, customer = "Customer v2.0" } }, options => options.ExcludingMissingMembers() );
         }
 
         [Fact]
@@ -34,7 +34,7 @@
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { id = 0, customer = "" } );
 
             // assert
-            order.ShouldBeEquivalentTo( new { id = 42, customer = "Customer v2.0" }, options => options.ExcludingMissingMembers() );
+            order.Should().BeEquivalentTo( new { id = 42, customer = "Customer v2.0" }, options => options.ExcludingMissingMembers() );
         }
     }
 }

@@ -298,7 +298,7 @@
                 var action = ( (TestApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
 
                 // assert
-                action.As<ControllerActionDescriptor>().ShouldBeEquivalentTo(
+                action.As<ControllerActionDescriptor>().Should().BeEquivalentTo(
                     new
                     {
                         ControllerTypeInfo = controllerType,
@@ -323,7 +323,7 @@
                 // act
 
                 // assert
-                test.ShouldThrow<AmbiguousActionException>().WithMessage( message );
+                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
             }
         }
 
@@ -344,7 +344,7 @@
                 // act
 
                 // assert
-                test.ShouldThrow<AmbiguousActionException>().WithMessage( message );
+                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
             }
         }
 
@@ -363,7 +363,7 @@
                 // act
 
                 // assert
-                test.ShouldThrow<AmbiguousActionException>().WithMessage( message );
+                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
             }
         }
 
@@ -384,7 +384,7 @@
                 // act
 
                 // assert
-                test.ShouldThrow<AmbiguousActionException>().WithMessage( message );
+                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
             }
         }
 
@@ -460,14 +460,14 @@
                 var action = ( (TestApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
 
                 // assert
-                action.As<ControllerActionDescriptor>().ShouldBeEquivalentTo(
+                action.As<ControllerActionDescriptor>().Should().BeEquivalentTo(
                     new
                     {
                         ActionName = actionName,
                         ControllerTypeInfo = controllerType.GetTypeInfo(),
                     },
                     options => options.ExcludingMissingMembers() );
-                action.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+                action.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                      new
                      {
                          IsApiVersionNeutral = false,
@@ -518,7 +518,7 @@
                 action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( typeof( ConventionsController ).GetTypeInfo() );
                 action.As<ControllerActionDescriptor>().ActionName.Should().Be( nameof( ConventionsController.GetV2 ) );
                 action.Parameters.Count.Should().Be( 1 );
-                action.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+                action.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                      new
                      {
                          IsApiVersionNeutral = false,

@@ -36,7 +36,7 @@
             // assert
             response.StatusCode.Should().Be( MethodNotAllowed );
             response.Content.Headers.Allow.Should().BeEquivalentTo( "GET" );
-            content.Error.ShouldBeEquivalentTo(
+            content.Error.Should().BeEquivalentTo(
                 new
                 {
                     Code = "UnsupportedApiVersion",

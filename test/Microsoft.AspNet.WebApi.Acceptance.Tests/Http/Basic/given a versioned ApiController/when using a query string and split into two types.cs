@@ -27,7 +27,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo(
+            content.Should().BeEquivalentTo(
                 new Dictionary<string, string>()
                 {
                     ["controller"] = controller,

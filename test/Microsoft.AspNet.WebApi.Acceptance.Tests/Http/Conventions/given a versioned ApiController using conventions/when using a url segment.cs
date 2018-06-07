@@ -29,7 +29,7 @@
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
-            content.ShouldBeEquivalentTo( new { controller = controllerName, version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller = controllerName, version = apiVersion } );
         }
 
         [Theory]
@@ -48,7 +48,7 @@
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "2.0, 3.0, 4.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.0" );
-            content.ShouldBeEquivalentTo( new { controller = controllerName, version = apiVersion, id = "42" } );
+            content.Should().BeEquivalentTo( new { controller = controllerName, version = apiVersion, id = "42" } );
         }
 
         [Fact]

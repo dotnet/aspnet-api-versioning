@@ -82,7 +82,7 @@
             var clone = original.Clone();
 
             // assert
-            clone.ShouldBeEquivalentTo( original );
+            clone.Should().BeEquivalentTo( original );
         }
     }
 }

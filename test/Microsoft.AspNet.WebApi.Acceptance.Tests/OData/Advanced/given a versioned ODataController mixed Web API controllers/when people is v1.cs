@@ -24,7 +24,7 @@
             var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
-            people.value.ShouldBeEquivalentTo(
+            people.value.Should().BeEquivalentTo(
                 new[] { new { id = 1, firstName = "Bill", lastName = "Mei" } },
                 options => options.ExcludingMissingMembers() );
         }
@@ -42,7 +42,7 @@
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
-            order.ShouldBeEquivalentTo(
+            order.Should().BeEquivalentTo(
                 new { id = 42, firstName = "Bill", lastName = "Mei" },
                 options => options.ExcludingMissingMembers() );
         }

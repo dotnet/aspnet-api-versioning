@@ -32,7 +32,7 @@
             context.AddParameter( "api-version", Query );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -66,7 +66,7 @@
             context.AddParameter( "api-version", Header );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -109,7 +109,7 @@
             context.AddParameter( "api-version", Path );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -156,7 +156,7 @@
             context.AddParameter( "api-version", Path );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -264,7 +264,7 @@
             context.AddParameter( "api-version", Query );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
