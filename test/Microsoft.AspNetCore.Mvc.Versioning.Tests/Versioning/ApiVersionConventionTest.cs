@@ -36,7 +36,7 @@
             convention.Apply( application );
 
             // assert
-            controller.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            controller.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -45,7 +45,7 @@
                     SupportedApiVersions = supported,
                     DeprecatedApiVersions = deprecated
                 } );
-            controller.Actions.Single().GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            controller.Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -105,7 +105,7 @@
             convention.Apply( application );
 
             // assert
-            application.Controllers.Single().GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            application.Controllers.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -114,7 +114,7 @@
                     SupportedApiVersions = new[] { new ApiVersion( 1, 0 ) },
                     DeprecatedApiVersions = new ApiVersion[0],
                 } );
-            application.Controllers.Single().Actions.Single().GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            application.Controllers.Single().Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,

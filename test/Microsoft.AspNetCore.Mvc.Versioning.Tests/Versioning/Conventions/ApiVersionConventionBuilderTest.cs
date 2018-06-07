@@ -19,7 +19,7 @@
             var controllerBuilder = conventionBuilder.Controller<StubController>();
 
             // assert
-            conventionBuilder.ProtectedControllerConventions.ShouldBeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
                 new Dictionary<TypeInfo, IApiVersionConvention<ControllerModel>>()
                 {
                     [typeof( StubController ).GetTypeInfo()] = controllerBuilder
@@ -36,7 +36,7 @@
             var controllerBuilder = conventionBuilder.Controller( typeof( StubController ) );
 
             // assert
-            conventionBuilder.ProtectedControllerConventions.ShouldBeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
                 new Dictionary<TypeInfo, IApiVersionConvention<ControllerModel>>()
                 {
                     [typeof( StubController ).GetTypeInfo()] = controllerBuilder
@@ -55,7 +55,7 @@
 
             // assert
             controllerBuilder.Should().BeSameAs( originalControllerBuilder );
-            conventionBuilder.ProtectedControllerConventions.ShouldBeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
                 new Dictionary<TypeInfo, IApiVersionConvention<ControllerModel>>()
                 {
                     [typeof( StubController ).GetTypeInfo()] = controllerBuilder
@@ -74,7 +74,7 @@
 
             // assert
             controllerBuilder.Should().BeSameAs( originalControllerBuilder );
-            conventionBuilder.ProtectedControllerConventions.ShouldBeEquivalentTo(
+            conventionBuilder.ProtectedControllerConventions.Should().BeEquivalentTo(
                 new Dictionary<TypeInfo, IApiVersionConvention<ControllerModel>>()
                 {
                     [typeof( StubController ).GetTypeInfo()] = controllerBuilder
@@ -93,7 +93,7 @@
             Action controllerConvention = () => conventionBuilder.Controller( typeof( StubController ) );
 
             // assert
-            controllerConvention.ShouldThrow<InvalidOperationException>();
+            controllerConvention.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]
@@ -108,7 +108,7 @@
             Action controllerConvention = () => conventionBuilder.Controller<StubController>();
 
             // assert
-            controllerConvention.ShouldThrow<InvalidOperationException>();
+            controllerConvention.Should().Throw<InvalidOperationException>();
         }
 
         sealed class TestApiVersionConventionBuilder : ApiVersionConventionBuilder

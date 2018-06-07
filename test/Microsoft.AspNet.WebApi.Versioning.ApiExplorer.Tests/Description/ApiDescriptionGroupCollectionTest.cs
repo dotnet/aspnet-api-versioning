@@ -62,7 +62,7 @@
             var descriptions = collection.Flatten().Cast<VersionedApiDescription>();
 
             // assert
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new Collection<VersionedApiDescription>()
                 {
                     new VersionedApiDescription() { ApiVersion = new ApiVersion( 1, 0 ), RelativePath = "api/people" },

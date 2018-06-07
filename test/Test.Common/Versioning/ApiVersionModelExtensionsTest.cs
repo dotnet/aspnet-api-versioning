@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             var aggregatedModel = model1.Aggregate( model2 );
 
             // assert
-            aggregatedModel.ShouldBeEquivalentTo(
+            aggregatedModel.Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = expected.IsApiVersionNeutral,
@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             var aggregatedModel = model.Aggregate( otherModels );
 
             // assert
-            aggregatedModel.ShouldBeEquivalentTo(
+            aggregatedModel.Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = expected.IsApiVersionNeutral,

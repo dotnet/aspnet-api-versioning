@@ -132,7 +132,7 @@
             Action match = () => constraint.Match( request, null, null, values, UriResolution );
 
             // assert
-            match.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
+            match.Should().Throw<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
         }
     }
 }

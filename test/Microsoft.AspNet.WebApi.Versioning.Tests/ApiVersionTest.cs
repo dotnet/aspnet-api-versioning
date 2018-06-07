@@ -19,7 +19,7 @@
             Action ctor = () => new ApiVersion( majorVersion, 0 );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
         }
 
         [Fact]
@@ -32,7 +32,7 @@
             Action ctor = () => new ApiVersion( majorVersion, 0, "Alpha" );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
         }
 
         [Fact]
@@ -45,7 +45,7 @@
             Action ctor = () => new ApiVersion( Today, majorVersion, 0 );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
         }
 
         [Fact]
@@ -58,7 +58,7 @@
             Action ctor = () => new ApiVersion( Today, majorVersion, 0, "Alpha" );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( majorVersion ) );
         }
 
         [Fact]
@@ -71,7 +71,7 @@
             Action ctor = () => new ApiVersion( 0, minorVersion );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
         }
 
         [Fact]
@@ -84,7 +84,7 @@
             Action ctor = () => new ApiVersion( 0, minorVersion, "Alpha" );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
         }
 
         [Fact]
@@ -97,7 +97,7 @@
             Action ctor = () => new ApiVersion( Today, 0, minorVersion );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
         }
 
         [Fact]
@@ -110,7 +110,7 @@
             Action ctor = () => new ApiVersion( Today, 0, minorVersion, "Alpha" );
 
             // assert
-            ctor.ShouldThrow<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
+            ctor.Should().Throw<ArgumentOutOfRangeException>().Subject.Single().ParamName.Should().Be( nameof( minorVersion ) );
         }
 
         [Fact]
@@ -123,7 +123,7 @@
             Action ctor = () => new ApiVersion( 1, 0, status );
 
             // assert
-            ctor.ShouldThrow<ArgumentException>().Subject.Single().ParamName.Should().Be( nameof( status ) );
+            ctor.Should().Throw<ArgumentException>().Subject.Single().ParamName.Should().Be( nameof( status ) );
         }
 
         [Fact]
@@ -136,7 +136,7 @@
             Action ctor = () => new ApiVersion( Today, status );
 
             // assert
-            ctor.ShouldThrow<ArgumentException>().Subject.Single().ParamName.Should().Be( nameof( status ) );
+            ctor.Should().Throw<ArgumentException>().Subject.Single().ParamName.Should().Be( nameof( status ) );
         }
 
         [Fact]
@@ -149,7 +149,7 @@
             Action ctor = () => new ApiVersion( Today, 1, 0, status );
 
             // assert
-            ctor.ShouldThrow<ArgumentException>().Subject.Single().ParamName.Should().Be( nameof( status ) );
+            ctor.Should().Throw<ArgumentException>().Subject.Single().ParamName.Should().Be( nameof( status ) );
         }
 
         [Theory]
@@ -208,7 +208,7 @@
             var apiVersion = ApiVersion.Parse( text );
 
             // assert
-            apiVersion.ShouldBeEquivalentTo(
+            apiVersion.Should().BeEquivalentTo(
                 new
                 {
                     GroupVersion = groupVersion,
@@ -231,7 +231,7 @@
 
 
             // assert
-            parse.ShouldThrow<FormatException>().WithMessage( message );
+            parse.Should().Throw<FormatException>().WithMessage( message );
         }
 
         [Theory]
@@ -256,7 +256,7 @@
 
             // assert
             result.Should().BeTrue();
-            apiVersion.ShouldBeEquivalentTo(
+            apiVersion.Should().BeEquivalentTo(
                 new
                 {
                     GroupVersion = groupVersion,

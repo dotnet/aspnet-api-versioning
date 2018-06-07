@@ -107,7 +107,7 @@
             var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new[]
                 {
                     new

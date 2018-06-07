@@ -48,7 +48,7 @@
             Action action = () => builder.Action( c => c.Timeout );
 
             // assert
-            action.ShouldThrow<InvalidOperationException>().And
+            action.Should().Throw<InvalidOperationException>().And
                   .Message.Should().Be( "The expression 'c => c.Timeout' must refer to a controller action method." );
         }
 
@@ -101,7 +101,7 @@
             Action actionConvention = () => builder.Object.Action( "NoSuchMethod" );
 
             // assert
-            actionConvention.ShouldThrow<MissingMethodException>().And.Message.Should().Be( message );
+            actionConvention.Should().Throw<MissingMethodException>().And.Message.Should().Be( message );
         }
 
         public sealed class StubController : ApiController

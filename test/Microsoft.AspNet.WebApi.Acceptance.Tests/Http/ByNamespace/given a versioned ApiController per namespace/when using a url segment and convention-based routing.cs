@@ -28,7 +28,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
-            content.ShouldBeEquivalentTo( new { Controller = controller, ApiVersion = apiVersion, AccountId = "42" } );
+            content.Should().BeEquivalentTo( new { Controller = controller, ApiVersion = apiVersion, AccountId = "42" } );
         }
 
         [Fact]

@@ -79,7 +79,7 @@
             Action read = () => reader.Read( request.Object );
 
             // assert
-            read.ShouldThrow<AmbiguousApiVersionException>().And.ApiVersions.Should().BeEquivalentTo( "1.0", "2.0" );
+            read.Should().Throw<AmbiguousApiVersionException>().And.ApiVersions.Should().BeEquivalentTo( "1.0", "2.0" );
         }
 
         [Theory]

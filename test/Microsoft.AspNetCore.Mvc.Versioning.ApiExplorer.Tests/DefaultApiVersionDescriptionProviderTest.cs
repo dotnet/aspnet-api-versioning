@@ -25,7 +25,7 @@
             var descriptions = descriptionProvider.ApiVersionDescriptions;
 
             // assert
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new[]
                 {
                     new ApiVersionDescription( new ApiVersion( 0, 9 ), "v0.9", true ),

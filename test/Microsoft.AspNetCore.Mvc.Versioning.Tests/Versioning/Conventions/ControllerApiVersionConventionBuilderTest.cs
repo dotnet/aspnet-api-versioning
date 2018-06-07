@@ -24,7 +24,7 @@
             controllerBuilder.ApplyTo( controllerModel );
 
             // assert
-            controllerModel.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            controllerModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -52,7 +52,7 @@
             controllerBuilder.ApplyTo( controllerModel );
 
             // assert
-            controllerModel.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            controllerModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = true,
@@ -78,7 +78,7 @@
             controllerBuilder.ApplyTo( controllerModel );
 
             // assert
-            controllerModel.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            controllerModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
