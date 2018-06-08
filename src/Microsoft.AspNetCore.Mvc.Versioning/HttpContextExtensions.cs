@@ -43,7 +43,9 @@
         public static ApiVersion GetRequestedApiVersion( this HttpContext context )
         {
             Arg.NotNull( context, nameof( context ) );
-            return context.ApiVersionProperties().ApiVersion;
+
+            var feature = context.Features.Get<IApiVersioningFeature>();
+            return feature?.RequestedApiVersion;
         }
     }
 }

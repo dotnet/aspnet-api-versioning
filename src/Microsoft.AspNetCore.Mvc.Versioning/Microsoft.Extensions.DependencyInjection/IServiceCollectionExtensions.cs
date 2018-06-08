@@ -46,11 +46,15 @@
             services.Add( new ServiceDescriptor( typeof( IErrorResponseProvider ), options.ErrorResponses ) );
             services.Add( Singleton<IOptions<ApiVersioningOptions>>( new OptionsWrapper<ApiVersioningOptions>( options ) ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
-            services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
             services.TryAddSingleton<ReportApiVersionsAttribute>();
-            services.AddTransient<IStartupFilter, InjectApiVersionRoutePolicy>();
+            services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
             services.AddMvcCore( mvcOptions => AddMvcOptions( mvcOptions, options ) );
             services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( options.RouteConstraintName, typeof( ApiVersionRouteConstraint ) ) );
+
+            if ( options.RegisterMiddleware )
+            {
+                services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
+            }
 
             if ( options.ReportApiVersions )
             {
@@ -78,20 +82,21 @@
             mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
         }
 
-        sealed class InjectApiVersionRoutePolicy : IStartupFilter
+        sealed class AutoRegisterMiddleware : IStartupFilter
         {
             readonly IApiVersionRoutePolicy routePolicy;
 
-            public InjectApiVersionRoutePolicy( IApiVersionRoutePolicy routePolicy ) => this.routePolicy = routePolicy;
+            public AutoRegisterMiddleware( IApiVersionRoutePolicy routePolicy ) => this.routePolicy = routePolicy;
 
-            public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
+            public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> configure )
             {
-                Contract.Requires( next != null );
+                Contract.Requires( configure != null );
                 Contract.Ensures( Contract.Result<Action<IApplicationBuilder>>() != null );
 
                 return app =>
                 {
-                    next( app );
+                    app.UseApiVersioning();
+                    configure( app );
                     app.UseRouter( builder => builder.Routes.Add( routePolicy ) );
                 };
             }
