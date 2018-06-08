@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.2.1</VersionPrefix>
+  <VersionPrefix>1.2.2</VersionPrefix>
   <AssemblyVersion>1.2.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer for OData v4.0</AssemblyTitle>
@@ -12,7 +12,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Fix convention-based link generation (Issue 265)" />
+  <ReleaseNotes Include="Fix hosting in IIS (Issue 302)" />
  </ItemGroup>
 
  <ItemGroup>
