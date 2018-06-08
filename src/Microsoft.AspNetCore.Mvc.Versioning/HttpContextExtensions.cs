@@ -1,10 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
-    using Http;
-    using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using System;
-    using System.Diagnostics.Contracts;
-    using Versioning;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpContext"/> class.
@@ -12,26 +10,6 @@
     [CLSCompliant( false )]
     public static class HttpContextExtensions
     {
-        const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
-
-        /// <summary>
-        /// Gets the current API versioning request properties.
-        /// </summary>
-        /// <param name="context">The <see cref="HttpContext">HTTP context</see> to get the API versioning properties for.</param>
-        /// <returns>The current <see cref="ApiVersionRequestProperties">API versioning properties</see>.</returns>
-        public static ApiVersionRequestProperties ApiVersionProperties( this HttpContext context )
-        {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( Contract.Result<ApiVersionRequestProperties>() != null );
-
-            if ( !context.Items.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
-            {
-                context.Items[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( context );
-            }
-
-            return properties;
-        }
-
         /// <summary>
         /// Gets the current API version requested.
         /// </summary>

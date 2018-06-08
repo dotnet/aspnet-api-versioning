@@ -26,7 +26,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionModelExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionParameterLocation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionReader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionRequestProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionsBaseAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ConstantApiVersionSelector.cs" />

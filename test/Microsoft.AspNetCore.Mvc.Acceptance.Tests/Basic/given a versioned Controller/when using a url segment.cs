@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc.Basic;
     using Microsoft.AspNetCore.Mvc.Basic.Controllers;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
