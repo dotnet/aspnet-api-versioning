@@ -6,6 +6,8 @@
     using Extensions.ObjectPool;
     using FluentAssertions;
     using Http;
+    using Microsoft.AspNetCore.Http.Features;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -17,46 +19,6 @@
 
     public class ApiVersionRouteConstraintTest
     {
-        class PassThroughRouter : IRouter
-        {
-            public VirtualPathData GetVirtualPath( VirtualPathContext context ) => null;
-
-            public Task RouteAsync( RouteContext context )
-            {
-                context.Handler = c => Task.CompletedTask;
-                return Task.CompletedTask;
-            }
-        }
-
-        static HttpContext NewHttpContext()
-        {
-            var httpContext = new Mock<HttpContext>();
-
-            httpContext.SetupProperty( hc => hc.Items, new Dictionary<object, object>() );
-
-            return httpContext.Object;
-        }
-
-        static ServiceCollection CreateServices()
-        {
-            var services = new ServiceCollection();
-
-            services.AddOptions();
-            services.AddLogging();
-            services.AddRouting();
-            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
-                    .AddSingleton( UrlEncoder.Default );
-
-            return services;
-        }
-
-        static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
-        {
-            var app = new Mock<IApplicationBuilder>();
-            app.SetupGet( a => a.ApplicationServices ).Returns( services );
-            return new RouteBuilder( app.Object ) { DefaultHandler = new PassThroughRouter() };
-        }
-
         [Theory]
         [InlineData( "apiVersion", "1", true )]
         [InlineData( "apiVersion", null, false )]
@@ -144,9 +106,11 @@
             // arrange
             var services = CreateServices().AddApiVersioning();
             var provider = services.BuildServiceProvider();
+            var httpContext = new DefaultHttpContext() { RequestServices = provider };
             var routeBuilder = CreateRouteBuilder( provider );
-            var actionContext = new ActionContext() { HttpContext = new DefaultHttpContext() { RequestServices = provider } };
+            var actionContext = new ActionContext() { HttpContext = httpContext };
 
+            httpContext.Features.Set<IApiVersioningFeature>( new ApiVersioningFeature( httpContext ) );
             routeBuilder.MapRoute( "default", "v{version:apiVersion}/{controller}/{action}" );
             actionContext.RouteData = new RouteData();
             actionContext.RouteData.Routers.Add( routeBuilder.Build() );
@@ -158,6 +122,49 @@
 
             // assert
             url.Should().Be( "/v1/Store/Buy" );
+        }
+
+        class PassThroughRouter : IRouter
+        {
+            public VirtualPathData GetVirtualPath( VirtualPathContext context ) => null;
+
+            public Task RouteAsync( RouteContext context )
+            {
+                context.Handler = c => Task.CompletedTask;
+                return Task.CompletedTask;
+            }
+        }
+
+        static HttpContext NewHttpContext()
+        {
+            var featureCollection = new Mock<IFeatureCollection>();
+            var httpContext = new Mock<HttpContext>();
+
+            featureCollection.Setup( fc => fc.Get<IApiVersioningFeature>() ).Returns( () => new ApiVersioningFeature( httpContext.Object ) );
+            httpContext.SetupGet( hc => hc.Features ).Returns( featureCollection.Object );
+            httpContext.SetupProperty( hc => hc.Items, new Dictionary<object, object>() );
+
+            return httpContext.Object;
+        }
+
+        static ServiceCollection CreateServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddOptions();
+            services.AddLogging();
+            services.AddRouting();
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
+                    .AddSingleton( UrlEncoder.Default );
+
+            return services;
+        }
+
+        static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
+        {
+            var app = new Mock<IApplicationBuilder>();
+            app.SetupGet( a => a.ApplicationServices ).Returns( services );
+            return new RouteBuilder( app.Object ) { DefaultHandler = new PassThroughRouter() };
         }
     }
 }

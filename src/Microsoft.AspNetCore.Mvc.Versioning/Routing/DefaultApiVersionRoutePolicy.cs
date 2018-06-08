@@ -258,11 +258,11 @@
                 return NotFound;
             }
 
-            var properties = httpContext.ApiVersionProperties();
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
             var method = httpContext.Request.Method;
             var requestUrl = new Lazy<string>( httpContext.Request.GetDisplayUrl );
-            var requestedVersion = properties.RawApiVersion;
-            var parsedVersion = properties.ApiVersion;
+            var requestedVersion = feature.RawRequestedApiVersion;
+            var parsedVersion = feature.RequestedApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
             var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates ) );
             var apiVersions = new Lazy<ApiVersionModel>( selectionResult.CandidateActions.SelectMany( l => l.Value.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) ).Aggregate );
