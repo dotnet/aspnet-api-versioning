@@ -84,20 +84,15 @@
 
         sealed class AutoRegisterMiddleware : IStartupFilter
         {
-            readonly IApiVersionRoutePolicy routePolicy;
-
-            public AutoRegisterMiddleware( IApiVersionRoutePolicy routePolicy ) => this.routePolicy = routePolicy;
-
-            public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> configure )
+            public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
             {
-                Contract.Requires( configure != null );
+                Contract.Requires( next != null );
                 Contract.Ensures( Contract.Result<Action<IApplicationBuilder>>() != null );
 
                 return app =>
                 {
                     app.UseApiVersioning();
-                    configure( app );
-                    app.UseRouter( builder => builder.Routes.Add( routePolicy ) );
+                    next( app );
                 };
             }
         }

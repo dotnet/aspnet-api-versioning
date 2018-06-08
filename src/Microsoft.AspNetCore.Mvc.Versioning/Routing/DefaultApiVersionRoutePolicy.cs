@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
-    using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
@@ -14,7 +13,6 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text;
-    using System.Threading.Tasks;
     using Versioning;
     using static ApiVersion;
     using static System.Environment;
@@ -28,66 +26,31 @@
     [CLSCompliant( false )]
     public class DefaultApiVersionRoutePolicy : IApiVersionRoutePolicy
     {
-        static readonly Task CompletedTask = Task.FromResult( default( object ) );
         readonly IOptions<ApiVersioningOptions> options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultApiVersionRoutePolicy"/> class.
         /// </summary>
-        /// <param name="actionInvokerFactory">The underlying <see cref="IActionInvokerFactory">action invoker factory</see>.</param>
         /// <param name="errorResponseProvider">The <see cref="IErrorResponseProvider">provider</see> used to create error responses.</param>
         /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the route policy.</param>
         public DefaultApiVersionRoutePolicy(
-            IActionInvokerFactory actionInvokerFactory,
             IErrorResponseProvider errorResponseProvider,
             IReportApiVersions reportApiVersions,
             ILoggerFactory loggerFactory,
-            IOptions<ApiVersioningOptions> options = null )
-            : this( actionInvokerFactory, errorResponseProvider, reportApiVersions, loggerFactory, null, options ) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultApiVersionRoutePolicy"/> class.
-        /// </summary>
-        /// <param name="actionInvokerFactory">The underlying <see cref="IActionInvokerFactory">action invoker factory</see>.</param>
-        /// <param name="errorResponseProvider">The <see cref="IErrorResponseProvider">provider</see> used to create error responses.</param>
-        /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        /// <param name="actionContextAccessor">The associated <see cref="IActionContextAccessor">action context accessor</see>.</param>
-        /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the route policy.</param>
-        public DefaultApiVersionRoutePolicy(
-            IActionInvokerFactory actionInvokerFactory,
-            IErrorResponseProvider errorResponseProvider,
-            IReportApiVersions reportApiVersions,
-            ILoggerFactory loggerFactory,
-            IActionContextAccessor actionContextAccessor,
-            IOptions<ApiVersioningOptions> options = null )
+            IOptions<ApiVersioningOptions> options )
         {
-            Arg.NotNull( actionInvokerFactory, nameof( actionInvokerFactory ) );
             Arg.NotNull( errorResponseProvider, nameof( errorResponseProvider ) );
             Arg.NotNull( reportApiVersions, nameof( reportApiVersions ) );
             Arg.NotNull( loggerFactory, nameof( loggerFactory ) );
+            Arg.NotNull( options, nameof( options ) );
 
             ErrorResponseProvider = errorResponseProvider;
-            ActionInvokerFactory = actionInvokerFactory;
             ApiVersionReporter = reportApiVersions;
             Logger = loggerFactory.CreateLogger( GetType() );
-            ActionContextAccessor = actionContextAccessor;
-            this.options = options ?? new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() );
+            this.options = options;
         }
-
-        /// <summary>
-        /// Gets the action invoker factory associated with the route policy.
-        /// </summary>
-        /// <value>The associated <see cref="IActionInvokerFactory"/>.</value>
-        protected IActionInvokerFactory ActionInvokerFactory { get; }
-
-        /// <summary>
-        /// Gets the action context accessor associated with the route policy, if any.
-        /// </summary>
-        /// <value>The associated <see cref="IActionContextAccessor"/> or <c>null</c>.</value>
-        protected IActionContextAccessor ActionContextAccessor { get; }
 
         /// <summary>
         /// Gets the error response provider associated with the route policy.
@@ -114,41 +77,27 @@
         protected ApiVersioningOptions Options => options.Value;
 
         /// <summary>
-        /// Gets the virtual path given the specified context.
-        /// </summary>
-        /// <param name="context">The <see cref="VirtualPathContext">virtual path context</see> used to retrieve the path data.</param>
-        /// <returns>The <see cref="VirtualPathData">virtual path data</see>. The default implementation always returns <c>null</c>.</returns>
-        public virtual VirtualPathData GetVirtualPath( VirtualPathContext context ) => null;
-
-        /// <summary>
         /// Executes the API versioning route policy.
         /// </summary>
         /// <param name="context">The <see cref="RouteContext">route context</see> to evaluate against.</param>
-        /// <returns>A <see cref="Task">task</see> representing the asynchonrous operation.</returns>
-        public virtual Task RouteAsync( RouteContext context )
+        /// <param name="selectionResult">The <see cref="ActionSelectionResult">result</see> of action selection.</param>
+        /// <returns>The <see cref="ActionDescriptor">action</see> conforming to the policy or <c>null</c>.</returns>
+        public virtual ActionDescriptor Evaluate( RouteContext context, ActionSelectionResult selectionResult )
         {
-            var selectionResult = context.HttpContext.ApiVersionProperties().SelectionResult;
-            var match = selectionResult.BestMatch;
+            Arg.NotNull( context, nameof( context ) );
+            Arg.NotNull( selectionResult, nameof( selectionResult ) );
 
-            if ( match == null )
+            switch ( selectionResult.MatchingActions.Count )
             {
-                var hasAnyMatches = selectionResult.MatchingActions.SelectMany( i => i.Value ).Any();
-
-                if ( hasAnyMatches )
-                {
-                    OnMultipleMatches( context, selectionResult );
-                }
-                else
-                {
+                case 0:
                     OnUnmatched( context, selectionResult );
-                }
-            }
-            else
-            {
-                OnSingleMatch( context, selectionResult, selectionResult.BestMatch );
+                    return null;
+                case 1:
+                    return OnSingleMatch( context, selectionResult );
             }
 
-            return CompletedTask;
+            OnMultipleMatches( context, selectionResult );
+            return null;
         }
 
         /// <summary>
@@ -156,17 +105,12 @@
         /// </summary>
         /// <param name="context">The current <see cref="RouteContext">route context</see>.</param>
         /// <param name="selectionResult">The current <see cref="ActionSelectionResult">action selection result</see>.</param>
-        /// <param name="match">The <see cref="ActionDescriptorMatch">matched</see> action.</param>
-        protected virtual void OnSingleMatch( RouteContext context, ActionSelectionResult selectionResult, ActionDescriptorMatch match )
+        /// <returns>The single, matching <see cref="ActionDescriptor">action</see> conforming to the policy.</returns>
+        protected virtual ActionDescriptor OnSingleMatch( RouteContext context, ActionSelectionResult selectionResult )
         {
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( selectionResult, nameof( selectionResult ) );
-            Arg.NotNull( match, nameof( match ) );
-
-            var handler = new DefaultActionHandler( ActionInvokerFactory, ActionContextAccessor, selectionResult, match );
-
-            context.RouteData = match.RouteData;
-            context.Handler = handler.Invoke;
+            return selectionResult.MatchingActions.Single();
         }
 
         /// <summary>
@@ -193,8 +137,7 @@
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( selectionResult, nameof( selectionResult ) );
 
-            var matchingActions = selectionResult.MatchingActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct();
-            var actionNames = Join( NewLine, matchingActions.Select( ExpandActionSignature ) );
+            var actionNames = Join( NewLine, selectionResult.MatchingActions.Select( ExpandActionSignature ) );
 
             Logger.AmbiguousActions( actionNames );
 
@@ -203,14 +146,14 @@
             throw new AmbiguousActionException( message );
         }
 
-        static string ExpandActionSignature( ActionDescriptorMatch match )
+        static string ExpandActionSignature( ActionDescriptor match )
         {
             Contract.Requires( match != null );
             Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
 
-            if ( !( match.Action is ControllerActionDescriptor action ) )
+            if ( !( match is ControllerActionDescriptor action ) )
             {
-                return match.Action.DisplayName;
+                return match.DisplayName;
             }
 
             var signature = new StringBuilder();
@@ -250,10 +193,10 @@
             Contract.Requires( httpContext != null );
             Contract.Requires( selectionResult != null );
 
-            const RequestHandler NotFound = default( RequestHandler );
-            var candidates = selectionResult.CandidateActions.OrderBy( kvp => kvp.Key ).SelectMany( kvp => kvp.Value ).Distinct().ToArray();
+            const RequestHandler NotFound = default;
+            var candidates = selectionResult.CandidateActions;
 
-            if ( candidates.Length == 0 )
+            if ( candidates.Count == 0 )
             {
                 return NotFound;
             }
@@ -265,7 +208,7 @@
             var parsedVersion = feature.RequestedApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
             var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates ) );
-            var apiVersions = new Lazy<ApiVersionModel>( selectionResult.CandidateActions.SelectMany( l => l.Value.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ) ).Aggregate );
+            var apiVersions = new Lazy<ApiVersionModel>( candidates.Select( a => a.GetProperty<ApiVersionModel>() ).Aggregate );
             var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter, apiVersions );
 
             if ( parsedVersion == null )
@@ -397,47 +340,6 @@
             context.AllowedMethods = allowedMethods.ToArray();
 
             return new MethodNotAllowedHandler( context );
-        }
-
-        sealed class DefaultActionHandler
-        {
-            readonly IActionContextAccessor actionContextAccessor;
-            readonly IActionInvokerFactory actionInvokerFactory;
-            readonly ActionSelectionResult selectionResult;
-            readonly ActionDescriptorMatch match;
-
-            internal DefaultActionHandler(
-                IActionInvokerFactory actionInvokerFactory,
-                IActionContextAccessor actionContextAccessor,
-                ActionSelectionResult selectionResult,
-                ActionDescriptorMatch match )
-            {
-                this.actionContextAccessor = actionContextAccessor;
-                this.actionInvokerFactory = actionInvokerFactory;
-                this.selectionResult = selectionResult;
-                this.match = match;
-            }
-
-            internal Task Invoke( HttpContext context )
-            {
-                Contract.Requires( context != null );
-
-                var actionContext = new ActionContext( context, match.RouteData, match.Action );
-
-                if ( actionContextAccessor != null )
-                {
-                    actionContextAccessor.ActionContext = actionContext;
-                }
-
-                var invoker = actionInvokerFactory.CreateInvoker( actionContext );
-
-                if ( invoker == null )
-                {
-                    throw new InvalidOperationException( SR.CouldNotCreateInvoker.FormatDefault( match.Action.DisplayName ) );
-                }
-
-                return invoker.InvokeAsync();
-            }
         }
     }
 }
