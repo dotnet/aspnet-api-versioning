@@ -7,6 +7,7 @@
     /// <summary>
     /// Represents the API versioning feature.
     /// </summary>
+    [CLSCompliant( false )]
     public sealed class ApiVersioningFeature : IApiVersioningFeature
     {
         readonly HttpContext context;
@@ -64,5 +65,11 @@
             }
             set => apiVersion = value;
         }
+
+        /// <summary>
+        /// Gets the action selection result associated with the current request.
+        /// </summary>
+        /// <value>The <see cref="ActionSelectionResult">action selection result</see> associated with the current request.</value>
+        public ActionSelectionResult SelectionResult { get; } = new ActionSelectionResult();
     }
 }
