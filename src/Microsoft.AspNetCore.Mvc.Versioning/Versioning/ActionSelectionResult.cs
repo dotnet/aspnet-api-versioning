@@ -11,32 +11,54 @@
     [CLSCompliant( false )]
     public class ActionSelectionResult
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ActionSelectionResult"/> class.
-        /// </summary>
-        /// <param name="candidateActions">A <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="ActionDescriptor">actions</see>.</param>
-        /// <param name="matchingActions">A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ActionDescriptor">matching actions</see>.</param>
-        public ActionSelectionResult( IEnumerable<ActionDescriptor> candidateActions, IEnumerable<ActionDescriptor> matchingActions )
-        {
-            Arg.NotNull( candidateActions, nameof( candidateActions ) );
-            Arg.NotNull( matchingActions, nameof( matchingActions ) );
+        readonly HashSet<ActionDescriptor> candidateActions = new HashSet<ActionDescriptor>();
+        readonly HashSet<ActionDescriptor> matchingActions = new HashSet<ActionDescriptor>();
 
-            CandidateActions = candidateActions.ToArray();
-            MatchingActions = matchingActions.ToArray();
+        /// <summary>
+        /// Gets the best action descriptor match.
+        /// </summary>
+        /// <value>The best <see cref="ActionDescriptor">action descriptor</see> match or <c>null</c>.</value>
+        /// <remarks>This property returns the first occurrence of a single match in the earliest iteration. If
+        /// no matches exist in any iteration or multiple matches exist, this property returns <c>null</c>.</remarks>
+        [CLSCompliant( false )]
+        public ActionDescriptor BestMatch => MatchingActions.FirstOrDefault();
+
+        /// <summary>
+        /// Gets a read-only collection of candidate actions.
+        /// </summary>
+        /// <value>A <see cref="IReadOnlyCollection{T}">read-only collection</see> of candidate <see cref="ActionDescriptor">actions</see>.</value>
+        [CLSCompliant( false )]
+        public IReadOnlyCollection<ActionDescriptor> CandidateActions => candidateActions;
+
+        /// <summary>
+        /// Gets a read-only collection of matching actions.
+        /// </summary>
+        /// <value>A <see cref="IReadOnlyCollection{T}">read-only collection</see> of <see cref="ActionDescriptor">matching actions</see>.</value>
+        [CLSCompliant( false )]
+        public IReadOnlyCollection<ActionDescriptor> MatchingActions => matchingActions;
+
+        /// <summary>
+        /// Adds the specified candidate actions to the selection result.
+        /// </summary>
+        /// <param name="actions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ActionDescriptor">actions</see>
+        /// to add to the selection result.</param>
+        [CLSCompliant( false )]
+        public void AddCandidates( IEnumerable<ActionDescriptor> actions )
+        {
+            Arg.NotNull( actions, nameof( actions ) );
+            candidateActions.AddRange( actions );
         }
 
         /// <summary>
-        /// Gets a read-only list of candidate actions.
+        /// Adds the specified matching actions to the selection result.
         /// </summary>
-        /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="ActionDescriptor">actions</see>.</value>
+        /// <param name="matches">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ActionDescriptor">matching actions</see>
+        /// to add to the selection result.</param>
         [CLSCompliant( false )]
-        public IReadOnlyList<ActionDescriptor> CandidateActions { get; }
-
-        /// <summary>
-        /// Gets a read-only list of matching actions.
-        /// </summary>
-        /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ActionDescriptor">matching actions</see>.</value>
-        [CLSCompliant( false )]
-        public IReadOnlyList<ActionDescriptor> MatchingActions { get; }
+        public void AddMatches( IEnumerable<ActionDescriptor> matches )
+        {
+            Arg.NotNull( matches, nameof( matches ) );
+            matchingActions.AddRange( matches );
+        }
     }
 }

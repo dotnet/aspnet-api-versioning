@@ -5,6 +5,7 @@
     /// <summary>
     /// Defines the behavior of the API versioning feature.
     /// </summary>
+    [CLSCompliant( false )]
     public interface IApiVersioningFeature
     {
         /// <summary>
@@ -20,5 +21,11 @@
         /// <remarks>If an API version was not provided for the current request or the value
         /// provided is invalid, this property will return <c>null</c>.</remarks>
         ApiVersion RequestedApiVersion { get; set; }
+
+        /// <summary>
+        /// Gets the action selection result associated with the current request.
+        /// </summary>
+        /// <value>The <see cref="ActionSelectionResult">action selection result</see> associated with the current request.</value>
+        ActionSelectionResult SelectionResult { get; }
     }
 }

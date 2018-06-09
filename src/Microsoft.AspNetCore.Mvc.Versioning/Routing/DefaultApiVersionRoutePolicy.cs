@@ -87,17 +87,19 @@
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( selectionResult, nameof( selectionResult ) );
 
+            const ActionDescriptor NoMatch = default;
+
             switch ( selectionResult.MatchingActions.Count )
             {
                 case 0:
                     OnUnmatched( context, selectionResult );
-                    return null;
+                    return NoMatch;
                 case 1:
                     return OnSingleMatch( context, selectionResult );
             }
 
             OnMultipleMatches( context, selectionResult );
-            return null;
+            return NoMatch;
         }
 
         /// <summary>
@@ -110,7 +112,7 @@
         {
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( selectionResult, nameof( selectionResult ) );
-            return selectionResult.MatchingActions.Single();
+            return selectionResult.BestMatch;
         }
 
         /// <summary>

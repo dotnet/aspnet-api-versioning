@@ -163,17 +163,19 @@
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
             var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var selectionResult = feature.SelectionResult;
 
             feature.RequestedApiVersion = selectionContext.RequestedVersion;
+            selectionResult.AddCandidates( candidates );
 
-            if ( finalMatches.Count == 0 && candidates.Count > 0 )
+            if ( finalMatches.Count == 0 )
             {
                 return null;
             }
 
-            var result = new ActionSelectionResult( candidates, finalMatches );
+            selectionResult.AddMatches( finalMatches );
 
-            return RoutePolicy.Evaluate( context, result );
+            return RoutePolicy.Evaluate( context, selectionResult );
         }
 
         /// <summary>
