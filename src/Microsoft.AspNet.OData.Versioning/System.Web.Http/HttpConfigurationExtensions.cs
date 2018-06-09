@@ -11,6 +11,7 @@
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning;
     using Microsoft.Web.OData.Builder;
     using Microsoft.Web.OData.Routing;
     using OData.Batch;
@@ -34,8 +35,6 @@
         const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
         const string UrlKeyDelimiterKey = "System.Web.OData.UrlKeyDelimiterKey";
         const string UnversionedRouteSuffix = "-Unversioned";
-        const string ApiVersionConstraintName = "apiVersion";
-        const string ApiVersionConstraint = "{" + ApiVersionConstraintName + "}";
 
         /// <summary>
         /// Maps the specified versioned OData routes.
@@ -138,6 +137,7 @@
 
                 var route = default( ODataRoute );
                 var messageHandler = rootContainer.GetService<HttpMessageHandler>();
+                var options = configuration.GetApiVersioningOptions();
 
                 if ( messageHandler == null )
                 {
@@ -149,7 +149,7 @@
                 }
 
                 routes.Add( versionedRouteName, route );
-                AddApiVersionConstraintIfNecessary( route );
+                AddApiVersionConstraintIfNecessary( route, options );
                 odataRoutes.Add( route );
             }
 
@@ -294,6 +294,7 @@
 
                 var route = default( ODataRoute );
                 var messageHandler = rootContainer.GetService<HttpMessageHandler>();
+                var options = configuration.GetApiVersioningOptions();
 
                 if ( messageHandler == null )
                 {
@@ -305,7 +306,7 @@
                 }
 
                 routes.Add( versionedRouteName, route );
-                AddApiVersionConstraintIfNecessary( route );
+                AddApiVersionConstraintIfNecessary( route, options );
                 odataRoutes.Add( route );
             }
 
@@ -365,6 +366,7 @@
             var route = default( ODataRoute );
             var routes = configuration.Routes;
             var messageHandler = rootContainer.GetService<HttpMessageHandler>();
+            var options = configuration.GetApiVersioningOptions();
 
             if ( messageHandler != null )
             {
@@ -391,12 +393,12 @@
             }
 
             routes.Add( routeName, route );
-            AddApiVersionConstraintIfNecessary( route );
+            AddApiVersionConstraintIfNecessary( route, options );
 
             var unversionedRouteConstraint = new ODataPathRouteConstraint( routeName );
             var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedRouteConstraint, apiVersion ) );
 
-            AddApiVersionConstraintIfNecessary( unversionedRoute );
+            AddApiVersionConstraintIfNecessary( unversionedRoute, options );
             configuration.Routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
 
             return route;
@@ -641,6 +643,7 @@
 
             var routeConstraint = new VersionedODataPathRouteConstraint( routeName, apiVersion );
             var route = default( ODataRoute );
+            var options = configuration.GetApiVersioningOptions();
 
             if ( defaultHandler != null )
             {
@@ -659,12 +662,12 @@
             }
 
             routes.Add( routeName, route );
-            AddApiVersionConstraintIfNecessary( route );
+            AddApiVersionConstraintIfNecessary( route, options );
 
             var unversionedRouteConstraint = new ODataPathRouteConstraint( routeName );
             var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedRouteConstraint, apiVersion ) );
 
-            AddApiVersionConstraintIfNecessary( unversionedRoute );
+            AddApiVersionConstraintIfNecessary( unversionedRoute, options );
             routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
 
             return route;
@@ -714,13 +717,15 @@
             return new VersionedODataPathRouteConstraint( versionedRouteName, apiVersion );
         }
 
-        static void AddApiVersionConstraintIfNecessary( ODataRoute route )
+        static void AddApiVersionConstraintIfNecessary( ODataRoute route, ApiVersioningOptions options )
         {
             Contract.Requires( route != null );
+            Contract.Requires( options != null );
 
             var routePrefix = route.RoutePrefix;
+            var apiVersionConstraint = "{" + options.RouteConstraintName + "}";
 
-            if ( routePrefix == null || routePrefix.IndexOf( ApiVersionConstraint, Ordinal ) < 0 || route.Constraints.ContainsKey( ApiVersionConstraintName ) )
+            if ( routePrefix == null || routePrefix.IndexOf( apiVersionConstraint, Ordinal ) < 0 || route.Constraints.ContainsKey( options.RouteConstraintName ) )
             {
                 return;
             }
@@ -731,7 +736,7 @@
             var originalConstraints = new Dictionary<string, object>( route.Constraints );
 
             route.Constraints.Clear();
-            route.Constraints.Add( ApiVersionConstraintName, new ApiVersionRouteConstraint() );
+            route.Constraints.Add( options.RouteConstraintName, new ApiVersionRouteConstraint() );
 
             foreach ( var constraint in originalConstraints )
             {
@@ -754,8 +759,9 @@
             Contract.Requires( configureAction != null );
 
             var unversionedRoute = new ODataRoute( routePrefix, new UnversionedODataPathRouteConstraint( unversionedConstraints ) );
+            var options = configuration.GetApiVersioningOptions();
 
-            AddApiVersionConstraintIfNecessary( unversionedRoute );
+            AddApiVersionConstraintIfNecessary( unversionedRoute, options );
             configuration.Routes.Add( routeName, unversionedRoute );
             odataRoutes.Add( unversionedRoute );
             configuration.CreateODataRootContainer( routeName, configureAction );
