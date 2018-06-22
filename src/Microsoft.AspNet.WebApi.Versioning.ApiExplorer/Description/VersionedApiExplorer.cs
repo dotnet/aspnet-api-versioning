@@ -458,7 +458,11 @@
 
             foreach ( var controllerType in controllerTypes )
             {
-                var descriptor = new HttpControllerDescriptor( Configuration, Empty, controllerType );
+                var descriptor = new HttpControllerDescriptor()
+                {
+                    Configuration = Configuration,
+                    ControllerType = controllerType,
+                };
 
                 options.Conventions.ApplyTo( descriptor );
 
@@ -773,16 +777,17 @@
 
             var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
             var bodyParameter = parameterDescriptions.FirstOrDefault( description => description.Source == FromBody );
+            var formatters = actionDescriptor.Configuration.Formatters;
             var supportedRequestBodyFormatters =
                 bodyParameter != null ?
-                Configuration.Formatters.Where( f => f.CanReadType( bodyParameter.ParameterDescriptor.ParameterType ) ) :
+                formatters.Where( f => f.CanReadType( bodyParameter.ParameterDescriptor.ParameterType ) ) :
                 Enumerable.Empty<MediaTypeFormatter>();
 
             var responseDescription = CreateResponseDescription( actionDescriptor );
             var returnType = responseDescription.ResponseType ?? responseDescription.DeclaredType;
             var supportedResponseFormatters =
                 ( returnType != null && returnType != typeof( void ) ) ?
-                Configuration.Formatters.Where( f => f.CanWriteType( returnType ) ) :
+                formatters.Where( f => f.CanWriteType( returnType ) ) :
                 Enumerable.Empty<MediaTypeFormatter>();
 
             supportedRequestBodyFormatters = GetInnerFormatters( supportedRequestBodyFormatters );
