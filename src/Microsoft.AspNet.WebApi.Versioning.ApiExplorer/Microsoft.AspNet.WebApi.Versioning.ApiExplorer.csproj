@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>1.2.0</VersionPrefix>
+  <VersionPrefix>1.2.1</VersionPrefix>
   <AssemblyVersion>1.2.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer</AssemblyTitle>
@@ -12,7 +12,7 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="Support substituting API version parameter in route templates (Issue 247)" />
+  <ReleaseNotes Include="Fix IControllerConfiguration recursion (Issue 313)" />
  </ItemGroup>
 
  <ItemGroup>
