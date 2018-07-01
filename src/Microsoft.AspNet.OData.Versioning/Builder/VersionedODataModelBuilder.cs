@@ -1,11 +1,9 @@
-﻿namespace Microsoft.Web.OData.Builder
+﻿namespace Microsoft.AspNet.OData.Builder
 {
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using Microsoft.Web.Http.Versioning.Conventions;
-    using Microsoft.Web.OData.Controllers;
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;

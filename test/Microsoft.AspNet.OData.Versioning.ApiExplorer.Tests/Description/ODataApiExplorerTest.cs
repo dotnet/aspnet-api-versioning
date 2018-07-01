@@ -1,13 +1,9 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using FluentAssertions;
-    using System;
-    using System.Collections.Generic;
+    using Microsoft.AspNet.OData;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.OData;
     using Xunit;
     using static System.Net.Http.HttpMethod;
 

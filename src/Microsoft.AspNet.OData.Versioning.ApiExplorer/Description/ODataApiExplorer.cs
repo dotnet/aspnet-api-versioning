@@ -1,5 +1,8 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Formatter;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Routing;
@@ -18,9 +21,6 @@
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
     using System.Web.Http.ValueProviders;
-    using System.Web.OData;
-    using System.Web.OData.Formatter;
-    using System.Web.OData.Routing;
     using static System.Text.RegularExpressions.RegexOptions;
     using static System.Web.Http.Description.ApiParameterSource;
 

@@ -1,8 +1,4 @@
-﻿#if WEBAPI
-namespace Microsoft.Web.OData.Builder
-#else
-namespace Microsoft.AspNet.OData.Builder
-#endif
+﻿namespace Microsoft.AspNet.OData.Builder
 {
 #if !WEBAPI
     using Microsoft.AspNetCore.Mvc;
@@ -17,9 +13,6 @@ namespace Microsoft.AspNet.OData.Builder
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-#if WEBAPI
-    using System.Web.OData.Builder;
-#endif
 
     /// <summary>
     /// Represents a versioned variant of the <see cref="ODataModelBuilder"/>.

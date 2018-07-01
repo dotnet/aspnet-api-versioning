@@ -1,8 +1,8 @@
-﻿namespace Microsoft.Web.OData.Controllers
+﻿namespace Microsoft.AspNet.OData
 {
-    using Builder;
     using FluentAssertions;
-    using Http;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.Web.Http;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,6 @@
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
-    using System.Web.OData;
     using Xunit;
 
     public class VersionedMetadataControllerTest

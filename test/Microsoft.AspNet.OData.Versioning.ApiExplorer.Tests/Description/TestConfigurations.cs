@@ -1,9 +1,9 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.Web.Http.Simulators.Configuration;
     using Microsoft.Web.Http.Simulators.Models;
     using Microsoft.Web.Http.Versioning.Conventions;
-    using Microsoft.Web.OData.Builder;
     using System.Collections;
     using System.Collections.Generic;
     using System.Web.Http;
