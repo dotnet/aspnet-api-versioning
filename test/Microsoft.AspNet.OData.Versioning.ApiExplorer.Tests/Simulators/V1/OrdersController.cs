@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Web.Http.Simulators.V1
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.Web.Http.Description;
     using Microsoft.Web.Http.Simulators.Models;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
 
     public class OrdersController : ODataController
     {

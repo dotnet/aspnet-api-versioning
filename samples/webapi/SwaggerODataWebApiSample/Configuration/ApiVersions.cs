@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Examples.Configuration
 {
     using Microsoft.Web.Http;
-    using System;
 
     static class ApiVersions
     {

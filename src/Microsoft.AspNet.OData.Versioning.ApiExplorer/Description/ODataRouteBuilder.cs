@@ -1,5 +1,8 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -7,9 +10,6 @@
     using System.Linq;
     using System.Text;
     using System.Web.Http.Description;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
     using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static ODataRouteActionType;
     using static System.Linq.Enumerable;

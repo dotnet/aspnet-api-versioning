@@ -4,13 +4,13 @@ namespace Microsoft.Examples
 {
     using Configuration;
     using global::Owin;
+    using Microsoft.AspNet.OData.Batch;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.OData;
-    using Microsoft.OData.UriParser;
     using Microsoft.Web.Http.Versioning;
-    using Microsoft.Web.OData.Builder;
     using System.Web.Http;
-    using System.Web.OData.Batch;
-    using System.Web.OData.Builder;
+    using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static Microsoft.OData.ServiceLifetime;
     using static System.Web.Http.RouteParameter;
 
@@ -43,14 +43,14 @@ namespace Microsoft.Examples
             var models = modelBuilder.GetEdmModels();
             var batchHandler = new DefaultODataBatchHandler( httpServer );
 
-            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureODataServices, batchHandler );
+            configuration.MapVersionedODataRoutes( "odata", "api", models, OnConfigureContainer, batchHandler );
             configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{id}", new { id = Optional } );
             appBuilder.UseWebApi( httpServer );
         }
 
-        static void ConfigureODataServices( IContainerBuilder builder )
+        static void OnConfigureContainer( IContainerBuilder builder )
         {
-            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => new CaseInsensitiveODataUriResolver() );
+            builder.AddService( Singleton, typeof( IODataPathHandler ), sp => new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses } );
         }
     }
 }

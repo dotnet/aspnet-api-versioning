@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Examples.V1
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Models;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
 
     /// <summary>
     /// Represents a RESTful people service.

@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using System;
@@ -10,7 +11,6 @@
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
-    using System.Web.OData;
     using static System.Reflection.BindingFlags;
 
     static class TypeExtensions

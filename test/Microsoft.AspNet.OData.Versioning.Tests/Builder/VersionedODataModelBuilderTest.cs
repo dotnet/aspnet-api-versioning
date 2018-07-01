@@ -1,16 +1,14 @@
-﻿namespace Microsoft.Web.OData.Builder
+﻿namespace Microsoft.AspNet.OData.Builder
 {
     using FluentAssertions;
-    using Http;
     using Microsoft.OData.Edm;
+    using Microsoft.Web.Http;
     using Moq;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
-    using System.Web.OData;
-    using System.Web.OData.Builder;
     using Xunit;
 
     public class VersionedODataModelBuilderTest

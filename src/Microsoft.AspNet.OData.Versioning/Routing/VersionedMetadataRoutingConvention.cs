@@ -1,12 +1,10 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
-    using Controllers;
+    using Microsoft.AspNet.OData.Routing.Conventions;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http.Controllers;
-    using System.Web.OData.Routing;
-    using System.Web.OData.Routing.Conventions;
     using static System.Net.Http.HttpMethod;
 
     /// <summary>

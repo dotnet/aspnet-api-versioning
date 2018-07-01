@@ -1,8 +1,10 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
     using FluentAssertions;
-    using Http;
+    using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.OData.Edm;
+    using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -10,33 +12,14 @@
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
-    using System.Web.OData.Builder;
-    using System.Web.OData.Routing;
-    using System.Web.OData.Routing.Conventions;
     using Xunit;
-    using static Http.ApiVersion;
+    using static Microsoft.Web.Http.ApiVersion;
     using static System.Net.Http.HttpMethod;
     using static System.Net.HttpStatusCode;
     using static System.Web.Http.Routing.HttpRouteDirection;
 
     public class VersionedODataPathRouteConstraintTest
     {
-        static VersionedODataPathRouteConstraint NewVersionedODataPathRouteConstraint( HttpRequestMessage request, IEdmModel model, ApiVersion apiVersion, string routePrefix = null )
-        {
-            var pathHandler = new DefaultODataPathHandler();
-            var conventions = ODataRoutingConventions.CreateDefault();
-            var configuration = new HttpConfiguration();
-            var routingConventions = Enumerable.Empty<IODataRoutingConvention>();
-            var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
-
-            configuration.AddApiVersioning();
-            configuration.MapVersionedODataRoute( "odata", routePrefix, model, apiVersion );
-            request.SetConfiguration( configuration );
-            configuration.EnsureInitialized();
-
-            return constraint;
-        }
-
         [Fact]
         public void match_should_always_return_true_for_uri_resolution()
         {
@@ -104,9 +87,10 @@
             var apiVersion = new ApiVersion( 2, 0 );
             var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)" );
             var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
-            var constraint = NewVersionedODataPathRouteConstraint( request, Test.Model, apiVersion );
-
-            request.GetConfiguration().AddApiVersioning(
+            var constraint = NewVersionedODataPathRouteConstraint(
+                request,
+                Test.Model,
+                apiVersion,
                 o =>
                 {
                     o.DefaultApiVersion = apiVersion;
@@ -133,6 +117,27 @@
 
             // assert
             match.Should().Throw<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
+        }
+
+        static VersionedODataPathRouteConstraint NewVersionedODataPathRouteConstraint(
+            HttpRequestMessage request,
+            IEdmModel model,
+            ApiVersion apiVersion,
+            Action<ApiVersioningOptions> configure = default,
+            string routePrefix = default )
+        {
+            var pathHandler = new DefaultODataPathHandler();
+            var conventions = ODataRoutingConventions.CreateDefault();
+            var configuration = new HttpConfiguration();
+            var routingConventions = Enumerable.Empty<IODataRoutingConvention>();
+            var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
+
+            configuration.AddApiVersioning( configure ?? new Action<ApiVersioningOptions>( _ => { } ) );
+            configuration.MapVersionedODataRoute( "odata", routePrefix, model, apiVersion );
+            request.SetConfiguration( configuration );
+            configuration.EnsureInitialized();
+
+            return constraint;
         }
     }
 }

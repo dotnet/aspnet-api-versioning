@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Mvc
                 return true;
             }
 
-            value = default( TValue );
+            value = default;
             return false;
         }
 

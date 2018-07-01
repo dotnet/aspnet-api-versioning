@@ -1,6 +1,6 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
-    using Http;
+    using Microsoft.Web.Http;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;

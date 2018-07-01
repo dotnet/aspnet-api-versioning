@@ -186,7 +186,7 @@
                 Contract.Ensures( Contract.Result<IReadOnlyList<CandidateHttpActionDescriptor>>() != null );
 
                 var routeData = controllerContext.RouteData;
-                var subRoutes = ignoreSubRoutes ? default( IEnumerable<IHttpRouteData> ) : routeData.GetSubRoutes();
+                var subRoutes = ignoreSubRoutes ? default : routeData.GetSubRoutes();
                 var actionsWithParameters = subRoutes == null ?
                     GetInitialCandidateWithParameterListForRegularRoutes( controllerContext, ignoreVerbs ) :
                     GetInitialCandidateWithParameterListForDirectRoutes( controllerContext, subRoutes, ignoreVerbs );

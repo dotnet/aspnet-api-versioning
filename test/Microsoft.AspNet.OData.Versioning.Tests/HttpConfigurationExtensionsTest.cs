@@ -1,26 +1,26 @@
-﻿namespace System.Web.OData
+﻿namespace Microsoft.AspNet.OData
 {
-    using Batch;
-    using Builder;
-    using Collections.Generic;
     using FluentAssertions;
-    using Http;
-    using Http.Dispatcher;
-    using Linq;
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Batch;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
-    using Microsoft.Web.OData.Builder;
-    using Microsoft.Web.OData.Routing;
     using Moq;
-    using Routing.Conventions;
+    using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Web.Http;
+    using System.Web.Http.Dispatcher;
     using System.Web.Http.Routing;
-    using System.Web.OData.Routing;
     using Xunit;
 
     public class HttpConfigurationExtensionsTest
     {
-        const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
+        const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
 
         [ApiVersion( "1.0" )]
         sealed class ControllerV1 : ODataController { }
@@ -74,9 +74,7 @@
             // assert
             foreach ( var route in routes )
             {
-                var constraint = route.PathRouteConstraint as VersionedODataPathRouteConstraint;
-
-                if ( constraint == null )
+                if ( !( route.PathRouteConstraint is VersionedODataPathRouteConstraint constraint ) )
                 {
                     continue;
                 }

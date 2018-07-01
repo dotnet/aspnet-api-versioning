@@ -2,7 +2,7 @@
 
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
-  <RootNamespace>Microsoft</RootNamespace>
+  <RootNamespace>Microsoft.AspNet.OData</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
  </PropertyGroup>
 

@@ -1,25 +1,24 @@
 ﻿namespace System.Web.Http
 {
-    using Collections.Generic;
-    using Diagnostics.Contracts;
-    using Linq;
     using Microsoft;
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Batch;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning;
-    using Microsoft.Web.OData.Builder;
-    using Microsoft.Web.OData.Routing;
-    using OData.Batch;
-    using OData.Extensions;
-    using OData.Routing;
-    using OData.Routing.Conventions;
-    using Routing;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
     using System.Net.Http;
-    using System.Web.OData;
+    using System.Web.Http.Routing;
     using static Microsoft.OData.ServiceLifetime;
     using static System.String;
     using static System.StringComparison;
@@ -29,9 +28,9 @@
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        const string ContainerBuilderFactoryKey = "System.Web.OData.ContainerBuilderFactoryKey";
-        const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
-        const string UrlKeyDelimiterKey = "System.Web.OData.UrlKeyDelimiterKey";
+        const string ContainerBuilderFactoryKey = "Microsoft.AspNet.OData.ContainerBuilderFactoryKey";
+        const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
+        const string UrlKeyDelimiterKey = "Microsoft.AspNet.OData.UrlKeyDelimiterKey";
         const string UnversionedRouteSuffix = "-Unversioned";
 
         /// <summary>
@@ -129,12 +128,10 @@
             object ConfigureRoutingConventions( IEdmModel model, string versionedRouteName, ApiVersion apiVersion )
             {
                 var routingConventions = VersionedODataRoutingConventions.CreateDefault();
+                var context = new ODataConventionConfigurationContext( configuration, versionedRouteName, model, apiVersion, routingConventions );
 
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
                 routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( versionedRouteName, configuration, apiVersion ) );
-
-                var context = new ODataConventionConfigurationContext( configuration, versionedRouteName, model, apiVersion, routingConventions );
-
                 configureRoutingConventions?.Invoke( context );
 
                 return context.RoutingConventions.ToArray();
@@ -401,12 +398,10 @@
             {
                 var model = serviceProvider.GetRequiredService<IEdmModel>();
                 var routingConventions = VersionedODataRoutingConventions.CreateDefault();
+                var context = new ODataConventionConfigurationContext( configuration, routeName, model, apiVersion, routingConventions );
 
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
                 routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, configuration, apiVersion ) );
-
-                var context = new ODataConventionConfigurationContext( configuration, routeName, model, apiVersion, routingConventions );
-
                 configureRoutingConventions?.Invoke( context );
 
                 return context.RoutingConventions.ToArray();

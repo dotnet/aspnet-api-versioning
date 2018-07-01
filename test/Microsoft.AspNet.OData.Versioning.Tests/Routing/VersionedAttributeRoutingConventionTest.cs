@@ -1,8 +1,6 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
-    using Builder;
     using FluentAssertions;
-    using Http;
     using Microsoft.OData.Edm;
     using Moq;
     using System;
@@ -11,8 +9,10 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
-    using System.Web.OData;
+    using Microsoft.AspNet.OData;
     using Xunit;
+    using Microsoft.Web.Http;
+    using Microsoft.AspNet.OData.Builder;
 
     public class VersionedAttributeRoutingConventionTest
     {

@@ -1,15 +1,14 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
-    using Http;
-    using Http.Versioning;
     using Microsoft.OData;
+    using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
-    using System.Web.OData.Routing;
     using static System.Net.HttpStatusCode;
     using static System.Web.Http.Routing.HttpRouteDirection;
 

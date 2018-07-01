@@ -1,5 +1,9 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Routing.Conventions;
+    using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System;
@@ -9,11 +13,6 @@
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Controllers;
-    using System.Web.OData;
-    using System.Web.OData.Extensions;
-    using System.Web.OData.Routing;
-    using System.Web.OData.Routing.Conventions;
-    using System.Web.OData.Routing.Template;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Web API.

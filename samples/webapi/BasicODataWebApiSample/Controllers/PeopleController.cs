@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Models;
     using System.Web.Http;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
 
     [ApiVersion( "1.0" )]
     [ApiVersion( "2.0" )]
