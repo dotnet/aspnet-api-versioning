@@ -1,13 +1,13 @@
 ﻿namespace Microsoft.Examples.V3
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
-    using Models;
     using System;
     using System.Collections.Generic;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
     using static System.Net.HttpStatusCode;
 
     /// <summary>

@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
-    using Models;
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.Examples.Models;
     using System.Web.Http;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
 
     [ODataRoutePrefix( "Orders" )]
     public class OrdersController : ODataController

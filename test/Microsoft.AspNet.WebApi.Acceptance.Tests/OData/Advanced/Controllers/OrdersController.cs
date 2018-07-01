@@ -1,6 +1,6 @@
-﻿namespace Microsoft.Web.OData.Advanced.Controllers
+﻿namespace Microsoft.AspNet.OData.Advanced.Controllers
 {
-    using Models;
+    using Microsoft.AspNet.OData.Models;
     using System.Web.Http;
 
     public class OrdersController : ApiController

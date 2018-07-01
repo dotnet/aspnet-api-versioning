@@ -1,11 +1,7 @@
-﻿#if WEBAPI
-namespace Microsoft.Web.OData.Routing
-#else
-namespace Microsoft.AspNet.OData.Routing
-#endif
+﻿namespace Microsoft.AspNet.OData.Routing
 {
-#if !WEBAPI
     using Microsoft.AspNet.OData.Routing.Template;
+#if !WEBAPI
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;
 #endif
@@ -16,10 +12,6 @@ namespace Microsoft.AspNet.OData.Routing
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-#if WEBAPI
-    using System.Web.OData.Routing;
-    using System.Web.OData.Routing.Template;
-#endif
     using static System.StringComparison;
 #if WEBAPI
     using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;

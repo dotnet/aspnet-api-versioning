@@ -1,8 +1,7 @@
 ﻿namespace Microsoft.OData.Edm
 {
     using FluentAssertions;
-    using System;
-    using Web.Http;
+    using Microsoft.Web.Http;
     using Xunit;
 
     public class ApiVersionAnnotationTest

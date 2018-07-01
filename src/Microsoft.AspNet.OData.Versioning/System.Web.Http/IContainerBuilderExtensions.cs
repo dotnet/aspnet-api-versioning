@@ -1,15 +1,15 @@
 ﻿namespace System.Web.Http
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Formatter.Deserialization;
+    using Microsoft.AspNet.OData.Formatter.Serialization;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Query.Expressions;
+    using Microsoft.AspNet.OData.Query.Validators;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
-    using OData.Routing;
-    using System.Web.Http.Dispatcher;
-    using System.Web.OData.Formatter.Deserialization;
-    using System.Web.OData.Formatter.Serialization;
-    using System.Web.OData.Query;
-    using System.Web.OData.Query.Expressions;
-    using System.Web.OData.Query.Validators;
-    using System.Web.OData.Routing.Conventions;
     using static Microsoft.OData.ServiceLifetime;
 
     static class IContainerBuilderExtensions
@@ -25,7 +25,7 @@
             AddDeserializerServices( builder );
             AddSerializerServices( builder );
             AddBinders( builder );
-            builder.AddService( Singleton, sp => sp.GetService<HttpConfiguration>()?.Services.GetAssembliesResolver() ?? new DefaultAssembliesResolver() );
+            AddHttpRequestScope( builder );
         }
 
         static void AddServicePrototypes( IContainerBuilder builder )
@@ -37,7 +37,7 @@
         static void AddQueryValidators( IContainerBuilder builder )
         {
             builder.AddService<CountQueryValidator>( Singleton );
-            builder.AddService<FilterQueryValidator>( Singleton );
+            builder.AddService<FilterQueryValidator>( Scoped );
             builder.AddService<ODataQueryValidator>( Singleton );
             builder.AddService<OrderByQueryValidator>( Singleton );
             builder.AddService<SelectExpandQueryValidator>( Singleton );
@@ -82,6 +82,12 @@
         {
             builder.AddService<ODataQuerySettings>( Scoped );
             builder.AddService<FilterBinder>( Transient );
+        }
+
+        static void AddHttpRequestScope( IContainerBuilder builder )
+        {
+            builder.AddService<HttpRequestScope>( Scoped );
+            builder.AddService( Scoped, sp => sp.GetRequiredService<HttpRequestScope>().HttpRequest );
         }
     }
 }

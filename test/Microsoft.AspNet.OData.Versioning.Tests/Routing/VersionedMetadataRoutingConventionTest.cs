@@ -1,6 +1,7 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
     using Moq;
@@ -9,11 +10,8 @@
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http.Controllers;
-    using System.Web.OData;
-    using System.Web.OData.Routing;
     using Xunit;
     using static Microsoft.OData.ServiceLifetime;
-    using ODataPath = System.Web.OData.Routing.ODataPath;
 
     public class VersionedMetadataRoutingConventionTest
     {

@@ -1,12 +1,12 @@
 ﻿namespace Microsoft.Web.Http.Simulators.V1
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
-    using Models;
+    using Microsoft.Web.Http.Simulators.Models;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
-    using System.Web.OData.Routing;
 
     [ApiVersion( "0.9" )]
     [ApiVersion( "1.0" )]

@@ -6,7 +6,7 @@
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API and OData v4.0.</Description>
-  <RootNamespace>Microsoft</RootNamespace>
+  <RootNamespace>Microsoft.AspNet.OData</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;OData;Versioning</PackageTags>
  </PropertyGroup>
@@ -20,7 +20,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.OData" Version="6.0.0" />
+  <PackageReference Include="Microsoft.AspNet.OData" Version="7.0.0" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -29,22 +29,6 @@
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
-
  <Import Project="..\Common.OData\Common.OData.projitems" Label="Shared" />
-
- <ItemGroup>
-   <Compile Update="C:\Dev\Projects\aspnet-api-versioning\src\Common.OData\SR.Designer.cs">
-     <DesignTime>True</DesignTime>
-     <AutoGen>True</AutoGen>
-     <DependentUpon>SR.resx</DependentUpon>
-   </Compile>
- </ItemGroup>
-
- <ItemGroup>
-   <EmbeddedResource Update="C:\Dev\Projects\aspnet-api-versioning\src\Common.OData\SR.resx">
-     <Generator>ResXFileCodeGenerator</Generator>
-     <LastGenOutput>SR.Designer.cs</LastGenOutput>
-   </EmbeddedResource>
- </ItemGroup>
 
 </Project>

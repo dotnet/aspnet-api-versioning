@@ -1,9 +1,8 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using System;
+    using Microsoft.AspNet.OData;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
 
     /// <summary>
     /// Represents the possible API versioning options for an OData API explorer.

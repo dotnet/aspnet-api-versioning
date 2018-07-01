@@ -14,8 +14,8 @@
     /// </summary>
     public static class HttpConfigurationExtensions
     {
-        const string RootContainerMappingsKey = "System.Web.OData.RootContainerMappingsKey";
-        const string UrlKeyDelimiterKey = "System.Web.OData.UrlKeyDelimiterKey";
+        const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
+        const string UrlKeyDelimiterKey = "Microsoft.AspNet.OData.UrlKeyDelimiterKey";
 
         /// <summary>
         /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.

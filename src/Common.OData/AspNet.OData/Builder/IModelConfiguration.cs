@@ -1,11 +1,8 @@
-﻿#if WEBAPI
-namespace Microsoft.Web.OData.Builder
+﻿namespace Microsoft.AspNet.OData.Builder
 {
+#if WEBAPI
     using Microsoft.Web.Http;
-    using System.Web.OData.Builder;
 #else
-namespace Microsoft.AspNet.OData.Builder
-{
     using Microsoft.AspNetCore.Mvc;
     using System;
 #endif

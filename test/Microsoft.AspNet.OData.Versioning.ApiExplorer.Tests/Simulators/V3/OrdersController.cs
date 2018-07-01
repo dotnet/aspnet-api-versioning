@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Web.Http.Simulators.V3
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.Web.Http.Description;
     using Microsoft.Web.Http.Simulators.Models;
     using System.Collections.Generic;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
     using static System.Linq.Enumerable;
     using static System.Net.HttpStatusCode;
 

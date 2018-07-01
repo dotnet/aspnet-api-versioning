@@ -1,10 +1,8 @@
-﻿// TODO: drop '.Controllers' in 7.0 to be congruent with OData library
-namespace Microsoft.Web.OData.Controllers
+﻿namespace Microsoft.AspNet.OData
 {
-    using Http;
+    using Microsoft.Web.Http;
     using System.Net.Http;
     using System.Web.Http;
-    using System.Web.OData;
     using static Microsoft.OData.ODataConstants;
     using static Microsoft.OData.ODataUtils;
     using static Microsoft.OData.ODataVersion;
