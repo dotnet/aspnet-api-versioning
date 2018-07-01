@@ -46,7 +46,7 @@
         /// <param name="serviceProvider">The current <see cref="IServiceProvider">HTTP configuration</see>.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
         public VersionedAttributeRoutingConvention( string routeName, IServiceProvider serviceProvider, ApiVersion apiVersion )
-            : this( routeName, serviceProvider, default( IODataPathTemplateHandler ), apiVersion ) { }
+            : this( routeName, serviceProvider, default, apiVersion ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
@@ -152,7 +152,7 @@
                 }
             }
 
-            return default( SelectControllerResult );
+            return default;
         }
 
         /// <summary>

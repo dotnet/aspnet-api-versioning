@@ -18,7 +18,6 @@
     using Microsoft.OData;
     using Microsoft.OData.Edm;
     using Microsoft.Simulators;
-    using Microsoft.Web.OData.Routing;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -81,7 +80,7 @@
         public void match_should_return_expected_result_for_service_and_metadata_document( string requestUri, string odataPath, string apiVersionValue, bool expected )
         {
             // arrange
-            const string rawApiVersion = default( string );
+            const string rawApiVersion = default;
             var url = new Uri( requestUri );
             var apiVersion = Parse( apiVersionValue );
             var context = NewHttpContext( url, Test.EmptyModel, rawApiVersion );
@@ -103,7 +102,7 @@
         public void match_should_return_expected_result_when_controller_is_implicitly_versioned( bool allowImplicitVersioning, bool expected )
         {
             // arrange
-            const string rawApiVersion = default( string );
+            const string rawApiVersion = default;
             var apiVersion = new ApiVersion( 2, 0 );
 
             void OnConfigure( ApiVersioningOptions options )
@@ -152,6 +151,7 @@
 
             var features = new Mock<IFeatureCollection>();
             var odataFeature = Mock.Of<IODataFeature>();
+            var apiVersioningFeature = Mock.Of<IApiVersioningFeature>();
             var query = new Mock<IQueryCollection>();
             var httpRequest = new Mock<HttpRequest>();
             var httpContext = new Mock<HttpContext>();
@@ -191,8 +191,11 @@
                 app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", routePrefix, model, apiVersion ) );
             }
 
+            apiVersioningFeature.RawRequestedApiVersion = rawApiVersion;
+            apiVersioningFeature.RequestedApiVersion = apiVersion;
             features.SetupGet( f => f[typeof( IODataFeature )] ).Returns( odataFeature );
             features.Setup( f => f.Get<IODataFeature>() ).Returns( odataFeature );
+            features.Setup( f => f.Get<IApiVersioningFeature>() ).Returns( apiVersioningFeature );
             query.Setup( q => q[It.IsAny<string>()] ).Returns( ( string k ) => queryValues.TryGetValue( k, out var v ) ? v : StringValues.Empty );
             httpContext.SetupGet( c => c.Features ).Returns( features.Object );
             httpContext.SetupProperty( c => c.RequestServices, serviceProvider );
@@ -206,11 +209,6 @@
             httpRequest.SetupProperty( r => r.Path, new PathString( '/' + url.GetComponents( Path, Unescaped ) ) );
             httpRequest.SetupProperty( r => r.QueryString, new QueryString( url.Query ) );
             httpRequest.SetupGet( r => r.Query ).Returns( query.Object );
-            httpContext.Object.Items["MS_ApiVersionRequestProperties"] = new ApiVersionRequestProperties( httpContext.Object )
-            {
-                ApiVersion = apiVersion,
-                RawApiVersion = rawApiVersion,
-            };
 
             return httpContext.Object;
         }

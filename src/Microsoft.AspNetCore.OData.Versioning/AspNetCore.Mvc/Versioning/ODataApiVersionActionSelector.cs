@@ -6,12 +6,14 @@
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.Linq;
 
     /// <summary>
@@ -29,11 +31,13 @@
         /// <param name="actionConstraintCache">The <see cref="ActionConstraintCache"/> that providers a set of <see cref="IActionConstraint"/> instances.</param>
         /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the action selector.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="routePolicy">The <see cref="IApiVersionRoutePolicy">route policy</see> applied to candidate matches.</param>
         public ODataApiVersionActionSelector(
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
             ActionConstraintCache actionConstraintCache,
             IOptions<ApiVersioningOptions> options,
-            ILoggerFactory loggerFactory ) : base( actionDescriptorCollectionProvider, actionConstraintCache, options, loggerFactory ) { }
+            ILoggerFactory loggerFactory,
+            IApiVersionRoutePolicy routePolicy ) : base( actionDescriptorCollectionProvider, actionConstraintCache, options, loggerFactory, routePolicy ) { }
 
         /// <summary>
         /// Selects a list of candidate actions from the specified route context.
@@ -44,17 +48,17 @@
         {
             Arg.NotNull( context, nameof( context ) );
 
-            var httpContext = context.HttpContext;
-            var request = httpContext.Request;
-            var odataPath = httpContext.ODataFeature().Path;
-            var routeData = context.RouteData;
+            var odataPath = context.HttpContext.ODataFeature().Path;
+            var routeValues = context.RouteData.Values;
+            var newOrExistingODataRouteCandidate = odataPath == null || routeValues.ContainsKey( ActionKey );
 
-            if ( odataPath == null || routeData.Values.ContainsKey( ActionKey ) )
+            if ( newOrExistingODataRouteCandidate )
             {
                 return base.SelectCandidates( context );
             }
 
-            var routingConventions = request.GetRoutingConventions();
+            var routeData = context.RouteData;
+            var routingConventions = context.HttpContext.Request.GetRoutingConventions();
 
             if ( routingConventions == null )
             {
@@ -86,11 +90,12 @@
             Arg.NotNull( context, nameof( context ) );
             Arg.NotNull( candidates, nameof( candidates ) );
 
-            var routeValues = context.RouteData.Values;
             var httpContext = context.HttpContext;
             var odataPath = httpContext.ODataFeature().Path;
+            var routeValues = context.RouteData.Values;
+            var odataRouteCandidate = odataPath != null && routeValues.ContainsKey( ActionKey );
 
-            if ( odataPath == null || !routeValues.ContainsKey( ActionKey ) )
+            if ( !odataRouteCandidate )
             {
                 return base.SelectBestCandidate( context, candidates );
             }
@@ -122,28 +127,20 @@
 
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
-            var properties = httpContext.ApiVersionProperties();
-            var selectionResult = properties.SelectionResult;
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var selectionResult = feature.SelectionResult;
 
-            properties.ApiVersion = selectionContext.RequestedVersion;
+            feature.RequestedApiVersion = selectionContext.RequestedVersion;
             selectionResult.AddCandidates( candidates );
 
-            if ( finalMatches != null )
+            if ( finalMatches.Count == 0 )
             {
-                var selectedAction = SelectActionWithApiVersionPolicyApplied( finalMatches, selectionResult );
-
-                if ( selectedAction != null )
-                {
-                    return selectedAction;
-                }
-
-                AppendPossibleMatches( finalMatches, context, selectionResult );
+                return null;
             }
 
-            // note: even though we may have had a successful match, this method could be called multiple times. the final decision
-            // is made by the IApiVersionRoutePolicy. we return here to make sure all candidates have been considered at least once.
-            selectionResult.EndIteration();
-            return null;
+            selectionResult.AddMatches( finalMatches );
+
+            return RoutePolicy.Evaluate( context, selectionResult );
         }
     }
 }
