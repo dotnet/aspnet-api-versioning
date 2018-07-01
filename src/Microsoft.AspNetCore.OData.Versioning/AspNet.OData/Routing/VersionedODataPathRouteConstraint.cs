@@ -1,6 +1,5 @@
-﻿namespace Microsoft.Web.OData.Routing
+﻿namespace Microsoft.AspNet.OData.Routing
 {
-    using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Versioning;
@@ -16,29 +15,19 @@
     /// Represents an <see cref="ODataPathRouteConstraint">OData path route constraint</see> which supports versioning.
     /// </summary>
     [CLSCompliant( false )]
-    public class VersionedODataPathRouteConstraint : IRouteConstraint
+    public class VersionedODataPathRouteConstraint : ODataPathRouteConstraint
     {
-        // HACK: [BUG] https://github.com/OData/WebApi/issues/1388
-        readonly ODataPathRouteConstraint @base;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedODataPathRouteConstraint" /> class.
         /// </summary>
         /// <param name="routeName">The name of the route this constraint is associated with.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the route constraint.</param>
         public VersionedODataPathRouteConstraint( string routeName, ApiVersion apiVersion )
+            : base( routeName )
         {
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             ApiVersion = apiVersion;
-            @base = new ODataPathRouteConstraint( routeName );
         }
-
-        /// <summary>
-        /// Gets the name of the route associated with the constraint.
-        /// </summary>
-        /// <value>The name of the route associated with the constraint.</value>
-        // HACK: [BUG] https://github.com/OData/WebApi/issues/1388
-        public string RouteName => @base.RouteName;
 
         /// <summary>
         /// Gets the API version matched by the current OData path route constraint.
@@ -55,7 +44,7 @@
         /// <param name="values">The current <see cref="RouteValueDictionary">collection</see> of route values.</param>
         /// <param name="routeDirection">The <see cref="RouteDirection">route direction</see> to match.</param>
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
-        public virtual bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
+        public override bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
         {
             Arg.NotNull( httpContext, nameof( httpContext ) );
             Arg.NotNull( route, nameof( route ) );
@@ -63,22 +52,22 @@
 
             if ( routeDirection == UrlGeneration )
             {
-                return @base.Match( httpContext, route, routeKey, values, routeDirection );
+                return base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
             var request = httpContext.Request;
-            var properties = httpContext.ApiVersionProperties();
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
 
-            if ( !TryGetRequestedApiVersion( httpContext, properties, out var requestedVersion ) )
+            if ( !TryGetRequestedApiVersion( httpContext, feature, out var requestedVersion ) )
             {
                 // note: if an error occurs reading the api version, still let the base constraint
                 // match the request. the IActionSelector will produce 400 during action selection.
-                return @base.Match( httpContext, route, routeKey, values, routeDirection );
+                return base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
             if ( requestedVersion != null )
             {
-                if ( ApiVersion == requestedVersion && @base.Match( httpContext, route, routeKey, values, routeDirection ) )
+                if ( ApiVersion == requestedVersion && base.Match( httpContext, route, routeKey, values, routeDirection ) )
                 {
                     return true;
                 }
@@ -95,8 +84,8 @@
 
             if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
             {
-                properties.ApiVersion = ApiVersion;
-                return @base.Match( httpContext, route, routeKey, values, routeDirection );
+                feature.RequestedApiVersion = ApiVersion;
+                return base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
             return false;
@@ -105,18 +94,18 @@
         static bool IsServiceDocumentOrMetadataRoute( RouteValueDictionary values ) =>
             values.TryGetValue( "odataPath", out var value ) && ( value == null || Equals( value, "$metadata" ) );
 
-        static bool TryGetRequestedApiVersion( HttpContext httpContext, ApiVersionRequestProperties properties, out ApiVersion apiVersion )
+        static bool TryGetRequestedApiVersion( HttpContext httpContext, IApiVersioningFeature feature, out ApiVersion apiVersion )
         {
             Contract.Requires( httpContext != null );
-            Contract.Requires( properties != null );
+            Contract.Requires( feature != null );
 
             try
             {
-                apiVersion = properties.ApiVersion;
+                apiVersion = feature.RequestedApiVersion;
             }
             catch ( AmbiguousApiVersionException )
             {
-                apiVersion = default( ApiVersion );
+                apiVersion = default;
                 return false;
             }
 
