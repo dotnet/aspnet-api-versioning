@@ -1,8 +1,6 @@
 ﻿namespace System.Web.Http
 {
     using Collections.Generic;
-    using Collections.Specialized;
-    using Diagnostics.CodeAnalysis;
     using Diagnostics.Contracts;
     using Linq;
     using Microsoft;
@@ -54,7 +52,7 @@
             string routePrefix,
             IEnumerable<IEdmModel> models,
             Action<IContainerBuilder> configureAction ) =>
-            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, configureAction, null );
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, configureAction, default, default );
 
         /// <summary>
         /// Maps the specified versioned OData routes.
@@ -75,6 +73,52 @@
             string routePrefix,
             IEnumerable<IEdmModel> models,
             Action<IContainerBuilder> configureAction,
+            ODataBatchHandler batchHandler ) =>
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, configureAction, default, batchHandler );
+
+        /// <summary>
+        /// Maps the specified versioned OData routes.
+        /// </summary>
+        /// <param name="configuration">The extended <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see> to use for parsing OData paths.</param>
+        /// <param name="configureAction">The configuring action to add the services to the root container.</param>
+        /// <param name="configureRoutingConventions">The configuring action to add or update routing conventions.</param>
+        /// <returns>The <see cref="IReadOnlyList{T}">read-only list</see> of added <see cref="ODataRoute">OData routes</see>.</returns>
+        /// <remarks>The specified <paramref name="models"/> must contain the <see cref="ApiVersionAnnotation">API version annotation</see>.  This annotation is
+        /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
+        /// create the <paramref name="models"/>.</remarks>
+        public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEnumerable<IEdmModel> models,
+            Action<IContainerBuilder> configureAction,
+            Action<ODataConventionConfigurationContext> configureRoutingConventions ) =>
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, configureAction, configureRoutingConventions, default );
+
+        /// <summary>
+        /// Maps the specified versioned OData routes.
+        /// </summary>
+        /// <param name="configuration">The extended <see cref="HttpConfiguration">HTTP configuration</see>.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see> to use for parsing OData paths.</param>
+        /// <param name="configureAction">The configuring action to add the services to the root container.</param>
+        /// <param name="configureRoutingConventions">The configuring action to add or update routing conventions.</param>
+        /// <param name="batchHandler">The <see cref="ODataBatchHandler">OData batch handler</see>.</param>
+        /// <returns>The <see cref="IReadOnlyList{T}">read-only list</see> of added <see cref="ODataRoute">OData routes</see>.</returns>
+        /// <remarks>The specified <paramref name="models"/> must contain the <see cref="ApiVersionAnnotation">API version annotation</see>.  This annotation is
+        /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
+        /// create the <paramref name="models"/>.</remarks>
+        public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            IEnumerable<IEdmModel> models,
+            Action<IContainerBuilder> configureAction,
+            Action<ODataConventionConfigurationContext> configureRoutingConventions,
             ODataBatchHandler batchHandler )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
@@ -83,12 +127,16 @@
 
             object ConfigureRoutingConventions( IEdmModel model, string versionedRouteName, ApiVersion apiVersion )
             {
-                var routingConventions = EnsureConventions( ODataRoutingConventions.CreateDefault() );
+                var routingConventions = VersionedODataRoutingConventions.CreateDefault();
 
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
                 routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( versionedRouteName, configuration, apiVersion ) );
 
-                return routingConventions.ToArray();
+                var context = new ODataConventionConfigurationContext( configuration, versionedRouteName, model, apiVersion, routingConventions );
+
+                configureRoutingConventions?.Invoke( context );
+
+                return context.RoutingConventions.ToArray();
             }
 
             if ( !IsNullOrEmpty( routePrefix ) )
@@ -170,7 +218,7 @@
         /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
         /// create the <paramref name="models"/>.</remarks>
         public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes( this HttpConfiguration configuration, string routeName, string routePrefix, IEnumerable<IEdmModel> models ) =>
-            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null );
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), default );
 
         /// <summary>
         /// Maps the specified versioned OData routes. When the <paramref name="batchHandler"/> is provided, it will create a
@@ -191,7 +239,7 @@
             string routePrefix,
             IEnumerable<IEdmModel> models,
             ODataBatchHandler batchHandler ) =>
-            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), batchHandler );
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), batchHandler );
 
         /// <summary>
         /// Maps the specified versioned OData routes.
@@ -214,7 +262,7 @@
             IEnumerable<IEdmModel> models,
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions ) =>
-            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, pathHandler, routingConventions, null );
+            MapVersionedODataRoutes( configuration, routeName, routePrefix, models, pathHandler, routingConventions, default );
 
         /// <summary>
         /// Maps the specified versioned OData routes. When the <paramref name="batchHandler"/> is provided, it will create a '$batch' endpoint to handle the batch requests.
@@ -231,9 +279,6 @@
         /// <remarks>The specified <paramref name="models"/> must contain the <see cref="ApiVersionAnnotation">API version annotation</see>.  This annotation is
         /// automatically applied when you use the <see cref="VersionedODataModelBuilder"/> and call <see cref="VersionedODataModelBuilder.GetEdmModels"/> to
         /// create the <paramref name="models"/>.</remarks>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "3", Justification = "Validated by a code contract." )]
-        [SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "The specified handler must be the batch handler." )]
         public static IReadOnlyList<ODataRoute> MapVersionedODataRoutes(
             this HttpConfiguration configuration,
             string routeName,
@@ -247,7 +292,7 @@
             Arg.NotNull( models, nameof( models ) );
             Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
 
-            var routeConventions = EnsureConventions( routingConventions.ToList() );
+            var routeConventions = VersionedODataRoutingConventions.AddOrUpdate( routingConventions.ToList() );
             var routes = configuration.Routes;
             var unversionedRouteName = routeName + UnversionedRouteSuffix;
 
@@ -324,7 +369,26 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the model.</param>
         /// <param name="configureAction">The configuring action to add the services to the root container.</param>
         /// <returns>The added <see cref="ODataRoute"/>.</returns>
-        public static ODataRoute MapVersionedODataRoute( this HttpConfiguration configuration, string routeName, string routePrefix, ApiVersion apiVersion, Action<IContainerBuilder> configureAction )
+        public static ODataRoute MapVersionedODataRoute( this HttpConfiguration configuration, string routeName, string routePrefix, ApiVersion apiVersion, Action<IContainerBuilder> configureAction ) =>
+            MapVersionedODataRoute( configuration, routeName, routePrefix, apiVersion, configureAction, default );
+
+        /// <summary>
+        /// Maps the specified OData route and the OData route attributes.
+        /// </summary>
+        /// <param name="configuration">The server configuration.</param>
+        /// <param name="routeName">The name of the route to map.</param>
+        /// <param name="routePrefix">The prefix to add to the OData route's path template.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the model.</param>
+        /// <param name="configureAction">The configuring action to add the services to the root container.</param>
+        /// <param name="configureRoutingConventions">The configuring action to add or update routing conventions.</param>
+        /// <returns>The added <see cref="ODataRoute"/>.</returns>
+        public static ODataRoute MapVersionedODataRoute(
+            this HttpConfiguration configuration,
+            string routeName,
+            string routePrefix,
+            ApiVersion apiVersion,
+            Action<IContainerBuilder> configureAction,
+            Action<ODataConventionConfigurationContext> configureRoutingConventions )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
@@ -333,12 +397,16 @@
             object ConfigureRoutingConventions( IServiceProvider serviceProvider )
             {
                 var model = serviceProvider.GetRequiredService<IEdmModel>();
-                var routingConventions = EnsureConventions( ODataRoutingConventions.CreateDefault() );
+                var routingConventions = VersionedODataRoutingConventions.CreateDefault();
 
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
                 routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, configuration, apiVersion ) );
 
-                return routingConventions.ToArray();
+                var context = new ODataConventionConfigurationContext( configuration, routeName, model, apiVersion, routingConventions );
+
+                configureRoutingConventions?.Invoke( context );
+
+                return context.RoutingConventions.ToArray();
             }
 
             if ( !IsNullOrEmpty( routePrefix ) )
@@ -416,7 +484,7 @@
         /// <remarks>The <see cref="ApiVersionAnnotation">API version annotation</see> will be added or updated on the specified <paramref name="model"/> using
         /// the provided <paramref name="apiVersion">API version</paramref>.</remarks>
         public static ODataRoute MapVersionedODataRoute( this HttpConfiguration configuration, string routeName, string routePrefix, IEdmModel model, ApiVersion apiVersion ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null, null );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), default, default );
 
         /// <summary>
         /// Maps a versioned OData route.
@@ -437,7 +505,7 @@
             IEdmModel model,
             ApiVersion apiVersion,
             ODataBatchHandler batchHandler ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), batchHandler, null );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), batchHandler, default );
 
         /// <summary>
         /// Maps the specified OData route and the OData route attributes. When the <paramref name="defaultHandler"/>
@@ -457,7 +525,7 @@
             IEdmModel model,
             ApiVersion apiVersion,
             HttpMessageHandler defaultHandler ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), ODataRoutingConventions.CreateDefault(), null, defaultHandler );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), default, defaultHandler );
 
         /// <summary>
         /// Maps a versioned OData route.
@@ -481,7 +549,7 @@
             ApiVersion apiVersion,
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, null, null );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, default, default );
 
         /// <summary>
         /// Maps a versioned OData route. When the <paramref name="batchHandler"/> is provided, it will create a '$batch' endpoint to handle the batch requests.
@@ -498,8 +566,6 @@
         /// <returns>The mapped <see cref="ODataRoute">OData route</see>.</returns>
         /// <remarks>The <see cref="ApiVersionAnnotation">API version annotation</see> will be added or updated on the specified <paramref name="model"/> using
         /// the provided <paramref name="apiVersion">API version</paramref>.</remarks>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        [SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "The specified handler must be the batch handler." )]
         public static ODataRoute MapVersionedODataRoute(
             this HttpConfiguration configuration,
             string routeName,
@@ -509,7 +575,7 @@
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions,
             ODataBatchHandler batchHandler ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, batchHandler, null );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, batchHandler, default );
 
         /// <summary>
         /// Maps the specified OData route. When the <paramref name="defaultHandler"/> is non-<c>null</c>, it will map
@@ -533,7 +599,7 @@
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions,
             HttpMessageHandler defaultHandler ) =>
-            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, null, defaultHandler );
+            MapVersionedODataRoute( configuration, routeName, routePrefix, model, apiVersion, pathHandler, routingConventions, default, defaultHandler );
 
         /// <summary>
         /// Gets the configured entity data model (EDM) for the specified API version.
@@ -597,8 +663,6 @@
             return null;
         }
 
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        [SuppressMessage( "Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "The specified handler must be the batch handler." )]
         static ODataRoute MapVersionedODataRoute(
             HttpConfiguration configuration,
             string routeName,
@@ -615,7 +679,7 @@
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<ODataRoute>() != null );
 
-            var routeConventions = EnsureConventions( routingConventions.ToList() );
+            var routeConventions = VersionedODataRoutingConventions.AddOrUpdate( routingConventions.ToList() );
             var routes = configuration.Routes;
 
             if ( !IsNullOrEmpty( routePrefix ) )
@@ -671,36 +735,6 @@
             routes.Add( routeName + UnversionedRouteSuffix, unversionedRoute );
 
             return route;
-        }
-
-        static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
-        {
-            Contract.Requires( conventions != null );
-            Contract.Ensures( Contract.Result<IList<IODataRoutingConvention>>() != null );
-
-            var discovered = new BitVector32( 0 );
-
-            for ( var i = 0; i < conventions.Count; i++ )
-            {
-                var convention = conventions[i];
-
-                if ( convention is MetadataRoutingConvention )
-                {
-                    conventions[i] = new VersionedMetadataRoutingConvention();
-                    discovered[1] = true;
-                }
-                else if ( convention is VersionedMetadataRoutingConvention )
-                {
-                    discovered[1] = true;
-                }
-            }
-
-            if ( !discovered[1] )
-            {
-                conventions.Insert( 0, new VersionedMetadataRoutingConvention() );
-            }
-
-            return conventions;
         }
 
         static ODataPathRouteConstraint MakeVersionedODataRouteConstraint( ApiVersion apiVersion, ref string versionedRouteName )
