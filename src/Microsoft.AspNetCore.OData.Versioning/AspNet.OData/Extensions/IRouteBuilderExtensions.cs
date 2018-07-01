@@ -10,7 +10,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
-    using Microsoft.Web.OData.Routing;
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;

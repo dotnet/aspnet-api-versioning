@@ -12,7 +12,6 @@
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
     using Microsoft.Simulators;
-    using Microsoft.Web.OData.Routing;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;

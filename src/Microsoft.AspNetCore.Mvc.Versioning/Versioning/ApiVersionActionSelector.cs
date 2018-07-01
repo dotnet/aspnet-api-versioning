@@ -234,16 +234,15 @@
         }
 
         /// <summary>
-        /// Selects a matched action based on all matches and the current selection result.
+        /// Selects a candidate action which does not have the API versioning convention applied.
         /// </summary>
         /// <param name="matches">The current <see cref="IReadOnlyList{T}">read-only list</see> of
         /// matching <see cref="ActionDescriptor">action</see>.</param>
-        /// <param name="result">The current <see cref="ActionSelectionResult">selection result</see>.</param>
-        /// <returns>A matched <see cref="ActionDescriptor"/> with an API versioning policy applied or <c>null</c>.</returns>
-        protected virtual ActionDescriptor SelectActionWithApiVersionPolicyApplied( IReadOnlyList<ActionDescriptor> matches, ActionSelectionResult result )
+        /// <returns>The selected <see cref="ActionDescriptor">action</see> with the API versioning convention applied or <c>null</c>.</returns>
+        /// <remarks>This method typically matches a non-API action such as a Razor page.</remarks>
+        protected virtual ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
         {
             Arg.NotNull( matches, nameof( matches ) );
-            Arg.NotNull( result, nameof( result ) );
 
             if ( matches.Count != 1 )
             {
@@ -259,7 +258,6 @@
 
             return null;
         }
-
 
         /// <summary>
         /// Verifies the requested API version is not ambiguous.
@@ -295,25 +293,6 @@
             }
 
             return false;
-        }
-
-        static ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
-        {
-            Contract.Requires( matches != null );
-
-            if ( matches.Count != 1 )
-            {
-                return null;
-            }
-
-            var selectedAction = matches[0];
-
-            if ( selectedAction.GetProperty<ApiVersionModel>() == null )
-            {
-                return selectedAction;
-            }
-
-            return null;
         }
 
         static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>

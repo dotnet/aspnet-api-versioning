@@ -42,7 +42,7 @@
         {
             Arg.NotNull( routeContext, nameof( routeContext ) );
 
-            const IEnumerable<ControllerActionDescriptor> NoActions = default( IEnumerable<ControllerActionDescriptor> );
+            const IEnumerable<ControllerActionDescriptor> NoActions = default;
             var httpContext = routeContext.HttpContext;
             var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
             var odataPath = httpContext.ODataFeature().Path;
