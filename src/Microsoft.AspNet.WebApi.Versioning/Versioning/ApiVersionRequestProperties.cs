@@ -28,7 +28,7 @@
         /// Gets or sets the raw, unparsed API version for the current request.
         /// </summary>
         /// <value>The unparsed API version value for the current request.</value>
-        public string RawApiVersion
+        public string RawRequestedApiVersion
         {
             get
             {
@@ -47,17 +47,17 @@
         /// <summary>
         /// Gets or sets the API version for the current request.
         /// </summary>
-        /// <value>The current <see cref="ApiVersion">API version</see> for the current request.</value>
+        /// <value>The current <see cref="RequestedApiVersion">API version</see> for the current request.</value>
         /// <remarks>If an API version was not provided for the current request or the value
         /// provided is invalid, this property will return <c>null</c>.</remarks>
-        public ApiVersion ApiVersion
+        public ApiVersion RequestedApiVersion
         {
             get
             {
                 if ( apiVersion == null )
                 {
 #pragma warning disable CA1806 // Do not ignore method results
-                    ApiVersion.TryParse( RawApiVersion, out apiVersion );
+                    ApiVersion.TryParse( RawRequestedApiVersion, out apiVersion );
 #pragma warning restore CA1806
                 }
 

@@ -24,7 +24,7 @@
             }
 
             reentrant = true;
-            var value = request.ApiVersionProperties().RawApiVersion;
+            var value = request.ApiVersionProperties().RawRequestedApiVersion;
             reentrant = false;
 
             return value;
