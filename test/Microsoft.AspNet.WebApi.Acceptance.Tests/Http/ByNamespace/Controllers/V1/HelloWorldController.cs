@@ -1,10 +1,9 @@
 ﻿namespace Microsoft.Web.Http.ByNamespace.Controllers.V1
 {
-    using Microsoft.Web.Http;
-    using Models;
+    using System;
     using System.Web.Http;
 
-    [ApiVersion( "1.0", Deprecated = true )]
+    [Obsolete( "Deprecated" )]
     [Route( "api/HelloWorld" )]
     [Route( "api/{version:apiVersion}/HelloWorld" )]
     public class HelloWorldController : ApiController

@@ -2,7 +2,6 @@
 {
     using Models;
 
-    [ApiVersion( "2.0" )]
     public class AgreementsController : Controller
     {
         [HttpGet]
