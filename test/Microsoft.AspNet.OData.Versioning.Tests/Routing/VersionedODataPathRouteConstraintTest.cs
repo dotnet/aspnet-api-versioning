@@ -48,7 +48,7 @@
         {
             // arrange
             var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)?api-version={apiVersion}" );
-            var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
+            var values = new Dictionary<string, object>() { ["odataPath"] = "Tests(1)" };
             var constraint = NewVersionedODataPathRouteConstraint( request, Test.Model, Parse( apiVersion ) );
 
             // act
@@ -68,7 +68,7 @@
             // arrange
             var apiVersion = Parse( apiVersionValue );
             var request = new HttpRequestMessage( Get, requestUri );
-            var values = new Dictionary<string, object>() { { "odataPath", odataPath } };
+            var values = new Dictionary<string, object>() { [nameof( odataPath )] = odataPath };
             var constraint = NewVersionedODataPathRouteConstraint( request, Test.EmptyModel, apiVersion );
 
             // act
@@ -79,14 +79,15 @@
         }
 
         [Theory]
-        [InlineData( true, true )]
-        [InlineData( false, false )]
-        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( bool allowImplicitVersioning, bool expected )
+        [InlineData( "http://localhost/", null, false )]
+        [InlineData( "http://localhost/$metadata", "$metadata", false )]
+        [InlineData( "http://localhost/Tests(1)", "Tests(1)", true )]
+        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( string requestUri, string odataPath, bool allowImplicitVersioning )
         {
             // arrange
             var apiVersion = new ApiVersion( 2, 0 );
-            var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)" );
-            var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
+            var request = new HttpRequestMessage( Get, requestUri );
+            var values = new Dictionary<string, object>() { [nameof( odataPath )] = odataPath };
             var constraint = NewVersionedODataPathRouteConstraint(
                 request,
                 Test.Model,
@@ -101,7 +102,7 @@
             var result = constraint.Match( request, null, null, values, UriResolution );
 
             // assert
-            result.Should().Be( expected );
+            result.Should().BeTrue();
         }
 
         [Fact]
@@ -109,7 +110,7 @@
         {
             // arrange
             var request = new HttpRequestMessage( Get, $"http://localhost/Tests(1)?api-version=1.0&api-version=2.0" );
-            var values = new Dictionary<string, object>() { { "odataPath", "Tests(1)" } };
+            var values = new Dictionary<string, object>() { ["odataPath"] = "Tests(1)" };
             var constraint = NewVersionedODataPathRouteConstraint( request, Test.Model, new ApiVersion( 1, 0 ) );
 
             // act
