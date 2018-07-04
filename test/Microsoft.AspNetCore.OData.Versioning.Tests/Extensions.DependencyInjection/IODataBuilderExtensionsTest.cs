@@ -37,7 +37,6 @@
             // assert
             services.Single( sd => sd.ServiceType == typeof( IOptions<ODataApiVersioningOptions> ) ).ImplementationInstance.GetType().Should().Be( typeof( OptionsWrapper<ODataApiVersioningOptions> ) );
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ODataApiVersionActionSelector ) );
-            services.Single( sd => sd.ServiceType == typeof( IODataApiVersionProvider ) ).ImplementationType.Name.Should().Be( "ODataApiVersionProvider" );
             services.Single( sd => sd.ServiceType == typeof( VersionedODataModelBuilder ) ).ImplementationType.Should().Be( typeof( VersionedODataModelBuilder ) );
             mvcOptions.Conventions.Single().GetType().Name.Should().Be( "MetadataControllerConvention" );
         }
