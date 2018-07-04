@@ -1,14 +1,13 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Abstractions;
-    using ActionConstraints;
-    using AspNetCore.Routing;
-    using Extensions.Logging;
-    using Extensions.Options;
-    using Http;
-    using Infrastructure;
-    using Internal;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ActionConstraints;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;

@@ -1,23 +1,22 @@
 ﻿namespace Microsoft
 {
     using Microsoft.AspNet.OData.Builder;
-    using Microsoft.OData.Edm;
+#if WEBAPI
+    using Microsoft.Web.Http;
+#else
+    using Microsoft.AspNetCore.Mvc;
+#endif
+    using System;
 
-    internal static class Test
+    public class TestModelConfiguration : IModelConfiguration
     {
-        static Test()
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
         {
-            var builder = new ODataModelBuilder();
             var tests = builder.EntitySet<TestEntity>( "Tests" ).EntityType;
             var neutralTests = builder.EntitySet<TestNeutralEntity>( "NeutralTests" ).EntityType;
 
             tests.HasKey( t => t.Id );
             neutralTests.HasKey( t => t.Id );
-            Model = builder.GetEdmModel();
         }
-
-        internal static IEdmModel Model { get; }
-
-        internal static IEdmModel EmptyModel { get; } = new ODataModelBuilder().GetEdmModel();
     }
 }
