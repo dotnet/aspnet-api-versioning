@@ -1,12 +1,16 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNet.OData.Routing.Conventions;
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Provides utility functions to create OData routing conventions with support for API versioning.
     /// </summary>
+#if !WEBAPI
+    [CLSCompliant( false )]
+#endif
     public static class VersionedODataRoutingConventions
     {
         /// <summary>
