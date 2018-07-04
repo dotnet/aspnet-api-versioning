@@ -3,11 +3,12 @@
     using Microsoft.AspNetCore.Mvc;
     using Models;
 
-    [ApiVersion( "1.0" )]
+    [Route( "[controller]" )]
     [Route( "v{version:apiVersion}/[controller]" )]
     public class OrdersController : Controller
     {
         // GET ~/v1/orders/{accountId}
+        // GET ~/orders/{accountId}?api-version=1.0
         [HttpGet( "{accountId}" )]
         public IActionResult Get( string accountId ) => Ok( new Order( GetType().FullName, accountId, HttpContext.GetRequestedApiVersion().ToString() ) );
     }
