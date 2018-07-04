@@ -62,7 +62,7 @@
                 throw CreateAmbiguousControllerException( new[] { versionNeutralController, versionedController } );
             }
 
-            request.ApiVersionProperties().ApiVersion = requestedVersion;
+            request.ApiVersionProperties().RequestedApiVersion = requestedVersion;
             result.RequestedVersion = requestedVersion;
             result.Controller = versionedController;
 
