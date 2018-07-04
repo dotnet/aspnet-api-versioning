@@ -11,5 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Test.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestModelConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestNeutralEntity.cs" />
   </ItemGroup>
 </Project>
