@@ -4,9 +4,9 @@ namespace Microsoft.Examples
 {
     using global::Owin;
     using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning.Conventions;
     using System.Web.Http;
     using System.Web.Http.Routing;
-    using static System.Web.Http.RouteParameter;
 
     public class Startup
     {
@@ -15,8 +15,15 @@ namespace Microsoft.Examples
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
 
-            // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
+            configuration.AddApiVersioning(
+                options =>
+                {
+                    // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+                    options.ReportApiVersions = true;
+
+                    // automatically applies an api version based on the name of the defining controller's namespace
+                    options.Conventions.Add( new VersionByNamespaceConvention() );
+                } );
 
             configuration.Routes.MapHttpRoute(
                 "VersionedQueryString",
