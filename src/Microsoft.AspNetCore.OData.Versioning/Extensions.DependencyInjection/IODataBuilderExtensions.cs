@@ -40,7 +40,6 @@
             services.Add( Singleton<IOptions<ODataApiVersioningOptions>>( new OptionsWrapper<ODataApiVersioningOptions>( options ) ) );
             services.RemoveAll<IActionSelector>();
             services.Replace( Singleton<IActionSelector, ODataApiVersionActionSelector>() );
-            services.TryAdd( Singleton<IODataApiVersionProvider, ODataApiVersionProvider>() );
             services.TryAdd( Transient<VersionedODataModelBuilder, VersionedODataModelBuilder>() );
             services.AddMvcCore( mvcOptions => mvcOptions.Conventions.Add( new MetadataControllerConvention( options ) ) );
 
