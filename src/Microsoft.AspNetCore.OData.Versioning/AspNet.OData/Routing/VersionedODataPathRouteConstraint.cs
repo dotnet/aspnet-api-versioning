@@ -67,28 +67,24 @@
 
             if ( requestedVersion != null )
             {
-                if ( ApiVersion == requestedVersion && base.Match( httpContext, route, routeKey, values, routeDirection ) )
-                {
-                    return true;
-                }
-
-                return false;
+                return ApiVersion == requestedVersion && base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
             var options = httpContext.RequestServices.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
 
-            if ( options.DefaultApiVersion != ApiVersion )
+            if ( options.DefaultApiVersion != ApiVersion || !base.Match( httpContext, route, routeKey, values, routeDirection ) )
             {
                 return false;
             }
 
-            if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
+            var maybeApiVersionNeutral = string.IsNullOrEmpty( feature.RawRequestedApiVersion );
+
+            if ( maybeApiVersionNeutral || options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
             {
                 feature.RequestedApiVersion = ApiVersion;
-                return base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
-            return false;
+            return true;
         }
 
         static bool IsServiceDocumentOrMetadataRoute( RouteValueDictionary values ) =>

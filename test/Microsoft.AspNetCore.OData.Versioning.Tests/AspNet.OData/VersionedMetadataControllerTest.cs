@@ -5,19 +5,14 @@
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Simulators;
-    using Moq;
     using System;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
-    using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
     public class VersionedMetadataControllerTest
     {
@@ -25,17 +20,9 @@
         public async Task options_should_return_expected_headers()
         {
             // arrange
-            var apiVersionProvider = new Mock<IODataApiVersionProvider>();
-            var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
-            var deprecated = new[] { new ApiVersion( 3, 0, "Beta" ) };
             var request = new HttpRequestMessage( new HttpMethod( "OPTIONS" ), "http://localhost/$metadata" );
             var response = default( HttpResponseMessage );
-
-            apiVersionProvider.SetupGet( p => p.SupportedApiVersions ).Returns( supported );
-            apiVersionProvider.SetupGet( p => p.DeprecatedApiVersions ).Returns( deprecated );
-
-            var hostBuilder = new WebHostBuilder().ConfigureServices( s => s.Replace( Singleton( apiVersionProvider.Object ) ) )
-                                                  .UseStartup<ODataStartup>();
+            var hostBuilder = new WebHostBuilder().UseStartup<ODataStartup>();
 
             using ( var server = new TestServer( hostBuilder ) )
             using ( var client = server.CreateClient() )
@@ -73,7 +60,7 @@
 
             public void Configure( IApplicationBuilder app, VersionedODataModelBuilder builder )
             {
-                builder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
+                builder.ModelConfigurations.Add( new TestModelConfiguration() );
                 app.UseMvc( r => r.MapVersionedODataRoutes( "odata", null, builder.GetEdmModels() ) );
             }
         }

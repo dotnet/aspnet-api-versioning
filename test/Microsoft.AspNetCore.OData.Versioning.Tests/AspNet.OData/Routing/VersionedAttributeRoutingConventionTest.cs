@@ -35,7 +35,7 @@
         public void select_action_should_return_true_for_versionX2Dneutral_controller()
         {
             // arrange
-            var routeContext = NewRouteContext( typeof( VersionNeutralController ) );
+            var routeContext = NewRouteContext( "http://localhost/NeutralTests(1)", typeof( VersionNeutralController ) );
             var serviceProvider = routeContext.HttpContext.RequestServices;
             var convention = NewRoutingConvention( serviceProvider, new ApiVersion( 1, 0 ) );
 
@@ -52,7 +52,7 @@
         public void select_action_should_return_expected_result_for_controller_version( int majorVersion, string expected )
         {
             // arrange
-            var routeContext = NewRouteContext( typeof( TestsController ) );
+            var routeContext = NewRouteContext( "http://localhost/Tests(1)?api-version=1.0", typeof( TestsController ) );
             var serviceProvider = routeContext.HttpContext.RequestServices;
             var convention = NewRoutingConvention( serviceProvider, new ApiVersion( majorVersion, 0 ) );
 
@@ -81,7 +81,7 @@
                     ControllerTypeInfo = controllerType,
                     DisplayName = $"{controllerType.FullName}.{method.Name} ({controllerType.Assembly.GetName().Name})",
                     MethodInfo = method,
-                    Properties = { [typeof(ApiVersionModel)] = model }
+                    Properties = { [typeof( ApiVersionModel )] = model }
                 }
             };
 
@@ -90,12 +90,9 @@
             return provider.Object;
         }
 
-        static RouteContext NewRouteContext( Type controllerType )
+        static RouteContext NewRouteContext( string requestUri, Type controllerType )
         {
-            var url = new Uri( "http://localhost/Tests(1)?api-version=1.0" );
-            var apiVersionProvider = new Mock<IODataApiVersionProvider>();
-            var supported = new[] { new ApiVersion( 1, 0 ) };
-            var deprecated = Array.Empty<ApiVersion>();
+            var url = new Uri( requestUri );
             var features = new Mock<IFeatureCollection>();
             var odataFeature = Mock.Of<IODataFeature>();
             var entitySet = Test.Model.EntityContainer.FindEntitySet( "Tests" );
@@ -103,23 +100,20 @@
             var httpContext = new Mock<HttpContext>();
             var services = new ServiceCollection();
 
-            apiVersionProvider.SetupGet( p => p.SupportedApiVersions ).Returns( supported );
-            apiVersionProvider.SetupGet( p => p.DeprecatedApiVersions ).Returns( deprecated );
             services.AddLogging();
             services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
             services.Add( Singleton<IOptions<MvcOptions>>( new OptionsWrapper<MvcOptions>( new MvcOptions() ) ) );
             services.AddMvcCore();
             services.AddApiVersioning();
             services.AddOData().EnableApiVersioning();
-            services.Replace( Singleton( apiVersionProvider.Object ) );
             services.Replace( Singleton( NewActionDescriptorProvider( controllerType.GetRuntimeMethod( "Get", new[] { typeof( int ) } ) ) ) );
 
             var serviceProvider = services.BuildServiceProvider();
             var app = new ApplicationBuilder( serviceProvider );
             var modelBuilder = serviceProvider.GetRequiredService<VersionedODataModelBuilder>();
 
-            modelBuilder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
-            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, modelBuilder.GetEdmModels().First(), supported[0] ) );
+            modelBuilder.ModelConfigurations.Add( new TestModelConfiguration() );
+            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, modelBuilder.GetEdmModels().First(), new ApiVersion( 1, 0 ) ) );
             odataFeature.Path = new DefaultODataPathHandler().Parse(
                 url.GetLeftPart( UriPartial.Authority ),
                 url.GetComponents( Path, Unescaped ),
