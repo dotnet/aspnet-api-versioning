@@ -70,18 +70,17 @@
 
             var options = request.GetApiVersioningOptions();
 
-            if ( options.DefaultApiVersion != ApiVersion )
+            if ( options.DefaultApiVersion != ApiVersion || !base.Match( request, route, parameterName, values, routeDirection ) )
             {
                 return false;
             }
 
             if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
             {
-                properties.ApiVersion = ApiVersion;
-                return base.Match( request, route, parameterName, values, routeDirection );
+                properties.RequestedApiVersion = ApiVersion;
             }
 
-            return false;
+            return true;
         }
 
         static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values ) =>
@@ -94,7 +93,7 @@
 
             try
             {
-                return properties.ApiVersion;
+                return properties.RequestedApiVersion;
             }
             catch ( AmbiguousApiVersionException ex )
             {
