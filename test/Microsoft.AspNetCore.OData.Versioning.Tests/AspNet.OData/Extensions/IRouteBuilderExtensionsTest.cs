@@ -38,14 +38,8 @@
 
             var perRequestContainer = app.ApplicationServices.GetRequiredService<IPerRouteContainer>();
             var serviceProvider = perRequestContainer.GetODataRootContainer( route.Name );
-
-            // TODO: https://github.com/OData/WebApi/issues/1388
-            // var constraint = route.PathRouteConstraint;
-            var constraint = (VersionedODataPathRouteConstraint) route.RouteConstraint;
-
             var routingConventions = serviceProvider.GetRequiredService<IEnumerable<IODataRoutingConvention>>().ToArray();
-
-            //var batchRoute = configuration.Routes["odataBatch"];
+            var constraint = (VersionedODataPathRouteConstraint) route.PathRouteConstraint;
 
             // assert
             routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
@@ -53,8 +47,8 @@
             routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
             constraint.RouteName.Should().Be( routeName );
             route.RoutePrefix.Should().Be( routePrefix );
-            //batchRoute.Handler.Should().Be( batchHandler );
-            //batchRoute.RouteTemplate.Should().Be( "api/v3/$batch" );
+            batchHandler.ODataRoute.Should().NotBeNull();
+            batchHandler.ODataRouteName.Should().Be( routeName );
         }
 
         [Fact]
@@ -63,46 +57,41 @@
             // arrange
             var routeName = "odata";
             var routePrefix = "api";
-            var batchHandler = new DefaultODataBatchHandler();
             var app = NewApplicationBuilder();
             var routes = default( IReadOnlyList<ODataRoute> );
             var perRequestContainer = app.ApplicationServices.GetRequiredService<IPerRouteContainer>();
             var modelBuilder = app.ApplicationServices.GetRequiredService<VersionedODataModelBuilder>();
 
-            modelBuilder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
+            modelBuilder.ModelConfigurations.Add( new TestModelConfiguration() );
 
             var models = modelBuilder.GetEdmModels();
 
             // act
-            app.UseMvc( r => routes = r.MapVersionedODataRoutes( routeName, routePrefix, models, batchHandler ) );
+            app.UseMvc( r => routes = r.MapVersionedODataRoutes( routeName, routePrefix, models, () => new DefaultODataBatchHandler() ) );
             app.Build();
-            
+
             // assert
             foreach ( var route in routes )
             {
-                var rootContainer = perRequestContainer.GetODataRootContainer( route.Name );
-                var routingConventions = rootContainer.GetRequiredService<IEnumerable<IODataRoutingConvention>>().ToArray();
-                //var batchRoute = configuration.Routes["odataBatch"];
-
-                // TODO: https://github.com/OData/WebApi/issues/1388
-                // if ( !( route.PathRouteConstraint is VersionedODataPathRouteConstraint constrant ) )
-                if ( !( route.RouteConstraint is VersionedODataPathRouteConstraint constraint ) )
+                if ( !( route.PathRouteConstraint is VersionedODataPathRouteConstraint constraint ) )
                 {
                     continue;
                 }
 
                 var apiVersion = constraint.ApiVersion;
                 var versionedRouteName = routeName + "-" + apiVersion.ToString();
+                var rootContainer = perRequestContainer.GetODataRootContainer( versionedRouteName );
+                var routingConventions = rootContainer.GetRequiredService<IEnumerable<IODataRoutingConvention>>().ToArray();
+                var batchHandler = perRequestContainer.GetODataRootContainer( versionedRouteName ).GetRequiredService<ODataBatchHandler>();
 
                 routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
                 routingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
                 routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();
                 constraint.RouteName.Should().Be( versionedRouteName );
                 route.RoutePrefix.Should().Be( routePrefix );
+                batchHandler.ODataRoute.Should().NotBeNull();
+                batchHandler.ODataRouteName.Should().Be( versionedRouteName );
             }
-
-            //batchRoute.Handler.Should().Be( batchHandler );
-            //batchRoute.RouteTemplate.Should().Be( "api/$batch" );
         }
 
         static ApplicationBuilder NewApplicationBuilder()

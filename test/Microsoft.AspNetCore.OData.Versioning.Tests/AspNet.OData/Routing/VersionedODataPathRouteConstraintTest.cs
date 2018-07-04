@@ -86,7 +86,7 @@
             var context = NewHttpContext( url, Test.EmptyModel, rawApiVersion );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
-            var values = new RouteValueDictionary() { ["odataPath"] = odataPath };
+            var values = new RouteValueDictionary() { [nameof( odataPath )] = odataPath };
             var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
 
             // act
@@ -97,9 +97,10 @@
         }
 
         [Theory]
-        [InlineData( true, true )]
-        [InlineData( false, false )]
-        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( bool allowImplicitVersioning, bool expected )
+        [InlineData( "http://localhost/", null, false )]
+        [InlineData( "http://localhost/$metadata", "$metadata", false )]
+        [InlineData( "http://localhost/Tests(1)", "Tests(1)", true )]
+        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( string requestUri, string odataPath, bool allowImplicitVersioning )
         {
             // arrange
             const string rawApiVersion = default;
@@ -111,18 +112,18 @@
                 options.AssumeDefaultVersionWhenUnspecified = allowImplicitVersioning;
             }
 
-            var url = new Uri( "http://localhost/Tests(1)" );
+            var url = new Uri( requestUri );
             var context = NewHttpContext( url, Test.Model, rawApiVersion, configure: OnConfigure );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
-            var values = new RouteValueDictionary() { ["odataPath"] = "Tests(1)" };
+            var values = new RouteValueDictionary() { [nameof( odataPath )] = odataPath };
             var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
 
             // act
             var result = constraint.Match( context, route, routeKey, values, IncomingRequest );
 
             // assert
-            result.Should().Be( expected );
+            result.Should().BeTrue();
         }
 
         [Theory]
@@ -135,7 +136,7 @@
             var apiVersion = new ApiVersion( 1, 0 );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
-            var values = new RouteValueDictionary() { { "odataPath", odataPath } };
+            var values = new RouteValueDictionary() { [nameof( odataPath )] = odataPath };
             var context = NewHttpContext( url, Test.Model, "1.0" );
             var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
 
@@ -179,7 +180,7 @@
             var app = new ApplicationBuilder( serviceProvider );
             var modelBuilder = serviceProvider.GetRequiredService<VersionedODataModelBuilder>();
 
-            modelBuilder.DefaultModelConfiguration = ( b, v ) => b.EntitySet<TestEntity>( "Tests" );
+            modelBuilder.ModelConfigurations.Add( new TestModelConfiguration() );
 
             if ( !TryParse( rawApiVersion, out var apiVersion ) )
             {
