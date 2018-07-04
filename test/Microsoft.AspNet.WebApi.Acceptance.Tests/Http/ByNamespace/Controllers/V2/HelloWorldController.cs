@@ -4,7 +4,6 @@
     using Models;
     using System.Web.Http;
 
-    [ApiVersion( "2.0" )]
     [Route( "api/HelloWorld" )]
     [Route( "api/{version:apiVersion}/HelloWorld" )]
     public class HelloWorldController : ApiController

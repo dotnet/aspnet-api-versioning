@@ -1,9 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ByNamespace
 {
-    using AspNetCore.Routing;
-    using Builder;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
+    using Microsoft.AspNetCore.Routing;
     using System.Reflection;
-    using Versioning;
 
     public abstract class ByNamespaceAcceptanceTest : AcceptanceTest
     {
@@ -20,6 +21,10 @@
             routeBuilder.MapRoute( "VersionedUrl", "v{version:apiVersion}/{controller}/{accountId}/{action=Get}" );
         }
 
-        protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;
+        protected override void OnAddApiVersioning( ApiVersioningOptions options )
+        {
+            options.ReportApiVersions = true;
+            options.Conventions.Add( new VersionByNamespaceConvention() );
+        }
     }
 }
