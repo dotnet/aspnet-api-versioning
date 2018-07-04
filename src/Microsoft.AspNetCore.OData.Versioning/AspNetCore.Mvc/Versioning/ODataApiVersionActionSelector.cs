@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
@@ -13,7 +15,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 
     /// <summary>
@@ -105,26 +106,16 @@
                 return null;
             }
 
-            var bestCandidates = new ConcurrentDictionary<int, List<ActionDescriptor>>();
-
-            foreach ( var candidate in candidates )
-            {
-                var parameters = candidate.Parameters.Where( p => p.BindingInfo != null ).ToArray();
-
-                if ( parameters.Length == 0 || parameters.Any( p => routeValues.ContainsKey( p.Name ) ) )
-                {
-                    bestCandidates.GetOrAdd( candidate.Parameters.Count, key => new List<ActionDescriptor>() ).Add( candidate );
-                }
-            }
-
-            var matches = candidates;
-
-            if ( bestCandidates.Count > 0 )
-            {
-                var key = bestCandidates.Keys.Max();
-                matches = bestCandidates[key];
-            }
-
+            var availableKeys = new HashSet<string>( routeValues.Keys, StringComparer.OrdinalIgnoreCase );
+            var possibleCandidates = candidates.Select( NewPossibleCandidate );
+            var bestCandidates = from candidate in possibleCandidates
+                                 where candidate.FilteredParameters.Count == 0 ||
+                                       candidate.FilteredParameters.All( p => availableKeys.Contains( p.Name ) )
+                                 orderby candidate.FilteredParameters descending,
+                                         candidate.TotalParameterCount descending
+                                 select candidate;
+            var id = bestCandidates.FirstOrDefault()?.Id;
+            var matches = string.IsNullOrEmpty( id ) ? candidates : candidates.Where( c => c.Id == id ).ToArray();
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
             var feature = httpContext.Features.Get<IApiVersioningFeature>();
@@ -141,6 +132,28 @@
             selectionResult.AddMatches( finalMatches );
 
             return RoutePolicy.Evaluate( context, selectionResult );
+        }
+
+        static ActionIdAndParameters NewPossibleCandidate( ActionDescriptor action ) => new ActionIdAndParameters( action.Id, action.Parameters.Count, action.Parameters.Where( IsNotSatisfiedByODataModelBinder ) );
+
+        static bool IsNotSatisfiedByODataModelBinder( ParameterDescriptor parameter ) => parameter.ParameterType != typeof( ODataParameterHelper ) && !IsODataQueryOptions( parameter.ParameterType );
+
+        static bool IsODataQueryOptions( Type parameterType ) => ( parameterType == typeof( ODataQueryOptions ) ) || ( parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof( ODataQueryOptions<> ) );
+
+        sealed class ActionIdAndParameters
+        {
+            internal ActionIdAndParameters( string id, int parameterCount, IEnumerable<ParameterDescriptor> filteredParameters )
+            {
+                Id = id;
+                TotalParameterCount = parameterCount;
+                FilteredParameters = filteredParameters.ToArray();
+            }
+
+            internal string Id { get; }
+
+            internal int TotalParameterCount { get; }
+
+            internal IReadOnlyList<ParameterDescriptor> FilteredParameters { get; }
         }
     }
 }
