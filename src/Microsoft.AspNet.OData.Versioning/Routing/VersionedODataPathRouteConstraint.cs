@@ -43,7 +43,6 @@
         /// <param name="values">A list of parameter values.</param>
         /// <param name="routeDirection">The route direction.</param>
         /// <returns>True if this instance equals a specified route; otherwise, false.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public override bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
         {
             Arg.NotNull( request, nameof( request ) );
@@ -108,8 +107,15 @@
             Contract.Requires( values != null );
 
             var apiVersion = default( object );
+            var routeConstraintName = nameof( apiVersion );
+            var configuration = request.GetConfiguration();
 
-            if ( !values.TryGetValue( nameof( apiVersion ), out apiVersion ) )
+            if ( configuration != null )
+            {
+                routeConstraintName = configuration.GetApiVersioningOptions().RouteConstraintName;
+            }
+
+            if ( !values.TryGetValue( routeConstraintName, out apiVersion ) )
             {
                 return;
             }
@@ -118,7 +124,7 @@
 
             if ( !( requestContext.Url is VersionedUrlHelperDecorator ) )
             {
-                requestContext.Url = new VersionedUrlHelperDecorator( requestContext.Url, apiVersion );
+                requestContext.Url = new VersionedUrlHelperDecorator( requestContext.Url, routeConstraintName, apiVersion );
             }
         }
     }
