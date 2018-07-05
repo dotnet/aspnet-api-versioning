@@ -7,14 +7,17 @@
     sealed class VersionedUrlHelperDecorator : UrlHelper
     {
         readonly UrlHelper decorated;
+        readonly string routeConstraintName;
         readonly object apiVersion;
 
-        internal VersionedUrlHelperDecorator( UrlHelper decorated, object apiVersion )
+        internal VersionedUrlHelperDecorator( UrlHelper decorated, string routeConstraintName, object apiVersion )
         {
             Contract.Requires( decorated != null );
+            Contract.Requires( !string.IsNullOrEmpty( routeConstraintName ) );
             Contract.Requires( apiVersion != null );
 
             this.decorated = decorated;
+            this.routeConstraintName = routeConstraintName;
             this.apiVersion = apiVersion;
 
             if ( decorated.Request != null )
@@ -23,7 +26,7 @@
             }
         }
 
-        void EnsureApiVersionRouteValue( IDictionary<string, object> routeValues ) => routeValues[nameof( apiVersion )] = apiVersion;
+        void EnsureApiVersionRouteValue( IDictionary<string, object> routeValues ) => routeValues[routeConstraintName] = apiVersion;
 
         public override string Content( string path ) => decorated.Content( path );
 
