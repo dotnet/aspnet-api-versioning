@@ -4,6 +4,7 @@
   <TargetFramework>net452</TargetFramework>
   <RootNamespace>Microsoft.Web</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
+  <NoWarn>CS0618</NoWarn>
  </PropertyGroup>
 
  <ItemGroup>
