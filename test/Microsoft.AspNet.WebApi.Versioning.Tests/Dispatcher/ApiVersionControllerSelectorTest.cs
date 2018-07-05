@@ -220,14 +220,14 @@
             Action selectController = () => selector.SelectController( request );
 
             // act
-            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
             var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
-            content.ShouldBeEquivalentTo(
+            content.Should().BeEquivalentTo(
                 new
                 {
                     Error = new
@@ -262,14 +262,14 @@
             Action selectController = () => selector.SelectController( request );
 
             // act
-            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
             var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
-            content.ShouldBeEquivalentTo(
+            content.Should().BeEquivalentTo(
                 new
                 {
                     Error = new
@@ -305,14 +305,14 @@
             Action selectController = () => selector.SelectController( request );
 
             // act
-            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
             var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
-            content.ShouldBeEquivalentTo(
+            content.Should().BeEquivalentTo(
                 new
                 {
                     Error = new
@@ -348,14 +348,14 @@
             Action selectController = () => selector.SelectController( request );
 
             // act
-            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
             var content = await ReadAsErrorByExampleAsync( response.Content, new { Error = new { Code = "", Message = "", InnerError = new { Message = "" } } } );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
-            content.ShouldBeEquivalentTo(
+            content.Should().BeEquivalentTo(
                 new
                 {
                     Error = new
@@ -393,7 +393,7 @@
             Action selectController = () => selector.SelectController( request );
 
             // act
-            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
             var content = await response.Content.ReadAsAsync<HttpError>();
 
             // assert
@@ -422,7 +422,7 @@
             Action selectAction = () => selector.SelectController( request );
 
             // act
-            var response = selectAction.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectAction.Should().Throw<HttpResponseException>().Subject.Single().Response;
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
@@ -448,7 +448,7 @@
             Action selectController = () => configuration.Services.GetHttpControllerSelector().SelectController( request );
 
             // act
-            var response = selectController.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
 
             // assert
             response.StatusCode.Should().Be( BadRequest );
@@ -485,7 +485,7 @@
             Action selectAction = () => actionSelector.SelectAction( controllerContext );
 
             // act
-            var response = selectAction.ShouldThrow<HttpResponseException>().Subject.Single().Response;
+            var response = selectAction.Should().Throw<HttpResponseException>().Subject.Single().Response;
 
             // assert
             response.StatusCode.Should().Be( MethodNotAllowed );
@@ -705,7 +705,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+Ambiguous2Control
             // act
 
             // assert
-            selectController.ShouldThrow<InvalidOperationException>().WithMessage( message );
+            selectController.Should().Throw<InvalidOperationException>().WithMessage( message );
         }
 
         [Fact]
@@ -747,7 +747,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+Ambiguous3Control
             // act
 
             // assert
-            selectController.ShouldThrow<InvalidOperationException>().WithMessage( message );
+            selectController.Should().Throw<InvalidOperationException>().WithMessage( message );
         }
 
         [Fact]
@@ -789,7 +789,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+Ambiguous1Control
             // act
 
             // assert
-            selectController.ShouldThrow<InvalidOperationException>().WithMessage( message );
+            selectController.Should().Throw<InvalidOperationException>().WithMessage( message );
         }
 
         [Fact]
@@ -831,7 +831,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             // act
 
             // assert
-            selectController.ShouldThrow<InvalidOperationException>().WithMessage( message );
+            selectController.Should().Throw<InvalidOperationException>().WithMessage( message );
         }
 
         [Fact]
@@ -962,7 +962,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             // assert
             controller.ControllerType.Should().Be( controllerType );
             action.ActionName.Should().Be( actionName );
-            controller.GetApiVersionModel().ShouldBeEquivalentTo(
+            controller.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -995,7 +995,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             Action selectController = () => selector.SelectController( request );
 
             // assert
-            selectController.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
+            selectController.Should().Throw<HttpResponseException>().And.Response.StatusCode.Should().Be( BadRequest );
         }
 
         [Fact]
@@ -1100,7 +1100,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
                              .HasApiVersion( 1, 0 )
                              .HasApiVersion( 2, 0 )
                              .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
-                             .Action( c => c.GetV2( default( int ) ) ).MapToApiVersion( 2, 0 );
+                             .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
             } );
             configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();
@@ -1148,7 +1148,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
                              .HasApiVersion( 1, 0 )
                              .HasApiVersion( 2, 0 )
                              .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
-                             .Action( c => c.GetV2( default( int ) ) ).MapToApiVersion( 2, 0 );
+                             .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
 
                 o.Conventions.Controller<Conventions2Controller>().HasApiVersion( 3, 0 );
             } );
@@ -1167,7 +1167,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             var controller = selector.SelectController( request );
 
             // assert
-            controller.GetApiVersionModel().ShouldBeEquivalentTo(
+            controller.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,

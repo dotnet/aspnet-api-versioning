@@ -1,8 +1,6 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
-    using Microsoft.Web.Http;
-    using Models;
-    using System.Threading.Tasks;
+    using Microsoft.Examples.Models;
     using System.Web.Http;
 
     // note: since the application is configured with AssumeDefaultVersionWhenUnspecifed, this controller

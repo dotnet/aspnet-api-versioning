@@ -1,7 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Routing
 {
-    using AspNetCore.Routing;
-    using Http;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
     using System;
     using static ApiVersion;
     using static AspNetCore.Routing.RouteDirection;
@@ -29,11 +30,11 @@
                 return false;
             }
 
-            var properties = httpContext.ApiVersionProperties();
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
 
             if ( values.TryGetValue( routeKey, out string value ) )
             {
-                properties.RawApiVersion = value;
+                feature.RawRequestedApiVersion = value;
             }
             else
             {
@@ -47,7 +48,7 @@
 
             if ( TryParse( value, out var requestedVersion ) )
             {
-                properties.ApiVersion = requestedVersion;
+                feature.RequestedApiVersion = requestedVersion;
                 return true;
             }
 

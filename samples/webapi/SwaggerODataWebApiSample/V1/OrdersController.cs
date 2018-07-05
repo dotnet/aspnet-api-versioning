@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Examples.V1
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
-    using System.Web.OData.Routing;
 
     /// <summary>
     /// Represents a RESTful service of orders.

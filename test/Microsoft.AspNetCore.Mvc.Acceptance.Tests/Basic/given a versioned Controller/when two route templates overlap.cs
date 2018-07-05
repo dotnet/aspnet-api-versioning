@@ -61,7 +61,7 @@
 
             // assert
             result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
-            act.ShouldThrow<AmbiguousActionException>();
+            act.Should().Throw<AmbiguousActionException>();
         }
     }
 }

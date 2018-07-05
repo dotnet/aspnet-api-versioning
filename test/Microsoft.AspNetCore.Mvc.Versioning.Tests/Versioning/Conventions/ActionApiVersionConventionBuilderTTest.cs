@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             actionBuilder.ApplyTo( actionModel );
 
             // assert
-            actionModel.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            actionModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             actionBuilder.ApplyTo( actionModel );
 
             // assert
-            actionModel.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            actionModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             actionBuilder.ApplyTo( actionModel );
 
             // assert
-            actionModel.GetProperty<ApiVersionModel>().ShouldBeEquivalentTo(
+            actionModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,

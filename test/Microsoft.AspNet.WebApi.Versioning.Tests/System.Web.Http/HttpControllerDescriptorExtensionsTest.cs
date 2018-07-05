@@ -150,7 +150,7 @@
             var versionInfo = controllerDescriptor.GetApiVersionModel();
 
             // assert
-            versionInfo.ShouldBeEquivalentTo(
+            versionInfo.Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = true,

@@ -1,11 +1,8 @@
 ﻿namespace Microsoft.Examples.V1.Controllers
 {
-    using Microsoft.Web.Http;
     using Models;
-    using System;
     using System.Web.Http;
 
-    [ApiVersion( "1.0" )]
     public class AgreementsController : ApiController
     {
         // GET ~/v1/agreements/{accountId}

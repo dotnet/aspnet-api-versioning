@@ -47,10 +47,10 @@
             services.Add( Singleton<IOptions<ApiVersioningOptions>>( new OptionsWrapper<ApiVersioningOptions>( options ) ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
             services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
+            services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
             services.TryAddSingleton<ReportApiVersionsAttribute>();
-            services.AddTransient<IStartupFilter, InjectApiVersionRoutePolicy>();
             services.AddMvcCore( mvcOptions => AddMvcOptions( mvcOptions, options ) );
-            services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( "apiVersion", typeof( ApiVersionRouteConstraint ) ) );
+            services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( options.RouteConstraintName, typeof( ApiVersionRouteConstraint ) ) );
 
             if ( options.ReportApiVersions )
             {
@@ -78,11 +78,19 @@
             mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
         }
 
-        sealed class InjectApiVersionRoutePolicy : IStartupFilter
+        sealed class AutoRegisterMiddleware : IStartupFilter
         {
             readonly IApiVersionRoutePolicy routePolicy;
+            readonly IOptions<ApiVersioningOptions> options;
 
-            public InjectApiVersionRoutePolicy( IApiVersionRoutePolicy routePolicy ) => this.routePolicy = routePolicy;
+            public AutoRegisterMiddleware( IApiVersionRoutePolicy routePolicy, IOptions<ApiVersioningOptions> options )
+            {
+                Contract.Requires( routePolicy != null );
+                Contract.Requires( options != null );
+
+                this.routePolicy = routePolicy;
+                this.options = options;
+            }
 
             public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
             {
@@ -91,8 +99,13 @@
 
                 return app =>
                 {
+                    if ( options.Value.RegisterMiddleware )
+                    {
+                        app.UseApiVersioning();
+                    }
+
                     next( app );
-                    app.UseRouter( builder => builder.Routes.Add( routePolicy ) );
+                    app.UseRouter( builder => builder.Routes.Add( new CatchAllRouteHandler( routePolicy ) ) );
                 };
             }
         }

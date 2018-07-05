@@ -1,10 +1,10 @@
-﻿namespace Microsoft.Web.OData.Conventions.Controllers
+﻿namespace Microsoft.AspNet.OData.Conventions.Controllers
 {
-    using Models;
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Models;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Routing;
     using System.Web.Http;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
 
     [ODataRoutePrefix( "Orders" )]
     public class OrdersController : ODataController

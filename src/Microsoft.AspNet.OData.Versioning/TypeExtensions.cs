@@ -1,7 +1,6 @@
-﻿namespace Microsoft
+﻿namespace Microsoft.AspNet.OData
 {
     using System;
-    using System.Web.OData;
 
     static class TypeExtensions
     {

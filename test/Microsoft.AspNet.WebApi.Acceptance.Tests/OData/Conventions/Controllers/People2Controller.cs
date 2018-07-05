@@ -1,11 +1,11 @@
-﻿namespace Microsoft.Web.OData.Conventions.Controllers
+﻿namespace Microsoft.AspNet.OData.Conventions.Controllers
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Models;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Web.Http;
-    using Models;
     using System.Web.Http;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
 
     [ControllerName( "People" )]
     [ODataRoutePrefix( "People" )]

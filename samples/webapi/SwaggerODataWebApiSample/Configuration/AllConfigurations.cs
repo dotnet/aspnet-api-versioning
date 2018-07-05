@@ -1,8 +1,7 @@
 ﻿namespace Microsoft.Examples.Configuration
 {
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.Web.Http;
-    using Microsoft.Web.OData.Builder;
-    using System.Web.OData.Builder;
 
     /// <summary>
     /// Represents the model configuration for all configurations.

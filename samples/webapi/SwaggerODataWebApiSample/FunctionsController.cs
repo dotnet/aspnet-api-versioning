@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Examples
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Web.Http;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData;
-    using System.Web.OData.Routing;
 
     /// <summary>
     /// Provides unbound, utility functions.

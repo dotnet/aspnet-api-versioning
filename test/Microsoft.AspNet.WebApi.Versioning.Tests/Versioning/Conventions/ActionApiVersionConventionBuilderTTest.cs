@@ -25,7 +25,7 @@
             actionBuilder.ApplyTo( actionDescriptor.Object );
 
             // assert
-            actionDescriptor.Object.GetApiVersionModel().ShouldBeEquivalentTo(
+            actionDescriptor.Object.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -51,7 +51,7 @@
             actionBuilder.ApplyTo( actionDescriptor.Object );
 
             // assert
-            actionDescriptor.Object.GetApiVersionModel().ShouldBeEquivalentTo(
+            actionDescriptor.Object.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -79,7 +79,7 @@
             actionBuilder.ApplyTo( actionDescriptor );
 
             // assert
-            actionDescriptor.GetApiVersionModel().ShouldBeEquivalentTo(
+            actionDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,

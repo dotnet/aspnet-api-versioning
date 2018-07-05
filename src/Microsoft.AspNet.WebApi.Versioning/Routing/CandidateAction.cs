@@ -13,7 +13,7 @@
         const string DebugFormat = "{0}, Order={1}, Prec={2}";
 
         internal CandidateAction( HttpActionDescriptor actionDescriptor )
-            : this( actionDescriptor, default( int ), default( decimal ) ) { }
+            : this( actionDescriptor, default, default ) { }
 
         internal CandidateAction( HttpActionDescriptor actionDescriptor, int order, decimal precedence )
         {

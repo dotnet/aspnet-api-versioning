@@ -1,9 +1,8 @@
 ﻿namespace Microsoft.Examples.Configuration
 {
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Microsoft.Web.OData.Builder;
-    using Models;
-    using System.Web.OData.Builder;
 
     public class PersonModelConfiguration : IModelConfiguration
     {

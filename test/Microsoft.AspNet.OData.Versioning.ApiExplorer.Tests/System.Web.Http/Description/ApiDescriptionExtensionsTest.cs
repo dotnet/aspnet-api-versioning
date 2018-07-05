@@ -1,6 +1,7 @@
 ﻿namespace System.Web.Http.Description
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
@@ -8,7 +9,6 @@
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Controllers;
-    using System.Web.OData.Builder;
     using Xunit;
 
     public class ApiDescriptionExtensionsTest

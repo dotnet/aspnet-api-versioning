@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc.Basic;
     using Microsoft.AspNetCore.Mvc.Basic.Controllers;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -28,7 +27,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = controller, version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller = controller, version = apiVersion } );
         }
 
         [Theory]
@@ -45,7 +44,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = controller, version = apiVersion, id = id } );
+            content.Should().BeEquivalentTo( new { controller = controller, version = apiVersion, id = id } );
         }
 
         [Theory]
@@ -92,7 +91,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = controller, query = "Foo", version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller = controller, query = "Foo", version = apiVersion } );
         }
     }
 }

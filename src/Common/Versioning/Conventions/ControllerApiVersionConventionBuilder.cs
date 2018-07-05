@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a builder for API versions applied to a controller.
     /// </summary>
-    public partial class ControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilderBase
+    public partial class ControllerApiVersionConventionBuilder : ControllerApiVersionConventionBuilderBase, IControllerConventionBuilder
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ControllerApiVersionConventionBuilder"/> class.
@@ -123,5 +123,15 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
             return ActionBuilders.GetOrAdd( actionMethod );
         }
+
+        void IControllerConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
+
+        void IControllerConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
+
+        void IControllerConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
+
+        void IControllerConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
+
+        void IControllerConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
     }
 }

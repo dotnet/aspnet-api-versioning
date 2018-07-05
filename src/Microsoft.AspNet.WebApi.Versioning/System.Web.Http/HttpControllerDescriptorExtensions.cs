@@ -2,7 +2,6 @@
 {
     using Collections.Generic;
     using Controllers;
-    using Diagnostics.CodeAnalysis;
     using Diagnostics.Contracts;
     using Linq;
     using Microsoft;
@@ -58,7 +57,6 @@
         /// </summary>
         /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller</see> to evaluate.</param>
         /// <returns>The <see cref="ApiVersionModel">API version information</see> for the controller.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public static ApiVersionModel GetApiVersionModel( this HttpControllerDescriptor controllerDescriptor )
         {
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
@@ -148,7 +146,6 @@
         /// </summary>
         /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller</see> to evaluate.</param>
         /// <returns>True if the controller is API version neutral (e.g. "unaware"); otherwise, false.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public static bool IsApiVersionNeutral( this HttpControllerDescriptor controllerDescriptor ) => controllerDescriptor.GetApiVersionModel().IsApiVersionNeutral;
 
         /// <summary>

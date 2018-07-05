@@ -1,14 +1,14 @@
-﻿namespace Microsoft.Web.OData.Basic
+﻿namespace Microsoft.AspNet.OData.Basic
 {
-    using Builder;
-    using Configuration;
-    using Controllers;
     using FluentAssertions;
+    using Microsoft.AspNet.OData.Basic.Controllers;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Configuration;
     using Microsoft.OData.UriParser;
+    using Microsoft.Web;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.OData.Builder;
     using Xunit;
     using static Microsoft.OData.ServiceLifetime;
     using static System.Net.HttpStatusCode;

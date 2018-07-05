@@ -1,8 +1,8 @@
 ﻿namespace given_a_versioned_ODataController_using_conventions
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData.Conventions;
     using Microsoft.Web;
-    using Microsoft.Web.OData.Conventions;
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;

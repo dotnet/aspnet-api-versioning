@@ -1,7 +1,7 @@
-﻿namespace Microsoft.Web.OData.Advanced.Controllers
+﻿namespace Microsoft.AspNet.OData.Advanced.Controllers
 {
     using Microsoft.Web.Http;
-    using Models;
+    using Microsoft.AspNet.OData.Models;
     using System.Web.Http;
 
     [ApiVersion( "3.0" )]

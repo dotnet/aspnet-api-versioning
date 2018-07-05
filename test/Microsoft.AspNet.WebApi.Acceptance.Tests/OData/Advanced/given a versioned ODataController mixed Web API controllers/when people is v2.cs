@@ -1,10 +1,8 @@
 ﻿namespace given_a_versioned_ODataController_mixed_Web_API_controllers
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData.Advanced;
     using Microsoft.Web;
-    using Microsoft.Web.OData.Advanced;
-    using System;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
@@ -22,7 +20,7 @@
             var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
-            people.value.ShouldBeEquivalentTo(
+            people.value.Should().BeEquivalentTo(
                 new[] { new { id = 1, firstName = "Bill", lastName = "Mei", email = "bill.mei@somewhere.com" } },
                 options => options.ExcludingMissingMembers() );
         }
@@ -38,7 +36,7 @@
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
-            order.ShouldBeEquivalentTo(
+            order.Should().BeEquivalentTo(
                 new { id = 42, firstName = "Bill", lastName = "Mei", email = "bill.mei@somewhere.com" },
                 options => options.ExcludingMissingMembers() );
         }

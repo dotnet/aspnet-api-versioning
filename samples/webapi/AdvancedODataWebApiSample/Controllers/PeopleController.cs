@@ -1,12 +1,11 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Query;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Models;
-    using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.OData;
-    using System.Web.OData.Query;
-    using System.Web.OData.Routing;
 
     // note: since the application is configured with AssumeDefaultVersionWhenUnspecifed, this controller
     // is resolved without or without an API version, even though it is explicitly versioned

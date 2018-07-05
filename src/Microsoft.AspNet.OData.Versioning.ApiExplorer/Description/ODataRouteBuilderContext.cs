@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
@@ -11,8 +13,6 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
     using System.Web.Http.Dispatcher;
-    using System.Web.OData;
-    using System.Web.OData.Routing;
     using static System.Linq.Enumerable;
 
     sealed class ODataRouteBuilderContext

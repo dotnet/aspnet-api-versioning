@@ -7,7 +7,6 @@
     using Microsoft.AspNetCore.Mvc.Routing;
     using Moq;
     using System;
-    using System.Collections.Generic;
     using Xunit;
     using static AspNetCore.Routing.RouteDirection;
 
@@ -37,27 +36,20 @@
         static HttpRequest RequestAfterApiVersionConstraintHasBeenMatched( string requestedVersion, IApiVersionReader apiVersionReader )
         {
             const string ParmaterName = "version";
-            const string ItemKey = "MS_ApiVersionRequestProperties";
 
             var request = new Mock<HttpRequest>();
             var routeData = new RouteData() { Values = { [ParmaterName] = requestedVersion } };
-            var feature = new RoutingFeature() { RouteData = routeData };
-            var featureCollection = new Mock<IFeatureCollection>();
+            var featureCollection = new FeatureCollection();
             var requestServices = new Mock<IServiceProvider>();
-            var items = new Dictionary<object, object>();
             var httpContext = new Mock<HttpContext>();
 
-            featureCollection.SetupGet( fc => fc[typeof( IRoutingFeature )] ).Returns( feature );
             requestServices.Setup( rs => rs.GetService( typeof( IApiVersionReader ) ) ).Returns( apiVersionReader );
-            httpContext.SetupGet( c => c.Features ).Returns( featureCollection.Object );
-            httpContext.SetupProperty( c => c.Items, items );
+            httpContext.SetupGet( c => c.Features ).Returns( featureCollection );
             httpContext.SetupProperty( c => c.RequestServices, requestServices.Object );
             httpContext.SetupGet( c => c.Request ).Returns( () => request.Object );
-
-            var properties = new ApiVersionRequestProperties( httpContext.Object );
-
-            items[ItemKey] = properties;
             request.SetupGet( r => r.HttpContext ).Returns( httpContext.Object );
+            featureCollection.Set<IApiVersioningFeature>( new ApiVersioningFeature( httpContext.Object ) );
+            featureCollection.Set<IRoutingFeature>( new RoutingFeature() { RouteData = routeData } );
 
             return request.Object;
         }

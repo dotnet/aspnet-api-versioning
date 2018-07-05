@@ -1,9 +1,8 @@
 ﻿namespace Microsoft.Web.Http.Simulators.Configuration
 {
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.Web.Http;
-    using Microsoft.Web.OData.Builder;
     using Models;
-    using System.Web.OData.Builder;
 
     public class PersonModelConfiguration : IModelConfiguration
     {

@@ -32,7 +32,7 @@
                 return true;
             }
 
-            convention = default( IApiVersionConvention<HttpActionDescriptor> );
+            convention = default;
             return false;
         }
     }

@@ -37,7 +37,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0" );
-            content.ShouldBeEquivalentTo( body );
+            content.Should().BeEquivalentTo( body );
         }
 
         [Fact]

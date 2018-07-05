@@ -105,7 +105,7 @@
         public static ApiVersion GetRequestedApiVersion( this HttpRequestMessage request )
         {
             Arg.NotNull( request, nameof( request ) );
-            return request.ApiVersionProperties().ApiVersion;
+            return request.ApiVersionProperties().RequestedApiVersion;
         }
     }
 }

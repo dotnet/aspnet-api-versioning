@@ -30,7 +30,7 @@
             apiExplorer.OnProvidersExecuted( context );
 
             // assert
-            context.Results.ShouldBeEquivalentTo(
+            context.Results.Should().BeEquivalentTo(
                 new[]
                 {
                     // orders

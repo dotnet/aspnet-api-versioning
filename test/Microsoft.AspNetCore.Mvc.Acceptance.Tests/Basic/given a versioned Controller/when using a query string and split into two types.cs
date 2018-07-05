@@ -26,7 +26,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = controller, version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller = controller, version = apiVersion } );
         }
 
         [Fact]
@@ -41,7 +41,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = nameof( ValuesController ), id = "42", version = "1.0" } );
+            content.Should().BeEquivalentTo( new { controller = nameof( ValuesController ), id = "42", version = "1.0" } );
         }
 
         [Fact]
@@ -56,7 +56,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = nameof( Values2Controller ), id = 42, version = "2.0" } );
+            content.Should().BeEquivalentTo( new { controller = nameof( Values2Controller ), id = 42, version = "2.0" } );
         }
 
         [Fact]
@@ -103,7 +103,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.ShouldBeEquivalentTo( new { controller = controller, query = "Foo", version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller = controller, query = "Foo", version = apiVersion } );
         }
     }
 }
