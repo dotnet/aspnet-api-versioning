@@ -42,7 +42,7 @@
         {
             loggerFactory.AddConsole( Configuration.GetSection( "Logging" ) );
             loggerFactory.AddDebug();
-            app.UseMvc( routeBuilder => routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() ) );
+            app.UseMvc( routeBuilder => routeBuilder.MapVersionedODataRoutes( "odata", "api/v{apiVersion}", modelBuilder.GetEdmModels() ) );
         }
     }
 }

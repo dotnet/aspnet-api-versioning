@@ -11,7 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/People?api-version=1.0",
+      "launchUrl": "api/v1/People",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -19,7 +19,7 @@
     "BasicSample": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/People?api-version=1.0",
+      "launchUrl": "http://localhost:5000/api/v1/People",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
