@@ -26,14 +26,14 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedApiDescriptionProvider"/> class.
         /// </summary>
-        /// <param name="metadadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
+        /// <param name="metadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
         /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiExplorerOptions">API explorer options</see>.</param>
-        public VersionedApiDescriptionProvider( IModelMetadataProvider metadadataProvider, IOptions<ApiExplorerOptions> options )
+        public VersionedApiDescriptionProvider( IModelMetadataProvider metadataProvider, IOptions<ApiExplorerOptions> options )
         {
-            Arg.NotNull( metadadataProvider, nameof( metadadataProvider ) );
+            Arg.NotNull( metadataProvider, nameof( metadataProvider ) );
             Arg.NotNull( options, nameof( options ) );
 
-            MetadataProvider = metadadataProvider;
+            MetadataProvider = metadataProvider;
             this.options = options;
             modelMetadata = new Lazy<ModelMetadata>( NewModelMetadata );
         }
@@ -231,9 +231,6 @@
             return versions.OrderBy( v => v );
         }
 
-        ModelMetadata NewModelMetadata() =>
-            new ApiVersionModelMetadata(
-                MetadataProvider.GetMetadataForType( typeof( string ) ),
-                Options.DefaultApiVersionParameterDescription );
+        ModelMetadata NewModelMetadata() => new ApiVersionModelMetadata( MetadataProvider, Options.DefaultApiVersionParameterDescription );
     }
 }

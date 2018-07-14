@@ -3,7 +3,6 @@
     using Microsoft.AspNet.OData;
     using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Microsoft.Web.Http.Description;
     using System;
     using System.Collections.Generic;
     using System.Web.Http;

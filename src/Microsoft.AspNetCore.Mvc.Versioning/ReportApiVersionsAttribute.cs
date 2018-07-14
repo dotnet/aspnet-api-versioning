@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
-    using Abstractions;
-    using ApplicationModels;
-    using Filters;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.Filters;
     using System;
-    using Versioning;
+    using Microsoft.AspNetCore.Mvc.Versioning;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.

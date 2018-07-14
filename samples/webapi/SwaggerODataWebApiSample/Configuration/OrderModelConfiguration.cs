@@ -30,12 +30,12 @@
 
             if ( apiVersion >= ApiVersions.V1 )
             {
-                order.Collection.Function( "MostExpensive" ).ReturnsFromEntitySet<Order>( "Orders" );
+                // order.Collection.Function( "MostExpensive" ).ReturnsFromEntitySet<Order>( "Orders" );
             }
 
             if ( apiVersion >= ApiVersions.V2 )
             {
-                order.Action( "Rate" ).Parameter<int>( "rating" );
+                //order.Action( "Rate" ).Parameter<int>( "rating" );
             }
         }
     }

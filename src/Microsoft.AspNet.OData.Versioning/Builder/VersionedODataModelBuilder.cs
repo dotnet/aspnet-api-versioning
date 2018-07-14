@@ -57,7 +57,7 @@
             var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
-            var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver ).Where( c => c.IsODataController() );
+            var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver ).Where( TypeExtensions.IsODataController );
             var conventions = Options.Conventions;
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();

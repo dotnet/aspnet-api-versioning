@@ -5,7 +5,7 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
 {
 #if !WEBAPI
-    using Filters;
+    using Microsoft.AspNetCore.Mvc.Filters;
 #endif
     using System;
 #if WEBAPI

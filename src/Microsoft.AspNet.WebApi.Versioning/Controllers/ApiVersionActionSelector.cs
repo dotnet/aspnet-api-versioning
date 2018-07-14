@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
-    using Dispatcher;
+    using Microsoft.Web.Http.Dispatcher;
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;

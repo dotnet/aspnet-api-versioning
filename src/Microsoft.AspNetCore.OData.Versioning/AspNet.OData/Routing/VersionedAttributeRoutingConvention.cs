@@ -222,7 +222,7 @@
 
             foreach ( var action in actions )
             {
-                if ( !IsODataController( action ) || !ShouldMapAction( action ) )
+                if ( !action.ControllerTypeInfo.IsODataController() || !ShouldMapAction( action ) )
                 {
                     continue;
                 }
@@ -240,8 +240,6 @@
 
             return attributeMappings;
         }
-
-        static bool IsODataController( ControllerActionDescriptor controller ) => typeof( ODataController ).GetTypeInfo().IsAssignableFrom( controller.ControllerTypeInfo );
 
         static IEnumerable<string> GetODataRoutePrefixes( ControllerActionDescriptor controllerAction )
         {

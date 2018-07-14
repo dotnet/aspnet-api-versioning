@@ -4,11 +4,15 @@ namespace Microsoft.Web.Http
 namespace Microsoft.AspNetCore.Mvc
 #endif
 {
+#if WEBAPI
+    using Microsoft.Web.Http.Versioning;
+#else
+    using Microsoft.AspNetCore.Mvc.Versioning;
+#endif
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using Versioning;
     using static System.Globalization.CultureInfo;
     using static System.String;
 

@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if WEBAPI
     using IActionResult = System.Net.Http.HttpResponseMessage;
 #else
-    using Http;
+    using Microsoft.AspNetCore.Http;
 #endif
     using System;
 

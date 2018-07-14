@@ -4,6 +4,7 @@ namespace Microsoft.Examples
 {
     using global::Owin;
     using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.Examples.Configuration;
     using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
@@ -26,6 +27,8 @@ namespace Microsoft.Examples
             const string routePrefix = default( string );
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
+
+            configuration.SetUrlKeyDelimiter( OData.ODataUrlKeyDelimiter.Parentheses );
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
             configuration.AddApiVersioning( o => o.ReportApiVersions = true );

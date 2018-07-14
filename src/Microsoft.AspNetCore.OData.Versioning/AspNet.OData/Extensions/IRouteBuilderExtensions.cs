@@ -79,7 +79,7 @@
                 var context = new ODataConventionConfigurationContext( versionedRouteName, model, apiVersion, routingConventions );
 
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
-                routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( routeName, builder.ServiceProvider, apiVersion ) );
+                routingConventions.Insert( 0, new VersionedAttributeRoutingConvention( versionedRouteName, builder.ServiceProvider, apiVersion ) );
                 configureRoutingConventions?.Invoke( context );
 
                 return context.RoutingConventions;
@@ -87,6 +87,7 @@
 
             builder.EnsureMetadataController();
 
+            var routeCollection = builder.ServiceProvider.GetRequiredService<IODataRouteCollectionProvider>();
             var perRouteContainer = builder.ServiceProvider.GetRequiredService<IPerRouteContainer>();
             var options = builder.ServiceProvider.GetRequiredService<ODataOptions>();
             var inlineConstraintResolver = builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
@@ -115,6 +116,7 @@
                 builder.ConfigureBatchHandler( rootContainer, route );
                 routes.Add( route );
                 odataRoutes.Add( route );
+                routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             }
 
             return odataRoutes;
@@ -207,11 +209,13 @@
             Arg.NotNull( models, nameof( models ) );
             Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
 
-            var options = builder.ServiceProvider.GetRequiredService<ODataOptions>();
-            var inlineConstraintResolver = builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
+            var serviceProvider = builder.ServiceProvider;
+            var options = serviceProvider.GetRequiredService<ODataOptions>();
+            var routeCollection = serviceProvider.GetRequiredService<IODataRouteCollectionProvider>();
+            var inlineConstraintResolver = serviceProvider.GetRequiredService<IInlineConstraintResolver>();
             var routeConventions = VersionedODataRoutingConventions.AddOrUpdate( routingConventions.ToList() );
             var routes = builder.Routes;
-            var perRouteContainer = builder.ServiceProvider.GetRequiredService<IPerRouteContainer>();
+            var perRouteContainer = serviceProvider.GetRequiredService<IPerRouteContainer>();
             var odataRoutes = new List<ODataRoute>();
 
             if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
@@ -225,10 +229,10 @@
                 var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
                 var routeConstraint = MakeVersionedODataRouteConstraint( apiVersion, ref versionedRouteName );
 
-                IEnumerable<IODataRoutingConvention> NewRouteConventions( IServiceProvider serviceProvider )
+                IEnumerable<IODataRoutingConvention> NewRouteConventions( IServiceProvider services )
                 {
                     var conventions = new IODataRoutingConvention[routeConventions.Count + 1];
-                    conventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName, builder.ServiceProvider, apiVersion );
+                    conventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName, serviceProvider, apiVersion );
                     routeConventions.CopyTo( conventions, 1 );
                     return conventions;
                 }
@@ -247,6 +251,7 @@
                 builder.ConfigureBatchHandler( batchHandler, route );
                 routes.Add( route );
                 odataRoutes.Add( route );
+                routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             }
 
             return odataRoutes;
@@ -305,6 +310,7 @@
                 return context.RoutingConventions.ToArray();
             }
 
+            var routeCollection = builder.ServiceProvider.GetRequiredService<IODataRouteCollectionProvider>();
             var perRouteContainer = builder.ServiceProvider.GetRequiredService<IPerRouteContainer>();
             var inlineConstraintResolver = builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
             var preConfigureAction = builder.ConfigureDefaultServices(
@@ -323,6 +329,7 @@
 
             builder.ConfigureBatchHandler( rootContainer, route );
             builder.Routes.Add( route );
+            routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
 
             return route;
         }
@@ -424,6 +431,7 @@
                 return conventions.ToArray();
             }
 
+            var routeCollection = builder.ServiceProvider.GetRequiredService<IODataRouteCollectionProvider>();
             var perRouteContainer = builder.ServiceProvider.GetRequiredService<IPerRouteContainer>();
             var options = builder.ServiceProvider.GetRequiredService<ODataOptions>();
             var inlineConstraintResolver = builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
@@ -447,6 +455,7 @@
 
             builder.ConfigureBatchHandler( rootContainer, route );
             builder.Routes.Add( route );
+            routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
 
             return route;
         }

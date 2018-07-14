@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Extensions.Primitives;
-    using Http;
     using System;
     using System.Diagnostics.Contracts;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Primitives;
 
     sealed class MethodNotAllowedHandler : RequestHandler
     {

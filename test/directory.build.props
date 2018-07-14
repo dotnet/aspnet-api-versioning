@@ -14,8 +14,8 @@
   <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
     <PackageReference Include="FluentAssertions" Version="5.3.2" />
     <PackageReference Include="Moq" Version="4.8.2" />
-    <PackageReference Include="more.xunit" Version="2.3.1" />
-    <PackageReference Include="more.xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.0-rc.1.build4038" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0-rc.1.build4038" />
   </ItemGroup>
 
 </Project>

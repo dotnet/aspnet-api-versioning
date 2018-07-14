@@ -1,11 +1,11 @@
 ﻿namespace System.Web.Http
 {
-    using Collections.Generic;
-    using Controllers;
-    using Diagnostics.Contracts;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Routing;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Routing;
-    using Routing;
 
     static class HttpRouteExtensions
     {

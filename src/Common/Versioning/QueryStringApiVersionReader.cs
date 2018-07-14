@@ -4,10 +4,13 @@ namespace Microsoft.Web.Http.Versioning
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
-    using Routing;
+#if WEBAPI
+    using Microsoft.Web.Http.Versioning;
+#else
+    using Microsoft.AspNetCore.Mvc.Versioning;
+#endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static ApiVersionParameterLocation;
     using static System.StringComparer;
 

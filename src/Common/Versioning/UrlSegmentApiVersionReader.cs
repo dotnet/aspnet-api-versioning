@@ -5,10 +5,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
 #if WEBAPI
-    using Routing;
+    using Microsoft.Web.Http.Routing;
 #else
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
-    using Routing;
 #endif
     using System.Diagnostics.Contracts;
     using static ApiVersionParameterLocation;

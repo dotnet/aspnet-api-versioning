@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
-    using ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
 
     /// <content>
