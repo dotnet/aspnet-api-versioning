@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Hosting;
+    using Microsoft.AspNetCore.Hosting;
     using System;
     using System.Diagnostics.Contracts;
     using static System.String;

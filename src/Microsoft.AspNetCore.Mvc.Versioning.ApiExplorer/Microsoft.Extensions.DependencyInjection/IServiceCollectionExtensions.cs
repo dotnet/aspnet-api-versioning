@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
-    using Extensions;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.AspNetCore.Mvc.Versioning;
-    using Microsoft.Extensions.Options;
     using System;
     using System.Diagnostics.Contracts;
+    using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Extensions.Options;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -17,27 +17,28 @@
         /// <summary>
         /// Adds an API explorer that is API version aware.
         /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder">core MVC builder</see> available in the application</param>
-        /// <returns>The original <see cref="IMvcCoreBuilder"/> instance.</returns>
-        public static IMvcCoreBuilder AddVersionedApiExplorer( this IMvcCoreBuilder builder ) => builder.AddVersionedApiExplorer( _ => { } );
+        /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
+        /// <returns>The original <paramref name="services"/> object.</returns>
+        public static IServiceCollection AddVersionedApiExplorer( this IServiceCollection services ) => services.AddVersionedApiExplorer( _ => { } );
 
         /// <summary>
         /// Adds an API explorer that is API version aware.
         /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder">core MVC builder</see> available in the application</param>
+        /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
         /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-        /// <returns>The original <see cref="IMvcCoreBuilder"/> instance.</returns>
-        public static IMvcCoreBuilder AddVersionedApiExplorer( this IMvcCoreBuilder builder, Action<ApiExplorerOptions> setupAction )
+        /// <returns>The original <paramref name="services"/> object.</returns>
+        public static IServiceCollection AddVersionedApiExplorer( this IServiceCollection services, Action<ApiExplorerOptions> setupAction )
         {
-            Arg.NotNull( builder, nameof( builder ) );
+            Arg.NotNull( services, nameof( services ) );
             Arg.NotNull( setupAction, nameof( setupAction ) );
 
-            builder.Services.Add( Singleton( serviceProvider => NewOptions( serviceProvider, setupAction ) ) );
-            builder.Services.TryAddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
-            builder.Services.TryAddSingleton<IApiDescriptionGroupCollectionProvider, ApiDescriptionGroupCollectionProvider>();
-            builder.Services.TryAddEnumerable( Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>() );
+            services.AddMvcCore().AddApiExplorer();
+            services.Add( Singleton( serviceProvider => NewOptions( serviceProvider, setupAction ) ) );
+            services.TryAddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
+            services.TryAddSingleton<IApiDescriptionGroupCollectionProvider, ApiDescriptionGroupCollectionProvider>();
+            services.TryAddEnumerable( Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>() );
 
-            return builder;
+            return services;
         }
 
         static IOptions<ApiExplorerOptions> NewOptions( IServiceProvider serviceProvider, Action<ApiExplorerOptions> setupAction )

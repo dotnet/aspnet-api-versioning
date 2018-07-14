@@ -6,10 +6,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 {
 #if WEBAPI
     using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning.Conventions;
 #else
     using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 #endif
-    using Conventions;
     using System;
     using System.Diagnostics.Contracts;
 #if WEBAPI

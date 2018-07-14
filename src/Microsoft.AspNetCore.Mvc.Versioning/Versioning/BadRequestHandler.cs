@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Http;
+    using Microsoft.AspNetCore.Http;
 
     sealed class BadRequestHandler : RequestHandler
     {

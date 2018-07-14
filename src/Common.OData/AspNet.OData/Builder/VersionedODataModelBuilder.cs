@@ -19,7 +19,7 @@
     /// </summary>
     public partial class VersionedODataModelBuilder
     {
-        Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder();
+        Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase();
 
         /// <summary>
         /// Gets or sets the factory method used to create model builders.

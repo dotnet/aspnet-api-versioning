@@ -59,7 +59,7 @@
         [HttpGet]
         [MapToApiVersion( "1.0" )]
         [ResponseType( typeof( Order ) )]
-        [ODataRoute( "MostExpensive" )]
+        [ODataRoute( nameof( MostExpensive ) )]
         public IHttpActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
     }
 }

@@ -11,7 +11,6 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Reflection;
     using static System.Linq.Enumerable;
 
     /// <content>
@@ -93,15 +92,12 @@
         {
             Contract.Ensures( Contract.Result<IEnumerable<ApiVersion>>() != null );
 
-            var odataController = typeof( ODataController ).GetTypeInfo();
             var actions = ActionDescriptorCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>();
             var implemented = new HashSet<ApiVersion>();
 
             foreach ( var action in actions )
             {
-                var controller = action.ControllerTypeInfo;
-
-                if ( !odataController.IsAssignableFrom( action.ControllerTypeInfo ) )
+                if ( !action.ControllerTypeInfo.IsODataController() )
                 {
                     continue;
                 }

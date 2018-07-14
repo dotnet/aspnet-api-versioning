@@ -76,7 +76,7 @@
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
         /// <param name="routeName">The name of the route.</param>
-        /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see></param>
+        /// <param name="controllers">The <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see>.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
         public VersionedAttributeRoutingConvention( string routeName, IEnumerable<HttpControllerDescriptor> controllers, ApiVersion apiVersion )
             : this( routeName, controllers, defaultPathHandler, apiVersion ) { }
@@ -149,7 +149,7 @@
         /// </summary>
         /// <param name="odataPath">The OData path.</param>
         /// <param name="request">The request.</param>
-        /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected controller</returns>
+        /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected controller.</returns>
         public virtual string SelectController( ODataPath odataPath, HttpRequestMessage request )
         {
             var values = new Dictionary<string, object>();
@@ -177,7 +177,7 @@
         /// <param name="odataPath">The OData path.</param>
         /// <param name="controllerContext">The controller context.</param>
         /// <param name="actionMap">The action map.</param>
-        /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected action</returns>
+        /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected action.</returns>
         public virtual string SelectAction( ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap )
         {
             var request = controllerContext.Request;
@@ -212,7 +212,7 @@
 
             foreach ( var controller in controllers )
             {
-                if ( !IsODataController( controller ) || !ShouldMapController( controller ) )
+                if ( !controller.ControllerType.IsODataController() || !ShouldMapController( controller ) )
                 {
                     continue;
                 }
@@ -242,8 +242,6 @@
 
             return attributeMappings;
         }
-
-        static bool IsODataController( HttpControllerDescriptor controller ) => typeof( ODataController ).IsAssignableFrom( controller.ControllerType );
 
         static IEnumerable<string> GetODataRoutePrefixes( HttpControllerDescriptor controllerDescriptor )
         {

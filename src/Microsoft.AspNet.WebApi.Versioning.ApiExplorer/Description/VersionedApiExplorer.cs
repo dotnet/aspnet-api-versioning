@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
-    using Routing;
+    using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -602,7 +602,7 @@
         }
 
         /// <summary>
-        /// Explores controllers that do not use direct routes (aka "attribute" routing)
+        /// Explores controllers that do not use direct routes (aka "attribute" routing).
         /// </summary>
         /// <param name="controllerMappings">The <see cref="IDictionary{TKey, TValue}">collection</see> of controller mappings.</param>
         /// <param name="route">The <see cref="IHttpRoute">route</see> to explore.</param>

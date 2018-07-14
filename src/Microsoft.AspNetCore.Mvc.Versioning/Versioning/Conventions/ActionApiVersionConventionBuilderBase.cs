@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
-    using ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
     using System.Linq;
-    using ControllerVersionInfo = Tuple<IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>>;
+    using ControllerVersionInfo = System.Tuple<System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>>;
 
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Core.

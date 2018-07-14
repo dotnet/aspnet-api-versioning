@@ -4,13 +4,9 @@
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Routing;
-    using Microsoft.Examples.Configuration;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
-    using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
     public class Startup
     {
@@ -31,11 +27,8 @@
             services.AddMvc();
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            services.AddApiVersioning( o => o.ReportApiVersions = true );
+            services.AddApiVersioning( options => options.ReportApiVersions = true );
             services.AddOData().EnableApiVersioning();
-
-            services.TryAddEnumerable( Transient<IModelConfiguration, OrderModelConfiguration>() );
-            services.TryAddEnumerable( Transient<IModelConfiguration, PersonModelConfiguration>() );
         }
 
         public void Configure( IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, VersionedODataModelBuilder modelBuilder )

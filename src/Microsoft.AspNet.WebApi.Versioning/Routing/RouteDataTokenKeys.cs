@@ -18,12 +18,12 @@
         internal const string Controller = "controller";
 
         /// <summary>
-        /// Used to allow customer-provided disambiguation between multiple matching attribute routes
+        /// Used to allow customer-provided disambiguation between multiple matching attribute routes.
         /// </summary>
         internal const string Order = "order";
 
         /// <summary>
-        /// Used to allow URI constraint-based disambiguation between multiple matching attribute routes
+        /// Used to allow URI constraint-based disambiguation between multiple matching attribute routes.
         /// </summary>
         internal const string Precedence = "precedence";
     }

@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
     using System.Diagnostics.Contracts;
-    using Versioning;
+    using Microsoft.Web.Http.Versioning;
 
     abstract class ControllerSelector
     {

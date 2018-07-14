@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// </summary>
         /// <typeparam name="TController">The type of controller.</typeparam>
         /// <param name="builder">The extended <see cref="IActionConventionBuilder{T}"/>.</param>
-        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method</param>
+        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
         public static ActionApiVersionConventionBuilder<TController> Action<TController>( this IActionConventionBuilder<TController> builder, Expression<Action<TController>> actionExpression )
 #if WEBAPI
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <typeparam name="TController">The type of controller.</typeparam>
         /// <typeparam name="TResult">The type of action result.</typeparam>
         /// <param name="builder">The extended <see cref="IActionConventionBuilder{T}"/>.</param>
-        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method</param>
+        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
         public static ActionApiVersionConventionBuilder<TController> Action<TController, TResult>( this IActionConventionBuilder<TController> builder, Expression<Func<TController, TResult>> actionExpression )
 #if WEBAPI

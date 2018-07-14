@@ -5,7 +5,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
 #if !WEBAPI
-    using Http;
+    using Microsoft.AspNetCore.Http;
 #endif
     using System;
     using System.Diagnostics.CodeAnalysis;
