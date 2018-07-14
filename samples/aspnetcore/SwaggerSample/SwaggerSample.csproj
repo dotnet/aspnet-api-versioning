@@ -3,7 +3,7 @@
  <PropertyGroup>
   <TargetFramework>netcoreapp2.0</TargetFramework>
   <RootNamespace>Microsoft.Examples</RootNamespace>
-  <DocumentationFile>bin\$(Configuration)\netcoreapp1.0\SwaggerSample.xml</DocumentationFile>
+  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildThisFileName).xml</DocumentationFile>
  </PropertyGroup>
 
  <ItemGroup>

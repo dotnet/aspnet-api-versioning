@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Abstractions;
-    using AspNetCore.Routing;
-    using Http;
     using System.Diagnostics.Contracts;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Routing;
 
     abstract class RequestHandler
     {

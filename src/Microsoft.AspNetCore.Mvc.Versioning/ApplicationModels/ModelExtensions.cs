@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq;
-    using Versioning;
+    using Microsoft.AspNetCore.Mvc.Versioning;
 
     /// <summary>
     /// Provides extension methods for <see cref="ApplicationModel">application models</see>, <see cref="ControllerModel">controller models</see>,

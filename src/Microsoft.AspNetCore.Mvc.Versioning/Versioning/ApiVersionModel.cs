@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
     using System.Collections.Generic;
     using System.Linq;

@@ -1,16 +1,16 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
-    using AspNetCore.Mvc;
-    using AspNetCore.Mvc.Infrastructure;
-    using AspNetCore.Mvc.Routing;
-    using AspNetCore.Mvc.Versioning;
-    using Extensions;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Options;
     using System;
     using System.Diagnostics.Contracts;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Microsoft.Extensions.Options;
     using static ServiceDescriptor;
 
     /// <summary>

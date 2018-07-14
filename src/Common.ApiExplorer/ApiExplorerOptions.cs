@@ -5,8 +5,10 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 #endif
 {
     using System;
-    using Versioning;
-#if !WEBAPI
+#if WEBAPI
+    using Microsoft.Web.Http.Versioning;
+#else
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using LocalSR = SR;
 #endif
 

@@ -9,7 +9,7 @@
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
     using System.Web.Http.Tracing;
-    using Versioning;
+    using Microsoft.Web.Http.Versioning;
     using static ApiVersion;
     using static System.Net.HttpStatusCode;
     using static System.String;

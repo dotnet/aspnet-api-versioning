@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+ <PropertyGroup>
+  <TargetFramework>netcoreapp2.0</TargetFramework>
+  <RootNamespace>Microsoft.Examples</RootNamespace>
+  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildThisFileName).xml</DocumentationFile>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\..\src\Microsoft.AspNetCore.OData.Versioning\Microsoft.AspNetCore.OData.Versioning.csproj" />
+  <ProjectReference Include="..\..\..\src\Microsoft.AspNetCore.OData.Versioning.ApiExplorer\Microsoft.AspNetCore.OData.Versioning.ApiExplorer.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+  <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
+ </ItemGroup>
+
+</Project>

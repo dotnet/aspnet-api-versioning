@@ -1,9 +1,9 @@
 ﻿namespace System.Web.Http
 {
-    using Collections.Generic;
-    using Diagnostics.Contracts;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using Microsoft.Web.Http.Routing;
-    using Routing;
+    using System.Web.Http.Routing;
 
     static class HttpRouteDataExtensions
     {

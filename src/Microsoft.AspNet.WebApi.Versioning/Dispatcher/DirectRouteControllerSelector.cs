@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
-    using Routing;
+    using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -8,7 +8,7 @@
     using System.Text;
     using System.Web.Http;
     using System.Web.Http.Controllers;
-    using Versioning;
+    using Microsoft.Web.Http.Versioning;
     using static System.Environment;
 
     sealed class DirectRouteControllerSelector : ControllerSelector

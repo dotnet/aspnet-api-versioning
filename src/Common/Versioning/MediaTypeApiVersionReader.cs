@@ -5,11 +5,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
 #if WEBAPI
-    using Routing;
+    using Microsoft.Web.Http.Routing;
 #else
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Net.Http.Headers;
-    using Routing;
 #endif
     using System;
     using System.Collections.Generic;

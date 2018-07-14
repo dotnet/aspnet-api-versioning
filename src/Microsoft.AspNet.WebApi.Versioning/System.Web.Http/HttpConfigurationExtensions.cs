@@ -1,8 +1,8 @@
 ﻿namespace System.Web.Http
 {
-    using Controllers;
-    using Diagnostics.Contracts;
-    using Dispatcher;
+    using System.Diagnostics.Contracts;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Dispatcher;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Controllers;

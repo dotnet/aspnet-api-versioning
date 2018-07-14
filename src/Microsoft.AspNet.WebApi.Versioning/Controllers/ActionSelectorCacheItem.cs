@@ -1,8 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
-    using Dispatcher;
-    using Microsoft.Web.Http.Versioning;
-    using Routing;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -15,6 +12,9 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
+    using Microsoft.Web.Http.Dispatcher;
+    using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning;
     using static System.Net.HttpStatusCode;
     using static System.StringComparer;
 

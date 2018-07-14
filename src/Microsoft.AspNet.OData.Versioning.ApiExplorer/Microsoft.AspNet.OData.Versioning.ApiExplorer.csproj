@@ -6,7 +6,7 @@
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer for OData v4.0</AssemblyTitle>
   <Description>The API Explorer for Microsoft ASP.NET Web API Versioning and OData v4.0.</Description>
-  <RootNamespace>Microsoft.Web.Http</RootNamespace>
+  <RootNamespace>Microsoft</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;Versioning;ApiExplorer;OData</PackageTags>
  </PropertyGroup>
@@ -27,5 +27,6 @@
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+ <Import Project="..\Common.OData.ApiExplorer\Common.OData.ApiExplorer.projitems" Label="Shared" />
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using ApplicationModels;
-    using Conventions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
     using System;
     using System.Diagnostics.Contracts;
 

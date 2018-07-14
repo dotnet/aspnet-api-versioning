@@ -1,9 +1,9 @@
 ﻿namespace System.Web.Http
 {
-    using Collections.Generic;
-    using Controllers;
-    using Diagnostics.Contracts;
-    using Linq;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Web.Http.Controllers;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;

@@ -1,10 +1,10 @@
 ﻿namespace System.Web.Http
 {
-    using Controllers;
-    using Diagnostics.Contracts;
-    using Linq;
-    using ModelBinding;
-    using ValueProviders;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.ModelBinding;
+    using System.Web.Http.ValueProviders;
 
     static class HttpParameterBindingExtensions
     {
