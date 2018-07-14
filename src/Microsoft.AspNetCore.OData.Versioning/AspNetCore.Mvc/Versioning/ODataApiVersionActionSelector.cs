@@ -107,17 +107,19 @@
             }
 
             var availableKeys = new HashSet<string>( routeValues.Keys, StringComparer.OrdinalIgnoreCase );
-            var possibleCandidates = candidates.Select( NewPossibleCandidate );
+            var possibleCandidates = candidates.Select( candidate => new ActionCandidate( candidate ) );
             var bestCandidates = from candidate in possibleCandidates
                                  where candidate.FilteredParameters.Count == 0 ||
                                        candidate.FilteredParameters.All( p => availableKeys.Contains( p.Name ) )
-                                 orderby candidate.FilteredParameters descending,
-                                         candidate.TotalParameterCount descending
                                  select candidate;
-            var id = bestCandidates.FirstOrDefault()?.Id;
-            var matches = string.IsNullOrEmpty( id ) ? candidates : candidates.Where( c => c.Id == id ).ToArray();
-            var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
-            var finalMatches = SelectBestActions( selectionContext );
+            var matches = bestCandidates.Select( bc => bc.Action ).ToArray();
+            var selectionContext = new ActionSelectionContext( httpContext, matches.Length == 0 ? candidates : matches, apiVersion );
+            var bestActions = SelectBestActions( selectionContext );
+            var finalMatch = bestActions.Select( action => new ActionCandidate( action ) )
+                                        .OrderByDescending( candidate => candidate.FilteredParameters.Count )
+                                        .ThenByDescending( candidate => candidate.TotalParameterCount )
+                                        .FirstOrDefault()?.Action;
+            IReadOnlyList<ActionDescriptor> finalMatches = finalMatch == null ? Array.Empty<ActionDescriptor>() : new[] { finalMatch };
             var feature = httpContext.Features.Get<IApiVersioningFeature>();
             var selectionResult = feature.SelectionResult;
 
@@ -134,26 +136,25 @@
             return RoutePolicy.Evaluate( context, selectionResult );
         }
 
-        static ActionIdAndParameters NewPossibleCandidate( ActionDescriptor action ) => new ActionIdAndParameters( action.Id, action.Parameters.Count, action.Parameters.Where( IsNotSatisfiedByODataModelBinder ) );
-
         static bool IsNotSatisfiedByODataModelBinder( ParameterDescriptor parameter ) => parameter.ParameterType != typeof( ODataParameterHelper ) && !IsODataQueryOptions( parameter.ParameterType );
 
         static bool IsODataQueryOptions( Type parameterType ) => ( parameterType == typeof( ODataQueryOptions ) ) || ( parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof( ODataQueryOptions<> ) );
 
-        sealed class ActionIdAndParameters
+        sealed class ActionCandidate
         {
-            internal ActionIdAndParameters( string id, int parameterCount, IEnumerable<ParameterDescriptor> filteredParameters )
+            internal ActionCandidate( ActionDescriptor action )
             {
-                Id = id;
-                TotalParameterCount = parameterCount;
-                FilteredParameters = filteredParameters.ToArray();
+                Action = action;
+                FilteredParameters = action.Parameters.Where( IsNotSatisfiedByODataModelBinder ).ToArray();
             }
 
-            internal string Id { get; }
+            internal ActionDescriptor Action { get; }
 
-            internal int TotalParameterCount { get; }
+            internal int TotalParameterCount => Action.Parameters.Count;
 
             internal IReadOnlyList<ParameterDescriptor> FilteredParameters { get; }
+
+            internal bool IsMappedTo( ApiVersion apiVersion ) => Action.IsMappedTo( apiVersion ) || Action.IsImplicitlyMappedTo( apiVersion );
         }
     }
 }
