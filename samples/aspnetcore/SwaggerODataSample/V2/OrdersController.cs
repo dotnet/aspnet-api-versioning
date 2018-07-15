@@ -6,6 +6,7 @@
     using Microsoft.Examples.Models;
     using System;
     using System.Collections.Generic;
+    using static Microsoft.AspNetCore.Http.StatusCodes;
 
     /// <summary>
     /// Represents a RESTful service of orders.
@@ -19,7 +20,8 @@
         /// </summary>
         /// <returns>All available orders.</returns>
         /// <response code="200">The successfully retrieved orders.</response>
-        [Produces( typeof( ODataValue<IEnumerable<Order>> ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
         [ODataRoute]
         public IActionResult Get()
         {
@@ -27,7 +29,7 @@
             {
                 new Order(){ Id = 1, Customer = "John Doe" },
                 new Order(){ Id = 2, Customer = "Bob Smith" },
-                new Order(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTime.UtcNow.AddDays( 7d ) }
+                new Order(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTime.UtcNow.AddDays( 7d ) },
             };
 
             return Ok( orders );
@@ -40,7 +42,9 @@
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [Produces( typeof( Order ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Order ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})" )]
         public IActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
 
@@ -51,7 +55,8 @@
         /// <returns>The created order.</returns>
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
-        [Produces( typeof( Order ) )]
+        [ProducesResponseType( typeof( Order ), Status201Created )]
+        [ProducesResponseType( Status400BadRequest )]
         [ODataRoute]
         public IActionResult Post( [FromBody] Order order )
         {
@@ -73,7 +78,9 @@
         /// <returns>The created order.</returns>
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="404">The order does not exist.</response>
-        [Produces( typeof( Order ) )]
+        [ProducesResponseType( typeof( Order ), Status204NoContent )]
+        [ProducesResponseType( Status400BadRequest )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})" )]
         public IActionResult Patch( int key, Delta<Order> delta )
         {
@@ -96,7 +103,8 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The no orders exist.</response>
         [HttpGet]
-        [Produces( typeof( Order ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Order ), Status200OK )]
         [ODataRoute( nameof( MostExpensive ) )]
         public IActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
 
@@ -108,6 +116,9 @@
         /// <returns>None</returns>
         /// <response code="204">The order was successfully rated.</response>
         [HttpPost]
+        [ProducesResponseType( Status200OK )]
+        [ProducesResponseType( Status400BadRequest )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})/Rate" )]
         public IActionResult Rate( int key, ODataActionParameters parameters )
         {

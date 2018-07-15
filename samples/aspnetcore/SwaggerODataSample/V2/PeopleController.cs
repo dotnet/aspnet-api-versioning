@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Examples.V2
 {
     using Microsoft.AspNet.OData;
-    using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Examples.Models;
     using System;
     using System.Collections.Generic;
+    using static Microsoft.AspNetCore.Http.StatusCodes;
 
     /// <summary>
     /// Represents a RESTful people service.
@@ -18,7 +18,8 @@
         /// </summary>
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
-        [Produces( typeof( ODataValue<IEnumerable<Person>> ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
         public IActionResult Get()
         {
             var people = new[]
@@ -28,21 +29,21 @@
                     Id = 1,
                     FirstName = "John",
                     LastName = "Doe",
-                    Email = "john.doe@somewhere.com"
+                    Email = "john.doe@somewhere.com",
                 },
                 new Person()
                 {
                     Id = 2,
                     FirstName = "Bob",
                     LastName = "Smith",
-                    Email = "bob.smith@somewhere.com"
+                    Email = "bob.smith@somewhere.com",
                 },
                 new Person()
                 {
                     Id = 3,
                     FirstName = "Jane",
                     LastName = "Doe",
-                    Email = "jane.doe@somewhere.com"
+                    Email = "jane.doe@somewhere.com",
                 }
             };
 
@@ -56,16 +57,17 @@
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [Produces( typeof( Person ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Person ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         public IActionResult Get( int key ) =>
             Ok( new Person()
             {
                 Id = key,
                 FirstName = "John",
                 LastName = "Doe",
-                Email = "john.doe@somewhere.com"
-            }
-            );
+                Email = "john.doe@somewhere.com",
+            } );
 
         /// <summary>
         /// Gets the new hires since the specified date.
@@ -74,7 +76,8 @@
         /// <returns>The matching new hires.</returns>
         /// <response code="200">The people were successfully retrieved.</response>
         [HttpGet]
-        [Produces( typeof( ODataValue<IEnumerable<Order>> ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
         public IActionResult NewHires( DateTime since ) => Get();
     }
 }
