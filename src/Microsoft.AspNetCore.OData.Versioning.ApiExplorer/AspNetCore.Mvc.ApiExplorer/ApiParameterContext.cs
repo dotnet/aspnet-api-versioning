@@ -8,14 +8,12 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using static System.UriComponents;
-    using static System.UriFormat;
 
-    internal class ApiParameterContext
+    sealed class ApiParameterContext
     {
         private ODataPathTemplate pathTemplate;
 
-        public ApiParameterContext(
+        internal ApiParameterContext(
             IModelMetadataProvider metadataProvider,
             ODataRouteBuilderContext routeContext,
             ModelTypeBuilder modelTypeBuilder )
@@ -31,17 +29,17 @@
 
         internal ODataRouteBuilderContext RouteContext { get; }
 
-        public IModelMetadataProvider MetadataProvider { get; }
+        internal IModelMetadataProvider MetadataProvider { get; }
 
-        public IList<ApiParameterDescription> Results { get; } = new List<ApiParameterDescription>();
+        internal IList<ApiParameterDescription> Results { get; } = new List<ApiParameterDescription>();
 
-        public IServiceProvider Services => RouteContext.Services;
+        internal IServiceProvider Services => RouteContext.Services;
 
-        public IAssembliesResolver AssembliesResolver => RouteContext.AssembliesResolver;
+        internal IAssembliesResolver AssembliesResolver => RouteContext.AssembliesResolver;
 
-        public ModelTypeBuilder TypeBuilder { get; }
+        internal ModelTypeBuilder TypeBuilder { get; }
 
-        public ODataPathTemplate PathTemplate
+        internal ODataPathTemplate PathTemplate
         {
             get
             {

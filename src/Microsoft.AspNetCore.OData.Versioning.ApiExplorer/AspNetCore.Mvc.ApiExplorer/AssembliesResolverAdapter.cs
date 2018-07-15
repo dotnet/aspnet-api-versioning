@@ -10,7 +10,7 @@
     {
         readonly List<Assembly> assemblies = new List<Assembly>();
 
-        public AssembliesResolverAdapter( ApplicationPartManager partManager )
+        internal AssembliesResolverAdapter( ApplicationPartManager partManager )
         {
             Contract.Requires( partManager != null );
 
