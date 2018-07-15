@@ -5,14 +5,11 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.Examples.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.PlatformAbstractions;
     using Swashbuckle.AspNetCore.Swagger;
     using System.IO;
     using System.Reflection;
-    using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
     /// <summary>
     /// Represents the startup process for the application.

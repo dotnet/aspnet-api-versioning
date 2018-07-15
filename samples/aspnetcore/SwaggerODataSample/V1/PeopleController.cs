@@ -1,9 +1,9 @@
 ﻿namespace Microsoft.Examples.V1
 {
     using Microsoft.AspNet.OData;
-    using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Examples.Models;
+    using static Microsoft.AspNetCore.Http.StatusCodes;
 
     /// <summary>
     /// Represents a RESTful people service.
@@ -20,14 +20,15 @@
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
         [HttpGet]
-        [Produces( typeof( Person ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Person ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         public IActionResult Get( int key ) =>
             Ok( new Person()
             {
                 Id = key,
                 FirstName = "John",
-                LastName = "Doe"
-            }
-            );
+                LastName = "Doe",
+            } );
     }
 }
