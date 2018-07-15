@@ -3,6 +3,7 @@
     using FluentAssertions;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Interfaces;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
@@ -38,6 +39,7 @@
             services.Single( sd => sd.ServiceType == typeof( IOptions<ODataApiVersioningOptions> ) ).ImplementationInstance.GetType().Should().Be( typeof( OptionsWrapper<ODataApiVersioningOptions> ) );
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ODataApiVersionActionSelector ) );
             services.Single( sd => sd.ServiceType == typeof( VersionedODataModelBuilder ) ).ImplementationType.Should().Be( typeof( VersionedODataModelBuilder ) );
+            services.Single( sd => sd.ServiceType == typeof( IODataRouteCollectionProvider ) ).ImplementationType.Name.Should().Be( "ODataRouteCollectionProvider" );
             mvcOptions.Conventions.Single().GetType().Name.Should().Be( "MetadataControllerConvention" );
         }
 
