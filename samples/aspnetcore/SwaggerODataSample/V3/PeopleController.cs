@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Examples.V3
 {
     using Microsoft.AspNet.OData;
-    using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Examples.Models;
     using System;
     using System.Collections.Generic;
+    using static Microsoft.AspNetCore.Http.StatusCodes;
 
     /// <summary>
     /// Represents a RESTful people service.
@@ -18,7 +18,8 @@
         /// </summary>
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
-        [Produces( typeof( ODataValue<IEnumerable<Person>> ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
         public IActionResult Get()
         {
             var people = new[]
@@ -59,7 +60,9 @@
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [Produces( typeof( Person ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Person ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         public IActionResult Get( int key ) =>
             Ok( new Person()
             {
@@ -67,9 +70,8 @@
                 FirstName = "John",
                 LastName = "Doe",
                 Email = "john.doe@somewhere.com",
-                Phone = "555-987-1234"
-            }
-            );
+                Phone = "555-987-1234",
+            } );
 
         /// <summary>
         /// Creates a new person.
@@ -78,7 +80,8 @@
         /// <returns>The created person.</returns>
         /// <response code="201">The person was successfully created.</response>
         /// <response code="400">The person was invalid.</response>
-        [Produces( typeof( Person ) )]
+        [ProducesResponseType( typeof( Person ), Status201Created )]
+        [ProducesResponseType( Status400BadRequest )]
         public IActionResult Post( [FromBody] Person person )
         {
             if ( !ModelState.IsValid )
@@ -98,7 +101,8 @@
         /// <returns>The matching new hires.</returns>
         /// <response code="200">The people were successfully retrieved.</response>
         [HttpGet]
-        [Produces( typeof( ODataValue<IEnumerable<Order>> ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
         public IActionResult NewHires( DateTime since ) => Get();
 
         /// <summary>
@@ -109,6 +113,9 @@
         /// <returns>None</returns>
         /// <response code="204">The person was successfully promoted.</response>
         [HttpPost]
+        [ProducesResponseType( Status200OK )]
+        [ProducesResponseType( Status400BadRequest )]
+        [ProducesResponseType( Status404NotFound )]
         public IActionResult Promote( int key, ODataActionParameters parameters )
         {
             if ( !ModelState.IsValid )

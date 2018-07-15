@@ -4,6 +4,7 @@
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Examples.Models;
+    using static Microsoft.AspNetCore.Http.StatusCodes;
 
     /// <summary>
     /// Represents a RESTful service of orders.
@@ -20,7 +21,9 @@
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [Produces( typeof( Order ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Order ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})" )]
         public IActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
 
@@ -32,7 +35,8 @@
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
         [MapToApiVersion( "1.0" )]
-        [Produces( typeof( Order ) )]
+        [ProducesResponseType( typeof( Order ), Status201Created )]
+        [ProducesResponseType( Status400BadRequest )]
         [ODataRoute]
         public IActionResult Post( [FromBody] Order order )
         {
@@ -54,7 +58,8 @@
         /// <response code="404">The no orders exist.</response>
         [HttpGet]
         [MapToApiVersion( "1.0" )]
-        [Produces( typeof( Order ) )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Order ), Status200OK )]
         [ODataRoute( "MostExpensive" )]
         public IActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
     }
