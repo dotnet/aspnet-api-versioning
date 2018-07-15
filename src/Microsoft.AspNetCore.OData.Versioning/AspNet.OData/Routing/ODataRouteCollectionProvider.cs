@@ -1,17 +1,27 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNetCore.Mvc;
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
-    sealed class ODataRouteCollectionProvider : IODataRouteCollectionProvider
+    /// <summary>
+    /// Represents an object that manages the collection of registered OData routes.
+    /// </summary>
+    [CLSCompliant( false )]
+    public sealed class ODataRouteCollectionProvider : IODataRouteCollectionProvider
     {
         private readonly ODataRouteCollection items = new ODataRouteCollection();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataRouteCollectionProvider"/> class.
+        /// </summary>
         public ODataRouteCollectionProvider() { }
 
+        /// <inheritdoc />
         public ReadOnlyKeyedCollection<ApiVersion, ODataRouteMapping> Items => items;
 
+        /// <inheritdoc />
         public void Add( ODataRouteMapping item )
         {
             Arg.NotNull( item, nameof( item ) );
