@@ -12,10 +12,8 @@
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Versioning;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using Microsoft.OData.Edm;
-    using Microsoft.OData.UriParser;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -560,7 +558,15 @@
                 {
                     foreach ( var responseTypeMetadataProvider in responseTypeMetadataProviders )
                     {
-                        var formatterSupportedContentTypes = responseTypeMetadataProvider.GetSupportedContentTypes( contentType, objectType.Value );
+                        var formatterSupportedContentTypes = default( IReadOnlyList<string> );
+
+                        try
+                        {
+                            formatterSupportedContentTypes = responseTypeMetadataProvider.GetSupportedContentTypes( contentType, objectType.Value );
+                        }
+                        catch ( InvalidOperationException )
+                        {
+                        }
 
                         if ( formatterSupportedContentTypes == null )
                         {

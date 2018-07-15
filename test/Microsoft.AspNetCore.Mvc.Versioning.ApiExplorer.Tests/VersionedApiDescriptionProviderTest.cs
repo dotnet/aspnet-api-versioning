@@ -3,7 +3,6 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using Moq;
     using System.Collections.Generic;

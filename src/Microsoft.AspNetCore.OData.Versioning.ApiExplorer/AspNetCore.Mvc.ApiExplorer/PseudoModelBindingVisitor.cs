@@ -7,22 +7,26 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
 
     sealed class PseudoModelBindingVisitor
     {
-        public PseudoModelBindingVisitor( ApiParameterContext context, ParameterDescriptor parameter )
+        internal PseudoModelBindingVisitor( ApiParameterContext context, ParameterDescriptor parameter )
         {
+            Contract.Requires( context != null );
+            Contract.Requires( parameter != null );
+
             Context = context;
             Parameter = parameter;
         }
 
-        public ApiParameterContext Context { get; }
+        internal ApiParameterContext Context { get; }
 
-        public ParameterDescriptor Parameter { get; }
+        internal ParameterDescriptor Parameter { get; }
 
         private HashSet<PropertyKey> Visited { get; } = new HashSet<PropertyKey>( new PropertyKeyEqualityComparer() );
 
-        public void WalkParameter( ApiParameterDescriptionContext context ) => Visit( context, BindingSource.ModelBinding, containerName: string.Empty );
+        internal void WalkParameter( ApiParameterDescriptionContext context ) => Visit( context, BindingSource.ModelBinding, containerName: string.Empty );
 
         private static string GetName( string containerName, ApiParameterDescriptionContext metadata )
         {
