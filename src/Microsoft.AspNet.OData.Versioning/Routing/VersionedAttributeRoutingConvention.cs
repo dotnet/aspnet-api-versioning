@@ -203,7 +203,7 @@
                 }
             }
 
-            return attributeRouteData["action"] as string;
+            return attributeRouteData["action"]?.ToString();
         }
 
         IDictionary<ODataPathTemplate, HttpActionDescriptor> BuildAttributeMappings( IEnumerable<HttpControllerDescriptor> controllers )
