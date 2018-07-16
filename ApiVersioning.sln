@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		LICENSE = LICENSE
+		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -140,7 +141,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common.OData.ApiExplorer", "src\Common.OData.ApiExplorer\Common.OData.ApiExplorer.shproj", "{C0C766F3-A2D6-461E-ADFF-27496600EA9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNetCore.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNetCore.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNetCore.OData.Versioning.ApiExplorer.Tests.csproj", "{23BC896B-A4CC-4C82-B98B-CE71239C2EB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Versioning.ApiExplorer.Tests", "test\Microsoft.AspNetCore.OData.Versioning.ApiExplorer.Tests\Microsoft.AspNetCore.OData.Versioning.ApiExplorer.Tests.csproj", "{23BC896B-A4CC-4C82-B98B-CE71239C2EB8}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
