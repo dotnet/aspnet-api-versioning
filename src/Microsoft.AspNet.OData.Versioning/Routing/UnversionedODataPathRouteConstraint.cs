@@ -1,9 +1,9 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
+    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.Web.Http;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
@@ -42,7 +42,17 @@
                 return false;
             }
 
-            return innerConstraints.Any( c => c.Match( request, route, parameterName, values, routeDirection ) );
+            request.DeleteRequestContainer( true );
+
+            foreach ( var constraint in innerConstraints )
+            {
+                if ( constraint.Match( request, route, parameterName, values, routeDirection ) )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
