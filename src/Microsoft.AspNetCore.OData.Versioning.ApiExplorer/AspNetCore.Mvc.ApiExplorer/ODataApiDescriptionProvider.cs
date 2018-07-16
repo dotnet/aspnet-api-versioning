@@ -11,6 +11,7 @@
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using Microsoft.OData.Edm;
@@ -161,7 +162,12 @@
                     {
                         var groupName = apiVersion.ToString( groupNameFormat, formatProvider );
 
-                        if ( mappings.TryGetValue( apiVersion, out var mapping ) )
+                        if ( !mappings.TryGetValue( apiVersion, out var mappingsPerApiVersion ) )
+                        {
+                            continue;
+                        }
+
+                        foreach ( var mapping in mappingsPerApiVersion )
                         {
                             foreach ( var apiDescription in NewODataApiDescriptions( action, groupName, mapping ) )
                             {

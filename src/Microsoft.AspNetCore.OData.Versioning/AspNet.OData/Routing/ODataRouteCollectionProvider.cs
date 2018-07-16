@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
@@ -19,7 +20,7 @@
         public ODataRouteCollectionProvider() { }
 
         /// <inheritdoc />
-        public ReadOnlyKeyedCollection<ApiVersion, ODataRouteMapping> Items => items;
+        public IODataRouteCollection Items => items;
 
         /// <inheritdoc />
         public void Add( ODataRouteMapping item )
@@ -28,22 +29,57 @@
             items.Add( item );
         }
 
-        sealed class ODataRouteCollection : ReadOnlyKeyedCollection<ApiVersion, ODataRouteMapping>
+        sealed class ODataRouteCollection : IODataRouteCollection
         {
-            private readonly Dictionary<ApiVersion, ODataRouteMapping> dictionary = new Dictionary<ApiVersion, ODataRouteMapping>();
+            private readonly List<ODataRouteMapping> items = new List<ODataRouteMapping>();
+            private readonly Dictionary<ApiVersion, List<ODataRouteMapping>> dictionary = new Dictionary<ApiVersion, List<ODataRouteMapping>>();
 
-            internal ODataRouteCollection() { }
+            public IReadOnlyList<ODataRouteMapping> this[ApiVersion key] => dictionary[key];
 
-            protected override IReadOnlyDictionary<ApiVersion, ODataRouteMapping> Dictionary => dictionary;
+            public ODataRouteMapping this[int index] => items[index];
 
-            protected override ApiVersion GetKeyForItem( ODataRouteMapping item ) => item.ApiVersion;
+            public int Count => items.Count;
+
+            public bool Contains( ODataRouteMapping item ) => items.Contains( item );
+
+            public bool ContainsKey( ApiVersion key ) => dictionary.ContainsKey( key );
+
+            public void CopyTo( ODataRouteMapping[] array, int index ) => items.CopyTo( array, index );
+
+            public IEnumerator<ODataRouteMapping> GetEnumerator() => items.GetEnumerator();
+
+            public int IndexOf( ODataRouteMapping item ) => items.IndexOf( item );
+
+            public bool TryGetValue( ApiVersion key, out IReadOnlyList<ODataRouteMapping> value )
+            {
+                if ( dictionary.TryGetValue( key, out var list ) )
+                {
+                    value = list;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             internal void Add( ODataRouteMapping item )
             {
                 Contract.Requires( item != null );
 
-                dictionary.Add( GetKeyForItem( item ), item );
-                Items.Add( item );
+                var key = item.ApiVersion;
+
+                if ( dictionary.TryGetValue( key, out var list ) )
+                {
+                    list.Add( item );
+                }
+                else
+                {
+                    dictionary.Add( key, new List<ODataRouteMapping>() { item } );
+                }
+
+                items.Add( item );
             }
         }
     }
