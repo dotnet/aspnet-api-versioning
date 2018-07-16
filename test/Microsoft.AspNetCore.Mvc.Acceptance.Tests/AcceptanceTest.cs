@@ -5,19 +5,15 @@
     using Builder;
     using Extensions.DependencyInjection;
     using Hosting;
-    using Microsoft.AspNetCore.Mvc.Razor;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Net.Http;
     using System.Reflection;
     using TestHost;
     using Versioning;
     using Xunit;
-    using static Microsoft.CodeAnalysis.MetadataReference;
     using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
-    using static System.Reflection.Assembly;
 
     [Trait( "Framework", "ASP.NET Core" )]
     public abstract partial class AcceptanceTest : IDisposable
@@ -66,7 +62,7 @@
         {
             var builder = new WebHostBuilder()
                 .Configure( app => app.UseMvc( OnConfigureRoutes ).UseMvcWithDefaultRoute() )
-                .ConfigureServices( OnConfigureServices )
+                .ConfigureServices( OnDefaultConfigureServices )
                 .UseContentRoot( GetContentRoot() );
 
             return new TestServer( builder );
@@ -79,33 +75,15 @@
             return newClient;
         }
 
-        void OnConfigureServices( IServiceCollection services )
+        void OnDefaultConfigureServices( IServiceCollection services )
         {
             var partManager = new ApplicationPartManager();
 
-            partManager.FeatureProviders.Add( filteredControllerTypes );
-            partManager.ApplicationParts.Add( new AssemblyPart( GetType().GetTypeInfo().Assembly ) );
+            OnConfigurePartManager( partManager );
             services.Add( Singleton( partManager ) );
             services.AddMvc();
             services.AddApiVersioning( OnAddApiVersioning );
-            services.Configure<RazorViewEngineOptions>( options =>
-            {
-                options.CompilationCallback += context =>
-                {
-                    var assembly = GetType().GetTypeInfo().Assembly;
-                    var assemblies = assembly.GetReferencedAssemblies().Select( x => CreateFromFile( Load( x ).Location ) ).ToList();
-
-                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "mscorlib" ) ).Location ) );
-#if NET461
-                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "netstandard" ) ).Location ) );
-#else
-                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "System.Private.Corelib" ) ).Location ) );
-#endif
-                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "System.Dynamic.Runtime" ) ).Location ) );
-                    assemblies.Add( CreateFromFile( Load( new AssemblyName( "Microsoft.AspNetCore.Razor" ) ).Location ) );
-                    context.Compilation = context.Compilation.AddReferences( assemblies );
-                };
-            } );
+            OnConfigureServices( services );
         }
 
         string GetContentRoot()
@@ -120,6 +98,11 @@
 
             return contentRoot.FullName;
         }
+
+        protected virtual void OnConfigurePartManager( ApplicationPartManager partManager ) =>
+            partManager.ApplicationParts.Add( new TestApplicationPart( FilteredControllerTypes ) );
+
+        protected virtual void OnConfigureServices( IServiceCollection services ) { }
 
         protected abstract void OnAddApiVersioning( ApiVersioningOptions options );
 
