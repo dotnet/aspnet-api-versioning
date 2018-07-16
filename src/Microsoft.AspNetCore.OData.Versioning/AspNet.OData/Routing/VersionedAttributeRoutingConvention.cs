@@ -6,11 +6,9 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ActionConstraints;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
-    using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
@@ -27,16 +25,6 @@
     [CLSCompliant( false )]
     public partial class VersionedAttributeRoutingConvention : IODataRoutingConvention
     {
-        static readonly string[] SupportedHttpMethodConventions = new[]
-        {
-            "GET",
-            "PUT",
-            "POST",
-            "DELETE",
-            "PATCH",
-            "HEAD",
-            "OPTIONS",
-        };
         readonly IServiceProvider serviceProvider;
 
         /// <summary>
@@ -132,7 +120,7 @@
         /// <param name="odataPath">The OData path.</param>
         /// <param name="request">The request.</param>
         /// <returns>The name of the selected controller; otherwise, <c>null</c> if the request isn't handled by this convention.</returns>
-        protected virtual SelectControllerResult SelectController( ODataPath odataPath, HttpRequest request )
+        protected virtual IEnumerable<SelectControllerResult> SelectController( ODataPath odataPath, HttpRequest request )
         {
             Arg.NotNull( odataPath, nameof( odataPath ) );
             Arg.NotNull( request, nameof( request ) );
@@ -143,16 +131,13 @@
             {
                 var template = attributeMapping.Key;
                 var action = attributeMapping.Value;
-                var supportedHttpMethods = GetSupportedHttpMethods( action );
 
-                if ( supportedHttpMethods.Contains( request.Method ) && template.TryMatch( odataPath, values ) )
+                if ( template.TryMatch( odataPath, values ) )
                 {
                     values["action"] = action.ActionName;
-                    return new SelectControllerResult( action.ControllerName, values );
+                    yield return new SelectControllerResult( action.ControllerName, values );
                 }
             }
-
-            return default;
         }
 
         /// <summary>
@@ -174,15 +159,15 @@
             {
                 if ( IsODataRouteParameter( item ) )
                 {
-                    feature.RoutingConventionsStore.Add( item );
+                    feature.RoutingConventionsStore[item.Key] = item.Value;
                 }
                 else
                 {
-                    routeData.Add( item );
+                    routeData[item.Key] = item.Value;
                 }
             }
 
-            return attributeRouteData["action"] as string;
+            return attributeRouteData["action"]?.ToString();
         }
 
         /// <summary>
@@ -195,25 +180,28 @@
             Arg.NotNull( routeContext, nameof( routeContext ) );
 
             var httpContext = routeContext.HttpContext;
-            var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
             var odataPath = httpContext.ODataFeature().Path;
-            var controllerResult = SelectController( odataPath, httpContext.Request );
+            var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
+            var actionDescriptors = actionCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().ToArray();
 
-            if ( controllerResult == null )
+            foreach ( var controllerResult in SelectController( odataPath, httpContext.Request ) )
             {
-                return null;
+                var controllerName = controllerResult.ControllerName;
+                var actionName = SelectAction( routeContext, controllerResult );
+
+                if ( string.IsNullOrEmpty( actionName ) )
+                {
+                    continue;
+                }
+
+                foreach ( var action in actionDescriptors )
+                {
+                    if ( action.ControllerName == controllerName && string.Equals( action.ActionName, actionName, OrdinalIgnoreCase ) )
+                    {
+                        yield return action;
+                    }
+                }
             }
-
-            var actionName = SelectAction( routeContext, controllerResult );
-
-            if ( string.IsNullOrEmpty( actionName ) )
-            {
-                return null;
-            }
-
-            var actionDescriptors = actionCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().Where( c => c.ControllerName == controllerResult.ControllerName );
-
-            return actionDescriptors.Where( c => string.Equals( c.ActionName, actionName, OrdinalIgnoreCase ) );
         }
 
         IDictionary<ODataPathTemplate, ControllerActionDescriptor> BuildAttributeMappings( IEnumerable<ControllerActionDescriptor> actions )
@@ -259,36 +247,6 @@
             var actionName = controllerAction.ActionName;
 
             return routeAttributes.Select( route => GetODataPathTemplate( prefix, route.PathTemplate, requestContainer, controllerName, actionName ) ).Where( template => template != null );
-        }
-
-        static IReadOnlyCollection<string> GetSupportedHttpMethods( ControllerActionDescriptor action )
-        {
-            Contract.Requires( action != null );
-            Contract.Ensures( Contract.Result<IReadOnlyCollection<string>>() != null );
-
-            var actionConstraints = ( action.ActionConstraints ?? Array.Empty<IActionConstraintMetadata>() ).OfType<HttpMethodActionConstraint>();
-            var attributedHttpMethods = actionConstraints.SelectMany( ac => ac.HttpMethods );
-            var httpMethods = new HashSet<string>( attributedHttpMethods, StringComparer.OrdinalIgnoreCase );
-
-            if ( httpMethods.Count > 0 )
-            {
-                return httpMethods;
-            }
-
-            foreach ( var supportedHttpMethod in SupportedHttpMethodConventions )
-            {
-                if ( action.MethodInfo.Name.StartsWith( supportedHttpMethod, OrdinalIgnoreCase ) )
-                {
-                    httpMethods.Add( supportedHttpMethod );
-                }
-            }
-
-            if ( httpMethods.Count == 0 )
-            {
-                httpMethods.Add( "POST" );
-            }
-
-            return httpMethods;
         }
     }
 }

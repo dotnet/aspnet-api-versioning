@@ -57,7 +57,7 @@
             var convention = NewRoutingConvention( serviceProvider, new ApiVersion( majorVersion, 0 ) );
 
             // act
-            var actionName = convention.SelectAction( routeContext )?.SingleOrDefault().ActionName;
+            var actionName = convention.SelectAction( routeContext )?.SingleOrDefault()?.ActionName;
 
             // assert
             actionName.Should().Be( expected );

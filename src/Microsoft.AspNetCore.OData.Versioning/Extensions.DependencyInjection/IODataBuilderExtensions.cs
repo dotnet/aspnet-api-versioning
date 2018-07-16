@@ -1,15 +1,17 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
-    using System;
-    using System.Linq;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Interfaces;
     using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
+    using System;
+    using System.Linq;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -47,6 +49,7 @@
             services.Replace( Singleton<IActionSelector, ODataApiVersionActionSelector>() );
             services.TryAdd( Transient<VersionedODataModelBuilder, VersionedODataModelBuilder>() );
             services.TryAdd( Singleton<IODataRouteCollectionProvider, ODataRouteCollectionProvider>() );
+            services.TryAddEnumerable( Transient<IActionDescriptorProvider, ODataSupportedHttpMethodProvider>() );
             services.AddMvcCore( mvcOptions => mvcOptions.Conventions.Add( new MetadataControllerConvention( options ) ) );
             AddModelConfigurationsAsServices( mvcCore, services );
 
