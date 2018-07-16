@@ -3,17 +3,16 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Basic;
-    using Microsoft.AspNetCore.Mvc.Basic.Controllers.WithViewsUsingConventions;
+    using Microsoft.AspNetCore.Mvc.Basic.Controllers.WithViewsUsingAttributes;
     using System.Net.Http.Headers;
     using System.Reflection;
     using System.Threading.Tasks;
     using Xunit;
 
-    public class when_accessing_a_view_using_convention_routing : BasicAcceptanceTest
+    public class when_accessing_a_view_using_attribute_routing : UIAcceptanceTest
     {
-        public when_accessing_a_view_using_convention_routing()
+        public when_accessing_a_view_using_attribute_routing()
         {
-            FilteredControllerTypes.Clear();
             FilteredControllerTypes.Add( typeof( HomeController ).GetTypeInfo() );
         }
 
@@ -21,6 +20,7 @@
         [InlineData( "http://localhost" )]
         [InlineData( "http://localhost/home" )]
         [InlineData( "http://localhost/home/index" )]
+        [InlineData( "http://localhost/index" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange
