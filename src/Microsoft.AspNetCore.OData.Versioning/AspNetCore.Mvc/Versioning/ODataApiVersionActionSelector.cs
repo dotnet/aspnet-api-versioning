@@ -2,10 +2,10 @@
 {
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Extensions;
-    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
+    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Routing;
@@ -13,8 +13,9 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.Contracts;
     using System.Linq;
 
     /// <summary>
@@ -51,9 +52,9 @@
 
             var odataPath = context.HttpContext.ODataFeature().Path;
             var routeValues = context.RouteData.Values;
-            var newOrExistingODataRouteCandidate = odataPath == null || routeValues.ContainsKey( ActionKey );
+            var notODataCandidate = odataPath == null || routeValues.ContainsKey( ActionKey );
 
-            if ( newOrExistingODataRouteCandidate )
+            if ( notODataCandidate )
             {
                 return base.SelectCandidates( context );
             }
@@ -66,18 +67,27 @@
                 return base.SelectCandidates( context );
             }
 
+            var possibleCandidates = new List<ActionCandidate>();
+
             foreach ( var convention in routingConventions )
             {
                 var actionDescriptor = convention.SelectAction( context );
 
-                if ( actionDescriptor?.Any() == true )
+                if ( actionDescriptor != null )
                 {
-                    routeData.Values[ActionKey] = actionDescriptor.First().ActionName;
-                    return actionDescriptor.ToArray();
+                    possibleCandidates.AddRange( actionDescriptor.Select( a => new ActionCandidate( a ) ) );
                 }
             }
 
-            return base.SelectCandidates( context );
+            if ( possibleCandidates.Count == 0 )
+            {
+                return base.SelectCandidates( context );
+            }
+
+            var availableKeys = new HashSet<string>( routeValues.Keys, StringComparer.OrdinalIgnoreCase );
+            var bestCandidates = possibleCandidates.Where( c => c.FilteredParameters.All( availableKeys.Contains ) ).Select( c => c.Action ).ToArray();
+
+            return bestCandidates.Length == 0 ? base.SelectCandidates( context ) : bestCandidates;
         }
 
         /// <summary>
@@ -106,14 +116,8 @@
                 return null;
             }
 
-            var availableKeys = new HashSet<string>( routeValues.Keys, StringComparer.OrdinalIgnoreCase );
-            var possibleCandidates = candidates.Select( candidate => new ActionCandidate( candidate ) );
-            var bestCandidates = from candidate in possibleCandidates
-                                 where candidate.FilteredParameters.Count == 0 ||
-                                       candidate.FilteredParameters.All( p => availableKeys.Contains( p.Name ) )
-                                 select candidate;
-            var matches = bestCandidates.Select( bc => bc.Action ).ToArray();
-            var selectionContext = new ActionSelectionContext( httpContext, matches.Length == 0 ? candidates : matches, apiVersion );
+            var matches = EvaluateActionConstraints( context, candidates );
+            var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var bestActions = SelectBestActions( selectionContext );
             var finalMatch = bestActions.Select( action => new ActionCandidate( action ) )
                                         .OrderByDescending( candidate => candidate.FilteredParameters.Count )
@@ -133,28 +137,40 @@
 
             selectionResult.AddMatches( finalMatches );
 
-            return RoutePolicy.Evaluate( context, selectionResult );
+            var bestCandidate = RoutePolicy.Evaluate( context, selectionResult );
+
+            if ( bestCandidate is ControllerActionDescriptor controllerAction )
+            {
+                routeValues[ActionKey] = controllerAction.ActionName;
+            }
+
+            return bestCandidate;
         }
 
-        static bool IsNotSatisfiedByODataModelBinder( ParameterDescriptor parameter ) => parameter.ParameterType != typeof( ODataParameterHelper ) && !IsODataQueryOptions( parameter.ParameterType );
+        static bool IsNotSatisfiedByODataModelBinder( ParameterDescriptor parameter )
+        {
+            Contract.Requires( parameter != null );
 
-        static bool IsODataQueryOptions( Type parameterType ) => ( parameterType == typeof( ODataQueryOptions ) ) || ( parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof( ODataQueryOptions<> ) );
+            var type = parameter.ParameterType;
+            return type != typeof( ODataParameterHelper ) && !type.IsODataQueryOptions() && !type.IsDelta();
+        }
 
+        [DebuggerDisplay( "{Action.DisplayName,nq}" )]
         sealed class ActionCandidate
         {
             internal ActionCandidate( ActionDescriptor action )
             {
+                Contract.Requires( action != null );
+
                 Action = action;
-                FilteredParameters = action.Parameters.Where( IsNotSatisfiedByODataModelBinder ).ToArray();
+                FilteredParameters = action.Parameters.Where( IsNotSatisfiedByODataModelBinder ).Select( p => p.Name ).ToArray();
             }
 
             internal ActionDescriptor Action { get; }
 
             internal int TotalParameterCount => Action.Parameters.Count;
 
-            internal IReadOnlyList<ParameterDescriptor> FilteredParameters { get; }
-
-            internal bool IsMappedTo( ApiVersion apiVersion ) => Action.IsMappedTo( apiVersion ) || Action.IsImplicitlyMappedTo( apiVersion );
+            internal IReadOnlyList<string> FilteredParameters { get; }
         }
     }
 }
