@@ -1,42 +1,37 @@
-﻿namespace Microsoft.AspNet.OData.Basic
+﻿namespace Microsoft.AspNetCore.OData.Basic
 {
     using FluentAssertions;
-    using Microsoft.AspNet.OData.Basic.Controllers;
     using Microsoft.AspNet.OData.Builder;
-    using Microsoft.AspNet.OData.Configuration;
-    using Microsoft.OData.UriParser;
-    using Microsoft.Web;
+    using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.OData.Basic.Controllers;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.DependencyInjection;
     using System.Net.Http;
+    using System.Reflection;
     using System.Threading.Tasks;
-    using System.Web.Http;
     using Xunit;
-    using static Microsoft.OData.ServiceLifetime;
     using static System.Net.HttpStatusCode;
 
     public abstract class BasicAcceptanceTest : ODataAcceptanceTest
     {
         protected BasicAcceptanceTest()
         {
-            FilteredControllerTypes.Add( typeof( OrdersController ) );
-            FilteredControllerTypes.Add( typeof( PeopleController ) );
-            FilteredControllerTypes.Add( typeof( People2Controller ) );
+            FilteredControllerTypes.Add( typeof( OrdersController ).GetTypeInfo() );
+            FilteredControllerTypes.Add( typeof( PeopleController ).GetTypeInfo() );
+            FilteredControllerTypes.Add( typeof( People2Controller ).GetTypeInfo() );
+        }
 
-            Configuration.AddApiVersioning( options => options.ReportApiVersions = true );
+        protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;
 
-            var modelBuilder = new VersionedODataModelBuilder( Configuration )
-            {
-                ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
-                ModelConfigurations =
-                {
-                    new PersonModelConfiguration(),
-                    new OrderModelConfiguration()
-                }
-            };
+        protected override void OnConfigureRoutes( IRouteBuilder routeBuilder )
+        {
+            var modelBuilder = routeBuilder.ServiceProvider.GetRequiredService<VersionedODataModelBuilder>();
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
-            Configuration.EnsureInitialized();
+            routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
+            routeBuilder.MapVersionedODataRoutes( "odata-bypath", "v{version:apiVersion}", models );
         }
 
         [Fact]
