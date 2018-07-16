@@ -12,6 +12,10 @@
  </PropertyGroup>
 
  <ItemGroup>
+   <Compile Include="..\Common.OData\TypeExtensions.cs" Link="AspNet.OData\TypeExtensions.cs" />
+ </ItemGroup>
+
+ <ItemGroup>
   <ReleaseNotes Include="Fix hosting in IIS (Issue 302)" />
  </ItemGroup>
 

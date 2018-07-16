@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNet.OData.Routing.Conventions;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http.Controllers;
@@ -18,7 +17,6 @@
         /// <param name="odataPath">The OData path.</param>
         /// <param name="request">The request.</param>
         /// <returns>The name of the selected controller or <c>null</c> if the request isn't handled by this convention.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public virtual string SelectController( ODataPath odataPath, HttpRequestMessage request )
         {
             Arg.NotNull( odataPath, nameof( odataPath ) );
@@ -33,7 +31,6 @@
         /// <param name="controllerContext">The controller context.</param>
         /// <param name="actionMap">The action map.</param>
         /// <returns>The name of the selected action or <c>null</c> if the request isn't handled by this convention.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public virtual string SelectAction( ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap )
         {
             Arg.NotNull( odataPath, nameof( odataPath ) );

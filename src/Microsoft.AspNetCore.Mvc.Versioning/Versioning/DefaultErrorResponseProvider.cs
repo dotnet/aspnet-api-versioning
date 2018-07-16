@@ -52,7 +52,7 @@
 
             if ( IsNullOrEmpty( context.MessageDetail ) )
             {
-                return default( TError );
+                return default;
             }
 
             var environment = (IHostingEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IHostingEnvironment ) );
@@ -62,7 +62,7 @@
                 return create( context );
             }
 
-            return default( TError );
+            return default;
         }
     }
 }
