@@ -294,6 +294,38 @@
             return false;
         }
 
+        /// <summary>
+        /// Returns a filtered list of actions based on the evaluated action constraints.
+        /// </summary>
+        /// <param name="context">The current <see cref="RouteContext">route context</see>.</param>
+        /// <param name="actions">The <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ActionDescriptor">actions</see> to evaluate.</param>
+        /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of the remaining <see cref="ActionDescriptor">actions</see> after all
+        /// action constraints have been evaluated.</returns>
+        protected virtual IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
+        {
+            Arg.NotNull( context, nameof( context ) );
+            Arg.NotNull( actions, nameof( actions ) );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
+
+            var candidates = new List<ActionSelectorCandidate>();
+
+            for ( var i = 0; i < actions.Count; i++ )
+            {
+                var action = actions[i];
+                var constraints = actionConstraintCache.GetActionConstraints( context.HttpContext, action );
+                candidates.Add( new ActionSelectorCandidate( action, constraints ) );
+            }
+
+            var matches = EvaluateActionConstraintsCore( context, candidates, startingOrder: null );
+
+            if ( matches == null )
+            {
+                return NoMatches;
+            }
+
+            return matches.Select( candidate => candidate.Action ).ToArray();
+        }
+
         static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>
             from action in context.MatchingActions
             let model = action.GetProperty<ApiVersionModel>()
@@ -321,31 +353,6 @@
             }
 
             return false;
-        }
-
-        IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
-        {
-            Contract.Requires( context != null );
-            Contract.Requires( actions != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
-
-            var candidates = new List<ActionSelectorCandidate>();
-
-            for ( var i = 0; i < actions.Count; i++ )
-            {
-                var action = actions[i];
-                var constraints = actionConstraintCache.GetActionConstraints( context.HttpContext, action );
-                candidates.Add( new ActionSelectorCandidate( action, constraints ) );
-            }
-
-            var matches = EvaluateActionConstraintsCore( context, candidates, startingOrder: null );
-
-            if ( matches == null )
-            {
-                return NoMatches;
-            }
-
-            return matches.Select( candidate => candidate.Action ).ToArray();
         }
 
         IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )
