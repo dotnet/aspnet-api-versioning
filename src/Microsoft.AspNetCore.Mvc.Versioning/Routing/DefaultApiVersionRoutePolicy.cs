@@ -209,7 +209,7 @@
             var requestedVersion = feature.RawRequestedApiVersion;
             var parsedVersion = feature.RequestedApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
-            var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates ) );
+            var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates, parsedVersion ) );
             var apiVersions = new Lazy<ApiVersionModel>( candidates.Select( a => a.GetProperty<ApiVersionModel>() ).Aggregate );
             var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter, apiVersions );
 
@@ -241,7 +241,7 @@
             return Unmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value, parsedVersion, requestedVersion );
         }
 
-        static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates )
+        static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates, ApiVersion apiVersion )
         {
             Contract.Requires( candidates != null );
             Contract.Ensures( Contract.Result<HashSet<string>>() != null );
@@ -253,6 +253,13 @@
                 if ( candidate.ActionConstraints == null )
                 {
                     continue;
+                }
+                else if ( apiVersion != null )
+                {
+                    if ( !candidate.IsMappedTo( apiVersion ) && !candidate.IsImplicitlyMappedTo( apiVersion ) )
+                    {
+                        continue;
+                    }
                 }
 
                 foreach ( var constraint in candidate.ActionConstraints.OfType<HttpMethodActionConstraint>() )
@@ -274,7 +281,7 @@
             Logger.ApiVersionUnspecified( actionNames );
             context.Code = UnsupportedApiVersion;
 
-            if ( allowedMethods.Contains( method ) )
+            if ( allowedMethods.Count == 0 || allowedMethods.Contains( method ) )
             {
                 context.Message = SR.VersionNeutralResourceNotSupported.FormatDefault( requestUrl );
                 return new BadRequestHandler( context );
@@ -332,7 +339,7 @@
 
             context.Code = UnsupportedApiVersion;
 
-            if ( allowedMethods.Contains( method ) )
+            if ( allowedMethods.Count == 0 || allowedMethods.Contains( method ) )
             {
                 context.Message = SR.VersionedResourceNotSupported.FormatDefault( requestUrl, requestedVersion );
                 return new BadRequestHandler( context );
