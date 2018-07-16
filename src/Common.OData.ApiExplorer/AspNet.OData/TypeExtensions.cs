@@ -27,19 +27,13 @@
         static readonly Type VoidType = typeof( void );
         static readonly Type ActionResultType = typeof( IActionResult );
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
-        static readonly Type DeltaType = typeof( IDelta );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         static readonly Type ODataPath = typeof( ODataPath );
-        static readonly Type ODataQueryOptions = typeof( ODataQueryOptions );
         static readonly Type ODataActionParameters = typeof( ODataActionParameters );
 
         internal static bool IsODataPath( this Type type ) => ODataPath.IsAssignableFrom( type );
 
-        internal static bool IsODataQueryOptions( this Type type ) => ODataQueryOptions.IsAssignableFrom( type );
-
         internal static bool IsODataActionParameters( this Type type ) => ODataActionParameters.IsAssignableFrom( type );
-
-        internal static bool IsDelta( this Type type ) => DeltaType.IsAssignableFrom( type );
 
         internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver, ModelTypeBuilder modelTypeBuilder )
         {

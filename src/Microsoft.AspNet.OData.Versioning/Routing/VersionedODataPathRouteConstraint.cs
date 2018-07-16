@@ -4,7 +4,6 @@
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Net.Http;
     using System.Web.Http;
