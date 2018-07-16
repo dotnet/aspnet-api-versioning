@@ -25,6 +25,7 @@
     [CLSCompliant( false )]
     public static class IRouteBuilderExtensions
     {
+        const string UnversionedRouteSuffix = "-Unversioned";
         static readonly Func<IRouteBuilder, Action<IContainerBuilder>, Action<IContainerBuilder>> configureDefaultServicesFunc = ResolveConfigureDefaultServicesFunc();
 
         /// <summary>
@@ -93,6 +94,7 @@
             var inlineConstraintResolver = builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
             var routes = builder.Routes;
             var odataRoutes = new List<ODataRoute>();
+            var unversionedConstraints = new List<IRouteConstraint>();
 
             foreach ( var model in models )
             {
@@ -113,11 +115,14 @@
 
                 var route = new ODataRoute( router, versionedRouteName, routePrefix.RemoveTrailingSlash(), routeConstraint, inlineConstraintResolver );
 
+                unversionedConstraints.Add( new ODataPathRouteConstraint( versionedRouteName ) );
                 builder.ConfigureBatchHandler( rootContainer, route );
                 routes.Add( route );
                 odataRoutes.Add( route );
                 routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             }
+
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, unversionedConstraints, inlineConstraintResolver );
 
             return odataRoutes;
         }
@@ -217,6 +222,7 @@
             var routes = builder.Routes;
             var perRouteContainer = serviceProvider.GetRequiredService<IPerRouteContainer>();
             var odataRoutes = new List<ODataRoute>();
+            var unversionedConstraints = new List<IRouteConstraint>();
 
             if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
             {
@@ -248,11 +254,14 @@
                 var router = rootContainer.GetService<IRouter>() ?? builder.DefaultHandler;
                 var route = new ODataRoute( router, versionedRouteName, routePrefix.RemoveTrailingSlash(), routeConstraint, inlineConstraintResolver );
 
+                unversionedConstraints.Add( new ODataPathRouteConstraint( versionedRouteName ) );
                 builder.ConfigureBatchHandler( batchHandler, route );
                 routes.Add( route );
                 odataRoutes.Add( route );
                 routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             }
+
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, unversionedConstraints, inlineConstraintResolver );
 
             return odataRoutes;
         }
@@ -330,6 +339,7 @@
             builder.ConfigureBatchHandler( rootContainer, route );
             builder.Routes.Add( route );
             routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver );
 
             return route;
         }
@@ -456,6 +466,7 @@
             builder.ConfigureBatchHandler( rootContainer, route );
             builder.Routes.Add( route );
             routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver );
 
             return route;
         }
@@ -529,6 +540,47 @@
             var batchMapping = builder.ServiceProvider.GetRequiredService<ODataBatchPathMapping>();
 
             batchMapping.AddRoute( route.Name, batchPath );
+        }
+
+        static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch(
+            this IRouteBuilder builder,
+            string routeName,
+            string routePrefix,
+            IEnumerable<IRouteConstraint> unversionedConstraints,
+            IInlineConstraintResolver inlineConstraintResolver )
+        {
+            Contract.Requires( builder != null );
+            Contract.Requires( !IsNullOrEmpty( routeName ) );
+            Contract.Requires( unversionedConstraints != null );
+            Contract.Requires( inlineConstraintResolver != null );
+
+            routeName += UnversionedRouteSuffix;
+
+            var constraint = new UnversionedODataPathRouteConstraint( unversionedConstraints );
+            var route = new ODataRoute( builder.DefaultHandler, routeName, routePrefix, constraint, inlineConstraintResolver );
+
+            builder.Routes.Add( route );
+        }
+
+        static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch(
+            this IRouteBuilder builder,
+            string routeName,
+            string routePrefix,
+            ApiVersion apiVersion,
+            IInlineConstraintResolver inlineConstraintResolver )
+        {
+            Contract.Requires( builder != null );
+            Contract.Requires( !IsNullOrEmpty( routeName ) );
+            Contract.Requires( apiVersion != null );
+            Contract.Requires( inlineConstraintResolver != null );
+
+            routeName += UnversionedRouteSuffix;
+
+            var innerConstraint = new ODataPathRouteConstraint( routeName );
+            var constraint = new UnversionedODataPathRouteConstraint( innerConstraint, apiVersion );
+            var route = new ODataRoute( builder.DefaultHandler, routeName, routePrefix, constraint, inlineConstraintResolver );
+
+            builder.Routes.Add( route );
         }
 
         static IRouteConstraint MakeVersionedODataRouteConstraint( ApiVersion apiVersion, ref string versionedRouteName )
