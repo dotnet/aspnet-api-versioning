@@ -16,7 +16,7 @@
     // services.AddOData().EnableApiVersioning();
     sealed class MetadataControllerConvention : IApplicationModelConvention
     {
-        readonly TypeInfo metadataControllerType = typeof( VersionedMetadataController ).GetTypeInfo();
+        readonly TypeInfo metadataControllerType = typeof( MetadataController ).GetTypeInfo();
         readonly ODataApiVersioningOptions options;
 
         internal MetadataControllerConvention( ODataApiVersioningOptions options ) => this.options = options;
@@ -60,7 +60,7 @@
             deprecated.ExceptWith( supported );
 
             var conventions = options.Conventions;
-            var builder = conventions.Controller<VersionedMetadataController>()
+            var builder = conventions.Controller( metadataController.ControllerType )
                                      .HasApiVersions( supported )
                                      .HasDeprecatedApiVersions( deprecated );
 
