@@ -77,9 +77,7 @@
                 return false;
             }
 
-            var maybeApiVersionNeutral = string.IsNullOrEmpty( feature.RawRequestedApiVersion );
-
-            if ( maybeApiVersionNeutral || options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
+            if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
             {
                 feature.RequestedApiVersion = ApiVersion;
             }
