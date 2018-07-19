@@ -18,7 +18,7 @@
         {
             // arrange
             var actionProvider = new TestActionDescriptorCollectionProvider();
-            var apiExplorerOptions = new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } );
+            var apiExplorerOptions = Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } );
             var descriptionProvider = new DefaultApiVersionDescriptionProvider( actionProvider, apiExplorerOptions );
 
             // act
@@ -41,7 +41,7 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() ) );
+                Options.Create( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
 
             // act
@@ -57,7 +57,7 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() ) );
+                Options.Create( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
             var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
 
@@ -79,7 +79,7 @@
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(
                 new Mock<IActionDescriptorCollectionProvider>().Object,
-                new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() ) );
+                Options.Create( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
             var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
             var model = new ApiVersionModel(

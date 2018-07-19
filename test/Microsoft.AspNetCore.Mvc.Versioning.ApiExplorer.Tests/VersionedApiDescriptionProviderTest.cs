@@ -17,8 +17,8 @@
             var actionProvider = new TestActionDescriptorCollectionProvider();
             var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
             var modelMetadataProvider = NewModelMetadataProvider();
-            var apiExplorerOptions = new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } );
-            var apiExplorer = new VersionedApiDescriptionProvider( modelMetadataProvider, apiExplorerOptions );
+            var apiExplorerOptions = new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" };
+            var apiExplorer = new VersionedApiDescriptionProvider( modelMetadataProvider, Options.Create( apiExplorerOptions ) );
 
             foreach ( var action in context.Actions )
             {

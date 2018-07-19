@@ -3,6 +3,7 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.Extensions.Options;
     using System.Collections.Generic;
     using System.Linq;
     using Xunit;
@@ -14,7 +15,8 @@
         public void on_providers_executed_should_aggregate_api_version_models_by_controller( ActionDescriptorProviderContext context )
         {
             // arrange
-            var collator = new ApiVersionCollator();
+            var options = Options.Create( new ApiVersioningOptions() { ReportApiVersions = true } );
+            var collator = new ApiVersionCollator( options );
             var expected = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
 
             // act

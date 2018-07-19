@@ -23,7 +23,7 @@
             // arrange
             var actionDescriptorCollectionProvider = NewActionDescriptorCollectionProvider();
             var apiVersion = new ApiVersion( 1, 0 );
-            var options = new OptionsWrapper<ApiVersioningOptions>( new ApiVersioningOptions() { DefaultApiVersion = apiVersion } );
+            var options = Options.Create( new ApiVersioningOptions() { DefaultApiVersion = apiVersion } );
             var defaultConfiguration = new Mock<Action<ODataModelBuilder, ApiVersion>>();
             var modelCreated = new Mock<Action<ODataModelBuilder, IEdmModel>>();
             var builder = new VersionedODataModelBuilder( actionDescriptorCollectionProvider, options )

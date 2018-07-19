@@ -104,7 +104,7 @@
 
             services.AddLogging();
             services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
-            services.Add( Singleton<IOptions<MvcOptions>>( new OptionsWrapper<MvcOptions>( new MvcOptions() ) ) );
+            services.Add( Singleton<IOptions<MvcOptions>>( Options.Create( new MvcOptions() ) ) );
             services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );
             services.AddApiVersioning();
             services.AddOData().EnableApiVersioning();

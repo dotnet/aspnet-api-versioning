@@ -1,16 +1,17 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
-    using System;
-    using System.Diagnostics.Contracts;
-    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
+    using System;
+    using System.Diagnostics.Contracts;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -24,7 +25,15 @@
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
         /// <returns>The original <paramref name="services"/> object.</returns>
-        public static IServiceCollection AddApiVersioning( this IServiceCollection services ) => services.AddApiVersioning( _ => { } );
+        public static IServiceCollection AddApiVersioning( this IServiceCollection services )
+        {
+            Arg.NotNull( services, nameof( services ) );
+            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
+
+            AddApiVersioningServices( services );
+
+            return services;
+        }
 
         /// <summary>
         /// Adds service API versioning to the specified services collection.
@@ -38,76 +47,38 @@
             Arg.NotNull( setupAction, nameof( setupAction ) );
             Contract.Ensures( Contract.Result<IServiceCollection>() != null );
 
-            var options = new ApiVersioningOptions();
-
-            setupAction( options );
-            services.Add( new ServiceDescriptor( typeof( IApiVersionReader ), options.ApiVersionReader ) );
-            services.Add( new ServiceDescriptor( typeof( IApiVersionSelector ), options.ApiVersionSelector ) );
-            services.Add( new ServiceDescriptor( typeof( IErrorResponseProvider ), options.ErrorResponses ) );
-            services.Add( Singleton<IOptions<ApiVersioningOptions>>( new OptionsWrapper<ApiVersioningOptions>( options ) ) );
-            services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
-            services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
-            services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
-            services.TryAddSingleton<ReportApiVersionsAttribute>();
-            services.AddMvcCore( mvcOptions => AddMvcOptions( mvcOptions, options ) );
-            services.AddRouting( routeOptions => routeOptions.ConstraintMap.Add( options.RouteConstraintName, typeof( ApiVersionRouteConstraint ) ) );
-
-            if ( options.ReportApiVersions )
-            {
-                services.TryAddSingleton<IReportApiVersions, DefaultApiVersionReporter>();
-                services.AddTransient<IActionDescriptorProvider, ApiVersionCollator>();
-            }
-            else
-            {
-                services.TryAddSingleton<IReportApiVersions, DoNotReportApiVersions>();
-            }
+            AddApiVersioningServices( services );
+            services.Configure( setupAction );
 
             return services;
         }
 
-        static void AddMvcOptions( MvcOptions mvcOptions, ApiVersioningOptions options )
+        static void AddApiVersioningServices( IServiceCollection services )
         {
-            Contract.Requires( mvcOptions != null );
-            Contract.Requires( options != null );
+            services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
+            services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector ) );
+            services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ErrorResponses ) );
+            services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
+            services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
+            services.TryAddSingleton<ReportApiVersionsAttribute>();
+            services.TryAddSingleton( OnRequestIReportApiVersions );
+            services.TryAddEnumerable( Transient<IPostConfigureOptions<MvcOptions>, ApiVersioningMvcOptionsSetup>() );
+            services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
+            services.TryAddEnumerable( Transient<IApplicationModelProvider, ApiVersioningApplicationModelProvider>() );
+            services.TryAddEnumerable( Transient<IActionDescriptorProvider, ApiVersionCollator>() );
+            services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
+        }
+
+        static IReportApiVersions OnRequestIReportApiVersions( IServiceProvider serviceProvider )
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
 
             if ( options.ReportApiVersions )
             {
-                mvcOptions.Filters.AddService<ReportApiVersionsAttribute>();
+                return new DefaultApiVersionReporter();
             }
 
-            mvcOptions.Conventions.Add( new ApiVersionConvention( options.DefaultApiVersion, options.Conventions ) );
-        }
-
-        sealed class AutoRegisterMiddleware : IStartupFilter
-        {
-            readonly IApiVersionRoutePolicy routePolicy;
-            readonly IOptions<ApiVersioningOptions> options;
-
-            public AutoRegisterMiddleware( IApiVersionRoutePolicy routePolicy, IOptions<ApiVersioningOptions> options )
-            {
-                Contract.Requires( routePolicy != null );
-                Contract.Requires( options != null );
-
-                this.routePolicy = routePolicy;
-                this.options = options;
-            }
-
-            public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
-            {
-                Contract.Requires( next != null );
-                Contract.Ensures( Contract.Result<Action<IApplicationBuilder>>() != null );
-
-                return app =>
-                {
-                    if ( options.Value.RegisterMiddleware )
-                    {
-                        app.UseApiVersioning();
-                    }
-
-                    next( app );
-                    app.UseRouter( builder => builder.Routes.Add( new CatchAllRouteHandler( routePolicy ) ) );
-                };
-            }
+            return new DoNotReportApiVersions();
         }
     }
 }
