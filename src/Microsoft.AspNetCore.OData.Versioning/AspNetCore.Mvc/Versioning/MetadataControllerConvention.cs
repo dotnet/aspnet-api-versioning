@@ -37,17 +37,19 @@
                 {
                     var model = controller.GetProperty<ApiVersionModel>();
 
-                    if ( model != null )
+                    if ( model == null )
                     {
-                        foreach ( var apiVersion in model.SupportedApiVersions )
-                        {
-                            supported.Add( apiVersion );
-                        }
+                        continue;
+                    }
 
-                        foreach ( var apiVersion in model.DeprecatedApiVersions )
-                        {
-                            deprecated.Add( apiVersion );
-                        }
+                    foreach ( var apiVersion in model.SupportedApiVersions )
+                    {
+                        supported.Add( apiVersion );
+                    }
+
+                    foreach ( var apiVersion in model.DeprecatedApiVersions )
+                    {
+                        deprecated.Add( apiVersion );
                     }
                 }
             }

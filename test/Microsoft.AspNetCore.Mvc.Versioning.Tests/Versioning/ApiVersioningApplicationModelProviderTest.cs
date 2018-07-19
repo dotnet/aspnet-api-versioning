@@ -2,20 +2,20 @@
 {
     using ApplicationModels;
     using FluentAssertions;
+    using Microsoft.Extensions.Options;
     using System.Linq;
     using System.Reflection;
     using Xunit;
     using static System.Type;
 
-    public class ApiVersionConventionTest
+    public class ApiVersioningApplicationModelProviderTest
     {
         [Fact]
-        public void convention_should_apply_api_version_model()
+        public void on_providers_executed_should_apply_api_version_model_conventions()
         {
             // arrange
             var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) };
             var deprecated = new[] { new ApiVersion( 0, 9 ) };
-            var model = new ApiVersionModel( supported, deprecated );
             var type = typeof( object );
             var attributes = new object[]
             {
@@ -29,11 +29,14 @@
             {
                 Actions = { new ActionModel( actionMethod, attributes ) }
             };
-            var application = new ApplicationModel() { Controllers = { controller } };
-            var convention = new ApiVersionConvention();
+            var options = Options.Create( new ApiVersioningOptions() );
+            var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+            var provider = new ApiVersioningApplicationModelProvider( options );
+
+            context.Result.Controllers.Add( controller );
 
             // act
-            convention.Apply( application );
+            provider.OnProvidersExecuted( context );
 
             // assert
             controller.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
@@ -57,7 +60,7 @@
         }
 
         [Fact]
-        public void convention_should_apply_api_versionX2Dneutral_model()
+        public void on_providers_executed_should_apply_api_versionX2Dneutral_model_conventions()
         {
             // arrange
             var model = ApiVersionModel.Neutral;
@@ -68,11 +71,14 @@
             {
                 Actions = { new ActionModel( actionMethod, attributes ) }
             };
-            var application = new ApplicationModel() { Controllers = { controller } };
-            var convention = new ApiVersionConvention();
+            var options = Options.Create( new ApiVersioningOptions() );
+            var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+            var provider = new ApiVersioningApplicationModelProvider( options );
+
+            context.Result.Controllers.Add( controller );
 
             // act
-            convention.Apply( application );
+            provider.OnProvidersExecuted( context );
 
             // assert
             controller.GetProperty<ApiVersionModel>().Should().BeSameAs( model );
@@ -80,32 +86,27 @@
         }
 
         [Fact]
-        public void convention_should_apply_implicit_api_version_model()
+        public void on_providers_executed_should_apply_implicit_api_version_model_conventions()
         {
             // arrange
             var type = typeof( object );
             var attributes = new object[0];
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
-            var application = new ApplicationModel()
+            var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Controllers =
-                {
-                    new ControllerModel( type.GetTypeInfo(), attributes )
-                    {
-                        Actions =
-                        {
-                            new ActionModel( actionMethod, attributes )
-                        }
-                    }
-                }
+                Actions = { new ActionModel( actionMethod, attributes ) }
             };
-            var convention = new ApiVersionConvention( new ApiVersion( 1, 0 ) );
+            var options = Options.Create( new ApiVersioningOptions() );
+            var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+            var provider = new ApiVersioningApplicationModelProvider( options );
+
+            context.Result.Controllers.Add( controller );
 
             // act
-            convention.Apply( application );
+            provider.OnProvidersExecuted( context );
 
             // assert
-            application.Controllers.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+            controller.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -114,7 +115,7 @@
                     SupportedApiVersions = new[] { new ApiVersion( 1, 0 ) },
                     DeprecatedApiVersions = new ApiVersion[0],
                 } );
-            application.Controllers.Single().Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+            controller.Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -126,34 +127,29 @@
         }
 
         [Fact]
-        public void convention_should_not_apply_implicit_api_version_model_to_controller_and_actions_with_explicit_api_versions()
+        public void on_providers_executed_should_not_apply_implicit_api_version_model_conventions_to_controller_and_actions_with_explicit_api_versions()
         {
             // arrange
             var type = typeof( object );
             var attributes = new object[] { new ApiVersionAttribute( "2.0" ) };
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
             var v1 = new ApiVersion( 1, 0 );
-            var application = new ApplicationModel()
+            var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Controllers =
-                {
-                    new ControllerModel( type.GetTypeInfo(), attributes )
-                    {
-                        Actions =
-                        {
-                            new ActionModel( actionMethod, attributes )
-                        }
-                    }
-                }
+                Actions = { new ActionModel( actionMethod, attributes ) }
             };
-            var convention = new ApiVersionConvention( v1 );
+            var options = Options.Create( new ApiVersioningOptions() { DefaultApiVersion = v1 } );
+            var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+            var provider = new ApiVersioningApplicationModelProvider( options );
+
+            context.Result.Controllers.Add( controller );
 
             // act
-            convention.Apply( application );
+            provider.OnProvidersExecuted( context );
 
             // assert
-            application.Controllers.Single().GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
-            application.Controllers.Single().Actions.Single().GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
+            controller.GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
+            controller.Actions.Single().GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
         }
     }
 }

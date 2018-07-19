@@ -1,11 +1,10 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
-    using System;
-    using System.Diagnostics.Contracts;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
+    using System;
+    using System.Diagnostics.Contracts;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -19,7 +18,15 @@
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
         /// <returns>The original <paramref name="services"/> object.</returns>
-        public static IServiceCollection AddVersionedApiExplorer( this IServiceCollection services ) => services.AddVersionedApiExplorer( _ => { } );
+        public static IServiceCollection AddVersionedApiExplorer( this IServiceCollection services )
+        {
+            Arg.NotNull( services, nameof( services ) );
+            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
+
+            AddApiExplorerServices( services );
+
+            return services;
+        }
 
         /// <summary>
         /// Adds an API explorer that is API version aware.
@@ -31,35 +38,22 @@
         {
             Arg.NotNull( services, nameof( services ) );
             Arg.NotNull( setupAction, nameof( setupAction ) );
+            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
 
-            services.AddMvcCore().AddApiExplorer();
-            services.Add( Singleton( serviceProvider => NewOptions( serviceProvider, setupAction ) ) );
-            services.TryAddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
-            services.TryAddSingleton<IApiDescriptionGroupCollectionProvider, ApiDescriptionGroupCollectionProvider>();
-            services.TryAddEnumerable( Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>() );
+            AddApiExplorerServices( services );
+            services.Configure( setupAction );
 
             return services;
         }
 
-        static IOptions<ApiExplorerOptions> NewOptions( IServiceProvider serviceProvider, Action<ApiExplorerOptions> setupAction )
+        static void AddApiExplorerServices( IServiceCollection services )
         {
-            Contract.Requires( serviceProvider != null );
-            Contract.Requires( setupAction != null );
-            Contract.Ensures( Contract.Result<IOptions<ApiExplorerOptions>>() != null );
+            Contract.Requires( services != null );
 
-            var versioningOptions = serviceProvider.GetService<IOptions<ApiVersioningOptions>>()?.Value;
-            var options = new ApiExplorerOptions();
-
-            if ( versioningOptions != null )
-            {
-                options.DefaultApiVersion = versioningOptions.DefaultApiVersion;
-                options.ApiVersionParameterSource = versioningOptions.ApiVersionReader;
-                options.AssumeDefaultVersionWhenUnspecified = versioningOptions.AssumeDefaultVersionWhenUnspecified;
-            }
-
-            setupAction( options );
-
-            return new OptionsWrapper<ApiExplorerOptions>( options );
+            services.AddMvcCore().AddApiExplorer();
+            services.TryAdd( Singleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>() );
+            services.TryAddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
+            services.TryAddEnumerable( Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>() );
         }
     }
 }

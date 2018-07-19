@@ -3,14 +3,14 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
     using Moq;
     using System.Linq;
     using Xunit;
-    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionReader;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionParameterLocation;
-    using Microsoft.AspNetCore.Routing;
-    using Microsoft.AspNetCore.Mvc.Routing;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionReader;
 
     public class ApiVersionParameterDescriptionContextTest
     {
