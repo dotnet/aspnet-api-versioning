@@ -1,4 +1,4 @@
-﻿namespace given_a_versioned_ODataController_mixed_Web_API_controllers
+﻿namespace given_a_versioned_ODataController_mixed_with_Web_API_controllers
 {
     using FluentAssertions;
     using Microsoft.AspNet.OData.Advanced;
@@ -8,41 +8,37 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_people_is_v1 : AdvancedAcceptanceTest
+    public class when_people_is_v3 : AdvancedAcceptanceTest
     {
-        [Theory]
-        [InlineData( "api/people" )]
-        [InlineData( "api/people?api-version=1.0" )]
-        public async Task then_get_should_return_200( string requestUrl )
+        [Fact]
+        public async Task then_get_should_return_200()
         {
             // arrange
-            var example = new { value = new[] { new { id = 0, firstName = "", lastName = "" } } };
+            var example = new { value = new[] { new { id = 0, firstName = "", lastName = "", email = "", phone = "" } } };
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await Client.GetAsync( "api/people?api-version=3.0" );
             var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
             people.value.Should().BeEquivalentTo(
-                new[] { new { id = 1, firstName = "Bill", lastName = "Mei" } },
+                new[] { new { id = 1, firstName = "Bill", lastName = "Mei", email = "bill.mei@somewhere.com", phone = "555-555-5555" } },
                 options => options.ExcludingMissingMembers() );
         }
 
-        [Theory]
-        [InlineData( "api/people(42)" )]
-        [InlineData( "api/people(42)?api-version=1.0" )]
-        public async Task then_get_with_key_should_return_200( string requestUrl )
+        [Fact]
+        public async Task then_get_with_key_should_return_200()
         {
             // arrange
-            var example = new { id = 0, firstName = "", lastName = "" };
+            var example = new { id = 0, firstName = "", lastName = "", email = "", phone = "" };
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await Client.GetAsync( "api/people(42)?api-version=3.0" );
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
             order.Should().BeEquivalentTo(
-                new { id = 42, firstName = "Bill", lastName = "Mei" },
+                new { id = 42, firstName = "Bill", lastName = "Mei", email = "bill.mei@somewhere.com", phone = "555-555-5555" },
                 options => options.ExcludingMissingMembers() );
         }
 
@@ -53,7 +49,7 @@
             var person = new { lastName = "Me" };
 
             // act
-            var response = await PatchAsync( $"api/people(42)?api-version=1.0", person );
+            var response = await PatchAsync( $"api/people(42)?api-version=3.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
