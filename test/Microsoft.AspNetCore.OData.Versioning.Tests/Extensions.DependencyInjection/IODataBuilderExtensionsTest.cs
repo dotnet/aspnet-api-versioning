@@ -4,11 +4,11 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Interfaces;
     using Microsoft.AspNet.OData.Routing;
-    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
-    using Microsoft.Extensions.Options;
     using Moq;
     using System.Linq;
     using Xunit;
@@ -20,7 +20,6 @@
         {
             // arrange
             var services = new ServiceCollection();
-            var mvcOptions = new MvcOptions();
             var mock = new Mock<IODataBuilder>();
 
             mock.SetupGet( b => b.Services ).Returns( services );
@@ -30,17 +29,12 @@
             // act
             builder.EnableApiVersioning();
 
-            var serviceProvider = services.BuildServiceProvider();
-            var mvcConfiguration = serviceProvider.GetRequiredService<IConfigureOptions<MvcOptions>>();
-
-            mvcConfiguration.Configure( mvcOptions );
-
             // assert
-            services.Single( sd => sd.ServiceType == typeof( IOptions<ODataApiVersioningOptions> ) ).ImplementationInstance.GetType().Should().Be( typeof( OptionsWrapper<ODataApiVersioningOptions> ) );
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ODataApiVersionActionSelector ) );
             services.Single( sd => sd.ServiceType == typeof( VersionedODataModelBuilder ) ).ImplementationType.Should().Be( typeof( VersionedODataModelBuilder ) );
-            services.Single( sd => sd.ServiceType == typeof( IODataRouteCollectionProvider ) ).ImplementationType.Name.Should().Be( "ODataRouteCollectionProvider" );
-            mvcOptions.Conventions.Single().GetType().Name.Should().Be( "MetadataControllerConvention" );
+            services.Single( sd => sd.ServiceType == typeof( IODataRouteCollectionProvider ) ).ImplementationType.Should().Be( typeof( ODataRouteCollectionProvider ) );
+            services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType.Name == "ODataApplicationModelProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataSupportedHttpMethodProvider" ).Should().BeTrue();
         }
 
         [Fact]
@@ -56,11 +50,14 @@
             var builder = mock.Object;
 
             // act
-            builder.EnableApiVersioning( o => o.Conventions = customConventions );
+            builder.EnableApiVersioning( options => options.Conventions = customConventions );
 
             // assert
-            var options = services.BuildServiceProvider().GetRequiredService<IOptions<ODataApiVersioningOptions>>().Value;
-            options.Conventions.Should().BeSameAs( customConventions );
+            services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ODataApiVersionActionSelector ) );
+            services.Single( sd => sd.ServiceType == typeof( VersionedODataModelBuilder ) ).ImplementationType.Should().Be( typeof( VersionedODataModelBuilder ) );
+            services.Single( sd => sd.ServiceType == typeof( IODataRouteCollectionProvider ) ).ImplementationType.Should().Be( typeof( ODataRouteCollectionProvider ) );
+            services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType.Name == "ODataApplicationModelProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataSupportedHttpMethodProvider" ).Should().BeTrue();
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -13,12 +14,35 @@
     [CLSCompliant( false )]
     public class ApiVersionCollator : IActionDescriptorProvider
     {
+        readonly IOptions<ApiVersioningOptions> options;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionCollator"/> class.
+        /// </summary>
+        /// <param name="options">The current <see cref="ApiVersioningOptions">API versioning options</see>.</param>
+        public ApiVersionCollator( IOptions<ApiVersioningOptions> options )
+        {
+            Arg.NotNull( options, nameof( options ) );
+            this.options = options;
+        }
+
+        /// <summary>
+        /// Gets the API versioning options associated with the collator.
+        /// </summary>
+        /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
+        protected ApiVersioningOptions Options => options.Value;
+
         /// <inheritdoc />
         public int Order { get; protected set; }
 
         /// <inheritdoc />
         public virtual void OnProvidersExecuted( ActionDescriptorProviderContext context )
         {
+            if ( !Options.ReportApiVersions )
+            {
+                return;
+            }
+
             foreach ( var actions in GroupActionsByController( context.Results ) )
             {
                 var collatedModel = CollateModel( actions );
@@ -36,9 +60,7 @@
         }
 
         /// <inheritdoc />
-        public virtual void OnProvidersExecuting( ActionDescriptorProviderContext context )
-        {
-        }
+        public virtual void OnProvidersExecuting( ActionDescriptorProviderContext context ) { }
 
         /// <summary>
         /// Resolves and returns the logical controller name for the specified action.

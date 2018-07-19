@@ -1,12 +1,14 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
-    using AspNetCore.Mvc;
-    using AspNetCore.Mvc.Infrastructure;
-    using AspNetCore.Mvc.Routing;
-    using AspNetCore.Mvc.Versioning;
-    using AspNetCore.Routing;
     using FluentAssertions;
-    using Options;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.Options;
     using System;
     using System.Linq;
     using Xunit;
@@ -18,26 +20,22 @@
         {
             // arrange
             var services = new ServiceCollection();
-            var mvcOptions = new MvcOptions();
-            var routeOptions = new RouteOptions();
-
-            services.AddMvc();
-            services.AddApiVersioning();
-
-            var serviceProvider = services.BuildServiceProvider();
-            var mvcConfiguration = serviceProvider.GetRequiredService<IConfigureOptions<MvcOptions>>();
-            var routeConfiguration = serviceProvider.GetRequiredService<IConfigureOptions<RouteOptions>>();
 
             // act
-            mvcConfiguration.Configure( mvcOptions );
-            routeConfiguration.Configure( routeOptions );
+            services.AddApiVersioning();
 
             // assert
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().NotBeNull();
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationInstance.Should().BeOfType<DefaultApiVersionSelector>();
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationFactory.Should().NotBeNull();
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationFactory.Should().NotBeNull();
+            services.Single( sd => sd.ServiceType == typeof( IErrorResponseProvider ) ).ImplementationFactory.Should().NotBeNull();
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ApiVersionActionSelector ) );
-            mvcOptions.Conventions.Single().Should().BeOfType<ApiVersionConvention>();
-            routeOptions.ConstraintMap["apiVersion"].Should().Be( typeof( ApiVersionRouteConstraint ) );
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionRoutePolicy ) ).ImplementationType.Should().Be( typeof( DefaultApiVersionRoutePolicy ) );
+            services.Single( sd => sd.ServiceType == typeof( ReportApiVersionsAttribute ) ).ImplementationType.Should().Be( typeof( ReportApiVersionsAttribute ) );
+            services.Single( sd => sd.ServiceType == typeof( IReportApiVersions ) ).ImplementationFactory.Should().NotBeNull();
+            services.Any( sd => sd.ServiceType == typeof( IPostConfigureOptions<MvcOptions> ) && sd.ImplementationType == typeof( ApiVersioningMvcOptionsSetup ) ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IPostConfigureOptions<RouteOptions> ) && sd.ImplementationType == typeof( ApiVersioningRouteOptionsSetup ) ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType == typeof( ApiVersioningApplicationModelProvider ) ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType == typeof( ApiVersionCollator ) ).Should().BeTrue();
         }
 
         [Fact]
@@ -45,33 +43,28 @@
         {
             // arrange
             var services = new ServiceCollection();
-            var mvcOptions = new MvcOptions();
-            var routeOptions = new RouteOptions();
-
-            services.AddMvc();
-            services.AddApiVersioning(
-                 o =>
-                 {
-                     o.ReportApiVersions = true;
-                     o.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
-                     o.ApiVersionSelector = new ConstantApiVersionSelector( new ApiVersion( DateTime.Today ) );
-                 } );
-
-            var serviceProvider = services.BuildServiceProvider();
-            var mvcConfiguration = serviceProvider.GetRequiredService<IConfigureOptions<MvcOptions>>();
-            var routeConfiguration = serviceProvider.GetRequiredService<IConfigureOptions<RouteOptions>>();
 
             // act
-            mvcConfiguration.Configure( mvcOptions );
-            routeConfiguration.Configure( routeOptions );
+            services.AddApiVersioning(
+                 options =>
+                 {
+                     options.ReportApiVersions = true;
+                     options.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
+                     options.ApiVersionSelector = new ConstantApiVersionSelector( new ApiVersion( DateTime.Today ) );
+                 } );
 
             // assert
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationInstance.Should().NotBeNull();
-            services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationInstance.Should().BeOfType<ConstantApiVersionSelector>();
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionReader ) ).ImplementationFactory.Should().NotBeNull();
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionSelector ) ).ImplementationFactory.Should().NotBeNull();
+            services.Single( sd => sd.ServiceType == typeof( IErrorResponseProvider ) ).ImplementationFactory.Should().NotBeNull();
             services.Single( sd => sd.ServiceType == typeof( IActionSelector ) ).ImplementationType.Should().Be( typeof( ApiVersionActionSelector ) );
-            mvcOptions.Filters.OfType<ServiceFilterAttribute>().Single().ServiceType.Should().Be( typeof( ReportApiVersionsAttribute ) );
-            mvcOptions.Conventions.Single().Should().BeOfType<ApiVersionConvention>();
-            routeOptions.ConstraintMap["apiVersion"].Should().Be( typeof( ApiVersionRouteConstraint ) );
+            services.Single( sd => sd.ServiceType == typeof( IApiVersionRoutePolicy ) ).ImplementationType.Should().Be( typeof( DefaultApiVersionRoutePolicy ) );
+            services.Single( sd => sd.ServiceType == typeof( ReportApiVersionsAttribute ) ).ImplementationType.Should().Be( typeof( ReportApiVersionsAttribute ) );
+            services.Single( sd => sd.ServiceType == typeof( IReportApiVersions ) ).ImplementationFactory.Should().NotBeNull();
+            services.Any( sd => sd.ServiceType == typeof( IPostConfigureOptions<MvcOptions> ) && sd.ImplementationType == typeof( ApiVersioningMvcOptionsSetup ) ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IPostConfigureOptions<RouteOptions> ) && sd.ImplementationType == typeof( ApiVersioningRouteOptionsSetup ) ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType == typeof( ApiVersioningApplicationModelProvider ) ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType == typeof( ApiVersionCollator ) ).Should().BeTrue();
         }
     }
 }
