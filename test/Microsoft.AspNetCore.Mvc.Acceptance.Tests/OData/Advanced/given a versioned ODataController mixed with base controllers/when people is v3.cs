@@ -1,8 +1,8 @@
-﻿namespace given_a_versioned_ODataController_mixed_Web_API_controllers
+﻿namespace given_a_versioned_ODataController_mixed_with_base_controllers
 {
     using FluentAssertions;
-    using Microsoft.AspNet.OData.Advanced;
-    using Microsoft.Web;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData.Advanced;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;

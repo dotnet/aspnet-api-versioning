@@ -1,4 +1,4 @@
-﻿namespace given_a_versioned_ApiController_mixed_with_OData_controllers
+﻿namespace given_a_versioned_ControllerBase_mixed_with_OData_controllers
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
