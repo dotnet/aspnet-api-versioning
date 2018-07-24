@@ -15,11 +15,11 @@
     {
         // GET api/v{version}/helloworld
         [HttpGet]
-        public IActionResult Get() => Ok( new { Controller = GetType().Name, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+        public IActionResult Get( ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Version = apiVersion.ToString() } );
 
         // GET api/v{version}/helloworld/{id}
         [HttpGet( "{id:int}", Name = "GetMessageById" )]
-        public IActionResult Get( int id ) => Ok( new { Controller = GetType().Name, Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+        public IActionResult Get( int id, ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Id = id, Version = apiVersion.ToString() } );
 
         // POST api/v{version}/helloworld
         [HttpPost]

@@ -11,10 +11,10 @@
     {
         // GET api/v{version}/helloworld
         [HttpGet]
-        public string Get() => $"Controller = {GetType().Name}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string Get( ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nVersion = {apiVersion}";
 
         // GET api/v{version}/helloworld/{id}
         [HttpGet( "{id:int}" )]
-        public string Get( int id ) => $"Controller = {GetType().Name}\nId = {id}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string Get( int id, ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nId = {id}\nVersion = {apiVersion}";
     }
 }

@@ -10,6 +10,6 @@
         // GET ~/v3/agreements/{accountId}
         // GET ~/agreements/{accountId}?api-version=3.0
         [HttpGet( "{accountId}" )]
-        public IActionResult Get( string accountId ) => Ok( new Agreement( GetType().FullName, accountId, HttpContext.GetRequestedApiVersion().ToString() ) );
+        public IActionResult Get( string accountId, ApiVersion apiVersion ) => Ok( new Agreement( GetType().FullName, accountId, apiVersion.ToString() ) );
     }
 }

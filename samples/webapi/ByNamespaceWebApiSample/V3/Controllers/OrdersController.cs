@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Examples.V3.Controllers
 {
+    using Microsoft.Web.Http;
     using Models;
     using System.Web.Http;
 
@@ -8,6 +9,6 @@
     {
         // GET ~/v3/orders/{accountId}
         [Route( "{accountId}" )]
-        public IHttpActionResult Get( string accountId ) => Ok( new Order( GetType().FullName, accountId, Request.GetRequestedApiVersion().ToString() ) );
+        public IHttpActionResult Get( string accountId, ApiVersion apiVersion ) => Ok( new Order( GetType().FullName, accountId, apiVersion.ToString() ) );
     }
 }

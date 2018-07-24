@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
+    using Microsoft.Web.Http;
     using System.Web.Http;
 
     [RoutePrefix( "api/values" )]
@@ -7,10 +8,10 @@
     {
         // GET api/values?api-version=1.0
         [Route]
-        public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+        public IHttpActionResult Get( ApiVersion apiVersion ) => Ok( new { controller = GetType().Name, version = apiVersion.ToString() } );
 
         // GET api/values/{id}?api-version=1.0
         [Route( "{id:int}" )]
-        public IHttpActionResult Get( int id ) => Ok( new { controller = GetType().Name, id = id, version = Request.GetRequestedApiVersion().ToString() } );
+        public IHttpActionResult Get( int id, ApiVersion apiVersion ) => Ok( new { controller = GetType().Name, id, version = apiVersion.ToString() } );
     }
 }
