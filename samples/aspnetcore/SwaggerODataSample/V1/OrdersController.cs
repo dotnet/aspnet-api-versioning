@@ -60,6 +60,7 @@
         [MapToApiVersion( "1.0" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "MostExpensive" )]
         public IActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
     }
