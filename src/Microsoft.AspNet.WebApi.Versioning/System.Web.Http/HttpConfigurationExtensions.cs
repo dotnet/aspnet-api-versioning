@@ -1,13 +1,13 @@
 ﻿namespace System.Web.Http
 {
-    using System.Diagnostics.Contracts;
-    using System.Web.Http.Controllers;
-    using System.Web.Http.Dispatcher;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Controllers;
     using Microsoft.Web.Http.Dispatcher;
     using Microsoft.Web.Http.Versioning;
+    using System.Diagnostics.Contracts;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Dispatcher;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
@@ -58,6 +58,7 @@
             }
 
             configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
+            configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
         }
     }
 }
