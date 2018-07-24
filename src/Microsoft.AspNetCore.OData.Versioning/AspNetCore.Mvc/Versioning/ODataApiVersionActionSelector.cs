@@ -17,6 +17,7 @@
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 
     /// <summary>
     /// Represents the logic for selecting an API-versioned, action method with additional support for OData actions.
@@ -67,15 +68,22 @@
                 return base.SelectCandidates( context );
             }
 
+            var visited = new HashSet<ActionDescriptor>();
             var possibleCandidates = new List<ActionCandidate>();
 
             foreach ( var convention in routingConventions )
             {
-                var actionDescriptor = convention.SelectAction( context );
+                var actions = convention.SelectAction( context );
 
-                if ( actionDescriptor != null )
+                if ( actions != null )
                 {
-                    possibleCandidates.AddRange( actionDescriptor.Select( a => new ActionCandidate( a ) ) );
+                    foreach ( var action in actions )
+                    {
+                        if ( visited.Add( action ) )
+                        {
+                            possibleCandidates.Add( new ActionCandidate( action ) );
+                        }
+                    }
                 }
             }
 
@@ -85,9 +93,28 @@
             }
 
             var availableKeys = new HashSet<string>( routeValues.Keys, StringComparer.OrdinalIgnoreCase );
-            var bestCandidates = possibleCandidates.Where( c => c.FilteredParameters.All( availableKeys.Contains ) ).Select( c => c.Action ).ToArray();
+            var bestCandidates = new List<ActionDescriptor>( possibleCandidates.Count );
 
-            return bestCandidates.Length == 0 ? base.SelectCandidates( context ) : bestCandidates;
+            availableKeys.Remove( ODataRouteConstants.ODataPath );
+
+            for ( var i = 0; i < possibleCandidates.Count; i++ )
+            {
+                var possibleCandidate = possibleCandidates[i];
+
+                if ( availableKeys.Count == 0 )
+                {
+                    if ( possibleCandidate.FilteredParameters.Count == 0 )
+                    {
+                        bestCandidates.Add( possibleCandidate.Action );
+                    }
+                }
+                else if ( possibleCandidate.FilteredParameters.All( availableKeys.Contains ) )
+                {
+                    bestCandidates.Add( possibleCandidate.Action );
+                }
+            }
+
+            return bestCandidates;
         }
 
         /// <summary>
@@ -102,9 +129,7 @@
             Arg.NotNull( candidates, nameof( candidates ) );
 
             var httpContext = context.HttpContext;
-            var odataPath = httpContext.ODataFeature().Path;
-            var routeValues = context.RouteData.Values;
-            var odataRouteCandidate = odataPath != null && routeValues.ContainsKey( ActionKey );
+            var odataRouteCandidate = httpContext.ODataFeature().Path != null;
 
             if ( !odataRouteCandidate )
             {
@@ -141,18 +166,10 @@
 
             if ( bestCandidate is ControllerActionDescriptor controllerAction )
             {
-                routeValues[ActionKey] = controllerAction.ActionName;
+                context.RouteData.Values[ActionKey] = controllerAction.ActionName;
             }
 
             return bestCandidate;
-        }
-
-        static bool IsNotSatisfiedByODataModelBinder( ParameterDescriptor parameter )
-        {
-            Contract.Requires( parameter != null );
-
-            var type = parameter.ParameterType;
-            return type != typeof( ODataParameterHelper ) && !type.IsODataQueryOptions() && !type.IsDelta();
         }
 
         [DebuggerDisplay( "{Action.DisplayName,nq}" )]
@@ -162,8 +179,20 @@
             {
                 Contract.Requires( action != null );
 
+                var filteredParameters = new List<string>( action.Parameters.Count );
+
+                foreach ( var parameter in action.Parameters )
+                {
+                    if ( parameter.ParameterType.IsModelBound() || parameter.BindingInfo?.BindingSource != Path )
+                    {
+                        continue;
+                    }
+
+                    filteredParameters.Add( parameter.Name );
+                }
+
                 Action = action;
-                FilteredParameters = action.Parameters.Where( IsNotSatisfiedByODataModelBinder ).Select( p => p.Name ).ToArray();
+                FilteredParameters = filteredParameters;
             }
 
             internal ActionDescriptor Action { get; }

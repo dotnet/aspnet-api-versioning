@@ -11,7 +11,6 @@
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using Microsoft.OData.Edm;
@@ -20,6 +19,7 @@
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
     using static Microsoft.AspNetCore.Http.StatusCodes;
@@ -71,15 +71,15 @@
             Arg.NotNull( mvcOptions, nameof( mvcOptions ) );
 
             RouteCollectionProvider = routeCollectionProvider;
-            AssembliesResolver = new AssembliesResolverAdapter( partManager );
-            TypeBuilder = new ModelTypeBuilder( AssembliesResolver );
+            Assemblies = partManager.ApplicationParts.OfType<AssemblyPart>().Select( p => p.Assembly ).ToArray();
+            TypeBuilder = new ModelTypeBuilder( Assemblies );
             MetadataProvider = metadataProvider;
             this.options = options;
             MvcOptions = mvcOptions.Value;
             modelMetadata = new Lazy<ModelMetadata>( NewModelMetadata );
         }
 
-        IAssembliesResolver AssembliesResolver { get; }
+        IEnumerable<Assembly> Assemblies { get; }
 
         ModelTypeBuilder TypeBuilder { get; }
 
@@ -322,7 +322,7 @@
             var declaredReturnType = GetDeclaredReturnType( action );
             var runtimeReturnType = GetRuntimeReturnType( declaredReturnType );
             var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes, runtimeReturnType, mapping.Services );
-            var routeContext = new ODataRouteBuilderContext( mapping, action, AssembliesResolver, Options );
+            var routeContext = new ODataRouteBuilderContext( mapping, action, Assemblies, Options );
             var parameterContext = new ApiParameterContext( MetadataProvider, routeContext, TypeBuilder );
             var parameters = GetParameters( parameterContext );
 
@@ -336,7 +336,7 @@
                 routeContext.ParameterDescriptions.Add( parameter );
             }
 
-            var relativePath = new ODataRouteBuilder( routeContext ).Build();
+            var relativePath = BuildRelativePath( action, routeContext );
 
             foreach ( var httpMethod in GetHttpMethods( action ) )
             {
@@ -547,7 +547,7 @@
                     results.Add( new ApiResponseType()
                     {
                         StatusCode = objectType.Key,
-                        Type = objectType.Value.SubstituteIfNecessary( serviceProvider, AssembliesResolver, TypeBuilder ),
+                        Type = objectType.Value.SubstituteIfNecessary( serviceProvider, Assemblies, TypeBuilder ),
                     } );
 
                     continue;
@@ -556,7 +556,7 @@
                 var apiResponseType = new ApiResponseType()
                 {
                     StatusCode = objectType.Key,
-                    Type = objectType.Value.SubstituteIfNecessary( serviceProvider, AssembliesResolver, TypeBuilder ),
+                    Type = objectType.Value.SubstituteIfNecessary( serviceProvider, Assemblies, TypeBuilder ),
                     ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ),
                 };
 
@@ -597,5 +597,23 @@
         }
 
         ModelMetadata NewModelMetadata() => new ApiVersionModelMetadata( MetadataProvider, Options.DefaultApiVersionParameterDescription );
+
+        static string BuildRelativePath( ControllerActionDescriptor action, ODataRouteBuilderContext routeContext )
+        {
+            Contract.Requires( action != null );
+            Contract.Requires( routeContext != null );
+            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+
+            var relativePath = action.AttributeRouteInfo?.Template;
+
+            // note: if path happens to be built adhead of time, it's expected to be qualified; rebuild it as necessary
+            if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedOperationNames )
+            {
+                var builder = new ODataRouteBuilder( routeContext );
+                relativePath = builder.Build();
+            }
+
+            return relativePath;
+        }
     }
 }

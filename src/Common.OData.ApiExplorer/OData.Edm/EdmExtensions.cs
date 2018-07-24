@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.OData.Edm
 {
+    using Microsoft.AspNet.OData;
 #if !WEBAPI
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
 #endif
@@ -16,10 +17,15 @@
 
     static class EdmExtensions
     {
-        internal static Type GetClrType( this IEdmType edmType, IAssembliesResolver assembliesResolver )
+#if WEBAPI
+        internal static Type GetClrType( this IEdmType edmType, IAssembliesResolver assembliesResolver ) =>
+            edmType.GetClrType( assembliesResolver.GetAssemblies() );
+#endif
+
+        internal static Type GetClrType( this IEdmType edmType, IEnumerable<Assembly> assemblies )
         {
             Contract.Requires( edmType != null );
-            Contract.Requires( assembliesResolver != null );
+            Contract.Requires( assemblies != null );
 
             if ( !( edmType is IEdmSchemaType schemaType ) )
             {
@@ -34,7 +40,7 @@
                 return type;
             }
 
-            using ( var matchingTypes = GetMatchingTypes( typeName, assembliesResolver ).GetEnumerator() )
+            using ( var matchingTypes = GetMatchingTypes( typeName, assemblies ).GetEnumerator() )
             {
                 if ( matchingTypes.MoveNext() )
                 {
@@ -101,13 +107,12 @@
             return Format( InvariantCulture, "{0}Of{1}", typeName, typeArgNames );
         }
 
-        static IEnumerable<Type> GetMatchingTypes( string edmFullName, IAssembliesResolver assembliesResolver ) =>
-            assembliesResolver.LoadedTypes().Where( t => t.IsPublic && t.EdmFullName() == edmFullName );
+        static IEnumerable<Type> GetMatchingTypes( string edmFullName, IEnumerable<Assembly> assemblies ) =>
+            assemblies.LoadedTypes().Where( t => t.IsPublic && t.EdmFullName() == edmFullName );
 
-        static IEnumerable<Type> LoadedTypes( this IAssembliesResolver assembliesResolver )
+        static IEnumerable<Type> LoadedTypes( this IEnumerable<Assembly> assemblies )
         {
             var loadedTypes = new List<Type>();
-            var assemblies = assembliesResolver.GetAssemblies();
 
             foreach ( var assembly in assemblies.Where( a => a?.IsDynamic == false ) )
             {

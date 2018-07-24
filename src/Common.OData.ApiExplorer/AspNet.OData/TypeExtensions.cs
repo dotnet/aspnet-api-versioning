@@ -28,17 +28,16 @@
         static readonly Type ActionResultType = typeof( IActionResult );
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
-        static readonly Type ODataPath = typeof( ODataPath );
-        static readonly Type ODataActionParameters = typeof( ODataActionParameters );
 
-        internal static bool IsODataPath( this Type type ) => ODataPath.IsAssignableFrom( type );
+#if WEBAPI
+        internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver, ModelTypeBuilder modelTypeBuilder ) =>
+            type.SubstituteIfNecessary( serviceProvider, assembliesResolver.GetAssemblies(), modelTypeBuilder );
+#endif
 
-        internal static bool IsODataActionParameters( this Type type ) => ODataActionParameters.IsAssignableFrom( type );
-
-        internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver, ModelTypeBuilder modelTypeBuilder )
+        internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IEnumerable<Assembly> assemblies, ModelTypeBuilder modelTypeBuilder )
         {
             Contract.Requires( serviceProvider != null );
-            Contract.Requires( assembliesResolver != null );
+            Contract.Requires( assemblies != null );
             Contract.Requires( modelTypeBuilder != null );
             Contract.Ensures( Contract.Result<Type>() != null );
 
@@ -51,7 +50,7 @@
 
             var innerType = result.InnerType;
             var model = serviceProvider.GetRequiredService<IEdmModel>();
-            var structuredType = innerType.GetStructuredType( model, assembliesResolver );
+            var structuredType = innerType.GetStructuredType( model, assemblies );
 
             if ( structuredType == null )
             {
@@ -128,14 +127,14 @@
             return typeDef.Equals( IEnumerableOfT ) || typeDef.GetInterfaces().Any( i => i.IsGenericType && i.GetGenericTypeDefinition().Equals( IEnumerableOfT ) );
         }
 
-        static IEdmStructuredType GetStructuredType( this Type type, IEdmModel model, IAssembliesResolver assembliesResolver )
+        static IEdmStructuredType GetStructuredType( this Type type, IEdmModel model, IEnumerable<Assembly> assemblies )
         {
             Contract.Requires( type != null );
             Contract.Requires( model != null );
-            Contract.Requires( assembliesResolver != null );
+            Contract.Requires( assemblies != null );
 
             var structuredTypes = model.SchemaElements.OfType<IEdmStructuredType>();
-            var structuredType = structuredTypes.FirstOrDefault( t => t.GetClrType( assembliesResolver ).Equals( type ) );
+            var structuredType = structuredTypes.FirstOrDefault( t => t.GetClrType( assemblies ).Equals( type ) );
 
             return structuredType;
         }

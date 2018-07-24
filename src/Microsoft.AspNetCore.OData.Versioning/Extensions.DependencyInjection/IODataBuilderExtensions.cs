@@ -3,6 +3,8 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Interfaces;
     using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -69,8 +71,9 @@
             services.Replace( Singleton<IActionSelector, ODataApiVersionActionSelector>() );
             services.TryAdd( Transient<VersionedODataModelBuilder, VersionedODataModelBuilder>() );
             services.TryAdd( Singleton<IODataRouteCollectionProvider, ODataRouteCollectionProvider>() );
-            services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataApplicationModelProvider>() );
-            services.TryAddEnumerable( Transient<IActionDescriptorProvider, ODataSupportedHttpMethodProvider>() );
+            services.AddTransient<IApplicationModelProvider, ODataApplicationModelProvider>();
+            services.AddTransient<IActionDescriptorProvider, ODataActionDescriptorProvider>();
+            services.AddSingleton<IActionDescriptorChangeProvider>( ODataActionDescriptorChangeProvider.Instance );
             services.AddModelConfigurationsAsServices( partManager );
         }
 

@@ -34,7 +34,8 @@
             services.Single( sd => sd.ServiceType == typeof( VersionedODataModelBuilder ) ).ImplementationType.Should().Be( typeof( VersionedODataModelBuilder ) );
             services.Single( sd => sd.ServiceType == typeof( IODataRouteCollectionProvider ) ).ImplementationType.Should().Be( typeof( ODataRouteCollectionProvider ) );
             services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType.Name == "ODataApplicationModelProvider" ).Should().BeTrue();
-            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataSupportedHttpMethodProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataActionDescriptorProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorChangeProvider ) && sd.ImplementationInstance.GetType().Name == "ODataActionDescriptorChangeProvider" ).Should().BeTrue();
         }
 
         [Fact]
@@ -57,7 +58,8 @@
             services.Single( sd => sd.ServiceType == typeof( VersionedODataModelBuilder ) ).ImplementationType.Should().Be( typeof( VersionedODataModelBuilder ) );
             services.Single( sd => sd.ServiceType == typeof( IODataRouteCollectionProvider ) ).ImplementationType.Should().Be( typeof( ODataRouteCollectionProvider ) );
             services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType.Name == "ODataApplicationModelProvider" ).Should().BeTrue();
-            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataSupportedHttpMethodProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataActionDescriptorProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IActionDescriptorChangeProvider ) && sd.ImplementationInstance.GetType().Name == "ODataActionDescriptorChangeProvider" ).Should().BeTrue();
         }
     }
 }
