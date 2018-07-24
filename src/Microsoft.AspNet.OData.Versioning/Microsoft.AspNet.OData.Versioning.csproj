@@ -20,7 +20,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.OData" Version="7.0.0" />
+  <PackageReference Include="Microsoft.AspNet.OData" Version="7.0.1" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
