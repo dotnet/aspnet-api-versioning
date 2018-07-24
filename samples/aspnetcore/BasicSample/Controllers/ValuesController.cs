@@ -12,6 +12,6 @@
     {
         // GET api/values?api-version=1.0
         [HttpGet]
-        public string Get() => $"Controller = {GetType().Name}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string Get( ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nVersion = {apiVersion}";
     }
 }
