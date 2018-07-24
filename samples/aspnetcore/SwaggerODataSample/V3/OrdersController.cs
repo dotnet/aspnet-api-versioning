@@ -12,7 +12,6 @@
     /// Represents a RESTful service of orders.
     /// </summary>
     [ApiVersion( "3.0" )]
-    [Produces( "application/json" )]
     [ODataRoutePrefix( "Orders" )]
     public class OrdersController : ODataController
     {
@@ -57,7 +56,8 @@
         /// <returns>The created order.</returns>
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
-        [Produces( typeof( Order ) )]
+        [ProducesResponseType( typeof( Order ), Status201Created )]
+        [ProducesResponseType( Status400BadRequest )]
         [ODataRoute]
         public IActionResult Post( [FromBody] Order order )
         {
@@ -78,9 +78,11 @@
         /// <param name="delta">The partial order to update.</param>
         /// <returns>The created order.</returns>
         /// <response code="204">The order was successfully updated.</response>
+        /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
         [ProducesResponseType( typeof( Order ), Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})" )]
         public IActionResult Patch( int key, Delta<Order> delta )
         {
@@ -103,6 +105,7 @@
         /// <param name="suspendOnly">Indicates if the order should only be suspended.</param>
         /// <returns>None</returns>
         /// <response code="204">The order was successfully canceled.</response>
+        /// <response code="404">The order does not exist.</response>
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})" )]
@@ -117,6 +120,7 @@
         [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( nameof( MostExpensive ) )]
         public IActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
 
@@ -127,8 +131,11 @@
         /// <param name="parameters">The action parameters.</param>
         /// <returns>None</returns>
         /// <response code="204">The order was successfully rated.</response>
+        /// <response code="400">The parameters are invalid.</response>
+        /// <response code="404">The order does not exist.</response>
         [HttpPost]
         [ProducesResponseType( Status200OK )]
+        [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
         [ODataRoute( "({key})/Rate" )]
         public IActionResult Rate( int key, ODataActionParameters parameters )

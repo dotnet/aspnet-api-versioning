@@ -77,6 +77,7 @@
         /// <param name="delta">The partial order to update.</param>
         /// <returns>The created order.</returns>
         /// <response code="204">The order was successfully updated.</response>
+        /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
         [ProducesResponseType( typeof( Order ), Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
@@ -105,6 +106,7 @@
         [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
         [ODataRoute( nameof( MostExpensive ) )]
         public IActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
 
@@ -115,6 +117,8 @@
         /// <param name="parameters">The action parameters.</param>
         /// <returns>None</returns>
         /// <response code="204">The order was successfully rated.</response>
+        /// <response code="400">The parameters are invalid.</response>
+        /// <response code="404">The order does not exist.</response>
         [HttpPost]
         [ProducesResponseType( Status200OK )]
         [ProducesResponseType( Status400BadRequest )]
