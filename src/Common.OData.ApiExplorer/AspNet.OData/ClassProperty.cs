@@ -29,13 +29,13 @@
             Attributes = AttributesFromProperty( clrProperty );
         }
 
-        internal ClassProperty( IAssembliesResolver assemblyResolver, IEdmOperationParameter parameter )
+        internal ClassProperty( IEnumerable<Assembly> assemblies, IEdmOperationParameter parameter )
         {
-            Contract.Requires( assemblyResolver != null );
+            Contract.Requires( assemblies != null );
             Contract.Requires( parameter != null );
 
             Name = parameter.Name;
-            Type = parameter.Type.Definition.GetClrType( assemblyResolver );
+            Type = parameter.Type.Definition.GetClrType( assemblies );
             Attributes = AttributesFromOperationParameter( parameter );
         }
 

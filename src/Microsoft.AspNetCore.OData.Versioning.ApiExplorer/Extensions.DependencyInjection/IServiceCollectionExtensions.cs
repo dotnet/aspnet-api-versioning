@@ -50,8 +50,18 @@
         {
             services.AddVersionedApiExplorer();
             services.TryAdd( Singleton<IOptionsFactory<ODataApiExplorerOptions>, ApiExplorerOptionsFactory<ODataApiExplorerOptions>>() );
+            services.Replace( Singleton<IOptionsFactory<ApiExplorerOptions>>( sp => new ODataApiExplorerOptionsAdapter( sp.GetRequiredService<IOptionsFactory<ODataApiExplorerOptions>>() ) ) );
             services.Replace( Singleton( typeof( ApiExplorerOptions ), sp => sp.GetRequiredService<ODataApiExplorerOptions>() ) );
             services.TryAddEnumerable( Transient<IApiDescriptionProvider, ODataApiDescriptionProvider>() );
+        }
+
+        sealed class ODataApiExplorerOptionsAdapter : IOptionsFactory<ApiExplorerOptions>
+        {
+            readonly IOptionsFactory<ODataApiExplorerOptions> factory;
+
+            internal ODataApiExplorerOptionsAdapter( IOptionsFactory<ODataApiExplorerOptions> factory ) => this.factory = factory;
+
+            public ApiExplorerOptions Create( string name ) => factory.Create( name );
         }
     }
 }

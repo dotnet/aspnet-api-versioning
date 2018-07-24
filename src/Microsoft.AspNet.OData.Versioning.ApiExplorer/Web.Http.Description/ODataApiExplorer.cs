@@ -46,7 +46,7 @@
         public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options ) : base( configuration, options )
         {
             Options = options;
-            modelTypeBuilder = new ModelTypeBuilder( configuration.Services.GetAssembliesResolver() );
+            modelTypeBuilder = new ModelTypeBuilder( configuration.Services.GetAssembliesResolver().GetAssemblies() );
         }
 
         /// <summary>

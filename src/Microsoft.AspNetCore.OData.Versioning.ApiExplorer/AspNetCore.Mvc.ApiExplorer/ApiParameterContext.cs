@@ -8,6 +8,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Reflection;
 
     sealed class ApiParameterContext
     {
@@ -35,7 +36,7 @@
 
         internal IServiceProvider Services => RouteContext.Services;
 
-        internal IAssembliesResolver AssembliesResolver => RouteContext.AssembliesResolver;
+        internal IEnumerable<Assembly> Assemblies => RouteContext.Assemblies;
 
         internal ModelTypeBuilder TypeBuilder { get; }
 
@@ -46,6 +47,14 @@
                 if ( pathTemplate != null )
                 {
                     return pathTemplate;
+                }
+
+                if ( RouteContext.ActionDescriptor.AttributeRouteInfo is ODataAttributeRouteInfo routeInfo )
+                {
+                    if ( ( pathTemplate = routeInfo.ODataTemplate ) != null )
+                    {
+                        return pathTemplate;
+                    }
                 }
 
                 var routeBuilder = new ODataRouteBuilder( RouteContext );

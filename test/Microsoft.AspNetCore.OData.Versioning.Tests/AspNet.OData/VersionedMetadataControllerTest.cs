@@ -60,7 +60,6 @@
 
             public void Configure( IApplicationBuilder app, VersionedODataModelBuilder builder )
             {
-                builder.ModelConfigurations.Add( new TestModelConfiguration() );
                 app.UseMvc( r => r.MapVersionedODataRoutes( "odata", null, builder.GetEdmModels() ) );
             }
         }

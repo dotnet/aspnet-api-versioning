@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNet.OData;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
@@ -17,27 +16,20 @@
     {
         private IODataPathTemplateHandler templateHandler;
 
-        internal ODataRouteBuilderContext(
-            ODataRouteMapping routeMapping,
-            ControllerActionDescriptor actionDescriptor,
-            IEnumerable<Assembly> assemblies,
-            ODataApiExplorerOptions options )
+        internal ODataRouteBuilderContext( IEnumerable<Assembly> assemblies, ODataRouteMapping routeMapping, ControllerActionDescriptor actionDescriptor )
         {
-            Contract.Requires( routeMapping != null );
             Contract.Requires( assemblies != null );
+            Contract.Requires( routeMapping != null );
             Contract.Requires( actionDescriptor != null );
-            Contract.Requires( options != null );
 
+            Assemblies = assemblies;
             ApiVersion = routeMapping.ApiVersion;
             serviceProvider = routeMapping.Services;
             EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
-            Assemblies = assemblies;
             routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = routeMapping.Route;
             ActionDescriptor = actionDescriptor;
-            ParameterDescriptions = new List<ApiParameterDescription>();
-            Options = options;
             UrlKeyDelimiter = serviceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter ?? Parentheses;
 
             var container = EdmModel.EntityContainer;

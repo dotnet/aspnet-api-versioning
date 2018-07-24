@@ -3,7 +3,6 @@
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.AspNet.OData.Routing.Template;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -17,7 +16,6 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
-    using static System.StringComparison;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -117,57 +115,41 @@
         /// <summary>
         /// Selects the controller for OData requests.
         /// </summary>
-        /// <param name="odataPath">The OData path.</param>
-        /// <param name="request">The request.</param>
+        /// <param name="routeContext">The current <see cref="RouteContext">context</see>.</param>
         /// <returns>The name of the selected controller; otherwise, <c>null</c> if the request isn't handled by this convention.</returns>
-        protected virtual IEnumerable<SelectControllerResult> SelectController( ODataPath odataPath, HttpRequest request )
+        protected virtual IEnumerable<SelectControllerResult> SelectController( RouteContext routeContext )
         {
-            Arg.NotNull( odataPath, nameof( odataPath ) );
-            Arg.NotNull( request, nameof( request ) );
+            Arg.NotNull( routeContext, nameof( routeContext ) );
 
-            var values = new Dictionary<string, object>();
+            var items = new Dictionary<string, object>();
+            var feature = routeContext.HttpContext.ODataFeature();
+            var odataPath = feature.Path;
+            IDictionary<string, object> routeData = routeContext.RouteData.Values;
 
             foreach ( var attributeMapping in AttributeMappings )
             {
                 var template = attributeMapping.Key;
                 var action = attributeMapping.Value;
 
-                if ( template.TryMatch( odataPath, values ) )
+                if ( !template.TryMatch( odataPath, items ) )
                 {
-                    values["action"] = action.ActionName;
-                    yield return new SelectControllerResult( action.ControllerName, values );
+                    continue;
                 }
+
+                foreach ( var item in items )
+                {
+                    if ( IsODataRouteParameter( item ) )
+                    {
+                        feature.RoutingConventionsStore[item.Key] = item.Value;
+                    }
+                    else
+                    {
+                        routeData[item.Key] = item.Value;
+                    }
+                }
+
+                yield return new SelectControllerResult( action.ControllerName, items );
             }
-        }
-
-        /// <summary>
-        /// Selects the action for OData requests.
-        /// </summary>
-        /// <param name="routeContext">The current <see cref="RouteContext">context</see>.</param>
-        /// <param name="controllerResult">The current <see cref="SelectControllerResult">controller selection result</see>.</param>
-        /// <returns>The name of the selected action; otherwise, <c>null</c> if the request isn't handled by this convention.</returns>
-        protected virtual string SelectAction( RouteContext routeContext, SelectControllerResult controllerResult )
-        {
-            Arg.NotNull( routeContext, nameof( routeContext ) );
-            Arg.NotNull( controllerResult, nameof( controllerResult ) );
-
-            var attributeRouteData = controllerResult.Values;
-            var feature = routeContext.HttpContext.ODataFeature();
-            IDictionary<string, object> routeData = routeContext.RouteData.Values;
-
-            foreach ( var item in attributeRouteData )
-            {
-                if ( IsODataRouteParameter( item ) )
-                {
-                    feature.RoutingConventionsStore[item.Key] = item.Value;
-                }
-                else
-                {
-                    routeData[item.Key] = item.Value;
-                }
-            }
-
-            return attributeRouteData["action"]?.ToString();
         }
 
         /// <summary>
@@ -179,24 +161,18 @@
         {
             Arg.NotNull( routeContext, nameof( routeContext ) );
 
-            var httpContext = routeContext.HttpContext;
-            var odataPath = httpContext.ODataFeature().Path;
-            var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
+            var services = routeContext.HttpContext.RequestServices;
+            var actionCollectionProvider = services.GetRequiredService<IActionDescriptorCollectionProvider>();
             var actionDescriptors = actionCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().ToArray();
 
-            foreach ( var controllerResult in SelectController( odataPath, httpContext.Request ) )
+            foreach ( var controllerResult in SelectController( routeContext ) )
             {
                 var controllerName = controllerResult.ControllerName;
-                var actionName = SelectAction( routeContext, controllerResult );
-
-                if ( string.IsNullOrEmpty( actionName ) )
-                {
-                    continue;
-                }
+                var attributeRouteData = controllerResult.Values;
 
                 foreach ( var action in actionDescriptors )
                 {
-                    if ( action.ControllerName == controllerName && string.Equals( action.ActionName, actionName, OrdinalIgnoreCase ) )
+                    if ( action.ControllerName == controllerName )
                     {
                         yield return action;
                     }

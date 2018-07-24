@@ -26,6 +26,9 @@
 #else
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 #endif
+#if !API_EXPLORER
+    using ApiParameterDescription = Microsoft.AspNetCore.Mvc.Abstractions.ParameterDescriptor;
+#endif
 
     sealed partial class ODataRouteBuilder
     {
@@ -138,7 +141,11 @@
                     AppendEntityKeysFromConvention( builder );
                     segments.Add( builder.ToString() );
                     builder.Clear();
+#if API_EXPLORER
                     builder.Append( Context.Options.UseQualifiedOperationNames ? Context.Operation.ShortQualifiedName() : Context.Operation.Name );
+#else
+                    builder.Append( Context.Operation.ShortQualifiedName() );
+#endif
                     AppendParametersFromConvention( builder, Context.Operation );
                     break;
                 case UnboundOperation:
@@ -217,8 +224,10 @@
                 var name = parameter.Name;
 #if WEBAPI
                 var routeParameterName = actionParameters[name].ParameterDescriptor.ParameterName;
-#else
+#elif API_EXPLORER
                 var routeParameterName = actionParameters[name].ParameterDescriptor.Name;
+#else
+                var routeParameterName = actionParameters[name].Name;
 #endif
 
                 builder.Append( '(' );
@@ -232,8 +241,10 @@
                     name = parameter.Name;
 #if WEBAPI
                     routeParameterName = actionParameters[name].ParameterDescriptor.ParameterName;
-#else
+#elif API_EXPLORER
                     routeParameterName = actionParameters[name].ParameterDescriptor.Name;
+#else
+                    routeParameterName = actionParameters[name].Name;
 #endif
                     builder.Append( ',' );
                     builder.Append( name );
@@ -279,7 +290,7 @@
                 return;
             }
 
-            var type = typeDef.GetClrType( Context.AssembliesResolver );
+            var type = typeDef.GetClrType( Context.Assemblies );
 
             if ( quotedTypes.TryGetValue( type, out var prefix ) )
             {
@@ -344,14 +355,20 @@
             {
 #if WEBAPI
                 if ( parameter.Source != FromUri )
-#else
+#elif API_EXPLORER
                 if ( parameter.Source != Query )
+#else
+                if ( parameter.BindingInfo.BindingSource != Query )
 #endif
                 {
                     continue;
                 }
 
+#if API_EXPLORER
                 var parameterType = parameter.ParameterDescriptor?.ParameterType;
+#else
+                var parameterType = parameter.ParameterType;
+#endif
 
                 if ( parameterType == null || IsBuiltInParameter( parameterType ) )
                 {

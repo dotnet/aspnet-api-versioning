@@ -24,15 +24,11 @@
 
     sealed class ModelTypeBuilder
     {
-        readonly IAssembliesResolver assembliesResolver;
+        readonly IEnumerable<Assembly> assemblies;
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
         readonly ConcurrentDictionary<ClassSignature, Type> generatedTypes = new ConcurrentDictionary<ClassSignature, Type>();
 
-        internal ModelTypeBuilder( IAssembliesResolver assembliesResolver )
-        {
-            Contract.Requires( assembliesResolver != null );
-            this.assembliesResolver = assembliesResolver;
-        }
+        internal ModelTypeBuilder( IEnumerable<Assembly> assemblies ) => this.assemblies = assemblies;
 
         internal Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
         {
@@ -67,7 +63,7 @@
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var name = action.FullName() + "Parameters";
-            var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( assembliesResolver, p ) );
+            var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( assemblies, p ) );
             var signature = new ClassSignature( name, properties, apiVersion );
 
             return generatedTypes.GetOrAdd( signature, CreateFromSignature );

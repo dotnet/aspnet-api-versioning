@@ -2,6 +2,7 @@
 {
 #if !WEBAPI
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
 #endif
@@ -15,6 +16,7 @@
 #endif
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 #if WEBAPI
     using System.Web.Http.Description;
     using System.Web.Http.Dispatcher;
@@ -28,7 +30,15 @@
 
         internal ApiVersion ApiVersion { get; }
 
-        internal IAssembliesResolver AssembliesResolver { get; }
+#if API_EXPLORER
+        internal ODataApiExplorerOptions Options { get; }
+
+        internal IList<ApiParameterDescription> ParameterDescriptions { get; }
+#else
+        internal IList<ParameterDescriptor> ParameterDescriptions => ActionDescriptor.Parameters;
+#endif
+
+        internal IEnumerable<Assembly> Assemblies { get; }
 
         internal IEdmModel EdmModel { get; }
 
@@ -38,15 +48,11 @@
 
         internal ControllerActionDescriptor ActionDescriptor { get; }
 
-        internal IList<ApiParameterDescription> ParameterDescriptions { get; }
-
         internal IEdmEntitySet EntitySet { get; }
 
         internal IEdmOperation Operation { get; }
 
         internal ODataRouteActionType ActionType { get; }
-
-        internal ODataApiExplorerOptions Options { get; }
 
         internal ODataUrlKeyDelimiter UrlKeyDelimiter { get; }
 
