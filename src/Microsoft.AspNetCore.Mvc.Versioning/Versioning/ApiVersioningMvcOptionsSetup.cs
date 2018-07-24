@@ -26,6 +26,8 @@
             {
                 options.Filters.AddService<ReportApiVersionsAttribute>();
             }
+
+            options.ModelBinderProviders.Insert( 0, new ApiVersionModelBinderProvider() );
         }
     }
 }
