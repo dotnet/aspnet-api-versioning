@@ -112,6 +112,8 @@
         /// <param name="parameters">The action parameters.</param>
         /// <returns>None</returns>
         /// <response code="204">The person was successfully promoted.</response>
+        /// <response code="400">The parameters are invalid.</response>
+        /// <response code="404">The person does not exist.</response>
         [HttpPost]
         [ProducesResponseType( Status200OK )]
         [ProducesResponseType( Status400BadRequest )]
