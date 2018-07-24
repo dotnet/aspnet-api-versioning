@@ -26,15 +26,19 @@
             // arrange
             var routeName = "odata";
             var routePrefix = "api/v3";
-            var model = new ODataModelBuilder().GetEdmModel();
+            var modelBuilder = new ODataModelBuilder();
+            var modelConfiguration = new TestModelConfiguration();
             var apiVersion = new ApiVersion( 3, 0 );
             var batchHandler = new DefaultODataBatchHandler();
             var app = NewApplicationBuilder();
             var route = default( ODataRoute );
 
+            modelConfiguration.Apply( modelBuilder, apiVersion );
+
+            var model = modelBuilder.GetEdmModel();
+
             // act
             app.UseMvc( r => route = r.MapVersionedODataRoute( routeName, routePrefix, model, apiVersion, batchHandler ) );
-            app.Build();
 
             var perRequestContainer = app.ApplicationServices.GetRequiredService<IPerRouteContainer>();
             var serviceProvider = perRequestContainer.GetODataRootContainer( route.Name );
@@ -68,7 +72,6 @@
 
             // act
             app.UseMvc( r => routes = r.MapVersionedODataRoutes( routeName, routePrefix, models, () => new DefaultODataBatchHandler() ) );
-            app.Build();
 
             // assert
             foreach ( var route in routes )
@@ -104,7 +107,7 @@
 
             services.AddLogging();
             services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
-            services.Add( Singleton<IOptions<MvcOptions>>( Options.Create( new MvcOptions() ) ) );
+            services.Add( Singleton( Options.Create( new MvcOptions() ) ) );
             services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );
             services.AddApiVersioning();
             services.AddOData().EnableApiVersioning();

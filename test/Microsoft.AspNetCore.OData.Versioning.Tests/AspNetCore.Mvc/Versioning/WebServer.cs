@@ -46,7 +46,6 @@
                     {
                         var modelBuilder = app.ApplicationServices.GetRequiredService<VersionedODataModelBuilder>();
 
-                        modelBuilder.ModelConfigurations.Add( new TestModelConfiguration() );
                         app.UseMvc( setupRoutes );
                         app.UseMvc( routeBuilder => routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() ) );
                     } );

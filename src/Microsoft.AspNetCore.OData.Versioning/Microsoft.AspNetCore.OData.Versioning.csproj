@@ -11,6 +11,11 @@
  </PropertyGroup>
 
  <ItemGroup>
+  <Compile Include="..\Common.OData.ApiExplorer\AspNet.OData\Routing\*.cs" Link="AspNet.OData\Routing\%(Filename)%(Extension)" />
+  <Compile Include="..\Common.OData.ApiExplorer\OData.Edm\*.cs" Link="OData.Edm\%(Filename)%(Extension)" />
+ </ItemGroup>
+ 
+ <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
  </ItemGroup>
 

@@ -123,6 +123,7 @@
             }
 
             builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, unversionedConstraints, inlineConstraintResolver );
+            NotifyRoutesMapped();
 
             return odataRoutes;
         }
@@ -262,6 +263,7 @@
             }
 
             builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, unversionedConstraints, inlineConstraintResolver );
+            NotifyRoutesMapped();
 
             return odataRoutes;
         }
@@ -340,6 +342,7 @@
             builder.Routes.Add( route );
             routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver );
+            NotifyRoutesMapped();
 
             return route;
         }
@@ -467,6 +470,7 @@
             builder.Routes.Add( route );
             routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver );
+            NotifyRoutesMapped();
 
             return route;
         }
@@ -598,5 +602,9 @@
         }
 
         static string RemoveTrailingSlash( this string @string ) => IsNullOrEmpty( @string ) ? @string : @string.TrimEnd( '/' );
+
+        // note: we don't have the required information necessary to build the odata route information
+        // until one or more routes have been mapped. if anyone has subscribed changes, notify them now.
+        static void NotifyRoutesMapped() => ODataActionDescriptorChangeProvider.Instance.NotifyChanged();
     }
 }

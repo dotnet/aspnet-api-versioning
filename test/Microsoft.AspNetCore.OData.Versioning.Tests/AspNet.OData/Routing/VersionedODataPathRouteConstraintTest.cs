@@ -16,7 +16,6 @@
     using Microsoft.Extensions.Options;
     using Microsoft.Extensions.Primitives;
     using Microsoft.OData;
-    using Microsoft.OData.Edm;
     using Microsoft.Simulators;
     using Moq;
     using System;
@@ -37,8 +36,7 @@
         {
             // arrange
             var url = new Uri( "http://localhost" );
-            var model = new EdmModel();
-            var httpContext = NewHttpContext( url, model, "1.0" );
+            var httpContext = NewHttpContext( url, "1.0" );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
             var values = new RouteValueDictionary();
@@ -59,7 +57,7 @@
             // arrange
             var url = new Uri( "http://localhost/Tests(1)?api-version=" + apiVersionValue );
             var apiVersion = Parse( apiVersionValue );
-            var context = NewHttpContext( url, Test.Model, apiVersionValue );
+            var context = NewHttpContext( url, apiVersionValue );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
             var values = new RouteValueDictionary() { ["odataPath"] = "Tests(1)" };
@@ -83,7 +81,7 @@
             const string rawApiVersion = default;
             var url = new Uri( requestUri );
             var apiVersion = Parse( apiVersionValue );
-            var context = NewHttpContext( url, Test.EmptyModel, rawApiVersion );
+            var context = NewHttpContext( url, rawApiVersion );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
             var values = new RouteValueDictionary() { [nameof( odataPath )] = odataPath };
@@ -113,7 +111,7 @@
             }
 
             var url = new Uri( requestUri );
-            var context = NewHttpContext( url, Test.Model, rawApiVersion, configure: OnConfigure );
+            var context = NewHttpContext( url, rawApiVersion, configure: OnConfigure );
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
             var values = new RouteValueDictionary() { [nameof( odataPath )] = odataPath };
@@ -137,7 +135,7 @@
             var route = Mock.Of<IRouter>();
             var routeKey = (string) null;
             var values = new RouteValueDictionary() { [nameof( odataPath )] = odataPath };
-            var context = NewHttpContext( url, Test.Model, "1.0" );
+            var context = NewHttpContext( url, "1.0" );
             var constraint = new VersionedODataPathRouteConstraint( "odata", apiVersion );
 
             // act
@@ -147,7 +145,7 @@
             result.Should().Be( expected );
         }
 
-        static HttpContext NewHttpContext( Uri url, IEdmModel model, string rawApiVersion, string routePrefix = null, Action<ApiVersioningOptions> configure = null )
+        static HttpContext NewHttpContext( Uri url, string rawApiVersion, string routePrefix = null, Action<ApiVersioningOptions> configure = null )
         {
 
             var features = new Mock<IFeatureCollection>();
@@ -171,7 +169,7 @@
 
             services.AddLogging();
             services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
-            services.Add( Singleton<IOptions<MvcOptions>>( Options.Create( new MvcOptions() ) ) );
+            services.Add( Singleton( Options.Create( new MvcOptions() ) ) );
             services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Add( new TestApplicationPart( typeof( TestsController ) ) ) );
             services.AddApiVersioning( configure ?? ( _ => { } ) );
             services.AddOData().EnableApiVersioning();
@@ -182,16 +180,14 @@
 
             modelBuilder.ModelConfigurations.Add( new TestModelConfiguration() );
 
+            var model = modelBuilder.GetEdmModels().Single();
+
             if ( !TryParse( rawApiVersion, out var apiVersion ) )
             {
-                var defaultApiVersion = serviceProvider.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.DefaultApiVersion;
-                app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", routePrefix, model, defaultApiVersion ) );
-            }
-            else
-            {
-                app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", routePrefix, model, apiVersion ) );
+                apiVersion = serviceProvider.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.DefaultApiVersion;
             }
 
+            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", routePrefix, model, apiVersion ) );
             apiVersioningFeature.RawRequestedApiVersion = rawApiVersion;
             apiVersioningFeature.RequestedApiVersion = apiVersion;
             features.SetupGet( f => f[typeof( IODataFeature )] ).Returns( odataFeature );
