@@ -35,7 +35,13 @@
         {
             loggerFactory.AddConsole( Configuration.GetSection( "Logging" ) );
             loggerFactory.AddDebug();
-            app.UseMvc( routeBuilder => routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() ) );
+            app.UseMvc(
+                routeBuilder =>
+                {
+                    var models = modelBuilder.GetEdmModels();
+                    routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
+                    routeBuilder.MapVersionedODataRoutes( "odata-bypath", "v{version:apiVersion}", models );
+                } );
         }
     }
 }
