@@ -60,9 +60,26 @@
         /// value is <c>null</c>.</value>
         public Action<ODataModelBuilder, IEdmModel> OnModelCreated { get; set; }
 
-        IEnumerable<IModelConfiguration> GetMergedConfigurations()
+        /// <summary>
+        /// Builds and returns the sequence of EDM models based on the define model configurations.
+        /// </summary>
+        /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
+        public virtual IEnumerable<IEdmModel> GetEdmModels()
         {
-            Contract.Ensures( Contract.Result<IEnumerable<IModelConfiguration>>() != null );
+            Contract.Ensures( Contract.Result<IEnumerable<IEdmModel>>() != null );
+
+            var apiVersions = GetApiVersions();
+            var configurations = GetMergedConfigurations();
+            var models = new List<IEdmModel>();
+
+            BuildModelPerApiVersion( apiVersions, configurations, models );
+
+            return models;
+        }
+
+        IList<IModelConfiguration> GetMergedConfigurations()
+        {
+            Contract.Ensures( Contract.Result<IList<IModelConfiguration>>() != null );
 
             var defaultConfiguration = DefaultModelConfiguration;
 
@@ -79,19 +96,20 @@
             return configurations;
         }
 
-        void BuildModelPerApiVersion( IEnumerable<ApiVersion> apiVersions, IEnumerable<IModelConfiguration> configurations, ICollection<IEdmModel> models )
+        void BuildModelPerApiVersion( IReadOnlyList<ApiVersion> apiVersions, IList<IModelConfiguration> configurations, ICollection<IEdmModel> models )
         {
             Contract.Requires( apiVersions != null );
             Contract.Requires( configurations != null );
             Contract.Requires( models != null );
 
-            foreach ( var apiVersion in apiVersions )
+            for ( var i = 0; i < apiVersions.Count; i++ )
             {
+                var apiVersion = apiVersions[i];
                 var builder = ModelBuilderFactory();
 
-                foreach ( var configuration in configurations )
+                for ( var j = 0; j < configurations.Count; j++ )
                 {
-                    configuration.Apply( builder, apiVersion );
+                    configurations[j].Apply( builder, apiVersion );
                 }
 
                 var model = builder.GetEdmModel();

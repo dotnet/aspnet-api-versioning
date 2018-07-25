@@ -6,11 +6,9 @@
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
-    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
     using static System.Linq.Enumerable;
 
     /// <content>
@@ -67,37 +65,23 @@
         protected ApiVersioningOptions Options => options.Value;
 
         /// <summary>
-        /// Builds and returns the sequence of EDM models based on the define model configurations.
-        /// </summary>
-        /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
-        public virtual IEnumerable<IEdmModel> GetEdmModels()
-        {
-            Contract.Ensures( Contract.Result<IEnumerable<IEdmModel>>() != null );
-
-            var apiVersions = GetApiVersions();
-            var configurations = GetMergedConfigurations();
-            var models = new List<IEdmModel>();
-
-            BuildModelPerApiVersion( apiVersions, configurations, models );
-
-            return models;
-        }
-
-        /// <summary>
         /// Gets the API versions for all known OData routes.
         /// </summary>
-        /// <returns>The <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see>
+        /// <returns>The <see cref="IReadOnlyList{T}">sequence</see> of <see cref="ApiVersion">API versions</see>
         /// for all known OData routes.</returns>
-        protected virtual IEnumerable<ApiVersion> GetApiVersions()
+        protected virtual IReadOnlyList<ApiVersion> GetApiVersions()
         {
-            Contract.Ensures( Contract.Result<IEnumerable<ApiVersion>>() != null );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersion>>() != null );
 
-            var actions = ActionDescriptorCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>();
-            var implemented = new HashSet<ApiVersion>();
+            var items = ActionDescriptorCollectionProvider.ActionDescriptors.Items;
+            var supported = new HashSet<ApiVersion>();
+            var deprecated = new HashSet<ApiVersion>();
 
-            foreach ( var action in actions )
+            for ( var i = 0; i < items.Count; i++ )
             {
-                if ( !action.ControllerTypeInfo.IsODataController() )
+                var item = items[i];
+
+                if ( !( item is ControllerActionDescriptor action ) || !action.ControllerTypeInfo.IsODataController() )
                 {
                     continue;
                 }
@@ -109,25 +93,29 @@
                     continue;
                 }
 
-                foreach ( var apiVersion in model.ImplementedApiVersions )
+                var versions = model.SupportedApiVersions;
+
+                for ( var j = 0; j < versions.Count; j++ )
                 {
-                    implemented.Add( apiVersion );
+                    supported.Add( versions[j] );
+                }
+
+                versions = model.DeprecatedApiVersions;
+
+                for ( var j = 0; j < versions.Count; j++ )
+                {
+                    deprecated.Add( versions[j] );
                 }
             }
 
-            if ( implemented.Count == 0 )
+            deprecated.ExceptWith( supported );
+
+            if ( supported.Count == 0 && deprecated.Count == 0 )
             {
-                implemented.Add( Options.DefaultApiVersion );
+                supported.Add( Options.DefaultApiVersion );
             }
 
-            var apiVersions = implemented.ToArray();
-
-            if ( apiVersions.Length > 1 )
-            {
-                Array.Sort( apiVersions );
-            }
-
-            return apiVersions;
+            return supported.Union( deprecated ).ToArray();
         }
     }
 }

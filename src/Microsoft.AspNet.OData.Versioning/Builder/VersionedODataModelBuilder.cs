@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
-    using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using Microsoft.Web.Http.Versioning.Conventions;
@@ -44,16 +43,14 @@
         protected ApiVersioningOptions Options => Configuration.GetApiVersioningOptions();
 
         /// <summary>
-        /// Builds and returns the sequence of EDM models based on the define model configurations.
+        /// Gets the API versions for all known OData routes.
         /// </summary>
-        /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Matches plural form of ODataModelBuilder.GetEdmModel(). A property would also not be appropriate." )]
-        public virtual IEnumerable<IEdmModel> GetEdmModels()
+        /// <returns>The <see cref="IReadOnlyList{T}">sequence</see> of <see cref="ApiVersion">API versions</see>
+        /// for all known OData routes.</returns>
+        protected virtual IReadOnlyList<ApiVersion> GetApiVersions()
         {
-            Contract.Ensures( Contract.Result<IEnumerable<IEdmModel>>() != null );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersion>>() != null );
 
-            var configurations = GetMergedConfigurations();
-            var models = new List<IEdmModel>();
             var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
@@ -69,23 +66,31 @@
                 conventions.ApplyTo( descriptor );
 
                 var model = descriptor.GetApiVersionModel();
+                var versions = model.SupportedApiVersions;
 
-                foreach ( var apiVersion in model.SupportedApiVersions )
+                for ( var i = 0; i < versions.Count; i++ )
                 {
-                    supported.Add( apiVersion );
+                    supported.Add( versions[i] );
                 }
 
-                foreach ( var apiVersion in model.DeprecatedApiVersions )
+                versions = model.DeprecatedApiVersions;
+
+                for ( var i = 0; i < versions.Count; i++ )
                 {
-                    deprecated.Add( apiVersion );
+                    deprecated.Add( versions[i] );
                 }
             }
 
             deprecated.ExceptWith( supported );
-            BuildModelPerApiVersion( supported.Union( deprecated ), configurations, models );
+
+            if ( supported.Count == 0 && deprecated.Count == 0 )
+            {
+                supported.Add( Options.DefaultApiVersion );
+            }
+
             ConfigureMetadataController( supported, deprecated );
 
-            return models;
+            return supported.Union( deprecated ).ToArray();
         }
 
         /// <summary>

@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
+    using System.Linq;
     using Xunit;
 
     public class ODataApiDescriptionProviderTest
@@ -33,10 +34,14 @@
             var serviceProvider = server.Host.Services;
 
             // act
-            var groups = serviceProvider.GetRequiredService<IApiDescriptionGroupCollectionProvider>().ApiDescriptionGroups.Items;
+            var groups = serviceProvider.GetRequiredService<IApiDescriptionGroupCollectionProvider>()
+                                        .ApiDescriptionGroups
+                                        .Items
+                                        .OrderBy( i => i.GroupName )
+                                        .ToArray();
 
             // assert
-            groups.Count.Should().Be( 4 );
+            groups.Length.Should().Be( 4 );
             AssertVersion0_9( groups[0] );
             AssertVersion1( groups[1] );
             AssertVersion2( groups[2] );
