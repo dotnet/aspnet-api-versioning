@@ -1,9 +1,8 @@
-﻿namespace Microsoft.Web.OData.Configuration
+﻿namespace Microsoft.AspNet.OData.Configuration
 {
-    using Builder;
-    using Http;
-    using Models;
-    using System.Web.OData.Builder;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Models;
+    using Microsoft.Web.Http;
 
     public class OrderModelConfiguration : IModelConfiguration
     {

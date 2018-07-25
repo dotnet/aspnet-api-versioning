@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>c0c766f3-a2d6-461e-adff-27496600ea9c</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Microsoft</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassSignature.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ModelTypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ODataValue{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteActionType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilderContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OData.Edm\EdmExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ODataApiExplorerOptions.cs" />
+  </ItemGroup>
+</Project>

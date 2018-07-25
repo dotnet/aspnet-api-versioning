@@ -1,15 +1,14 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Abstractions;
-    using ActionConstraints;
-    using AspNetCore.Routing;
-    using Extensions.Logging;
-    using Extensions.Options;
-    using Http;
-    using Infrastructure;
-    using Internal;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ActionConstraints;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.AspNetCore.Mvc.Internal;
+    using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -36,21 +35,25 @@
         /// <param name="actionConstraintCache">The <see cref="ActionConstraintCache"/> that providers a set of <see cref="IActionConstraint"/> instances.</param>
         /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the action selector.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="routePolicy">The <see cref="IApiVersionRoutePolicy">route policy</see> applied to candidate matches.</param>
         public ApiVersionActionSelector(
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
             ActionConstraintCache actionConstraintCache,
             IOptions<ApiVersioningOptions> options,
-            ILoggerFactory loggerFactory )
+            ILoggerFactory loggerFactory,
+            IApiVersionRoutePolicy routePolicy )
         {
             Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
             Arg.NotNull( actionConstraintCache, nameof( actionConstraintCache ) );
             Arg.NotNull( options, nameof( options ) );
             Arg.NotNull( loggerFactory, nameof( loggerFactory ) );
+            Arg.NotNull( routePolicy, nameof( routePolicy ) );
 
             this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
             this.actionConstraintCache = actionConstraintCache;
             this.options = options;
             Logger = loggerFactory.CreateLogger( GetType() );
+            RoutePolicy = routePolicy;
         }
 
         Cache Current
@@ -92,6 +95,12 @@
         protected ILogger Logger { get; }
 
         /// <summary>
+        /// Gets the route policy applied to selected candidate actions.
+        /// </summary>
+        /// <value>The <see cref="IApiVersionRoutePolicy">route policy</see> applied to selected candidate actions.</value>
+        protected IApiVersionRoutePolicy RoutePolicy { get; }
+
+        /// <summary>
         /// Selects a list of candidate actions from the specified route context.
         /// </summary>
         /// <param name="context">The current <see cref="RouteContext">route context</see> to evaluate.</param>
@@ -106,7 +115,7 @@
 
             for ( var i = 0; i < keys.Length; i++ )
             {
-                context.RouteData.Values.TryGetValue( keys[i], out object value );
+                context.RouteData.Values.TryGetValue( keys[i], out var value );
 
                 if ( value != null )
                 {
@@ -137,7 +146,7 @@
 
             var httpContext = context.HttpContext;
 
-            if ( ( context.Handler = VerifyRequestedApiVersionIsNotAmbiguous( httpContext, out var apiVersion ) ) != null )
+            if ( IsRequestedApiVersionAmbiguous( context, out var apiVersion ) )
             {
                 return null;
             }
@@ -152,29 +161,20 @@
 
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
-            var properties = httpContext.ApiVersionProperties();
-            var selectionResult = properties.SelectionResult;
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var selectionResult = feature.SelectionResult;
 
-            properties.ApiVersion = selectionContext.RequestedVersion;
+            feature.RequestedApiVersion = selectionContext.RequestedVersion;
             selectionResult.AddCandidates( candidates );
 
-            if ( finalMatches != null )
+            if ( finalMatches.Count == 0 )
             {
-                if ( ( selectedAction = SelectActionWithApiVersionPolicyApplied( finalMatches, selectionResult ) ) == null )
-                {
-                    AppendPossibleMatches( finalMatches, context, selectionResult );
-                }
-                else
-                {
-                    AppendPossibleMatches( new[] { selectedAction }, context, selectionResult );
-                    return selectedAction;
-                }
+                return null;
             }
 
-            // note: even though we may have had a successful match, this method could be called multiple times. the final decision
-            // is made by the IApiVersionRoutePolicy. we return here to make sure all candidates have been considered at least once.
-            selectionResult.EndIteration();
-            return null;
+            selectionResult.AddMatches( finalMatches );
+
+            return RoutePolicy.Evaluate( context, selectionResult );
         }
 
         /// <summary>
@@ -185,6 +185,7 @@
         protected virtual IReadOnlyList<ActionDescriptor> SelectBestActions( ActionSelectionContext context )
         {
             Arg.NotNull( context, nameof( context ) );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
 
             var bestMatches = new List<ActionDescriptor>( context.MatchingActions.Count );
 
@@ -231,9 +232,16 @@
             return bestMatches;
         }
 
-        static ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
+        /// <summary>
+        /// Selects a candidate action which does not have the API versioning convention applied.
+        /// </summary>
+        /// <param name="matches">The current <see cref="IReadOnlyList{T}">read-only list</see> of
+        /// matching <see cref="ActionDescriptor">action</see>.</param>
+        /// <returns>The selected <see cref="ActionDescriptor">action</see> with the API versioning convention applied or <c>null</c>.</returns>
+        /// <remarks>This method typically matches a non-API action such as a Razor page.</remarks>
+        protected virtual ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
         {
-            Contract.Requires( matches != null );
+            Arg.NotNull( matches, nameof( matches ) );
 
             if ( matches.Count != 1 )
             {
@@ -250,47 +258,19 @@
             return null;
         }
 
-        static ActionDescriptor SelectActionWithApiVersionPolicyApplied( IReadOnlyList<ActionDescriptor> matches, ActionSelectionResult result )
+        /// <summary>
+        /// Verifies the requested API version is not ambiguous.
+        /// </summary>
+        /// <param name="context">The current <see cref="RouteContext">route context</see>.</param>
+        /// <param name="apiVersion">The requested <see cref="ApiVersion">API version</see> or <c>null</c>.</param>
+        /// <returns>True if the requested API version is ambiguous; otherwise, false.</returns>
+        /// <remarks>This method will also change the <see cref="RouteContext.Handler"/> to an appropriate
+        /// error response if the API version is ambiguous.</remarks>
+        protected virtual bool IsRequestedApiVersionAmbiguous( RouteContext context, out ApiVersion apiVersion )
         {
-            Contract.Requires( matches != null );
-            Contract.Requires( result != null );
+            Arg.NotNull( context, nameof( context ) );
 
-            if ( matches.Count != 1 )
-            {
-                return null;
-            }
-
-            var match = matches[0];
-
-            if ( !result.HasMatchesInPreviousIterations )
-            {
-                return match;
-            }
-
-            return null;
-        }
-
-        static void AppendPossibleMatches( IReadOnlyList<ActionDescriptor> matches, RouteContext context, ActionSelectionResult result )
-        {
-            Contract.Requires( matches != null );
-            Contract.Requires( context != null );
-            Contract.Requires( result != null );
-
-            if ( matches.Count == 0 )
-            {
-                return;
-            }
-
-            var routeData = new RouteData( context.RouteData );
-            var matchingActions = new MatchingActionSequence( matches, routeData );
-
-            result.AddMatches( matchingActions );
-            result.TrySetBestMatch( matchingActions.BestMatch );
-        }
-
-        RequestHandler VerifyRequestedApiVersionIsNotAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
-        {
-            Contract.Requires( httpContext != null );
+            var httpContext = context.HttpContext;
 
             try
             {
@@ -299,16 +279,51 @@
             catch ( AmbiguousApiVersionException ex )
             {
                 Logger.LogInformation( ex.Message );
-                apiVersion = default( ApiVersion );
+                apiVersion = default;
+
                 var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
                 {
                     Code = AmbiguousApiVersion,
                     Message = ex.Message,
                 };
-                return new BadRequestHandler( handlerContext );
+
+                context.Handler = new BadRequestHandler( handlerContext );
+                return true;
             }
 
-            return null;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a filtered list of actions based on the evaluated action constraints.
+        /// </summary>
+        /// <param name="context">The current <see cref="RouteContext">route context</see>.</param>
+        /// <param name="actions">The <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ActionDescriptor">actions</see> to evaluate.</param>
+        /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of the remaining <see cref="ActionDescriptor">actions</see> after all
+        /// action constraints have been evaluated.</returns>
+        protected virtual IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
+        {
+            Arg.NotNull( context, nameof( context ) );
+            Arg.NotNull( actions, nameof( actions ) );
+            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
+
+            var candidates = new List<ActionSelectorCandidate>();
+
+            for ( var i = 0; i < actions.Count; i++ )
+            {
+                var action = actions[i];
+                var constraints = actionConstraintCache.GetActionConstraints( context.HttpContext, action );
+                candidates.Add( new ActionSelectorCandidate( action, constraints ) );
+            }
+
+            var matches = EvaluateActionConstraintsCore( context, candidates, startingOrder: null );
+
+            if ( matches == null )
+            {
+                return NoMatches;
+            }
+
+            return matches.Select( candidate => candidate.Action ).ToArray();
         }
 
         static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>
@@ -338,31 +353,6 @@
             }
 
             return false;
-        }
-
-        IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
-        {
-            Contract.Requires( context != null );
-            Contract.Requires( actions != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
-
-            var candidates = new List<ActionSelectorCandidate>();
-
-            for ( var i = 0; i < actions.Count; i++ )
-            {
-                var action = actions[i];
-                var constraints = actionConstraintCache.GetActionConstraints( context.HttpContext, action );
-                candidates.Add( new ActionSelectorCandidate( action, constraints ) );
-            }
-
-            var matches = EvaluateActionConstraintsCore( context, candidates, startingOrder: null );
-
-            if ( matches == null )
-            {
-                return NoMatches;
-            }
-
-            return matches.Select( candidate => candidate.Action ).ToArray();
         }
 
         IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )
@@ -465,63 +455,6 @@
             }
         }
 
-        sealed class MatchingActionSequence : IEnumerable<ActionDescriptorMatch>
-        {
-            readonly IReadOnlyList<ActionDescriptor> matches;
-            readonly RouteData routeData;
-
-            internal MatchingActionSequence( IReadOnlyList<ActionDescriptor> matches, RouteData routeData )
-            {
-                Contract.Requires( matches != null );
-                Contract.Requires( matches.Count > 0 );
-                Contract.Requires( routeData != null );
-
-                this.matches = matches;
-                this.routeData = routeData;
-            }
-
-            internal ActionDescriptorMatch BestMatch { get; private set; }
-
-            RouteData NewMatchRouteData( ActionDescriptor match )
-            {
-                Contract.Requires( match != null );
-                Contract.Ensures( Contract.Result<RouteData>() != null );
-
-                var matchedRouteData = new RouteData( routeData );
-                var matchedRouteValues = matchedRouteData.Values;
-
-                foreach ( var entry in match.RouteValues )
-                {
-                    if ( !matchedRouteValues.ContainsKey( entry.Key ) )
-                    {
-                        matchedRouteValues.Add( entry.Key, entry.Value );
-                    }
-                }
-
-                return matchedRouteData;
-            }
-
-            public IEnumerator<ActionDescriptorMatch> GetEnumerator()
-            {
-                if ( matches.Count == 1 )
-                {
-                    var match = matches[0];
-                    BestMatch = new ActionDescriptorMatch( match, NewMatchRouteData( match ) );
-                    yield return BestMatch;
-                }
-                else
-                {
-                    for ( var i = 0; i < matches.Count; i++ )
-                    {
-                        var match = matches[i];
-                        yield return new ActionDescriptorMatch( match, NewMatchRouteData( match ) );
-                    }
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
-
 #pragma warning disable CA1724 // private type and will not cause a conflict
         sealed class Cache
 #pragma warning restore CA1724
@@ -531,16 +464,17 @@
                 Contract.Requires( actions != null );
 
                 Version = actions.Version;
-                OrdinalEntries = new Dictionary<string[], List<ActionDescriptor>>( StringArrayComparer.Ordinal );
-                OrdinalIgnoreCaseEntries = new Dictionary<string[], List<ActionDescriptor>>( StringArrayComparer.OrdinalIgnoreCase );
                 RouteKeys = IdentifyRouteKeysForActionSelection( actions );
                 BuildOrderedSetOfKeysForRouteValues( actions );
             }
 
             public int Version { get; }
+
             public string[] RouteKeys { get; }
-            public Dictionary<string[], List<ActionDescriptor>> OrdinalEntries { get; }
-            public Dictionary<string[], List<ActionDescriptor>> OrdinalIgnoreCaseEntries { get; }
+
+            public Dictionary<string[], List<ActionDescriptor>> OrdinalEntries { get; } = new Dictionary<string[], List<ActionDescriptor>>( StringArrayComparer.Ordinal );
+
+            public Dictionary<string[], List<ActionDescriptor>> OrdinalIgnoreCaseEntries { get; } = new Dictionary<string[], List<ActionDescriptor>>( StringArrayComparer.OrdinalIgnoreCase );
 
             static string[] IdentifyRouteKeysForActionSelection( ActionDescriptorCollection actions )
             {

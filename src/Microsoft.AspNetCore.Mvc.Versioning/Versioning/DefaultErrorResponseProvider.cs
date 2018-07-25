@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Hosting;
+    using Microsoft.AspNetCore.Hosting;
     using System;
     using System.Diagnostics.Contracts;
     using static System.String;
@@ -52,7 +52,7 @@
 
             if ( IsNullOrEmpty( context.MessageDetail ) )
             {
-                return default( TError );
+                return default;
             }
 
             var environment = (IHostingEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IHostingEnvironment ) );
@@ -62,7 +62,7 @@
                 return create( context );
             }
 
-            return default( TError );
+            return default;
         }
     }
 }

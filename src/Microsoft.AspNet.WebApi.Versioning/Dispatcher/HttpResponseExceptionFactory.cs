@@ -9,7 +9,7 @@
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
     using System.Web.Http.Tracing;
-    using Versioning;
+    using Microsoft.Web.Http.Versioning;
     using static ApiVersion;
     using static System.Net.HttpStatusCode;
     using static System.String;
@@ -96,7 +96,7 @@
         [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Created exception cannot be disposed. Handled by the caller." )]
         HttpResponseMessage CreateBadRequestForUnspecifiedApiVersionOrInvalidApiVersion( bool versionNeutral )
         {
-            var requestedVersion = request.ApiVersionProperties().RawApiVersion;
+            var requestedVersion = request.ApiVersionProperties().RawRequestedApiVersion;
             var message = default( string );
 
             if ( IsNullOrEmpty( requestedVersion ) )

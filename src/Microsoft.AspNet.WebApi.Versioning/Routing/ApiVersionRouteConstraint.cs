@@ -33,7 +33,7 @@
 
             if ( values.TryGetValue( parameterName, out string value ) )
             {
-                properties.RawApiVersion = value;
+                properties.RawRequestedApiVersion = value;
             }
             else
             {
@@ -47,7 +47,7 @@
 
             if ( TryParse( value, out var requestedVersion ) )
             {
-                properties.ApiVersion = requestedVersion;
+                properties.RequestedApiVersion = requestedVersion;
                 return true;
             }
 

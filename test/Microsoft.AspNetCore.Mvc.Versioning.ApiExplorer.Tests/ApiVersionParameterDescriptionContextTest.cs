@@ -3,14 +3,14 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
     using Moq;
     using System.Linq;
     using Xunit;
-    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionReader;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionParameterLocation;
-    using Microsoft.AspNetCore.Routing;
-    using Microsoft.AspNetCore.Mvc.Routing;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionReader;
 
     public class ApiVersionParameterDescriptionContextTest
     {
@@ -32,7 +32,7 @@
             context.AddParameter( "api-version", Query );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -66,7 +66,7 @@
             context.AddParameter( "api-version", Header );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -109,7 +109,7 @@
             context.AddParameter( "api-version", Path );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -156,7 +156,7 @@
             context.AddParameter( "api-version", Path );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",
@@ -264,7 +264,7 @@
             context.AddParameter( "api-version", Query );
 
             // assert
-            description.ParameterDescriptions.Single().ShouldBeEquivalentTo(
+            description.ParameterDescriptions.Single().Should().BeEquivalentTo(
                 new
                 {
                     Name = "api-version",

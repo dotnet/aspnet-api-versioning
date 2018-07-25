@@ -1,15 +1,16 @@
-﻿namespace Microsoft.Web.OData.Advanced
+﻿namespace Microsoft.AspNet.OData.Advanced
 {
-    using Builder;
-    using Configuration;
-    using Controllers;
-    using Http;
-    using Http.Versioning;
+    using Microsoft.AspNet.OData.Advanced.Controllers;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Configuration;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.OData;
     using Microsoft.OData.UriParser;
+    using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
     using System.Web.Http;
-    using System.Web.OData.Builder;
-    using static System.Web.Http.RouteParameter;
     using static Microsoft.OData.ServiceLifetime;
+    using static System.Web.Http.RouteParameter;
 
     public abstract class AdvancedAcceptanceTest : ODataAcceptanceTest
     {
@@ -42,9 +43,15 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata", "api", models, OnConfigureContainer );
             Configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{key}", new { key = Optional } );
             Configuration.EnsureInitialized();
+        }
+
+        void OnConfigureContainer( IContainerBuilder builder )
+        {
+            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver );
+            builder.AddService( Singleton, typeof( IODataPathHandler ), sp => TestPathHandler );
         }
     }
 }

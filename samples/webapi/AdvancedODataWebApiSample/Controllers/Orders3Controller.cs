@@ -1,8 +1,7 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
+    using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Models;
-    using System.Threading.Tasks;
     using System.Web.Http;
 
     [ApiVersion( "3.0" )]

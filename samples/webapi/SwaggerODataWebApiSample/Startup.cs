@@ -3,18 +3,15 @@
 namespace Microsoft.Examples
 {
     using global::Owin;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.Examples.Configuration;
-    using Microsoft.OData;
-    using Microsoft.OData.UriParser;
-    using Microsoft.Web.OData.Builder;
     using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
     using System.IO;
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using System.Web.OData.Builder;
-    using static Microsoft.OData.ServiceLifetime;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -30,6 +27,8 @@ namespace Microsoft.Examples
             const string routePrefix = default( string );
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
+
+            configuration.SetUrlKeyDelimiter( OData.ODataUrlKeyDelimiter.Parentheses );
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
             configuration.AddApiVersioning( o => o.ReportApiVersions = true );
@@ -52,7 +51,7 @@ namespace Microsoft.Examples
             // TODO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
 
             // WHEN VERSIONING BY: query string, header, or media type
-            configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureODataServices );
+            configuration.MapVersionedODataRoutes( "odata", routePrefix, models );
 
             // WHEN VERSIONING BY: url segment
             //configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
@@ -104,11 +103,6 @@ namespace Microsoft.Examples
                         .EnableSwaggerUi( swagger => swagger.EnableDiscoveryUrlSelector() );
 
             builder.UseWebApi( httpServer );
-        }
-
-        static void ConfigureODataServices( IContainerBuilder builder )
-        {
-            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => new CaseInsensitiveODataUriResolver() );
         }
 
         static string XmlCommentsFilePath

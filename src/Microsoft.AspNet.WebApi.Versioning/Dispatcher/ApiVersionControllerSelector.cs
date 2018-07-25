@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
-    using Controllers;
-    using Routing;
+    using Microsoft.Web.Http.Controllers;
+    using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
-    using Versioning;
+    using Microsoft.Web.Http.Versioning;
     using static Controllers.HttpControllerDescriptorComparer;
     using static System.StringComparer;
     using static Versioning.ErrorCodes;

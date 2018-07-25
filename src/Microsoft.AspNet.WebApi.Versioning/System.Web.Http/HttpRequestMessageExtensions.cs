@@ -1,13 +1,13 @@
 ﻿namespace System.Web.Http
 {
-    using Diagnostics.CodeAnalysis;
-    using Diagnostics.Contracts;
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+    using System.Net;
+    using System.Net.Http;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
-    using Net;
-    using Net.Http;
-    using System;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequestMessage"/> class.
@@ -105,7 +105,7 @@
         public static ApiVersion GetRequestedApiVersion( this HttpRequestMessage request )
         {
             Arg.NotNull( request, nameof( request ) );
-            return request.ApiVersionProperties().ApiVersion;
+            return request.ApiVersionProperties().RequestedApiVersion;
         }
     }
 }

@@ -1,9 +1,8 @@
-﻿namespace Microsoft.Web.OData.Configuration
+﻿namespace Microsoft.AspNet.OData.Configuration
 {
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.Web.Http;
-    using Microsoft.Web.OData.Builder;
-    using Models;
-    using System.Web.OData.Builder;
+    using Microsoft.AspNet.OData.Models;
 
     public class PersonModelConfiguration : IModelConfiguration
     {

@@ -108,7 +108,7 @@
             Action format = () => provider.Format( malformedFormat, apiVersion, null );
 
             // assert
-            format.ShouldThrow<FormatException>();
+            format.Should().Throw<FormatException>();
         }
 
         [Theory]

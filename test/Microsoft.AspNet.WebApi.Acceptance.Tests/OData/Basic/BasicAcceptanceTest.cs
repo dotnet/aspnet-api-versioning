@@ -1,14 +1,14 @@
-﻿namespace Microsoft.Web.OData.Basic
+﻿namespace Microsoft.AspNet.OData.Basic
 {
-    using Builder;
-    using Configuration;
-    using Controllers;
     using FluentAssertions;
+    using Microsoft.AspNet.OData.Basic.Controllers;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Configuration;
     using Microsoft.OData.UriParser;
+    using Microsoft.Web;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.OData.Builder;
     using Xunit;
     using static Microsoft.OData.ServiceLifetime;
     using static System.Net.HttpStatusCode;
@@ -40,7 +40,7 @@
         }
 
         [Fact]
-        public async Task service_document_should_return_400_for_unsupported_url_api_version()
+        public async Task then_service_document_should_return_400_for_unsupported_url_api_version()
         {
             // arrange
             var requestUrl = $"v4";
@@ -55,7 +55,7 @@
         }
 
         [Fact]
-        public async Task metadata_should_return_400_for_unsupported_url_api_version()
+        public async Task then_X24metadata_should_return_400_for_unsupported_url_api_version()
         {
             // arrange
 

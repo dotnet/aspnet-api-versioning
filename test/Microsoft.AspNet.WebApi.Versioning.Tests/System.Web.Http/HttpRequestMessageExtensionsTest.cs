@@ -74,7 +74,7 @@
 
             // assert
             version.Should().Be( requestedVersion );
-            request.ApiVersionProperties().ApiVersion.Should().Be( requestedVersion );
+            request.ApiVersionProperties().RequestedApiVersion.Should().Be( requestedVersion );
         }
 
         [Theory]
@@ -97,7 +97,7 @@
 
             // assert
             version.Should().Be( requestedVersion );
-            request.ApiVersionProperties().ApiVersion.Should().Be( requestedVersion );
+            request.ApiVersionProperties().RequestedApiVersion.Should().Be( requestedVersion );
         }
     }
 }

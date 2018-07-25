@@ -37,7 +37,7 @@
             var descriptions = apiExplorer.ApiDescriptions;
 
             // assert
-            descriptions.Single().Should().ShouldBeEquivalentTo(
+            descriptions.Single().Should().Should().BeEquivalentTo(
                 new { HttpMethod = Get, RelativePath = routeTemplate, ActionDescriptor = action },
                 options => options.ExcludingMissingMembers() );
         }
@@ -63,7 +63,7 @@
             var descriptions = apiExplorer.ApiDescriptions;
 
             // assert
-            descriptions.Single().Should().ShouldBeEquivalentTo(
+            descriptions.Single().Should().Should().BeEquivalentTo(
                 new { HttpMethod = Get, RelativePath = routeTemplate },
                 options => options.ExcludingMissingMembers() );
         }
@@ -113,7 +113,7 @@
             var descriptions = apiExplorer.ApiDescriptions;
 
             // assert
-            descriptions.Single().Should().ShouldBeEquivalentTo(
+            descriptions.Single().Should().Should().BeEquivalentTo(
                 new { HttpMethod = Get, RelativePath = routeTemplate, ActionDescriptor = action },
                 options => options.ExcludingMissingMembers() );
         }
@@ -210,7 +210,7 @@
             var descriptions = apiExplorer.ApiDescriptions;
 
             // assert
-            descriptions.Single().Should().ShouldBeEquivalentTo(
+            descriptions.Single().Should().Should().BeEquivalentTo(
                new { HttpMethod = Get, RelativePath = routeTemplate, ActionDescriptor = action },
                options => options.ExcludingMissingMembers() );
         }
@@ -288,7 +288,7 @@
             var relativePath = description.RelativePath;
 
             // assert
-            description.ShouldBeEquivalentTo(
+            description.Should().BeEquivalentTo(
                 new
                 {
                     ID = $"GET{relativePath}",
@@ -313,7 +313,7 @@
             var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new[]
                 {
                     new
@@ -348,7 +348,7 @@
             var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new[]
                 {
                     new
@@ -394,7 +394,7 @@
 
             // assert
             descriptionGroup.IsDeprecated.Should().BeTrue();
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new[]
                 {
                     new
@@ -429,7 +429,7 @@
             var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
-            descriptions.ShouldBeEquivalentTo(
+            descriptions.Should().BeEquivalentTo(
                 new[]
                 {
                     new

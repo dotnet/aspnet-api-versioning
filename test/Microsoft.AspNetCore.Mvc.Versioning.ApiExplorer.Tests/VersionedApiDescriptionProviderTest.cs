@@ -3,7 +3,6 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using Moq;
     using System.Collections.Generic;
@@ -18,8 +17,8 @@
             var actionProvider = new TestActionDescriptorCollectionProvider();
             var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
             var modelMetadataProvider = NewModelMetadataProvider();
-            var apiExplorerOptions = new OptionsWrapper<ApiExplorerOptions>( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } );
-            var apiExplorer = new VersionedApiDescriptionProvider( modelMetadataProvider, apiExplorerOptions );
+            var apiExplorerOptions = new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" };
+            var apiExplorer = new VersionedApiDescriptionProvider( modelMetadataProvider, Options.Create( apiExplorerOptions ) );
 
             foreach ( var action in context.Actions )
             {
@@ -30,7 +29,7 @@
             apiExplorer.OnProvidersExecuted( context );
 
             // assert
-            context.Results.ShouldBeEquivalentTo(
+            context.Results.Should().BeEquivalentTo(
                 new[]
                 {
                     // orders

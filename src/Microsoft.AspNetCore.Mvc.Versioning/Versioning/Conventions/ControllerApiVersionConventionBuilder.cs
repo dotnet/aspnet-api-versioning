@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
-    using ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
     using System.Reflection;
 
@@ -26,7 +26,7 @@
                 return true;
             }
 
-            convention = default( IApiVersionConvention<ActionModel> );
+            convention = default;
             return false;
         }
     }

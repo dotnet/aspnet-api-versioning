@@ -1,9 +1,9 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Abstractions
 {
-    using ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
     using System.Linq;
-    using Versioning;
+    using Microsoft.AspNetCore.Mvc.Versioning;
 
     /// <summary>
     /// Provides extension methods for the <see cref="ActionDescriptor"/> class.

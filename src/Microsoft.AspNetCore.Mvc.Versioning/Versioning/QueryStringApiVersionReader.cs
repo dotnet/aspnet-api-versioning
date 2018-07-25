@@ -1,9 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Http;
+    using Microsoft.AspNetCore.Http;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using static System.String;
 
     /// <content>
@@ -22,7 +21,21 @@
         {
             Arg.NotNull( request, nameof( request ) );
 
-            var versions = new HashSet<string>( request.Query[ParameterName].Where( v => !IsNullOrEmpty( v ) ), StringComparer.OrdinalIgnoreCase );
+            var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+
+            foreach ( var parameterName in ParameterNames )
+            {
+                var values = request.Query[parameterName];
+
+                foreach ( var value in values )
+                {
+                    if ( !IsNullOrEmpty( value ) )
+                    {
+                        versions.Add( value );
+                    }
+                }
+            }
+
             return versions.EnsureZeroOrOneApiVersions();
         }
     }

@@ -175,4 +175,7 @@
   <data name="VersionNeutralMethodNotSupported" xml:space="preserve">
     <value>The HTTP resource that matches the request URI '{0}' does not support HTTP method '{1}'.</value>
   </data>
+  <data name="MultipleApiVersionsInferredFromNamespaces" xml:space="preserve">
+    <value>Multiple API versions were inferred from the namespace '{0}'. The convention must match exactly zero or one API versions.</value>
+  </data>
 </root>

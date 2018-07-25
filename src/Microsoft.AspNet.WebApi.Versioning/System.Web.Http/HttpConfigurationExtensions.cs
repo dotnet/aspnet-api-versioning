@@ -1,14 +1,13 @@
 ﻿namespace System.Web.Http
 {
-    using Controllers;
-    using Diagnostics.CodeAnalysis;
-    using Diagnostics.Contracts;
-    using Dispatcher;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Controllers;
     using Microsoft.Web.Http.Dispatcher;
     using Microsoft.Web.Http.Versioning;
+    using System.Diagnostics.Contracts;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Dispatcher;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
@@ -41,8 +40,6 @@
         /// </summary>
         /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use use service versioning.</param>
         /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract." )]
         public static void AddApiVersioning( this HttpConfiguration configuration, Action<ApiVersioningOptions> setupAction )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
@@ -61,6 +58,7 @@
             }
 
             configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
+            configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
         }
     }
 }

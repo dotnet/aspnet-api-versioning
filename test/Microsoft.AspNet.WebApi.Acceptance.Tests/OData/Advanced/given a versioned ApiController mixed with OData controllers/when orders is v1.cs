@@ -1,9 +1,8 @@
 ﻿namespace given_a_versioned_ApiController_mixed_with_OData_controllers
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData.Advanced;
     using Microsoft.Web;
-    using Microsoft.Web.OData.Advanced;
-    using System;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -20,7 +19,7 @@
             var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new[] { new { Id = 0, Customer = "" } } );
 
             // assert
-            orders.ShouldBeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v1.0" } } );
+            orders.Should().BeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v1.0" } } );
         }
 
         [Fact]
@@ -34,7 +33,7 @@
             var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new[] { new { Id = 0, Customer = "" } } );
 
             // assert
-            orders.ShouldBeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v1.0" } } );
+            orders.Should().BeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v1.0" } } );
         }
 
         [Fact]
@@ -48,7 +47,7 @@
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { Id = 0, Customer = "" } );
 
             // assert
-            order.ShouldBeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );
+            order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );
         }
 
         [Fact]
@@ -62,7 +61,7 @@
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { Id = 0, Customer = "" } );
 
             // assert
-            order.ShouldBeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );
+            order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );
         }
     }
 }

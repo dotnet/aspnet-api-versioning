@@ -90,7 +90,7 @@
             controllerBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().ShouldBeEquivalentTo(
+            controllerDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
@@ -124,7 +124,7 @@
             controllerBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().ShouldBeEquivalentTo(
+            controllerDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = true,
@@ -156,7 +156,7 @@
             controllerBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().ShouldBeEquivalentTo(
+            controllerDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,

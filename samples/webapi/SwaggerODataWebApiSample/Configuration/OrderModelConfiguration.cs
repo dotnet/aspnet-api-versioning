@@ -1,9 +1,8 @@
 ﻿namespace Microsoft.Examples.Configuration
 {
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
-    using Microsoft.Web.OData.Builder;
-    using System.Web.OData.Builder;
 
     /// <summary>
     /// Represents the model configuration for orders.
@@ -31,12 +30,12 @@
 
             if ( apiVersion >= ApiVersions.V1 )
             {
-                order.Collection.Function( "MostExpensive" ).ReturnsFromEntitySet<Order>( "Orders" );
+                // order.Collection.Function( "MostExpensive" ).ReturnsFromEntitySet<Order>( "Orders" );
             }
 
             if ( apiVersion >= ApiVersions.V2 )
             {
-                order.Action( "Rate" ).Parameter<int>( "rating" );
+                //order.Action( "Rate" ).Parameter<int>( "rating" );
             }
         }
     }

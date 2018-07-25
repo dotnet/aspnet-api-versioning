@@ -1,12 +1,11 @@
-﻿namespace Microsoft.Web.OData.Conventions
+﻿namespace Microsoft.AspNet.OData.Conventions
 {
-    using Builder;
-    using Configuration;
-    using Controllers;
-    using Http.Versioning.Conventions;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Configuration;
+    using Microsoft.AspNet.OData.Conventions.Controllers;
     using Microsoft.OData.UriParser;
+    using Microsoft.Web.Http.Versioning.Conventions;
     using System.Web.Http;
-    using System.Web.OData.Builder;
     using static Microsoft.OData.ServiceLifetime;
 
     public abstract class ConventionsAcceptanceTest : ODataAcceptanceTest
@@ -26,7 +25,7 @@
                     options.Conventions.Controller<PeopleController>()
                                        .HasApiVersion( 1, 0 )
                                        .HasApiVersion( 2, 0 )
-                                       .Action( c => c.Patch( default( int ), null, null ) ).MapToApiVersion( 2, 0 );
+                                       .Action( c => c.Patch( default, null, null ) ).MapToApiVersion( 2, 0 );
                     options.Conventions.Controller<People2Controller>()
                                        .HasApiVersion( 3, 0 );
                 } );

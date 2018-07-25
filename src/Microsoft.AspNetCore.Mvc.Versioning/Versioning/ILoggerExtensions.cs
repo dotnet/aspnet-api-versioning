@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using ActionConstraints;
-    using Extensions.Logging;
+    using Microsoft.AspNetCore.Mvc.ActionConstraints;
+    using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
     using System.Linq;

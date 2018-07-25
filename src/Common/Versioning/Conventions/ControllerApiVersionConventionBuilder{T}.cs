@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// Represents a builder for API versions applied to a controller.
     /// </summary>
 #pragma warning disable SA1619 // Generic type parameters should be documented partial class; false positive
-    public partial class ControllerApiVersionConventionBuilder<T> : ControllerApiVersionConventionBuilderBase
+    public partial class ControllerApiVersionConventionBuilder<T> : ControllerApiVersionConventionBuilderBase, IControllerConventionBuilder
 #pragma warning restore SA1619
     {
         /// <summary>
@@ -108,5 +108,15 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder<T>>() != null );
             return ActionBuilders.GetOrAdd( actionMethod );
         }
+
+        void IControllerConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
+
+        void IControllerConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
+
+        void IControllerConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
+
+        void IControllerConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
+
+        void IControllerConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
     }
 }

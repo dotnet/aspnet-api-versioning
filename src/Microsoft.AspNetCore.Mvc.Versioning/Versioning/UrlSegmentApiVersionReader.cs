@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Http;
+    using Microsoft.AspNetCore.Http;
     using System;
 
     /// <content>
@@ -25,7 +25,8 @@
             }
 
             reentrant = true;
-            var value = request.HttpContext.ApiVersionProperties().RawApiVersion;
+            var feature = request.HttpContext.Features.Get<IApiVersioningFeature>();
+            var value = feature.RawRequestedApiVersion;
             reentrant = false;
 
             return value;

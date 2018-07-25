@@ -21,10 +21,11 @@
         {
             Arg.NotNull( request, nameof( request ) );
 
-            var parameters = from pair in request.GetQueryNameValuePairs()
-                             where ParameterName.Equals( pair.Key, OrdinalIgnoreCase ) && pair.Value.Length > 0
-                             select pair.Value;
-            var versions = new HashSet<string>( parameters, StringComparer.OrdinalIgnoreCase );
+            var values = from pair in request.GetQueryNameValuePairs()
+                         from parameterName in ParameterNames
+                         where parameterName.Equals( pair.Key, OrdinalIgnoreCase ) && pair.Value.Length > 0
+                         select pair.Value;
+            var versions = new HashSet<string>( values, StringComparer.OrdinalIgnoreCase );
 
             return versions.EnsureZeroOrOneApiVersions();
         }

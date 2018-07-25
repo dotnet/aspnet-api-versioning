@@ -45,7 +45,7 @@
         {
             // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
-            services.AddMvcCore().AddVersionedApiExplorer(
+            services.AddVersionedApiExplorer(
                 options =>
                 {
                     options.GroupNameFormat = "'v'VVV";
@@ -56,7 +56,7 @@
                 } );
 
             services.AddMvc();
-            services.AddApiVersioning( o => o.ReportApiVersions = true );
+            services.AddApiVersioning( options => options.ReportApiVersions = true );
             services.AddSwaggerGen(
                 options =>
                 {
