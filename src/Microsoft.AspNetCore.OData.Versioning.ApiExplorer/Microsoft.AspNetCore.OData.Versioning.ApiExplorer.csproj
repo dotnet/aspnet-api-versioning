@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
+  <VersionPrefix>3.0.0</VersionPrefix>
+  <AssemblyVersion>3.0.0.0</AssemblyVersion>
   <TargetFramework>netstandard2.0</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Core Versioned API Explorer for OData v4.0</AssemblyTitle>
   <Description>The API Explorer for Microsoft ASP.NET Core and OData v4.0.</Description>
@@ -10,12 +12,16 @@
  </PropertyGroup>
 
  <ItemGroup>
-   <Compile Include="..\Common.OData\TypeExtensions.cs" Link="AspNet.OData\TypeExtensions.cs" />
+  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v3.0.0" />
  </ItemGroup>
 
  <ItemGroup>
-   <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
-   <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+  <Compile Include="..\Common.OData\TypeExtensions.cs" Link="AspNet.OData\TypeExtensions.cs" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
+  <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
  </ItemGroup>
 
  <ItemGroup>
