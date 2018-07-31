@@ -24,7 +24,13 @@ The supported flavors of ASP.NET are:
   [nuget](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Versioning) |
   [quick start](../../wiki/New-Services-Quick-Start#aspnet-core) |
   [samples](../../tree/master/samples/aspnetcore) )
-  <br>Adds service API versioning to your ASP.NET Core applications
+  <br>Adds service API versioning to your ASP.NET Core applications<br>
+  
+* **ASP.NET Core and OData** (
+  [nuget](https://www.nuget.org/packages/Microsoft.AspNetCore.OData.Versioning) |
+  [quick start](../../wiki/New-Services-Quick-Start#aspnet-core-with-odata-v40) |
+  [samples](../../tree/master/samples/aspnetcore) )
+  <br>Adds service API versioning to your ASP.NET Core applications using OData v4.0
 
 This is also the home of the ASP.NET API versioning API explorers that you can use to easily document your REST APIs with Swagger:
 
@@ -44,9 +50,18 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
   [nuget](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer) |
   [quick start](../../wiki/API-Documentation#aspnet-core) |
   [samples](../../tree/master/samples/aspnetcore/SwaggerSample) )
-  <br>Adds additional API explorer support to your ASP.NET Core applications
+  <br>Adds additional API explorer support to your ASP.NET Core applications<br> 
+
+* **ASP.NET Core with OData API Explorer** (
+  [nuget](https://www.nuget.org/packages/Microsoft.AspNetCore.OData.Versioning.ApiExplorer) |
+  [quick start](../../wiki/API-Documentation#aspnet-core-with-odata) |
+  [samples](../../tree/master/samples/aspnetcore/SwaggerODataSample) )
+  <br>Adds additional API explorer support to your ASP.NET Core applications using OData v4.0
 
 You can additional find samples, documentation, and getting started instructions in the [wiki](../../wiki).
+
+## Discussion
+Have a general question, suggestion, or other feedback? Join the [discussion](https://teams.microsoft.com/l/channel/19%3af8fdae88689b445bac337554b05d24da%40thread.skype/General?groupId=8ac1a7bf-c9f0-4e50-a657-dc4a357e5249&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47) on Microsoft Teams.
 
 ----
 > If you are an existing user, please makes sure you review the [release notes](../../releases) between all major and minor package releases.
