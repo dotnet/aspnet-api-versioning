@@ -218,7 +218,7 @@
 
             var routes = FlattenRoutes( Configuration.Routes ).ToArray();
 
-            foreach ( var apiVersion in FlattenApiVersions() )
+            foreach ( var apiVersion in FlattenApiVersions( controllerMappings ) )
             {
                 foreach ( var route in routes )
                 {
@@ -441,15 +441,16 @@
             }
         }
 
-        IEnumerable<ApiVersion> FlattenApiVersions()
+        IEnumerable<ApiVersion> FlattenApiVersions( IDictionary<string, HttpControllerDescriptor> controllerMapping )
         {
+            Contract.Requires( controllerMapping != null );
             Contract.Ensures( Contract.Result<IEnumerable<ApiVersion>>() != null );
 
             var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
             var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver );
-            var options = Configuration.GetApiVersioningOptions();
+            var controllerDescriptors = controllerMapping.Values;
             var declared = new HashSet<ApiVersion>();
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
@@ -458,13 +459,12 @@
 
             foreach ( var controllerType in controllerTypes )
             {
-                var descriptor = new HttpControllerDescriptor()
-                {
-                    Configuration = Configuration,
-                    ControllerType = controllerType,
-                };
+                var descriptor = FindControllerDescriptor( controllerDescriptors, controllerType );
 
-                options.Conventions.ApplyTo( descriptor );
+                if ( descriptor == null )
+                {
+                    continue;
+                }
 
                 var model = descriptor.GetApiVersionModel();
 
@@ -494,11 +494,37 @@
 
             if ( supported.Count == 0 )
             {
-                supported.Add( options.DefaultApiVersion );
+                supported.Add( Configuration.GetApiVersioningOptions().DefaultApiVersion );
                 return supported;
             }
 
             return supported.OrderBy( v => v );
+        }
+
+        static HttpControllerDescriptor FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
+        {
+            Contract.Requires( controllerDescriptors != null );
+            Contract.Requires( controllerType != null );
+
+            foreach ( var controllerDescriptor in controllerDescriptors )
+            {
+                if ( controllerDescriptor is IEnumerable<HttpControllerDescriptor> groupedControllerDescriptors )
+                {
+                    foreach ( var groupedControllerDescriptor in groupedControllerDescriptors )
+                    {
+                        if ( controllerType.Equals( groupedControllerDescriptor.ControllerType ) )
+                        {
+                            return groupedControllerDescriptor;
+                        }
+                    }
+                }
+                else if ( controllerType.Equals( controllerDescriptor.ControllerType ) )
+                {
+                    return controllerDescriptor;
+                }
+            }
+
+            return default;
         }
 
         static HttpControllerDescriptor GetDirectRouteController( CandidateAction[] directRouteCandidates, ApiVersion apiVersion )
@@ -1050,9 +1076,7 @@
             }
 
             // note that we don't support custom constraint (IHttpRouteConstraint) because it might rely on the request and some runtime states
-            var constraintsRule = constraint as string;
-
-            if ( constraintsRule == null )
+            if ( !( constraint is string constraintsRule ) )
             {
                 return true;
             }

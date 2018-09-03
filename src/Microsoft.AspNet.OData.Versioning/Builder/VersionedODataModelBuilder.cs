@@ -3,8 +3,8 @@
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using Microsoft.Web.Http.Versioning.Conventions;
+    using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http;
@@ -23,7 +23,6 @@
         /// <remarks>This constructor resolves the current <see cref="IHttpControllerSelector"/> from the
         /// <see cref="ServicesExtensions.GetHttpControllerSelector(ServicesContainer)"/> extension method via the
         /// <see cref="HttpConfiguration.Services"/>.</remarks>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public VersionedODataModelBuilder( HttpConfiguration configuration )
         {
             Arg.NotNull( configuration, nameof( configuration ) );
@@ -55,15 +54,18 @@
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
             var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver ).Where( TypeExtensions.IsODataController );
-            var conventions = Options.Conventions;
+            var controllerDescriptors = services.GetHttpControllerSelector().GetControllerMapping().Values;
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
 
             foreach ( var controllerType in controllerTypes )
             {
-                var descriptor = new HttpControllerDescriptor( Configuration, string.Empty, controllerType );
+                var descriptor = FindControllerDescriptor( controllerDescriptors, controllerType );
 
-                conventions.ApplyTo( descriptor );
+                if ( descriptor == null )
+                {
+                    continue;
+                }
 
                 var model = descriptor.GetApiVersionModel();
                 var versions = model.SupportedApiVersions;
@@ -115,6 +117,32 @@
                                                .HasDeprecatedApiVersions( deprecatedApiVersions );
 
             controllerBuilder.ApplyTo( controllerDescriptor );
+        }
+
+        static HttpControllerDescriptor FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
+        {
+            Contract.Requires( controllerDescriptors != null );
+            Contract.Requires( controllerType != null );
+
+            foreach ( var controllerDescriptor in controllerDescriptors )
+            {
+                if ( controllerDescriptor is IEnumerable<HttpControllerDescriptor> groupedControllerDescriptors )
+                {
+                    foreach ( var groupedControllerDescriptor in groupedControllerDescriptors )
+                    {
+                        if ( controllerType.Equals( groupedControllerDescriptor.ControllerType ) )
+                        {
+                            return groupedControllerDescriptor;
+                        }
+                    }
+                }
+                else if ( controllerType.Equals( controllerDescriptor.ControllerType ) )
+                {
+                    return controllerDescriptor;
+                }
+            }
+
+            return default;
         }
     }
 }

@@ -11,72 +11,6 @@
 
     public class HttpControllerDescriptorExtensionsTest
     {
-        public static IEnumerable<object[]> DeclaredApiVersionData
-        {
-            get
-            {
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestController ) ),
-                    new[] { ApiVersion.Default }
-                };
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestVersion2Controller ) ),
-                    new[] { new ApiVersion( 1, 8 ), new ApiVersion( 1, 9 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) }
-                };
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( AttributeRoutedTest4Controller ) ),
-                    new[] { new ApiVersion( 4, 0 ) }
-                };
-            }
-        }
-
-        public static IEnumerable<object[]> SupportedApiVersionData
-        {
-            get
-            {
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestController ) ),
-                    new[] { ApiVersion.Default }
-                };
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestVersion2Controller ) ),
-                    new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) }
-                };
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( AttributeRoutedTest4Controller ) ),
-                    new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 4, 0 ) }
-                };
-            }
-        }
-
-        public static IEnumerable<object[]> DeprecatedApiVersionData
-        {
-            get
-            {
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestController ) ),
-                    new ApiVersion[0]
-                };
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestVersion2Controller ) ),
-                    new[] { new ApiVersion( 1, 8 ), new ApiVersion( 1, 9 ) }
-                };
-                yield return new object[]
-                {
-                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( AttributeRoutedTest4Controller ) ),
-                    new[] { new ApiVersion( 3, 0, "Alpha" ) }
-                };
-            }
-        }
-
         [Fact]
         public void get_api_version_info_should_add_and_return_new_instance_for_controller_descriptor()
         {
@@ -94,14 +28,14 @@
         }
 
         [Fact]
-        public void get_api_version_info_should_returne_exising_instance_for_controller_descriptor()
+        public void get_api_version_info_should_return_exising_instance_for_controller_descriptor()
         {
             // arrange
             var controller = new Mock<IHttpController>().Object;
             var controllerDescriptor = new HttpControllerDescriptor( new HttpConfiguration(), "Tests", controller.GetType() );
             var assignedVersionInfo = ApiVersionModel.Default;
 
-            controllerDescriptor.Properties["MS_ApiVersionInfo"] = assignedVersionInfo;
+            controllerDescriptor.Properties[typeof(ApiVersionModel)] = assignedVersionInfo;
 
             // act
             var versionInfo = controllerDescriptor.GetApiVersionModel();
@@ -211,6 +145,72 @@
 
             // assert
             deprecatedVersions.Should().BeEquivalentTo( expectedVersions );
+        }
+
+        public static IEnumerable<object[]> DeclaredApiVersionData
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestController ) ),
+                    new[] { ApiVersion.Default }
+                };
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestVersion2Controller ) ),
+                    new[] { new ApiVersion( 1, 8 ), new ApiVersion( 1, 9 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) }
+                };
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( AttributeRoutedTest4Controller ) ),
+                    new[] { new ApiVersion( 4, 0 ) }
+                };
+            }
+        }
+
+        public static IEnumerable<object[]> SupportedApiVersionData
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestController ) ),
+                    new[] { ApiVersion.Default }
+                };
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestVersion2Controller ) ),
+                    new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) }
+                };
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( AttributeRoutedTest4Controller ) ),
+                    new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 4, 0 ) }
+                };
+            }
+        }
+
+        public static IEnumerable<object[]> DeprecatedApiVersionData
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestController ) ),
+                    new ApiVersion[0]
+                };
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( TestVersion2Controller ) ),
+                    new[] { new ApiVersion( 1, 8 ), new ApiVersion( 1, 9 ) }
+                };
+                yield return new object[]
+                {
+                    new HttpControllerDescriptor( new HttpConfiguration(), "Tests", typeof( AttributeRoutedTest4Controller ) ),
+                    new[] { new ApiVersion( 3, 0, "Alpha" ) }
+                };
+            }
         }
     }
 }

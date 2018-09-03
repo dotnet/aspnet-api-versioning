@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.Web.Http.Simulators.Configuration;
-    using Microsoft.Web.Http.Simulators.Models;
     using Microsoft.Web.Http.Versioning.Conventions;
     using System.Collections;
     using System.Collections.Generic;
@@ -34,7 +33,7 @@
                     options.Conventions.Controller<Simulators.V1.OrdersController>()
                                        .HasApiVersion( 1, 0 )
                                        .HasDeprecatedApiVersion( 0, 9 )
-                                       .Action( c => c.Post( default( Order ) ) ).MapToApiVersion( 1, 0 );
+                                       .Action( c => c.Post( default ) ).MapToApiVersion( 1, 0 );
                     options.Conventions.Controller<Simulators.V2.OrdersController>()
                                        .HasApiVersion( 2, 0 );
                     options.Conventions.Controller<Simulators.V3.OrdersController>()
@@ -59,14 +58,16 @@
                typeof( Simulators.V1.PeopleController ),
                typeof( Simulators.V2.PeopleController ),
                typeof( Simulators.V3.PeopleController ) );
+
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+            configuration.AddApiVersioning();
+
             var builder = new VersionedODataModelBuilder( configuration )
             {
                 ModelConfigurations = { new PersonModelConfiguration() }
             };
             var models = builder.GetEdmModels();
 
-            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
-            configuration.AddApiVersioning();
             configuration.MapVersionedODataRoutes( "odata", "api/v{apiVersion}", models );
 
             return configuration;

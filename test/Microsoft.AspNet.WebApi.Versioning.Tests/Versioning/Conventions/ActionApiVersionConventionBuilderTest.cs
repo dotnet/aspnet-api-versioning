@@ -2,7 +2,9 @@
 {
     using FluentAssertions;
     using Moq;
+    using System;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -18,8 +20,11 @@
             var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
             var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
+            var empty = Enumerable.Empty<ApiVersion>();
+            var controllerVersionInfo = Tuple.Create( empty, empty, empty, empty );
 
             actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
+            actionDescriptor.Object.Properties[controllerVersionInfo.GetType()] = controllerVersionInfo;
 
             // act
             actionBuilder.ApplyTo( actionDescriptor.Object );
@@ -32,7 +37,7 @@
                     DeclaredApiVersions = new ApiVersion[0],
                     SupportedApiVersions = new ApiVersion[0],
                     DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new ApiVersion[0]
+                    ImplementedApiVersions = new ApiVersion[0],
                 } );
         }
 
@@ -43,8 +48,11 @@
             var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
             var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
             var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
+            var empty = Enumerable.Empty<ApiVersion>();
+            var controllerVersionInfo = Tuple.Create( empty, empty, empty, empty );
 
             actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
+            actionDescriptor.Object.Properties[controllerVersionInfo.GetType()] = controllerVersionInfo;
             actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) );
 
             // act
@@ -56,9 +64,9 @@
                 {
                     IsApiVersionNeutral = false,
                     DeclaredApiVersions = new[] { new ApiVersion( 2, 0 ) },
-                    SupportedApiVersions = new[] { new ApiVersion( 2, 0 ) },
+                    SupportedApiVersions = new ApiVersion[0],
                     DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new[] { new ApiVersion( 2, 0 ) }
+                    ImplementedApiVersions = new ApiVersion[0],
                 } );
         }
 
@@ -71,7 +79,10 @@
             var controllerDescriptor = new HttpControllerDescriptor() { ControllerType = typeof( DecoratedController ) };
             var method = typeof( DecoratedController ).GetMethod( nameof( DecoratedController.Get ) );
             var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, method );
+            var empty = Enumerable.Empty<ApiVersion>();
+            var controllerVersionInfo = Tuple.Create( empty, empty, empty, empty );
 
+            actionDescriptor.Properties[controllerVersionInfo.GetType()] = controllerVersionInfo;
             actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) )
                          .MapToApiVersion( new ApiVersion( 3, 0 ) );
 
@@ -84,9 +95,9 @@
                 {
                     IsApiVersionNeutral = false,
                     DeclaredApiVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
-                    SupportedApiVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
+                    SupportedApiVersions = new ApiVersion[0],
                     DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) }
+                    ImplementedApiVersions = new ApiVersion[0],
                 } );
         }
 

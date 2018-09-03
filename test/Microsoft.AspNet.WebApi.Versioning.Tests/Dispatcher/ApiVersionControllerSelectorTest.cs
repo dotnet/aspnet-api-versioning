@@ -95,7 +95,7 @@
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=" + version );
 
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -124,7 +124,7 @@
             var configuration = new HttpConfiguration();
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=" + version );
 
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();
 
@@ -633,10 +633,10 @@
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, "http://localhost/orders" );
 
-            configuration.AddApiVersioning( o =>
+            configuration.AddApiVersioning( options =>
                 {
-                    o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.ApiVersionSelector = new LowestImplementedApiVersionSelector( o );
+                    options.AssumeDefaultVersionWhenUnspecified = true;
+                    options.ApiVersionSelector = new LowestImplementedApiVersionSelector( options );
                 } );
             configuration.Routes.MapHttpRoute( "Default", "{controller}/{id}", new { id = Optional } );
             configuration.EnsureInitialized();
@@ -655,7 +655,7 @@
                 RequestContext = new HttpRequestContext()
                 {
                     Configuration = configuration,
-                    RouteData = routeData
+                    RouteData = routeData,
                 }
             };
 
@@ -936,7 +936,7 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, requestUri );
 
-            configuration.AddApiVersioning();
+            configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             configuration.EnsureInitialized();
 
             var routeData = configuration.Routes.GetRouteData( request );
@@ -1142,15 +1142,16 @@ Microsoft.Web.Http.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralC
 
             controllerTypeResolver.Setup( r => r.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
             configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
-            configuration.AddApiVersioning( o =>
+            configuration.AddApiVersioning( options =>
             {
-                o.Conventions.Controller<ConventionsController>()
-                             .HasApiVersion( 1, 0 )
-                             .HasApiVersion( 2, 0 )
-                             .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
-                             .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
+                options.ReportApiVersions = true;
+                options.Conventions.Controller<ConventionsController>()
+                                   .HasApiVersion( 1, 0 )
+                                   .HasApiVersion( 2, 0 )
+                                   .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
+                                   .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
 
-                o.Conventions.Controller<Conventions2Controller>().HasApiVersion( 3, 0 );
+                options.Conventions.Controller<Conventions2Controller>().HasApiVersion( 3, 0 );
             } );
             configuration.Routes.MapHttpRoute( "Default", "api/{controller}/{id}", new { id = Optional } );
             configuration.MapHttpAttributeRoutes();

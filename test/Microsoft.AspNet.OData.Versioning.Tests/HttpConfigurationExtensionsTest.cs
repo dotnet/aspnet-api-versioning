@@ -120,6 +120,7 @@
 
             controllerTypeResolver.Setup( ctr => ctr.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
             configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
+            configuration.AddApiVersioning();
 
             var builder = new VersionedODataModelBuilder( configuration );
 

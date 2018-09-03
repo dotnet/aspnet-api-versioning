@@ -15,16 +15,16 @@
     {
         internal DirectRouteControllerSelector( ApiVersioningOptions options ) : base( options ) { }
 
-        internal override ControllerSelectionResult SelectController( ApiVersionControllerAggregator aggregator )
+        internal override ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
-            Contract.Requires( aggregator != null );
+            Contract.Requires( context != null );
             Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
 
-            var request = aggregator.Request;
-            var requestedVersion = aggregator.RequestedApiVersion;
+            var request = context.Request;
+            var requestedVersion = context.RequestedApiVersion;
             var result = new ControllerSelectionResult()
             {
-                HasCandidates = aggregator.HasAttributeBasedRoutes,
+                HasCandidates = context.HasAttributeBasedRoutes,
                 RequestedVersion = requestedVersion,
             };
 
@@ -33,7 +33,7 @@
                 return result;
             }
 
-            var versionNeutralController = result.Controller = GetVersionNeutralController( aggregator.DirectRouteCandidates );
+            var versionNeutralController = result.Controller = GetVersionNeutralController( context.DirectRouteCandidates );
 
             if ( requestedVersion == null )
             {
@@ -42,7 +42,7 @@
                     return result;
                 }
 
-                requestedVersion = ApiVersionSelector.SelectVersion( request, aggregator.AllVersions );
+                requestedVersion = ApiVersionSelector.SelectVersion( request, context.AllVersions );
 
                 if ( requestedVersion == null )
                 {
@@ -50,7 +50,7 @@
                 }
             }
 
-            var versionedController = GetVersionedController( aggregator, requestedVersion );
+            var versionedController = GetVersionedController( context, requestedVersion );
 
             if ( versionedController == null )
             {
@@ -99,12 +99,12 @@
             return controllerDescriptor;
         }
 
-        static HttpControllerDescriptor GetVersionedController( ApiVersionControllerAggregator aggregator, ApiVersion requestedVersion )
+        static HttpControllerDescriptor GetVersionedController( ControllerSelectionContext context, ApiVersion requestedVersion )
         {
-            Contract.Requires( aggregator != null );
+            Contract.Requires( context != null );
             Contract.Requires( requestedVersion != null );
 
-            var directRouteCandidates = aggregator.DirectRouteCandidates;
+            var directRouteCandidates = context.DirectRouteCandidates;
             var controller = directRouteCandidates[0].ActionDescriptor.ControllerDescriptor;
 
             if ( directRouteCandidates.Length == 1 )
@@ -120,11 +120,6 @@
                 {
                     return null;
                 }
-            }
-
-            if ( !controller.HasApiVersionInfo() )
-            {
-                controller.SetApiVersionModel( aggregator.AllVersions );
             }
 
             return controller;

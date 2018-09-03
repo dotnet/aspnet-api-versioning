@@ -44,27 +44,6 @@
             }
         }
 
-        internal ApiVersionModel( HttpControllerDescriptor controllerDescriptor, ApiVersionModel aggregatedVersions )
-        {
-            Contract.Requires( controllerDescriptor != null );
-            Contract.Requires( aggregatedVersions != null );
-
-            if ( IsApiVersionNeutral = controllerDescriptor.GetCustomAttributes<IApiVersionNeutral>( false ).Any() )
-            {
-                declaredVersions = emptyVersions;
-                implementedVersions = emptyVersions;
-                supportedVersions = emptyVersions;
-                deprecatedVersions = emptyVersions;
-            }
-            else
-            {
-                declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => GetDeclaredControllerApiVersions( controllerDescriptor ) );
-                implementedVersions = aggregatedVersions.implementedVersions;
-                supportedVersions = aggregatedVersions.supportedVersions;
-                deprecatedVersions = aggregatedVersions.deprecatedVersions;
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
         /// </summary>
@@ -73,7 +52,9 @@
         {
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
-            if ( IsApiVersionNeutral = actionDescriptor.ControllerDescriptor.GetCustomAttributes<IApiVersionNeutral>( false ).Any() )
+            var controllerModel = actionDescriptor.ControllerDescriptor.GetApiVersionModel();
+
+            if ( IsApiVersionNeutral = controllerModel.IsApiVersionNeutral )
             {
                 declaredVersions = emptyVersions;
                 implementedVersions = emptyVersions;
@@ -83,9 +64,9 @@
             else
             {
                 declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( actionDescriptor.GetCustomAttributes<IApiVersionProvider>( false ).GetImplementedApiVersions );
-                implementedVersions = declaredVersions;
-                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( actionDescriptor.GetCustomAttributes<IApiVersionProvider>( false ).GetSupportedApiVersions );
-                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( actionDescriptor.GetCustomAttributes<IApiVersionProvider>( false ).GetDeprecatedApiVersions );
+                implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => controllerModel.ImplementedApiVersions );
+                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => controllerModel.SupportedApiVersions );
+                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => controllerModel.DeprecatedApiVersions );
             }
         }
 

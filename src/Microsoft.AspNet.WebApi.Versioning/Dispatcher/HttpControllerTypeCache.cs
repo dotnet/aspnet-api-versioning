@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Web.Http;
-    using System.Web.Http.Dispatcher;
+    using static System.Web.Http.Dispatcher.DefaultHttpControllerSelector;
 
     sealed class HttpControllerTypeCache
     {
@@ -36,11 +36,39 @@
                 return attribute.Name;
             }
 
-            // use standard convention for the controller name
+            // use standard convention for the controller name (ex: ValuesController -> Values)
             var name = type.Name;
-            var suffixLength = DefaultHttpControllerSelector.ControllerSuffix.Length;
+            var suffixLength = ControllerSuffix.Length;
 
-            return name.Substring( 0, name.Length - suffixLength );
+            name = name.Substring( 0, name.Length - suffixLength );
+
+            // trim trailing numbers to enable grouping by convention (ex: Values1Controller -> Values, Values2Controller -> Values)
+            return TrimTrailingNumbers( name );
+        }
+
+        static string TrimTrailingNumbers( string name )
+        {
+            if ( string.IsNullOrEmpty( name ) )
+            {
+                return name;
+            }
+
+            var last = name.Length - 1;
+
+            for ( var i = last; i >= 0; i-- )
+            {
+                if ( !char.IsNumber( name[i] ) )
+                {
+                    if ( i < last )
+                    {
+                        return name.Substring( 0, i + 1 );
+                    }
+
+                    return name;
+                }
+            }
+
+            return name;
         }
 
         Dictionary<string, ILookup<string, Type>> InitializeCache()

@@ -1,41 +1,36 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
+    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
-    using Microsoft.Web.Http.Versioning;
     using static System.Environment;
 
     sealed class ConventionRouteControllerSelector : ControllerSelector
     {
         readonly HttpControllerTypeCache controllerTypeCache;
 
-        internal ConventionRouteControllerSelector( ApiVersioningOptions options, HttpControllerTypeCache controllerTypeCache ) : base( options )
-        {
-            Contract.Requires( controllerTypeCache != null );
-            this.controllerTypeCache = controllerTypeCache;
-        }
+        internal ConventionRouteControllerSelector( ApiVersioningOptions options, HttpControllerTypeCache controllerTypeCache )
+            : base( options ) => this.controllerTypeCache = controllerTypeCache;
 
-        [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
-        internal override ControllerSelectionResult SelectController( ApiVersionControllerAggregator aggregator )
+        internal override ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
-            Contract.Requires( aggregator != null );
+            Contract.Requires( context != null );
             Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
 
-            var request = aggregator.Request;
-            var requestedVersion = aggregator.RequestedApiVersion;
-            var controllerName = aggregator.ControllerName;
+            var request = context.Request;
+            var requestedVersion = context.RequestedApiVersion;
+            var controllerName = context.ControllerName;
             var result = new ControllerSelectionResult()
             {
                 RequestedVersion = requestedVersion,
                 ControllerName = controllerName,
-                HasCandidates = aggregator.HasConventionBasedRoutes,
+                HasCandidates = context.HasConventionBasedRoutes,
             };
 
             if ( !result.HasCandidates )
@@ -43,8 +38,8 @@
                 return result;
             }
 
-            var ambiguousException = new Lazy<Exception>( () => CreateAmbiguousControllerException( aggregator.RouteData.Route, controllerName, controllerTypeCache.GetControllerTypes( controllerName ) ) );
-            var versionNeutralController = result.Controller = GetVersionNeutralController( aggregator.ConventionRouteCandidates, ambiguousException );
+            var ambiguousException = new Lazy<Exception>( () => CreateAmbiguousControllerException( context.RouteData.Route, controllerName, controllerTypeCache.GetControllerTypes( controllerName ) ) );
+            var versionNeutralController = result.Controller = GetVersionNeutralController( context.ConventionRouteCandidates, ambiguousException );
 
             if ( requestedVersion == null )
             {
@@ -53,7 +48,7 @@
                     return result;
                 }
 
-                requestedVersion = ApiVersionSelector.SelectVersion( request, aggregator.AllVersions );
+                requestedVersion = ApiVersionSelector.SelectVersion( request, context.AllVersions );
 
                 if ( requestedVersion == null )
                 {
@@ -61,7 +56,7 @@
                 }
             }
 
-            var versionedController = GetVersionedController( aggregator, requestedVersion, ambiguousException );
+            var versionedController = GetVersionedController( context, requestedVersion, ambiguousException );
 
             if ( versionedController == null )
             {
@@ -74,6 +69,7 @@
             }
 
             request.ApiVersionProperties().RequestedApiVersion = requestedVersion;
+            result.RequestedVersion = requestedVersion;
             result.Controller = versionedController;
 
             return result;
@@ -109,13 +105,13 @@
             return controllerDescriptor;
         }
 
-        static HttpControllerDescriptor GetVersionedController( ApiVersionControllerAggregator aggregator, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
+        static HttpControllerDescriptor GetVersionedController( ControllerSelectionContext context, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
         {
-            Contract.Requires( aggregator != null );
+            Contract.Requires( context != null );
             Contract.Requires( requestedVersion != null );
             Contract.Requires( ambiguousException != null );
 
-            var candidates = aggregator.ConventionRouteCandidates;
+            var candidates = context.ConventionRouteCandidates;
             var controller = candidates[0];
 
             if ( candidates.Count == 1 )
@@ -131,11 +127,6 @@
                 {
                     return null;
                 }
-            }
-
-            if ( !controller.HasApiVersionInfo() )
-            {
-                controller.SetApiVersionModel( aggregator.AllVersions );
             }
 
             controller.SetRelatedCandidates( candidates );
