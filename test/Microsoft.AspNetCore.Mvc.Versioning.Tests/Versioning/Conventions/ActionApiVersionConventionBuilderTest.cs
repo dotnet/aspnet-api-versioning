@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
+﻿namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using ApplicationModels;
     using FluentAssertions;
@@ -10,7 +7,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using System.Reflection;
     using Xunit;
     using static Moq.Times;
-    using ControllerVersionInfo = Tuple<IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>>;
 
     public class ActionApiVersionConventionBuilderTest
     {
@@ -23,7 +19,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
             var actionModel = new ActionModel( method, new object[0] );
             var empty = Enumerable.Empty<ApiVersion>();
-            var controllerVersionInfo = new ControllerVersionInfo( empty, empty, empty, empty );
+            var controllerVersionInfo = (empty, empty, empty, empty);
 
             actionModel.SetProperty( controllerVersionInfo );
 
@@ -38,7 +34,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                     DeclaredApiVersions = new ApiVersion[0],
                     SupportedApiVersions = new ApiVersion[0],
                     DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new ApiVersion[0]
+                    ImplementedApiVersions = new ApiVersion[0],
                 } );
         }
 
@@ -52,7 +48,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             var attributes = new object[] { new MapToApiVersionAttribute( "2.0" ) };
             var actionModel = new ActionModel( method, attributes );
             var empty = Enumerable.Empty<ApiVersion>();
-            var controllerVersionInfo = new ControllerVersionInfo( empty, empty, empty, empty );
+            var controllerVersionInfo = (empty, empty, empty, empty);
 
             actionModel.SetProperty( controllerVersionInfo );
             actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) );
@@ -68,7 +64,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                     DeclaredApiVersions = new[] { new ApiVersion( 2, 0 ) },
                     SupportedApiVersions = new ApiVersion[0],
                     DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new ApiVersion[0]
+                    ImplementedApiVersions = new ApiVersion[0],
                 } );
         }
 
@@ -82,7 +78,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             var attributes = method.GetCustomAttributes().Cast<object>().ToArray();
             var actionModel = new ActionModel( method, attributes );
             var empty = Enumerable.Empty<ApiVersion>();
-            var controllerVersionInfo = new ControllerVersionInfo( empty, empty, empty, empty );
+            var controllerVersionInfo = (empty, empty, empty, empty);
 
             actionModel.SetProperty( controllerVersionInfo );
             actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) )
@@ -99,7 +95,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                     DeclaredApiVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
                     SupportedApiVersions = new ApiVersion[0],
                     DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new ApiVersion[0]
+                    ImplementedApiVersions = new ApiVersion[0],
                 } );
         }
 

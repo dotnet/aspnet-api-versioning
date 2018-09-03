@@ -1,14 +1,9 @@
-﻿#pragma warning disable SA1200 // Using directives should be placed correctly; false positive - required for inner, short-hand type aliasing
-using System;
-using System.Collections.Generic;
-#pragma warning restore SA1200
-
-namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
+﻿namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-    using ControllerVersionInfo = System.Tuple<System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>>;
 
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Core.
@@ -29,13 +24,18 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                                      from version in provider.Versions
                                      select version );
 
-            var controllerVersionInfo = actionModel.GetProperty<ControllerVersionInfo>();
+            var (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions) =
+                actionModel.GetProperty<(IEnumerable<ApiVersion>,
+                                         IEnumerable<ApiVersion>,
+                                         IEnumerable<ApiVersion>,
+                                         IEnumerable<ApiVersion>)>();
+
             var versionModel = new ApiVersionModel(
                 declaredVersions: MappedVersions,
-                supportedVersions: controllerVersionInfo.Item1,
-                deprecatedVersions: controllerVersionInfo.Item2,
-                advertisedVersions: controllerVersionInfo.Item3,
-                deprecatedAdvertisedVersions: controllerVersionInfo.Item4 );
+                supportedVersions,
+                deprecatedVersions,
+                advertisedVersions,
+                deprecatedAdvertisedVersions );
 
             actionModel.SetProperty( versionModel );
         }
