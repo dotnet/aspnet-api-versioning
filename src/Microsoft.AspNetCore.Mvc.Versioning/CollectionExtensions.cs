@@ -15,11 +15,11 @@
             return dictionary.TryGetValue( key, out TValue value ) ? value : defaultValue();
         }
 
-        internal static void SetOrRemove<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, TValue value ) where TValue : class
+        internal static void SetOrRemove<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, TValue value )
         {
             Contract.Requires( dictionary != null );
 
-            if ( value == null )
+            if ( value == default && default( TValue ) == null )
             {
                 dictionary.Remove( key );
             }
