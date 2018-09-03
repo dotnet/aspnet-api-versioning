@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Versioning.Conventions
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -19,20 +20,25 @@
         {
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
-            mappedVersions.UnionWith( from provider in actionDescriptor.GetCustomAttributes<IApiVersionProvider>()
-                                      where !provider.AdvertiseOnly && !provider.Deprecated
-                                      from version in provider.Versions
-                                      select version );
+            MappedVersions.AddRange( from provider in actionDescriptor.GetCustomAttributes<IApiVersionProvider>()
+                                     where !provider.AdvertiseOnly && !provider.Deprecated
+                                     from version in provider.Versions
+                                     select version );
 
-            var noVersions = Enumerable.Empty<ApiVersion>();
-            var model = new ApiVersionModel(
-                apiVersionNeutral: false,
-                supported: mappedVersions,
-                deprecated: noVersions,
-                advertised: noVersions,
-                deprecatedAdvertised: noVersions );
+            var (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions) =
+                actionDescriptor.GetProperty<Tuple<IEnumerable<ApiVersion>,
+                                                   IEnumerable<ApiVersion>,
+                                                   IEnumerable<ApiVersion>,
+                                                   IEnumerable<ApiVersion>>>();
 
-            actionDescriptor.SetApiVersionModel( model );
+            var versionModel = new ApiVersionModel(
+                declaredVersions: MappedVersions,
+                supportedVersions,
+                deprecatedVersions,
+                advertisedVersions,
+                deprecatedAdvertisedVersions );
+
+            actionDescriptor.SetProperty( versionModel );
         }
     }
 }

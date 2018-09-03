@@ -610,11 +610,8 @@
             Arg.NotNull( configuration, nameof( configuration ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
-            var allRoutes = configuration.Routes;
-            var routes = new KeyValuePair<string, IHttpRoute>[allRoutes.Count];
+            var routes = configuration.Routes.ToDictionary();
             var containers = configuration.GetRootContainerMappings();
-
-            allRoutes.CopyTo( routes, 0 );
 
             foreach ( var route in routes )
             {

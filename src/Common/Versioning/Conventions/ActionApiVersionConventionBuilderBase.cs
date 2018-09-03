@@ -12,8 +12,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// </summary>
     public partial class ActionApiVersionConventionBuilderBase
     {
-        readonly HashSet<ApiVersion> mappedVersions = new HashSet<ApiVersion>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilderBase"/> class.
         /// </summary>
@@ -23,6 +21,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// Gets the collection of API versions mapped to the current action.
         /// </summary>
         /// <value>A <see cref="ICollection{T}">collection</see> of mapped <see cref="ApiVersion">API versions</see>.</value>
-        protected ICollection<ApiVersion> MappedVersions => mappedVersions;
+        protected ICollection<ApiVersion> MappedVersions { get; } = new HashSet<ApiVersion>();
     }
 }

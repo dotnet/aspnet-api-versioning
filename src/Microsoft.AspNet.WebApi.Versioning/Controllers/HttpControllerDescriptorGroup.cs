@@ -4,7 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
@@ -14,18 +14,19 @@
     /// <summary>
     /// Represents a HTTP controller descriptor that is a grouped set of other HTTP controller descriptors.
     /// </summary>
-    [SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Although the type is a collection, the term 'group' is more meaningful in this context." )]
+#pragma warning disable CA1710 // Identifiers should have correct suffix
     public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnlyList<HttpControllerDescriptor>
+#pragma warning restore CA1710 // Identifiers should have correct suffix
     {
         readonly HttpControllerDescriptor firstDescriptor;
         readonly IReadOnlyList<HttpControllerDescriptor> descriptors;
+        readonly IReadOnlyDictionary<ApiVersion, HttpControllerDescriptor> controllerMapping;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
         /// </summary>
         /// <param name="controllerDescriptors">An <see cref="Array">array</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public HttpControllerDescriptorGroup( params HttpControllerDescriptor[] controllerDescriptors )
         {
             Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
@@ -33,6 +34,7 @@
 
             firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
+            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -42,7 +44,6 @@
         /// <param name="controllerName">The name of the controller the controller descriptor represents.</param>
         /// <param name="controllerDescriptors">An <see cref="Array">array</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "2", Justification = "Validated by a code contract." )]
         public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, params HttpControllerDescriptor[] controllerDescriptors )
             : base( configuration, controllerName, controllerDescriptors[0].ControllerType )
         {
@@ -53,6 +54,7 @@
 
             firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
+            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -60,7 +62,6 @@
         /// </summary>
         /// <param name="controllerDescriptors">A <see cref="IReadOnlyList{T}">read-only list</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public HttpControllerDescriptorGroup( IReadOnlyList<HttpControllerDescriptor> controllerDescriptors )
         {
             Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
@@ -68,6 +69,7 @@
 
             firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
+            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -77,7 +79,6 @@
         /// <param name="controllerName">The name of the controller the controller descriptor represents.</param>
         /// <param name="controllerDescriptors">A <see cref="IReadOnlyList{T}">read-only list</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "2", Justification = "Validated by a code contract." )]
         public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, IReadOnlyList<HttpControllerDescriptor> controllerDescriptors )
             : base( configuration, controllerName, controllerDescriptors[0].ControllerType )
         {
@@ -88,6 +89,7 @@
 
             firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
+            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -111,14 +113,12 @@
 
             var version = request.GetRequestedApiVersion();
 
-            if ( version == null )
+            if ( version != null && controllerMapping.TryGetValue( version, out var descriptor ) )
             {
-                return firstDescriptor.CreateController( request );
+                return descriptor.CreateController( request );
             }
 
-            var descriptor = descriptors.FirstOrDefault( d => d.GetDeclaredApiVersions().Contains( version ) ) ?? firstDescriptor;
-
-            return descriptor.CreateController( request );
+            return firstDescriptor.CreateController( request );
         }
 
         /// <summary>
@@ -180,5 +180,30 @@
         /// </summary>
         /// <value>The total number of items in the group.</value>
         public int Count => descriptors.Count;
+
+        static Dictionary<ApiVersion, HttpControllerDescriptor> MapApiVersionsToControllerDescriptors( IReadOnlyList<HttpControllerDescriptor> descriptors )
+        {
+            Contract.Requires( descriptors != null );
+
+            if ( descriptors.Count < 2 )
+            {
+                return default;
+            }
+
+            var mapping = new Dictionary<ApiVersion, HttpControllerDescriptor>();
+
+            for ( var i = 0; i < descriptors.Count; i++ )
+            {
+                var descriptor = descriptors[i];
+                var apiVersions = descriptor.GetDeclaredApiVersions();
+
+                for ( var j = 0; j < apiVersions.Count; j++ )
+                {
+                    mapping[apiVersions[j]] = descriptor;
+                }
+            }
+
+            return mapping;
+        }
     }
 }

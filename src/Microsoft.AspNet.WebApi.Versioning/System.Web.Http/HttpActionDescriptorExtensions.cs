@@ -1,12 +1,11 @@
 ﻿namespace System.Web.Http
 {
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
-    using System.Web.Http.Controllers;
     using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Web.Http.Controllers;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpActionDescriptor"/> class.
@@ -14,32 +13,19 @@
     public static class HttpActionDescriptorExtensions
     {
         const string AttributeRoutedPropertyKey = "MS_IsAttributeRouted";
-        const string ApiVersionInfoKey = "MS_ApiVersionInfo";
-
-        internal static bool IsAttributeRouted( this HttpActionDescriptor actionDescriptor )
-        {
-            Contract.Requires( actionDescriptor != null );
-
-            actionDescriptor.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
-            return value ?? false;
-        }
 
         /// <summary>
         /// Gets the API version information associated with a action.
         /// </summary>
         /// <param name="actionDescriptor">The <see cref="HttpActionDescriptor">action</see> to evaluate.</param>
         /// <returns>The <see cref="ApiVersionModel">API version information</see> for the action.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public static ApiVersionModel GetApiVersionModel( this HttpActionDescriptor actionDescriptor )
         {
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
             Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
 
-            return (ApiVersionModel) actionDescriptor.Properties.GetOrAdd( ApiVersionInfoKey, key => new ApiVersionModel( actionDescriptor ) );
+            return actionDescriptor.GetProperty<ApiVersionModel>() ?? new ApiVersionModel( actionDescriptor );
         }
-
-        internal static void SetApiVersionModel( this HttpActionDescriptor actionDescriptor, ApiVersionModel model ) =>
-            actionDescriptor.Properties.AddOrUpdate( ApiVersionInfoKey, model, ( key, value ) => model );
 
         /// <summary>
         /// Gets a value indicating whether the action is API version neutral.
@@ -55,5 +41,24 @@
         /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersion">API versions</see>
         /// declared by the action.</returns>
         public static IReadOnlyList<ApiVersion> GetApiVersions( this HttpActionDescriptor actionDescriptor ) => actionDescriptor.GetApiVersionModel().DeclaredApiVersions;
+
+        internal static bool IsAttributeRouted( this HttpActionDescriptor actionDescriptor )
+        {
+            Contract.Requires( actionDescriptor != null );
+
+            actionDescriptor.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
+            return value ?? false;
+        }
+
+        internal static T GetProperty<T>( this HttpActionDescriptor actionDescriptor ) =>
+            actionDescriptor.Properties.TryGetValue( typeof( T ), out T value ) ? value : default;
+
+        internal static void SetProperty<T>( this HttpActionDescriptor actionDescriptor, T value ) =>
+            actionDescriptor.Properties.AddOrUpdate( typeof( T ), value, ( key, oldValue ) => value );
+
+#pragma warning disable  CA1801 // Review unused parameters; intentional for type parameter
+        internal static void RemoveProperty<T>( this HttpActionDescriptor actionDescriptor, T value ) =>
+            actionDescriptor.Properties.TryRemove( typeof( T ), out _ );
+#pragma warning restore CA1801
     }
 }

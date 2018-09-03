@@ -19,11 +19,10 @@
         public void get_enumerator_should_iterate_over_expected_items()
         {
             // arrange
-            var expected = new[] { new HttpControllerDescriptor(), new HttpControllerDescriptor(), new HttpControllerDescriptor() };
-            var group = new HttpControllerDescriptorGroup( expected );
+            var expected = NewControllerDescriptors( 3 );
 
             // act
-
+            var group = new HttpControllerDescriptorGroup( expected );
 
             // assert
             group.Should().BeEquivalentTo( expected );
@@ -33,7 +32,7 @@
         public void indexer_should_return_expected_item()
         {
             // arrange
-            var expected = new[] { new HttpControllerDescriptor(), new HttpControllerDescriptor(), new HttpControllerDescriptor() };
+            var expected = NewControllerDescriptors( 3 );
             var group = new HttpControllerDescriptorGroup( expected );
             var list = new List<HttpControllerDescriptor>();
 
@@ -53,12 +52,24 @@
             // arrange
             var descriptor1 = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var descriptor2 = new Mock<HttpControllerDescriptor>() { CallBase = true };
+            var configuration = new HttpConfiguration();
 
             descriptor1.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "1.0" ) } );
+            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionProvider>() );
+            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionNeutral>() );
 
             descriptor2.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "2.0" ) } );
+            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionProvider>() );
+            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionNeutral>() );
+
+            descriptor1.Object.Configuration = configuration;
+            descriptor2.Object.Configuration = configuration;
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
             var expected = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) };
@@ -78,9 +89,22 @@
             var filter2 = new Mock<IFilter>().Object;
             var descriptor1 = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var descriptor2 = new Mock<HttpControllerDescriptor>() { CallBase = true };
+            var configuration = new HttpConfiguration();
 
             descriptor1.Setup( d => d.GetFilters() ).Returns( () => new Collection<IFilter>() { filter1 } );
+            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionProvider>() );
+            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionNeutral>() );
+
             descriptor2.Setup( d => d.GetFilters() ).Returns( () => new Collection<IFilter>() { filter2 } );
+            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionProvider>() );
+            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionNeutral>() );
+
+            descriptor1.Object.Configuration = configuration;
+            descriptor2.Object.Configuration = configuration;
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
 
@@ -116,11 +140,24 @@
             // arrange
             var expected = new Mock<IHttpController>().Object;
             var controller2 = new Mock<IHttpController>().Object;
-            var descriptor1 = new Mock<HttpControllerDescriptor>();
-            var descriptor2 = new Mock<HttpControllerDescriptor>();
+            var descriptor1 = new Mock<HttpControllerDescriptor>() { CallBase = true };
+            var descriptor2 = new Mock<HttpControllerDescriptor>() { CallBase = true };
+            var configuration = new HttpConfiguration();
 
             descriptor1.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( expected );
+            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionProvider>() );
+            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionNeutral>() );
+
             descriptor2.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( controller2 );
+            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionProvider>() );
+            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
+                       .Returns( () => new Collection<IApiVersionNeutral>() );
+
+            descriptor1.Object.Configuration = configuration;
+            descriptor2.Object.Configuration = configuration;
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
             var request = new HttpRequestMessage();
@@ -205,5 +242,25 @@
             descriptor1.Verify( d => d.CreateController( request ), Once() );
             descriptor2.Verify( d => d.CreateController( request ), Never() );
         }
+
+        static IReadOnlyList<HttpControllerDescriptor> NewControllerDescriptors( int count )
+        {
+            var configuration = new HttpConfiguration();
+            var list = new List<HttpControllerDescriptor>();
+
+            for ( var i = 0; i < count; i++ )
+            {
+                list.Add( NewControllerDescriptor( configuration ) );
+            }
+
+            return list;
+        }
+
+        static HttpControllerDescriptor NewControllerDescriptor( HttpConfiguration configuration ) =>
+                new HttpControllerDescriptor()
+                {
+                    Configuration = configuration,
+                    ControllerType = typeof( IHttpController ),
+                };
     }
 }

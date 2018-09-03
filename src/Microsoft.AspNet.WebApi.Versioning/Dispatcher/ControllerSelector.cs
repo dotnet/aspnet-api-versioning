@@ -17,6 +17,6 @@
 
         protected IApiVersionSelector ApiVersionSelector => options.ApiVersionSelector;
 
-        internal abstract ControllerSelectionResult SelectController( ApiVersionControllerAggregator aggregator );
+        internal abstract ControllerSelectionResult SelectController( ControllerSelectionContext context );
     }
 }

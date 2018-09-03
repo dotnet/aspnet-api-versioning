@@ -2,6 +2,7 @@
 {
     using Microsoft.Web.Http.Controllers;
     using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -11,10 +12,9 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
-    using Microsoft.Web.Http.Versioning;
     using static System.StringComparison;
 
-    sealed class ApiVersionControllerAggregator
+    sealed class ControllerSelectionContext
     {
         readonly Lazy<string> controllerName;
         readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache;
@@ -22,7 +22,7 @@
         readonly Lazy<CandidateAction[]> directRouteCandidates;
         readonly Lazy<ApiVersionModel> allVersions;
 
-        internal ApiVersionControllerAggregator(
+        internal ControllerSelectionContext(
             HttpRequestMessage request,
             Func<HttpRequestMessage, string> controllerName,
             Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache )
@@ -36,26 +36,8 @@
             RouteData = request.GetRouteData();
             conventionRouteCandidates = new Lazy<HttpControllerDescriptorGroup>( GetConventionRouteCandidates );
             directRouteCandidates = new Lazy<CandidateAction[]>( () => RouteData?.GetDirectRouteCandidates() );
-            allVersions = new Lazy<ApiVersionModel>( AggregateAllCandiateVersions );
+            allVersions = new Lazy<ApiVersionModel>( CreateAggregatedModel );
         }
-
-        HttpControllerDescriptorGroup GetConventionRouteCandidates()
-        {
-            if ( string.IsNullOrEmpty( ControllerName ) )
-            {
-                return null;
-            }
-
-            if ( controllerInfoCache.Value.TryGetValue( ControllerName, out var candidates ) )
-            {
-                return candidates;
-            }
-
-            return null;
-        }
-
-        ApiVersionModel AggregateAllCandiateVersions() =>
-            ( ConventionRouteCandidates ?? Enumerable.Empty<HttpControllerDescriptor>() ).Union( EnumerateDirectRoutes() ).AggregateVersions();
 
         internal HttpRequestMessage Request { get; }
 
@@ -74,6 +56,36 @@
         internal bool HasAttributeBasedRoutes => DirectRouteCandidates != null;
 
         internal ApiVersionModel AllVersions => allVersions.Value;
+
+        static bool RouteTemplatesIntersect( string template1, string template2 ) =>
+            template1.StartsWith( template2, OrdinalIgnoreCase ) || template2.StartsWith( template1, OrdinalIgnoreCase );
+
+        static IEnumerable<HttpControllerDescriptor> EnumerateControllersInDataTokens( IDictionary<string, object> dataTokens )
+        {
+            Contract.Requires( dataTokens != null );
+            Contract.Ensures( Contract.Result<IEnumerable<HttpControllerDescriptor>>() != null );
+
+            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Controller, out var value ) )
+            {
+                if ( value is HttpControllerDescriptor controllerDescriptor )
+                {
+                    yield return controllerDescriptor;
+                }
+
+                yield break;
+            }
+
+            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out value ) )
+            {
+                if ( value is HttpActionDescriptor[] actionDescriptors )
+                {
+                    foreach ( var actionDescriptor in actionDescriptors )
+                    {
+                        yield return actionDescriptor.ControllerDescriptor;
+                    }
+                }
+            }
+        }
 
         IEnumerable<HttpControllerDescriptor> EnumerateDirectRoutes()
         {
@@ -109,34 +121,24 @@
             return controllers.Distinct();
         }
 
-        static bool RouteTemplatesIntersect( string template1, string template2 ) =>
-            template1.StartsWith( template2, OrdinalIgnoreCase ) || template2.StartsWith( template1, OrdinalIgnoreCase );
+        HttpControllerDescriptorGroup GetConventionRouteCandidates() =>
+            !string.IsNullOrEmpty( ControllerName ) && controllerInfoCache.Value.TryGetValue( ControllerName, out var candidates ) ? candidates : default;
 
-        static IEnumerable<HttpControllerDescriptor> EnumerateControllersInDataTokens( IDictionary<string, object> dataTokens )
+        ApiVersionModel CreateAggregatedModel()
         {
-            Contract.Requires( dataTokens != null );
-            Contract.Ensures( Contract.Result<IEnumerable<HttpControllerDescriptor>>() != null );
+            var models = Enumerable.Empty<ApiVersionModel>();
 
-            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Controller, out var value ) )
+            if ( HasConventionBasedRoutes )
             {
-                if ( value is HttpControllerDescriptor controllerDescriptor )
-                {
-                    yield return controllerDescriptor;
-                }
-
-                yield break;
+                models = models.Union( ConventionRouteCandidates.Select( c => c.GetProperty<ApiVersionModel>() ).Where( m => m != null ) );
             }
 
-            if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out value ) )
+            if ( HasAttributeBasedRoutes )
             {
-                if ( value is HttpActionDescriptor[] actionDescriptors )
-                {
-                    foreach ( var actionDescriptor in actionDescriptors )
-                    {
-                        yield return actionDescriptor.ControllerDescriptor;
-                    }
-                }
+                models = models.Union( DirectRouteCandidates.Select( c => c.ActionDescriptor.GetProperty<ApiVersionModel>() ).Where( m => m != null ) );
             }
+
+            return models.Aggregate();
         }
     }
 }

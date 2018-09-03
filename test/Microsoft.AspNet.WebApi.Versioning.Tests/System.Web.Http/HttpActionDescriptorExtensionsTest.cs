@@ -39,7 +39,7 @@
         }
 
         [Fact]
-        public void get_api_version_info_should_add_and_return_new_instance_for_action_descriptor()
+        public void get_api_version_info_should_return_new_instance_for_action_descriptor()
         {
             // arrange
             var controller = new Mock<IHttpController>().Object;
@@ -53,11 +53,11 @@
 
             // assert
             versionInfo.Should().NotBeNull();
-            actionDescriptor.Properties.ContainsKey( "MS_ApiVersionInfo" ).Should().BeTrue();
+            actionDescriptor.Properties.ContainsKey( typeof( ApiVersionModel ) ).Should().BeFalse();
         }
 
         [Fact]
-        public void get_api_version_info_should_returne_exising_instance_for_action_descriptor()
+        public void get_api_version_info_should_return_exising_instance_for_action_descriptor()
         {
             // arrange
             var controller = new Mock<IHttpController>().Object;
@@ -65,7 +65,7 @@
             var actionDescriptor = new Mock<HttpActionDescriptor>( controllerDescriptor ) { CallBase = true }.Object;
             var assignedVersionInfo = ApiVersionModel.Default;
 
-            actionDescriptor.Properties["MS_ApiVersionInfo"] = assignedVersionInfo;
+            actionDescriptor.Properties[typeof(ApiVersionModel)] = assignedVersionInfo;
 
             // act
             var versionInfo = actionDescriptor.GetApiVersionModel();
