@@ -1,16 +1,11 @@
-﻿#pragma warning disable SA1200 // Using directives should be placed correctly; false positive - required for inner, short-hand type aliasing
-using System;
-using System.Collections.Generic;
-#pragma warning restore SA1200
-
-namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
+﻿namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
-    using ControllerVersionInfo = System.Tuple<System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>, System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.ApiVersion>>;
 
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Core.
@@ -47,10 +42,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             }
         }
 
-        ControllerVersionInfo ApplyControllerConventions( ControllerModel controllerModel )
+        (IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>) ApplyControllerConventions( ControllerModel controllerModel )
         {
             Contract.Requires( controllerModel != null );
-            Contract.Ensures( Contract.Result<ControllerVersionInfo>() != null );
 
             MergeControllerAttributesWithConventions( controllerModel );
 
@@ -63,7 +57,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                 controllerModel.SetProperty( new ApiVersionModel( VersionNeutral, supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions ) );
             }
 
-            return new ControllerVersionInfo( supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions );
+            return (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions);
         }
 
         void MergeControllerAttributesWithConventions( ControllerModel controllerModel )
@@ -103,10 +97,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                                                     select version );
         }
 
-        void ApplyActionConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
+        void ApplyActionConventions( ControllerModel controller, (IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>) controllerVersionInfo )
         {
             Contract.Requires( controller != null );
-            Contract.Requires( controllerVersionInfo != null );
 
             if ( VersionNeutral )
             {
@@ -118,10 +111,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             }
         }
 
-        void MergeActionAttributesWithConventions( ControllerModel controller, ControllerVersionInfo controllerVersionInfo )
+        void MergeActionAttributesWithConventions( ControllerModel controller, (IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>) controllerVersionInfo )
         {
             Contract.Requires( controller != null );
-            Contract.Requires( controllerVersionInfo != null );
 
             foreach ( var action in controller.Actions )
             {
@@ -133,7 +125,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                 {
                     action.SetProperty( controllerVersionInfo );
                     actionConvention.ApplyTo( action );
-                    action.SetProperty( default( ControllerVersionInfo ) );
+                    action.RemoveProperty( controllerVersionInfo );
                 }
                 else
                 {
