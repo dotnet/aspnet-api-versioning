@@ -42,7 +42,7 @@
             }
         }
 
-        (IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>) ApplyControllerConventions( ControllerModel controllerModel )
+        Tuple<IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>> ApplyControllerConventions( ControllerModel controllerModel )
         {
             Contract.Requires( controllerModel != null );
 
@@ -57,7 +57,7 @@
                 controllerModel.SetProperty( new ApiVersionModel( VersionNeutral, supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions ) );
             }
 
-            return (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions);
+            return Tuple.Create( supportedVersions.AsEnumerable(), deprecatedVersions.AsEnumerable(), advertisedVersions.AsEnumerable(), deprecatedAdvertisedVersions.AsEnumerable() );
         }
 
         void MergeControllerAttributesWithConventions( ControllerModel controllerModel )
@@ -97,7 +97,7 @@
                                                     select version );
         }
 
-        void ApplyActionConventions( ControllerModel controller, (IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>) controllerVersionInfo )
+        void ApplyActionConventions( ControllerModel controller, Tuple<IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>> controllerVersionInfo )
         {
             Contract.Requires( controller != null );
 
@@ -111,7 +111,7 @@
             }
         }
 
-        void MergeActionAttributesWithConventions( ControllerModel controller, (IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>) controllerVersionInfo )
+        void MergeActionAttributesWithConventions( ControllerModel controller, Tuple<IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>, IEnumerable<ApiVersion>> controllerVersionInfo )
         {
             Contract.Requires( controller != null );
 
