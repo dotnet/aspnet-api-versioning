@@ -3,6 +3,7 @@
     using ApplicationModels;
     using FluentAssertions;
     using Moq;
+    using System;
     using System.Linq;
     using System.Reflection;
     using Xunit;
@@ -19,7 +20,7 @@
             var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
             var actionModel = new ActionModel( method, new object[0] );
             var empty = Enumerable.Empty<ApiVersion>();
-            var controllerVersionInfo = (empty, empty, empty, empty);
+            var controllerVersionInfo = Tuple.Create( empty, empty, empty, empty );
 
             actionModel.SetProperty( controllerVersionInfo );
 
@@ -48,7 +49,7 @@
             var attributes = new object[] { new MapToApiVersionAttribute( "2.0" ) };
             var actionModel = new ActionModel( method, attributes );
             var empty = Enumerable.Empty<ApiVersion>();
-            var controllerVersionInfo = (empty, empty, empty, empty);
+            var controllerVersionInfo = Tuple.Create( empty, empty, empty, empty );
 
             actionModel.SetProperty( controllerVersionInfo );
             actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) );
@@ -78,7 +79,7 @@
             var attributes = method.GetCustomAttributes().Cast<object>().ToArray();
             var actionModel = new ActionModel( method, attributes );
             var empty = Enumerable.Empty<ApiVersion>();
-            var controllerVersionInfo = (empty, empty, empty, empty);
+            var controllerVersionInfo = Tuple.Create( empty, empty, empty, empty );
 
             actionModel.SetProperty( controllerVersionInfo );
             actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) )

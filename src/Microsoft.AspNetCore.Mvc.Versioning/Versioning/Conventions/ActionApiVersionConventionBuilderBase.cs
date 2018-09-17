@@ -25,10 +25,10 @@
                                      select version );
 
             var (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions) =
-                actionModel.GetProperty<(IEnumerable<ApiVersion>,
-                                         IEnumerable<ApiVersion>,
-                                         IEnumerable<ApiVersion>,
-                                         IEnumerable<ApiVersion>)>();
+                actionModel.GetProperty<Tuple<IEnumerable<ApiVersion>,
+                                              IEnumerable<ApiVersion>,
+                                              IEnumerable<ApiVersion>,
+                                              IEnumerable<ApiVersion>>>();
 
             var versionModel = new ApiVersionModel(
                 declaredVersions: MappedVersions,
