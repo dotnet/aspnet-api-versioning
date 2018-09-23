@@ -50,14 +50,15 @@
 
             var innerType = result.InnerType;
             var model = serviceProvider.GetRequiredService<IEdmModel>();
-            var structuredType = innerType.GetStructuredType( model, assemblies );
+            var resolver = new StructuredTypeResolver( model, assemblies );
+            var structuredType = resolver.GetStructuredType( innerType );
 
             if ( structuredType == null )
             {
                 return type;
             }
 
-            if ( structuredType.IsEquivalentTo( innerType ) )
+            if ( structuredType.IsEquivalentTo( innerType, resolver ) )
             {
                 return type.IsDelta() ? innerType : type;
             }
@@ -86,7 +87,7 @@
 
             var openTypes = new Stack<Type>();
 
-            // IEnumerable<T>, ODataValue<T>, or Delta<T>
+            // ActionResult<T>, IEnumerable<T>, ODataValue<T>, or Delta<T>
             if ( type.IsGenericTypeWithSingleTypeArgument() )
             {
                 openTypes.Push( type.GetGenericTypeDefinition() );
@@ -127,16 +128,48 @@
             return typeDef.Equals( IEnumerableOfT ) || typeDef.GetInterfaces().Any( i => i.IsGenericType && i.GetGenericTypeDefinition().Equals( IEnumerableOfT ) );
         }
 
-        static IEdmStructuredType GetStructuredType( this Type type, IEdmModel model, IEnumerable<Assembly> assemblies )
+        static bool IsEquivalentTo( this IEdmStructuredType structuredType, Type type, StructuredTypeResolver resolver )
         {
+            Contract.Requires( structuredType != null );
             Contract.Requires( type != null );
-            Contract.Requires( model != null );
-            Contract.Requires( assemblies != null );
+            Contract.Requires( resolver != null );
 
-            var structuredTypes = model.SchemaElements.OfType<IEdmStructuredType>();
-            var structuredType = structuredTypes.FirstOrDefault( t => t.GetClrType( assemblies ).Equals( type ) );
+            const BindingFlags bindingFlags = Public | Instance;
+            var queue = new Queue<(IEdmStructuredType StructuredType, Type Type)>();
 
-            return structuredType;
+            queue.Enqueue( (structuredType, type) );
+
+            while ( queue.Count > 0 )
+            {
+                var current = queue.Dequeue();
+
+                if ( !current.StructuredType.IsEquivalentTo( current.Type ) )
+                {
+                    return false;
+                }
+
+                foreach ( var property in type.GetProperties( bindingFlags ) )
+                {
+                    type = property.PropertyType;
+
+                    var result = type.CanBeSubstituted();
+
+                    if ( !result.IsSupported )
+                    {
+                        continue;
+                    }
+
+                    type = result.InnerType;
+                    structuredType = resolver.GetStructuredType( type );
+
+                    if ( structuredType != null )
+                    {
+                        queue.Enqueue( (structuredType, type) );
+                    }
+                }
+            }
+
+            return true;
         }
 
         static bool IsEquivalentTo( this IEdmStructuredType structuredType, Type type )
@@ -151,6 +184,31 @@
             var structuralProperties = new HashSet<string>( structuredType.StructuralProperties().Select( p => p.Name ), comparer );
 
             return structuralProperties.IsSupersetOf( clrProperties );
+        }
+
+        sealed class StructuredTypeResolver
+        {
+            readonly IEdmModel model;
+            readonly IReadOnlyList<Assembly> assemblies;
+
+            internal StructuredTypeResolver( IEdmModel model, IEnumerable<Assembly> assemblies )
+            {
+                Contract.Requires( model != null );
+                Contract.Requires( assemblies != null );
+
+                this.model = model;
+                this.assemblies = assemblies.ToArray();
+            }
+
+            internal IEdmStructuredType GetStructuredType( Type type )
+            {
+                Contract.Requires( type != null );
+
+                var structuredTypes = model.SchemaElements.OfType<IEdmStructuredType>();
+                var structuredType = structuredTypes.FirstOrDefault( t => t.GetClrType( assemblies ).Equals( type ) );
+
+                return structuredType;
+            }
         }
 
         struct SubstitutionResult
