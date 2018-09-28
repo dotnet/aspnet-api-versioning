@@ -16,7 +16,7 @@ The supported flavors of ASP.NET are:
 
 * **ASP.NET Web API and OData** (
   [nuget](https://www.nuget.org/packages/Microsoft.AspNet.OData.Versioning) |
-  [quick start](/wiki/New-Services-Quick-Start#aspnet-web-api-with-odata-v40) |
+  [quick start](../../wiki/New-Services-Quick-Start#aspnet-web-api-with-odata-v40) |
   [samples](../../tree/master/samples/webapi) )
   <br>Adds service API versioning to your Web API applications using OData v4.0<br>
 
