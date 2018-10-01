@@ -12,8 +12,6 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
-  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
  </ItemGroup>
 
  <Import Project="..\OData.Test.Shared\OData.Test.Shared.projitems" Label="Shared" />

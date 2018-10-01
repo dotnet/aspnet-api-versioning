@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\common.props" />
-  
-  <PropertyGroup>
-    <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
-  </PropertyGroup>
+ <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\common.props" />
 
-  <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
-    <None Include="$(MSBuildThisFileDirectory)$(AcceptanceTestPrefix)xunit.runner.json" Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" Visible="false" />
-  </ItemGroup>
+ <PropertyGroup>
+  <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
+  <IsAspNetCore>$(MSBuildProjectName.StartsWith('Microsoft.AspNetCore'))</IsAspNetCore>
+ </PropertyGroup>
 
-  <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
-    <PackageReference Include="FluentAssertions" Version="5.4.1" />
-    <PackageReference Include="Moq" Version="4.9.0" />
-    <PackageReference Include="xunit" Version="2.4.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-  </ItemGroup>
+ <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+  <None Include="$(MSBuildThisFileDirectory)$(AcceptanceTestPrefix)xunit.runner.json" Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+  <PackageReference Include="FluentAssertions" Version="5.4.1" />
+  <PackageReference Include="Moq" Version="4.9.0" />
+  <PackageReference Include="xunit" Version="2.4.0" />
+  <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
+ </ItemGroup>
+
 
 </Project>
