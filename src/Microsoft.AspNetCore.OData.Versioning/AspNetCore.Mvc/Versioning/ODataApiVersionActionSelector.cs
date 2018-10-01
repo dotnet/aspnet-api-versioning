@@ -25,8 +25,6 @@
     [CLSCompliant( false )]
     public class ODataApiVersionActionSelector : ApiVersionActionSelector
     {
-        static readonly string ActionKey = ODataRouteConstants.Action;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataApiVersionActionSelector"/> class.
         /// </summary>
@@ -53,7 +51,7 @@
 
             var odataPath = context.HttpContext.ODataFeature().Path;
             var routeValues = context.RouteData.Values;
-            var notODataCandidate = odataPath == null || routeValues.ContainsKey( ActionKey );
+            var notODataCandidate = odataPath == null || routeValues.ContainsKey( ODataRouteConstants.Action );
 
             if ( notODataCandidate )
             {
@@ -75,14 +73,16 @@
             {
                 var actions = convention.SelectAction( context );
 
-                if ( actions != null )
+                if ( actions == null )
                 {
-                    foreach ( var action in actions )
+                    continue;
+                }
+
+                foreach ( var action in actions )
+                {
+                    if ( visited.Add( action ) )
                     {
-                        if ( visited.Add( action ) )
-                        {
-                            possibleCandidates.Add( new ActionCandidate( action ) );
-                        }
+                        possibleCandidates.Add( new ActionCandidate( action ) );
                     }
                 }
             }
@@ -162,14 +162,7 @@
 
             selectionResult.AddMatches( finalMatches );
 
-            var bestCandidate = RoutePolicy.Evaluate( context, selectionResult );
-
-            if ( bestCandidate is ControllerActionDescriptor controllerAction )
-            {
-                context.RouteData.Values[ActionKey] = controllerAction.ActionName;
-            }
-
-            return bestCandidate;
+            return RoutePolicy.Evaluate( context, selectionResult );
         }
 
         [DebuggerDisplay( "{Action.DisplayName,nq}" )]

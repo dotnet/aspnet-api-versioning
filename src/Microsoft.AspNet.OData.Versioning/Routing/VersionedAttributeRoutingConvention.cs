@@ -19,6 +19,7 @@
     /// </content>
     public partial class VersionedAttributeRoutingConvention : IODataRoutingConvention
     {
+        const string AttributeRouteData = nameof( AttributeRouteData );
         static readonly DefaultODataPathHandler defaultPathHandler = new DefaultODataPathHandler();
 
         /// <summary>
@@ -161,8 +162,8 @@
 
                 if ( action.SupportedHttpMethods.Contains( request.Method ) && template.TryMatch( odataPath, values ) )
                 {
-                    values["action"] = action.ActionName;
-                    request.Properties["AttributeRouteData"] = values;
+                    values[ODataRouteConstants.Action] = action.ActionName;
+                    request.Properties[AttributeRouteData] = values;
 
                     return action.ControllerDescriptor.ControllerName;
                 }
@@ -183,7 +184,7 @@
             var request = controllerContext.Request;
             var properties = request.Properties;
 
-            if ( !properties.TryGetValue( (string) "AttributeRouteData", out var value ) || !( value is IDictionary<string, object> attributeRouteData ) )
+            if ( !properties.TryGetValue( AttributeRouteData, out var value ) || !( value is IDictionary<string, object> attributeRouteData ) )
             {
                 return null;
             }
@@ -203,7 +204,7 @@
                 }
             }
 
-            return attributeRouteData["action"]?.ToString();
+            return attributeRouteData[ODataRouteConstants.Action]?.ToString();
         }
 
         IDictionary<ODataPathTemplate, HttpActionDescriptor> BuildAttributeMappings( IEnumerable<HttpControllerDescriptor> controllers )

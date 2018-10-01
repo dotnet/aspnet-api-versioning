@@ -148,6 +148,8 @@
                     }
                 }
 
+                items[ODataRouteConstants.Action] = action.ActionName;
+
                 yield return new SelectControllerResult( action.ControllerName, items );
             }
         }
@@ -161,18 +163,20 @@
         {
             Arg.NotNull( routeContext, nameof( routeContext ) );
 
-            var services = routeContext.HttpContext.RequestServices;
+            var httpContext = routeContext.HttpContext;
+            var services = httpContext.RequestServices;
             var actionCollectionProvider = services.GetRequiredService<IActionDescriptorCollectionProvider>();
             var actionDescriptors = actionCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().ToArray();
+            var comparer = StringComparer.OrdinalIgnoreCase;
 
             foreach ( var controllerResult in SelectController( routeContext ) )
             {
                 var controllerName = controllerResult.ControllerName;
-                var attributeRouteData = controllerResult.Values;
+                var actionName = controllerResult.Values[ODataRouteConstants.Action].ToString();
 
                 foreach ( var action in actionDescriptors )
                 {
-                    if ( action.ControllerName == controllerName )
+                    if ( action.ControllerName == controllerName && comparer.Equals( actionName, action.ActionName ) )
                     {
                         yield return action;
                     }
