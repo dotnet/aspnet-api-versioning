@@ -27,6 +27,7 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)SR.resx">
       <LastGenOutput>%(Filename).Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
+      <ManifestResourceName>$(Import_RootNamespace).%(Filename)</ManifestResourceName>
     </EmbeddedResource>
   </ItemGroup>
 </Project>
