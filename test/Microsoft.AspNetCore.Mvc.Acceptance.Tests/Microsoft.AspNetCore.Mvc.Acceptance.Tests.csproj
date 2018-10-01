@@ -2,8 +2,8 @@
 
  <PropertyGroup>
   <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
-  <RootNamespace>Microsoft.AspNetCore</RootNamespace>
   <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.0</TargetFrameworks>
+  <RootNamespace>Microsoft.AspNetCore</RootNamespace>
   <AssetTargetFallback>$(AssetTargetFallback);portable-net451+win8</AssetTargetFallback>
   <PreserveCompilationContext>true</PreserveCompilationContext>
  </PropertyGroup>
@@ -16,8 +16,6 @@
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
   <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
-  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
   <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.1.1" />
  </ItemGroup>
 
