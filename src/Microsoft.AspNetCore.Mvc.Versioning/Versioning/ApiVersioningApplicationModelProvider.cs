@@ -4,7 +4,10 @@
     using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
     using Microsoft.Extensions.Options;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Reflection;
 
     /// <summary>
     /// Represents an <see cref="IApplicationModelProvider">application model provider</see>, which
@@ -42,17 +45,18 @@
             var implicitVersionModel = new ApiVersionModel( Options.DefaultApiVersion );
             var conventionBuilder = Options.Conventions;
             var application = context.Result;
+            var controllers = FilterControllers( application.Controllers );
 
             if ( conventionBuilder.Count == 0 )
             {
-                foreach ( var controller in application.Controllers )
+                foreach ( var controller in controllers )
                 {
                     ApplyAttributeOrImplicitConventions( controller, implicitVersionModel );
                 }
             }
             else
             {
-                foreach ( var controller in application.Controllers )
+                foreach ( var controller in controllers )
                 {
                     if ( !conventionBuilder.ApplyTo( controller ) )
                     {
@@ -64,6 +68,37 @@
 
         /// <inheritdoc />
         public virtual void OnProvidersExecuting( ApplicationModelProviderContext context ) { }
+
+        IEnumerable<ControllerModel> FilterControllers( IEnumerable<ControllerModel> controllers )
+        {
+            Contract.Requires( controllers != null );
+            Contract.Ensures( Contract.Result<IEnumerable<ControllerModel>>() != null );
+
+            if ( !Options.UseApiBehavior )
+            {
+                return controllers;
+            }
+
+            var assembly = typeof( ControllerAttribute ).Assembly;
+            var apiBehaviorSupported = assembly.ExportedTypes.Any( t => t.Name == "ApiControllerAttribute" );
+
+            return apiBehaviorSupported ? controllers.Where( IsApiController ) : controllers;
+        }
+
+        static bool IsApiController( ControllerModel controller )
+        {
+            if ( controller.Attributes.Any( IsApiBehaviorMetadata ) )
+            {
+                return true;
+            }
+
+            var controllerAssembly = controller.ControllerType.Assembly;
+            var assemblyAttributes = controllerAssembly.GetCustomAttributes();
+
+            return assemblyAttributes.Any( IsApiBehaviorMetadata );
+        }
+
+        static bool IsApiBehaviorMetadata( object attribute ) => attribute.GetType().GetInterfaces().Any( i => i.Name == "IApiBehaviorMetadata" );
 
         static bool IsDecoratedWithAttributes( ControllerModel controller )
         {
