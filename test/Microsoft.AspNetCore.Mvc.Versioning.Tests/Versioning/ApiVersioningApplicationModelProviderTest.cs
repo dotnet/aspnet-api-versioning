@@ -27,7 +27,7 @@
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
             var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Actions = { new ActionModel( actionMethod, attributes ) }
+                Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
             var options = Options.Create( new ApiVersioningOptions() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
@@ -52,7 +52,7 @@
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = deprecated.Union( supported ).ToArray(),
+                    DeclaredApiVersions = new ApiVersion[0],
                     ImplementedApiVersions = deprecated.Union( supported ).ToArray(),
                     SupportedApiVersions = supported,
                     DeprecatedApiVersions = deprecated
@@ -69,7 +69,7 @@
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
             var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Actions = { new ActionModel( actionMethod, attributes ) }
+                Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
             var options = Options.Create( new ApiVersioningOptions() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
@@ -94,7 +94,7 @@
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
             var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Actions = { new ActionModel( actionMethod, attributes ) }
+                Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
             var options = Options.Create( new ApiVersioningOptions() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
@@ -136,7 +136,7 @@
             var v1 = new ApiVersion( 1, 0 );
             var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Actions = { new ActionModel( actionMethod, attributes ) }
+                Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
             var options = Options.Create( new ApiVersioningOptions() { DefaultApiVersion = v1 } );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
@@ -150,6 +150,52 @@
             // assert
             controller.GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
             controller.Actions.Single().GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
+        }
+
+        [Fact]
+        public void on_providers_executed_should_only_apply_api_version_model_conventions_with_api_behavior()
+        {
+            // arrange
+            var supported = new[] { new ApiVersion( 1, 0 ) };
+            var deprecated = new ApiVersion[0];
+            var type = typeof( object );
+            var attributes = new object[]
+            {
+                new ApiVersionAttribute( "1.0" ),
+                new ApiControllerAttribute(),
+            };
+            var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
+            var apiController = new ControllerModel( type.GetTypeInfo(), attributes )
+            {
+                Actions = { new ActionModel( actionMethod, new object[0] ) },
+            };
+            var uiController = new ControllerModel( type.GetTypeInfo(), new object[0] )
+            {
+                Actions = { new ActionModel( actionMethod, new object[0] ) },
+            };
+            var controllers = new[] { apiController, uiController };
+            var controllerTypes = new[] { apiController.ControllerType, uiController.ControllerType };
+            var options = Options.Create( new ApiVersioningOptions() { UseApiBehavior = true } );
+            var context = new ApplicationModelProviderContext( controllerTypes );
+            var provider = new ApiVersioningApplicationModelProvider( options );
+
+            context.Result.Controllers.Add( apiController );
+            context.Result.Controllers.Add( uiController );
+
+            // act
+            provider.OnProvidersExecuted( context );
+
+            // assert
+            apiController.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+                new
+                {
+                    IsApiVersionNeutral = false,
+                    DeclaredApiVersions = supported,
+                    ImplementedApiVersions = supported,
+                    SupportedApiVersions = supported,
+                    DeprecatedApiVersions = deprecated,
+                } );
+            uiController.Actions.Single().GetProperty<ApiVersionModel>().Should().BeNull();
         }
     }
 }
