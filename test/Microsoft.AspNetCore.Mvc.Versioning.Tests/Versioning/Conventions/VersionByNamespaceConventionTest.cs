@@ -23,6 +23,7 @@
         [InlineData( "Contoso.Api.v2018_04_01_Beta.Controllers", "2018-04-01-Beta" )]
         [InlineData( "Contoso.Api.v2018_04_01_1_0_Beta.Controllers", "2018-04-01.1.0-Beta" )]
         [InlineData( "MyRestaurant.Vegetarian.Food.v1_1.Controllers", "1.1" )]
+        [InlineData( "VersioningSample.V5.Controllers", "5.0" )]
         public void apply_should_infer_supported_api_version_from_namespace( string @namespace, string versionText )
         {
             // arrange
@@ -56,6 +57,7 @@
         [InlineData( "Contoso.Api.v2018_04_01_Beta.Controllers", "2018-04-01-Beta" )]
         [InlineData( "Contoso.Api.v2018_04_01_1_0_Beta.Controllers", "2018-04-01.1.0-Beta" )]
         [InlineData( "MyRestaurant.Vegetarian.Food.v1_1.Controllers", "1.1" )]
+        [InlineData( "VersioningSample.V5.Controllers", "5.0" )]
         public void apply_should_infer_deprecated_api_version_from_namespace( string @namespace, string versionText )
         {
             // arrange
