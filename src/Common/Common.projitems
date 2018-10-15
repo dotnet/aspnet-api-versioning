@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MapToApiVersionAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReportApiVersionsAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\AmbiguousApiVersionException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersionFormatProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\ApiVersioningOptions.cs" />

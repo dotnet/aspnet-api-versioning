@@ -212,6 +212,8 @@
             var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates, parsedVersion ) );
             var apiVersions = new Lazy<ApiVersionModel>( candidates.Select( a => a.GetProperty<ApiVersionModel>() ).Aggregate );
             var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter, apiVersions );
+            var url = new Uri( requestUrl.Value );
+            var safeUrl = url.SafeFullPath();
 
             if ( parsedVersion == null )
             {
@@ -219,26 +221,26 @@
                 {
                     if ( Options.AssumeDefaultVersionWhenUnspecified || candidates.Any( c => c.IsApiVersionNeutral() ) )
                     {
-                        return VersionNeutralUnmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value );
+                        return VersionNeutralUnmatched( handlerContext, safeUrl, method, allowedMethods.Value, actionNames.Value );
                     }
 
                     return UnspecifiedApiVersion( handlerContext, actionNames.Value );
                 }
                 else if ( !TryParse( requestedVersion, out parsedVersion ) )
                 {
-                    return MalformedApiVersion( handlerContext, requestUrl.Value, requestedVersion );
+                    return MalformedApiVersion( handlerContext, safeUrl, requestedVersion );
                 }
             }
             else if ( IsNullOrEmpty( requestedVersion ) )
             {
-                return VersionNeutralUnmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value );
+                return VersionNeutralUnmatched( handlerContext, safeUrl, method, allowedMethods.Value, actionNames.Value );
             }
             else
             {
                 requestedVersion = parsedVersion.ToString();
             }
 
-            return Unmatched( handlerContext, requestUrl.Value, method, allowedMethods.Value, actionNames.Value, parsedVersion, requestedVersion );
+            return Unmatched( handlerContext, safeUrl, method, allowedMethods.Value, actionNames.Value, parsedVersion, requestedVersion );
         }
 
         static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates, ApiVersion apiVersion )

@@ -202,6 +202,24 @@
         }
 
         [Fact]
+        public async Task return_only_path_for_unmatched_action()
+        {
+            // arrange
+            var request = new HttpRequestMessage( Post, "api/attributed?api-version=1.0" );
+
+            using ( var server = new WebServer( options => options.ReportApiVersions = true ) )
+            {
+                // act
+                var response = await server.Client.SendAsync( request );
+
+                // assert
+                var content = await  response.Content.ReadAsStringAsync();
+                content.Should().Contain( "api/attributed" );
+                content.Should().NotContain( "?api-version=1.0" );
+            }
+        }
+
+        [Fact]
         public async Task select_best_candidate_should_assume_1X2E0_for_attributeX2Dbased_controller_when_allowed()
         {
             // arrange

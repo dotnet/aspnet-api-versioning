@@ -129,8 +129,10 @@
             Contract.Requires( requestedVersion != null );
             Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
 
-            var message = SR.VersionedResourceNotSupported.FormatDefault( request.RequestUri, requestedVersion );
-            var messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( request.RequestUri, requestedVersion );
+            var safeUrl = request.RequestUri.SafeFullPath();
+
+            var message = SR.VersionedResourceNotSupported.FormatDefault( safeUrl, requestedVersion );
+            var messageDetail = SR.VersionedControllerNameNotFound.FormatDefault( safeUrl, requestedVersion );
 
             TraceWriter.Info( request, ControllerSelectorCategory, message );
 
@@ -153,7 +155,9 @@
             var requestedMethod = request.Method;
             var version = request.GetRequestedApiVersion()?.ToString() ?? "(null)";
             var message = SR.VersionedMethodNotSupported.FormatDefault( version, requestedMethod );
-            var messageDetail = SR.VersionedActionNameNotFound.FormatDefault( request.RequestUri, requestedMethod, version );
+            var safeUrl = request.RequestUri.SafeFullPath();
+
+            var messageDetail = SR.VersionedActionNameNotFound.FormatDefault( safeUrl, requestedMethod, version );
 
             TraceWriter.Info( request, ControllerSelectorCategory, message );
             response = Options.ErrorResponses.MethodNotAllowed( request, UnsupportedApiVersion, message, messageDetail );
@@ -185,12 +189,14 @@
         {
             Contract.Requires( conventionRouteResult != null );
 
-            var message = SR.ResourceNotFound.FormatDefault( request.RequestUri );
+            var safeUrl = request.RequestUri.SafeFullPath();
+
+            var message = SR.ResourceNotFound.FormatDefault( safeUrl );
             var messageDetail = default( string );
 
             if ( IsNullOrEmpty( conventionRouteResult.ControllerName ) )
             {
-                messageDetail = SR.ControllerNameNotFound.FormatDefault( request.RequestUri );
+                messageDetail = SR.ControllerNameNotFound.FormatDefault( safeUrl );
             }
             else
             {

@@ -44,5 +44,28 @@
                     Message = "The HTTP resource that matches the request URI 'http://localhost/api/ping' does not support HTTP method 'POST'."
                 } );
         }
+
+        [Fact]
+        public async Task then_unsupported_api_version_error_should_only_contain_the_path()
+        {
+            // arrange
+            var entity = new { };
+
+            // act
+            var response = await PostAsync( "api/ping?additionalQuery=true", entity );
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
+            // assert
+            response.StatusCode.Should().Be( MethodNotAllowed );
+            response.Content.Headers.Allow.Should().BeEquivalentTo( "GET" );
+            content.Error.Should().BeEquivalentTo(
+                new
+                {
+                    Code = "UnsupportedApiVersion",
+                    InnerError = default( OneApiInnerError ),
+                    Message = "The HTTP resource that matches the request URI 'http://localhost/api/ping' does not support HTTP method 'POST'."
+                } );
+        }
     }
 }
+
