@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Web.Http.Dispatcher
+﻿using FluentAssertions.Common;
+
+namespace Microsoft.Web.Http.Dispatcher
 {
     using Controllers;
     using FluentAssertions;
@@ -202,8 +204,8 @@
         public async Task select_controller_should_return_400_for_unmatchedX2C_attributeX2Dbased_controller_version()
         {
             // arrange
-            var message = "The HTTP resource that matches the request URI 'http://localhost/api/test?api-version=42.0' does not support the API version '42.0'.";
-            var messageDetail = "No route providing a controller name with API version '42.0' was found to match request URI 'http://localhost/api/test?api-version=42.0'.";
+            var message = "The HTTP resource that matches the request URI 'http://localhost/api/test' does not support the API version '42.0'.";
+            var messageDetail = "No route providing a controller name with API version '42.0' was found to match request URI 'http://localhost/api/test'.";
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=42.0" );
 
@@ -286,8 +288,8 @@
         public async Task select_controller_should_return_400_for_unmatchedX2C_conventionX2Dbased_controller_version()
         {
             // arrange
-            var message = "The HTTP resource that matches the request URI 'http://localhost/api/test?api-version=4.0' does not support the API version '4.0'.";
-            var messageDetail = "No route providing a controller name with API version '4.0' was found to match request URI 'http://localhost/api/test?api-version=4.0'.";
+            var message = "The HTTP resource that matches the request URI 'http://localhost/api/test' does not support the API version '4.0'.";
+            var messageDetail = "No route providing a controller name with API version '4.0' was found to match request URI 'http://localhost/api/test'.";
             var configuration = new HttpConfiguration();
             var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=4.0" );
 
@@ -373,8 +375,10 @@
         [InlineData( "http://localhost/api/random?api-version=10.0" )]
         public async Task select_controller_should_return_404_for_unmatched_controller( string requestUri )
         {
+            var uri = new Uri( requestUri );
+            var safeUrl = string.IsNullOrWhiteSpace( uri.Query ) ? uri.AbsoluteUri : uri.AbsoluteUri.Replace( uri.Query, string.Empty );
             // arrange
-            var message = "No HTTP resource was found that matches the request URI '" + requestUri + "'.";
+            var message = "No HTTP resource was found that matches the request URI '" + safeUrl + "'.";
             var messageDetail = "No type was found that matches the controller named 'random'.";
             var configuration = AttributeRoutingEnabledConfiguration;
             var request = new HttpRequestMessage( Get, requestUri );

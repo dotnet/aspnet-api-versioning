@@ -62,5 +62,22 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        [Fact]
+        public async Task then_the_service_document_should_return_only_path_for_an_unsupported_version()
+        {
+            // arrange
+
+
+            // act
+            var response = await Client.GetAsync( "api?api-version=4.0" );
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
+            // assert
+            response.StatusCode.Should().Be( BadRequest );
+            content.Error.Code.Should().Be( "UnsupportedApiVersion" );
+            content.Error.Message.Should().Contain( "api" );
+            content.Error.Message.Should().NotContain( "?api-version=1.0" );
+        }
     }
 }
