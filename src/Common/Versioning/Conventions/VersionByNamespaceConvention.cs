@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
             // 'v' | 'V' : [<year> '-' <month> '-' <day>] : [<major[.minor]>] : [<status>]
             // ex: v2018_04_01_1_1_Beta
-            const string Pattern = @"(?:^|\.)[vV](\d{4})?_?(\d{2})?_?(\d{2})?_?(\d+)?_?(\d*)_?([a-zA-Z][a-zA-Z0-9]*)?(?:$|\.)";
+            const string Pattern = @"[^\.]?[vV](\d{4})?_?(\d{2})?_?(\d{2})?_?(\d+)?_?(\d*)_?([a-zA-Z][a-zA-Z0-9]*)?[\.$]?";
 
             var match = Regex.Match( @namespace, Pattern, Singleline );
             var rawApiVersions = new List<string>();
