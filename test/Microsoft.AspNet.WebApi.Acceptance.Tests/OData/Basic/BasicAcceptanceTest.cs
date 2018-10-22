@@ -57,7 +57,8 @@
         [Theory]
         [InlineData( "?additionalQuery=true" )]
         [InlineData( "?additionalQuery=true#anchor-123" )]
-        public async Task then_the_service_document_should_return_only_path_for_an_unsupported_version(string additionalUriPart )
+        [InlineData( "#anchor-123" )]
+        public async Task then_the_service_document_should_return_only_path_for_an_unsupported_version( string additionalUriPart )
         {
             // arrange
             var requestUrl = $"v4{additionalUriPart}";
