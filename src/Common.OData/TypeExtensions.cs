@@ -5,6 +5,9 @@
     using System;
     using System.Reflection;
 
+    /// <summary>
+    /// Provides extension methods for the <see cref="Type"/> class.
+    /// </summary>
     static partial class TypeExtensions
     {
         static readonly TypeInfo ODataController = typeof( ODataController ).GetTypeInfo();

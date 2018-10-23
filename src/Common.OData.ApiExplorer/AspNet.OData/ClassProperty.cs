@@ -1,8 +1,5 @@
 ﻿namespace Microsoft.AspNet.OData
 {
-#if !WEBAPI
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
-#endif
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -11,21 +8,19 @@
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
-#if WEBAPI
-    using System.Web.Http.Dispatcher;
-#endif
 
     struct ClassProperty
     {
         internal readonly string Name;
         internal readonly Type Type;
 
-        internal ClassProperty( PropertyInfo clrProperty )
+        internal ClassProperty( PropertyInfo clrProperty, Type propertyType )
         {
             Contract.Requires( clrProperty != null );
+            Contract.Requires( propertyType != null );
 
             Name = clrProperty.Name;
-            Type = clrProperty.PropertyType;
+            Type = propertyType;
             Attributes = AttributesFromProperty( clrProperty );
         }
 

@@ -2,7 +2,7 @@
 
  <PropertyGroup>
   <TargetFramework>net452</TargetFramework>
-  <RootNamespace>Microsoft.Web.Http</RootNamespace>
+  <RootNamespace>Microsoft</RootNamespace>
  </PropertyGroup>
 
  <ItemGroup>

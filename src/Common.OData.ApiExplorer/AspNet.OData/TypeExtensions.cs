@@ -1,228 +1,194 @@
 ﻿namespace Microsoft.AspNet.OData
 {
-    using Microsoft.AspNet.OData.Query;
-    using Microsoft.AspNet.OData.Routing;
 #if !WEBAPI
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
 #endif
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
+#if WEBAPI
+    using Microsoft.Web.Http;
+#endif
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
     using System.Net.Http;
-    using System.Reflection;
-#if WEBAPI
-    using System.Web.Http.Dispatcher;
-#endif
-    using static System.Reflection.BindingFlags;
+    using static System.StringComparison;
 #if WEBAPI
     using IActionResult = System.Web.Http.IHttpActionResult;
 #endif
 
-    static partial class TypeExtensions
+    /// <summary>
+    /// Provides extension methods for the <see cref="Type"/> class.
+    /// </summary>
+    public static partial class TypeExtensions
     {
         static readonly Type VoidType = typeof( void );
         static readonly Type ActionResultType = typeof( IActionResult );
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
+        static readonly Type DeltaOfT = typeof( Delta<> );
+        static readonly Type ODataValueOfT = typeof( ODataValue<> );
 
-#if WEBAPI
-        internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver, ModelTypeBuilder modelTypeBuilder ) =>
-            type.SubstituteIfNecessary( serviceProvider, assembliesResolver.GetAssemblies(), modelTypeBuilder );
-#endif
-
-        internal static Type SubstituteIfNecessary( this Type type, IServiceProvider serviceProvider, IEnumerable<Assembly> assemblies, ModelTypeBuilder modelTypeBuilder )
+        /// <summary>
+        /// Substitutes the specified type, if required.
+        /// </summary>
+        /// <param name="type">The <see cref="Type">type</see> to be evaluated.</param>
+        /// <param name="context">The current <see cref="TypeSubstitutionContext">type substitution context</see>.</param>
+        /// <returns>The original <paramref name="type"/> or a substitution <see cref="Type">type</see> based on the
+        /// provided <paramref name="context"/>.</returns>
+        public static Type SubstituteIfNecessary( this Type type, TypeSubstitutionContext context )
         {
-            Contract.Requires( serviceProvider != null );
-            Contract.Requires( assemblies != null );
-            Contract.Requires( modelTypeBuilder != null );
+            Arg.NotNull( type, nameof( type ) );
+            Arg.NotNull( context, nameof( context ) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
-            var result = type.CanBeSubstituted();
-
-            if ( !result.IsSupported )
-            {
-                return type;
-            }
-
-            var innerType = result.InnerType;
-            var model = serviceProvider.GetRequiredService<IEdmModel>();
-            var resolver = new StructuredTypeResolver( model, assemblies );
-            var structuredType = resolver.GetStructuredType( innerType );
-
-            if ( structuredType == null )
-            {
-                return type;
-            }
-
-            if ( structuredType.IsEquivalentTo( innerType, resolver ) )
-            {
-                return type.IsDelta() ? innerType : type;
-            }
-
-            var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model ).ApiVersion;
-
-            innerType = modelTypeBuilder.NewStructuredType( structuredType, innerType, apiVersion );
-
-            if ( !type.IsDelta() )
-            {
-                foreach ( var openType in result.OpenTypes )
-                {
-                    innerType = openType.MakeGenericType( innerType );
-                }
-            }
-
-            return innerType;
-        }
-
-        static SubstitutionResult CanBeSubstituted( this Type type )
-        {
-            if ( type == null )
-            {
-                return default;
-            }
-
             var openTypes = new Stack<Type>();
+            var holder = new Lazy<Tuple<ApiVersion, StructuredTypeResolver>>(
+                () => Tuple.Create( context.ApiVersion, new StructuredTypeResolver( context.Model, context.Assemblies ) ) );
 
-            // ActionResult<T>, IEnumerable<T>, ODataValue<T>, or Delta<T>
-            if ( type.IsGenericTypeWithSingleTypeArgument() )
+            if ( IsSubstitutableGeneric( type, openTypes, out var innerType ) )
             {
-                openTypes.Push( type.GetGenericTypeDefinition() );
-                type = type.GetGenericArguments()[0];
+                var (apiVersion, resolver) = holder.Value;
+                var structuredType = resolver.GetStructuredType( innerType );
 
-                // ODataValue<IEnumerable<T>>
-                if ( type.IsEnumerable() )
+                if ( structuredType == null )
                 {
-                    openTypes.Push( type.GetGenericTypeDefinition() );
-                    type = type.GetGenericArguments()[0];
+                    return type;
                 }
-                else if ( type.IsGenericType )
+
+                var newType = context.ModelTypeBuilder.NewStructuredType( structuredType, innerType, apiVersion );
+                return innerType.Equals( newType ) ? type : CloseGeneric( openTypes, newType );
+            }
+
+            if ( CanBeSubstituted( type ) )
+            {
+                var (apiVersion, resolver) = holder.Value;
+                var structuredType = resolver.GetStructuredType( type );
+                type = context.ModelTypeBuilder.NewStructuredType( structuredType, type, apiVersion );
+            }
+
+            return type;
+        }
+
+        internal static void Deconstruct<T1, T2>( this Tuple<T1, T2> tuple, out T1 item1, out T2 item2 )
+        {
+            Contract.Requires( tuple != null );
+
+            item1 = tuple.Item1;
+            item2 = tuple.Item2;
+        }
+
+        static bool IsSubstitutableGeneric( Type type, Stack<Type> openTypes, out Type innerType )
+        {
+            Contract.Requires( type != null );
+            Contract.Requires( openTypes != null );
+
+            innerType = default;
+
+            if ( !type.IsGenericType )
+            {
+                return false;
+            }
+
+            var typeDef = type.GetGenericTypeDefinition();
+            var typeArgs = type.GetGenericArguments();
+
+            if ( typeArgs.Length != 1 )
+            {
+                return false;
+            }
+
+            openTypes.Push( typeDef );
+
+            var typeArg = typeArgs[0];
+
+            if ( typeDef.Equals( IEnumerableOfT ) ||
+                 typeDef.Equals( DeltaOfT ) ||
+                 typeDef.Equals( ODataValueOfT ) ||
+                 typeDef.FullName.Equals( "Microsoft.AspNetCore.Mvc.ActionResult`1", Ordinal ) )
+            {
+                innerType = typeArg;
+            }
+            else
+            {
+                foreach ( var @interface in type.GetInterfaces() )
                 {
-                    return default;
+                    if ( @interface.IsEnumerable( out innerType ) )
+                    {
+                        break;
+                    }
                 }
             }
 
-            var supported = Type.GetTypeCode( type ) == TypeCode.Object &&
-                            !type.IsValueType &&
-                            !type.Equals( VoidType ) &&
-                            !type.Equals( ActionResultType ) &&
-                            !type.Equals( HttpResponseType );
+            if ( innerType == null )
+            {
+                return false;
+            }
 
-            return new SubstitutionResult( type, supported, openTypes );
+            // examples: ODataValue<IEnumerable<Entity>>, ActionResult<IEnumerable<Entity>>
+            while ( innerType.IsEnumerable( out var nextType ) )
+            {
+                openTypes.Push( IEnumerableOfT );
+                innerType = nextType;
+            }
+
+            return true;
         }
 
-        static bool IsGenericTypeWithSingleTypeArgument( this Type type ) => type.IsGenericType && type.GetGenericArguments().Length == 1;
-
-        static bool IsEnumerable( this Type type )
+        static Type CloseGeneric( Stack<Type> openTypes, Type innerType )
         {
-            if ( !type.IsGenericTypeWithSingleTypeArgument() )
+            Contract.Requires( openTypes != null );
+            Contract.Requires( openTypes.Count > 0 );
+            Contract.Requires( innerType != null );
+
+            var type = openTypes.Pop().MakeGenericType( innerType );
+
+            while ( openTypes.Count > 0 )
+            {
+                type = openTypes.Pop().MakeGenericType( type );
+            }
+
+            return type;
+        }
+
+        static bool CanBeSubstituted( Type type )
+        {
+            Contract.Requires( type != null );
+
+            return Type.GetTypeCode( type ) == TypeCode.Object &&
+                  !type.IsValueType &&
+                  !type.Equals( VoidType ) &&
+                  !type.Equals( ActionResultType ) &&
+                  !type.Equals( HttpResponseType );
+        }
+
+        static bool IsEnumerable( this Type type, out Type itemType )
+        {
+            Contract.Requires( type != null );
+
+            itemType = default;
+
+            if ( !type.IsGenericType )
             {
                 return false;
             }
 
             var typeDef = type.GetGenericTypeDefinition();
 
-            return typeDef.Equals( IEnumerableOfT ) || typeDef.GetInterfaces().Any( i => i.IsGenericType && i.GetGenericTypeDefinition().Equals( IEnumerableOfT ) );
-        }
-
-        static bool IsEquivalentTo( this IEdmStructuredType structuredType, Type type, StructuredTypeResolver resolver )
-        {
-            Contract.Requires( structuredType != null );
-            Contract.Requires( type != null );
-            Contract.Requires( resolver != null );
-
-            const BindingFlags bindingFlags = Public | Instance;
-            var queue = new Queue<(IEdmStructuredType StructuredType, Type Type)>();
-
-            queue.Enqueue( (structuredType, type) );
-
-            while ( queue.Count > 0 )
+            if ( typeDef.Equals( IEnumerableOfT ) )
             {
-                var current = queue.Dequeue();
+                itemType = type.GetGenericArguments()[0];
+                return true;
+            }
 
-                if ( !current.StructuredType.IsEquivalentTo( current.Type ) )
+            foreach ( var @interface in type.GetInterfaces() )
+            {
+                if ( @interface.IsEnumerable( out itemType ) )
                 {
-                    return false;
-                }
-
-                foreach ( var property in type.GetProperties( bindingFlags ) )
-                {
-                    type = property.PropertyType;
-
-                    var result = type.CanBeSubstituted();
-
-                    if ( !result.IsSupported )
-                    {
-                        continue;
-                    }
-
-                    type = result.InnerType;
-                    structuredType = resolver.GetStructuredType( type );
-
-                    if ( structuredType != null )
-                    {
-                        queue.Enqueue( (structuredType, type) );
-                    }
+                    return true;
                 }
             }
 
-            return true;
-        }
-
-        static bool IsEquivalentTo( this IEdmStructuredType structuredType, Type type )
-        {
-            Contract.Requires( structuredType != null );
-            Contract.Requires( type != null );
-
-            const BindingFlags bindingFlags = Public | Instance;
-
-            var comparer = StringComparer.OrdinalIgnoreCase;
-            var clrProperties = new HashSet<string>( type.GetProperties( bindingFlags ).Select( p => p.Name ), comparer );
-            var structuralProperties = new HashSet<string>( structuredType.StructuralProperties().Select( p => p.Name ), comparer );
-
-            return structuralProperties.IsSupersetOf( clrProperties );
-        }
-
-        sealed class StructuredTypeResolver
-        {
-            readonly IEdmModel model;
-            readonly IReadOnlyList<Assembly> assemblies;
-
-            internal StructuredTypeResolver( IEdmModel model, IEnumerable<Assembly> assemblies )
-            {
-                Contract.Requires( model != null );
-                Contract.Requires( assemblies != null );
-
-                this.model = model;
-                this.assemblies = assemblies.ToArray();
-            }
-
-            internal IEdmStructuredType GetStructuredType( Type type )
-            {
-                Contract.Requires( type != null );
-
-                var structuredTypes = model.SchemaElements.OfType<IEdmStructuredType>();
-                var structuredType = structuredTypes.FirstOrDefault( t => t.GetClrType( assemblies ).Equals( type ) );
-
-                return structuredType;
-            }
-        }
-
-        struct SubstitutionResult
-        {
-            internal SubstitutionResult( Type innerType, bool supported, IEnumerable<Type> openTypes )
-            {
-                IsSupported = supported;
-                InnerType = innerType;
-                OpenTypes = openTypes;
-            }
-
-            internal readonly bool IsSupported;
-            internal readonly Type InnerType;
-            internal readonly IEnumerable<Type> OpenTypes;
+            return false;
         }
     }
 }

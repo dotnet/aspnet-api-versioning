@@ -11,11 +11,14 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassSignature.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ModelTypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\IModelTypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\DefaultModelTypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ODataValue{T}.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteActionType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilderContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\StructuredTypeResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeSubstitutionContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OData.Edm\EdmExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ODataApiExplorerOptions.cs" />

@@ -30,7 +30,6 @@
     public class ODataApiExplorer : VersionedApiExplorer
     {
         static readonly Regex odataVariableRegex = new Regex( $"{{\\*{ODataRouteConstants.ODataPath}}}", CultureInvariant | Compiled | IgnoreCase );
-        readonly ModelTypeBuilder modelTypeBuilder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataApiExplorer"/> class.
@@ -46,7 +45,7 @@
         public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options ) : base( configuration, options )
         {
             Options = options;
-            modelTypeBuilder = new ModelTypeBuilder( configuration.Services.GetAssembliesResolver().GetAssemblies() );
+            ModelTypeBuilder = new DefaultModelTypeBuilder( configuration.Services.GetAssembliesResolver().GetAssemblies() );
         }
 
         /// <summary>
@@ -54,6 +53,12 @@
         /// </summary>
         /// <value>The <see cref="ODataApiExplorerOptions">API explorer options</see>.</value>
         protected new virtual ODataApiExplorerOptions Options { get; }
+
+        /// <summary>
+        /// Gets the model type builder used by the API explorer.
+        /// </summary>
+        /// <value>The associated <see cref="IModelTypeBuilder">mode type builder</see>.</value>
+        protected virtual IModelTypeBuilder ModelTypeBuilder { get; }
 
         /// <summary>
         /// Determines whether the action should be considered.
@@ -191,8 +196,9 @@
             var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
             var assembliesResolver = actionDescriptor.Configuration.Services.GetAssembliesResolver();
             var returnType = description.ResponseType ?? description.DeclaredType;
+            var context = new TypeSubstitutionContext( serviceProvider, assembliesResolver.GetAssemblies(), ModelTypeBuilder );
 
-            description.ResponseType = returnType.SubstituteIfNecessary( serviceProvider, assembliesResolver, modelTypeBuilder );
+            description.ResponseType = returnType.SubstituteIfNecessary( context );
 
             return description;
         }
@@ -229,7 +235,14 @@
                     }
 
                     var parameterDescriptions = CreateParameterDescriptions( action, route );
-                    var context = new ODataRouteBuilderContext( Configuration, apiVersion, (ODataRoute) route, action, parameterDescriptions, modelTypeBuilder, Options );
+                    var context = new ODataRouteBuilderContext(
+                                    Configuration,
+                                    apiVersion,
+                                    (ODataRoute) route,
+                                    action,
+                                    parameterDescriptions,
+                                    ModelTypeBuilder,
+                                    Options );
 
                     if ( context.IsRouteExcluded )
                     {
@@ -287,7 +300,8 @@
                 description.Source = FromBody;
 
                 var parameterType = descriptor.ParameterType;
-                var substitutedType = parameterType.SubstituteIfNecessary( serviceProvider, assembliesResolver, modelTypeBuilder );
+                var context = new TypeSubstitutionContext( serviceProvider, assembliesResolver.GetAssemblies(), ModelTypeBuilder );
+                var substitutedType = parameterType.SubstituteIfNecessary( context );
 
                 if ( parameterType != substitutedType )
                 {

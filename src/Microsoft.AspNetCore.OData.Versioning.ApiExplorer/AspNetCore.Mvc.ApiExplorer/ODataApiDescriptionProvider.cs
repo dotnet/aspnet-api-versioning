@@ -72,7 +72,7 @@
 
             RouteCollectionProvider = routeCollectionProvider;
             Assemblies = partManager.ApplicationParts.OfType<AssemblyPart>().Select( p => p.Assembly ).ToArray();
-            TypeBuilder = new ModelTypeBuilder( Assemblies );
+            ModelTypeBuilder = new DefaultModelTypeBuilder( Assemblies );
             MetadataProvider = metadataProvider;
             this.options = options;
             MvcOptions = mvcOptions.Value;
@@ -81,7 +81,11 @@
 
         IEnumerable<Assembly> Assemblies { get; }
 
-        ModelTypeBuilder TypeBuilder { get; }
+        /// <summary>
+        /// Gets the model type builder used by the API explorer.
+        /// </summary>
+        /// <value>The associated <see cref="IModelTypeBuilder">mode type builder</see>.</value>
+        protected virtual IModelTypeBuilder ModelTypeBuilder { get; }
 
         /// <summary>
         /// Gets the associated route collection provider.
@@ -323,7 +327,7 @@
             var runtimeReturnType = GetRuntimeReturnType( declaredReturnType );
             var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes, runtimeReturnType, mapping.Services );
             var routeContext = new ODataRouteBuilderContext( mapping, action, Assemblies, Options );
-            var parameterContext = new ApiParameterContext( MetadataProvider, routeContext, TypeBuilder );
+            var parameterContext = new ApiParameterContext( MetadataProvider, routeContext, ModelTypeBuilder );
             var parameters = GetParameters( parameterContext );
 
             if ( routeContext.IsRouteExcluded )
@@ -547,7 +551,7 @@
                     results.Add( new ApiResponseType()
                     {
                         StatusCode = objectType.Key,
-                        Type = objectType.Value.SubstituteIfNecessary( serviceProvider, Assemblies, TypeBuilder ),
+                        Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, Assemblies, ModelTypeBuilder ) ),
                     } );
 
                     continue;
@@ -556,7 +560,7 @@
                 var apiResponseType = new ApiResponseType()
                 {
                     StatusCode = objectType.Key,
-                    Type = objectType.Value.SubstituteIfNecessary( serviceProvider, Assemblies, TypeBuilder ),
+                    Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, Assemblies, ModelTypeBuilder ) ),
                     ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ),
                 };
 

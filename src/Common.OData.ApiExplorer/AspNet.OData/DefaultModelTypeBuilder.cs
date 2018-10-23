@@ -5,7 +5,6 @@
     using Microsoft.Web.Http;
 #else
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.OData.Edm;
 #endif
     using System;
@@ -22,44 +21,93 @@
     using static System.Guid;
     using static System.Reflection.Emit.AssemblyBuilderAccess;
 
-    sealed class ModelTypeBuilder
+    /// <summary>
+    /// Represents the default model type builder.
+    /// </summary>
+    public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     {
-        readonly IEnumerable<Assembly> assemblies;
+        static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
+        readonly ICollection<Assembly> assemblies;
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
         readonly ConcurrentDictionary<ClassSignature, Type> generatedTypes = new ConcurrentDictionary<ClassSignature, Type>();
 
-        internal ModelTypeBuilder( IEnumerable<Assembly> assemblies ) => this.assemblies = assemblies;
-
-        internal Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultModelTypeBuilder"/> class.
+        /// </summary>
+        /// <param name="assemblies">The <see cref="IEnumerable{T}">sequence</see> of application <see cref="Assembly">assemblies</see>.</param>
+        public DefaultModelTypeBuilder( IEnumerable<Assembly> assemblies )
         {
-            Contract.Requires( structuredType != null );
-            Contract.Requires( clrType != null );
-            Contract.Requires( apiVersion != null );
+            Arg.NotNull( assemblies, nameof( assemblies ) );
+            this.assemblies = new HashSet<Assembly>( assemblies );
+        }
+
+        /// <inheritdoc />
+        public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
+        {
+            Arg.NotNull( structuredType, nameof( structuredType ) );
+            Arg.NotNull( clrType, nameof( clrType ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance;
 
             var properties = new List<ClassProperty>();
-            var structuralProperties = new HashSet<string>( structuredType.StructuralProperties().Select( p => p.Name ), StringComparer.OrdinalIgnoreCase );
+            var structuralProperties = structuredType.Properties().ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
+            var clrTypeMatchesEdmType = true;
 
             foreach ( var property in clrType.GetProperties( bindingFlags ) )
             {
-                if ( structuralProperties.Contains( property.Name ) )
+                if ( !structuralProperties.TryGetValue( property.Name, out var structuralProperty ) )
                 {
-                    properties.Add( new ClassProperty( property ) );
+                    clrTypeMatchesEdmType = false;
+                    continue;
                 }
+
+                var propertyType = property.PropertyType;
+                var structuredTypeRef = structuralProperty.Type;
+
+                if ( structuredTypeRef.IsCollection() )
+                {
+                    var collectionType = structuredTypeRef.AsCollection();
+                    var elementType = collectionType.ElementType();
+
+                    if ( elementType.IsStructured() )
+                    {
+                        assemblies.Add( clrType.Assembly );
+
+                        var itemType = elementType.Definition.GetClrType( assemblies );
+                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion );
+
+                        if ( !itemType.Equals( newItemType ) )
+                        {
+                            propertyType = IEnumerableOfT.MakeGenericType( newItemType );
+                        }
+                    }
+                }
+                else if ( structuredTypeRef.IsStructured() )
+                {
+                    propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), property.PropertyType, apiVersion );
+                }
+
+                clrTypeMatchesEdmType &= property.PropertyType.Equals( propertyType );
+                properties.Add( new ClassProperty( property, propertyType ) );
             }
 
-            var name = clrType.FullName;
-            var signature = new ClassSignature( name, properties, apiVersion );
+            if ( clrTypeMatchesEdmType )
+            {
+                return clrType;
+            }
+
+            var signature = new ClassSignature( clrType.FullName, properties, apiVersion );
 
             return generatedTypes.GetOrAdd( signature, CreateFromSignature );
         }
 
-        internal Type NewActionParameters( IEdmAction action, ApiVersion apiVersion )
+        /// <inheritdoc />
+        public Type NewActionParameters( IEdmAction action, ApiVersion apiVersion )
         {
-            Contract.Requires( action != null );
-            Contract.Requires( apiVersion != null );
+            Arg.NotNull( action, nameof( action ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var name = action.FullName() + "Parameters";
