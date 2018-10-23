@@ -17,7 +17,7 @@
         internal ApiParameterContext(
             IModelMetadataProvider metadataProvider,
             ODataRouteBuilderContext routeContext,
-            ModelTypeBuilder modelTypeBuilder )
+            IModelTypeBuilder modelTypeBuilder )
         {
             Contract.Requires( metadataProvider != null );
             Contract.Requires( routeContext != null );
@@ -38,7 +38,7 @@
 
         internal IEnumerable<Assembly> Assemblies => RouteContext.Assemblies;
 
-        internal ModelTypeBuilder TypeBuilder { get; }
+        internal IModelTypeBuilder TypeBuilder { get; }
 
         internal ODataPathTemplate PathTemplate
         {

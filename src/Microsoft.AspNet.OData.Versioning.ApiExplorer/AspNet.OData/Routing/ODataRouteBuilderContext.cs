@@ -23,7 +23,7 @@
             ODataRoute route,
             HttpActionDescriptor actionDescriptor,
             IList<ApiParameterDescription> parameterDescriptions,
-            ModelTypeBuilder modelTypeBuilder,
+            IModelTypeBuilder modelTypeBuilder,
             ODataApiExplorerOptions options )
         {
             Contract.Requires( configuration != null );
@@ -65,12 +65,11 @@
             }
         }
 
-        void ConvertODataActionParametersToTypedModel( ModelTypeBuilder modelTypeBuilder, IEdmAction action )
+        void ConvertODataActionParametersToTypedModel( IModelTypeBuilder modelTypeBuilder, IEdmAction action )
         {
             Contract.Requires( modelTypeBuilder != null );
             Contract.Requires( action != null );
 
-            var actionParameters = typeof( ODataActionParameters );
             var apiVersion = new Lazy<ApiVersion>( () => EdmModel.GetAnnotationValue<ApiVersionAnnotation>( EdmModel ).ApiVersion );
 
             for ( var i = 0; i < ParameterDescriptions.Count; i++ )
@@ -78,7 +77,7 @@
                 var description = ParameterDescriptions[i];
                 var parameter = description.ParameterDescriptor;
 
-                if ( actionParameters.IsAssignableFrom( parameter.ParameterType ) )
+                if ( parameter.ParameterType.IsODataActionParameters() )
                 {
                     description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( action, apiVersion.Value ) );
                     break;
