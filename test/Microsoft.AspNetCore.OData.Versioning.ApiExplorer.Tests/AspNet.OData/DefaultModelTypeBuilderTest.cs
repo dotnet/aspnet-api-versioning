@@ -87,6 +87,29 @@
             innerType.Should().HaveProperty<string>( nameof( Contact.LastName ) );
         }
 
+        [Fact]
+        public void type_should_match_with_self_referencing_property_substitution()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var person = modelBuilder.EntitySet<Company>( "Companies" ).EntityType;
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof(Company);
+
+            //act
+            var subsitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            subsitutedType.GetRuntimeProperties().Should().HaveCount( 3 );
+            subsitutedType.Should().HaveProperty<int>( nameof(Company.CompanyId) );
+            subsitutedType.Should().HaveProperty<string>( nameof(Company.Name) );
+            subsitutedType = subsitutedType.GetRuntimeProperties().Single( p => p.Name == nameof( Company.ParentCompany ) ).PropertyType;
+            subsitutedType.GetRuntimeProperties().Should().HaveCount( 3 );
+            subsitutedType.Should().HaveProperty<int>( nameof(Company.CompanyId) );
+            subsitutedType.Should().HaveProperty<string>( nameof(Company.Name) );
+        }
+
         [Theory]
         [MemberData( nameof( SubstitutionData ) )]
         public void type_should_match_edm_with_child_entity_substitution( Type originalType )
