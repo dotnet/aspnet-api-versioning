@@ -13,6 +13,7 @@
   <IncludeBuildOutput>true</IncludeBuildOutput>
   <MinClientVersion>2.5</MinClientVersion>
   <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
+  <NoWarn>NU5118;$(NoWarn)</NoWarn>
  </PropertyGroup>
 
  <ItemGroup Label="NuGet">

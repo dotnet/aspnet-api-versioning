@@ -4,6 +4,18 @@
  <Target Name="GenerateReleaseNotes" BeforeTargets="GenerateNuspec" Label="NuGet">
 
   <PropertyGroup>
+   <ReleaseNotesFile>$(MSBuildProjectDirectory)\ReleaseNotes.txt</ReleaseNotesFile>
+  </PropertyGroup>
+  
+  <ReadLinesFromFile File="$(ReleaseNotesFile)" Condition="Exists('$(ReleaseNotesFile)')" >
+   <Output TaskParameter="Lines" ItemName="ReleaseNotes"/>
+  </ReadLinesFromFile>
+
+  <ItemGroup Condition=" @(ReleaseNotes->Count()) == 0 ">
+   <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v$(PackageVersion)" />
+  </ItemGroup>
+
+  <PropertyGroup>
    <ReleaseNoteCount>@(ReleaseNotes->Count())</ReleaseNoteCount>
    <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &lt; 2 " >@(ReleaseNotes->'%(Identity)')</PackageReleaseNotes>
    <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &gt; 1 " >@(ReleaseNotes->'• %(Identity)','%0D%0A')</PackageReleaseNotes>

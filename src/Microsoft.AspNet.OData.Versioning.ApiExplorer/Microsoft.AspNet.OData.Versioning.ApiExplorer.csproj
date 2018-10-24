@@ -16,10 +16,6 @@
  </ItemGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v3.0.0" />
- </ItemGroup>
-
- <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNet.OData.Versioning\Microsoft.AspNet.OData.Versioning.csproj" />
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.csproj" />
  </ItemGroup>
