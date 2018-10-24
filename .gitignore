@@ -20,6 +20,7 @@ x86/
 [Bb]in/
 [Oo]bj/
 [Ff]akes[Aa]ssemblies/
+*.binlog
 
 # ignore nuget packages folder
 /packages
