@@ -30,6 +30,7 @@
         readonly ICollection<Assembly> assemblies;
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
         readonly ConcurrentDictionary<ClassSignature, Type> generatedTypes = new ConcurrentDictionary<ClassSignature, Type>();
+        private readonly Dictionary<string, Type> passedTypes = new Dictionary<string, Type>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultModelTypeBuilder"/> class.
@@ -66,6 +67,14 @@
                 var propertyType = property.PropertyType;
                 var structuredTypeRef = structuralProperty.Type;
 
+                if ( passedTypes.TryGetValue(structuredTypeRef.ToString(), out var passedType) )
+                {
+                    properties.Add(new ClassProperty(property, passedType));
+                    continue;
+                }
+
+                passedTypes.Add(structuredTypeRef.ToString(), propertyType);
+
                 if ( structuredTypeRef.IsCollection() )
                 {
                     var collectionType = structuredTypeRef.AsCollection();
@@ -76,7 +85,7 @@
                         assemblies.Add( clrType.Assembly );
 
                         var itemType = elementType.Definition.GetClrType( assemblies );
-                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion );
+                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion);
 
                         if ( !itemType.Equals( newItemType ) )
                         {
@@ -86,7 +95,7 @@
                 }
                 else if ( structuredTypeRef.IsStructured() )
                 {
-                    propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), property.PropertyType, apiVersion );
+                    propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), property.PropertyType, apiVersion);
                 }
 
                 clrTypeMatchesEdmType &= property.PropertyType.Equals( propertyType );
