@@ -1,23 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
- <PropertyGroup>
-  <TargetFramework>net452</TargetFramework>
-  <RootNamespace>Microsoft</RootNamespace>
- </PropertyGroup>
-
- <ItemGroup>
-  <ProjectReference Include="..\..\src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj" />
- </ItemGroup>
-
- <ItemGroup>
-  <Reference Include="Microsoft.CSharp" />
-  <Reference Include="System" />
-  <Reference Include="System.ComponentModel.DataAnnotations" />
- </ItemGroup>
- 
- <ItemGroup>
-  <PackageReference Include="System.Runtime" Version="4.1.0" />
-  <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
- </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+    <RootNamespace>Microsoft</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Runtime" Version="4.1.0" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
+  </ItemGroup>
 </Project>

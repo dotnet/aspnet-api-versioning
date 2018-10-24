@@ -85,7 +85,7 @@
             innerType.Should().HaveProperty<int>( nameof( Contact.ContactId ) );
             innerType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
             innerType.Should().HaveProperty<string>( nameof( Contact.LastName ) );
-        }
+        }  
 
         [Fact]
         public void type_should_match_with_self_referencing_property_substitution()
