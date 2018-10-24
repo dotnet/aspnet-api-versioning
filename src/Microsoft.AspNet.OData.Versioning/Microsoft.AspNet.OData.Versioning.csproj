@@ -12,10 +12,6 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v3.0.0" />
- </ItemGroup>
-
- <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
  </ItemGroup>
 

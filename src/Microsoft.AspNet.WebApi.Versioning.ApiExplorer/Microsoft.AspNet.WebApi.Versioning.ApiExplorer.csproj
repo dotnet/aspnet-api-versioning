@@ -12,10 +12,6 @@
  </PropertyGroup>
 
  <ItemGroup>
-  <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v3.0.0" />
- </ItemGroup>
-
- <ItemGroup>
    <Compile Include="..\Shared\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
  </ItemGroup>
 
