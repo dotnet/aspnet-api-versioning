@@ -132,6 +132,47 @@
             innerType.Should().HaveProperty<string>( nameof( Contact.LastName ) );
         }
 
+        [Fact]
+        public void type_should_match_with_self_referencing_property_substitution()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+
+            modelBuilder.EntitySet<Company>( "Companies" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Company );
+
+            //act
+            var subsitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            subsitutedType.Should().Be( typeof( Company ) );
+        }
+
+        [Fact]
+        public void type_should_use_self_referencing_property_substitution()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var company = modelBuilder.EntitySet<Company>( "Companies" ).EntityType;
+
+            company.Ignore( c => c.DateFounded );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Company );
+
+            //act
+            var subsitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            subsitutedType.GetRuntimeProperties().Should().HaveCount( 4 );
+            subsitutedType.Should().HaveProperty<int>( nameof( Company.CompanyId ) );
+            subsitutedType.Should().HaveProperty<string>( nameof( Company.Name ) );
+            subsitutedType.Should().Be( subsitutedType.GetRuntimeProperty( nameof( Company.ParentCompany ) ).PropertyType );
+            subsitutedType.Should().Be( subsitutedType.GetRuntimeProperty( nameof( Company.Subsidiaries ) ).PropertyType.GetGenericArguments()[0] );
+        }
+
         [Theory]
         [MemberData( nameof( SubstitutionData ) )]
         public void type_should_match_edm_with_child_entity_substitution( Type originalType )
@@ -158,7 +199,7 @@
             nextType.Should().HaveProperty<string>( nameof( Contact.LastName ) );
             nextType.Should().HaveProperty<string>( nameof( Contact.Email ) );
             nextType.Should().HaveProperty<string>( nameof( Contact.Phone ) );
-            nextType = nextType.GetRuntimeProperties().Single( p => p.Name == nameof( Contact.Addresses ) ).PropertyType.GetGenericArguments()[0];
+            nextType = nextType.GetRuntimeProperty( nameof( Contact.Addresses ) ).PropertyType.GetGenericArguments()[0];
             nextType.GetRuntimeProperties().Should().HaveCount( 5 );
             nextType.Should().HaveProperty<int>( nameof( Address.AddressId ) );
             nextType.Should().HaveProperty<string>( nameof( Address.Street ) );
