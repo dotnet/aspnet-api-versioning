@@ -31,6 +31,51 @@
             substitutedType.Should().Be( originalType );
         }
 
+        [Fact]
+        public void substituted_type_should_be_extracted_from_parent_generic()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+
+            modelBuilder.EntitySet<Contact>( "Contacts" );
+            modelBuilder.EntityType<Address>();
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Delta<Contact> );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.Should().Be( typeof( Contact ) );
+        }
+
+        [Fact]
+        public void type_should_be_match_edm_when_extracted_and_substituted_from_parent_generic()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
+
+            contact.Ignore( p => p.Email );
+            contact.Ignore( p => p.Phone );
+            contact.Ignore( p => p.Addresses );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Delta<Contact> );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.Should().NotBe( originalType );
+            substitutedType.Should().NotBe( typeof( Contact ) );
+            substitutedType.GetRuntimeProperties().Should().HaveCount( 3 );
+            substitutedType.Should().HaveProperty<int>( nameof( Contact.ContactId ) );
+            substitutedType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
+            substitutedType.Should().HaveProperty<string>( nameof( Contact.LastName ) );
+        }
+
         [Theory]
         [MemberData( nameof( SubstitutionData ) )]
         public void type_should_match_edm_with_top_entity_substitution( Type originalType )
@@ -156,7 +201,6 @@
                 yield return new object[] { typeof( IEnumerable<string> ) };
                 yield return new object[] { typeof( IEnumerable<Contact> ) };
                 yield return new object[] { typeof( ODataValue<IEnumerable<Contact>> ) };
-                yield return new object[] { typeof( Delta<Contact> ) };
             }
         }
 
@@ -166,7 +210,6 @@
             {
                 yield return new object[] { typeof( IEnumerable<Contact> ) };
                 yield return new object[] { typeof( ODataValue<Contact> ) };
-                yield return new object[] { typeof( Delta<Contact> ) };
             }
         }
 
