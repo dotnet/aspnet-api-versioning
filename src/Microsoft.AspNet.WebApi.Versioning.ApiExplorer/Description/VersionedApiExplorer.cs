@@ -271,7 +271,10 @@
 
                 if ( Options.SubstituteApiVersionInUrl )
                 {
-                    UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( apiDescriptionGroup, Options.SubstitutionFormat );
+                    foreach ( var apiDescription in apiDescriptionGroup.ApiDescriptions )
+                    {
+                        apiDescription.TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
+                    }
                 }
             }
 
@@ -392,32 +395,6 @@
 
             expandedRouteTemplate = Uri.UnescapeDataString( boundRouteTemplate.BoundTemplate );
             return true;
-        }
-
-        static void UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( ApiDescriptionGroup apiDescriptionGroup, string apiVersionFormat )
-        {
-            Contract.Requires( apiDescriptionGroup != null );
-
-            foreach ( var apiDescription in apiDescriptionGroup.ApiDescriptions )
-            {
-                var parameter = apiDescription.ParameterDescriptions.FirstOrDefault( p => p.ParameterDescriptor is ApiVersionParameterDescriptor pd && pd.FromPath );
-
-                if ( parameter == null )
-                {
-                    continue;
-                }
-
-                var relativePath = apiDescription.RelativePath;
-                var token = '{' + parameter.ParameterDescriptor.ParameterName + '}';
-                var value = apiDescription.ApiVersion.ToString( apiVersionFormat, InvariantCulture );
-                var newRelativePath = relativePath.Replace( token, value );
-
-                if ( relativePath != newRelativePath )
-                {
-                    apiDescription.RelativePath = newRelativePath;
-                    apiDescription.ParameterDescriptions.Remove( parameter );
-                }
-            }
         }
 
         static IEnumerable<IHttpRoute> FlattenRoutes( IEnumerable<IHttpRoute> routes )
@@ -690,14 +667,6 @@
         {
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
-
-            var action = apiDescription.ActionDescriptor;
-            var model = action.GetApiVersionModel();
-
-            if ( model.IsApiVersionNeutral || ( model.DeclaredApiVersions.Count == 0 && action.ControllerDescriptor.IsApiVersionNeutral() ) )
-            {
-                return;
-            }
 
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, Options );

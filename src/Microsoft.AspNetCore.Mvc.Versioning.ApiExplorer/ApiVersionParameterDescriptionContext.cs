@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
@@ -17,6 +19,7 @@
     public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescriptionContext
     {
         readonly List<ApiParameterDescription> parameters = new List<ApiParameterDescription>( 1 );
+        readonly Lazy<bool> versionNeutral;
         bool optional;
 
         /// <summary>
@@ -43,6 +46,7 @@
             ModelMetadata = modelMetadata;
             Options = options;
             optional = options.AssumeDefaultVersionWhenUnspecified && apiVersion == options.DefaultApiVersion;
+            versionNeutral = new Lazy<bool>( TestIfApiVersionNeutral );
         }
 
         /// <summary>
@@ -57,6 +61,12 @@
         /// </summary>
         /// <value>The associated <see cref="ApiVersion">API version</see>.</value>
         protected ApiVersion ApiVersion { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the current API is version-neutral.
+        /// </summary>
+        /// <value>True if the current API is version-neutral; otherwise, false.</value>
+        protected bool IsApiVersionNeutral => versionNeutral.Value;
 
         /// <summary>
         /// Gets the model metadata for API version parameters.
@@ -93,20 +103,29 @@
         /// <param name="location">One of the <see cref="ApiVersionParameterLocation"/> values.</param>
         public virtual void AddParameter( string name, ApiVersionParameterLocation location )
         {
+            var add = default( Action<string> );
+
             switch ( location )
             {
                 case Query:
-                    AddQueryString( name );
+                    add = AddQueryString;
                     break;
                 case Header:
-                    AddHeader( name );
+                    add = AddHeader;
                     break;
                 case Path:
                     UpdateUrlSegment();
-                    break;
+                    return;
                 case MediaTypeParameter:
-                    AddMediaTypeParameter( name );
+                    add = AddMediaTypeParameter;
                     break;
+                default:
+                    return;
+            }
+
+            if ( Options.AddApiVersionParametersWhenVersionNeutral || !IsApiVersionNeutral )
+            {
+                add( name );
             }
         }
 
@@ -235,6 +254,26 @@
             parameters.Add( parameter );
 
             return parameter;
+        }
+
+        bool TestIfApiVersionNeutral()
+        {
+            var action = ApiDescription.ActionDescriptor;
+            var model = action.GetProperty<ApiVersionModel>();
+
+            if ( model.IsApiVersionNeutral )
+            {
+                return true;
+            }
+
+            if ( model.DeclaredApiVersions.Count > 0 )
+            {
+                return false;
+            }
+
+            model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
+
+            return model?.IsApiVersionNeutral == true;
         }
 
         void RemoveAllParametersExcept( ApiParameterDescription parameter )

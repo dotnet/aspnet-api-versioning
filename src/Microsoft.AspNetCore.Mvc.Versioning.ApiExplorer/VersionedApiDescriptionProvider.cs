@@ -97,23 +97,6 @@
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
-            var action = apiDescription.ActionDescriptor;
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model.IsApiVersionNeutral )
-            {
-                return;
-            }
-            else if ( model.DeclaredApiVersions.Count == 0 )
-            {
-                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-                if ( model?.IsApiVersionNeutral == true )
-                {
-                    return;
-                }
-            }
-
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
@@ -155,12 +138,7 @@
                     groupResult.GroupName = groupName;
                     groupResult.SetApiVersion( version );
                     PopulateApiVersionParameters( groupResult, version );
-
-                    if ( Options.SubstituteApiVersionInUrl )
-                    {
-                        UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( groupResult, Options.SubstitutionFormat );
-                    }
-
+                    groupResult.TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
                     groupResults.Add( groupResult );
                 }
             }
@@ -179,29 +157,6 @@
         /// <param name="context">The current <see cref="ApiDescriptionProviderContext">execution context</see>.</param>
         /// <remarks>The default implementation performs no operation.</remarks>
         public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context ) { }
-
-        static void UpdateRelativePathAndRemoveApiVersionParameterIfNecessary( ApiDescription apiDescription, string apiVersionFormat )
-        {
-            Contract.Requires( apiDescription != null );
-
-            var parameter = apiDescription.ParameterDescriptions.FirstOrDefault( pd => pd.Source == BindingSource.Path && pd.ModelMetadata?.DataTypeName == nameof( ApiVersion ) );
-
-            if ( parameter == null )
-            {
-                return;
-            }
-
-            var relativePath = apiDescription.RelativePath;
-            var token = '{' + parameter.Name + '}';
-            var value = apiDescription.GetApiVersion().ToString( apiVersionFormat, InvariantCulture );
-            var newRelativePath = relativePath.Replace( token, value );
-
-            if ( relativePath != newRelativePath )
-            {
-                apiDescription.RelativePath = newRelativePath;
-                apiDescription.ParameterDescriptions.Remove( parameter );
-            }
-        }
 
         IEnumerable<ApiVersion> FlattenApiVersions( IEnumerable<ApiDescription> descriptions )
         {

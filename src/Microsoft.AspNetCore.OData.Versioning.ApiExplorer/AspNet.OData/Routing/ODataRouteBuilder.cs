@@ -1,11 +1,8 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Routing.Template;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
-    using static System.Globalization.CultureInfo;
     using static System.String;
 
     partial class ODataRouteBuilder
@@ -17,31 +14,34 @@
             return Join( "/", segments );
         }
 
-        string UpdateRoutePrefixAndRemoveApiVersionParameterIfNecessary( string routePrefix )
+        static string RemoveRouteConstraints( string routePrefix )
         {
             Contract.Requires( !IsNullOrEmpty( routePrefix ) );
             Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
 
-            var parameters = Context.ParameterDescriptions;
-            var parameter = parameters.FirstOrDefault( pd => pd.Source == BindingSource.Path && pd.ModelMetadata?.DataTypeName == nameof( ApiVersion ) );
+            var parsedTemplate = TemplateParser.Parse( routePrefix );
+            var segments = new List<string>( parsedTemplate.Segments.Count );
 
-            if ( parameter == null )
+            foreach ( var segment in parsedTemplate.Segments )
             {
-                return routePrefix;
+                var currentSegment = Empty;
+
+                foreach ( var part in segment.Parts )
+                {
+                    if ( part.IsLiteral )
+                    {
+                        currentSegment += part.Text;
+                    }
+                    else if ( part.IsParameter )
+                    {
+                        currentSegment += Concat( "{", part.Name, "}" );
+                    }
+                }
+
+                segments.Add( currentSegment );
             }
 
-            var apiVersionFormat = Context.Options.SubstitutionFormat;
-            var token = Concat( '{', parameter.Name, '}' );
-            var value = Context.ApiVersion.ToString( apiVersionFormat, InvariantCulture );
-            var newRoutePrefix = routePrefix.Replace( token, value );
-
-            if ( routePrefix == newRoutePrefix )
-            {
-                return routePrefix;
-            }
-
-            parameters.Remove( parameter );
-            return newRoutePrefix;
+            return Join( "/", segments );
         }
     }
 }

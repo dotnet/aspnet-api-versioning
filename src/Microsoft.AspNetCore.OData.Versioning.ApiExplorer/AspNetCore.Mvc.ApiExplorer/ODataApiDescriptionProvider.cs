@@ -11,7 +11,10 @@
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.AspNetCore.Routing.Template;
     using Microsoft.Extensions.Options;
     using Microsoft.OData.Edm;
     using System;
@@ -54,12 +57,14 @@
         /// </summary>
         /// <param name="routeCollectionProvider">The <see cref="IODataRouteCollectionProvider">OData route collection provider</see> associated with the description provider.</param>
         /// <param name="partManager">The <see cref="ApplicationPartManager">application part manager</see> containing the configured application parts.</param>
+        /// <param name="inlineConstraintResolver">The <see cref="IInlineConstraintResolver">inline constraint resolver</see> used to parse route template constraints.</param>
         /// <param name="metadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
         /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ODataApiExplorerOptions">API explorer options</see>.</param>
         /// <param name="mvcOptions">A <see cref="IOptions{TOptions}">holder</see> containing the current <see cref="Mvc.MvcOptions">MVC options</see>.</param>
         public ODataApiDescriptionProvider(
             IODataRouteCollectionProvider routeCollectionProvider,
             ApplicationPartManager partManager,
+            IInlineConstraintResolver inlineConstraintResolver,
             IModelMetadataProvider metadataProvider,
             IOptions<ODataApiExplorerOptions> options,
             IOptions<MvcOptions> mvcOptions )
@@ -73,6 +78,7 @@
             RouteCollectionProvider = routeCollectionProvider;
             Assemblies = partManager.ApplicationParts.OfType<AssemblyPart>().Select( p => p.Assembly ).ToArray();
             ModelTypeBuilder = new DefaultModelTypeBuilder( Assemblies );
+            ConstraintResolver = inlineConstraintResolver;
             MetadataProvider = metadataProvider;
             this.options = options;
             MvcOptions = mvcOptions.Value;
@@ -98,6 +104,12 @@
         /// </summary>
         /// <value>The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</value>
         protected IModelMetadataProvider MetadataProvider { get; }
+
+        /// <summary>
+        /// Gets the object used to resolve inline constraints.
+        /// </summary>
+        /// <value>The associated <see cref="IInlineConstraintResolver">inline constraint resolver</see>.</value>
+        protected IInlineConstraintResolver ConstraintResolver { get; }
 
         /// <summary>
         /// Gets the options associated with the API explorer.
@@ -200,23 +212,6 @@
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
-            var action = apiDescription.ActionDescriptor;
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model.IsApiVersionNeutral )
-            {
-                return;
-            }
-            else if ( model.DeclaredApiVersions.Count == 0 )
-            {
-                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-                if ( model?.IsApiVersionNeutral == true )
-                {
-                    return;
-                }
-            }
-
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
@@ -315,6 +310,24 @@
             return action.FilterDescriptors.Select( fd => fd.Filter ).OfType<IApiResponseMetadataProvider>().ToArray();
         }
 
+        static string BuildRelativePath( ControllerActionDescriptor action, ODataRouteBuilderContext routeContext )
+        {
+            Contract.Requires( action != null );
+            Contract.Requires( routeContext != null );
+            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+
+            var relativePath = action.AttributeRouteInfo?.Template;
+
+            // note: if path happens to be built adhead of time, it's expected to be qualified; rebuild it as necessary
+            if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedOperationNames )
+            {
+                var builder = new ODataRouteBuilder( routeContext );
+                relativePath = builder.Build();
+            }
+
+            return relativePath;
+        }
+
         IEnumerable<ApiDescription> NewODataApiDescriptions( ControllerActionDescriptor action, string groupName, ODataRouteMapping mapping )
         {
             Contract.Requires( action != null );
@@ -364,6 +377,7 @@
 
                 PopulateApiVersionParameters( apiDescription, mapping.ApiVersion );
                 apiDescription.SetApiVersion( mapping.ApiVersion );
+                apiDescription.TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
                 yield return apiDescription;
             }
         }
@@ -410,6 +424,8 @@
                     context.Results.RemoveAt( i );
                 }
             }
+
+            ProcessRouteParameters( context );
 
             return context.Results;
         }
@@ -602,22 +618,81 @@
 
         ModelMetadata NewModelMetadata() => new ApiVersionModelMetadata( MetadataProvider, Options.DefaultApiVersionParameterDescription );
 
-        static string BuildRelativePath( ControllerActionDescriptor action, ODataRouteBuilderContext routeContext )
+        void ProcessRouteParameters( ApiParameterContext context )
         {
-            Contract.Requires( action != null );
-            Contract.Requires( routeContext != null );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            var prefix = context.RouteContext.Route.RoutePrefix;
 
-            var relativePath = action.AttributeRouteInfo?.Template;
-
-            // note: if path happens to be built adhead of time, it's expected to be qualified; rebuild it as necessary
-            if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedOperationNames )
+            if ( string.IsNullOrEmpty( prefix ) )
             {
-                var builder = new ODataRouteBuilder( routeContext );
-                relativePath = builder.Build();
+                return;
             }
 
-            return relativePath;
+            var routeTemplate = TemplateParser.Parse( prefix );
+            var routeParameters = new Dictionary<string, ApiParameterRouteInfo>( StringComparer.OrdinalIgnoreCase );
+
+            foreach ( var routeParameter in routeTemplate.Parameters )
+            {
+                routeParameters.Add( routeParameter.Name, CreateRouteInfo( routeParameter ) );
+            }
+
+            foreach ( var parameter in context.Results )
+            {
+                if ( parameter.Source == Path || parameter.Source == ModelBinding || parameter.Source == Custom )
+                {
+                    if ( routeParameters.TryGetValue( parameter.Name, out var routeInfo ) )
+                    {
+                        parameter.RouteInfo = routeInfo;
+                        routeParameters.Remove( parameter.Name );
+
+                        if ( parameter.Source == ModelBinding && !parameter.RouteInfo.IsOptional )
+                        {
+                            parameter.Source = Path;
+                        }
+                    }
+                }
+            }
+
+            foreach ( var routeParameter in routeParameters )
+            {
+                var result = new ApiParameterDescription()
+                {
+                    Name = routeParameter.Key,
+                    RouteInfo = routeParameter.Value,
+                    Source = Path,
+                };
+
+                context.Results.Add( result );
+
+                if ( !routeParameter.Value.Constraints.OfType<ApiVersionRouteConstraint>().Any() )
+                {
+                    continue;
+                }
+
+                var metadata = NewModelMetadata();
+
+                result.ModelMetadata = metadata;
+                result.Type = metadata.ModelType;
+            }
+        }
+
+        ApiParameterRouteInfo CreateRouteInfo( TemplatePart routeParameter )
+        {
+            var constraints = new List<IRouteConstraint>();
+
+            if ( routeParameter.InlineConstraints != null )
+            {
+                foreach ( var constraint in routeParameter.InlineConstraints )
+                {
+                    constraints.Add( ConstraintResolver.ResolveConstraint( constraint.Constraint ) );
+                }
+            }
+
+            return new ApiParameterRouteInfo()
+            {
+                Constraints = constraints,
+                DefaultValue = routeParameter.DefaultValue,
+                IsOptional = routeParameter.IsOptional || routeParameter.DefaultValue != null,
+            };
         }
     }
 }

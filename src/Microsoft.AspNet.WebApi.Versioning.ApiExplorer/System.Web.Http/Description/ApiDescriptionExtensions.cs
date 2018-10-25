@@ -3,6 +3,8 @@
     using Microsoft;
     using Microsoft.Web.Http.Description;
     using System.Diagnostics.Contracts;
+    using System.Linq;
+    using static System.Globalization.CultureInfo;
 
     /// <summary>
     /// Provides extension methods for the <see cref="ApiDescription"/> class.
@@ -50,6 +52,44 @@
         }
 
         /// <summary>
+        /// Attempts to update the relate path of the specified API description and remove the corresponding parameter according to the specified options.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to attempt to update.</param>
+        /// <param name="options">The current <see cref="ApiExplorerOptions">API Explorer options</see>.</param>
+        /// <returns>True if the <paramref name="apiDescription">API description</paramref> was updated; otherwise, false.</returns>
+        public static bool TryUpdateRelativePathAndRemoveApiVersionParameter( this ApiDescription apiDescription, ApiExplorerOptions options )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            Arg.NotNull( options, nameof( options ) );
+
+            if ( !options.SubstituteApiVersionInUrl || !( apiDescription is VersionedApiDescription versionedApiDescription ) )
+            {
+                return false;
+            }
+
+            var parameter = versionedApiDescription.ParameterDescriptions.FirstOrDefault( p => p.ParameterDescriptor is ApiVersionParameterDescriptor pd && pd.FromPath );
+
+            if ( parameter == null )
+            {
+                return false;
+            }
+
+            var relativePath = apiDescription.RelativePath;
+            var token = '{' + parameter.ParameterDescriptor.ParameterName + '}';
+            var value = versionedApiDescription.ApiVersion.ToString( options.SubstitutionFormat, InvariantCulture );
+            var newRelativePath = relativePath.Replace( token, value );
+
+            if ( relativePath == newRelativePath )
+            {
+                return false;
+            }
+
+            apiDescription.RelativePath = newRelativePath;
+            apiDescription.ParameterDescriptions.Remove( parameter );
+            return true;
+        }
+
+        /// <summary>
         /// Gets a property of the specified type from the API description.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type">type</see> of property to retrieve.</typeparam>
@@ -59,12 +99,12 @@
         {
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
 
-            if ( apiDescription.Properties.TryGetValue( typeof( T ), out object value ) )
+            if ( apiDescription.Properties.TryGetValue( typeof( T ), out var value ) )
             {
                 return (T) value;
             }
 
-            return default( T );
+            return default;
         }
 
         /// <summary>
