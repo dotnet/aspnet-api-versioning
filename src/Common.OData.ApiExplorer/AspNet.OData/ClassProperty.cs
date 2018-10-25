@@ -11,8 +11,8 @@
 
     struct ClassProperty
     {
+        readonly Type type;
         internal readonly string Name;
-        internal readonly Type Type;
 
         internal ClassProperty( PropertyInfo clrProperty, Type propertyType )
         {
@@ -20,7 +20,7 @@
             Contract.Requires( propertyType != null );
 
             Name = clrProperty.Name;
-            Type = propertyType;
+            type = propertyType;
             Attributes = AttributesFromProperty( clrProperty );
         }
 
@@ -30,11 +30,35 @@
             Contract.Requires( parameter != null );
 
             Name = parameter.Name;
-            Type = parameter.Type.Definition.GetClrType( assemblies );
+            type = parameter.Type.Definition.GetClrType( assemblies );
             Attributes = AttributesFromOperationParameter( parameter );
         }
 
         internal IEnumerable<CustomAttributeBuilder> Attributes { get; }
+
+        public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ type.GetHashCode();
+
+        public Type GetType( Type declaringType )
+        {
+            Contract.Requires( declaringType != null );
+            Contract.Ensures( Contract.Result<Type>() != null );
+
+            if ( type == DeclaringType.Value )
+            {
+                return declaringType;
+            }
+            else if ( type.IsGenericType )
+            {
+                var typeArgs = type.GetGenericArguments();
+
+                if ( typeArgs.Length == 1 && typeArgs[0] == DeclaringType.Value )
+                {
+                    return type.GetGenericTypeDefinition().MakeGenericType( declaringType );
+                }
+            }
+
+            return type;
+        }
 
         static IEnumerable<CustomAttributeBuilder> AttributesFromProperty( PropertyInfo clrProperty )
         {
@@ -93,7 +117,5 @@
 
             yield return new CustomAttributeBuilder( ctor, args );
         }
-
-        public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ Type.GetHashCode();
     }
 }

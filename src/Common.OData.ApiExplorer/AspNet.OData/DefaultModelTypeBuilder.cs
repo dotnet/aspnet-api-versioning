@@ -30,6 +30,7 @@
         readonly ICollection<Assembly> assemblies;
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
         readonly ConcurrentDictionary<ClassSignature, Type> generatedTypes = new ConcurrentDictionary<ClassSignature, Type>();
+        readonly Dictionary<EdmTypeKey, Type> visitedEdmTypes = new Dictionary<EdmTypeKey, Type>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultModelTypeBuilder"/> class.
@@ -49,6 +50,13 @@
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
+            var typeKey = new EdmTypeKey( structuredType, apiVersion );
+
+            if ( visitedEdmTypes.TryGetValue( typeKey, out var generatedType ) )
+            {
+                return generatedType;
+            }
+
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance;
 
             var properties = new List<ClassProperty>();
@@ -63,33 +71,19 @@
                     continue;
                 }
 
-                var propertyType = property.PropertyType;
                 var structuredTypeRef = structuralProperty.Type;
+                var propertyType = property.PropertyType;
 
                 if ( structuredTypeRef.IsCollection() )
                 {
-                    var collectionType = structuredTypeRef.AsCollection();
-                    var elementType = collectionType.ElementType();
-
-                    if ( elementType.IsStructured() )
-                    {
-                        assemblies.Add( clrType.Assembly );
-
-                        var itemType = elementType.Definition.GetClrType( assemblies );
-                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion );
-
-                        if ( !itemType.Equals( newItemType ) )
-                        {
-                            propertyType = IEnumerableOfT.MakeGenericType( newItemType );
-                        }
-                    }
+                    propertyType = NewStructuredTypeOrSelf( typeKey, structuredTypeRef.AsCollection(), propertyType, apiVersion );
                 }
                 else if ( structuredTypeRef.IsStructured() )
                 {
-                    propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), property.PropertyType, apiVersion );
+                    propertyType = NewStructuredTypeOrSelf( typeKey, structuredTypeRef.ToStructuredType(), propertyType, apiVersion );
                 }
 
-                clrTypeMatchesEdmType &= property.PropertyType.Equals( propertyType );
+                clrTypeMatchesEdmType &= propertyType.IsDeclaringType() || property.PropertyType.Equals( propertyType );
                 properties.Add( new ClassProperty( property, propertyType ) );
             }
 
@@ -100,7 +94,10 @@
 
             var signature = new ClassSignature( clrType.FullName, properties, apiVersion );
 
-            return generatedTypes.GetOrAdd( signature, CreateFromSignature );
+            generatedType = generatedTypes.GetOrAdd( signature, CreateFromSignature );
+            visitedEdmTypes.Add( typeKey, generatedType );
+
+            return generatedType;
         }
 
         /// <inheritdoc />
@@ -128,10 +125,12 @@
 
             foreach ( var property in @class.Properties )
             {
-                var field = typeBuilder.DefineField( "_" + property.Name, property.Type, FieldAttributes.Private );
-                var propertyBuilder = typeBuilder.DefineProperty( property.Name, PropertyAttributes.HasDefault, property.Type, null );
-                var getter = typeBuilder.DefineMethod( "get_" + property.Name, PropertyMethodAttributes, property.Type, Type.EmptyTypes );
-                var setter = typeBuilder.DefineMethod( "set_" + property.Name, PropertyMethodAttributes, null, new[] { property.Type } );
+                var type = property.GetType( typeBuilder );
+                var name = property.Name;
+                var field = typeBuilder.DefineField( "_" + name, type, FieldAttributes.Private );
+                var propertyBuilder = typeBuilder.DefineProperty( name, PropertyAttributes.HasDefault, type, null );
+                var getter = typeBuilder.DefineMethod( "get_" + name, PropertyMethodAttributes, type, Type.EmptyTypes );
+                var setter = typeBuilder.DefineMethod( "set_" + name, PropertyMethodAttributes, null, new[] { type } );
                 var il = getter.GetILGenerator();
 
                 il.Emit( OpCodes.Ldarg_0 );
@@ -154,6 +153,55 @@
             }
 
             return typeBuilder.CreateTypeInfo();
+        }
+
+        Type NewStructuredTypeOrSelf( EdmTypeKey declaringTypeKey, IEdmCollectionTypeReference collectionType, Type clrType, ApiVersion apiVersion )
+        {
+            Contract.Requires( collectionType != null );
+            Contract.Requires( clrType != null );
+            Contract.Requires( apiVersion != null );
+            Contract.Ensures( Contract.Result<Type>() != null );
+
+            var elementType = collectionType.ElementType();
+
+            if ( !elementType.IsStructured() )
+            {
+                return clrType;
+            }
+
+            var structuredType = elementType.ToStructuredType();
+
+            if ( declaringTypeKey == new EdmTypeKey( structuredType, apiVersion ) )
+            {
+                return IEnumerableOfT.MakeGenericType( DeclaringType.Value );
+            }
+
+            assemblies.Add( clrType.Assembly );
+
+            var itemType = elementType.Definition.GetClrType( assemblies );
+            var newItemType = NewStructuredType( structuredType, itemType, apiVersion );
+
+            if ( !itemType.Equals( newItemType ) )
+            {
+                clrType = IEnumerableOfT.MakeGenericType( newItemType );
+            }
+
+            return clrType;
+        }
+
+        Type NewStructuredTypeOrSelf( EdmTypeKey declaringTypeKey, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
+        {
+            Contract.Requires( structuredType != null );
+            Contract.Requires( clrType != null );
+            Contract.Requires( apiVersion != null );
+            Contract.Ensures( Contract.Result<Type>() != null );
+
+            if ( declaringTypeKey == new EdmTypeKey( structuredType, apiVersion ) )
+            {
+                return DeclaringType.Value;
+            }
+
+            return NewStructuredType( structuredType, clrType, apiVersion );
         }
 
         static ModuleBuilder CreateModuleForApiVersion( ApiVersion apiVersion )
