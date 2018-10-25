@@ -24,11 +24,11 @@
 
         internal ParameterDescriptor Parameter { get; }
 
-        private HashSet<PropertyKey> Visited { get; } = new HashSet<PropertyKey>( new PropertyKeyEqualityComparer() );
+        HashSet<PropertyKey> Visited { get; } = new HashSet<PropertyKey>( new PropertyKeyEqualityComparer() );
 
         internal void WalkParameter( ApiParameterDescriptionContext context ) => Visit( context, BindingSource.ModelBinding, containerName: string.Empty );
 
-        private static string GetName( string containerName, ApiParameterDescriptionContext metadata )
+        static string GetName( string containerName, ApiParameterDescriptionContext metadata )
         {
             if ( string.IsNullOrEmpty( metadata.BinderModelName ) )
             {
@@ -38,7 +38,7 @@
             return metadata.BinderModelName;
         }
 
-        private void Visit( ApiParameterDescriptionContext bindingContext, BindingSource ambientSource, string containerName )
+        void Visit( ApiParameterDescriptionContext bindingContext, BindingSource ambientSource, string containerName )
         {
             var source = bindingContext.BindingSource;
 

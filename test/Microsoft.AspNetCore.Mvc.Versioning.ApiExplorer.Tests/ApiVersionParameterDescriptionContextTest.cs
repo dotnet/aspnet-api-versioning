@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
     using Microsoft.AspNetCore.Mvc.Routing;
@@ -18,8 +19,8 @@
         public void add_parameter_should_add_descriptor_for_query_parameter()
         {
             // arrange
-            var description = new ApiDescription();
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -52,8 +53,8 @@
         public void add_parameter_should_add_descriptor_for_header()
         {
             // arrange
-            var description = new ApiDescription();
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -95,8 +96,8 @@
                 },
                 Source = BindingSource.Path
             };
-            var description = new ApiDescription() { ParameterDescriptions = { parameter } };
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version, parameter );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -139,8 +140,8 @@
                 },
                 Source = BindingSource.Path
             };
-            var description = new ApiDescription() { ParameterDescriptions = { parameter } };
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version, parameter );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -186,8 +187,8 @@
                 },
                 Source = BindingSource.Path
             };
-            var description = new ApiDescription() { ParameterDescriptions = { parameter } };
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version, parameter );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -211,24 +212,25 @@
         {
             // arrange
             const string Json = "application/json";
+            var version = new ApiVersion( 1, 0 );
             var description = new ApiDescription()
             {
+                ActionDescriptor = new ActionDescriptor() { Properties = { [typeof( ApiVersionModel )] = new ApiVersionModel( version ) } },
                 SupportedRequestFormats =
                 {
-                    new ApiRequestFormat() { MediaType = Json }
+                new ApiRequestFormat() { MediaType = Json }
                 },
                 SupportedResponseTypes =
                 {
-                    new ApiResponseType()
-                    {
-                        ApiResponseFormats =
+                new ApiResponseType()
+                {
+                    ApiResponseFormats =
                         {
                             new ApiResponseFormat() { MediaType = Json }
                         }
-                    }
+                }
                 }
             };
-            var version = new ApiVersion( 1, 0 );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -249,8 +251,8 @@
         public void add_parameter_should_add_optional_parameter_when_allowed()
         {
             // arrange
-            var description = new ApiDescription();
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -284,8 +286,8 @@
         public void add_parameter_should_make_parameters_optional_after_first_parameter()
         {
             // arrange
-            var description = new ApiDescription();
             var version = new ApiVersion( 1, 0 );
+            var description = NewApiDescription( version );
             var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
             var options = new ApiExplorerOptions()
             {
@@ -301,6 +303,22 @@
             // assert
             description.ParameterDescriptions[0].RouteInfo.IsOptional.Should().BeFalse();
             description.ParameterDescriptions[1].RouteInfo.IsOptional.Should().BeTrue();
+        }
+
+        static ApiDescription NewApiDescription( ApiVersion apiVersion, params ApiParameterDescription[] parameters )
+        {
+            var description = new ApiDescription();
+            var action = new ActionDescriptor();
+
+            action.SetProperty( new ApiVersionModel( apiVersion ) );
+            description.ActionDescriptor = action;
+
+            foreach ( var parameter in parameters )
+            {
+                description.ParameterDescriptions.Add( parameter );
+            }
+
+            return description;
         }
     }
 }

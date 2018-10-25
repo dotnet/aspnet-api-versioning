@@ -80,7 +80,7 @@
                 return;
             }
 
-            prefix = UpdateRoutePrefixAndRemoveApiVersionParameterIfNecessary( prefix );
+            prefix = RemoveRouteConstraints( prefix );
             segments.Add( prefix );
         }
 
