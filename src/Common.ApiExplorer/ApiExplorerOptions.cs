@@ -53,5 +53,22 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// <value>The default description for API version parameters. The default value
         /// is "The requested API version".</value>
         public string DefaultApiVersionParameterDescription { get; set; } = LocalSR.DefaultApiVersionParamDesc;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether API version parameters are added when an API is version-neutral.
+        /// </summary>
+        /// <value>True if API version parameters should be included when exploring a version-neutral API; otherwise, false.
+        /// The default value is <c>false</c>.</value>
+        /// <remarks>
+        /// <para>
+        /// A version-neutral API can accept any API version, including none at all. Setting this property to true
+        /// will enable exploring parameter descriptors for an API version that can be used to generate user input, which
+        /// may be useful for a version-neutral API that its own per-API version logic.
+        /// </para>
+        /// <para>
+        /// An API version defined using the URLsegment method is unaffected by this setting because path-based route
+        /// parameters are always required.
+        /// </para></remarks>
+        public bool AddApiVersionParametersWhenVersionNeutral { get; set; }
     }
 }
