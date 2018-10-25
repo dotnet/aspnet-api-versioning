@@ -3,15 +3,21 @@
 namespace Microsoft.Examples
 {
     using global::Owin;
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Configuration;
+    using Microsoft.OData;
+    using Microsoft.OData.UriParser;
     using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
     using System.IO;
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Description;
+    using static Microsoft.OData.ODataUrlKeyDelimiter;
+    using static Microsoft.OData.ServiceLifetime;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -28,8 +34,6 @@ namespace Microsoft.Examples
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
 
-            configuration.SetUrlKeyDelimiter( OData.ODataUrlKeyDelimiter.Parentheses );
-
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
             configuration.AddApiVersioning( o => o.ReportApiVersions = true );
 
@@ -38,7 +42,6 @@ namespace Microsoft.Examples
 
             var modelBuilder = new VersionedODataModelBuilder( configuration )
             {
-                ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
                 ModelConfigurations =
                 {
                     new AllConfigurations(),
@@ -51,10 +54,10 @@ namespace Microsoft.Examples
             // TODO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
 
             // WHEN VERSIONING BY: query string, header, or media type
-            configuration.MapVersionedODataRoutes( "odata", routePrefix, models );
+            configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureContainer );
 
             // WHEN VERSIONING BY: url segment
-            //configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureODataServices );
+            //configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureContainer );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
@@ -113,6 +116,12 @@ namespace Microsoft.Examples
                 var fileName = typeof( Startup ).GetTypeInfo().Assembly.GetName().Name + ".xml";
                 return Path.Combine( basePath, fileName );
             }
+        }
+
+        static void ConfigureContainer( IContainerBuilder builder )
+        {
+            builder.AddService<IODataPathHandler>( Singleton, sp => new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses } );
+            builder.AddService<ODataUriResolver>( Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver() { EnableCaseInsensitive = true } );
         }
     }
 }
