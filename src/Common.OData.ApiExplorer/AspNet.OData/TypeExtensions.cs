@@ -25,7 +25,6 @@
         static readonly Type ActionResultType = typeof( IActionResult );
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
-        static readonly Type DeltaOfT = typeof( Delta<> );
         static readonly Type ODataValueOfT = typeof( ODataValue<> );
 
         /// <summary>
@@ -56,7 +55,13 @@
                 }
 
                 var newType = context.ModelTypeBuilder.NewStructuredType( structuredType, innerType, apiVersion );
-                return innerType.Equals( newType ) ? type : CloseGeneric( openTypes, newType );
+
+                if ( innerType.Equals( newType ) )
+                {
+                    return type.ExtractInnerType() ? innerType : type;
+                }
+
+                return CloseGeneric( openTypes, newType );
             }
 
             if ( CanBeSubstituted( type ) )
@@ -101,10 +106,7 @@
 
             var typeArg = typeArgs[0];
 
-            if ( typeDef.Equals( IEnumerableOfT ) ||
-                 typeDef.Equals( DeltaOfT ) ||
-                 typeDef.Equals( ODataValueOfT ) ||
-                 typeDef.FullName.Equals( "Microsoft.AspNetCore.Mvc.ActionResult`1", Ordinal ) )
+            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() )
             {
                 innerType = typeArg;
             }
@@ -140,7 +142,14 @@
             Contract.Requires( openTypes.Count > 0 );
             Contract.Requires( innerType != null );
 
-            var type = openTypes.Pop().MakeGenericType( innerType );
+            var type = openTypes.Pop();
+
+            if ( type.ExtractInnerType() )
+            {
+                return innerType;
+            }
+
+            type = type.MakeGenericType( innerType );
 
             while ( openTypes.Count > 0 )
             {
@@ -158,7 +167,8 @@
                   !type.IsValueType &&
                   !type.Equals( VoidType ) &&
                   !type.Equals( ActionResultType ) &&
-                  !type.Equals( HttpResponseType );
+                  !type.Equals( HttpResponseType ) &&
+                  !type.IsODataActionParameters();
         }
 
         static bool IsEnumerable( this Type type, out Type itemType )
@@ -190,5 +200,11 @@
 
             return false;
         }
+
+        static bool IsActionResult( this Type type ) =>
+            type.IsGenericType &&
+            type.GetGenericTypeDefinition().FullName.Equals( "Microsoft.AspNetCore.Mvc.ActionResult`1", Ordinal );
+
+        static bool ExtractInnerType( this Type type ) => type.IsDelta() || type.IsActionResult();
     }
 }
