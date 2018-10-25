@@ -2,11 +2,17 @@
 
 namespace Microsoft.Examples
 {
-    using Configuration;
     using global::Owin;
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Batch;
     using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.Examples.Configuration;
+    using Microsoft.OData;
+    using Microsoft.OData.UriParser;
     using System.Web.Http;
+    using static Microsoft.OData.ODataUrlKeyDelimiter;
+    using static Microsoft.OData.ServiceLifetime;
 
     public class Startup
     {
@@ -20,7 +26,6 @@ namespace Microsoft.Examples
 
             var modelBuilder = new VersionedODataModelBuilder( configuration )
             {
-                ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
                 ModelConfigurations =
                 {
                     new PersonModelConfiguration(),
@@ -30,9 +35,15 @@ namespace Microsoft.Examples
             var models = modelBuilder.GetEdmModels();
             var batchHandler = new DefaultODataBatchHandler( httpServer );
 
-            configuration.MapVersionedODataRoutes( "odata", "api", models, batchHandler );
-            configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models );
+            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureContainer, batchHandler );
+            configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, ConfigureContainer );
             appBuilder.UseWebApi( httpServer );
+        }
+
+        static void ConfigureContainer( IContainerBuilder builder )
+        {
+            builder.AddService<IODataPathHandler>( Singleton, sp => new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses } );
+            builder.AddService<ODataUriResolver>( Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver() { EnableCaseInsensitive = true } );
         }
     }
 }
