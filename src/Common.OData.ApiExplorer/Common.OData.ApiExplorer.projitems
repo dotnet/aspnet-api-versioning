@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\IModelTypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\DefaultModelTypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ODataValue{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\PropertyDependency.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteActionType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilderContext.cs" />
