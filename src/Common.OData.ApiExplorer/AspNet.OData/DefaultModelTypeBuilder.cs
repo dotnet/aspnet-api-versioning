@@ -29,7 +29,7 @@
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         readonly ICollection<Assembly> assemblies;
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
-        readonly ConcurrentDictionary<EdmTypeKey, Type> generatedEdmTypes = new ConcurrentDictionary<EdmTypeKey, Type>();
+        readonly ConcurrentDictionary<EdmTypeKey, TypeInfo> generatedEdmTypes = new ConcurrentDictionary<EdmTypeKey, TypeInfo>();
         readonly ConcurrentDictionary<EdmTypeKey, TypeBuilder> unfinishedTypes = new ConcurrentDictionary<EdmTypeKey, TypeBuilder>();
         readonly HashSet<EdmTypeKey> visitedEdmTypes = new HashSet<EdmTypeKey>();
         readonly Dictionary<EdmTypeKey, List<PropertyDependency>> dependencies = new Dictionary<EdmTypeKey, List<PropertyDependency>>();
@@ -67,7 +67,7 @@
             var structuralProperties = structuredType.Properties().ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
             var clrTypeMatchesEdmType = true;
             var hasUnfinishedTypes = false;
-            var dependentProperties = new List<Tuple<EdmTypeKey, bool, string>>();
+            var dependentProperties = new List<PropertyDependency>();
 
             foreach ( var property in clrType.GetProperties( bindingFlags ) )
             {
@@ -98,8 +98,8 @@
                         {
                             clrTypeMatchesEdmType = false;
                             hasUnfinishedTypes = true;
-                            var dependencyTuple = new Tuple<EdmTypeKey, bool, string>( elementKey, true, property.Name );
-                            dependentProperties.Add( dependencyTuple );
+                            var dependency = new PropertyDependency( elementKey, true, property.Name );
+                            dependentProperties.Add( dependency );
                             continue;
                         }
 
@@ -130,8 +130,8 @@
                     {
                         clrTypeMatchesEdmType = false;
                         hasUnfinishedTypes = true;
-                        var dependencyTuple = new Tuple<EdmTypeKey, bool, string>( propertyTypeKey, false, property.Name );
-                        dependentProperties.Add( dependencyTuple );
+                        var dependency = new PropertyDependency( propertyTypeKey, false, property.Name );
+                        dependentProperties.Add( dependency );
                         continue;
                     }
                 }
@@ -152,15 +152,14 @@
                 if ( !unfinishedTypes.TryGetValue( typeKey, out var typeBuilder ) )
                 {
                     typeBuilder = CreateTypeBuilderFromSignature( signature );
-                    var newPropertyDependencies = new List<PropertyDependency>();
-                    foreach ( var dependencyTuple in dependentProperties )
+
+                    foreach ( var propertyDependency in dependentProperties )
                     {
-                        newPropertyDependencies.Add( new PropertyDependency( typeBuilder, dependencyTuple.Item1, dependencyTuple.Item2, dependencyTuple.Item3 ) );
+                        propertyDependency.DependentType = typeBuilder;
                     }
 
-                    dependencies.Add( typeKey, newPropertyDependencies );
-                    unfinishedTypes.GetOrAdd( typeKey, typeBuilder );
-
+                    dependencies.Add( typeKey, dependentProperties );
+                    ResolveForUnfinishedTypes();
                     return ResolveDependencies( typeBuilder, typeKey );
                 }
 
@@ -218,6 +217,7 @@
         private Type ResolveDependencies( TypeBuilder typeBuilder, EdmTypeKey typeKey )
         {
             var keys = dependencies.Keys.ToList();
+            unfinishedTypes.GetOrAdd( typeKey, typeBuilder );
 
             foreach ( var key in keys )
             {
@@ -255,9 +255,25 @@
                         }
                     }
                 }
+
+                if ( !dependencies.ContainsKey( typeKey ) )
+                {
+                    var typeInfo = typeBuilder.CreateTypeInfo();
+                    generatedEdmTypes.GetOrAdd( key, typeInfo );
+                    return typeBuilder.CreateTypeInfo();
+                }
             }
 
             return typeBuilder;
+        }
+
+        private void ResolveForUnfinishedTypes()
+        {
+            var keys = unfinishedTypes.Keys;
+            foreach ( var key in keys )
+            {
+                ResolveDependencies(unfinishedTypes[key], key);
+            }
         }
 
         static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name )
