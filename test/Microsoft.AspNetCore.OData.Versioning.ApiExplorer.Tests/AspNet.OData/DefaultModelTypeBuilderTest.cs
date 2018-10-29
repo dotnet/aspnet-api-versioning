@@ -133,24 +133,6 @@
         }
 
         [Fact]
-        public void type_should_match_with_self_referencing_property_substitution()
-        {
-            // arrange
-            var modelBuilder = new ODataConventionModelBuilder();
-
-            modelBuilder.EntitySet<Company>( "Companies" );
-
-            var context = NewContext( modelBuilder.GetEdmModel() );
-            var originalType = typeof( Company );
-
-            //act
-            var subsitutedType = originalType.SubstituteIfNecessary( context );
-
-            // assert
-            subsitutedType.Should().Be( typeof( Company ) );
-        }
-
-        [Fact]
         public void type_should_use_self_referencing_property_substitution()
         {
             // arrange

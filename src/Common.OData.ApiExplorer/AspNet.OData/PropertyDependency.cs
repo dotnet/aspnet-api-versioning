@@ -14,7 +14,7 @@ namespace Microsoft.AspNet.OData
         /// <param name="dependentOnTypeKey">The key of the type the property has a dependency on.</param>
         /// <param name="propertyName">The name of the property.</param>
         /// <param name="isCollection">Whether the property is a collection or not.</param>
-        internal PropertyDependency( TypeBuilder dependentType, EdmTypeKey dependentOnTypeKey, string propertyName, bool isCollection )
+        internal PropertyDependency( TypeBuilder dependentType, EdmTypeKey dependentOnTypeKey,  bool isCollection, string propertyName )
         {
             Arg.NotNull<TypeBuilder>( dependentType, nameof(dependentType) );
             Arg.NotNull<EdmTypeKey>( dependentOnTypeKey, nameof( dependentOnTypeKey ) );
