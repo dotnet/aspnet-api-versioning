@@ -82,25 +82,6 @@
             item2 = tuple.Item2;
         }
 
-        internal static bool IsDeclaringType( this Type type )
-        {
-            Contract.Requires( type != null );
-
-            if ( type == DeclaringType.Value )
-            {
-                return true;
-            }
-
-            if ( !type.IsGenericType )
-            {
-                return false;
-            }
-
-            var typeArgs = type.GetGenericArguments();
-
-            return typeArgs.Length == 1 && typeArgs[0] == DeclaringType.Value;
-        }
-
         static bool IsSubstitutableGeneric( Type type, Stack<Type> openTypes, out Type innerType )
         {
             Contract.Requires( type != null );
