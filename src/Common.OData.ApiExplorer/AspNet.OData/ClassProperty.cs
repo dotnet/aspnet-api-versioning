@@ -38,17 +38,8 @@
 
         public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ type.GetHashCode();
 
-        public Type GetType( Type declaringType )
+        public Type GetPropertyType()
         {
-            Contract.Requires( declaringType != null );
-            Contract.Ensures( Contract.Result<Type>() != null );
-
-            if ( type.IsGenericType )
-            {
-                var typeArgs = type.GetGenericArguments();
-                return type.GetGenericTypeDefinition().MakeGenericType( declaringType );
-            }
-
             return type;
         }
 
