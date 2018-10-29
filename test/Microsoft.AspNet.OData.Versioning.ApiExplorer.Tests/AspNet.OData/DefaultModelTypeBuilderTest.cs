@@ -173,6 +173,31 @@
             subsitutedType.Should().Be( subsitutedType.GetRuntimeProperty( nameof( Company.Subsidiaries ) ).PropertyType.GetGenericArguments()[0] );
         }
 
+        [Fact]
+        public void type_should_use_back_referencing_property_substitution()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var employer = modelBuilder.EntitySet<Employer>( "Employers" ).EntityType;
+
+            employer.Ignore( e => e.Birthday );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Employer );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.GetRuntimeProperties().Should().HaveCount( 4 );
+            substitutedType.Should().HaveProperty<int>( nameof( Employer.EmployerId ) );
+            substitutedType.Should().HaveProperty<string>( nameof( Employer.FirstName ) );
+            substitutedType.Should().HaveProperty<string>( nameof( Employer.LastName ) );
+
+            var employees = substitutedType.GetProperty( nameof( Employer.Employees ) ).PropertyType.GetGenericArguments()[0];
+            substitutedType.Should().Be( employees.GetProperty( nameof( Employee.Employer ) ).PropertyType );
+        }
+
         [Theory]
         [MemberData( nameof( SubstitutionData ) )]
         public void type_should_match_edm_with_child_entity_substitution( Type originalType )
