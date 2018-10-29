@@ -43,18 +43,10 @@
             Contract.Requires( declaringType != null );
             Contract.Ensures( Contract.Result<Type>() != null );
 
-            if ( type == DeclaringType.Value )
-            {
-                return declaringType;
-            }
-            else if ( type.IsGenericType )
+            if ( type.IsGenericType )
             {
                 var typeArgs = type.GetGenericArguments();
-
-                if ( typeArgs.Length == 1 && typeArgs[0] == DeclaringType.Value )
-                {
-                    return type.GetGenericTypeDefinition().MakeGenericType( declaringType );
-                }
+                return type.GetGenericTypeDefinition().MakeGenericType( declaringType );
             }
 
             return type;

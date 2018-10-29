@@ -136,7 +136,7 @@
                     }
                 }
 
-                clrTypeMatchesEdmType &= propertyType.IsDeclaringType() || property.PropertyType.Equals( propertyType );
+                clrTypeMatchesEdmType &= property.PropertyType.Equals( propertyType );
                 properties.Add( new ClassProperty( property, propertyType ) );
             }
 

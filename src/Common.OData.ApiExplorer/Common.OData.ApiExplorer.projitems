@@ -11,7 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassSignature.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\DeclaringType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\EdmTypeKey.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\IModelTypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\DefaultModelTypeBuilder.cs" />
