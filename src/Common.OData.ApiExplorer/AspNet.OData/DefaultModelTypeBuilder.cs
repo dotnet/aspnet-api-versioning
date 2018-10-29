@@ -67,7 +67,7 @@
             var structuralProperties = structuredType.Properties().ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
             var clrTypeMatchesEdmType = true;
             var hasUnfinishedTypes = false;
-            var dependentProperties = new Dictionary<string, Tuple<EdmTypeKey, bool>>();
+            var dependentProperties = new List<Tuple<EdmTypeKey, bool, string>>();
 
             foreach ( var property in clrType.GetProperties( bindingFlags ) )
             {
@@ -98,8 +98,8 @@
                         {
                             clrTypeMatchesEdmType = false;
                             hasUnfinishedTypes = true;
-                            var keyTuple = new Tuple<EdmTypeKey, bool>( elementKey, true );
-                            dependentProperties.Add(property.Name,  keyTuple );
+                            var dependencyTuple = new Tuple<EdmTypeKey, bool, string>( elementKey, true, property.Name );
+                            dependentProperties.Add( dependencyTuple );
                             continue;
                         }
 
@@ -130,8 +130,8 @@
                     {
                         clrTypeMatchesEdmType = false;
                         hasUnfinishedTypes = true;
-                        var keyTuple = new Tuple<EdmTypeKey, bool>( propertyTypeKey, false );
-                        dependentProperties.Add(property.Name, keyTuple );
+                        var dependencyTuple = new Tuple<EdmTypeKey, bool, string>( propertyTypeKey, false, property.Name );
+                        dependentProperties.Add( dependencyTuple );
                         continue;
                     }
                 }
@@ -153,10 +153,9 @@
                 {
                     typeBuilder = CreateTypeBuilderFromSignature( signature );
                     var newPropertyDependencies = new List<PropertyDependency>();
-                    foreach ( var name in dependentProperties.Keys )
+                    foreach ( var dependencyTuple in dependentProperties )
                     {
-                        var keyTuple = dependentProperties[name];
-                        newPropertyDependencies.Add( new PropertyDependency( typeBuilder, keyTuple.Item1, name, keyTuple.Item2 ) );
+                        newPropertyDependencies.Add( new PropertyDependency( typeBuilder, dependencyTuple.Item1, dependencyTuple.Item2, dependencyTuple.Item3 ) );
                     }
 
                     dependencies.Add( typeKey, newPropertyDependencies );
