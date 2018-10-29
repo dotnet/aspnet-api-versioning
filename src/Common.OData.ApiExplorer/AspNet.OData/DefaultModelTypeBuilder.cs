@@ -113,6 +113,7 @@
                         if ( !itemType.Equals( newItemType ) )
                         {
                             propertyType = IEnumerableOfT.MakeGenericType( newItemType );
+                            clrTypeMatchesEdmType = false;
                         }
                     }
                 }
@@ -201,7 +202,7 @@
 
             foreach ( var property in @class.Properties )
             {
-                var type = property.GetType( typeBuilder );
+                var type = property.GetPropertyType();
                 var name = property.Name;
                 var propertyBuilder = AddProperty( typeBuilder, type, name );
 
