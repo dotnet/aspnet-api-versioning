@@ -30,7 +30,18 @@
             Contract.Requires( parameter != null );
 
             Name = parameter.Name;
-            type = parameter.Type.Definition.GetClrType( assemblies );
+
+            if ( parameter.Type.IsCollection() )
+            {
+                var collectionType = parameter.Type.AsCollection();
+                var elementType = collectionType.ElementType().Definition.GetClrType( assemblies );
+                type = typeof( IEnumerable<> ).MakeGenericType( elementType );
+            }
+            else
+            {
+                type = parameter.Type.Definition.GetClrType( assemblies );
+            }
+
             Attributes = AttributesFromOperationParameter( parameter );
         }
 

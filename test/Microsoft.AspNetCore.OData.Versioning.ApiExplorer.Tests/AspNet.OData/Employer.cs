@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 namespace Microsoft.AspNet.OData
 {
+    using System;
+    using System.Collections.Generic;
+
     public class Employer
     {
         public int EmployerId { get; set; }
