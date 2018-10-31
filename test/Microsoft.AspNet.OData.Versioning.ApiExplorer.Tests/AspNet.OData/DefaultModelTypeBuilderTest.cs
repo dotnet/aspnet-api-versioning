@@ -242,6 +242,33 @@
             substitutionType.Should().HaveProperty<bool>( "callbackRequired" );
         }
 
+        [Fact]
+        public void substitute_should_generate_type_for_action_parameters_with_collection_parameters()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
+            var action = contact.Action( "PlanMeeting" );
+
+            action.Parameter<DateTime>( "when" );
+            action.CollectionParameter<Contact>( "attendees" );
+            action.CollectionParameter<string>( "topics" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var model = context.Model;
+            var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
+            var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
+
+            // act
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( operation, ApiVersion.Default );
+
+            // assert
+            substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
+            substitutionType.Should().HaveProperty<DateTimeOffset>( "when" );
+            substitutionType.Should().HaveProperty<IEnumerable<Contact>>( "attendees" );
+            substitutionType.Should().HaveProperty<IEnumerable<string>>( "topics" );
+        }
+
         public static IEnumerable<object[]> SubstitutionNotRequiredData
         {
             get
