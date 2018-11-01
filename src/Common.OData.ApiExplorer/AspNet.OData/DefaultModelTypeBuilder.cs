@@ -173,6 +173,7 @@
         /// <inheritdoc />
         public Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion )
         {
+            Arg.NotNull( services, nameof( services ) );
             Arg.NotNull( action, nameof( action ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
             Contract.Ensures( Contract.Result<Type>() != null );
@@ -202,7 +203,7 @@
 
             foreach ( var property in @class.Properties )
             {
-                var type = property.GetPropertyType();
+                var type = property.Type;
                 var name = property.Name;
                 var propertyBuilder = AddProperty( typeBuilder, type, name );
 
