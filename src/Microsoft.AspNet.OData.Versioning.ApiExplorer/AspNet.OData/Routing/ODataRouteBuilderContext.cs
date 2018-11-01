@@ -79,7 +79,7 @@
 
                 if ( parameter.ParameterType.IsODataActionParameters() )
                 {
-                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( action, apiVersion.Value ) );
+                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( serviceProvider, action, apiVersion.Value ) );
                     break;
                 }
             }
