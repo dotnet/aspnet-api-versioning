@@ -11,7 +11,7 @@
 
     struct ClassProperty
     {
-        readonly Type type;
+        internal readonly Type Type;
         internal readonly string Name;
 
         internal ClassProperty( PropertyInfo clrProperty, Type propertyType )
@@ -20,14 +20,16 @@
             Contract.Requires( propertyType != null );
 
             Name = clrProperty.Name;
-            type = propertyType;
+            Type = propertyType;
             Attributes = AttributesFromProperty( clrProperty );
         }
 
         internal ClassProperty( IServiceProvider services, IEnumerable<Assembly> assemblies, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
         {
+            Contract.Requires( services != null );
             Contract.Requires( assemblies != null );
             Contract.Requires( parameter != null );
+            Contract.Requires( typeBuilder != null );
 
             Name = parameter.Name;
             var context = new TypeSubstitutionContext( services, assemblies, typeBuilder );
@@ -38,13 +40,13 @@
                 var elementType = collectionType.ElementType().Definition.GetClrType( assemblies );
                 var substitutedType = elementType.SubstituteIfNecessary( context );
 
-                type = typeof( IEnumerable<> ).MakeGenericType( substitutedType );
+                Type = typeof( IEnumerable<> ).MakeGenericType( substitutedType );
             }
             else
             {
                 var parameterType = parameter.Type.Definition.GetClrType( assemblies );
 
-                type = parameterType.SubstituteIfNecessary( context );
+                Type = parameterType.SubstituteIfNecessary( context );
             }
 
             Attributes = AttributesFromOperationParameter( parameter );
@@ -52,12 +54,7 @@
 
         internal IEnumerable<CustomAttributeBuilder> Attributes { get; }
 
-        public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ type.GetHashCode();
-
-        public Type GetPropertyType()
-        {
-            return type;
-        }
+        public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ Type.GetHashCode();
 
         static IEnumerable<CustomAttributeBuilder> AttributesFromProperty( PropertyInfo clrProperty )
         {
