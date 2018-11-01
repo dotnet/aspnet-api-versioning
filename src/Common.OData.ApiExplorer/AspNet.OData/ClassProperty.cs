@@ -24,22 +24,27 @@
             Attributes = AttributesFromProperty( clrProperty );
         }
 
-        internal ClassProperty( IEnumerable<Assembly> assemblies, IEdmOperationParameter parameter )
+        internal ClassProperty( IServiceProvider services, IEnumerable<Assembly> assemblies, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
         {
             Contract.Requires( assemblies != null );
             Contract.Requires( parameter != null );
 
             Name = parameter.Name;
+            var context = new TypeSubstitutionContext( services, assemblies, typeBuilder );
 
             if ( parameter.Type.IsCollection() )
             {
                 var collectionType = parameter.Type.AsCollection();
                 var elementType = collectionType.ElementType().Definition.GetClrType( assemblies );
-                type = typeof( IEnumerable<> ).MakeGenericType( elementType );
+                var substitutedType = elementType.SubstituteIfNecessary( context );
+
+                type = typeof( IEnumerable<> ).MakeGenericType( substitutedType );
             }
             else
             {
-                type = parameter.Type.Definition.GetClrType( assemblies );
+                var parameterType = parameter.Type.Definition.GetClrType( assemblies );
+
+                type = parameterType.SubstituteIfNecessary( context );
             }
 
             Attributes = AttributesFromOperationParameter( parameter );

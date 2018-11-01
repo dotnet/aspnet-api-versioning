@@ -88,7 +88,7 @@
             {
                 var action = (IEdmAction) Context.RouteContext.Operation;
                 var apiVersion = Context.RouteContext.ApiVersion;
-                type = Context.TypeBuilder.NewActionParameters( action, apiVersion );
+                type = Context.TypeBuilder.NewActionParameters( Context.Services, action, apiVersion );
             }
             else
             {

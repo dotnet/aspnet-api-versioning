@@ -8,6 +8,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Microsoft.Extensions.DependencyInjection;
     using Xunit;
 
     public class DefaultModelTypeBuilderTest
@@ -231,15 +232,54 @@
             var model = context.Model;
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
+            var services = new ServiceCollection();
+            services.AddSingleton( model );
 
             // act
-            var substitutionType = context.ModelTypeBuilder.NewActionParameters( operation, ApiVersion.Default );
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default );
 
             // assert
             substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
             substitutionType.Should().HaveProperty<DateTimeOffset>( "when" );
             substitutionType.Should().HaveProperty<string>( "contactedBy" );
             substitutionType.Should().HaveProperty<bool>( "callbackRequired" );
+        }
+
+        [Fact]
+        public void substitute_should_generate_type_for_action_parameters_with_substituted_types()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
+            contact.Ignore( c => c.Email  );
+            var action = contact.Action( "PlanInterview" );
+
+            action.Parameter<DateTime>( "when" );
+            action.Parameter<Contact>( "interviewer" );
+            action.Parameter<Contact>( "interviewee" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var model = context.Model;
+            var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
+            var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
+            var services = new ServiceCollection();
+            services.AddSingleton( model );
+
+            // act
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default );
+
+            // assert
+            substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
+            substitutionType.Should().HaveProperty<DateTimeOffset>( "when" );
+            var contactType = substitutionType.GetRuntimeProperty( "interviewer" ).PropertyType;
+            contactType.Should().Be( substitutionType.GetRuntimeProperty( "interviewee" ).PropertyType );
+
+            contactType.GetRuntimeProperties().Should().HaveCount( 5 );
+            contactType.Should().HaveProperty<int>( "ContactId" );
+            contactType.Should().HaveProperty<string>( "FirstName" );
+            contactType.Should().HaveProperty<string>( "LastName" );
+            contactType.Should().HaveProperty<string>( "Phone" );
+            contactType.Should().HaveProperty<List<Address>>( "Addresses" );
         }
 
         [Fact]
@@ -258,9 +298,11 @@
             var model = context.Model;
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
+            var services = new ServiceCollection();
+            services.AddSingleton( model );
 
             // act
-            var substitutionType = context.ModelTypeBuilder.NewActionParameters( operation, ApiVersion.Default );
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default );
 
             // assert
             substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
