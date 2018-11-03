@@ -46,7 +46,7 @@
             ModelMetadata = modelMetadata;
             Options = options;
             optional = options.AssumeDefaultVersionWhenUnspecified && apiVersion == options.DefaultApiVersion;
-            versionNeutral = new Lazy<bool>( TestIfApiVersionNeutral );
+            versionNeutral = new Lazy<bool>( () => ApiDescription.ActionDescriptor.GetApiVersionModel().IsApiVersionNeutral );
         }
 
         /// <summary>
@@ -254,26 +254,6 @@
             parameters.Add( parameter );
 
             return parameter;
-        }
-
-        bool TestIfApiVersionNeutral()
-        {
-            var action = ApiDescription.ActionDescriptor;
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model.IsApiVersionNeutral )
-            {
-                return true;
-            }
-
-            if ( model.DeclaredApiVersions.Count > 0 )
-            {
-                return false;
-            }
-
-            model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-            return model?.IsApiVersionNeutral == true;
         }
 
         void RemoveAllParametersExcept( ApiParameterDescription parameter )

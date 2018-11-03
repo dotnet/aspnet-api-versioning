@@ -1,9 +1,12 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Abstractions
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
-    using System;
-    using System.Linq;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using System;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
+    using static System.Linq.Enumerable;
 
     /// <summary>
     /// Provides extension methods for the <see cref="ActionDescriptor"/> class.
@@ -12,68 +15,91 @@
     public static class ActionDescriptorExtensions
     {
         /// <summary>
-        /// Returns a value indicating whether the provided action implicitly maps to the specified version.
+        /// Gets the API version information associated with a action.
         /// </summary>
         /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
-        /// <param name="version">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
-        /// <returns>True if the <paramref name="action"/> implicitly maps to the specified <paramref name="version"/>; otherwise, false.</returns>
-        public static bool IsImplicitlyMappedTo( this ActionDescriptor action, ApiVersion version )
+        /// <returns>The <see cref="ApiVersionModel">API version information</see> for the action.</returns>
+        public static ApiVersionModel GetApiVersionModel( this ActionDescriptor action ) => action.GetApiVersionModel( Explicit );
+
+        /// <summary>
+        /// Gets the API version information associated with a action.
+        /// </summary>
+        /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
+        /// <param name="mapping">One or more of the <see cref="ApiVersionMapping"/> values.</param>
+        /// <returns>The <see cref="ApiVersionModel">API version information</see> for the action.</returns>
+        public static ApiVersionModel GetApiVersionModel( this ActionDescriptor action, ApiVersionMapping mapping )
         {
             Arg.NotNull( action, nameof( action ) );
+            Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
 
-            if ( version == null )
+            switch ( mapping )
             {
-                return false;
+                case Explicit:
+                    return action.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
+                case Implicit:
+                    return action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
+                case Explicit | Implicit:
+
+                    var model = action.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
+
+                    if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Count > 0 )
+                    {
+                        return model;
+                    }
+
+                    var implicitModel = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
+
+                    return new ApiVersionModel(
+                        implicitModel.DeclaredApiVersions,
+                        model.SupportedApiVersions,
+                        model.DeprecatedApiVersions,
+                        Empty<ApiVersion>(),
+                        Empty<ApiVersion>() );
             }
 
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model != null && model.DeclaredApiVersions.Count > 0 )
-            {
-                return false;
-            }
-
-            model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-            return model != null && model.DeclaredApiVersions.Contains( version );
+            return ApiVersionModel.Empty;
         }
 
         /// <summary>
-        /// Returns a value indicating whether the provided action maps to the specified version.
+        /// Returns a value indicating whether the provided action maps to the specified API version.
         /// </summary>
         /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
-        /// <param name="version">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
-        /// <returns>True if the <paramref name="action"/> maps to the specified <paramref name="version"/>; otherwise, false.</returns>
-        public static bool IsMappedTo( this ActionDescriptor action, ApiVersion version )
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
+        /// <returns>One of the <see cref="ApiVersionMapping"/> values.</returns>
+        public static ApiVersionMapping MappingTo( this ActionDescriptor action, ApiVersion apiVersion )
         {
             Arg.NotNull( action, nameof( action ) );
 
-            if ( version == null )
+            var model = action.GetApiVersionModel();
+
+            if ( model.IsApiVersionNeutral || ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) ) )
             {
-                return false;
+                return Explicit;
+            }
+            else if ( model.DeclaredApiVersions.Count == 0 )
+            {
+                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
+
+                if ( model != null && ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) ) )
+                {
+                    return Implicit;
+                }
             }
 
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model == null )
-            {
-                return false;
-            }
-
-            return model.DeclaredApiVersions.Contains( version );
+            return None;
         }
 
         /// <summary>
-        /// Gets a value indicating whether the provided action is API version-neutral.
+        /// Returns a value indicating whether the provided action maps to the specified API version.
         /// </summary>
         /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
-        /// <returns>True if the action is API version-neutral; otherwise, false.</returns>
-        public static bool IsApiVersionNeutral( this ActionDescriptor action )
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
+        /// <returns>True if the <paramref name="action"/> explicitly or implicitly maps to the specified
+        /// <paramref name="apiVersion">API version</paramref>; otherwise, false.</returns>
+        public static bool IsMappedTo( this ActionDescriptor action, ApiVersion apiVersion )
         {
             Arg.NotNull( action, nameof( action ) );
-
-            var model = action.GetProperty<ApiVersionModel>();
-            return model == null || model.IsApiVersionNeutral;
+            return action.MappingTo( apiVersion ) > None;
         }
     }
 }

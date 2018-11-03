@@ -59,10 +59,8 @@
                 new Mock<IActionDescriptorCollectionProvider>().Object,
                 Options.Create( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
-            var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
 
-            controller.SetProperty( ApiVersionModel.Neutral );
-            action.SetProperty( controller );
+            action.SetProperty( ApiVersionModel.Neutral );
 
             // act
             var result = provider.IsDeprecated( action, new ApiVersion( 1, 0 ) );
@@ -81,7 +79,6 @@
                 new Mock<IActionDescriptorCollectionProvider>().Object,
                 Options.Create( new ApiExplorerOptions() ) );
             var action = new ActionDescriptor();
-            var controller = new ControllerModel( typeof( Controller ).GetTypeInfo(), new object[0] );
             var model = new ApiVersionModel(
                 declaredVersions: new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) },
                 supportedVersions: new[] { new ApiVersion( 2, 0 ) },
@@ -89,8 +86,7 @@
                 advertisedVersions: Empty<ApiVersion>(),
                 deprecatedAdvertisedVersions: Empty<ApiVersion>() );
 
-            controller.SetProperty( model );
-            action.SetProperty( controller );
+            action.SetProperty( model );
 
             // act
             var result = provider.IsDeprecated( action, new ApiVersion( majorVersion, 0 ) );

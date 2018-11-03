@@ -7,6 +7,7 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using Xunit;
+    using static ApiVersionMapping;
 
     public class ApiVersionConventionBuilderTest
     {
@@ -123,11 +124,13 @@
             conventionBuilder.Add( new VersionByNamespaceConvention() );
             configuration.AddApiVersioning( o => o.Conventions = conventionBuilder );
 
+            var actionDescriptor = configuration.Services.GetActionSelector().GetActionMapping( controllerDescriptor ).SelectMany( g => g ).Single();
+
             // act
             conventionBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().DeclaredApiVersions.Single().Should().Be( new ApiVersion( 2, 0 ) );
+            actionDescriptor.MappingTo( new ApiVersion( 2, 0 ) ).Should().Be( Implicit );
         }
 
         sealed class TestApiVersionConventionBuilder : ApiVersionConventionBuilder

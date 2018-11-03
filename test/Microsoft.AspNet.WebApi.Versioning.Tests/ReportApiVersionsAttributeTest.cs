@@ -12,6 +12,7 @@
     using System.Web.Http.Routing;
     using Versioning;
     using Xunit;
+    using static System.Linq.Enumerable;
 
     public class ReportApiVersionsAttributeTest
     {
@@ -37,6 +38,11 @@
             var context = new HttpActionExecutedContext( actionContext, null );
 
             controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) ).Returns( attributes );
+            actionDescriptor.Properties[typeof( ApiVersionModel )] = new ApiVersionModel(
+                supportedVersions: new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) },
+                deprecatedVersions: new[] { new ApiVersion( 0, 5 ) },
+                advertisedVersions: Empty<ApiVersion>(),
+                deprecatedAdvertisedVersions: Empty<ApiVersion>() );
 
             // act
             attribute.OnActionExecuted( context );
@@ -63,6 +69,7 @@
             var context = new HttpActionExecutedContext( actionContext, null );
 
             controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) ).Returns( attributes );
+            controllerDescriptor.Object.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
 
             // act
             attribute.OnActionExecuted( context );

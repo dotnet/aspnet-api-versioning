@@ -56,9 +56,5 @@
             Arg.NotNull( action, nameof( action ) );
             action.Properties.SetOrRemove( typeof( T ), value );
         }
-
-#pragma warning disable CA1801 // Review unused parameters; intentional for type parameter
-        internal static void RemoveProperty<T>( this ActionModel action, T value ) => action.Properties.Remove( typeof( T ) );
-#pragma warning restore CA1801
     }
 }

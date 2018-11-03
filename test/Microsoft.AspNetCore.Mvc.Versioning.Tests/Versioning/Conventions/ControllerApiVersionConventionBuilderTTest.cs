@@ -2,6 +2,7 @@
 {
     using ApplicationModels;
     using FluentAssertions;
+    using System;
     using System.Linq;
     using System.Reflection;
     using Xunit;
@@ -12,7 +13,11 @@
         public void apply_to_should_assign_conventions_to_controller()
         {
             // arrange
-            var controllerModel = new ControllerModel( typeof( UndecoratedController ).GetTypeInfo(), new object[0] );
+            var controllerType = typeof( UndecoratedController );
+            var action = controllerType.GetRuntimeMethod( nameof( UndecoratedController.Get ), Type.EmptyTypes );
+            var attributes = Array.Empty<object>();
+            var actionModel = new ActionModel( action, attributes );
+            var controllerModel = new ControllerModel( controllerType.GetTypeInfo(), attributes ) { Actions = { actionModel } };
             var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
 
             controllerBuilder.HasDeprecatedApiVersion( 0, 9 )
@@ -24,11 +29,11 @@
             controllerBuilder.ApplyTo( controllerModel );
 
             // assert
-            controllerModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+            actionModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 2, 0 ) },
+                    DeclaredApiVersions = Array.Empty<ApiVersion>(),
                     SupportedApiVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
                     DeprecatedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 3, 0, "Beta" ) },
                     ImplementedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 3, 0, "Beta" ) }
@@ -39,7 +44,11 @@
         public void apply_to_should_assign_empty_conventions_to_api_version_neutral_controller()
         {
             // arrange
-            var controllerModel = new ControllerModel( typeof( UndecoratedController ).GetTypeInfo(), new object[0] );
+            var controllerType = typeof( UndecoratedController );
+            var action = controllerType.GetRuntimeMethod( nameof( UndecoratedController.Get ), Type.EmptyTypes );
+            var attributes = Array.Empty<object>();
+            var actionModel = new ActionModel( action, attributes );
+            var controllerModel = new ControllerModel( controllerType.GetTypeInfo(), attributes ) { Actions = { actionModel } };
             var controllerBuilder = new ControllerApiVersionConventionBuilder<UndecoratedController>();
 
             controllerBuilder.HasDeprecatedApiVersion( 0, 9 )
@@ -52,14 +61,14 @@
             controllerBuilder.ApplyTo( controllerModel );
 
             // assert
-            controllerModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+            actionModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = true,
-                    DeclaredApiVersions = new ApiVersion[0],
-                    SupportedApiVersions = new ApiVersion[0],
-                    DeprecatedApiVersions = new ApiVersion[0],
-                    ImplementedApiVersions = new ApiVersion[0]
+                    DeclaredApiVersions = Array.Empty<ApiVersion>(),
+                    SupportedApiVersions = Array.Empty<ApiVersion>(),
+                    DeprecatedApiVersions = Array.Empty<ApiVersion>(),
+                    ImplementedApiVersions = Array.Empty<ApiVersion>()
                 } );
         }
 
@@ -67,8 +76,11 @@
         public void apply_to_should_assign_model_to_controller_from_conventions_and_attributes()
         {
             // arrange
-            var attributes = typeof( DecoratedController ).GetTypeInfo().GetCustomAttributes().Cast<object>().ToArray();
-            var controllerModel = new ControllerModel( typeof( DecoratedController ).GetTypeInfo(), attributes );
+            var controllerType = typeof( DecoratedController ).GetTypeInfo();
+            var action = controllerType.GetRuntimeMethod( nameof( DecoratedController.Get ), Type.EmptyTypes );
+            var attributes = controllerType.GetCustomAttributes().Cast<object>().ToArray();
+            var actionModel = new ActionModel( action, Array.Empty<object>() );
+            var controllerModel = new ControllerModel( controllerType, attributes ) { Actions = { actionModel } };
             var controllerBuilder = new ControllerApiVersionConventionBuilder<DecoratedController>();
 
             controllerBuilder.HasApiVersion( 1, 0 )
@@ -78,11 +90,11 @@
             controllerBuilder.ApplyTo( controllerModel );
 
             // assert
-            controllerModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+            actionModel.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) },
+                    DeclaredApiVersions = Array.Empty<ApiVersion>(),
                     SupportedApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 4, 0 ) },
                     DeprecatedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 3, 0, "Beta" ) },
                     ImplementedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 3, 0, "Beta" ), new ApiVersion( 4, 0 ) }

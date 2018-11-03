@@ -7,23 +7,6 @@
 
     public class ModelExtensionsTest
     {
-        sealed class TestPropertyValue { }
-
-        [Fact]
-        public void set_property_should_update_controller_model_properties()
-        {
-            // arrange
-            var controllerType = typeof( object ).GetTypeInfo();
-            var controller = new ControllerModel( controllerType, new object[0] );
-            var value = new TestPropertyValue();
-
-            // act
-            controller.SetProperty( value );
-
-            // assert
-            controller.GetProperty<TestPropertyValue>().Should().BeSameAs( value );
-        }
-
         [Fact]
         public void set_property_should_update_action_model_properties()
         {
@@ -38,5 +21,7 @@
             // assert
             action.GetProperty<TestPropertyValue>().Should().BeSameAs( value );
         }
+
+        sealed class TestPropertyValue { }
     }
 }

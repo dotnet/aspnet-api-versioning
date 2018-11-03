@@ -60,6 +60,8 @@
                        .Returns( () => new Collection<IApiVersionProvider>() );
             descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionNeutral>() );
+            descriptor1.Object.Configuration = configuration;
+            descriptor1.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
 
             descriptor2.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "2.0" ) } );
@@ -67,9 +69,8 @@
                        .Returns( () => new Collection<IApiVersionProvider>() );
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionNeutral>() );
-
-            descriptor1.Object.Configuration = configuration;
             descriptor2.Object.Configuration = configuration;
+            descriptor2.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 2, 0 ) );
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
             var expected = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) };
@@ -96,15 +97,16 @@
                        .Returns( () => new Collection<IApiVersionProvider>() );
             descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionNeutral>() );
+            descriptor1.Object.Configuration = configuration;
+            descriptor1.Object.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
 
             descriptor2.Setup( d => d.GetFilters() ).Returns( () => new Collection<IFilter>() { filter2 } );
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionProvider>() );
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionNeutral>() );
-
-            descriptor1.Object.Configuration = configuration;
             descriptor2.Object.Configuration = configuration;
+            descriptor2.Object.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
 
@@ -126,6 +128,8 @@
 
             var group = new HttpControllerDescriptorGroup( descriptor.Object );
             var request = new HttpRequestMessage();
+
+            request.ApiVersionProperties().SelectedController = descriptor.Object;
 
             // act
             var controller = group.CreateController( request );
@@ -149,18 +153,21 @@
                        .Returns( () => new Collection<IApiVersionProvider>() );
             descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionNeutral>() );
+            descriptor1.Object.Configuration = configuration;
+            descriptor1.Object.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
 
             descriptor2.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( controller2 );
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionProvider>() );
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionNeutral>() );
-
-            descriptor1.Object.Configuration = configuration;
             descriptor2.Object.Configuration = configuration;
+            descriptor2.Object.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
             var request = new HttpRequestMessage();
+
+            request.ApiVersionProperties().SelectedController = descriptor1.Object;
 
             // act
             var controller = group.CreateController( request );
@@ -187,6 +194,7 @@
                        .Returns( () => new Collection<IApiVersionNeutral>() );
             descriptor1.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( controller1 );
             descriptor1.Object.Configuration = configuration;
+            descriptor1.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 2, 0 ) );
 
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionProvider>() { new ApiVersionAttribute( "1.0" ) } );
@@ -194,9 +202,12 @@
                        .Returns( () => new Collection<IApiVersionNeutral>() );
             descriptor2.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( expected );
             descriptor2.Object.Configuration = configuration;
+            descriptor2.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object ) { Configuration = configuration };
             var request = new HttpRequestMessage( HttpMethod.Get, "http://localhost/api/test?api-version=1.0" );
+
+            request.ApiVersionProperties().SelectedController = descriptor2.Object;
 
             // act
             var controller = group.CreateController( request );
@@ -223,6 +234,7 @@
                        .Returns( () => new Collection<IApiVersionNeutral>() );
             descriptor1.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( expected );
             descriptor1.Object.Configuration = configuration;
+            descriptor1.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
 
             descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<IApiVersionProvider>() { new ApiVersionAttribute( "2.0" ) } );
@@ -230,9 +242,12 @@
                        .Returns( () => new Collection<IApiVersionNeutral>() );
             descriptor2.Setup( d => d.CreateController( It.IsAny<HttpRequestMessage>() ) ).Returns( controller2 );
             descriptor2.Object.Configuration = configuration;
+            descriptor2.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 2, 0 ) );
 
             var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object ) { Configuration = configuration };
             var request = new HttpRequestMessage( HttpMethod.Get, "http://localhost/api/test?api-version=3.0" );
+
+            request.ApiVersionProperties().SelectedController = descriptor1.Object;
 
             // act
             var controller = group.CreateController( request );

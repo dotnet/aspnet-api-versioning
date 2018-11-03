@@ -1,8 +1,10 @@
 ﻿namespace Microsoft.Web.Http.Versioning
 {
-    using System;
+    using System.ComponentModel;
     using System.Net.Http;
     using System.Web.Http;
+    using System.Web.Http.Controllers;
+    using static System.ComponentModel.EditorBrowsableState;
 
     /// <summary>
     /// Represents current API versioning request properties.
@@ -65,5 +67,13 @@
             }
             set => apiVersion = value;
         }
+
+        /// <summary>
+        /// Gets or sets the controller selected during a request.
+        /// </summary>
+        /// <value>The <see cref="HttpControllerDescriptor">controller</see> select during a request.
+        /// The default value is <c>null</c>.</value>
+        [EditorBrowsable( Never )]
+        public HttpControllerDescriptor SelectedController { get; set; }
     }
 }

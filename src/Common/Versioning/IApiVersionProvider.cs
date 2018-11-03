@@ -13,18 +13,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     public interface IApiVersionProvider
     {
         /// <summary>
-        /// Gets a value indicating whether the provided set of API versions are advertised only.
+        /// Gets the options associated with the provided API versions.
         /// </summary>
-        /// <value>True if the provided set of API versions are only being advertised; otherwise, false.</value>
-        /// <remarks>Advertised service API versions indicate the existence of other versioned services,
-        /// but the implementation of those services are implemented elsewhere.</remarks>
-        bool AdvertiseOnly { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the provided set of API versions are deprecated.
-        /// </summary>
-        /// <value>True if the specified set of API versions are deprecated; otherwise, false.</value>
-        bool Deprecated { get; }
+        ApiVersionProviderOptions Options { get; }
 
         /// <summary>
         /// Gets the defined API versions defined.

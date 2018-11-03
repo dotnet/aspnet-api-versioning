@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
-    using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -8,20 +7,18 @@
     using System.Text;
     using System.Web.Http;
     using System.Web.Http.Controllers;
-    using Microsoft.Web.Http.Versioning;
+    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Environment;
 
-    sealed class DirectRouteControllerSelector : ControllerSelector
+    sealed class DirectRouteControllerSelector : IControllerSelector
     {
-        internal DirectRouteControllerSelector( ApiVersioningOptions options ) : base( options ) { }
-
-        internal override ControllerSelectionResult SelectController( ControllerSelectionContext context )
+        public ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
             Contract.Requires( context != null );
             Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
 
             var request = context.Request;
-            var requestedVersion = context.RequestedApiVersion;
+            var requestedVersion = context.RequestedVersion;
             var result = new ControllerSelectionResult()
             {
                 HasCandidates = context.HasAttributeBasedRoutes,
@@ -33,133 +30,53 @@
                 return result;
             }
 
-            var versionNeutralController = result.Controller = GetVersionNeutralController( context.DirectRouteCandidates );
+            var bestMatch = default( HttpActionDescriptor );
+            var bestMatches = new HashSet<HttpControllerDescriptor>();
+            var implicitMatches = new HashSet<HttpControllerDescriptor>();
 
-            if ( requestedVersion == null )
+            for ( var i = 0; i < context.DirectRouteCandidates.Length; i++ )
             {
-                if ( !AssumeDefaultVersionWhenUnspecified )
+                var action = context.DirectRouteCandidates[i].ActionDescriptor;
+
+                switch ( action.MappingTo( requestedVersion ) )
                 {
-                    return result;
+                    case Explicit:
+                        bestMatch = action;
+                        bestMatches.Add( action.ControllerDescriptor );
+                        break;
+                    case Implicit:
+                        implicitMatches.Add( action.ControllerDescriptor );
+                        break;
                 }
-
-                requestedVersion = ApiVersionSelector.SelectVersion( request, context.AllVersions );
-
-                if ( requestedVersion == null )
-                {
-                    return result;
-                }
             }
 
-            var versionedController = GetVersionedController( context, requestedVersion );
-
-            if ( versionedController == null )
+            switch ( bestMatches.Count )
             {
-                return result;
+                case 0:
+                    bestMatches.UnionWith( implicitMatches );
+                    break;
+                case 1:
+                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
+                    {
+                        bestMatches.UnionWith( implicitMatches );
+                    }
+
+                    break;
             }
 
-            if ( versionNeutralController != null )
+            switch ( bestMatches.Count )
             {
-                throw CreateAmbiguousControllerException( new[] { versionNeutralController, versionedController } );
+                case 0:
+                    break;
+                case 1:
+                    result.Controller = bestMatches.Single();
+                    break;
+                default:
+                    throw CreateAmbiguousControllerException( bestMatches );
             }
-
-            request.ApiVersionProperties().RequestedApiVersion = requestedVersion;
-            result.RequestedVersion = requestedVersion;
-            result.Controller = versionedController;
 
             return result;
         }
-
-        static HttpControllerDescriptor GetVersionNeutralController( CandidateAction[] directRouteCandidates )
-        {
-            Contract.Requires( directRouteCandidates != null );
-            Contract.Requires( directRouteCandidates.Length > 0 );
-
-            HttpControllerDescriptor controllerDescriptor = null;
-
-            using ( var iterator = directRouteCandidates.Where( c => c.ActionDescriptor.IsApiVersionNeutral() ).GetEnumerator() )
-            {
-                if ( !iterator.MoveNext() )
-                {
-                    return controllerDescriptor;
-                }
-
-                controllerDescriptor = iterator.Current.ActionDescriptor.ControllerDescriptor;
-
-                while ( iterator.MoveNext() )
-                {
-                    var candidate = iterator.Current;
-
-                    if ( candidate.ActionDescriptor.ControllerDescriptor != controllerDescriptor )
-                    {
-                        throw CreateAmbiguousControllerException( directRouteCandidates );
-                    }
-                }
-            }
-
-            return controllerDescriptor;
-        }
-
-        static HttpControllerDescriptor GetVersionedController( ControllerSelectionContext context, ApiVersion requestedVersion )
-        {
-            Contract.Requires( context != null );
-            Contract.Requires( requestedVersion != null );
-
-            var directRouteCandidates = context.DirectRouteCandidates;
-            var controller = directRouteCandidates[0].ActionDescriptor.ControllerDescriptor;
-
-            if ( directRouteCandidates.Length == 1 )
-            {
-                if ( !controller.GetDeclaredApiVersions().Contains( requestedVersion ) )
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                if ( ( controller = ResolveController( directRouteCandidates, requestedVersion ) ) == null )
-                {
-                    return null;
-                }
-            }
-
-            return controller;
-        }
-
-        static HttpControllerDescriptor ResolveController( CandidateAction[] directRouteCandidates, ApiVersion requestedVersion )
-        {
-            Contract.Requires( directRouteCandidates != null );
-            Contract.Requires( directRouteCandidates.Length > 0 );
-            Contract.Requires( requestedVersion != null );
-
-            var controllerDescriptor = default( HttpControllerDescriptor );
-            var matches = from candidate in directRouteCandidates
-                          let controller = candidate.ActionDescriptor.ControllerDescriptor
-                          where controller.GetDeclaredApiVersions().Contains( requestedVersion )
-                          select controller;
-
-            using ( var iterator = matches.GetEnumerator() )
-            {
-                if ( !iterator.MoveNext() )
-                {
-                    return null;
-                }
-
-                controllerDescriptor = iterator.Current;
-
-                while ( iterator.MoveNext() )
-                {
-                    if ( iterator.Current != controllerDescriptor )
-                    {
-                        throw CreateAmbiguousControllerException( directRouteCandidates );
-                    }
-                }
-            }
-
-            return controllerDescriptor;
-        }
-
-        static Exception CreateAmbiguousControllerException( CandidateAction[] candidates ) =>
-            CreateAmbiguousControllerException( candidates.Select( c => c.ActionDescriptor.ControllerDescriptor ) );
 
         static Exception CreateAmbiguousControllerException( IEnumerable<HttpControllerDescriptor> candidates )
         {

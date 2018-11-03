@@ -15,6 +15,7 @@
 
         [HttpGet]
         [MapToApiVersion( "3.0" )]
+        [ActionName( nameof( Get ) )]
         public Task<string> Get3() => Task.FromResult( "Test" );
     }
 }

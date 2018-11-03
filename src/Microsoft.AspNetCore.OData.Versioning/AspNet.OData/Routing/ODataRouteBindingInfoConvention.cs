@@ -39,7 +39,7 @@
             Contract.Requires( context != null );
             Contract.Requires( action != null );
 
-            var model = GetModel( action );
+            var model = action.GetApiVersionModel();
             var mappings = RouteCollectionProvider.Items;
             var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
 
@@ -88,20 +88,6 @@
                     context.Results.Add( Clone( action, iterator.Current ) );
                 }
             }
-        }
-
-        static ApiVersionModel GetModel( ControllerActionDescriptor action )
-        {
-            Contract.Requires( action != null );
-
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model == null || model.DeclaredApiVersions.Count == 0 )
-            {
-                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-            }
-
-            return model;
         }
 
         void UpdateBindingInfo( ControllerActionDescriptor action, ODataRouteMapping mapping, ICollection<ODataAttributeRouteInfo> routeInfos )

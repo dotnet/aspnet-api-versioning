@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Web.Http.Versioning.Conventions
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
+    using static System.Linq.Enumerable;
 
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Web API.
@@ -20,23 +20,38 @@
         {
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
-            MappedVersions.AddRange( from provider in actionDescriptor.GetCustomAttributes<IApiVersionProvider>()
-                                     where !provider.AdvertiseOnly && !provider.Deprecated
-                                     from version in provider.Versions
-                                     select version );
+            MergeAttributesWithConventions( actionDescriptor.GetCustomAttributes<Attribute>() );
 
-            var (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions) =
-                actionDescriptor.GetProperty<Tuple<IEnumerable<ApiVersion>,
-                                                   IEnumerable<ApiVersion>,
-                                                   IEnumerable<ApiVersion>,
-                                                   IEnumerable<ApiVersion>>>();
+            if ( VersionNeutral )
+            {
+                actionDescriptor.SetProperty( ApiVersionModel.Neutral );
+                return;
+            }
 
-            var versionModel = new ApiVersionModel(
-                declaredVersions: MappedVersions,
-                supportedVersions,
-                deprecatedVersions,
-                advertisedVersions,
-                deprecatedAdvertisedVersions );
+            var versionModel = default( ApiVersionModel );
+
+            if ( MappedVersions.Count == 0 )
+            {
+                var declaredVersions = SupportedVersions.Union( DeprecatedVersions );
+
+                versionModel = new ApiVersionModel(
+                    declaredVersions,
+                    SupportedVersions,
+                    DeprecatedVersions,
+                    AdvertisedVersions,
+                    DeprecatedAdvertisedVersions );
+            }
+            else
+            {
+                var emptyVersions = Empty<ApiVersion>();
+
+                versionModel = new ApiVersionModel(
+                    declaredVersions: MappedVersions,
+                    supportedVersions: emptyVersions,
+                    deprecatedVersions: emptyVersions,
+                    advertisedVersions: emptyVersions,
+                    deprecatedAdvertisedVersions: emptyVersions );
+            }
 
             actionDescriptor.SetProperty( versionModel );
         }

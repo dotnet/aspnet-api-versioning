@@ -465,7 +465,7 @@
         public async Task select_best_candidate_should_return_correct_controller_for_versioned_route_attribute( string versionSegment, Type controllerType, string actionName, string declaredVersionsValue )
         {
             // arrange
-            var declared = declaredVersionsValue == null ? new ApiVersion[0] : declaredVersionsValue.Split( ',' ).Select( Parse ).ToArray();
+            var declared = declaredVersionsValue == null ? Array.Empty<ApiVersion>() : declaredVersionsValue.Split( ',' ).Select( Parse ).ToArray();
             var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 5, 0 ) };
             var deprecated = new[] { new ApiVersion( 4, 0 ) };
             var implemented = supported.Union( deprecated ).OrderBy( v => v ).ToArray();
@@ -524,7 +524,7 @@
                                                                              .HasApiVersion( 2, 0 )
                                                                              .AdvertisesApiVersion( 3, 0 )
                                                                              .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
-                                                                             .Action( c => c.GetV2( default( int ) ) ).MapToApiVersion( 2, 0 );
+                                                                             .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
             using ( var server = new WebServer( versioningSetup ) )
             {
                 var response = await server.Client.GetAsync( $"api/conventions/1?api-version=2.0" );

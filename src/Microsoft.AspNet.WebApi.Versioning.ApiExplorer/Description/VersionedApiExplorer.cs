@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -10,7 +11,6 @@
     using System.Net.Http;
     using System.Net.Http.Formatting;
     using System.Reflection;
-    using System.Text;
     using System.Text.RegularExpressions;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -18,6 +18,7 @@
     using System.Web.Http.ModelBinding.Binders;
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
+    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Globalization.CultureInfo;
     using static System.String;
     using static System.Text.RegularExpressions.RegexOptions;
@@ -141,18 +142,7 @@
 
             if ( ( setting == null || !setting.IgnoreApi ) && MatchRegexConstraint( route, RouteValueKeys.Action, actionRouteParameterValue ) )
             {
-                var model = actionDescriptor.GetApiVersionModel();
-
-                if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion ) )
-                {
-                    return true;
-                }
-
-                if ( model.DeclaredApiVersions.Count == 0 )
-                {
-                    model = actionDescriptor.ControllerDescriptor.GetApiVersionModel();
-                    return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
-                }
+                return actionDescriptor.IsMappedTo( apiVersion );
             }
 
             return false;
@@ -174,13 +164,7 @@
 
             var setting = controllerDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
 
-            if ( ( setting == null || !setting.IgnoreApi ) && MatchRegexConstraint( route, RouteValueKeys.Controller, controllerRouteParameterValue ) )
-            {
-                var model = controllerDescriptor.GetApiVersionModel();
-                return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
-            }
-
-            return false;
+            return ( setting == null || !setting.IgnoreApi ) && MatchRegexConstraint( route, RouteValueKeys.Controller, controllerRouteParameterValue );
         }
 
         /// <summary>
@@ -247,8 +231,7 @@
                         }
                         else
                         {
-                            var model = description.ActionDescriptor.GetApiVersionModel();
-                            var overrideImplicitlyMappedApiDescription = model.DeclaredApiVersions.Contains( apiVersion );
+                            var overrideImplicitlyMappedApiDescription = description.ActionDescriptor.MappingTo( apiVersion ) == Explicit;
 
                             if ( overrideImplicitlyMappedApiDescription )
                             {
@@ -330,7 +313,7 @@
                         // Undeclared route parameter handling generates query string like "?name={name}"
                         AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
                     }
-                    else if ( TypeHelper.CanConvertFromString( parameterDescription.ParameterDescriptor.ParameterType ) )
+                    else if ( parameterDescription.ParameterDescriptor.ParameterType.CanConvertFromString() )
                     {
                         // Simple type generates query string like "?name={name}"
                         AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
@@ -426,6 +409,7 @@
             var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
+            var actionSelector = services.GetActionSelector();
             var controllerTypes = typeResolver.GetControllerTypes( assembliesResolver );
             var controllerDescriptors = controllerMapping.Values;
             var declared = new HashSet<ApiVersion>();
@@ -436,30 +420,43 @@
 
             foreach ( var controllerType in controllerTypes )
             {
-                var descriptor = FindControllerDescriptor( controllerDescriptors, controllerType );
+                var controller = FindControllerDescriptor( controllerDescriptors, controllerType );
 
-                if ( descriptor == null )
+                if ( controller == null )
                 {
                     continue;
                 }
 
-                var model = descriptor.GetApiVersionModel();
+                var model = controller.GetApiVersionModel();
+                var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
 
-                foreach ( var version in model.DeclaredApiVersions )
+                for ( var i = 0; i < model.DeclaredApiVersions.Count; i++ )
                 {
-                    declared.Add( version );
+                    declared.Add( model.DeclaredApiVersions[i] );
                 }
 
-                foreach ( var version in model.SupportedApiVersions )
+                foreach ( var action in actions )
                 {
-                    supported.Add( version );
-                    advertisedSupported.Add( version );
-                }
+                    model = action.GetApiVersionModel();
 
-                foreach ( var version in model.DeprecatedApiVersions )
-                {
-                    deprecated.Add( version );
-                    advertisedDeprecated.Add( version );
+                    for ( var i = 0; i < model.DeclaredApiVersions.Count; i++ )
+                    {
+                        declared.Add( model.DeclaredApiVersions[i] );
+                    }
+
+                    for ( var i = 0; i < model.SupportedApiVersions.Count; i++ )
+                    {
+                        var version = model.SupportedApiVersions[i];
+                        supported.Add( version );
+                        advertisedSupported.Add( version );
+                    }
+
+                    for ( var i = 0; i < model.DeprecatedApiVersions.Count; i++ )
+                    {
+                        var version = model.DeprecatedApiVersions[i];
+                        deprecated.Add( version );
+                        advertisedDeprecated.Add( version );
+                    }
                 }
             }
 
@@ -504,54 +501,50 @@
             return default;
         }
 
-        static HttpControllerDescriptor GetDirectRouteController( CandidateAction[] directRouteCandidates, ApiVersion apiVersion )
+        static HttpControllerDescriptor GetDirectRouteController( CandidateAction[] candidates, ApiVersion apiVersion )
         {
             Contract.Requires( apiVersion != null );
 
-            if ( directRouteCandidates == null )
+            if ( candidates == null )
             {
-                return null;
+                return default;
             }
 
-            var controllerDescriptor = directRouteCandidates[0].ActionDescriptor.ControllerDescriptor;
+            var bestMatch = default( HttpActionDescriptor );
+            var bestMatches = new HashSet<HttpControllerDescriptor>();
+            var implicitMatches = new HashSet<HttpControllerDescriptor>();
 
-            if ( directRouteCandidates.Length == 1 )
+            for ( var i = 0; i < candidates.Length; i++ )
             {
-                var model = controllerDescriptor.GetApiVersionModel();
+                var action = candidates[i].ActionDescriptor;
 
-                if ( !model.IsApiVersionNeutral && !model.DeclaredApiVersions.Contains( apiVersion ) )
+                switch ( action.MappingTo( apiVersion ) )
                 {
-                    return null;
-                }
-            }
-            else
-            {
-                var matches = from candidate in directRouteCandidates
-                              let controller = candidate.ActionDescriptor.ControllerDescriptor
-                              let model = controller.GetApiVersionModel()
-                              where model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion )
-                              select controller;
-
-                using ( var iterator = matches.GetEnumerator() )
-                {
-                    if ( !iterator.MoveNext() )
-                    {
-                        return null;
-                    }
-
-                    controllerDescriptor = iterator.Current;
-
-                    while ( iterator.MoveNext() )
-                    {
-                        if ( iterator.Current != controllerDescriptor )
-                        {
-                            return null;
-                        }
-                    }
+                    case ApiVersionMapping.Explicit:
+                        bestMatch = action;
+                        bestMatches.Add( action.ControllerDescriptor );
+                        break;
+                    case ApiVersionMapping.Implicit:
+                        implicitMatches.Add( action.ControllerDescriptor );
+                        break;
                 }
             }
 
-            return controllerDescriptor;
+            switch ( bestMatches.Count )
+            {
+                case 0:
+                    bestMatches.UnionWith( implicitMatches );
+                    break;
+                case 1:
+                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
+                    {
+                        bestMatches.UnionWith( implicitMatches );
+                    }
+
+                    break;
+            }
+
+            return bestMatches.Count == 1 ? bestMatches.Single() : default;
         }
 
         /// <summary>
@@ -789,7 +782,8 @@
             supportedResponseFormatters = GetInnerFormatters( supportedResponseFormatters );
 
             var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
-            var deprecated = actionDescriptor.ControllerDescriptor.GetApiVersionModel().DeprecatedApiVersions.Contains( apiVersion );
+            var model = actionDescriptor.GetApiVersionModel();
+            var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
 
             foreach ( var method in supportedMethods )
             {
@@ -843,7 +837,7 @@
             return parameterDescriptions.Count( parameter =>
                          parameter.Source == FromUri &&
                          parameter.ParameterDescriptor != null &&
-                         !TypeHelper.CanConvertFromString( parameter.ParameterDescriptor.ParameterType ) &&
+                         !parameter.ParameterDescriptor.ParameterType.CanConvertFromString() &&
                          parameter.CanConvertPropertiesFromString() ) > 1;
         }
 
@@ -879,7 +873,7 @@
 
         static bool IsBindableDictionry( Type type ) => new DictionaryModelBinderProvider().GetBinder( null, type ) != null;
 
-        static bool IsBindableKeyValuePair( Type type ) => TypeHelper.GetTypeArgumentsIfMatch( type, typeof( KeyValuePair<,> ) ) != null;
+        static bool IsBindableKeyValuePair( Type type ) => type.GetTypeArgumentsIfMatch( typeof( KeyValuePair<,> ) ) != null;
 
         static void AddPlaceholder( IDictionary<string, object> parameterValuesForRoute, string queryParameterName )
         {
@@ -949,7 +943,7 @@
                         var parameterName = parameter.ParameterName;
 
                         if ( !parameterDescriptions.Any( p => string.Equals( p.Name, parameterName, StringComparison.OrdinalIgnoreCase ) ) &&
-                            ( !routeDefaults.TryGetValue( parameterName, out var parameterValue ) ||
+                           ( !routeDefaults.TryGetValue( parameterName, out var parameterValue ) ||
                             parameterValue != RouteParameter.Optional ) )
                         {
                             parameterDescriptions.Add( new ApiParameterDescription() { Name = parameterName, Source = FromUri } );
@@ -1011,9 +1005,7 @@
 
                 if ( filteredDescriptions.ContainsKey( apiDescriptionId ) )
                 {
-                    var model = description.ActionDescriptor.GetApiVersionModel();
-
-                    if ( model.DeclaredApiVersions.Contains( apiVersion ) )
+                    if ( description.ActionDescriptor.MappingTo( apiVersion ) == Explicit )
                     {
                         filteredDescriptions[apiDescriptionId] = description;
                     }

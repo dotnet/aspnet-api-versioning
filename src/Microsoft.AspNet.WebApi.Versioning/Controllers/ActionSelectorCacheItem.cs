@@ -1,5 +1,8 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
+    using Microsoft.Web.Http.Dispatcher;
+    using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -12,9 +15,6 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
-    using Microsoft.Web.Http.Dispatcher;
-    using Microsoft.Web.Http.Routing;
-    using Microsoft.Web.Http.Versioning;
     using static System.Net.HttpStatusCode;
     using static System.StringComparer;
 
@@ -43,7 +43,7 @@
             {
                 Contract.Requires( controllerDescriptor != null );
 
-                this.controllerDescriptor = Decorator.GetInner( controllerDescriptor );
+                this.controllerDescriptor = controllerDescriptor;
 
                 var allMethods = this.controllerDescriptor.ControllerType.GetMethods( BindingFlags.Instance | BindingFlags.Public );
                 var validMethods = Array.FindAll( allMethods, IsValidActionMethod );

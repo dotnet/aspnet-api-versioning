@@ -76,5 +76,26 @@ namespace Microsoft.AspNetCore.Mvc
 
             throw new AmbiguousApiVersionException( message, apiVersions.OrderBy( v => v ) );
         }
+
+        internal static void UnionWith<T>( this ICollection<T> collection, IEnumerable<T> other )
+        {
+            Contract.Requires( collection != null );
+            Contract.Requires( other != null );
+
+            if ( collection is ISet<T> set )
+            {
+                set.UnionWith( other );
+            }
+            else
+            {
+                foreach ( var item in other )
+                {
+                    if ( !collection.Contains( item ) )
+                    {
+                        collection.Add( item );
+                    }
+                }
+            }
+        }
     }
 }

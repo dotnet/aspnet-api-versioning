@@ -13,6 +13,7 @@
     using Xunit;
     using Microsoft.Web.Http;
     using Microsoft.AspNet.OData.Builder;
+    using Microsoft.Web.Http.Versioning;
 
     public class VersionedAttributeRoutingConventionTest
     {
@@ -43,6 +44,8 @@
             var controller = new HttpControllerDescriptor( configuration, string.Empty, typeof( NeutralController ) );
             var convention = new VersionedAttributeRoutingConvention( "Tests", configuration, new ApiVersion( 1, 0 ) );
 
+            controller.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
+
             // act
             var result = convention.ShouldMapController( controller );
 
@@ -51,20 +54,22 @@
         }
 
         [Theory]
-        [InlineData( 1, true )]
-        [InlineData( 2, false )]
-        public void should_map_controller_should_return_expected_result_for_controller_version( int majorVersion, bool expected )
+        [InlineData( 1 )]
+        [InlineData( 2 )]
+        public void should_map_controller_should_return_expected_result_for_controller_version( int majorVersion )
         {
             // arrange
             var configuration = new HttpConfiguration();
             var controller = new HttpControllerDescriptor( configuration, string.Empty, typeof( ControllerV1 ) );
             var convention = new VersionedAttributeRoutingConvention( "Tests", configuration, new ApiVersion( majorVersion, 0 ) );
 
+            controller.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+
             // act
             var result = convention.ShouldMapController( controller );
 
             // assert
-            result.Should().Be( expected );
+            result.Should().BeTrue();
         }
     }
 }

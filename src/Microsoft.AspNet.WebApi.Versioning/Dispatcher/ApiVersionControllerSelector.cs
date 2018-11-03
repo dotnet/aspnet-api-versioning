@@ -13,7 +13,6 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
-    using static Controllers.HttpControllerDescriptorComparer;
     using static System.StringComparer;
     using static Versioning.ErrorCodes;
 
@@ -70,7 +69,16 @@
             EnsureRequestHasValidApiVersion( request );
 
             var context = new ControllerSelectionContext( request, GetControllerName, controllerInfoCache );
-            var conventionRouteSelector = new ConventionRouteControllerSelector( options, controllerTypeCache );
+
+            if ( context.RequestedVersion == null )
+            {
+                if ( options.AssumeDefaultVersionWhenUnspecified )
+                {
+                    context.RequestedVersion = options.ApiVersionSelector.SelectVersion( context.Request, context.AllVersions );
+                }
+            }
+
+            var conventionRouteSelector = new ConventionRouteControllerSelector( controllerTypeCache );
             var conventionRouteResult = default( ControllerSelectionResult );
             var exceptionFactory = new HttpResponseExceptionFactory( request, new Lazy<ApiVersionModel>( () => context.AllVersions ) );
 
@@ -80,25 +88,25 @@
 
                 if ( conventionRouteResult.Succeeded )
                 {
-                    return conventionRouteResult.Controller;
+                    return request.ApiVersionProperties().SelectedController = conventionRouteResult.Controller;
                 }
 
                 throw exceptionFactory.NewNotFoundOrBadRequestException( conventionRouteResult, default );
             }
 
-            var directRouteSelector = new DirectRouteControllerSelector( options );
+            var directRouteSelector = new DirectRouteControllerSelector();
             var directRouteResult = directRouteSelector.SelectController( context );
 
             if ( directRouteResult.Succeeded )
             {
-                return directRouteResult.Controller;
+                return request.ApiVersionProperties().SelectedController = directRouteResult.Controller;
             }
 
             conventionRouteResult = conventionRouteSelector.SelectController( context );
 
             if ( conventionRouteResult.Succeeded )
             {
-                return conventionRouteResult.Controller;
+                return request.ApiVersionProperties().SelectedController = conventionRouteResult.Controller;
             }
 
             throw exceptionFactory.NewNotFoundOrBadRequestException( conventionRouteResult, directRouteResult );
@@ -178,12 +186,8 @@
                     }
                 }
 
-                descriptors.Sort( ByVersion );
-
-                var descriptorGroup =
-                    options.ReportApiVersions ?
-                    new HttpControllerDescriptorGroup( configuration, key, ApplyCollatedModel( descriptors, actionSelector, CollateModel( descriptors ) ) ) :
-                    new HttpControllerDescriptorGroup( configuration, key, descriptors.ToArray() );
+                var innerDescriptors = ApplyCollatedModels( descriptors, actionSelector );
+                var descriptorGroup = new HttpControllerDescriptorGroup( configuration, key, innerDescriptors );
 
                 mapping.TryAdd( key, descriptorGroup );
             }
@@ -205,7 +209,7 @@
             Contract.Requires( actionSelector != null );
             Contract.Requires( implicitVersionModel != null );
 
-            controller.SetProperty( implicitVersionModel );
+            controller.SetApiVersionModel( implicitVersionModel );
 
             var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
 
@@ -232,27 +236,68 @@
             }
         }
 
-        static ApiVersionModel CollateModel( IEnumerable<HttpControllerDescriptor> controllers ) => controllers.Select( c => c.GetApiVersionModel() ).Aggregate();
-
-        static HttpControllerDescriptor[] ApplyCollatedModel( List<HttpControllerDescriptor> controllers, IHttpActionSelector actionSelector, ApiVersionModel collatedModel )
+        static HttpControllerDescriptor[] ApplyCollatedModels( List<HttpControllerDescriptor> controllers, IHttpActionSelector actionSelector )
         {
             Contract.Requires( controllers != null );
             Contract.Requires( actionSelector != null );
-            Contract.Requires( collatedModel != null );
             Contract.Ensures( Contract.Result<HttpControllerDescriptor[]>() != null );
 
-            foreach ( var controller in controllers )
-            {
-                var model = controller.GetApiVersionModel();
-                var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
+            var supported = new HashSet<ApiVersion>();
+            var deprecated = new HashSet<ApiVersion>();
+            var models = new List<ApiVersionModel>( controllers.Count );
+            var visited = new List<Tuple<HttpActionDescriptor, ApiVersionModel>>( controllers.Count );
 
-                controller.SetProperty( model.Aggregate( collatedModel ) );
+            for ( var i = 0; i < controllers.Count; i++ )
+            {
+                // 1 - collate controller versions (only useful for 400s)
+                var controller = controllers[i];
+                var model = controller.GetApiVersionModel();
+
+                supported.AddRange( model.SupportedApiVersions );
+                deprecated.AddRange( model.DeprecatedApiVersions );
+
+                // 2 - collate action versions (only required for reporting api versions)
+                var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
 
                 foreach ( var action in actions )
                 {
                     model = action.GetApiVersionModel();
-                    action.SetProperty( model.Aggregate( collatedModel ) );
+
+                    if ( model.IsApiVersionNeutral )
+                    {
+                        continue;
+                    }
+
+                    models.Add( model );
+                    visited.Add( Tuple.Create( action, model ) );
                 }
+            }
+
+            // 3 - apply collated controller model
+            var collatedModel = new ApiVersionModel( supported, deprecated );
+
+            for ( var i = 0; i < controllers.Count; i++ )
+            {
+                var controller = controllers[i];
+                var model = controller.GetApiVersionModel();
+
+                controller.SetApiVersionModel( model.Aggregate( collatedModel ) );
+            }
+
+            if ( visited.Count == 0 )
+            {
+                return controllers.ToArray();
+            }
+
+            // 4 - apply collated action model
+            collatedModel = models.Aggregate();
+
+            for ( var i = 0; i < visited.Count; i++ )
+            {
+                var item = visited[i];
+                var (action, model) = item;
+
+                action.SetProperty( model.Aggregate( collatedModel ) );
             }
 
             return controllers.ToArray();
@@ -268,8 +313,8 @@
             }
             catch ( AmbiguousApiVersionException ex )
             {
-                var options = request.GetApiVersioningOptions();
-                throw new HttpResponseException( options.ErrorResponses.BadRequest( request, AmbiguousApiVersion, ex.Message ) );
+                var response = request.GetApiVersioningOptions().ErrorResponses;
+                throw new HttpResponseException( response.BadRequest( request, AmbiguousApiVersion, ex.Message ) );
             }
         }
     }

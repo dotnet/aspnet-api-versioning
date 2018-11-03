@@ -124,14 +124,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             return ActionBuilders.GetOrAdd( actionMethod );
         }
 
-        void IControllerConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
+        void IApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
 
-        void IControllerConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
+        void IApiVersionConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
 
-        void IControllerConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
+        void IApiVersionConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
 
-        void IControllerConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
+        void IApiVersionConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
 
-        void IControllerConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
+        void IApiVersionConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
     }
 }

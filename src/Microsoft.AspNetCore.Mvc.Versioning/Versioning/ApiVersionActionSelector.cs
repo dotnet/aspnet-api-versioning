@@ -13,6 +13,7 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Threading;
+    using static ApiVersionMapping;
     using static ErrorCodes;
     using static System.Globalization.CultureInfo;
 
@@ -187,49 +188,50 @@
             Arg.NotNull( context, nameof( context ) );
             Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
 
-            var bestMatches = new List<ActionDescriptor>( context.MatchingActions.Count );
+            var requestedVersion = context.RequestedVersion;
 
-            bestMatches.AddRange( MatchVersionNeutralActions( context ) );
-
-            if ( context.RequestedVersion == null )
+            if ( requestedVersion == null )
             {
-                if ( !Options.AssumeDefaultVersionWhenUnspecified )
+                if ( Options.AssumeDefaultVersionWhenUnspecified )
                 {
-                    return bestMatches;
-                }
-
-                context.RequestedVersion = ApiVersionSelector.SelectVersion( context.HttpContext.Request, context.AllVersions );
-
-                if ( context.RequestedVersion == null )
-                {
-                    return bestMatches;
+                    context.RequestedVersion = requestedVersion = ApiVersionSelector.SelectVersion( context.HttpContext.Request, context.AllVersions );
                 }
             }
 
-            var implicitMatches = new List<ActionDescriptor>();
-            var explicitMatches = from action in context.MatchingActions
-                                  let model = action.GetProperty<ApiVersionModel>()
-                                  where ActionIsSatisfiedBy( action, model, context.RequestedVersion, implicitMatches )
-                                  select action;
+            var bestMatches = new HashSet<ActionDescriptor>();
+            var implicitMatches = new HashSet<ActionDescriptor>();
 
-            bestMatches.AddRange( explicitMatches );
+            for ( var i = 0; i < context.MatchingActions.Count; i++ )
+            {
+                var action = context.MatchingActions[i];
+
+                switch ( action.MappingTo( requestedVersion ) )
+                {
+                    case Explicit:
+                        bestMatches.Add( action );
+                        break;
+                    case Implicit:
+                        implicitMatches.Add( action );
+                        break;
+                }
+            }
 
             if ( bestMatches.Count == 0 )
             {
                 bestMatches.AddRange( implicitMatches );
             }
 
-            if ( bestMatches.Count != 1 )
+            if ( bestMatches.Count == 1 )
             {
-                return bestMatches;
+                var model = bestMatches.Single().GetApiVersionModel();
+
+                if ( model.IsApiVersionNeutral )
+                {
+                    bestMatches.AddRange( implicitMatches );
+                }
             }
 
-            if ( bestMatches[0].IsApiVersionNeutral() )
-            {
-                bestMatches.AddRange( implicitMatches );
-            }
-
-            return bestMatches;
+            return bestMatches.ToArray();
         }
 
         /// <summary>
@@ -324,35 +326,6 @@
             }
 
             return matches.Select( candidate => candidate.Action ).ToArray();
-        }
-
-        static IEnumerable<ActionDescriptor> MatchVersionNeutralActions( ActionSelectionContext context ) =>
-            from action in context.MatchingActions
-            let model = action.GetProperty<ApiVersionModel>()
-            where model?.IsApiVersionNeutral ?? false
-            select action;
-
-        static bool ActionIsSatisfiedBy( ActionDescriptor action, ApiVersionModel model, ApiVersion version, ICollection<ActionDescriptor> implicitMatches )
-        {
-            Contract.Requires( action != null );
-            Contract.Requires( implicitMatches != null );
-
-            if ( model == null )
-            {
-                return false;
-            }
-
-            if ( action.IsMappedTo( version ) )
-            {
-                return true;
-            }
-
-            if ( action.IsImplicitlyMappedTo( version ) )
-            {
-                implicitMatches.Add( action );
-            }
-
-            return false;
         }
 
         IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )

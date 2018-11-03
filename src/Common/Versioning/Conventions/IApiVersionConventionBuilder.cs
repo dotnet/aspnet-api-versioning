@@ -7,9 +7,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using System;
 
     /// <summary>
-    /// Defines the behavior of a convention builder for a controller.
+    /// Defines the behavior of an API version convention builder.
     /// </summary>
-    public partial interface IControllerConventionBuilder
+    public partial interface IApiVersionConventionBuilder
     {
         /// <summary>
         /// Indicates that the controller is API version-neutral.
