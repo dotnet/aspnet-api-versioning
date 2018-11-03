@@ -89,20 +89,7 @@
                 }
             }
 
-            var model = actionDescriptor.GetApiVersionModel();
-
-            if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion ) )
-            {
-                return true;
-            }
-
-            if ( model.DeclaredApiVersions.Count == 0 )
-            {
-                model = actionDescriptor.ControllerDescriptor.GetApiVersionModel();
-                return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
-            }
-
-            return false;
+            return actionDescriptor.IsMappedTo( apiVersion );
         }
 
         /// <summary>
@@ -141,8 +128,7 @@
                 }
             }
 
-            var model = controllerDescriptor.GetApiVersionModel();
-            return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
+            return true;
         }
 
         /// <summary>
@@ -429,7 +415,8 @@
             var requestFormatters = new List<MediaTypeFormatter>();
             var responseFormatters = new List<MediaTypeFormatter>();
             var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
-            var deprecated = actionDescriptor.ControllerDescriptor.GetApiVersionModel().DeprecatedApiVersions.Contains( apiVersion );
+            var model = actionDescriptor.GetApiVersionModel();
+            var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
 
             PopulateMediaTypeFormatters( actionDescriptor, routeBuilderContext.ParameterDescriptions, route, responseType, requestFormatters, responseFormatters );
 

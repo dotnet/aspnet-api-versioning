@@ -3,11 +3,11 @@
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
 
-    /// <content>
-    /// Provides additional implementation specific to ASP.NET Core.
-    /// </content>
+    /// <summary>
+    /// Defines the behavior of a convention builder for a controller.
+    /// </summary>
     [CLSCompliant( false )]
-    public partial interface IControllerConventionBuilder : IApiVersionConvention<ControllerModel>
+    public interface IControllerConventionBuilder : IApiVersionConventionBuilder, IApiVersionConvention<ControllerModel>
     {
     }
 }

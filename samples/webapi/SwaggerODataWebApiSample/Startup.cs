@@ -51,7 +51,7 @@ namespace Microsoft.Examples
             };
             var models = modelBuilder.GetEdmModels();
 
-            // TODO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
+            // INFO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
 
             // WHEN VERSIONING BY: query string, header, or media type
             configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureContainer );

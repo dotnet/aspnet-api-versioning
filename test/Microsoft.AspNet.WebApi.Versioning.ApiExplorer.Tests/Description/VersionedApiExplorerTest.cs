@@ -2,6 +2,7 @@
 {
     using FluentAssertions;
     using Microsoft.Web.Http.Routing;
+    using Microsoft.Web.Http.Versioning;
     using Models;
     using Moq;
     using Simulators;
@@ -11,6 +12,7 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
+    using System.Web.Http.Dispatcher;
     using System.Web.Http.Routing;
     using Xunit;
     using static InternalTypeExtensions;
@@ -25,8 +27,12 @@
             // arrange
             var configuration = new HttpConfiguration();
             var routeTemplate = "api/values";
-            var controllerDescriptor = new HttpControllerDescriptor( configuration, "ApiExplorerValues", typeof( ApiExplorerValuesController ) );
-            var action = new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( ApiExplorerValuesController ).GetMethod( "Get" ) );
+            var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+            var controller = new HttpControllerDescriptor( configuration, "ApiExplorerValues", typeof( ApiExplorerValuesController ) );
+            var action = new ReflectedHttpActionDescriptor( controller, typeof( ApiExplorerValuesController ).GetMethod( "Get" ) )
+            {
+                Properties = { [typeof( ApiVersionModel )] = model },
+            };
             var actions = new ReflectedHttpActionDescriptor[] { action };
 
             configuration.Routes.Add( "Route", CreateDirectRoute( routeTemplate, actions ) );
@@ -48,11 +54,18 @@
             // arrange
             var configuration = new HttpConfiguration();
             var routeTemplate = "api/values";
-            var controllerDescriptor = new HttpControllerDescriptor( configuration, "ApiExplorerValues", typeof( ApiExplorerValuesController ) );
+            var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+            var controller = new HttpControllerDescriptor( configuration, "ApiExplorerValues", typeof( ApiExplorerValuesController ) );
             var actions = new ReflectedHttpActionDescriptor[]
             {
-                new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( ApiExplorerValuesController ).GetMethod( "Get" ) ),
-                new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( ApiExplorerValuesController ).GetMethod( "Post" ) ),
+                new ReflectedHttpActionDescriptor( controller, typeof( ApiExplorerValuesController ).GetMethod( "Get" ) )
+                {
+                    Properties = { [typeof(ApiVersionModel)] = model },
+                },
+                new ReflectedHttpActionDescriptor( controller, typeof( ApiExplorerValuesController ).GetMethod( "Post" ) )
+                {
+                    Properties = { [typeof(ApiVersionModel)] = model },
+                },
             };
 
             configuration.Routes.Add( "Route", CreateDirectRoute( routeTemplate, actions ) );
@@ -98,8 +111,12 @@
             // arrange
             var configuration = new HttpConfiguration();
             var routeTemplate = "api/values";
+            var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
             var controllerDescriptor = new HttpControllerDescriptor( configuration, "AttributeApiExplorerValues", typeof( AttributeApiExplorerValuesController ) );
-            var action = new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( AttributeApiExplorerValuesController ).GetMethod( "Action" ) );
+            var action = new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( AttributeApiExplorerValuesController ).GetMethod( "Action" ) )
+            {
+                Properties = { [typeof( ApiVersionModel )] = model },
+            };
             var actions = new ReflectedHttpActionDescriptor[] { action };
             var routeCollection = new List<IHttpRoute>() { CreateDirectRoute( routeTemplate, actions ) };
             var route = NewRouteCollectionRoute();
@@ -198,8 +215,12 @@
             // arrange
             var configuration = new HttpConfiguration();
             var routeTemplate = "api/values/{id}";
+            var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
             var controllerDescriptor = new HttpControllerDescriptor( configuration, "ApiExplorerValues", typeof( DuplicatedIdController ) );
-            var action = new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( DuplicatedIdController ).GetMethod( "Get" ) );
+            var action = new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( DuplicatedIdController ).GetMethod( "Get" ) )
+            {
+                Properties = { [typeof( ApiVersionModel )] = model },
+            };
             var actions = new ReflectedHttpActionDescriptor[] { action };
 
             configuration.Routes.Add( "Route", CreateDirectRoute( routeTemplate, actions ) );
@@ -285,15 +306,14 @@
 
             // act
             var description = descriptionGroup.ApiDescriptions.Single();
-            var relativePath = description.RelativePath;
 
             // assert
             description.Should().BeEquivalentTo(
                 new
                 {
-                    ID = $"GET{relativePath}",
+                    ID = "GETValues",
                     HttpMethod = Get,
-                    RelativePath = relativePath,
+                    RelativePath = "Values",
                     Version = apiVersion
                 },
                 options => options.ExcludingMissingMembers() );
@@ -310,7 +330,6 @@
 
             // act
             var descriptions = descriptionGroup.ApiDescriptions;
-            var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
             descriptions.Should().BeEquivalentTo(
@@ -318,16 +337,16 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}",
+                        ID = "GETValues",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[0],
+                        RelativePath = "Values",
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}",
+                        ID = "GETValues/{id}",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[1],
+                        RelativePath = "Values/{id}",
                         Version = apiVersion
                     }
                 },
@@ -345,7 +364,6 @@
 
             // act
             var descriptions = descriptionGroup.ApiDescriptions;
-            var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
             descriptions.Should().BeEquivalentTo(
@@ -353,25 +371,25 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}",
+                        ID = "GETValues",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[0],
+                        RelativePath = "Values",
                         Version = apiVersion,
                         ActionDescriptor = new { ActionName = "GetV3" }
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}",
+                        ID = "GETValues/{id}",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[1],
+                        RelativePath = "Values/{id}",
                         Version = apiVersion,
                         ActionDescriptor = new { ActionName = "Get" }
                     },
                     new
                     {
-                        ID = $"POST{relativePaths[2]}",
+                        ID = "POSTValues",
                         HttpMethod = Post,
-                        RelativePath = relativePaths[2],
+                        RelativePath = "Values",
                         Version = apiVersion,
                         ActionDescriptor = new { ActionName = "Post" }
                     }
@@ -390,7 +408,6 @@
 
             // act
             var descriptions = descriptionGroup.ApiDescriptions;
-            var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
             descriptionGroup.IsDeprecated.Should().BeTrue();
@@ -399,16 +416,16 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}",
+                        ID = "GETValues",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[0],
+                        RelativePath = "Values",
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}",
+                        ID = "GETValues/{id}",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[1],
+                        RelativePath = "Values/{id}",
                         Version = apiVersion
                     }
                 },
@@ -426,7 +443,6 @@
 
             // act
             var descriptions = descriptionGroup.ApiDescriptions;
-            var relativePaths = descriptions.Select( d => d.RelativePath ).ToArray();
 
             // assert
             descriptions.Should().BeEquivalentTo(
@@ -434,30 +450,30 @@
                 {
                     new
                     {
-                        ID = $"GET{relativePaths[0]}",
+                        ID = "GETValues",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[0],
+                        RelativePath = "Values",
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"GET{relativePaths[1]}",
+                        ID = "GETValues/{id}",
                         HttpMethod = Get,
-                        RelativePath = relativePaths[1],
+                        RelativePath = "Values/{id}",
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"POST{relativePaths[2]}",
+                        ID = "POSTValues",
                         HttpMethod = Post,
-                        RelativePath = relativePaths[2],
+                        RelativePath = "Values",
                         Version = apiVersion
                     },
                     new
                     {
-                        ID = $"DELETE{relativePaths[3]}",
+                        ID = "DELETEValues/{id}",
                         HttpMethod = Delete,
-                        RelativePath = relativePaths[3],
+                        RelativePath = "Values/{id}",
                         Version = apiVersion
                     }
                 },

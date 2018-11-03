@@ -40,8 +40,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <see cref="ApiVersionModel">API version information</see> to aggregate.</param>
         /// <returns>A new <see cref="ApiVersionModel"/> that is the aggregated result of the
         /// <paramref name="otherVersions">other version information</paramref> and the current version information.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract." )]
         public static ApiVersionModel Aggregate( this ApiVersionModel version, IEnumerable<ApiVersionModel> otherVersions )
         {
             Arg.NotNull( version, nameof( version ) );
@@ -71,7 +69,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// </summary>
         /// <param name="versions">The <see cref="ApiVersionModel">API version information</see> to aggregate.</param>
         /// <returns>A new <see cref="ApiVersionModel"/> that is the aggregated result of the provided <paramref name="versions">version information</paramref>.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
         public static ApiVersionModel Aggregate( this IEnumerable<ApiVersionModel> versions )
         {
             Arg.NotNull( versions, nameof( versions ) );

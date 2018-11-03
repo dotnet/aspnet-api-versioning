@@ -25,16 +25,18 @@
             var controllerType = typeof( IHttpController );
             var controllerDescriptor = new Mock<HttpControllerDescriptor>( configuration, "Test", controllerType ) { CallBase = true };
             var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
+            var attribute = new ApiVersionAttribute( version );
 
             controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
                                 .Returns( () => new Collection<IApiVersionNeutral>() );
 
             actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
-                            .Returns( () => new Collection<IApiVersionProvider>() { new ApiVersionAttribute( version ) } );
+                            .Returns( () => new Collection<IApiVersionProvider>() { attribute } );
 
             var newActionDescriptor = actionDescriptor.Object;
 
             newActionDescriptor.ControllerDescriptor = controllerDescriptor.Object;
+            newActionDescriptor.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( attribute.Versions[0] );
 
             return newActionDescriptor;
         }

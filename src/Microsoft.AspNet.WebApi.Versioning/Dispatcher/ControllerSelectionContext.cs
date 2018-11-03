@@ -18,9 +18,10 @@
     {
         readonly Lazy<string> controllerName;
         readonly Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>> controllerInfoCache;
-        readonly Lazy<HttpControllerDescriptorGroup> conventionRouteCandidates;
+        readonly Lazy<CandidateAction[]> conventionRouteCandidates;
         readonly Lazy<CandidateAction[]> directRouteCandidates;
         readonly Lazy<ApiVersionModel> allVersions;
+        readonly ApiVersionRequestProperties requestProperties;
 
         internal ControllerSelectionContext(
             HttpRequestMessage request,
@@ -31,10 +32,11 @@
             Contract.Requires( controllerInfoCache != null );
 
             Request = request;
+            requestProperties = request.ApiVersionProperties();
             this.controllerName = new Lazy<string>( () => controllerName( Request ) );
             this.controllerInfoCache = controllerInfoCache;
             RouteData = request.GetRouteData();
-            conventionRouteCandidates = new Lazy<HttpControllerDescriptorGroup>( GetConventionRouteCandidates );
+            conventionRouteCandidates = new Lazy<CandidateAction[]>( GetConventionRouteCandidates );
             directRouteCandidates = new Lazy<CandidateAction[]>( () => RouteData?.GetDirectRouteCandidates() );
             allVersions = new Lazy<ApiVersionModel>( CreateAggregatedModel );
         }
@@ -45,11 +47,15 @@
 
         internal string ControllerName => controllerName.Value;
 
-        internal ApiVersion RequestedApiVersion => Request.GetRequestedApiVersion();
+        internal ApiVersion RequestedVersion
+        {
+            get => requestProperties.RequestedApiVersion;
+            set => requestProperties.RequestedApiVersion = value;
+        }
 
-        internal HttpControllerDescriptorGroup ConventionRouteCandidates => conventionRouteCandidates.Value;
+        internal CandidateAction[] ConventionRouteCandidates => conventionRouteCandidates.Value;
 
-        internal bool HasConventionBasedRoutes => ConventionRouteCandidates != null && ConventionRouteCandidates.Count > 0;
+        internal bool HasConventionBasedRoutes => ConventionRouteCandidates != null && ConventionRouteCandidates.Length > 0;
 
         internal CandidateAction[] DirectRouteCandidates => directRouteCandidates.Value;
 
@@ -121,8 +127,28 @@
             return controllers.Distinct();
         }
 
-        HttpControllerDescriptorGroup GetConventionRouteCandidates() =>
-            !string.IsNullOrEmpty( ControllerName ) && controllerInfoCache.Value.TryGetValue( ControllerName, out var candidates ) ? candidates : default;
+        CandidateAction[] GetConventionRouteCandidates()
+        {
+            if ( string.IsNullOrEmpty( ControllerName ) || !controllerInfoCache.Value.TryGetValue( ControllerName, out var controllers ) )
+            {
+                return default;
+            }
+
+            var candidates = new List<CandidateAction>();
+
+            foreach ( var controller in controllers )
+            {
+                var actionSelector = controller.Configuration.Services.GetActionSelector();
+                var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
+
+                foreach ( var action in actions )
+                {
+                    candidates.Add( new CandidateAction( action ) );
+                }
+            }
+
+            return candidates.ToArray();
+        }
 
         ApiVersionModel CreateAggregatedModel()
         {
@@ -130,12 +156,12 @@
 
             if ( HasConventionBasedRoutes )
             {
-                models = models.Union( ConventionRouteCandidates.Select( c => c.GetProperty<ApiVersionModel>() ).Where( m => m != null ) );
+                models = models.Union( ConventionRouteCandidates.Select( c => c.ActionDescriptor.GetApiVersionModel() ) );
             }
 
             if ( HasAttributeBasedRoutes )
             {
-                models = models.Union( DirectRouteCandidates.Select( c => c.ActionDescriptor.GetProperty<ApiVersionModel>() ).Where( m => m != null ) );
+                models = models.Union( DirectRouteCandidates.Select( c => c.ActionDescriptor.GetApiVersionModel() ) );
             }
 
             return models.Aggregate();

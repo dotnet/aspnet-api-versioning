@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
-    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -9,22 +8,22 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
+    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Environment;
 
-    sealed class ConventionRouteControllerSelector : ControllerSelector
+    sealed class ConventionRouteControllerSelector : IControllerSelector
     {
         readonly HttpControllerTypeCache controllerTypeCache;
 
-        internal ConventionRouteControllerSelector( ApiVersioningOptions options, HttpControllerTypeCache controllerTypeCache )
-            : base( options ) => this.controllerTypeCache = controllerTypeCache;
+        internal ConventionRouteControllerSelector( HttpControllerTypeCache controllerTypeCache ) => this.controllerTypeCache = controllerTypeCache;
 
-        internal override ControllerSelectionResult SelectController( ControllerSelectionContext context )
+        public ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
             Contract.Requires( context != null );
             Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
 
             var request = context.Request;
-            var requestedVersion = context.RequestedApiVersion;
+            var requestedVersion = context.RequestedVersion;
             var controllerName = context.ControllerName;
             var result = new ControllerSelectionResult()
             {
@@ -38,129 +37,53 @@
                 return result;
             }
 
-            var ambiguousException = new Lazy<Exception>( () => CreateAmbiguousControllerException( context.RouteData.Route, controllerName, controllerTypeCache.GetControllerTypes( controllerName ) ) );
-            var versionNeutralController = result.Controller = GetVersionNeutralController( context.ConventionRouteCandidates, ambiguousException );
+            var bestMatch = default( HttpActionDescriptor );
+            var bestMatches = new HashSet<HttpControllerDescriptor>();
+            var implicitMatches = new HashSet<HttpControllerDescriptor>();
 
-            if ( requestedVersion == null )
+            for ( var i = 0; i < context.ConventionRouteCandidates.Length; i++ )
             {
-                if ( !AssumeDefaultVersionWhenUnspecified )
+                var action = context.ConventionRouteCandidates[i].ActionDescriptor;
+
+                switch ( action.MappingTo( requestedVersion ) )
                 {
-                    return result;
+                    case Explicit:
+                        bestMatch = action;
+                        bestMatches.Add( action.ControllerDescriptor );
+                        break;
+                    case Implicit:
+                        implicitMatches.Add( action.ControllerDescriptor );
+                        break;
                 }
-
-                requestedVersion = ApiVersionSelector.SelectVersion( request, context.AllVersions );
-
-                if ( requestedVersion == null )
-                {
-                    return result;
-                }
             }
 
-            var versionedController = GetVersionedController( context, requestedVersion, ambiguousException );
-
-            if ( versionedController == null )
+            switch ( bestMatches.Count )
             {
-                return result;
+                case 0:
+                    bestMatches.UnionWith( implicitMatches );
+                    break;
+                case 1:
+                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
+                    {
+                        bestMatches.UnionWith( implicitMatches );
+                    }
+
+                    break;
             }
 
-            if ( versionNeutralController != null )
+            switch ( bestMatches.Count )
             {
-                throw ambiguousException.Value;
+                case 0:
+                    break;
+                case 1:
+                    result.Controller = bestMatches.Single();
+                    result.Controller.SetPossibleCandidates( context.ConventionRouteCandidates.Select( c => c.ActionDescriptor.ControllerDescriptor ).ToArray() );
+                    break;
+                default:
+                    throw CreateAmbiguousControllerException( context.RouteData.Route, controllerName, controllerTypeCache.GetControllerTypes( controllerName ) );
             }
-
-            request.ApiVersionProperties().RequestedApiVersion = requestedVersion;
-            result.RequestedVersion = requestedVersion;
-            result.Controller = versionedController;
 
             return result;
-        }
-
-        static HttpControllerDescriptor GetVersionNeutralController( IEnumerable<HttpControllerDescriptor> candidates, Lazy<Exception> ambiguousException )
-        {
-            Contract.Requires( candidates != null );
-            Contract.Requires( ambiguousException != null );
-
-            var controllerDescriptor = default( HttpControllerDescriptor );
-
-            using ( var iterator = candidates.Where( c => c.IsApiVersionNeutral() ).GetEnumerator() )
-            {
-                if ( !iterator.MoveNext() )
-                {
-                    return controllerDescriptor;
-                }
-
-                controllerDescriptor = iterator.Current;
-
-                while ( iterator.MoveNext() )
-                {
-                    var candidate = iterator.Current;
-
-                    if ( candidate != controllerDescriptor )
-                    {
-                        throw ambiguousException.Value;
-                    }
-                }
-            }
-
-            return controllerDescriptor;
-        }
-
-        static HttpControllerDescriptor GetVersionedController( ControllerSelectionContext context, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
-        {
-            Contract.Requires( context != null );
-            Contract.Requires( requestedVersion != null );
-            Contract.Requires( ambiguousException != null );
-
-            var candidates = context.ConventionRouteCandidates;
-            var controller = candidates[0];
-
-            if ( candidates.Count == 1 )
-            {
-                if ( !controller.GetDeclaredApiVersions().Contains( requestedVersion ) )
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                if ( ( controller = ResolveController( candidates, requestedVersion, ambiguousException ) ) == null )
-                {
-                    return null;
-                }
-            }
-
-            controller.SetRelatedCandidates( candidates );
-            return controller;
-        }
-
-        static HttpControllerDescriptor ResolveController( IEnumerable<HttpControllerDescriptor> candidates, ApiVersion requestedVersion, Lazy<Exception> ambiguousException )
-        {
-            Contract.Requires( candidates != null );
-            Contract.Requires( requestedVersion != null );
-            Contract.Requires( ambiguousException != null );
-
-            var controllerDescriptor = default( HttpControllerDescriptor );
-            var matches = candidates.Where( c => c.GetDeclaredApiVersions().Contains( requestedVersion ) );
-
-            using ( var iterator = matches.GetEnumerator() )
-            {
-                if ( !iterator.MoveNext() )
-                {
-                    return null;
-                }
-
-                controllerDescriptor = iterator.Current;
-
-                while ( iterator.MoveNext() )
-                {
-                    if ( iterator.Current != controllerDescriptor )
-                    {
-                        throw ambiguousException.Value;
-                    }
-                }
-            }
-
-            return controllerDescriptor;
         }
 
         static Exception CreateAmbiguousControllerException( IHttpRoute route, string controllerName, ICollection<Type> matchingTypes )

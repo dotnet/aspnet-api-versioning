@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Mvc
     /// <summary>
     /// Represents the metadata to indicate a service is API version neutral.
     /// </summary>
-    [AttributeUsage( Class, AllowMultiple = false, Inherited = true )]
+    [AttributeUsage( Class | Method, AllowMultiple = false, Inherited = true )]
     public sealed class ApiVersionNeutralAttribute : Attribute, IApiVersionNeutral
     {
     }

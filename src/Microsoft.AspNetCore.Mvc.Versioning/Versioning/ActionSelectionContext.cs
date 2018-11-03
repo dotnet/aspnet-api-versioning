@@ -57,6 +57,6 @@
         /// implicit API version matching is allowed and a version has been selected.</remarks>
         public ApiVersion RequestedVersion { get; set; }
 
-        ApiVersionModel CreateAggregatedModel() => MatchingActions.Select( action => action.GetProperty<ApiVersionModel>() ).Where( model => model != null ).Aggregate();
+        ApiVersionModel CreateAggregatedModel() => MatchingActions.Select( action => action.GetApiVersionModel() ).Aggregate();
     }
 }

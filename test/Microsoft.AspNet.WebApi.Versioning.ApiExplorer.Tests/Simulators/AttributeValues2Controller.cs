@@ -8,7 +8,7 @@
     [ApiVersion( "2.0" )]
     [ApiVersion( "3.0-beta", Deprecated = true )]
     [ApiVersion( "3.0" )]
-    [RoutePrefix( "values" )]
+    [RoutePrefix( "Values" )]
     public class AttributeValues2Controller : ApiController
     {
         [Route]

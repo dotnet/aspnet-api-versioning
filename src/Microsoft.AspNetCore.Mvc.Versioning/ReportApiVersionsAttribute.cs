@@ -1,10 +1,9 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Filters;
-    using System;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using System;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -46,9 +45,9 @@
                 return;
             }
 
-            var model = context.ActionDescriptor.GetProperty<ApiVersionModel>();
+            var model = context.ActionDescriptor.GetApiVersionModel();
 
-            if ( model?.IsApiVersionNeutral == false )
+            if ( !model.IsApiVersionNeutral )
             {
                 reporter.Report( response.Headers, model );
             }

@@ -85,15 +85,17 @@
                              .AdvertisesApiVersion( 3, 0 )
                              .AdvertisesDeprecatedApiVersion( 3, 0, "Beta" );
 
+            var actionDescriptor = configuration.Services.GetActionSelector().GetActionMapping( controllerDescriptor ).SelectMany( g => g ).Single();
+
             // act
             controllerBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
+            actionDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 2, 0 ) },
+                    DeclaredApiVersions = new ApiVersion[0],
                     SupportedApiVersions = new[] { new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
                     DeprecatedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 3, 0, "Beta" ) },
                     ImplementedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 3, 0, "Beta" ) }
@@ -119,11 +121,13 @@
                              .AdvertisesDeprecatedApiVersion( 3, 0, "Beta" )
                              .IsApiVersionNeutral();
 
+            var actionDescriptor = configuration.Services.GetActionSelector().GetActionMapping( controllerDescriptor ).SelectMany( g => g ).Single();
+
             // act
             controllerBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
+            actionDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = true,
@@ -151,15 +155,17 @@
             controllerBuilder.HasApiVersion( 1, 0 )
                              .AdvertisesApiVersion( 4, 0 );
 
+            var actionDescriptor = configuration.Services.GetActionSelector().GetActionMapping( controllerDescriptor ).SelectMany( g => g ).Single();
+
             // act
             controllerBuilder.ApplyTo( controllerDescriptor );
 
             // assert
-            controllerDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
+            actionDescriptor.GetApiVersionModel().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) },
+                    DeclaredApiVersions = new ApiVersion[0],
                     SupportedApiVersions = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 4, 0 ) },
                     DeprecatedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 3, 0, "Beta" ) },
                     ImplementedApiVersions = new[] { new ApiVersion( 0, 9 ), new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 3, 0, "Beta" ), new ApiVersion( 4, 0 ) }

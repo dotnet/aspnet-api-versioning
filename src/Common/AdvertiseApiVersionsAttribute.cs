@@ -18,11 +18,13 @@ namespace Microsoft.AspNetCore.Mvc
     /// </summary>
     /// <remarks>Advertised service API versions indicate the existence of other versioned services, but the implementation of those
     /// services are implemented elsewhere.</remarks>
-    [AttributeUsage( Class, AllowMultiple = true, Inherited = false )]
+    [AttributeUsage( Class | Method, AllowMultiple = true, Inherited = false )]
     [SuppressMessage( "Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "An accessor property is provided, but the values are typed; not strings." )]
     [SuppressMessage( "Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Justification = "Allows extensibility." )]
-    public partial class AdvertiseApiVersionsAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
+    public class AdvertiseApiVersionsAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     {
+        ApiVersionProviderOptions options = ApiVersionProviderOptions.Advertised;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AdvertiseApiVersionsAttribute"/> class.
         /// </summary>
@@ -49,7 +51,7 @@ namespace Microsoft.AspNetCore.Mvc
         public AdvertiseApiVersionsAttribute( params string[] versions ) : base( versions ) { }
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types
-        bool IApiVersionProvider.AdvertiseOnly => true;
+        ApiVersionProviderOptions IApiVersionProvider.Options => options;
 #pragma warning restore CA1033 // Interface methods should be callable by child types
 
         /// <summary>
@@ -57,7 +59,21 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <value>True if the specified set of API versions are deprecated; otherwise, false.
         /// The default value is <c>false</c>.</value>
-        public bool Deprecated { get; set; }
+        public bool Deprecated
+        {
+            get => ( options & ApiVersionProviderOptions.Deprecated ) == ApiVersionProviderOptions.Deprecated;
+            set
+            {
+                if ( value )
+                {
+                    options |= ApiVersionProviderOptions.Deprecated;
+                }
+                else
+                {
+                    options &= ~ApiVersionProviderOptions.Deprecated;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns a hash code for the current instance.

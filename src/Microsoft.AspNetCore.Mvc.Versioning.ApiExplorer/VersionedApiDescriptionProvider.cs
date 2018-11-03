@@ -1,15 +1,14 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Globalization.CultureInfo;
     using static System.Linq.Enumerable;
 
@@ -67,24 +66,7 @@
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
             Arg.NotNull( apiVersion, nameof( actionDescriptor ) );
 
-            var model = actionDescriptor.GetProperty<ApiVersionModel>();
-
-            if ( model != null )
-            {
-                if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion ) )
-                {
-                    return true;
-                }
-
-                if ( model.DeclaredApiVersions.Count > 0 )
-                {
-                    return false;
-                }
-            }
-
-            model = actionDescriptor.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-            return model != null && ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion ) );
+            return actionDescriptor.IsMappedTo( apiVersion );
         }
 
         /// <summary>
@@ -168,10 +150,9 @@
             foreach ( var description in descriptions )
             {
                 var action = description.ActionDescriptor;
-                var model = action.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
-                var implicitModel = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
+                var model = action.GetApiVersionModel( Explicit | Implicit );
 
-                foreach ( var version in model.DeclaredApiVersions.Union( implicitModel.DeclaredApiVersions ) )
+                foreach ( var version in model.DeclaredApiVersions )
                 {
                     versions.Add( version );
                 }

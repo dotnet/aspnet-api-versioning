@@ -27,29 +27,34 @@
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
 
-            foreach ( var controller in application.Controllers )
+            for ( var i = 0; i < application.Controllers.Count; i++ )
             {
+                var controller = application.Controllers[i];
+
                 if ( metadataControllerType.IsAssignableFrom( controller.ControllerType ) )
                 {
                     metadataController = controller;
+                    continue;
                 }
-                else
+
+                for ( var j = 0; j < controller.Actions.Count; j++ )
                 {
-                    var model = controller.GetProperty<ApiVersionModel>();
+                    var action = controller.Actions[j];
+                    var model = action.GetProperty<ApiVersionModel>();
 
                     if ( model == null )
                     {
                         continue;
                     }
 
-                    foreach ( var apiVersion in model.SupportedApiVersions )
+                    for ( var k = 0; k < model.SupportedApiVersions.Count; k++ )
                     {
-                        supported.Add( apiVersion );
+                        supported.Add( model.SupportedApiVersions[k] );
                     }
 
-                    foreach ( var apiVersion in model.DeprecatedApiVersions )
+                    for ( var k = 0; k < model.DeprecatedApiVersions.Count; k++ )
                     {
-                        deprecated.Add( apiVersion );
+                        deprecated.Add( model.DeprecatedApiVersions[k] );
                     }
                 }
             }

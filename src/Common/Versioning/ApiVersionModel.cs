@@ -24,34 +24,30 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         static readonly Lazy<ApiVersionModel> neutralVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( NeutralModel ) );
         static readonly Lazy<ApiVersionModel> emptyVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( EmptyModel ) );
 #if WEBAPI
-        static readonly Lazy<IReadOnlyList<ApiVersion>> emptyVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new ApiVersion[0] );
+        static readonly IReadOnlyList<ApiVersion> emptyVersions = new ApiVersion[0];
 #else
-        static readonly Lazy<IReadOnlyList<ApiVersion>> emptyVersions = new Lazy<IReadOnlyList<ApiVersion>>( Array.Empty<ApiVersion> );
+        static readonly IReadOnlyList<ApiVersion> emptyVersions = Array.Empty<ApiVersion>();
 #endif
-        static readonly Lazy<IReadOnlyList<ApiVersion>> defaultVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new[] { ApiVersion.Default } );
-        readonly Lazy<IReadOnlyList<ApiVersion>> declaredVersions;
-        readonly Lazy<IReadOnlyList<ApiVersion>> implementedVersions;
-        readonly Lazy<IReadOnlyList<ApiVersion>> supportedVersions;
-        readonly Lazy<IReadOnlyList<ApiVersion>> deprecatedVersions;
+        static readonly IReadOnlyList<ApiVersion> defaultVersions = new[] { ApiVersion.Default };
 
         ApiVersionModel( int kind )
         {
             switch ( kind )
             {
                 case DefaultModel:
-                    declaredVersions = defaultVersions;
-                    implementedVersions = defaultVersions;
-                    supportedVersions = defaultVersions;
-                    deprecatedVersions = emptyVersions;
+                    DeclaredApiVersions = defaultVersions;
+                    ImplementedApiVersions = defaultVersions;
+                    SupportedApiVersions = defaultVersions;
+                    DeprecatedApiVersions = emptyVersions;
                     break;
                 case NeutralModel:
                     IsApiVersionNeutral = true;
                     goto case EmptyModel;
                 case EmptyModel:
-                    declaredVersions = emptyVersions;
-                    implementedVersions = emptyVersions;
-                    supportedVersions = emptyVersions;
-                    deprecatedVersions = emptyVersions;
+                    DeclaredApiVersions = emptyVersions;
+                    ImplementedApiVersions = emptyVersions;
+                    SupportedApiVersions = emptyVersions;
+                    DeprecatedApiVersions = emptyVersions;
                     break;
             }
         }
@@ -65,45 +61,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             if ( IsApiVersionNeutral = implemented.Count == 0 )
             {
-                declaredVersions = emptyVersions;
-                implementedVersions = emptyVersions;
-                supportedVersions = emptyVersions;
-                deprecatedVersions = emptyVersions;
+                DeclaredApiVersions = emptyVersions;
+                ImplementedApiVersions = emptyVersions;
+                SupportedApiVersions = emptyVersions;
+                DeprecatedApiVersions = emptyVersions;
             }
             else
             {
-                declaredVersions = original.declaredVersions;
-                implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => implemented );
-                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supported );
-                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => deprecated );
-            }
-        }
-
-        internal ApiVersionModel(
-            bool apiVersionNeutral,
-            IEnumerable<ApiVersion> supported,
-            IEnumerable<ApiVersion> deprecated,
-            IEnumerable<ApiVersion> advertised,
-            IEnumerable<ApiVersion> deprecatedAdvertised )
-        {
-            Contract.Requires( supported != null );
-            Contract.Requires( deprecated != null );
-            Contract.Requires( advertised != null );
-            Contract.Requires( deprecatedAdvertised != null );
-
-            if ( IsApiVersionNeutral = apiVersionNeutral )
-            {
-                declaredVersions = emptyVersions;
-                implementedVersions = emptyVersions;
-                supportedVersions = emptyVersions;
-                deprecatedVersions = emptyVersions;
-            }
-            else
-            {
-                declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( supported.Union( deprecated ).ToSortedReadOnlyList );
-                supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supported.Union( advertised ).ToSortedReadOnlyList );
-                deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecated.Union( deprecatedAdvertised ).ToSortedReadOnlyList );
-                implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => supportedVersions.Value.Union( deprecatedVersions.Value ).ToSortedReadOnlyList() );
+                DeclaredApiVersions = original.DeclaredApiVersions;
+                ImplementedApiVersions = implemented;
+                SupportedApiVersions = supported;
+                DeprecatedApiVersions = deprecated;
             }
         }
 
@@ -116,10 +84,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         {
             Arg.NotNull( declaredVersion, nameof( declaredVersion ) );
 
-            declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => new[] { declaredVersion } );
-            implementedVersions = declaredVersions;
-            supportedVersions = declaredVersions;
-            deprecatedVersions = emptyVersions;
+            DeclaredApiVersions = new[] { declaredVersion };
+            ImplementedApiVersions = DeclaredApiVersions;
+            SupportedApiVersions = DeclaredApiVersions;
+            DeprecatedApiVersions = emptyVersions;
         }
 
         /// <summary>
@@ -136,10 +104,30 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             Arg.NotNull( supportedVersions, nameof( supportedVersions ) );
             Arg.NotNull( deprecatedVersions, nameof( deprecatedVersions ) );
 
-            declaredVersions = emptyVersions;
-            implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.Union( deprecatedVersions ).Distinct().ToSortedReadOnlyList );
-            this.supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.ToSortedReadOnlyList );
-            this.deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecatedVersions.ToSortedReadOnlyList );
+            DeclaredApiVersions = emptyVersions;
+            ImplementedApiVersions = supportedVersions.Union( deprecatedVersions ).Distinct().ToSortedReadOnlyList();
+            SupportedApiVersions = supportedVersions.ToSortedReadOnlyList();
+            DeprecatedApiVersions = deprecatedVersions.ToSortedReadOnlyList();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
+        /// </summary>
+        /// <param name="supportedVersions">The supported <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        /// <param name="deprecatedVersions">The deprecated <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        /// <param name="advertisedVersions">The advertised <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        /// <param name="deprecatedAdvertisedVersions">The deprecated, advertised <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiVersion">API versions</see> on a controller.</param>
+        public ApiVersionModel(
+            IEnumerable<ApiVersion> supportedVersions,
+            IEnumerable<ApiVersion> deprecatedVersions,
+            IEnumerable<ApiVersion> advertisedVersions,
+            IEnumerable<ApiVersion> deprecatedAdvertisedVersions )
+            : this( supportedVersions.Union( deprecatedVersions ), supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions )
+        {
+            Arg.NotNull( supportedVersions, nameof( supportedVersions ) );
+            Arg.NotNull( deprecatedVersions, nameof( deprecatedVersions ) );
+            Arg.NotNull( advertisedVersions, nameof( advertisedVersions ) );
+            Arg.NotNull( deprecatedAdvertisedVersions, nameof( deprecatedAdvertisedVersions ) );
         }
 
         /// <summary>
@@ -163,10 +151,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             Arg.NotNull( advertisedVersions, nameof( advertisedVersions ) );
             Arg.NotNull( deprecatedAdvertisedVersions, nameof( deprecatedAdvertisedVersions ) );
 
-            this.declaredVersions = new Lazy<IReadOnlyList<ApiVersion>>( declaredVersions.ToSortedReadOnlyList );
-            this.supportedVersions = new Lazy<IReadOnlyList<ApiVersion>>( supportedVersions.Union( advertisedVersions ).ToSortedReadOnlyList );
-            this.deprecatedVersions = new Lazy<IReadOnlyList<ApiVersion>>( deprecatedVersions.Union( deprecatedAdvertisedVersions ).ToSortedReadOnlyList );
-            implementedVersions = new Lazy<IReadOnlyList<ApiVersion>>( () => this.supportedVersions.Value.Union( this.deprecatedVersions.Value ).ToSortedReadOnlyList() );
+            DeclaredApiVersions = declaredVersions.ToSortedReadOnlyList();
+            SupportedApiVersions = supportedVersions.Union( advertisedVersions ).ToSortedReadOnlyList();
+            DeprecatedApiVersions = deprecatedVersions.Union( deprecatedAdvertisedVersions ).ToSortedReadOnlyList();
+            ImplementedApiVersions = SupportedApiVersions.Union( DeprecatedApiVersions ).ToSortedReadOnlyList();
         }
 
         string DebuggerDisplayText => IsApiVersionNeutral ? "*.*" : string.Join( ", ", DeclaredApiVersions );
@@ -202,7 +190,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersion">API versions</see>
         /// declared by the controller or action.</value>
         /// <remarks>The declared API versions are constrained to the versions declared explicitly by the specified controller or action.</remarks>
-        public IReadOnlyList<ApiVersion> DeclaredApiVersions => declaredVersions.Value;
+        public IReadOnlyList<ApiVersion> DeclaredApiVersions { get; }
 
         /// <summary>
         /// Gets the API versions implemented by the controller or action.
@@ -210,14 +198,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersion">API versions</see>
         /// implemented by the controller or action.</value>
         /// <remarks>The implemented API versions include the supported and deprecated API versions.</remarks>
-        public IReadOnlyList<ApiVersion> ImplementedApiVersions => implementedVersions.Value;
+        public IReadOnlyList<ApiVersion> ImplementedApiVersions { get; }
 
         /// <summary>
         /// Gets the API versions supported by the controller.
         /// </summary>
         /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersion">API versions</see>
         /// supported by the controller.</value>
-        public IReadOnlyList<ApiVersion> SupportedApiVersions => supportedVersions.Value;
+        public IReadOnlyList<ApiVersion> SupportedApiVersions { get; }
 
         /// <summary>
         /// Gets the API versions deprecated by the controller.
@@ -227,6 +215,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>A deprecated API version does not mean it is not supported by the controller. A deprecated API
         /// version is typically advertised six months or more before it becomes unsupported; in which case, the
         /// controller would no longer indicate that it is an <see cref="ImplementedApiVersions">implemented version</see>.</remarks>
-        public IReadOnlyList<ApiVersion> DeprecatedApiVersions => deprecatedVersions.Value;
+        public IReadOnlyList<ApiVersion> DeprecatedApiVersions { get; }
     }
 }

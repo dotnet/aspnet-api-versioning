@@ -6,7 +6,7 @@
     using System.Text;
 
     // REF: https://raw.githubusercontent.com/aspnet/Common/dev/shared/Microsoft.Extensions.TypeNameHelper.Sources/TypeNameHelper.cs
-    static class TypeNameHelper
+    static class TypeExtensions
     {
         static readonly Dictionary<Type, string> BuiltInTypeNames = new Dictionary<Type, string>
         {
@@ -27,8 +27,6 @@
             [typeof( ulong )] = "ulong",
             [typeof( ushort )] = "ushort",
         };
-
-        internal static string GetTypeDisplayName( object item, bool fullName = true ) => item?.GetType().GetTypeDisplayName( fullName );
 
         /// <summary>
         /// Pretty print a type name.

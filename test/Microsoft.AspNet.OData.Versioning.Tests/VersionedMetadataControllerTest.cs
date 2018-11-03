@@ -15,15 +15,6 @@
 
     public class VersionedMetadataControllerTest
     {
-        [ApiVersion( "1.0" )]
-        [ApiVersion( "2.0" )]
-        sealed class Controller1 : ODataController { }
-
-        [ApiVersion( "2.0", Deprecated = true )]
-        [ApiVersion( "3.0-Beta", Deprecated = true )]
-        [ApiVersion( "3.0" )]
-        sealed class Controller2 : ODataController { }
-
         [Fact]
         public async Task options_should_return_expected_headers()
         {
@@ -56,6 +47,21 @@
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Beta" );
             response.Content.Headers.Allow.Should().BeEquivalentTo( "GET", "OPTIONS" );
+        }
+
+        [ApiVersion( "1.0" )]
+        [ApiVersion( "2.0" )]
+        sealed class Controller1 : ODataController
+        {
+            public IHttpActionResult Get() => Ok();
+        }
+
+        [ApiVersion( "2.0", Deprecated = true )]
+        [ApiVersion( "3.0-Beta", Deprecated = true )]
+        [ApiVersion( "3.0" )]
+        sealed class Controller2 : ODataController
+        {
+            public IHttpActionResult Get() => Ok();
         }
     }
 }

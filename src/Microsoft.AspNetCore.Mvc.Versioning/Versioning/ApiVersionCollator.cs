@@ -38,11 +38,6 @@
         /// <inheritdoc />
         public virtual void OnProvidersExecuted( ActionDescriptorProviderContext context )
         {
-            if ( !Options.ReportApiVersions )
-            {
-                return;
-            }
-
             foreach ( var actions in GroupActionsByController( context.Results ) )
             {
                 var collatedModel = CollateModel( actions );
@@ -51,7 +46,7 @@
                 {
                     var model = action.GetProperty<ApiVersionModel>();
 
-                    if ( model != null )
+                    if ( model != null && !model.IsApiVersionNeutral )
                     {
                         action.SetProperty( model.Aggregate( collatedModel ) );
                     }
@@ -150,7 +145,6 @@
             return name;
         }
 
-        static ApiVersionModel CollateModel( IEnumerable<ActionDescriptor> actions ) =>
-            actions.Select( a => a.GetProperty<ApiVersionModel>() ).Where( m => m != null ).Aggregate();
+        static ApiVersionModel CollateModel( IEnumerable<ActionDescriptor> actions ) => actions.Select( a => a.GetApiVersionModel() ).Aggregate();
     }
 }

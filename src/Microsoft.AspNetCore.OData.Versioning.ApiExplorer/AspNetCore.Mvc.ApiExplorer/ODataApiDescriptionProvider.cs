@@ -12,7 +12,6 @@
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.AspNetCore.Routing.Template;
     using Microsoft.Extensions.Options;
@@ -27,6 +26,7 @@
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
     using static Microsoft.AspNetCore.Http.StatusCodes;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Linq.Enumerable;
     using static System.StringComparison;
 
@@ -158,7 +158,7 @@
                     continue;
                 }
 
-                var model = GetModel( action );
+                var model = action.GetApiVersionModel( Explicit | Implicit );
 
                 if ( model.IsApiVersionNeutral )
                 {
@@ -216,20 +216,6 @@
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
             parameterSource.AddParameters( context );
-        }
-
-        static ApiVersionModel GetModel( ControllerActionDescriptor action )
-        {
-            Contract.Requires( action != null );
-
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model == null || model.DeclaredApiVersions.Count == 0 )
-            {
-                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-            }
-
-            return model;
         }
 
         static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action )

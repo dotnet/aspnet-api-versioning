@@ -144,18 +144,19 @@
             var matches = EvaluateActionConstraints( context, candidates );
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var bestActions = SelectBestActions( selectionContext );
-            var finalMatch = bestActions.Select( action => new ActionCandidate( action ) )
-                                        .OrderByDescending( candidate => candidate.FilteredParameters.Count )
-                                        .ThenByDescending( candidate => candidate.TotalParameterCount )
-                                        .FirstOrDefault()?.Action;
-            IReadOnlyList<ActionDescriptor> finalMatches = finalMatch == null ? Array.Empty<ActionDescriptor>() : new[] { finalMatch };
+            var finalMatches = bestActions.Select( action => new ActionCandidate( action ) )
+                                          .OrderByDescending( candidate => candidate.FilteredParameters.Count )
+                                          .ThenByDescending( candidate => candidate.TotalParameterCount )
+                                          .Take( 1 )
+                                          .Select( candidate => candidate.Action )
+                                          .ToArray();
             var feature = httpContext.Features.Get<IApiVersioningFeature>();
             var selectionResult = feature.SelectionResult;
 
             feature.RequestedApiVersion = selectionContext.RequestedVersion;
             selectionResult.AddCandidates( candidates );
 
-            if ( finalMatches.Count == 0 )
+            if ( finalMatches.Length == 0 )
             {
                 return null;
             }
@@ -172,11 +173,22 @@
             {
                 Contract.Requires( action != null );
 
-                var filteredParameters = new List<string>( action.Parameters.Count );
+                TotalParameterCount = action.Parameters.Count;
 
-                foreach ( var parameter in action.Parameters )
+                var filteredParameters = new List<string>( TotalParameterCount );
+
+                for ( var i = 0; i < TotalParameterCount; i++ )
                 {
-                    if ( parameter.ParameterType.IsModelBound() || parameter.BindingInfo?.BindingSource != Path )
+                    var parameter = action.Parameters[i];
+
+                    if ( parameter.ParameterType.IsModelBound() )
+                    {
+                        continue;
+                    }
+
+                    var bindingSource = parameter.BindingInfo?.BindingSource;
+
+                    if ( bindingSource != Custom && bindingSource != Path )
                     {
                         continue;
                     }
@@ -190,7 +202,7 @@
 
             internal ActionDescriptor Action { get; }
 
-            internal int TotalParameterCount => Action.Parameters.Count;
+            internal int TotalParameterCount { get; }
 
             internal IReadOnlyList<string> FilteredParameters { get; }
         }

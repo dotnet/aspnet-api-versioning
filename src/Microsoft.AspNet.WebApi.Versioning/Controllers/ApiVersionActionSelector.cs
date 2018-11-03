@@ -1,13 +1,13 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
-    using Microsoft.Web.Http.Dispatcher;
-    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
+    using System.Web.Http.Services;
+    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Threading.Interlocked;
 
     /// <summary>
@@ -73,35 +73,32 @@
 
             var request = controllerContext.Request;
             var requestedVersion = request.GetRequestedApiVersion();
-            var model = new Lazy<ApiVersionModel>( controllerContext.ControllerDescriptor.GetApiVersionModel );
-            var exceptionFactory = new HttpResponseExceptionFactory( request, model );
 
             if ( candidateActions.Count == 1 )
             {
                 var action = candidateActions[0];
-                var versions = action.GetApiVersions();
-                var matched = versions.Count == 0 || versions.Contains( requestedVersion );
-                return matched ? action : null;
+                return action.MappingTo( requestedVersion ) != None ? action : null;
             }
 
-            var implicitMatches = new List<HttpActionDescriptor>();
-            var explicitMatches = new List<HttpActionDescriptor>();
+            var bestMatches = new List<HttpActionDescriptor>( candidateActions.Count );
+            var implicitMatches = new List<HttpActionDescriptor>( bestMatches.Count );
 
-            foreach ( var action in candidateActions )
+            for ( var i = 0; i < candidateActions.Count; i++ )
             {
-                var versions = action.GetApiVersions();
+                var action = candidateActions[i];
 
-                if ( versions.Count == 0 )
+                switch ( action.MappingTo( requestedVersion ) )
                 {
-                    implicitMatches.Add( action );
-                }
-                else if ( versions.Contains( requestedVersion ) )
-                {
-                    explicitMatches.Add( action );
+                    case Explicit:
+                        bestMatches.Add( action );
+                        break;
+                    case Implicit:
+                        implicitMatches.Add( action );
+                        break;
                 }
             }
 
-            switch ( explicitMatches.Count )
+            switch ( bestMatches.Count )
             {
                 case 0:
                     switch ( implicitMatches.Count )
@@ -116,9 +113,9 @@
 
                     break;
                 case 1:
-                    return explicitMatches[0];
+                    return bestMatches[0];
                 default:
-                    throw CreateAmbiguousActionException( explicitMatches );
+                    throw CreateAmbiguousActionException( bestMatches );
             }
 
             return null;
@@ -134,6 +131,8 @@
         {
             Contract.Requires( controllerDescriptor != null );
             Contract.Ensures( Contract.Result<ActionSelectorCacheItem>() != null );
+
+            controllerDescriptor = Decorator.GetInner( controllerDescriptor );
 
             if ( fastCache == null )
             {

@@ -4,7 +4,6 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
@@ -18,9 +17,7 @@
     public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnlyList<HttpControllerDescriptor>
 #pragma warning restore CA1710 // Identifiers should have correct suffix
     {
-        readonly HttpControllerDescriptor firstDescriptor;
         readonly IReadOnlyList<HttpControllerDescriptor> descriptors;
-        readonly IReadOnlyDictionary<ApiVersion, HttpControllerDescriptor> controllerMapping;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
@@ -32,9 +29,7 @@
             Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
             Arg.InRange( controllerDescriptors.Length, 1, nameof( controllerDescriptors ) );
 
-            firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
-            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -52,9 +47,7 @@
             Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
             Arg.InRange( controllerDescriptors.Length, 1, nameof( controllerDescriptors ) );
 
-            firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
-            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -67,9 +60,7 @@
             Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
             Arg.InRange( controllerDescriptors.Count, 1, nameof( controllerDescriptors ) );
 
-            firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
-            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -87,9 +78,7 @@
             Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
             Arg.InRange( controllerDescriptors.Count, 1, nameof( controllerDescriptors ) );
 
-            firstDescriptor = controllerDescriptors[0];
             descriptors = controllerDescriptors;
-            controllerMapping = MapApiVersionsToControllerDescriptors( descriptors );
         }
 
         /// <summary>
@@ -106,19 +95,8 @@
         {
             Arg.NotNull( request, nameof( request ) );
 
-            if ( Count == 1 )
-            {
-                return firstDescriptor.CreateController( request );
-            }
-
-            var version = request.GetRequestedApiVersion();
-
-            if ( version != null && controllerMapping.TryGetValue( version, out var descriptor ) )
-            {
-                return descriptor.CreateController( request );
-            }
-
-            return firstDescriptor.CreateController( request );
+            var descriptor = request.ApiVersionProperties().SelectedController;
+            return descriptor.CreateController( request );
         }
 
         /// <summary>
@@ -180,30 +158,5 @@
         /// </summary>
         /// <value>The total number of items in the group.</value>
         public int Count => descriptors.Count;
-
-        static Dictionary<ApiVersion, HttpControllerDescriptor> MapApiVersionsToControllerDescriptors( IReadOnlyList<HttpControllerDescriptor> descriptors )
-        {
-            Contract.Requires( descriptors != null );
-
-            if ( descriptors.Count < 2 )
-            {
-                return default;
-            }
-
-            var mapping = new Dictionary<ApiVersion, HttpControllerDescriptor>();
-
-            for ( var i = 0; i < descriptors.Count; i++ )
-            {
-                var descriptor = descriptors[i];
-                var apiVersions = descriptor.GetDeclaredApiVersions();
-
-                for ( var j = 0; j < apiVersions.Count; j++ )
-                {
-                    mapping[apiVersions[j]] = descriptor;
-                }
-            }
-
-            return mapping;
-        }
     }
 }

@@ -120,8 +120,6 @@
             Contract.Requires( controller != null );
             Contract.Requires( implicitVersionModel != null );
 
-            controller.SetProperty( implicitVersionModel );
-
             foreach ( var action in controller.Actions )
             {
                 action.SetProperty( implicitVersionModel );

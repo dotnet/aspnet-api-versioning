@@ -5,7 +5,6 @@
     using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
@@ -16,6 +15,7 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -84,32 +84,7 @@
         public virtual bool ShouldMapAction( ControllerActionDescriptor action )
         {
             Arg.NotNull( action, nameof( action ) );
-
-            var model = action.GetProperty<ApiVersionModel>();
-
-            if ( model != null )
-            {
-                if ( model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( ApiVersion ) )
-                {
-                    return true;
-                }
-
-                var implicitlyUnmatchable = model.DeclaredApiVersions.Count > 0;
-
-                if ( implicitlyUnmatchable )
-                {
-                    return false;
-                }
-            }
-
-            model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-            if ( model == null )
-            {
-                return false;
-            }
-
-            return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( ApiVersion );
+            return action.IsMappedTo( ApiVersion );
         }
 
         /// <summary>

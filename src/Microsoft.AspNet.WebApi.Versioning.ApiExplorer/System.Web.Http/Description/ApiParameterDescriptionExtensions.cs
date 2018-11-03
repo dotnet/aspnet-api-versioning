@@ -11,6 +11,6 @@
             description.ParameterDescriptor.ParameterType.GetBindableProperties();
 
         internal static bool CanConvertPropertiesFromString( this ApiParameterDescription description ) =>
-            description.GetBindableProperties().All( p => TypeHelper.CanConvertFromString( p.PropertyType ) );
+            description.GetBindableProperties().All( p => p.PropertyType.CanConvertFromString() );
     }
 }

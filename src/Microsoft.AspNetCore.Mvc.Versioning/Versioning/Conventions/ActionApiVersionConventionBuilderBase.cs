@@ -2,8 +2,8 @@
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
+    using static System.Linq.Enumerable;
 
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Core.
@@ -19,23 +19,38 @@
         {
             Arg.NotNull( actionModel, nameof( actionModel ) );
 
-            MappedVersions.AddRange( from provider in actionModel.Attributes.OfType<IApiVersionProvider>()
-                                     where !provider.AdvertiseOnly && !provider.Deprecated
-                                     from version in provider.Versions
-                                     select version );
+            MergeAttributesWithConventions( actionModel.Attributes );
 
-            var (supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions) =
-                actionModel.GetProperty<Tuple<IEnumerable<ApiVersion>,
-                                              IEnumerable<ApiVersion>,
-                                              IEnumerable<ApiVersion>,
-                                              IEnumerable<ApiVersion>>>();
+            if ( VersionNeutral )
+            {
+                actionModel.SetProperty( ApiVersionModel.Neutral );
+                return;
+            }
 
-            var versionModel = new ApiVersionModel(
-                declaredVersions: MappedVersions,
-                supportedVersions,
-                deprecatedVersions,
-                advertisedVersions,
-                deprecatedAdvertisedVersions );
+            var versionModel = default( ApiVersionModel );
+
+            if ( MappedVersions.Count == 0 )
+            {
+                var declaredVersions = SupportedVersions.Union( DeprecatedVersions );
+
+                versionModel = new ApiVersionModel(
+                    declaredVersions,
+                    SupportedVersions,
+                    DeprecatedVersions,
+                    AdvertisedVersions,
+                    DeprecatedAdvertisedVersions );
+            }
+            else
+            {
+                var emptyVersions = Empty<ApiVersion>();
+
+                versionModel = new ApiVersionModel(
+                    declaredVersions: MappedVersions,
+                    supportedVersions: emptyVersions,
+                    deprecatedVersions: emptyVersions,
+                    advertisedVersions: emptyVersions,
+                    deprecatedAdvertisedVersions: emptyVersions );
+            }
 
             actionModel.SetProperty( versionModel );
         }

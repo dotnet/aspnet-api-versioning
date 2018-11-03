@@ -1,10 +1,5 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Routing
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
-    using System.Text;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -14,11 +9,16 @@
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
-    using static ApiVersion;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Text;
+    using static Microsoft.AspNetCore.Mvc.ApiVersion;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
     using static System.Environment;
     using static System.Linq.Enumerable;
     using static System.String;
-    using static Versioning.ErrorCodes;
 
     /// <summary>
     /// Represents the default API versioning route policy.
@@ -210,7 +210,7 @@
             var parsedVersion = feature.RequestedApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, candidates.Select( a => a.DisplayName ) ) );
             var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( candidates, parsedVersion ) );
-            var apiVersions = new Lazy<ApiVersionModel>( candidates.Select( a => a.GetProperty<ApiVersionModel>() ).Aggregate );
+            var apiVersions = new Lazy<ApiVersionModel>( candidates.Select( a => a.GetApiVersionModel() ).Aggregate );
             var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter, apiVersions );
             var url = new Uri( requestUrl.Value );
             var safeUrl = url.SafeFullPath();
@@ -219,7 +219,7 @@
             {
                 if ( IsNullOrEmpty( requestedVersion ) )
                 {
-                    if ( Options.AssumeDefaultVersionWhenUnspecified || candidates.Any( c => c.IsApiVersionNeutral() ) )
+                    if ( Options.AssumeDefaultVersionWhenUnspecified || candidates.Any( c => c.GetApiVersionModel().IsApiVersionNeutral ) )
                     {
                         return VersionNeutralUnmatched( handlerContext, safeUrl, method, allowedMethods.Value, actionNames.Value );
                     }
@@ -252,16 +252,9 @@
 
             foreach ( var candidate in candidates )
             {
-                if ( candidate.ActionConstraints == null )
+                if ( candidate.ActionConstraints == null || !candidate.IsMappedTo( apiVersion ) )
                 {
                     continue;
-                }
-                else if ( apiVersion != null )
-                {
-                    if ( !candidate.IsMappedTo( apiVersion ) && !candidate.IsImplicitlyMappedTo( apiVersion ) )
-                    {
-                        continue;
-                    }
                 }
 
                 foreach ( var constraint in candidate.ActionConstraints.OfType<HttpMethodActionConstraint>() )

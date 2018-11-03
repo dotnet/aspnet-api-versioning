@@ -110,14 +110,12 @@
         /// </summary>
         /// <param name="controller">The <see cref="HttpControllerDescriptor">controller descriptor</see> to evaluate.</param>
         /// <returns>True if the <paramref name="controller"/> should be mapped as an OData controller; otherwise, false.</returns>
-        /// <remarks>This method will match any OData controller that is API version-neutral or has a declared API version that
-        /// matches the API version applied to the associated <see cref="ApiVersionModel">model</see>.</remarks>
+        /// <remarks>The default implementation always returns <c>true</c>.</remarks>
         public virtual bool ShouldMapController( HttpControllerDescriptor controller )
         {
             Arg.NotNull( controller, nameof( controller ) );
 
-            var model = controller.GetApiVersionModel();
-            return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( ApiVersion );
+            return true;
         }
 
         /// <summary>
@@ -130,19 +128,7 @@
         public virtual bool ShouldMapAction( HttpActionDescriptor action )
         {
             Arg.NotNull( action, nameof( action ) );
-
-            var model = action.GetApiVersionModel();
-
-            if ( model.IsApiVersionNeutral )
-            {
-                return true;
-            }
-            else if ( model.DeclaredApiVersions.Count == 0 )
-            {
-                return ShouldMapController( action.ControllerDescriptor );
-            }
-
-            return model.DeclaredApiVersions.Contains( ApiVersion );
+            return action.IsMappedTo( ApiVersion );
         }
 
         /// <summary>

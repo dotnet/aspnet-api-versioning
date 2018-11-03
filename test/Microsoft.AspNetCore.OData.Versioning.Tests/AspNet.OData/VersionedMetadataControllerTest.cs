@@ -30,7 +30,7 @@
                 client.BaseAddress = new Uri( "http://localhost" );
 
                 // act
-                response = await client.SendAsync( request );
+                response = ( await client.SendAsync( request ) ).EnsureSuccessStatusCode();
             }
 
             // assert

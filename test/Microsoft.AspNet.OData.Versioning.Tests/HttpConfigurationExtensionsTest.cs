@@ -20,14 +20,6 @@
 
     public class HttpConfigurationExtensionsTest
     {
-        const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
-
-        [ApiVersion( "1.0" )]
-        sealed class ControllerV1 : ODataController { }
-
-        [ApiVersion( "2.0" )]
-        sealed class ControllerV2 : ODataController { }
-
         [Fact]
         public void map_versioned_odata_route_should_return_expected_result()
         {
@@ -113,6 +105,8 @@
             model.Should().BeSameAs( models[modelIndex] );
         }
 
+        const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
+
         static IEnumerable<IEdmModel> CreateModels( HttpConfiguration configuration )
         {
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
@@ -139,6 +133,18 @@
             var routingConventions = (IEnumerable<IODataRoutingConvention>) serviceProviders[key].GetService( typeof( IEnumerable<IODataRoutingConvention> ) );
 
             return routingConventions.ToArray();
+        }
+
+        [ApiVersion( "1.0" )]
+        sealed class ControllerV1 : ODataController
+        {
+            public IHttpActionResult Get() => Ok();
+        }
+
+        [ApiVersion( "2.0" )]
+        sealed class ControllerV2 : ODataController
+        {
+            public IHttpActionResult Get() => Ok();
         }
     }
 }

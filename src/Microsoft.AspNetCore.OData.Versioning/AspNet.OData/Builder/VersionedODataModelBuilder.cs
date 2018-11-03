@@ -86,13 +86,7 @@
                     continue;
                 }
 
-                var model = action.GetProperty<ApiVersionModel>();
-
-                if ( model == null )
-                {
-                    continue;
-                }
-
+                var model = action.GetApiVersionModel();
                 var versions = model.SupportedApiVersions;
 
                 for ( var j = 0; j < versions.Count; j++ )

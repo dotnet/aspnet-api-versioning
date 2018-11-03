@@ -3,7 +3,7 @@
     using System.Web.Http;
 
     [ApiVersion( "1.0" )]
-    [RoutePrefix( "values" )]
+    [RoutePrefix( "Values" )]
     public class AttributeValues1Controller : ApiController
     {
         [Route]

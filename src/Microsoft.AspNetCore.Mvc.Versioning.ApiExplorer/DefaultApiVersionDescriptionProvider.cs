@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Globalization.CultureInfo;
 
     /// <summary>
@@ -58,16 +59,8 @@
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
 
-            var model = actionDescriptor.GetProperty<ApiVersionModel>();
-
-            if ( model != null && !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion ) )
-            {
-                return true;
-            }
-
-            model = actionDescriptor.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
-
-            return model != null && !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
+            var model = actionDescriptor.GetApiVersionModel();
+            return !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
         }
 
         /// <summary>
@@ -103,10 +96,9 @@
 
             foreach ( var action in actions )
             {
-                var model = action.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
-                var implicitModel = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
+                var model = action.GetApiVersionModel( Explicit | Implicit );
 
-                foreach ( var version in model.DeclaredApiVersions.Union( implicitModel.DeclaredApiVersions ) )
+                foreach ( var version in model.DeclaredApiVersions )
                 {
                     declared.Add( version );
                 }

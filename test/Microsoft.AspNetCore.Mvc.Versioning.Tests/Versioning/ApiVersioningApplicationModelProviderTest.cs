@@ -3,6 +3,7 @@
     using ApplicationModels;
     using FluentAssertions;
     using Microsoft.Extensions.Options;
+    using System;
     using System.Linq;
     using System.Reflection;
     using Xunit;
@@ -27,7 +28,7 @@
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
             var controller = new ControllerModel( type.GetTypeInfo(), attributes )
             {
-                Actions = { new ActionModel( actionMethod, new object[0] ) }
+                Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) }
             };
             var options = Options.Create( new ApiVersioningOptions() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
@@ -39,20 +40,11 @@
             provider.OnProvidersExecuted( context );
 
             // assert
-            controller.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
-                new
-                {
-                    IsApiVersionNeutral = false,
-                    DeclaredApiVersions = deprecated.Union( supported ).ToArray(),
-                    ImplementedApiVersions = deprecated.Union( supported ).ToArray(),
-                    SupportedApiVersions = supported,
-                    DeprecatedApiVersions = deprecated
-                } );
             controller.Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = new ApiVersion[0],
+                    DeclaredApiVersions = Array.Empty<ApiVersion>(),
                     ImplementedApiVersions = deprecated.Union( supported ).ToArray(),
                     SupportedApiVersions = supported,
                     DeprecatedApiVersions = deprecated
@@ -81,7 +73,6 @@
             provider.OnProvidersExecuted( context );
 
             // assert
-            controller.GetProperty<ApiVersionModel>().Should().BeSameAs( model );
             controller.Actions.Single().GetProperty<ApiVersionModel>().Should().BeSameAs( model );
         }
 
@@ -106,15 +97,6 @@
             provider.OnProvidersExecuted( context );
 
             // assert
-            controller.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
-                new
-                {
-                    IsApiVersionNeutral = false,
-                    DeclaredApiVersions = new[] { new ApiVersion( 1, 0 ) },
-                    ImplementedApiVersions = new[] { new ApiVersion( 1, 0 ) },
-                    SupportedApiVersions = new[] { new ApiVersion( 1, 0 ) },
-                    DeprecatedApiVersions = new ApiVersion[0],
-                } );
             controller.Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
@@ -148,7 +130,6 @@
             provider.OnProvidersExecuted( context );
 
             // assert
-            controller.GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
             controller.Actions.Single().GetProperty<ApiVersionModel>().ImplementedApiVersions.Should().NotContain( v1 );
         }
 
@@ -186,11 +167,11 @@
             provider.OnProvidersExecuted( context );
 
             // assert
-            apiController.GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
+            apiController.Actions.Single().GetProperty<ApiVersionModel>().Should().BeEquivalentTo(
                 new
                 {
                     IsApiVersionNeutral = false,
-                    DeclaredApiVersions = supported,
+                    DeclaredApiVersions = Array.Empty<ApiVersion>(),
                     ImplementedApiVersions = supported,
                     SupportedApiVersions = supported,
                     DeprecatedApiVersions = deprecated,

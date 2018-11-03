@@ -3,10 +3,10 @@
     using System;
     using System.Web.Http.Controllers;
 
-    /// <content>
-    /// Provides additional implementation specific to ASP.NET Web API.
-    /// </content>
-    public partial interface IControllerConventionBuilder : IApiVersionConvention<HttpControllerDescriptor>
+    /// <summary>
+    /// Defines the behavior of a convention builder for a controller.
+    /// </summary>
+    public interface IControllerConventionBuilder : IApiVersionConventionBuilder, IApiVersionConvention<HttpControllerDescriptor>
     {
     }
 }
