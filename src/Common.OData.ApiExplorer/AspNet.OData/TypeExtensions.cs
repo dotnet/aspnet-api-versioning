@@ -6,6 +6,7 @@
     using Microsoft.OData.Edm;
 #if WEBAPI
     using Microsoft.Web.Http;
+    using System.Web.Http;
 #endif
     using System;
     using System.Collections.Generic;
@@ -26,6 +27,7 @@
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         static readonly Type ODataValueOfT = typeof( ODataValue<> );
+        static readonly Type SingleResultOfT = typeof( SingleResult<> );
 
         /// <summary>
         /// Substitutes the specified type, if required.
@@ -106,7 +108,7 @@
 
             var typeArg = typeArgs[0];
 
-            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() )
+            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() || typeDef.Equals( SingleResultOfT ))
             {
                 innerType = typeArg;
             }
