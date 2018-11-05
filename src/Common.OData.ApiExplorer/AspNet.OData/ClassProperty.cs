@@ -84,6 +84,14 @@
                     }
                 }
 
+                for ( var i = 0; i < ctorArgs.Length; i++ )
+                {
+                    if ( ctorArgs[i] is IReadOnlyCollection<CustomAttributeTypedArgument> paramsList )
+                    {
+                        ctorArgs[i] = paramsList.Select( a => a.Value ).ToArray();
+                    }
+                }
+
                 yield return new CustomAttributeBuilder(
                     ctor,
                     ctorArgs,
