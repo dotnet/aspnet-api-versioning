@@ -274,7 +274,10 @@
             var keys = unfinishedTypes.Keys;
             foreach ( var key in keys )
             {
-                ResolveDependencies(unfinishedTypes[key], key);
+                if ( unfinishedTypes.TryGetValue( key, out var type ) )
+                {
+                    ResolveDependencies(type, key);
+                }
             }
         }
 
