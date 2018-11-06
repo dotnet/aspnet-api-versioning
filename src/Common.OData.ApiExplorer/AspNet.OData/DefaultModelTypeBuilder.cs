@@ -171,14 +171,16 @@
         }
 
         /// <inheritdoc />
-        public Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion )
+        public Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion, string controllerName )
         {
             Arg.NotNull( services, nameof( services ) );
             Arg.NotNull( action, nameof( action ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            Arg.NotNull( controllerName, nameof(controllerName) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
-            var name = action.FullName() + "Parameters";
+            var name = controllerName + "." + action.FullName() + "Parameters";
+
             var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, assemblies, p, this ) );
             var signature = new ClassSignature( name, properties, apiVersion );
 

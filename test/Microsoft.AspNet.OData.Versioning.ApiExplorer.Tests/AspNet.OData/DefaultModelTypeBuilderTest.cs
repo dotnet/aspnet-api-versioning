@@ -236,7 +236,7 @@
             services.AddSingleton( model );
 
             // act
-            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default );
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default, contact.Name );
 
             // assert
             substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
@@ -266,7 +266,7 @@
             services.AddSingleton( model );
 
             // act
-            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default );
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default, contact.Name );
 
             // assert
             substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
@@ -302,7 +302,7 @@
             services.AddSingleton( model );
 
             // act
-            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default );
+            var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default, contact.Name );
 
             // assert
             substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
