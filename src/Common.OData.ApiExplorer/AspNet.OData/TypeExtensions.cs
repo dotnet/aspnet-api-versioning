@@ -70,7 +70,11 @@
             {
                 var (apiVersion, resolver) = holder.Value;
                 var structuredType = resolver.GetStructuredType( type );
+
+                if ( structuredType != null )
+                {
                 type = context.ModelTypeBuilder.NewStructuredType( structuredType, type, apiVersion );
+                }
             }
 
             return type;

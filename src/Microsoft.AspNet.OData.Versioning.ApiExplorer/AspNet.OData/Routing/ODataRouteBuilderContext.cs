@@ -77,7 +77,7 @@
                 var description = ParameterDescriptions[i];
                 var parameter = description.ParameterDescriptor;
 
-                if ( parameter.ParameterType.IsODataActionParameters() )
+                if ( parameter != null && parameter.ParameterType.IsODataActionParameters() )
                 {
                     description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( serviceProvider, action, apiVersion.Value ) );
                     break;
