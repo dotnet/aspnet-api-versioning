@@ -180,7 +180,6 @@
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var name = controllerName + "." + action.FullName() + "Parameters";
-
             var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, assemblies, p, this ) );
             var signature = new ClassSignature( name, properties, apiVersion );
 
@@ -226,7 +225,6 @@
             foreach ( var key in keys )
             {
                 var propertyDependencies = dependencies[key];
-
                 for ( var x = propertyDependencies.Count - 1; x >= 0; x-- )
                 {
                     var propertyDependency = propertyDependencies[x];
