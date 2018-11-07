@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Versioning.Conventions
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -20,7 +21,11 @@
         {
             Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
 
-            MergeAttributesWithConventions( actionDescriptor.GetCustomAttributes<Attribute>() );
+            var attributes = new List<object>();
+
+            attributes.AddRange( actionDescriptor.GetCustomAttributes<IApiVersionNeutral>( inherit: true ) );
+            attributes.AddRange( actionDescriptor.GetCustomAttributes<IApiVersionProvider>( inherit: false ) );
+            MergeAttributesWithConventions( attributes );
 
             if ( VersionNeutral )
             {

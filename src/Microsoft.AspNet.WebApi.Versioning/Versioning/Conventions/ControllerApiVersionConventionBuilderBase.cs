@@ -28,7 +28,11 @@
         {
             Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
 
-            MergeAttributesWithConventions( controllerDescriptor.GetCustomAttributes<Attribute>() );
+            var attributes = new List<object>();
+
+            attributes.AddRange( controllerDescriptor.GetCustomAttributes<IApiVersionNeutral>( inherit: true ) );
+            attributes.AddRange( controllerDescriptor.GetCustomAttributes<IApiVersionProvider>( inherit: false ) );
+            MergeAttributesWithConventions( attributes );
             ApplyActionConventions( controllerDescriptor );
         }
 
