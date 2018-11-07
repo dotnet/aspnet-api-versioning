@@ -226,10 +226,22 @@
             foreach ( var key in keys )
             {
                 var propertyDependencies = dependencies[key];
+
                 for ( var x = propertyDependencies.Count - 1; x >= 0; x-- )
                 {
                     var propertyDependency = propertyDependencies[x];
-                    if ( propertyDependency.DependentOnTypeKey == typeKey )
+                    Type dependentOnType = null;
+
+                    if ( unfinishedTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnTypeBuilder ) )
+                    {
+                        dependentOnType = dependentOnTypeBuilder;
+                    }
+                    else if ( generatedEdmTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnTypeInfo ) )
+                    {
+                        dependentOnType = dependentOnTypeInfo;
+                    }
+
+                    if ( dependentOnType != null)
                     {
                         if ( propertyDependency.IsCollection )
                         {
