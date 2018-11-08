@@ -312,7 +312,51 @@
         }
 
         [Fact]
-        public void should_get_attributes_from_property_that_has_attributes_that_takes_params()
+        public void substitute_should_generate_types_for_actions_with_the_same_name_in_different_controllers()
+        {
+            // arrange 
+            var modelBuilder = new ODataConventionModelBuilder();
+            var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
+            var action = contact.Action( "PlanMeeting" );
+
+            action.Parameter<DateTime>( "when" );
+            action.CollectionParameter<Contact>( "attendees" );
+            action.CollectionParameter<string>( "topics" );
+
+            var employee = modelBuilder.EntitySet<Employee>( "Employees" ).EntityType;
+            action = employee.Action( "PlanMeeting" );
+
+            action.Parameter<DateTime>( "when" );
+            action.CollectionParameter<Employee>( "attendees" );
+            action.Parameter<string>( "project" );
+            
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var model = context.Model;
+
+            var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
+            var operations = model.FindDeclaredOperations( qualifiedName ).Select( o => (IEdmAction) o ).ToArray();
+            var services = new ServiceCollection();
+            services.AddSingleton( model );
+            
+            // act
+            var contactActionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operations[0], ApiVersion.Default, contact.Name );
+            var employeesActionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operations[1], ApiVersion.Default, employee.Name );
+
+            // assert
+            contactActionType.Should().NotBe( employeesActionType );
+            contactActionType.GetRuntimeProperties().Should().HaveCount( 3 );
+            contactActionType.Should().HaveProperty<DateTimeOffset>( "when" );
+            contactActionType.Should().HaveProperty<IEnumerable<Contact>>( "attendees" );
+            contactActionType.Should().HaveProperty<IEnumerable<string>>( "topics" );
+
+            employeesActionType.GetRuntimeProperties().Should().HaveCount( 3 );
+            employeesActionType.Should().HaveProperty<DateTimeOffset>( "when" );
+            Assert.NotNull(employeesActionType.GetRuntimeProperty( "attendees" ));
+            employeesActionType.Should().HaveProperty<string>( "project" );
+        }
+
+        [Fact]
+        public void substitute_should_get_attributes_from_property_that_has_attributes_that_takes_params()
         {
             // arrange
             var modelBuilder = new ODataConventionModelBuilder();
