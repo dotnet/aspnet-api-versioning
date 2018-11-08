@@ -6,6 +6,7 @@ namespace Microsoft.AspNet.OData
         
         public Employer Employer { get; set; }
 
+        [AllowedRoles("Manager", "Employer")]
         public decimal Salary { get; set; }
 
         public string FirstName { get; set; }

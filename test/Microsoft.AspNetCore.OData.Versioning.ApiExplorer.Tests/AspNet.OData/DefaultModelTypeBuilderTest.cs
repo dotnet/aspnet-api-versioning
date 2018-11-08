@@ -311,6 +311,28 @@
             substitutionType.Should().HaveProperty<IEnumerable<string>>( "topics" );
         }
 
+        [Fact]
+        public void should_get_attributes_from_property_that_has_attributes_that_takes_params()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var employee = modelBuilder.EntitySet<Employee>( "Employees" ).EntityType;
+            employee.Ignore( e => e.FirstName );
+            var originalType = typeof( Employee );
+            
+            var context = NewContext( modelBuilder.GetEdmModel() );
+
+            // act
+            var substitutionType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            var property = substitutionType.GetRuntimeProperty( "Salary" );
+            var attributeWithParams = property.GetCustomAttribute<AllowedRolesAttribute>();
+
+            Assert.Equal( "Manager", attributeWithParams.AllowedRoles[0] );
+            Assert.Equal( "Employer", attributeWithParams.AllowedRoles[1] );
+        }
+
         public static IEnumerable<object[]> SubstitutionNotRequiredData
         {
             get
