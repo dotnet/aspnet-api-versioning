@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Basic
 {
-    using Controllers;
+    using Microsoft.Web.Http.Basic.Controllers;
     using Microsoft.Web.Http.Routing;
     using System.Web.Http;
     using System.Web.Http.Routing;
@@ -19,6 +19,7 @@
             FilteredControllerTypes.Add( typeof( HelloWorldController ) );
             FilteredControllerTypes.Add( typeof( PingController ) );
             FilteredControllerTypes.Add( typeof( OverlappingRouteTemplateController ) );
+            FilteredControllerTypes.Add( typeof( OrdersController ) );
             Configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             Configuration.MapHttpAttributeRoutes( constraintResolver );
             Configuration.EnsureInitialized();

@@ -13,6 +13,7 @@
             FilteredControllerTypes.Add( typeof( HelloWorldController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( HelloWorld2Controller ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( PingController ).GetTypeInfo() );
+            FilteredControllerTypes.Add( typeof( OrdersController ).GetTypeInfo() );
         }
 
         protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;
