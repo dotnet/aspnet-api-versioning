@@ -17,7 +17,7 @@ dotnet_naming_rule.test_methods.severity = none
 # note: glob expansion syntax cannot be used because the patterns do not overlap
 [when*.cs]
 
-dotnet_naming_symbols.test_methods.applicable_kinds           = method
+dotnet_naming_symbols.test_methods.applicable_kinds           = class, method
 dotnet_naming_symbols.test_methods.applicable_accessibilities = public
 
 dotnet_naming_style.test_methods.capitalization = all_lower
