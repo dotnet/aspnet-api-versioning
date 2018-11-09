@@ -177,7 +177,7 @@
                     {
                         var descriptor = new HttpControllerDescriptor( configuration, key, type );
 
-                        if ( conventions.Count == 0 || !conventions.ApplyTo( descriptor ) )
+                        if ( !conventions.ApplyTo( descriptor ) )
                         {
                             ApplyAttributeOrImplicitConventions( descriptor, actionSelector, implicitVersionModel );
                         }
@@ -244,19 +244,26 @@
 
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
-            var models = new List<ApiVersionModel>( controllers.Count );
-            var visited = new List<Tuple<HttpActionDescriptor, ApiVersionModel>>( controllers.Count );
+            var controllerModels = new List<ApiVersionModel>( controllers.Count );
+            var actionModels = new List<ApiVersionModel>( controllers.Count );
+            var visitedControllers = new List<Tuple<HttpControllerDescriptor, ApiVersionModel>>( controllers.Count );
+            var visitedActions = new List<Tuple<HttpActionDescriptor, ApiVersionModel>>( controllers.Count );
 
             for ( var i = 0; i < controllers.Count; i++ )
             {
-                // 1 - collate controller versions (only useful for 400s)
+                // 1 - collate controller versions
                 var controller = controllers[i];
                 var model = controller.GetApiVersionModel();
 
-                supported.AddRange( model.SupportedApiVersions );
-                deprecated.AddRange( model.DeprecatedApiVersions );
+                if ( model.IsApiVersionNeutral )
+                {
+                    continue;
+                }
 
-                // 2 - collate action versions (only required for reporting api versions)
+                controllerModels.Add( model );
+                visitedControllers.Add( Tuple.Create( controller, model ) );
+
+                // 2 - collate action versions
                 var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
 
                 foreach ( var action in actions )
@@ -268,36 +275,31 @@
                         continue;
                     }
 
-                    models.Add( model );
-                    visited.Add( Tuple.Create( action, model ) );
+                    actionModels.Add( model );
+                    visitedActions.Add( Tuple.Create( action, model ) );
                 }
             }
 
-            // 3 - apply collated controller model
-            var collatedModel = new ApiVersionModel( supported, deprecated );
+            // 3 - apply collated action model
+            var collatedModel = actionModels.Aggregate();
 
-            for ( var i = 0; i < controllers.Count; i++ )
+            for ( var i = 0; i < visitedActions.Count; i++ )
             {
-                var controller = controllers[i];
-                var model = controller.GetApiVersionModel();
-
-                controller.SetApiVersionModel( model.Aggregate( collatedModel ) );
-            }
-
-            if ( visited.Count == 0 )
-            {
-                return controllers.ToArray();
-            }
-
-            // 4 - apply collated action model
-            collatedModel = models.Aggregate();
-
-            for ( var i = 0; i < visited.Count; i++ )
-            {
-                var item = visited[i];
-                var (action, model) = item;
+                var (action, model) = visitedActions[i];
 
                 action.SetProperty( model.Aggregate( collatedModel ) );
+            }
+
+            // 4 - apply collated controller model
+            // note: allows controllers to report versions in 400s even when an action is unmatched
+            controllerModels.Add( collatedModel );
+            collatedModel = controllerModels.Aggregate();
+
+            for ( var i = 0; i < visitedControllers.Count; i++ )
+            {
+                var (controller, model) = visitedControllers[i];
+
+                controller.SetApiVersionModel( model.Aggregate( collatedModel ) );
             }
 
             return controllers.ToArray();

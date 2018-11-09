@@ -1,6 +1,9 @@
 ﻿namespace Microsoft.Web.Http.Versioning.Conventions
 {
     using System;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Web.Http;
     using System.Web.Http.Controllers;
 
     /// <content>
@@ -22,5 +25,28 @@
         }
 
         static Type GetKey( Type type ) => type;
+
+        static bool HasDecoratedActions( HttpControllerDescriptor controllerDescriptor )
+        {
+            Contract.Requires( controllerDescriptor != null );
+
+            var actionSelector = controllerDescriptor.Configuration.Services.GetActionSelector();
+            var actions = actionSelector.GetActionMapping( controllerDescriptor ).SelectMany( g => g );
+
+            foreach ( var action in actions )
+            {
+                if ( action.GetCustomAttributes<IApiVersionNeutral>( inherit: true ).Count > 0 )
+                {
+                    return true;
+                }
+
+                if ( action.GetCustomAttributes<IApiVersionProvider>( inherit: false ).Count > 0 )
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
