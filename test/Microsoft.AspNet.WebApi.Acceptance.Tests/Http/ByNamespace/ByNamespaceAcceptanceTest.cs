@@ -12,7 +12,8 @@
         {
             None,
             HelloWorld,
-            Agreements
+            Agreements,
+            Orders,
         }
 
         protected ByNamespaceAcceptanceTest( SetupKind kind )
@@ -24,6 +25,9 @@
                     break;
                 case SetupKind.Agreements:
                     ConfigureAgreements();
+                    break;
+                case SetupKind.Orders:
+                    ConfigureOrders();
                     break;
             }
 
@@ -74,6 +78,26 @@
                     options.ReportApiVersions = true;
                     options.DefaultApiVersion = new ApiVersion( 2, 0 );
                     options.AssumeDefaultVersionWhenUnspecified = true;
+                    options.Conventions.Add( new VersionByNamespaceConvention() );
+                } );
+        }
+
+        void ConfigureOrders()
+        {
+            FilteredControllerTypes.Add( typeof( Controllers.V1.OrdersController ) );
+            FilteredControllerTypes.Add( typeof( Controllers.V2.OrdersController ) );
+            FilteredControllerTypes.Add( typeof( Controllers.V3.OrdersController ) );
+
+            var constraintResolver = new DefaultInlineConstraintResolver()
+            {
+                ConstraintMap = { ["apiVersion"] = typeof( ApiVersionRouteConstraint ) }
+            };
+
+            Configuration.MapHttpAttributeRoutes( constraintResolver );
+            Configuration.AddApiVersioning(
+                options =>
+                {
+                    options.ReportApiVersions = true;
                     options.Conventions.Add( new VersionByNamespaceConvention() );
                 } );
         }

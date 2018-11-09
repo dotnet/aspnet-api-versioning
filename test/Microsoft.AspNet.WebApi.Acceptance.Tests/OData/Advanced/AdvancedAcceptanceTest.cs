@@ -34,7 +34,6 @@
 
             var modelBuilder = new VersionedODataModelBuilder( Configuration )
             {
-                ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
                 ModelConfigurations =
                 {
                     new PersonModelConfiguration(),

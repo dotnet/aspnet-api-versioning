@@ -1,0 +1,35 @@
+﻿namespace Microsoft.AspNetCore.Mvc.Conventions.Controllers
+{
+    using Microsoft.AspNetCore.Mvc;
+    using System;
+
+    [Route( "api/[controller]" )]
+    public class OrdersController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult Get() => Ok();
+
+        [HttpGet( "{id}", Name = "GetOrderById" )]
+        public IActionResult Get( int id ) => Ok();
+
+        [HttpPost]
+        public IActionResult Post( [FromBody] Order order )
+        {
+            order.Id = 42;
+            return CreatedAtRoute( "GetOrderById", new { id = order.Id }, order );
+        }
+
+        [HttpPut( "{id}" )]
+        public IActionResult Put( int id, [FromBody] Order order ) => NoContent();
+
+        [HttpDelete( "{id}" )]
+        public IActionResult Delete( int id ) => NoContent();
+    }
+
+    public class Order
+    {
+        public int Id { get; set; }
+
+        public string Customer { get; set; }
+    }
+}

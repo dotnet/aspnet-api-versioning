@@ -25,7 +25,8 @@
             partManager.ApplicationParts.Add(
                 new TestApplicationPart(
                     typeof( OrderModelConfiguration ),
-                    typeof( PersonModelConfiguration ) ) );
+                    typeof( PersonModelConfiguration ),
+                    typeof( CustomerModelConfiguration ) ) );
         }
 
         protected override void OnConfigureServices( IServiceCollection services ) => services.AddOData().EnableApiVersioning();

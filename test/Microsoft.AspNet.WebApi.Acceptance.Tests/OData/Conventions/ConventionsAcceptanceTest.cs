@@ -15,6 +15,7 @@
             FilteredControllerTypes.Add( typeof( OrdersController ) );
             FilteredControllerTypes.Add( typeof( PeopleController ) );
             FilteredControllerTypes.Add( typeof( People2Controller ) );
+            FilteredControllerTypes.Add( typeof( CustomersController ) );
 
             Configuration.AddApiVersioning(
                 options =>
@@ -28,15 +29,22 @@
                                        .Action( c => c.Patch( default, null, null ) ).MapToApiVersion( 2, 0 );
                     options.Conventions.Controller<People2Controller>()
                                        .HasApiVersion( 3, 0 );
+                    options.Conventions.Controller<CustomersController>()
+                                       .Action( c => c.Get() ).HasApiVersion( 2, 0 ).HasApiVersion( 3, 0 )
+                                       .Action( c => c.Get( default ) ).HasApiVersion( 1, 0 ).HasApiVersion( 2, 0 ).HasApiVersion( 3, 0 )
+                                       .Action( c => c.Post( default ) ).HasApiVersion( 1, 0 ).HasApiVersion( 2, 0 ).HasApiVersion( 3, 0 )
+                                       .Action( c => c.Put( default, default ) ).HasApiVersion( 3, 0 )
+                                       .Action( c => c.Delete( default ) ).IsApiVersionNeutral();
+
                 } );
 
             var modelBuilder = new VersionedODataModelBuilder( Configuration )
             {
-                ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
                 ModelConfigurations =
                 {
                     new PersonModelConfiguration(),
-                    new OrderModelConfiguration()
+                    new OrderModelConfiguration(),
+                    new CustomerModelConfiguration(),
                 }
             };
             var models = modelBuilder.GetEdmModels();

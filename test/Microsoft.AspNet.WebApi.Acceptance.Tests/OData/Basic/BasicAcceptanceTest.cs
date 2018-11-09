@@ -6,6 +6,7 @@
     using Microsoft.AspNet.OData.Configuration;
     using Microsoft.OData.UriParser;
     using Microsoft.Web;
+    using Microsoft.Web.OData.Basic.Controllers;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -20,16 +21,17 @@
             FilteredControllerTypes.Add( typeof( OrdersController ) );
             FilteredControllerTypes.Add( typeof( PeopleController ) );
             FilteredControllerTypes.Add( typeof( People2Controller ) );
+            FilteredControllerTypes.Add( typeof( CustomersController ) );
 
             Configuration.AddApiVersioning( options => options.ReportApiVersions = true );
 
             var modelBuilder = new VersionedODataModelBuilder( Configuration )
             {
-                ModelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase(),
                 ModelConfigurations =
                 {
                     new PersonModelConfiguration(),
-                    new OrderModelConfiguration()
+                    new OrderModelConfiguration(),
+                    new CustomerModelConfiguration(),
                 }
             };
             var models = modelBuilder.GetEdmModels();
