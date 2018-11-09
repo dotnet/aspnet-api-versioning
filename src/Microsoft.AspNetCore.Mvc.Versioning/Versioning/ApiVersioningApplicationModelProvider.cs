@@ -47,21 +47,11 @@
             var application = context.Result;
             var controllers = FilterControllers( application.Controllers );
 
-            if ( conventionBuilder.Count == 0 )
+            foreach ( var controller in controllers )
             {
-                foreach ( var controller in controllers )
+                if ( !conventionBuilder.ApplyTo( controller ) )
                 {
                     ApplyAttributeOrImplicitConventions( controller, implicitVersionModel );
-                }
-            }
-            else
-            {
-                foreach ( var controller in controllers )
-                {
-                    if ( !conventionBuilder.ApplyTo( controller ) )
-                    {
-                        ApplyAttributeOrImplicitConventions( controller, implicitVersionModel );
-                    }
                 }
             }
         }

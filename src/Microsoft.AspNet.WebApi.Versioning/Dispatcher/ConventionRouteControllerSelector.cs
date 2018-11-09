@@ -6,18 +6,16 @@
     using System.Linq;
     using System.Text;
     using System.Web.Http;
-    using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
-    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Environment;
 
-    sealed class ConventionRouteControllerSelector : IControllerSelector
+    sealed class ConventionRouteControllerSelector : ControllerSelector
     {
         readonly HttpControllerTypeCache controllerTypeCache;
 
         internal ConventionRouteControllerSelector( HttpControllerTypeCache controllerTypeCache ) => this.controllerTypeCache = controllerTypeCache;
 
-        public ControllerSelectionResult SelectController( ControllerSelectionContext context )
+        public override ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
             Contract.Requires( context != null );
             Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
@@ -37,39 +35,7 @@
                 return result;
             }
 
-            var bestMatch = default( HttpActionDescriptor );
-            var bestMatches = new HashSet<HttpControllerDescriptor>();
-            var implicitMatches = new HashSet<HttpControllerDescriptor>();
-
-            for ( var i = 0; i < context.ConventionRouteCandidates.Length; i++ )
-            {
-                var action = context.ConventionRouteCandidates[i].ActionDescriptor;
-
-                switch ( action.MappingTo( requestedVersion ) )
-                {
-                    case Explicit:
-                        bestMatch = action;
-                        bestMatches.Add( action.ControllerDescriptor );
-                        break;
-                    case Implicit:
-                        implicitMatches.Add( action.ControllerDescriptor );
-                        break;
-                }
-            }
-
-            switch ( bestMatches.Count )
-            {
-                case 0:
-                    bestMatches.UnionWith( implicitMatches );
-                    break;
-                case 1:
-                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
-                    {
-                        bestMatches.UnionWith( implicitMatches );
-                    }
-
-                    break;
-            }
+            var bestMatches = SelectBestCandidates( context.ConventionRouteCandidates, requestedVersion );
 
             switch ( bestMatches.Count )
             {
@@ -80,6 +46,12 @@
                     result.Controller.SetPossibleCandidates( context.ConventionRouteCandidates.Select( c => c.ActionDescriptor.ControllerDescriptor ).ToArray() );
                     break;
                 default:
+                    if ( TryDisambiguateControllerByAction( request, bestMatches, out var resolvedController ) )
+                    {
+                        result.Controller = resolvedController;
+                        break;
+                    }
+
                     throw CreateAmbiguousControllerException( context.RouteData.Route, controllerName, controllerTypeCache.GetControllerTypes( controllerName ) );
             }
 

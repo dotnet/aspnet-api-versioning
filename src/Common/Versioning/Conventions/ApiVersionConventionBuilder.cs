@@ -113,9 +113,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
             if ( !hasExplicitConventions )
             {
-                var hasNoImplicitConventions = ControllerConventions.Count == 0;
+                var hasNoExplicitConventions = ControllerConventions.Count == 0;
 
-                if ( hasNoImplicitConventions )
+                if ( hasNoExplicitConventions && !( applied = HasDecoratedActions( model ) ) )
                 {
                     return false;
                 }

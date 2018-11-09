@@ -5,14 +5,12 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text;
-    using System.Web.Http;
     using System.Web.Http.Controllers;
-    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Environment;
 
-    sealed class DirectRouteControllerSelector : IControllerSelector
+    sealed class DirectRouteControllerSelector : ControllerSelector
     {
-        public ControllerSelectionResult SelectController( ControllerSelectionContext context )
+        public override ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
             Contract.Requires( context != null );
             Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
@@ -30,39 +28,7 @@
                 return result;
             }
 
-            var bestMatch = default( HttpActionDescriptor );
-            var bestMatches = new HashSet<HttpControllerDescriptor>();
-            var implicitMatches = new HashSet<HttpControllerDescriptor>();
-
-            for ( var i = 0; i < context.DirectRouteCandidates.Length; i++ )
-            {
-                var action = context.DirectRouteCandidates[i].ActionDescriptor;
-
-                switch ( action.MappingTo( requestedVersion ) )
-                {
-                    case Explicit:
-                        bestMatch = action;
-                        bestMatches.Add( action.ControllerDescriptor );
-                        break;
-                    case Implicit:
-                        implicitMatches.Add( action.ControllerDescriptor );
-                        break;
-                }
-            }
-
-            switch ( bestMatches.Count )
-            {
-                case 0:
-                    bestMatches.UnionWith( implicitMatches );
-                    break;
-                case 1:
-                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
-                    {
-                        bestMatches.UnionWith( implicitMatches );
-                    }
-
-                    break;
-            }
+            var bestMatches = SelectBestCandidates( context.DirectRouteCandidates, requestedVersion );
 
             switch ( bestMatches.Count )
             {
@@ -72,6 +38,12 @@
                     result.Controller = bestMatches.Single();
                     break;
                 default:
+                    if ( TryDisambiguateControllerByAction( request, bestMatches, out var resolvedController ) )
+                    {
+                        result.Controller = resolvedController;
+                        break;
+                    }
+
                     throw CreateAmbiguousControllerException( bestMatches );
             }
 

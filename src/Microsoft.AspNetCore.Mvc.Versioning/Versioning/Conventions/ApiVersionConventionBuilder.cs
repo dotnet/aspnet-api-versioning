@@ -2,6 +2,8 @@
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
     using System.Reflection;
 
     /// <content>
@@ -24,5 +26,27 @@
         }
 
         static TypeInfo GetKey( Type type ) => type.GetTypeInfo();
+
+        static bool HasDecoratedActions( ControllerModel controllerModel )
+        {
+            Contract.Requires( controllerModel != null );
+
+            foreach ( var action in controllerModel.Actions )
+            {
+                var attributes = action.Attributes;
+
+                if ( attributes.OfType<IApiVersionNeutral>().Any() )
+                {
+                    return true;
+                }
+
+                if ( attributes.OfType<IApiVersionProvider>().Any() )
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
