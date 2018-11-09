@@ -34,10 +34,11 @@
         /// <param name="services">The <see cref="IServiceProvider">services</see> needed to potentially substitute types.</param>
         /// <param name="action">The defining <see cref="IEdmAction">action</see>.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> of the <paramref name="action"/> to create the parameter type for.</param>
+        /// <param name="controllerName">The name of the controller that defines the action. Necessary for generating unique parameter types.</param>
         /// <returns>A strong <see cref="Type">type</see> definition for the OData <paramref name="action"/> parameters.</returns>
         /// <remarks><see cref="ODataActionParameters">OData action parameters</see> are modeled as a <see cref="Dictionary{TKey,TValue}">dictionary</see>,
         /// which is difficult to use effectively by documentation tools such as the API Explorer. The corresponding type is generated only once per
         /// <paramref name="apiVersion">API version</paramref>.</remarks>
-        Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion );
+        Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion, string controllerName );
     }
 }

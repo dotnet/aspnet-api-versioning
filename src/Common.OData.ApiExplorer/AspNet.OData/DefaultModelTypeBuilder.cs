@@ -171,14 +171,15 @@
         }
 
         /// <inheritdoc />
-        public Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion )
+        public Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion, string controllerName )
         {
             Arg.NotNull( services, nameof( services ) );
             Arg.NotNull( action, nameof( action ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            Arg.NotNull( controllerName, nameof(controllerName) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
-            var name = action.FullName() + "Parameters";
+            var name = controllerName + "." + action.FullName() + "Parameters";
             var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, assemblies, p, this ) );
             var signature = new ClassSignature( name, properties, apiVersion );
 
@@ -227,7 +228,18 @@
                 for ( var x = propertyDependencies.Count - 1; x >= 0; x-- )
                 {
                     var propertyDependency = propertyDependencies[x];
-                    if ( propertyDependency.DependentOnTypeKey == typeKey )
+                    Type dependentOnType = null;
+
+                    if ( unfinishedTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnTypeBuilder ) )
+                    {
+                        dependentOnType = dependentOnTypeBuilder;
+                    }
+                    else if ( generatedEdmTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnTypeInfo ) )
+                    {
+                        dependentOnType = dependentOnTypeInfo;
+                    }
+
+                    if ( dependentOnType != null)
                     {
                         if ( propertyDependency.IsCollection )
                         {
@@ -274,7 +286,10 @@
             var keys = unfinishedTypes.Keys;
             foreach ( var key in keys )
             {
-                ResolveDependencies(unfinishedTypes[key], key);
+                if ( unfinishedTypes.TryGetValue( key, out var type ) )
+                {
+                    ResolveDependencies(type, key);
+                }
             }
         }
 

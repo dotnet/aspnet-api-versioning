@@ -61,14 +61,15 @@
 
             if ( Operation?.IsAction() == true )
             {
-                ConvertODataActionParametersToTypedModel( modelTypeBuilder, (IEdmAction) Operation );
+                ConvertODataActionParametersToTypedModel( modelTypeBuilder, (IEdmAction) Operation, actionDescriptor.ControllerDescriptor.ControllerName );
             }
         }
 
-        void ConvertODataActionParametersToTypedModel( IModelTypeBuilder modelTypeBuilder, IEdmAction action )
+        void ConvertODataActionParametersToTypedModel( IModelTypeBuilder modelTypeBuilder, IEdmAction action, string controllerName )
         {
             Contract.Requires( modelTypeBuilder != null );
             Contract.Requires( action != null );
+            Contract.Requires( controllerName != null );
 
             var apiVersion = new Lazy<ApiVersion>( () => EdmModel.GetAnnotationValue<ApiVersionAnnotation>( EdmModel ).ApiVersion );
 
@@ -77,9 +78,9 @@
                 var description = ParameterDescriptions[i];
                 var parameter = description.ParameterDescriptor;
 
-                if ( parameter.ParameterType.IsODataActionParameters() )
+                if ( parameter != null && parameter.ParameterType.IsODataActionParameters() )
                 {
-                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( serviceProvider, action, apiVersion.Value ) );
+                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( serviceProvider, action, apiVersion.Value, controllerName ) );
                     break;
                 }
             }
