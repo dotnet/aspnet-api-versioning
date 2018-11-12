@@ -37,7 +37,6 @@
             ApiVersion = apiVersion;
             serviceProvider = configuration.GetODataRootContainer( route );
             EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
-            Assemblies = configuration.Services.GetAssembliesResolver().GetAssemblies();
             routeAttribute = actionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = route;

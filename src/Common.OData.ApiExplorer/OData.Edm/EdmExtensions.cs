@@ -17,15 +17,10 @@
 
     static class EdmExtensions
     {
-#if WEBAPI
-        internal static Type GetClrType( this IEdmType edmType, IAssembliesResolver assembliesResolver ) =>
-            edmType.GetClrType( assembliesResolver.GetAssemblies() );
-#endif
-
-        internal static Type GetClrType( this IEdmType edmType, IEnumerable<Assembly> assemblies )
+        internal static Type GetClrType( this IEdmType edmType, IEdmModel edmModel )
         {
             Contract.Requires( edmType != null );
-            Contract.Requires( assemblies != null );
+            Contract.Requires(edmModel != null );
 
             if ( !( edmType is IEdmSchemaType schemaType ) )
             {
@@ -40,17 +35,11 @@
                 return type;
             }
 
-            using ( var matchingTypes = GetMatchingTypes( typeName, assemblies ).GetEnumerator() )
+            var element = (IEdmSchemaType) edmType;
+            var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>(element);
+            if ( annotationValue != null )
             {
-                if ( matchingTypes.MoveNext() )
-                {
-                    type = matchingTypes.Current;
-
-                    if ( !matchingTypes.MoveNext() )
-                    {
-                        return type;
-                    }
-                }
+                return annotationValue.ClrType;
             }
 
             return null;
@@ -87,57 +76,6 @@
             }
 
             return null;
-        }
-
-        static string EdmFullName( this Type clrType ) => Format( InvariantCulture, "{0}.{1}", clrType.Namespace, clrType.MangleClrTypeName() );
-
-        static string MangleClrTypeName( this Type type )
-        {
-            Contract.Requires( type != null );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
-
-            if ( !type.IsGenericType )
-            {
-                return type.Name;
-            }
-
-            var typeName = type.Name.Replace( '`', '_' );
-            var typeArgNames = Join( "_", type.GetGenericArguments().Select( t => t.MangleClrTypeName() ) );
-
-            return Format( InvariantCulture, "{0}Of{1}", typeName, typeArgNames );
-        }
-
-        static IEnumerable<Type> GetMatchingTypes( string edmFullName, IEnumerable<Assembly> assemblies ) =>
-            assemblies.LoadedTypes().Where( t => t.IsPublic && t.EdmFullName() == edmFullName );
-
-        static IEnumerable<Type> LoadedTypes( this IEnumerable<Assembly> assemblies )
-        {
-            var loadedTypes = new List<Type>();
-
-            foreach ( var assembly in assemblies.Where( a => a?.IsDynamic == false ) )
-            {
-                var exportedTypes = default( IEnumerable<Type> );
-
-                try
-                {
-                    exportedTypes = assembly.ExportedTypes;
-                }
-                catch ( ReflectionTypeLoadException ex )
-                {
-                    exportedTypes = ex.Types;
-                }
-                catch
-                {
-                    continue;
-                }
-
-                if ( exportedTypes != null )
-                {
-                    loadedTypes.AddRange( exportedTypes );
-                }
-            }
-
-            return loadedTypes;
         }
     }
 }

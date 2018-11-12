@@ -44,7 +44,7 @@
 
             var openTypes = new Stack<Type>();
             var holder = new Lazy<Tuple<ApiVersion, StructuredTypeResolver>>(
-                () => Tuple.Create( context.ApiVersion, new StructuredTypeResolver( context.Model, context.Assemblies ) ) );
+                () => Tuple.Create( context.ApiVersion, new StructuredTypeResolver( context.Model ) ) );
 
             if ( IsSubstitutableGeneric( type, openTypes, out var innerType ) )
             {
@@ -56,7 +56,7 @@
                     return type;
                 }
 
-                var newType = context.ModelTypeBuilder.NewStructuredType( structuredType, innerType, apiVersion );
+                var newType = context.ModelTypeBuilder.NewStructuredType( structuredType, innerType, apiVersion, context.Model );
 
                 if ( innerType.Equals( newType ) )
                 {
@@ -73,7 +73,7 @@
 
                 if ( structuredType != null )
                 {
-                type = context.ModelTypeBuilder.NewStructuredType( structuredType, type, apiVersion );
+                type = context.ModelTypeBuilder.NewStructuredType( structuredType, type, apiVersion, context.Model );
                 }
             }
 

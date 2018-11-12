@@ -38,8 +38,6 @@
         internal IList<ParameterDescriptor> ParameterDescriptions => ActionDescriptor.Parameters;
 #endif
 
-        internal IEnumerable<Assembly> Assemblies { get; }
-
         internal IEdmModel EdmModel { get; }
 
         internal string RouteTemplate { get; }

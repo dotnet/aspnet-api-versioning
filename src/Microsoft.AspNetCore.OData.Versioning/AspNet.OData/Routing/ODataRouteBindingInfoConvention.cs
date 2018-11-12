@@ -21,15 +21,11 @@
 
     sealed class ODataRouteBindingInfoConvention : IODataActionDescriptorConvention
     {
-        readonly IEnumerable<Assembly> assemblies;
-
-        internal ODataRouteBindingInfoConvention( IODataRouteCollectionProvider routeCollectionProvider, ApplicationPartManager partManager )
+        internal ODataRouteBindingInfoConvention( IODataRouteCollectionProvider routeCollectionProvider )
         {
             Contract.Requires( routeCollectionProvider != null );
-            Contract.Requires( partManager != null );
 
             RouteCollectionProvider = routeCollectionProvider;
-            assemblies = partManager.ApplicationParts.OfType<AssemblyPart>().Select( p => p.Assembly ).ToArray();
         }
 
         IODataRouteCollectionProvider RouteCollectionProvider { get; }
@@ -96,7 +92,7 @@
             Contract.Requires( mapping != null );
             Contract.Requires( routeInfos != null );
 
-            var routeContext = new ODataRouteBuilderContext( assemblies, mapping, action );
+            var routeContext = new ODataRouteBuilderContext( mapping, action );
             var routeBuilder = new ODataRouteBuilder( routeContext );
             var parameterContext = new ActionParameterContext( routeBuilder, routeContext );
 

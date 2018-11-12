@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.AspNet.OData
 {
-    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -8,6 +7,8 @@
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData.Edm;
 
     struct ClassProperty
     {
@@ -24,27 +25,26 @@
             Attributes = AttributesFromProperty( clrProperty );
         }
 
-        internal ClassProperty( IServiceProvider services, IEnumerable<Assembly> assemblies, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
+        internal ClassProperty( IServiceProvider services, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
         {
             Contract.Requires( services != null );
-            Contract.Requires( assemblies != null );
             Contract.Requires( parameter != null );
             Contract.Requires( typeBuilder != null );
 
             Name = parameter.Name;
-            var context = new TypeSubstitutionContext( services, assemblies, typeBuilder );
+            var context = new TypeSubstitutionContext( services, typeBuilder );
 
             if ( parameter.Type.IsCollection() )
             {
                 var collectionType = parameter.Type.AsCollection();
-                var elementType = collectionType.ElementType().Definition.GetClrType( assemblies );
+                var elementType = collectionType.ElementType().Definition.GetClrType( services.GetRequiredService<IEdmModel>() );
                 var substitutedType = elementType.SubstituteIfNecessary( context );
 
                 Type = typeof( IEnumerable<> ).MakeGenericType( substitutedType );
             }
             else
             {
-                var parameterType = parameter.Type.Definition.GetClrType( assemblies );
+                var parameterType = parameter.Type.Definition.GetClrType( services.GetRequiredService<IEdmModel>() );
 
                 Type = parameterType.SubstituteIfNecessary( context );
             }

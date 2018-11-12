@@ -56,36 +56,30 @@
         /// Initializes a new instance of the <see cref="ODataApiDescriptionProvider"/> class.
         /// </summary>
         /// <param name="routeCollectionProvider">The <see cref="IODataRouteCollectionProvider">OData route collection provider</see> associated with the description provider.</param>
-        /// <param name="partManager">The <see cref="ApplicationPartManager">application part manager</see> containing the configured application parts.</param>
         /// <param name="inlineConstraintResolver">The <see cref="IInlineConstraintResolver">inline constraint resolver</see> used to parse route template constraints.</param>
         /// <param name="metadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
         /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ODataApiExplorerOptions">API explorer options</see>.</param>
         /// <param name="mvcOptions">A <see cref="IOptions{TOptions}">holder</see> containing the current <see cref="Mvc.MvcOptions">MVC options</see>.</param>
         public ODataApiDescriptionProvider(
             IODataRouteCollectionProvider routeCollectionProvider,
-            ApplicationPartManager partManager,
             IInlineConstraintResolver inlineConstraintResolver,
             IModelMetadataProvider metadataProvider,
             IOptions<ODataApiExplorerOptions> options,
             IOptions<MvcOptions> mvcOptions )
         {
             Arg.NotNull( routeCollectionProvider, nameof( routeCollectionProvider ) );
-            Arg.NotNull( partManager, nameof( partManager ) );
             Arg.NotNull( metadataProvider, nameof( metadataProvider ) );
             Arg.NotNull( options, nameof( options ) );
             Arg.NotNull( mvcOptions, nameof( mvcOptions ) );
 
             RouteCollectionProvider = routeCollectionProvider;
-            Assemblies = partManager.ApplicationParts.OfType<AssemblyPart>().Select( p => p.Assembly ).ToArray();
-            ModelTypeBuilder = new DefaultModelTypeBuilder( Assemblies );
+            ModelTypeBuilder = new DefaultModelTypeBuilder();
             ConstraintResolver = inlineConstraintResolver;
             MetadataProvider = metadataProvider;
             this.options = options;
             MvcOptions = mvcOptions.Value;
             modelMetadata = new Lazy<ModelMetadata>( NewModelMetadata );
         }
-
-        IEnumerable<Assembly> Assemblies { get; }
 
         /// <summary>
         /// Gets the model type builder used by the API explorer.
@@ -325,7 +319,7 @@
             var declaredReturnType = GetDeclaredReturnType( action );
             var runtimeReturnType = GetRuntimeReturnType( declaredReturnType );
             var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes, runtimeReturnType, mapping.Services );
-            var routeContext = new ODataRouteBuilderContext( mapping, action, Assemblies, Options );
+            var routeContext = new ODataRouteBuilderContext( mapping, action, Options );
             var parameterContext = new ApiParameterContext( MetadataProvider, routeContext, ModelTypeBuilder );
             var parameters = GetParameters( parameterContext );
 
@@ -553,7 +547,7 @@
                     results.Add( new ApiResponseType()
                     {
                         StatusCode = objectType.Key,
-                        Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, Assemblies, ModelTypeBuilder ) ),
+                        Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) ),
                     } );
 
                     continue;
@@ -562,7 +556,7 @@
                 var apiResponseType = new ApiResponseType()
                 {
                     StatusCode = objectType.Key,
-                    Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, Assemblies, ModelTypeBuilder ) ),
+                    Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) ),
                     ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ),
                 };
 

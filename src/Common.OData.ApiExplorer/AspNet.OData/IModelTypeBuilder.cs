@@ -21,12 +21,13 @@
         /// <param name="structuredType">The <see cref="IEdmStructuredType">structured type</see> to evaluate.</param>
         /// <param name="clrType">The CLR <see cref="Type">type</see> mapped to the <paramref name="structuredType">structured type</paramref>.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the type mapping.</param>
+        /// <param name="edmModel">The <see cref="IEdmModel">EdmModel</see> the structured type belongs to.</param>
         /// <returns>The original <paramref name="clrType">CLR type</paramref> or a new, dynamically generated substitute <see cref="Type">type</see>
         /// that is a subset of the original <paramref name="clrType">CLR type</paramref>, but maps one-to-one with the
         /// <paramref name="structuredType">structured type</paramref>.</returns>
         /// <remarks>If a substitution is not required, the original <paramref name="clrType">CLR type</paramref> is returned. When a substitution
         /// <see cref="Type">type</see> is generated, it is performed only once per <paramref name="apiVersion">API version</paramref>.</remarks>
-        Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion );
+        Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel );
 
         /// <summary>
         /// Creates an returns a strongly-typed definition for OData action parameters.

@@ -24,17 +24,14 @@
         /// Initializes a new instance of the <see cref="TypeSubstitutionContext"/> class.
         /// </summary>
         /// <param name="model">The <see cref="IEdmModel">EDM model</see> to compare against.</param>
-        /// <param name="assemblies">The <see cref="IEnumerable{T}">sequence</see> of application <see cref="Assembly">assemblies</see>.</param>
         /// <param name="modelTypeBuilder">The associated <see cref="IModelTypeBuilder">model type builder</see>.</param>
-        public TypeSubstitutionContext( IEdmModel model, IEnumerable<Assembly> assemblies, IModelTypeBuilder modelTypeBuilder )
+        public TypeSubstitutionContext( IEdmModel model, IModelTypeBuilder modelTypeBuilder )
         {
             Arg.NotNull( model, nameof( model ) );
-            Arg.NotNull( assemblies, nameof( assemblies ) );
             Arg.NotNull( modelTypeBuilder, nameof( modelTypeBuilder ) );
 
             this.model = new Lazy<IEdmModel>( () => model );
             apiVersion = new Lazy<ApiVersion>( () => Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Default );
-            Assemblies = assemblies;
             ModelTypeBuilder = modelTypeBuilder;
         }
 
@@ -43,17 +40,14 @@
         /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider">service provider</see> that the
         /// <see cref="IEdmModel">EDM model</see> can be resolved from.</param>
-        /// <param name="assemblies">The <see cref="IEnumerable{T}">sequence</see> of application <see cref="Assembly">assemblies</see>.</param>
         /// <param name="modelTypeBuilder">The associated <see cref="IModelTypeBuilder">model type builder</see>.</param>
-        public TypeSubstitutionContext( IServiceProvider serviceProvider, IEnumerable<Assembly> assemblies, IModelTypeBuilder modelTypeBuilder )
+        public TypeSubstitutionContext( IServiceProvider serviceProvider, IModelTypeBuilder modelTypeBuilder )
         {
             Arg.NotNull( serviceProvider, nameof( serviceProvider ) );
-            Arg.NotNull( assemblies, nameof( assemblies ) );
             Arg.NotNull( modelTypeBuilder, nameof( modelTypeBuilder ) );
 
             model = new Lazy<IEdmModel>( serviceProvider.GetRequiredService<IEdmModel> );
             apiVersion = new Lazy<ApiVersion>( () => Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Default );
-            Assemblies = assemblies;
             ModelTypeBuilder = modelTypeBuilder;
         }
 
@@ -68,12 +62,6 @@
         /// </summary>
         /// <value>The associated <see cref="ApiVersion">API version</see>.</value>
         public ApiVersion ApiVersion => apiVersion.Value;
-
-        /// <summary>
-        /// Gets the sequence of known application assemblies.
-        /// </summary>
-        /// <value>The <see cref="IEnumerable{T}">sequence</see> of application <see cref="Assembly">assemblies</see>.</value>
-        public IEnumerable<Assembly> Assemblies { get; }
 
         /// <summary>
         /// Gets the model type builder used to create substitution types.

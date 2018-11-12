@@ -290,7 +290,7 @@
                 return;
             }
 
-            var type = typeDef.GetClrType( Context.Assemblies );
+            var type = typeDef.GetClrType( Context.EdmModel );
 
             if ( quotedTypes.TryGetValue( type, out var prefix ) )
             {

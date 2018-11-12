@@ -36,8 +36,6 @@
 
         internal IServiceProvider Services => RouteContext.Services;
 
-        internal IEnumerable<Assembly> Assemblies => RouteContext.Assemblies;
-
         internal IModelTypeBuilder TypeBuilder { get; }
 
         internal ODataPathTemplate PathTemplate

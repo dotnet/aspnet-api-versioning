@@ -16,13 +16,11 @@
     {
         private IODataPathTemplateHandler templateHandler;
 
-        internal ODataRouteBuilderContext( IEnumerable<Assembly> assemblies, ODataRouteMapping routeMapping, ControllerActionDescriptor actionDescriptor )
+        internal ODataRouteBuilderContext( ODataRouteMapping routeMapping, ControllerActionDescriptor actionDescriptor )
         {
-            Contract.Requires( assemblies != null );
             Contract.Requires( routeMapping != null );
             Contract.Requires( actionDescriptor != null );
 
-            Assemblies = assemblies;
             ApiVersion = routeMapping.ApiVersion;
             serviceProvider = routeMapping.Services;
             EdmModel = serviceProvider.GetRequiredService<IEdmModel>();

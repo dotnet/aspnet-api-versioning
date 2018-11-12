@@ -20,18 +20,15 @@
         internal ODataRouteBuilderContext(
             ODataRouteMapping routeMapping,
             ControllerActionDescriptor actionDescriptor,
-            IEnumerable<Assembly> assemblies,
             ODataApiExplorerOptions options )
         {
             Contract.Requires( routeMapping != null );
-            Contract.Requires( assemblies != null );
             Contract.Requires( actionDescriptor != null );
             Contract.Requires( options != null );
 
             ApiVersion = routeMapping.ApiVersion;
             serviceProvider = routeMapping.Services;
             EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
-            Assemblies = assemblies;
             routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = routeMapping.Route;
