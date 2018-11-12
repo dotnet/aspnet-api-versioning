@@ -398,8 +398,7 @@
 
         static TypeSubstitutionContext NewContext( IEdmModel model )
         {
-            var assemblies = new[] { typeof( DefaultModelTypeBuilderTest ).Assembly };
-            return new TypeSubstitutionContext( model, assemblies, new DefaultModelTypeBuilder( assemblies ) );
+            return new TypeSubstitutionContext( model, new DefaultModelTypeBuilder() );
         }
     }
 }

@@ -27,29 +27,19 @@
     public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     {
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
-        readonly ICollection<Assembly> assemblies;
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
         readonly ConcurrentDictionary<EdmTypeKey, TypeInfo> generatedEdmTypes = new ConcurrentDictionary<EdmTypeKey, TypeInfo>();
         readonly ConcurrentDictionary<EdmTypeKey, TypeBuilder> unfinishedTypes = new ConcurrentDictionary<EdmTypeKey, TypeBuilder>();
         readonly HashSet<EdmTypeKey> visitedEdmTypes = new HashSet<EdmTypeKey>();
         readonly Dictionary<EdmTypeKey, List<PropertyDependency>> dependencies = new Dictionary<EdmTypeKey, List<PropertyDependency>>();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultModelTypeBuilder"/> class.
-        /// </summary>
-        /// <param name="assemblies">The <see cref="IEnumerable{T}">sequence</see> of application <see cref="Assembly">assemblies</see>.</param>
-        public DefaultModelTypeBuilder( IEnumerable<Assembly> assemblies )
-        {
-            Arg.NotNull( assemblies, nameof( assemblies ) );
-            this.assemblies = new HashSet<Assembly>( assemblies );
-        }
-
         /// <inheritdoc />
-        public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
+        public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel )
         {
             Arg.NotNull( structuredType, nameof( structuredType ) );
             Arg.NotNull( clrType, nameof( clrType ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            Arg.NotNull( edmModel, nameof( edmModel ) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var typeKey = new EdmTypeKey( structuredType, apiVersion );
@@ -88,10 +78,9 @@
 
                     if ( elementType.IsStructured() )
                     {
-                        assemblies.Add( clrType.Assembly );
                         visitedEdmTypes.Add( propertyTypeKey );
 
-                        var itemType = elementType.Definition.GetClrType( assemblies );
+                        var itemType = elementType.Definition.GetClrType( edmModel );
                         var elementKey = new EdmTypeKey(elementType, apiVersion);
 
                         if ( visitedEdmTypes.Contains( elementKey ) )
@@ -103,7 +92,7 @@
                             continue;
                         }
 
-                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion );
+                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion, edmModel );
 
                         if ( newItemType is TypeBuilder )
                         {
@@ -121,7 +110,7 @@
                 {
                     if ( !visitedEdmTypes.Contains( propertyTypeKey ) )
                     {
-                        propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), propertyType, apiVersion );
+                        propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), propertyType, apiVersion, edmModel );
                         if ( propertyType is TypeBuilder )
                         {
                             hasUnfinishedTypes = true;
@@ -180,7 +169,7 @@
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var name = controllerName + "." + action.FullName() + "Parameters";
-            var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, assemblies, p, this ) );
+            var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, p, this ) );
             var signature = new ClassSignature( name, properties, apiVersion );
 
             return CreateTypeInfoFromSignature( signature );

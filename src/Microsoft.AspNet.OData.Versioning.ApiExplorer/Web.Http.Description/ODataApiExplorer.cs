@@ -45,7 +45,7 @@
         public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options ) : base( configuration, options )
         {
             Options = options;
-            ModelTypeBuilder = new DefaultModelTypeBuilder( configuration.Services.GetAssembliesResolver().GetAssemblies() );
+            ModelTypeBuilder = new DefaultModelTypeBuilder();
         }
 
         /// <summary>
@@ -182,7 +182,7 @@
             var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
             var assembliesResolver = actionDescriptor.Configuration.Services.GetAssembliesResolver();
             var returnType = description.ResponseType ?? description.DeclaredType;
-            var context = new TypeSubstitutionContext( serviceProvider, assembliesResolver.GetAssemblies(), ModelTypeBuilder );
+            var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder );
 
             description.ResponseType = returnType.SubstituteIfNecessary( context );
 
@@ -271,11 +271,10 @@
             return willReadUri;
         }
 
-        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider, IAssembliesResolver assembliesResolver )
+        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider )
         {
             Contract.Requires( parameterBinding != null );
             Contract.Requires( serviceProvider != null );
-            Contract.Requires( assembliesResolver != null );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
 
             var descriptor = parameterBinding.Descriptor;
@@ -286,7 +285,7 @@
                 description.Source = FromBody;
 
                 var parameterType = descriptor.ParameterType;
-                var context = new TypeSubstitutionContext( serviceProvider, assembliesResolver.GetAssemblies(), ModelTypeBuilder );
+                var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder );
                 var substitutedType = parameterType.SubstituteIfNecessary( context );
 
                 if ( parameterType != substitutedType )
@@ -318,14 +317,13 @@
             {
                 var configuration = actionDescriptor.Configuration;
                 var serviceProvider = configuration.GetODataRootContainer( route );
-                var assembliesResolver = configuration.Services.GetAssembliesResolver();
                 var parameterBindings = actionBinding.ParameterBindings;
 
                 if ( parameterBindings != null )
                 {
                     foreach ( var binding in parameterBindings )
                     {
-                        list.Add( CreateParameterDescriptionFromBinding( binding, serviceProvider, assembliesResolver ) );
+                        list.Add( CreateParameterDescriptionFromBinding( binding, serviceProvider ) );
                     }
                 }
             }

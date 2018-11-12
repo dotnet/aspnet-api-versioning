@@ -38,7 +38,7 @@
             var conventions = new IODataActionDescriptorConvention[]
             {
                 new ImplicitHttpMethodConvention(),
-                new ODataRouteBindingInfoConvention( routeCollectionProvider, partManager ),
+                new ODataRouteBindingInfoConvention( routeCollectionProvider ),
             };
 
             foreach ( var action in ODataActions( results ) )

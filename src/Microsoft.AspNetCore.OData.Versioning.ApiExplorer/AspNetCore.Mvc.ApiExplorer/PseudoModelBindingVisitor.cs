@@ -92,7 +92,7 @@
             }
             else
             {
-                type = type.SubstituteIfNecessary( new TypeSubstitutionContext( Context.Services, Context.Assemblies, Context.TypeBuilder ) );
+                type = type.SubstituteIfNecessary( new TypeSubstitutionContext( Context.Services, Context.TypeBuilder ) );
             }
 
             return new ApiParameterDescription()
