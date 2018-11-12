@@ -285,7 +285,7 @@
         static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name )
         {
             const MethodAttributes propertyMethodAttributes = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
-            var field = addTo.DefineField( name, shouldBeAdded, FieldAttributes.Private );
+            var field = addTo.DefineField( "_" + name, shouldBeAdded, FieldAttributes.Private );
             var propertyBuilder = addTo.DefineProperty( name, PropertyAttributes.HasDefault, shouldBeAdded, null );
             var getter = addTo.DefineMethod( "get_" + name, propertyMethodAttributes, shouldBeAdded, Type.EmptyTypes );
             var setter = addTo.DefineMethod( "set_" + name, propertyMethodAttributes, shouldBeAdded, Type.EmptyTypes );
