@@ -251,20 +251,19 @@
                     {
                         var typeInfo = type.CreateTypeInfo();
                         generatedEdmTypes.GetOrAdd( key, typeInfo );
-
-                        if ( key == typeKey )
-                        {
-                            return typeInfo;
-                        }
                     }
                 }
+            }
 
-                if ( !dependencies.ContainsKey( typeKey ) )
-                {
-                    var typeInfo = typeBuilder.CreateTypeInfo();
-                    generatedEdmTypes.GetOrAdd( key, typeInfo );
-                    return typeBuilder.CreateTypeInfo();
-                }
+            if ( !dependencies.ContainsKey( typeKey ) )
+            {
+                var typeInfo = typeBuilder.CreateTypeInfo();
+                generatedEdmTypes.GetOrAdd( typeKey, typeInfo );
+            }
+
+            if ( generatedEdmTypes.TryGetValue( typeKey, out var generatedType ) )
+            {
+                return generatedType;
             }
 
             return typeBuilder;
