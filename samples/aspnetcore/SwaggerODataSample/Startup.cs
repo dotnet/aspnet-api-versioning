@@ -41,13 +41,16 @@
                 {
                     // resolve the IApiVersionDescriptionProvider service
                     // note: that we have to build a temporary service provider here because one has not been created yet
-                    var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
-
-                    // add a swagger document for each discovered API version
-                    // note: you might choose to skip or document deprecated API versions differently
-                    foreach ( var description in provider.ApiVersionDescriptions )
+                    using ( var serviceProvider = services.BuildServiceProvider() )
                     {
-                        options.SwaggerDoc( description.GroupName, CreateInfoForApiVersion( description ) );
+                        var provider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
+
+                        // add a swagger document for each discovered API version
+                        // note: you might choose to skip or document deprecated API versions differently
+                        foreach ( var description in provider.ApiVersionDescriptions )
+                        {
+                            options.SwaggerDoc( description.GroupName, CreateInfoForApiVersion( description ) );
+                        }
                     }
 
                     // add a custom operation filter which sets default values
