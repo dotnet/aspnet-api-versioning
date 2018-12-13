@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
     using Moq;
     using System.Threading.Tasks;
     using Xunit;
@@ -60,6 +61,7 @@
 
             bindingContext.SetupGet( bc => bc.HttpContext ).Returns( httpContext );
             bindingContext.SetupProperty( bc => bc.Result );
+            bindingContext.SetupProperty( bc => bc.ValidationState, new ValidationStateDictionary() );
 
             return bindingContext.Object;
         }
