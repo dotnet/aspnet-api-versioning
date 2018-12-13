@@ -1,6 +1,9 @@
-﻿namespace Microsoft.Web.Http
+﻿#if WEBAPI
+namespace Microsoft.Web.Http
+#else
+namespace Microsoft.AspNetCore.Mvc
+#endif
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 

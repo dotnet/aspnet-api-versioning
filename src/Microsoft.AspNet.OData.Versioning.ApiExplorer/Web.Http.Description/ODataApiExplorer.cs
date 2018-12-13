@@ -1,10 +1,12 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Formatter;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
+    using Microsoft.OData.UriParser;
     using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections.Generic;
@@ -16,7 +18,6 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
-    using System.Web.Http.Dispatcher;
     using System.Web.Http.ModelBinding;
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
@@ -140,6 +141,11 @@
         /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
         protected override Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
         {
+            Arg.NotNull( controllerMappings, nameof( controllerMappings ) );
+            Arg.NotNull( route, nameof( route ) );
+            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
+
             if ( !( route is ODataRoute ) )
             {
                 return base.ExploreRouteControllers( controllerMappings, route, apiVersion );
@@ -169,7 +175,29 @@
                 }
             }
 
+            ExploreQueryOptions( apiDescriptions, Configuration.GetODataRootContainer( route ).GetRequiredService<ODataUriResolver>() );
+
             return apiDescriptions;
+        }
+
+        /// <summary>
+        /// Explores the OData query options for the specified API descriptions.
+        /// </summary>
+        /// <param name="apiDescriptions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="VersionedApiDescription">API descriptions</see> to explore.</param>
+        /// <param name="uriResolver">The associated <see cref="ODataUriResolver">OData URI resolver</see>.</param>
+        protected virtual void ExploreQueryOptions( IEnumerable<VersionedApiDescription> apiDescriptions, ODataUriResolver uriResolver )
+        {
+            Arg.NotNull( apiDescriptions, nameof( apiDescriptions ) );
+            Arg.NotNull( uriResolver, nameof( uriResolver ) );
+
+            var queryOptions = Options.QueryOptions;
+            var settings = new ODataQueryOptionSettings()
+            {
+                NoDollarPrefix = uriResolver.EnableNoDollarQueryOptions,
+                DescriptionProvider = queryOptions.DescriptionProvider,
+            };
+
+            queryOptions.ApplyTo( apiDescriptions, settings );
         }
 
         ResponseDescription CreateResponseDescriptionWithRoute( HttpActionDescriptor actionDescriptor, IHttpRoute route )

@@ -6,8 +6,10 @@
     using Microsoft.Web.Http;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Description;
+    using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static System.Net.HttpStatusCode;
 
     /// <summary>
@@ -23,9 +25,10 @@
         /// <returns>All available orders.</returns>
         /// <response code="200">The successfully retrieved orders.</response>
         [HttpGet]
-        [ResponseType( typeof( ODataValue<IEnumerable<Order>> ) )]
         [ODataRoute]
-        public IHttpActionResult Get()
+        [ResponseType( typeof( ODataValue<IEnumerable<Order>> ) )]
+        [EnableQuery( MaxTop = 100, AllowedQueryOptions = Select | Top | Skip | Count )]
+        public IQueryable<Order> Get()
         {
             var orders = new[]
             {
@@ -34,7 +37,7 @@
                 new Order(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTime.UtcNow.AddDays( 7d ) }
             };
 
-            return Ok( orders );
+            return orders.AsQueryable();
         }
 
         /// <summary>
@@ -45,9 +48,10 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ResponseType( typeof( Order ) )]
         [ODataRoute( "({key})" )]
-        public IHttpActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
+        [ResponseType( typeof( Order ) )]
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public SingleResult<Order> Get( int key ) => SingleResult.Create( new[] { new Order() { Id = key, Customer = "John Doe" } }.AsQueryable() );
 
         /// <summary>
         /// Places a new order.
@@ -57,8 +61,8 @@
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
         [HttpPost]
-        [ResponseType( typeof( Order ) )]
         [ODataRoute]
+        [ResponseType( typeof( Order ) )]
         public IHttpActionResult Post( [FromBody] Order order )
         {
             if ( !ModelState.IsValid )
@@ -80,8 +84,8 @@
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpPatch]
-        [ResponseType( typeof( Order ) )]
         [ODataRoute( "({key})" )]
+        [ResponseType( typeof( Order ) )]
         public IHttpActionResult Patch( int key, Delta<Order> delta )
         {
             if ( !ModelState.IsValid )
@@ -103,9 +107,10 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The no orders exist.</response>
         [HttpGet]
-        [ResponseType( typeof( Order ) )]
         [ODataRoute( nameof( MostExpensive ) )]
-        public IHttpActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
+        [ResponseType( typeof( Order ) )]
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public SingleResult<Order> MostExpensive() => SingleResult.Create( new[] { new Order() { Id = 42, Customer = "Bill Mei" } }.AsQueryable() );
 
         /// <summary>
         /// Rates an order.

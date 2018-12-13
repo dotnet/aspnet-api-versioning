@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.Web.Http {
+namespace Microsoft {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace Microsoft.Web.Http {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SR {
@@ -39,7 +39,7 @@ namespace Microsoft.Web.Http {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.Web.Http.SR", typeof(SR).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.SR", typeof(SR).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,200 @@ namespace Microsoft.Web.Http {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An action method with the name &apos;{0}&apos; could not be found. The method must be public, non-static, and not have the NonActionAttribute applied..
+        /// </summary>
+        internal static string ActionMethodNotFound {
+            get {
+                return ResourceManager.GetString("ActionMethodNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The allowed arithmetic operators are: {0}..
+        /// </summary>
+        internal static string AllowedArithmeticOperatorsDesc {
+            get {
+                return ResourceManager.GetString("AllowedArithmeticOperatorsDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The allowed functions are: {0}..
+        /// </summary>
+        internal static string AllowedFunctionsDesc {
+            get {
+                return ResourceManager.GetString("AllowedFunctionsDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The allowed logical operators are: {0}..
+        /// </summary>
+        internal static string AllowedLogicalOperatorsDesc {
+            get {
+                return ResourceManager.GetString("AllowedLogicalOperatorsDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The allowed properties are: {0}..
+        /// </summary>
+        internal static string AllowedPropertiesDesc {
+            get {
+                return ResourceManager.GetString("AllowedPropertiesDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple action methods with the name &apos;{0}&apos; were found, but could not be resolved using the provided arguments..
+        /// </summary>
+        internal static string AmbiguousActionMethod {
+            get {
+                return ResourceManager.GetString("AmbiguousActionMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OData query option conventions cannot be applied to the controller type {0} using both typed and untyped convention builders..
+        /// </summary>
+        internal static string ConventionStyleMismatch {
+            get {
+                return ResourceManager.GetString("ConventionStyleMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates whether the total count of items within a collection are returned in the result..
+        /// </summary>
+        internal static string CountQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("CountQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicates the related entities to be represented inline..
+        /// </summary>
+        internal static string ExpandQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("ExpandQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restricts the set of items returned..
+        /// </summary>
+        internal static string FilterQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("FilterQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The expression &apos;{0}&apos; must refer to a controller action method..
+        /// </summary>
+        internal static string InvalidActionMethodExpression {
+            get {
+                return ResourceManager.GetString("InvalidActionMethodExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum depth is {0}..
+        /// </summary>
+        internal static string MaxDepthDesc {
+            get {
+                return ResourceManager.GetString("MaxDepthDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum number of expressions is {0}..
+        /// </summary>
+        internal static string MaxExpressionDesc {
+            get {
+                return ResourceManager.GetString("MaxExpressionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum value is {0}..
+        /// </summary>
+        internal static string MaxValueDesc {
+            get {
+                return ResourceManager.GetString("MaxValueDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only a single, valid query option may be specified..
+        /// </summary>
+        internal static string MultipleQueryOptionsNotAllowed {
+            get {
+                return ResourceManager.GetString("MultipleQueryOptionsNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The container builder created by the container builder factory must not be null..
         /// </summary>
         internal static string NullContainer {
             get {
                 return ResourceManager.GetString("NullContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the order in which items are returned..
+        /// </summary>
+        internal static string OrderByQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("OrderByQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type {0} does not implement the {1} interface..
+        /// </summary>
+        internal static string RequiredInterfaceNotImplemented {
+            get {
+                return ResourceManager.GetString("RequiredInterfaceNotImplemented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limits the properties returned in the result..
+        /// </summary>
+        internal static string SelectQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("SelectQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excludes the specified number of items of the queried collection from the result..
+        /// </summary>
+        internal static string SkipQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("SkipQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limits the number of items returned from a collection..
+        /// </summary>
+        internal static string TopQueryOptionDesc {
+            get {
+                return ResourceManager.GetString("TopQueryOptionDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The query option ${0} is not supported..
+        /// </summary>
+        internal static string UnsupportedQueryOption {
+            get {
+                return ResourceManager.GetString("UnsupportedQueryOption", resourceCulture);
             }
         }
     }

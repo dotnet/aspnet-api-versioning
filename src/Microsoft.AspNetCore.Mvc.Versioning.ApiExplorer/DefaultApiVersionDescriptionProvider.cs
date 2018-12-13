@@ -1,9 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;

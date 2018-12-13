@@ -22,7 +22,7 @@
 
             Name = clrProperty.Name;
             Type = propertyType;
-            Attributes = AttributesFromProperty( clrProperty );
+            Attributes = clrProperty.DeclaredAttributes();
         }
 
         internal ClassProperty( IServiceProvider services, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
@@ -55,52 +55,6 @@
         internal IEnumerable<CustomAttributeBuilder> Attributes { get; }
 
         public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ Type.GetHashCode();
-
-        static IEnumerable<CustomAttributeBuilder> AttributesFromProperty( PropertyInfo clrProperty )
-        {
-            Contract.Requires( clrProperty != null );
-            Contract.Ensures( Contract.Result<IEnumerable<CustomAttributeBuilder>>() != null );
-
-            foreach ( var attribute in clrProperty.CustomAttributes )
-            {
-                var ctor = attribute.Constructor;
-                var ctorArgs = attribute.ConstructorArguments.Select( a => a.Value ).ToArray();
-                var namedProperties = new List<PropertyInfo>( attribute.NamedArguments.Count );
-                var propertyValues = new List<object>( attribute.NamedArguments.Count );
-                var namedFields = new List<FieldInfo>( attribute.NamedArguments.Count );
-                var fieldValues = new List<object>( attribute.NamedArguments.Count );
-
-                foreach ( var argument in attribute.NamedArguments )
-                {
-                    if ( argument.IsField )
-                    {
-                        namedFields.Add( (FieldInfo) argument.MemberInfo );
-                        fieldValues.Add( argument.TypedValue.Value );
-                    }
-                    else
-                    {
-                        namedProperties.Add( (PropertyInfo) argument.MemberInfo );
-                        propertyValues.Add( argument.TypedValue.Value );
-                    }
-                }
-
-                for ( var i = 0; i < ctorArgs.Length; i++ )
-                {
-                    if ( ctorArgs[i] is IReadOnlyCollection<CustomAttributeTypedArgument> paramsList )
-                    {
-                        ctorArgs[i] = paramsList.Select( a => a.Value ).ToArray();
-                    }
-                }
-
-                yield return new CustomAttributeBuilder(
-                    ctor,
-                    ctorArgs,
-                    namedProperties.ToArray(),
-                    propertyValues.ToArray(),
-                    namedFields.ToArray(),
-                    fieldValues.ToArray() );
-            }
-        }
 
         static IEnumerable<CustomAttributeBuilder> AttributesFromOperationParameter( IEdmOperationParameter parameter )
         {

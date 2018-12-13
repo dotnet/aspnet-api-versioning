@@ -4,8 +4,10 @@
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
+    using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Description;
+    using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
 
     /// <summary>
     /// Represents a RESTful service of orders.
@@ -23,9 +25,10 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ResponseType( typeof( Order ) )]
         [ODataRoute( "({key})" )]
-        public IHttpActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
+        [ResponseType( typeof( Order ) )]
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public SingleResult<Order> Get( int key ) => SingleResult.Create( new[] { new Order() { Id = key, Customer = "John Doe" } }.AsQueryable() );
 
         /// <summary>
         /// Places a new order.
@@ -35,9 +38,9 @@
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
         [HttpPost]
+        [ODataRoute]
         [MapToApiVersion( "1.0" )]
         [ResponseType( typeof( Order ) )]
-        [ODataRoute]
         public IHttpActionResult Post( [FromBody] Order order )
         {
             if ( !ModelState.IsValid )
@@ -57,9 +60,10 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The no orders exist.</response>
         [HttpGet]
+        [ODataRoute( nameof( MostExpensive ) )]
         [MapToApiVersion( "1.0" )]
         [ResponseType( typeof( Order ) )]
-        [ODataRoute( nameof( MostExpensive ) )]
-        public IHttpActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public SingleResult<Order> MostExpensive() => SingleResult.Create( new[] { new Order() { Id = 42, Customer = "Bill Mei" } }.AsQueryable() );
     }
 }

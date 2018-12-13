@@ -1,5 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
     using Microsoft.Extensions.Options;
     using System;
 
@@ -27,6 +29,10 @@
                 options.Filters.AddService<ReportApiVersionsAttribute>();
             }
 
+            var modelMetadataDetailsProviders = options.ModelMetadataDetailsProviders;
+
+            modelMetadataDetailsProviders.Insert( 0, new SuppressChildValidationMetadataProvider( typeof( ApiVersion ) ) );
+            modelMetadataDetailsProviders.Insert( 0, new BindingSourceMetadataProvider( typeof( ApiVersion ), BindingSource.Special ) );
             options.ModelBinderProviders.Insert( 0, new ApiVersionModelBinderProvider() );
         }
     }

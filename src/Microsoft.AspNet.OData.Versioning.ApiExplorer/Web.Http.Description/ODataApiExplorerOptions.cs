@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.AspNet.OData.Builder;
     using System.Web.Http;
 
     /// <content>

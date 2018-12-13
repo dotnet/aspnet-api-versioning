@@ -81,7 +81,7 @@
                         visitedEdmTypes.Add( propertyTypeKey );
 
                         var itemType = elementType.Definition.GetClrType( edmModel );
-                        var elementKey = new EdmTypeKey(elementType, apiVersion);
+                        var elementKey = new EdmTypeKey( elementType, apiVersion );
 
                         if ( visitedEdmTypes.Contains( elementKey ) )
                         {
@@ -135,7 +135,7 @@
                 return clrType;
             }
 
-            var signature = new ClassSignature( clrType.FullName, properties, apiVersion );
+            var signature = new ClassSignature( clrType, properties, apiVersion );
 
             if ( hasUnfinishedTypes )
             {
@@ -165,7 +165,7 @@
             Arg.NotNull( services, nameof( services ) );
             Arg.NotNull( action, nameof( action ) );
             Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( controllerName, nameof(controllerName) );
+            Arg.NotNull( controllerName, nameof( controllerName ) );
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var name = controllerName + "." + action.FullName() + "Parameters";
@@ -191,6 +191,11 @@
             var moduleBuilder = modules.GetOrAdd( @class.ApiVersion, CreateModuleForApiVersion );
             var typeBuilder = moduleBuilder.DefineType( @class.Name, TypeAttributes.Class );
 
+            foreach ( var attribute in @class.Attributes )
+            {
+                typeBuilder.SetCustomAttribute( attribute );
+            }
+
             foreach ( var property in @class.Properties )
             {
                 var type = property.Type;
@@ -206,14 +211,16 @@
             return typeBuilder;
         }
 
-        private Type ResolveDependencies( TypeBuilder typeBuilder, EdmTypeKey typeKey )
+        Type ResolveDependencies( TypeBuilder typeBuilder, EdmTypeKey typeKey )
         {
-            var keys = dependencies.Keys.ToList();
+            var keys = dependencies.Keys.ToArray();
+
             unfinishedTypes.GetOrAdd( typeKey, typeBuilder );
 
             foreach ( var key in keys )
             {
                 var propertyDependencies = dependencies[key];
+
                 for ( var x = propertyDependencies.Count - 1; x >= 0; x-- )
                 {
                     var propertyDependency = propertyDependencies[x];
@@ -228,7 +235,7 @@
                         dependentOnType = dependentOnTypeInfo;
                     }
 
-                    if ( dependentOnType != null)
+                    if ( dependentOnType != null )
                     {
                         if ( propertyDependency.IsCollection )
                         {
@@ -247,18 +254,17 @@
                 if ( propertyDependencies.Count == 0 )
                 {
                     dependencies.Remove( key );
+
                     if ( unfinishedTypes.TryRemove( key, out var type ) )
                     {
-                        var typeInfo = type.CreateTypeInfo();
-                        generatedEdmTypes.GetOrAdd( key, typeInfo );
+                        generatedEdmTypes.GetOrAdd( key, type.CreateTypeInfo() );
                     }
                 }
             }
 
             if ( !dependencies.ContainsKey( typeKey ) )
             {
-                var typeInfo = typeBuilder.CreateTypeInfo();
-                generatedEdmTypes.GetOrAdd( typeKey, typeInfo );
+                generatedEdmTypes.GetOrAdd( typeKey, typeBuilder.CreateTypeInfo() );
             }
 
             if ( generatedEdmTypes.TryGetValue( typeKey, out var generatedType ) )
@@ -269,14 +275,15 @@
             return typeBuilder;
         }
 
-        private void ResolveForUnfinishedTypes()
+        void ResolveForUnfinishedTypes()
         {
             var keys = unfinishedTypes.Keys;
+
             foreach ( var key in keys )
             {
                 if ( unfinishedTypes.TryGetValue( key, out var type ) )
                 {
-                    ResolveDependencies(type, key);
+                    ResolveDependencies( type, key );
                 }
             }
         }

@@ -11,7 +11,10 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
     using System.Net.Http;
+    using System.Reflection;
+    using System.Reflection.Emit;
     using static System.StringComparison;
 #if WEBAPI
     using IActionResult = System.Web.Http.IHttpActionResult;
@@ -60,7 +63,7 @@
 
                 if ( innerType.Equals( newType ) )
                 {
-                    return type.ExtractInnerType() ? innerType : type;
+                    return type.ShouldExtractInnerType() ? innerType : type;
                 }
 
                 return CloseGeneric( openTypes, newType );
@@ -73,11 +76,57 @@
 
                 if ( structuredType != null )
                 {
-                type = context.ModelTypeBuilder.NewStructuredType( structuredType, type, apiVersion, context.Model );
+                    type = context.ModelTypeBuilder.NewStructuredType( structuredType, type, apiVersion, context.Model );
                 }
             }
 
             return type;
+        }
+
+        internal static IEnumerable<CustomAttributeBuilder> DeclaredAttributes( this MemberInfo member )
+        {
+            Contract.Requires( member != null );
+            Contract.Ensures( Contract.Result<IEnumerable<CustomAttributeBuilder>>() != null );
+
+            foreach ( var attribute in member.CustomAttributes )
+            {
+                var ctor = attribute.Constructor;
+                var ctorArgs = attribute.ConstructorArguments.Select( a => a.Value ).ToArray();
+                var namedProperties = new List<PropertyInfo>( attribute.NamedArguments.Count );
+                var propertyValues = new List<object>( attribute.NamedArguments.Count );
+                var namedFields = new List<FieldInfo>( attribute.NamedArguments.Count );
+                var fieldValues = new List<object>( attribute.NamedArguments.Count );
+
+                foreach ( var argument in attribute.NamedArguments )
+                {
+                    if ( argument.IsField )
+                    {
+                        namedFields.Add( (FieldInfo) argument.MemberInfo );
+                        fieldValues.Add( argument.TypedValue.Value );
+                    }
+                    else
+                    {
+                        namedProperties.Add( (PropertyInfo) argument.MemberInfo );
+                        propertyValues.Add( argument.TypedValue.Value );
+                    }
+                }
+
+                for ( var i = 0; i < ctorArgs.Length; i++ )
+                {
+                    if ( ctorArgs[i] is IReadOnlyCollection<CustomAttributeTypedArgument> paramsList )
+                    {
+                        ctorArgs[i] = paramsList.Select( a => a.Value ).ToArray();
+                    }
+                }
+
+                yield return new CustomAttributeBuilder(
+                    ctor,
+                    ctorArgs,
+                    namedProperties.ToArray(),
+                    propertyValues.ToArray(),
+                    namedFields.ToArray(),
+                    fieldValues.ToArray() );
+            }
         }
 
         internal static void Deconstruct<T1, T2>( this Tuple<T1, T2> tuple, out T1 item1, out T2 item2 )
@@ -86,6 +135,34 @@
 
             item1 = tuple.Item1;
             item2 = tuple.Item2;
+        }
+
+        internal static Type ExtractInnerType( this Type type )
+        {
+            Contract.Requires( type != null );
+            Contract.Ensures( Contract.Result<Type>() != null );
+
+            if ( !type.IsGenericType )
+            {
+                return type;
+            }
+
+            var typeDef = type.GetGenericTypeDefinition();
+            var typeArgs = type.GetGenericArguments();
+
+            if ( typeArgs.Length != 1 )
+            {
+                return type;
+            }
+
+            var typeArg = typeArgs[0];
+
+            if ( typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() || typeDef.Equals( SingleResultOfT ) )
+            {
+                return typeArg;
+            }
+
+            return type;
         }
 
         static bool IsSubstitutableGeneric( Type type, Stack<Type> openTypes, out Type innerType )
@@ -112,7 +189,7 @@
 
             var typeArg = typeArgs[0];
 
-            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() || typeDef.Equals( SingleResultOfT ))
+            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() || typeDef.Equals( SingleResultOfT ) )
             {
                 innerType = typeArg;
             }
@@ -150,7 +227,7 @@
 
             var type = openTypes.Pop();
 
-            if ( type.ExtractInnerType() )
+            if ( type.ShouldExtractInnerType() )
             {
                 return innerType;
             }
@@ -177,7 +254,7 @@
                   !type.IsODataActionParameters();
         }
 
-        static bool IsEnumerable( this Type type, out Type itemType )
+        internal static bool IsEnumerable( this Type type, out Type itemType )
         {
             Contract.Requires( type != null );
 
@@ -211,6 +288,8 @@
             type.IsGenericType &&
             type.GetGenericTypeDefinition().FullName.Equals( "Microsoft.AspNetCore.Mvc.ActionResult`1", Ordinal );
 
-        static bool ExtractInnerType( this Type type ) => type.IsDelta() || type.IsActionResult();
+        static bool IsSingleResult( this Type type ) => SingleResultOfT.IsAssignableFrom( type );
+
+        static bool ShouldExtractInnerType( this Type type ) => type.IsDelta() || type.IsSingleResult() || type.IsActionResult();
     }
 }

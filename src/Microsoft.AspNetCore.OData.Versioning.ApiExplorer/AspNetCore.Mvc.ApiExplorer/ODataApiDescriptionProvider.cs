@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -11,11 +13,14 @@
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.AspNetCore.Routing.Template;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using Microsoft.OData.Edm;
+    using Microsoft.OData.UriParser;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -58,12 +63,14 @@
         /// <param name="routeCollectionProvider">The <see cref="IODataRouteCollectionProvider">OData route collection provider</see> associated with the description provider.</param>
         /// <param name="inlineConstraintResolver">The <see cref="IInlineConstraintResolver">inline constraint resolver</see> used to parse route template constraints.</param>
         /// <param name="metadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
+        /// <param name="defaultQuerySettings">The OData <see cref="DefaultQuerySettings">default query setting</see>.</param>
         /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ODataApiExplorerOptions">API explorer options</see>.</param>
         /// <param name="mvcOptions">A <see cref="IOptions{TOptions}">holder</see> containing the current <see cref="Mvc.MvcOptions">MVC options</see>.</param>
         public ODataApiDescriptionProvider(
             IODataRouteCollectionProvider routeCollectionProvider,
             IInlineConstraintResolver inlineConstraintResolver,
             IModelMetadataProvider metadataProvider,
+            DefaultQuerySettings defaultQuerySettings,
             IOptions<ODataApiExplorerOptions> options,
             IOptions<MvcOptions> mvcOptions )
         {
@@ -76,6 +83,7 @@
             ModelTypeBuilder = new DefaultModelTypeBuilder();
             ConstraintResolver = inlineConstraintResolver;
             MetadataProvider = metadataProvider;
+            DefaultQuerySettings = defaultQuerySettings;
             this.options = options;
             MvcOptions = mvcOptions.Value;
             modelMetadata = new Lazy<ModelMetadata>( NewModelMetadata );
@@ -98,6 +106,12 @@
         /// </summary>
         /// <value>The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</value>
         protected IModelMetadataProvider MetadataProvider { get; }
+
+        /// <summary>
+        /// Gets the OData default query settings.
+        /// </summary>
+        /// <value>The OData <see cref="DefaultQuerySettings">default query setting</see>.</value>
+        protected DefaultQuerySettings DefaultQuerySettings { get; }
 
         /// <summary>
         /// Gets the object used to resolve inline constraints.
@@ -133,6 +147,7 @@
             var ignoreApiExplorerSettings = !Options.UseApiExplorerSettings;
             var mappings = RouteCollectionProvider.Items;
             var results = context.Results;
+
             var groupNameFormat = Options.GroupNameFormat;
             var formatProvider = CultureInfo.CurrentCulture;
 
@@ -158,11 +173,18 @@
                 {
                     foreach ( var mapping in mappings )
                     {
+                        var descriptions = new List<ApiDescription>();
                         var groupName = mapping.ApiVersion.ToString( groupNameFormat, formatProvider );
 
                         foreach ( var apiDescription in NewODataApiDescriptions( action, groupName, mapping ) )
                         {
                             results.Add( apiDescription );
+                            descriptions.Add( apiDescription );
+                        }
+
+                        if ( descriptions.Count > 0 )
+                        {
+                            ExploreQueryOptions( descriptions, mapping.Services.GetRequiredService<ODataUriResolver>() );
                         }
                     }
                 }
@@ -179,9 +201,17 @@
 
                         foreach ( var mapping in mappingsPerApiVersion )
                         {
+                            var descriptions = new List<ApiDescription>();
+
                             foreach ( var apiDescription in NewODataApiDescriptions( action, groupName, mapping ) )
                             {
                                 results.Add( apiDescription );
+                                descriptions.Add( apiDescription );
+                            }
+
+                            if ( descriptions.Count > 0 )
+                            {
+                                ExploreQueryOptions( descriptions, mapping.Services.GetRequiredService<ODataUriResolver>() );
                             }
                         }
                     }
@@ -210,6 +240,28 @@
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
             parameterSource.AddParameters( context );
+        }
+
+        /// <summary>
+        /// Explores the OData query options for the specified API descriptions.
+        /// </summary>
+        /// <param name="apiDescriptions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiDescription">API descriptions</see> to explore.</param>
+        /// <param name="uriResolver">The associated <see cref="ODataUriResolver">OData URI resolver</see>.</param>
+        protected virtual void ExploreQueryOptions( IEnumerable<ApiDescription> apiDescriptions, ODataUriResolver uriResolver )
+        {
+            Arg.NotNull( apiDescriptions, nameof( apiDescriptions ) );
+            Arg.NotNull( uriResolver, nameof( uriResolver ) );
+
+            var queryOptions = Options.QueryOptions;
+            var settings = new ODataQueryOptionSettings()
+            {
+                NoDollarPrefix = uriResolver.EnableNoDollarQueryOptions,
+                DescriptionProvider = queryOptions.DescriptionProvider,
+                DefaultQuerySettings = DefaultQuerySettings,
+                ModelMetadataProvider = MetadataProvider,
+            };
+
+            queryOptions.ApplyTo( apiDescriptions, settings );
         }
 
         static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action )
@@ -343,6 +395,7 @@
                     HttpMethod = httpMethod,
                     RelativePath = relativePath,
                     GroupName = groupName,
+                    Properties = { [typeof( IEdmModel )] = routeContext.EdmModel },
                 };
 
                 foreach ( var parameter in parameters )
@@ -370,10 +423,11 @@
             {
                 foreach ( var actionParameter in action.Parameters )
                 {
-                    UpdateBindingInfo( context, actionParameter );
+                    var metadata = MetadataProvider.GetMetadataForType( actionParameter.ParameterType );
+
+                    UpdateBindingInfo( context, actionParameter, metadata );
 
                     var visitor = new PseudoModelBindingVisitor( context, actionParameter );
-                    var metadata = MetadataProvider.GetMetadataForType( actionParameter.ParameterType );
                     var bindingContext = new ApiParameterDescriptionContext( metadata, actionParameter.BindingInfo, propertyName: actionParameter.Name );
 
                     visitor.WalkParameter( bindingContext );
@@ -410,20 +464,29 @@
             return context.Results;
         }
 
-        void UpdateBindingInfo( ApiParameterContext context, ParameterDescriptor parameter )
+        void UpdateBindingInfo( ApiParameterContext context, ParameterDescriptor parameter, ModelMetadata metadata )
         {
             Contract.Requires( context != null );
             Contract.Requires( parameter != null );
-
-            if ( parameter.BindingInfo != null )
-            {
-                return;
-            }
+            Contract.Requires( metadata != null );
 
             var paramType = parameter.ParameterType;
 
+            if ( parameter.BindingInfo != null )
+            {
+                // HACK: it's unclear why the default ParameterDescriptor doesn't have the correct BindingSource
+                // the DefaultApiDescriptionProvider does the right thing for non-OData actions
+                if ( typeof( ApiVersion ).IsAssignableFrom( paramType ) )
+                {
+                    parameter.BindingInfo.BindingSource = metadata.BindingSource;
+                }
+
+                return;
+            }
+
             if ( paramType.IsODataQueryOptions() || paramType.IsODataPath() )
             {
+                parameter.BindingInfo = new BindingInfo() { BindingSource = Special };
                 return;
             }
             else if ( paramType.IsDelta() )

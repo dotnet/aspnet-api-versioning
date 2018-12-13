@@ -2,14 +2,17 @@
 {
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.Examples.Models;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.PlatformAbstractions;
     using Swashbuckle.AspNetCore.Swagger;
     using System.IO;
     using System.Reflection;
+    using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -35,6 +38,13 @@
                     // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
+
+                    // configure query options (which cannot otherwise be configured by OData conventions)
+                    options.QueryOptions.Controller<V2.PeopleController>()
+                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
+
+                    options.QueryOptions.Controller<V3.PeopleController>()
+                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
                 } );
             services.AddSwaggerGen(
                 options =>

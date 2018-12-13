@@ -5,6 +5,8 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 #endif
 {
     using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Builder;
+    using System;
 #if WEBAPI
     using System.Web.Http;
     using System.Web.Http.Description;
@@ -17,6 +19,8 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
     /// </summary>
     public partial class ODataApiExplorerOptions : ApiExplorerOptions
     {
+        ODataQueryOptionsConventionBuilder queryOptions = new ODataQueryOptionsConventionBuilder();
+
         /// <summary>
         /// Gets or sets a value indicating whether the API explorer settings are honored.
         /// </summary>
@@ -33,5 +37,22 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// </summary>
         /// <value>True if qualified names are used when building URLs for operations; otherwise, false. The default value is <c>false</c>.</value>
         public bool UseQualifiedOperationNames { get; set; }
+
+        /// <summary>
+        /// Gets or sets the convention builder used to describe OData query options.
+        /// </summary>
+        /// <value>An <see cref="ODataActionQueryOptionsConventionBuilder">OData query option convention builder</see>.</value>
+#if !WEBAPI
+        [CLSCompliant( false )]
+#endif
+        public ODataQueryOptionsConventionBuilder QueryOptions
+        {
+            get => queryOptions;
+            set
+            {
+                Arg.NotNull( value, nameof( value ) );
+                queryOptions = value;
+            }
+        }
     }
 }
