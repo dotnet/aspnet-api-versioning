@@ -1,11 +1,14 @@
 ﻿namespace Microsoft.Examples.Models
 {
+    using Microsoft.AspNet.OData.Query;
     using System;
     using System.ComponentModel.DataAnnotations;
 
     /// <summary>
     /// Represents an order.
     /// </summary>
+    [Select]
+    [Select( "effectiveDate", SelectType = SelectExpandType.Disabled )]
     public class Order
     {
         /// <summary>

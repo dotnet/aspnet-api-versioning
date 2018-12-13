@@ -8,7 +8,7 @@
         internal ApiParameterDescriptionContext( ModelMetadata metadata, BindingInfo bindingInfo, string propertyName )
         {
             ModelMetadata = metadata;
-            BinderModelName = bindingInfo?.BinderModelName ?? metadata.BinderModelName;
+            BinderModelName = BinderModelName = bindingInfo?.BinderModelName ?? metadata.BinderModelName;
             BindingSource = bindingInfo?.BindingSource ?? metadata.BindingSource;
             PropertyName = propertyName ?? metadata.PropertyName;
         }

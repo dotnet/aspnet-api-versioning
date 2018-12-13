@@ -124,7 +124,10 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiControllerExtensions.cs" />
     <Compile Include="Configuration\AllConfigurations.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="HttpRequestMessageExtensions.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="FunctionsController.cs" />
@@ -175,7 +178,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1874</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:1874/swagger</IISUrl>
+          <IISUrl>http://localhost:1874/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

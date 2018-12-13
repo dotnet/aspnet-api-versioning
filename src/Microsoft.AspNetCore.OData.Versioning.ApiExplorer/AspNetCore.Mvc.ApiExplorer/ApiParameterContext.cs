@@ -8,7 +8,6 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Reflection;
 
     sealed class ApiParameterContext
     {

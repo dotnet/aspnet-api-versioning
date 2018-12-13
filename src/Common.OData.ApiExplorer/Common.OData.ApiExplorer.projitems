@@ -9,12 +9,35 @@
     <Import_RootNamespace>Microsoft</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\DefaultODataQueryOptionDescriptionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IODataActionQueryOptionsConventionBuilder{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IODataActionQueryOptionsConventionBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IODataQueryOptionDescriptionProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IODataQueryOptionsConvention.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IODataQueryOptionsConventionBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionConventionLookup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionsConventionBuilderExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionsConventionBuilderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionsConventionBuilderCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionsConventionBuilderCollection{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionsConventionBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataActionQueryOptionsConventionBuilder{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataAttributeVisitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataControllerQueryOptionConvention.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataControllerQueryOptionsConventionBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataControllerQueryOptionsConventionBuilder{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataQueryOptionDescriptionContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataQueryOptionsConventionBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataQueryOptionSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataValidationSettingsConvention.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\ODataValidationSettingsExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ClassSignature.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\EdmTypeKey.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\IModelTypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\DefaultModelTypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ODataValue{T}.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\OriginalTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\PropertyDependency.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteActionType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilder.cs" />
@@ -22,6 +45,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\StructuredTypeResolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeSubstitutionContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OData.Edm\EdmExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ODataApiExplorerOptions.cs" />
   </ItemGroup>

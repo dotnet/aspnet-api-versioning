@@ -2,7 +2,6 @@
 {
     using Microsoft.OData.Edm;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
@@ -11,12 +10,7 @@
     {
         readonly IEdmModel model;
 
-        internal StructuredTypeResolver( IEdmModel model )
-        {
-            Contract.Requires( model != null );
-
-            this.model = model;
-        }
+        internal StructuredTypeResolver( IEdmModel model ) => this.model = model;
 
         internal IEdmStructuredType GetStructuredType( Type type )
         {
@@ -24,6 +18,16 @@
 
             var structuredTypes = model.SchemaElements.OfType<IEdmStructuredType>();
             var structuredType = structuredTypes.FirstOrDefault( t => type.Equals( t.GetClrType( model ) ) );
+
+            if ( structuredType == null )
+            {
+                var original = type.GetCustomAttribute<OriginalTypeAttribute>( inherit: false );
+
+                if ( original != null )
+                {
+                    return GetStructuredType( original.Type );
+                }
+            }
 
             return structuredType;
         }

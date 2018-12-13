@@ -5,17 +5,20 @@ namespace Microsoft.Examples
     using global::Owin;
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
-    using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Configuration;
+    using Microsoft.Examples.Models;
     using Microsoft.OData;
     using Microsoft.OData.UriParser;
     using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
+    using System;
     using System.IO;
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Description;
+    using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static Microsoft.OData.ServiceLifetime;
 
@@ -69,6 +72,13 @@ namespace Microsoft.Examples
                     // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
+
+                    // configure query options (which cannot otherwise be configured by OData conventions)
+                    options.QueryOptions.Controller<V2.PeopleController>()
+                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
+
+                    options.QueryOptions.Controller<V3.PeopleController>()
+                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
                 } );
 
             configuration.EnableSwagger(
@@ -112,7 +122,7 @@ namespace Microsoft.Examples
         {
             get
             {
-                var basePath = System.AppDomain.CurrentDomain.RelativeSearchPath;
+                var basePath = AppDomain.CurrentDomain.RelativeSearchPath;
                 var fileName = typeof( Startup ).GetTypeInfo().Assembly.GetName().Name + ".xml";
                 return Path.Combine( basePath, fileName );
             }

@@ -117,7 +117,70 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ActionMethodNotFound" xml:space="preserve">
+    <value>An action method with the name '{0}' could not be found. The method must be public, non-static, and not have the NonActionAttribute applied.</value>
+  </data>
+  <data name="AllowedArithmeticOperatorsDesc" xml:space="preserve">
+    <value>The allowed arithmetic operators are: {0}.</value>
+  </data>
+  <data name="AllowedFunctionsDesc" xml:space="preserve">
+    <value>The allowed functions are: {0}.</value>
+  </data>
+  <data name="AllowedLogicalOperatorsDesc" xml:space="preserve">
+    <value>The allowed logical operators are: {0}.</value>
+  </data>
+  <data name="AllowedPropertiesDesc" xml:space="preserve">
+    <value>The allowed properties are: {0}.</value>
+  </data>
+  <data name="AmbiguousActionMethod" xml:space="preserve">
+    <value>Multiple action methods with the name '{0}' were found, but could not be resolved using the provided arguments.</value>
+  </data>
+  <data name="ConventionStyleMismatch" xml:space="preserve">
+    <value>OData query option conventions cannot be applied to the controller type {0} using both typed and untyped convention builders.</value>
+  </data>
+  <data name="CountQueryOptionDesc" xml:space="preserve">
+    <value>Indicates whether the total count of items within a collection are returned in the result.</value>
+  </data>
+  <data name="ExpandQueryOptionDesc" xml:space="preserve">
+    <value>Indicates the related entities to be represented inline.</value>
+  </data>
+  <data name="FilterQueryOptionDesc" xml:space="preserve">
+    <value>Restricts the set of items returned.</value>
+  </data>
+  <data name="InvalidActionMethodExpression" xml:space="preserve">
+    <value>The expression '{0}' must refer to a controller action method.</value>
+  </data>
+  <data name="MaxDepthDesc" xml:space="preserve">
+    <value>The maximum depth is {0}.</value>
+  </data>
+  <data name="MaxExpressionDesc" xml:space="preserve">
+    <value>The maximum number of expressions is {0}.</value>
+  </data>
+  <data name="MaxValueDesc" xml:space="preserve">
+    <value>The maximum value is {0}.</value>
+  </data>
+  <data name="MultipleQueryOptionsNotAllowed" xml:space="preserve">
+    <value>Only a single, valid query option may be specified.</value>
+  </data>
   <data name="NullContainer" xml:space="preserve">
     <value>The container builder created by the container builder factory must not be null.</value>
+  </data>
+  <data name="OrderByQueryOptionDesc" xml:space="preserve">
+    <value>Specifies the order in which items are returned.</value>
+  </data>
+  <data name="RequiredInterfaceNotImplemented" xml:space="preserve">
+    <value>The type {0} does not implement the {1} interface.</value>
+  </data>
+  <data name="SelectQueryOptionDesc" xml:space="preserve">
+    <value>Limits the properties returned in the result.</value>
+  </data>
+  <data name="SkipQueryOptionDesc" xml:space="preserve">
+    <value>Excludes the specified number of items of the queried collection from the result.</value>
+  </data>
+  <data name="TopQueryOptionDesc" xml:space="preserve">
+    <value>Limits the number of items returned from a collection.</value>
+  </data>
+  <data name="UnsupportedQueryOption" xml:space="preserve">
+    <value>The query option ${0} is not supported.</value>
   </data>
 </root>

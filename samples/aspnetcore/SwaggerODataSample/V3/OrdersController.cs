@@ -6,6 +6,8 @@
     using Microsoft.Examples.Models;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static Microsoft.AspNetCore.Http.StatusCodes;
 
     /// <summary>
@@ -21,19 +23,20 @@
         /// <returns>All available orders.</returns>
         /// <response code="200">Orders successfully retrieved.</response>
         /// <response code="400">The order is invalid.</response>
+        [ODataRoute]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
-        [ODataRoute]
-        public IActionResult Get()
+        [EnableQuery( MaxTop = 100, AllowedQueryOptions = Select | Top | Skip | Count )]
+        public IQueryable<Order> Get()
         {
             var orders = new[]
             {
                 new Order(){ Id = 1, Customer = "John Doe" },
                 new Order(){ Id = 2, Customer = "John Doe" },
-                new Order(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTime.UtcNow.AddDays( 7d ) },
+                new Order(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTime.UtcNow.AddDays( 7d ) }
             };
 
-            return Ok( orders );
+            return orders.AsQueryable();
         }
 
         /// <summary>
@@ -43,11 +46,12 @@
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
+        [ODataRoute( "({key})" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})" )]
-        public IActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public SingleResult<Order> Get( int key ) => SingleResult.Create( new[] { new Order() { Id = key, Customer = "John Doe" } }.AsQueryable() );
 
         /// <summary>
         /// Places a new order.
@@ -56,9 +60,9 @@
         /// <returns>The created order.</returns>
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
+        [ODataRoute]
         [ProducesResponseType( typeof( Order ), Status201Created )]
         [ProducesResponseType( Status400BadRequest )]
-        [ODataRoute]
         public IActionResult Post( [FromBody] Order order )
         {
             if ( !ModelState.IsValid )
@@ -80,10 +84,10 @@
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
+        [ODataRoute( "({key})" )]
         [ProducesResponseType( typeof( Order ), Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})" )]
         public IActionResult Patch( int key, Delta<Order> delta )
         {
             if ( !ModelState.IsValid )
@@ -106,9 +110,9 @@
         /// <returns>None</returns>
         /// <response code="204">The order was successfully canceled.</response>
         /// <response code="404">The order does not exist.</response>
+        [ODataRoute( "({key})" )]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})" )]
         public IActionResult Delete( int key, bool suspendOnly ) => NoContent();
 
         /// <summary>
@@ -118,11 +122,12 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The no orders exist.</response>
         [HttpGet]
+        [ODataRoute( nameof( MostExpensive ) )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( nameof( MostExpensive ) )]
-        public IActionResult MostExpensive() => Ok( new Order() { Id = 42, Customer = "Bill Mei" } );
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public SingleResult<Order> MostExpensive() => SingleResult.Create( new[] { new Order() { Id = 42, Customer = "Bill Mei" } }.AsQueryable() );
 
         /// <summary>
         /// Rates an order.
@@ -134,10 +139,10 @@
         /// <response code="400">The parameters are invalid.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpPost]
+        [ODataRoute( "({key})/Rate" )]
         [ProducesResponseType( Status200OK )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})/Rate" )]
         public IActionResult Rate( int key, ODataActionParameters parameters )
         {
             if ( !ModelState.IsValid )
