@@ -484,17 +484,28 @@
             Contract.Requires( parameter != null );
             Contract.Requires( metadata != null );
 
-            if ( parameter.BindingInfo != null )
+            var parameterType = parameter.ParameterType;
+            var bindingInfo = parameter.BindingInfo;
+
+            if ( bindingInfo != null )
             {
+                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
+                {
+                    bindingInfo.BindingSource = Special;
+                }
+
                 return;
             }
 
-            var bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
-
-            parameter.BindingInfo = bindingInfo;
+            parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
 
             if ( bindingInfo.BindingSource != null )
             {
+                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
+                {
+                    bindingInfo.BindingSource = Special;
+                }
+
                 return;
             }
 

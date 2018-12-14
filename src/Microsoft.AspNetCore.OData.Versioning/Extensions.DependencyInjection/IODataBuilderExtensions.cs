@@ -10,7 +10,6 @@
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection.Extensions;
-    using Microsoft.Extensions.Options;
     using System;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -68,7 +67,6 @@
 
             ConfigureDefaultFeatureProviders( partManager );
             services.Replace( Singleton<IActionSelector, ODataApiVersionActionSelector>() );
-            services.AddTransient<IPostConfigureOptions<MvcOptions>, ODataMvcOptionsSetup>();
             services.TryAdd( Transient<VersionedODataModelBuilder, VersionedODataModelBuilder>() );
             services.TryAdd( Singleton<IODataRouteCollectionProvider, ODataRouteCollectionProvider>() );
             services.AddTransient<IApplicationModelProvider, ODataApplicationModelProvider>();
