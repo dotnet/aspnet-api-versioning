@@ -85,7 +85,9 @@
         /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
         [ODataRoute( "({key})" )]
-        [ProducesResponseType( typeof( Order ), Status204NoContent )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Order), Status200OK )]
+        [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
         public IActionResult Patch( int key, Delta<Order> delta )
@@ -140,7 +142,7 @@
         /// <response code="404">The order does not exist.</response>
         [HttpPost]
         [ODataRoute( "({key})/Rate" )]
-        [ProducesResponseType( Status200OK )]
+        [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
         public IActionResult Rate( int key, ODataActionParameters parameters )

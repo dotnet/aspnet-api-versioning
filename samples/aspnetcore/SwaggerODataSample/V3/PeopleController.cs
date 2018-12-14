@@ -120,6 +120,7 @@
         /// <returns>The created person.</returns>
         /// <response code="201">The person was successfully created.</response>
         /// <response code="400">The person was invalid.</response>
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Person ), Status201Created )]
         [ProducesResponseType( Status400BadRequest )]
         public IActionResult Post( [FromBody] Person person )
@@ -156,7 +157,7 @@
         /// <response code="400">The parameters are invalid.</response>
         /// <response code="404">The person does not exist.</response>
         [HttpPost]
-        [ProducesResponseType( Status200OK )]
+        [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
         public IActionResult Promote( int key, ODataActionParameters parameters )
