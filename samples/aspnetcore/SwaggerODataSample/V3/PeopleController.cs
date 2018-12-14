@@ -144,7 +144,7 @@
         /// <response code="200">The people were successfully retrieved.</response>
         [HttpGet]
         [Produces( "application/json" )]
-        [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
         public IActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
 
         /// <summary>
