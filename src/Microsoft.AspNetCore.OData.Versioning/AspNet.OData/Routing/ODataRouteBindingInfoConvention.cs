@@ -37,9 +37,6 @@
             Contract.Requires( context != null );
             Contract.Requires( action != null );
 
-            // any existing AttributeRouteInfo is expected to be fake up to this point so clear it
-            action.AttributeRouteInfo = null;
-
             var model = action.GetApiVersionModel();
             var mappings = RouteCollectionProvider.Items;
             var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
@@ -120,19 +117,30 @@
             Contract.Requires( context != null );
             Contract.Requires( parameter != null );
 
+            var parameterType = parameter.ParameterType;
             var bindingInfo = parameter.BindingInfo;
 
             if ( bindingInfo != null )
             {
+                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
+                {
+                    bindingInfo.BindingSource = Special;
+                }
+
                 return;
             }
 
-            var metadata = ModelMetadataProvider.GetMetadataForType( parameter.ParameterType );
+            var metadata = ModelMetadataProvider.GetMetadataForType( parameterType );
 
             parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
 
             if ( bindingInfo.BindingSource != null )
             {
+                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
+                {
+                    bindingInfo.BindingSource = Special;
+                }
+
                 return;
             }
 
