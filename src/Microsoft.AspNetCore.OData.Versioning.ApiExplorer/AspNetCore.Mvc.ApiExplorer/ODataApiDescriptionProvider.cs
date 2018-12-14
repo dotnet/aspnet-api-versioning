@@ -470,28 +470,17 @@
             Contract.Requires( parameter != null );
             Contract.Requires( metadata != null );
 
-            var paramType = parameter.ParameterType;
-
             if ( parameter.BindingInfo != null )
             {
-                // HACK: it's unclear why the default ParameterDescriptor doesn't have the correct BindingSource
-                // the DefaultApiDescriptionProvider does the right thing for non-OData actions
-                if ( typeof( ApiVersion ).IsAssignableFrom( paramType ) )
-                {
-                    parameter.BindingInfo.BindingSource = metadata.BindingSource;
-                }
-
                 return;
             }
 
-            if ( paramType.IsODataQueryOptions() || paramType.IsODataPath() )
+            var bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
+
+            parameter.BindingInfo = bindingInfo;
+
+            if ( bindingInfo.BindingSource != null )
             {
-                parameter.BindingInfo = new BindingInfo() { BindingSource = Special };
-                return;
-            }
-            else if ( paramType.IsDelta() )
-            {
-                parameter.BindingInfo = new BindingInfo() { BindingSource = Body };
                 return;
             }
 
@@ -537,31 +526,25 @@
                         break;
                     }
 
-                    if ( paramType.IsODataActionParameters() )
+                    key = operation.Parameters.FirstOrDefault( p => p.Name.Equals( paramName, OrdinalIgnoreCase ) );
+
+                    if ( key == null )
                     {
-                        source = Body;
+                        if ( operation.IsBound )
+                        {
+                            goto case EntitySet;
+                        }
                     }
                     else
                     {
-                        key = operation.Parameters.FirstOrDefault( p => p.Name.Equals( paramName, OrdinalIgnoreCase ) );
-
-                        if ( key == null )
-                        {
-                            if ( operation.IsBound )
-                            {
-                                goto case EntitySet;
-                            }
-                        }
-                        else
-                        {
-                            source = Path;
-                        }
+                        source = Path;
                     }
 
                     break;
             }
 
-            parameter.BindingInfo = new BindingInfo() { BindingSource = source };
+            bindingInfo.BindingSource = source;
+            parameter.BindingInfo = bindingInfo;
         }
 
         IReadOnlyList<ApiResponseType> GetApiResponseTypes( IReadOnlyList<IApiResponseMetadataProvider> responseMetadataAttributes, Type responseType, IServiceProvider serviceProvider )

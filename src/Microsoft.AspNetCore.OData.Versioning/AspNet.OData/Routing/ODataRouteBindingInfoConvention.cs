@@ -2,18 +2,14 @@
 {
     using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
-    using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Reflection;
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
     using static System.Linq.Enumerable;
@@ -21,19 +17,28 @@
 
     sealed class ODataRouteBindingInfoConvention : IODataActionDescriptorConvention
     {
-        internal ODataRouteBindingInfoConvention( IODataRouteCollectionProvider routeCollectionProvider )
+        internal ODataRouteBindingInfoConvention(
+            IODataRouteCollectionProvider routeCollectionProvider,
+            IModelMetadataProvider modelMetadataProvider )
         {
             Contract.Requires( routeCollectionProvider != null );
+            Contract.Requires( modelMetadataProvider != null );
 
             RouteCollectionProvider = routeCollectionProvider;
+            ModelMetadataProvider = modelMetadataProvider;
         }
 
         IODataRouteCollectionProvider RouteCollectionProvider { get; }
+
+        IModelMetadataProvider ModelMetadataProvider { get; }
 
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
             Contract.Requires( context != null );
             Contract.Requires( action != null );
+
+            // any existing AttributeRouteInfo is expected to be fake up to this point so clear it
+            action.AttributeRouteInfo = null;
 
             var model = action.GetApiVersionModel();
             var mappings = RouteCollectionProvider.Items;
@@ -48,7 +53,7 @@
                     return;
                 }
 
-                // note: any mapping will do for a version-neutral action; just take the first one
+                // any mapping will do for a version-neutral action; just take the first one
                 var mapping = mappings[0];
 
                 UpdateBindingInfo( action, mapping, routeInfos );
@@ -110,32 +115,24 @@
             routeInfos.Add( routeInfo );
         }
 
-        static void UpdateBindingInfo( ActionParameterContext context, ParameterDescriptor parameter )
+        void UpdateBindingInfo( ActionParameterContext context, ParameterDescriptor parameter )
         {
             Contract.Requires( context != null );
             Contract.Requires( parameter != null );
 
             var bindingInfo = parameter.BindingInfo;
 
-            if ( bindingInfo != null && bindingInfo.BindingSource != Custom )
+            if ( bindingInfo != null )
             {
                 return;
             }
 
-            bindingInfo = parameter.BindingInfo ?? new BindingInfo();
+            var metadata = ModelMetadataProvider.GetMetadataForType( parameter.ParameterType );
 
-            var paramType = parameter.ParameterType;
+            parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
 
-            if ( paramType.IsODataQueryOptions() || paramType.IsODataPath() )
+            if ( bindingInfo.BindingSource != null )
             {
-                bindingInfo.BindingSource = ModelBinding;
-                parameter.BindingInfo = bindingInfo;
-                return;
-            }
-            else if ( paramType.IsDelta() )
-            {
-                bindingInfo.BindingSource = Body;
-                parameter.BindingInfo = bindingInfo;
                 return;
             }
 
@@ -181,25 +178,18 @@
                         break;
                     }
 
-                    if ( paramType.IsODataActionParameters() )
+                    key = operation.Parameters.FirstOrDefault( p => p.Name.Equals( paramName, OrdinalIgnoreCase ) );
+
+                    if ( key == null )
                     {
-                        source = Body;
+                        if ( operation.IsBound )
+                        {
+                            goto case EntitySet;
+                        }
                     }
                     else
                     {
-                        key = operation.Parameters.FirstOrDefault( p => p.Name.Equals( paramName, OrdinalIgnoreCase ) );
-
-                        if ( key == null )
-                        {
-                            if ( operation.IsBound )
-                            {
-                                goto case EntitySet;
-                            }
-                        }
-                        else
-                        {
-                            source = Path;
-                        }
+                        source = Path;
                     }
 
                     break;

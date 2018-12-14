@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -13,14 +14,20 @@
     {
         readonly IODataRouteCollectionProvider routeCollectionProvider;
         readonly ApplicationPartManager partManager;
+        readonly IModelMetadataProvider modelMetadataProvider;
 
-        public ODataActionDescriptorProvider( IODataRouteCollectionProvider routeCollectionProvider, ApplicationPartManager partManager )
+        public ODataActionDescriptorProvider(
+            IODataRouteCollectionProvider routeCollectionProvider,
+            ApplicationPartManager partManager,
+            IModelMetadataProvider modelMetadataProvider )
         {
             Contract.Requires( routeCollectionProvider != null );
             Contract.Requires( partManager != null );
+            Contract.Requires( modelMetadataProvider != null );
 
             this.routeCollectionProvider = routeCollectionProvider;
             this.partManager = partManager;
+            this.modelMetadataProvider = modelMetadataProvider;
         }
 
         public int Order => 0;
@@ -38,7 +45,7 @@
             var conventions = new IODataActionDescriptorConvention[]
             {
                 new ImplicitHttpMethodConvention(),
-                new ODataRouteBindingInfoConvention( routeCollectionProvider ),
+                new ODataRouteBindingInfoConvention( routeCollectionProvider, modelMetadataProvider ),
             };
 
             foreach ( var action in ODataActions( results ) )
@@ -60,7 +67,7 @@
             foreach ( var result in results )
             {
                 if ( result is ControllerActionDescriptor action &&
-                    action.ControllerTypeInfo.IsODataController() &&
+                     action.ControllerTypeInfo.IsODataController() &&
                     !action.ControllerTypeInfo.IsMetadataController() )
                 {
                     yield return action;
