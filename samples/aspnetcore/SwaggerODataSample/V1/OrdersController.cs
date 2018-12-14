@@ -39,6 +39,7 @@
         /// <response code="400">The order is invalid.</response>
         [ODataRoute]
         [MapToApiVersion( "1.0" )]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status201Created )]
         [ProducesResponseType( Status400BadRequest )]
         public IActionResult Post( [FromBody] Order order )
