@@ -153,16 +153,9 @@
 
             foreach ( var action in context.Actions.OfType<ControllerActionDescriptor>() )
             {
-                if ( !action.ControllerTypeInfo.IsODataController() || action.ControllerTypeInfo.IsMetadataController() )
-                {
-                    continue;
-                }
-
-                var controller = action.GetProperty<ControllerModel>();
-                var apiExplorer = controller?.ApiExplorer;
-                var visible = ignoreApiExplorerSettings || ( apiExplorer?.IsVisible ?? true );
-
-                if ( !visible )
+                if ( !action.ControllerTypeInfo.IsODataController() ||
+                      action.ControllerTypeInfo.IsMetadataController() ||
+                     !IsVisible( action ) )
                 {
                     continue;
                 }
@@ -225,6 +218,27 @@
         /// <param name="context">The current <see cref="ApiDescriptionProviderContext">execution context</see>.</param>
         /// <remarks>The default implementation performs no operation.</remarks>
         public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context ) { }
+
+        /// <summary>
+        /// Returns a value indicating whether the specified action is visible to the API Explorer.
+        /// </summary>
+        /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
+        /// <returns>True if the <paramref name="action"/> is visible; otherwise, false.</returns>
+        protected bool IsVisible( ActionDescriptor action )
+        {
+            Arg.NotNull( action, nameof( action ) );
+
+            var ignoreApiExplorerSettings = !Options.UseApiExplorerSettings;
+
+            if ( ignoreApiExplorerSettings )
+            {
+                return true;
+            }
+
+            return action.GetProperty<ApiExplorerModel>()?.IsODataVisible() ??
+                   action.GetProperty<ControllerModel>()?.ApiExplorer?.IsODataVisible() ??
+                   false;
+        }
 
         /// <summary>
         /// Populates the API version parameters for the specified API description.

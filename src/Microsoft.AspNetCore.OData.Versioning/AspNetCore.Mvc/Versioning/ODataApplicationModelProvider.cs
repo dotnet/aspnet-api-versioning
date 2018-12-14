@@ -16,8 +16,17 @@
 
         public void OnProvidersExecuted( ApplicationModelProviderContext context )
         {
-            var convention = new MetadataControllerConvention( Options );
-            convention.Apply( context.Result );
+            var application = context.Result;
+            var conventions = new IApplicationModelConvention[]
+            {
+                new MetadataControllerConvention( Options ),
+                new ApiExplorerModelConvention(),
+            };
+
+            for ( var i = 0; i < conventions.Length; i++ )
+            {
+                conventions[i].Apply( application );
+            }
         }
 
         public void OnProvidersExecuting( ApplicationModelProviderContext context ) { }
