@@ -1,12 +1,14 @@
 ﻿namespace given_a_versioned_ODataController_using_conventions
 {
     using FluentAssertions;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Conventions;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_an_action : ConventionsAcceptanceTest
+    [Collection( nameof( ConventionsODataCollection ) )]
+    public class when_using_an_action : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "api/customers(42)?api-version=1.0" )]
@@ -70,5 +72,7 @@
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
+
+        public when_using_an_action( ConventionsFixture fixture ) : base( fixture ) { }
     }
 }

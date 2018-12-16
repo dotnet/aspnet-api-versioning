@@ -2,16 +2,16 @@
 {
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Razor;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection;
     using System.Linq;
     using System.Reflection;
-    using Versioning;
     using static Microsoft.CodeAnalysis.MetadataReference;
     using static System.Reflection.Assembly;
 
-    public abstract class UIAcceptanceTest : AcceptanceTest
+    public class UIFixture : HttpServerFixture
     {
-        protected UIAcceptanceTest() { }
+        protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;
 
         protected override void OnConfigurePartManager( ApplicationPartManager partManager )
         {
@@ -40,8 +40,5 @@
                 };
             } );
         }
-
-
-        protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;
     }
 }

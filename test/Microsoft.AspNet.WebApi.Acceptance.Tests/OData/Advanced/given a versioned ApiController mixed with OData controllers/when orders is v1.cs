@@ -1,12 +1,14 @@
 ﻿namespace given_a_versioned_ApiController_mixed_with_OData_controllers
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Advanced;
     using Microsoft.Web;
     using System.Threading.Tasks;
     using Xunit;
 
-    public class when_orders_is_v1 : AdvancedAcceptanceTest
+    [Collection( nameof( AdvancedODataCollection ) )]
+    public class when_orders_is_v1 : ODataAcceptanceTest
     {
         [Fact]
         public async Task then_get_should_return_200_for_an_unspecified_version()
@@ -63,5 +65,7 @@
             // assert
             order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );
         }
+
+        public when_orders_is_v1( AdvancedFixture fixture ) : base( fixture ) { }
     }
 }

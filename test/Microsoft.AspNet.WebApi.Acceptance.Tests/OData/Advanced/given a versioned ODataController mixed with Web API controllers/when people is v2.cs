@@ -1,13 +1,15 @@
 ﻿namespace given_a_versioned_ODataController_mixed_with_Web_API_controllers
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Advanced;
     using Microsoft.Web;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_people_is_v2 : AdvancedAcceptanceTest
+    [Collection( nameof( AdvancedODataCollection ) )]
+    public class when_people_is_v2 : ODataAcceptanceTest
     {
         [Fact]
         public async Task then_get_should_return_200()
@@ -66,5 +68,7 @@
             // assert
             response.StatusCode.Should().Be( BadRequest );
         }
+
+        public when_people_is_v2( AdvancedFixture fixture ) : base( fixture ) { }
     }
 }

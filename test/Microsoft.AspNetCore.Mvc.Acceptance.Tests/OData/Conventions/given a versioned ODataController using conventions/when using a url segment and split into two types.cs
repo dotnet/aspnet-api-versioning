@@ -2,6 +2,7 @@
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Conventions;
     using System.Linq;
     using System.Net.Http;
@@ -9,7 +10,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_url_segment_and_split_into_two_types : ConventionsAcceptanceTest
+    [Collection( nameof( ConventionsODataCollection ) )]
+    public class when_using_a_url_segment_and_split_into_two_types : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "v1/people" )]
@@ -74,5 +76,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        public when_using_a_url_segment_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }
     }
 }

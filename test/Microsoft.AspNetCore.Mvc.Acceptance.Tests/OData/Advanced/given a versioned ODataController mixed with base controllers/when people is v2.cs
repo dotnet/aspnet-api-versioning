@@ -2,12 +2,14 @@
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Advanced;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_people_is_v2 : AdvancedAcceptanceTest
+    [Collection( nameof( AdvancedODataCollection ) )]
+    public class when_people_is_v2 : ODataAcceptanceTest
     {
         [Fact]
         public async Task then_get_should_return_200()
@@ -66,5 +68,7 @@
             // assert
             response.StatusCode.Should().Be( BadRequest );
         }
+
+        public when_people_is_v2( AdvancedFixture fixture ) : base( fixture ) { }
     }
 }

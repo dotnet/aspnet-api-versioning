@@ -1,6 +1,7 @@
 ﻿namespace given_a_versioned_ODataController_mixed_with_Web_API_controllers
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Advanced;
     using Microsoft.Web;
     using System.Net.Http;
@@ -8,7 +9,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_people_is_v1 : AdvancedAcceptanceTest
+    [Collection( nameof( AdvancedODataCollection ) )]
+    public class when_people_is_v1 : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "api/people" )]
@@ -60,5 +62,7 @@
             response.StatusCode.Should().Be( MethodNotAllowed );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        public when_people_is_v1( AdvancedFixture fixture ) : base( fixture ) { }
     }
 }

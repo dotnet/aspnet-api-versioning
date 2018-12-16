@@ -1,12 +1,12 @@
 ﻿namespace Microsoft.Web.Http.MediaTypeNegotiation
 {
-    using Controllers;
+    using Microsoft.Web.Http.MediaTypeNegotiation.Controllers;
+    using Microsoft.Web.Http.Versioning;
     using System.Web.Http;
-    using Versioning;
 
-    public abstract class MediaTypeNegotiationAcceptanceTest : AcceptanceTest
+    public class MediaTypeNegotiationFixture : HttpServerFixture
     {
-        protected MediaTypeNegotiationAcceptanceTest()
+        public MediaTypeNegotiationFixture()
         {
             FilteredControllerTypes.Add( typeof( ValuesController ) );
             FilteredControllerTypes.Add( typeof( Values2Controller ) );

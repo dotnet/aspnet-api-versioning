@@ -1,15 +1,14 @@
 ﻿namespace given_a_versioned_ApiController_per_namespace
 {
     using FluentAssertions;
+    using Microsoft.Web;
     using Microsoft.Web.Http.ByNamespace;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_an_action : ByNamespaceAcceptanceTest
+    public class when_using_an_action : AcceptanceTest, IClassFixture<OrdersFixture>
     {
-        public when_using_an_action() : base( SetupKind.Orders ) { }
-
         [Theory]
         [InlineData( "api/orders/42?api-version=1.0" )]
         [InlineData( "api/orders/42?api-version=2.0" )]
@@ -68,5 +67,7 @@
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
+
+        public when_using_an_action( OrdersFixture fixture ) : base( fixture ) { }
     }
 }

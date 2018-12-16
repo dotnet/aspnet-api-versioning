@@ -8,7 +8,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_no_version_is_specified : BasicAcceptanceTest
+    [Collection( nameof( BasicCollection ) )]
+    public class when_no_version_is_specified : AcceptanceTest
     {
         [Fact]
         public async Task then_get_should_return_204()
@@ -48,5 +49,7 @@
                     Message = "The requested resource with API version '(null)' does not support HTTP method 'POST'."
                 } );
         }
+
+        public when_no_version_is_specified( BasicFixture fixture ) : base( fixture ) { }
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Basic
 {
-    using Controllers;
+    using Microsoft.AspNetCore.Mvc.Basic.Controllers;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using System.Reflection;
-    using Versioning;
 
-    public abstract class BasicAcceptanceTest: AcceptanceTest
+    public class BasicFixture : HttpServerFixture
     {
-        protected BasicAcceptanceTest()
+        public BasicFixture()
         {
             FilteredControllerTypes.Add( typeof( ValuesController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( Values2Controller ).GetTypeInfo() );

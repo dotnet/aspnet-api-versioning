@@ -1,12 +1,12 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.MediaTypeNegotiation
 {
-    using Controllers;
+    using Microsoft.AspNetCore.Mvc.MediaTypeNegotiation.Controllers;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using System.Reflection;
-    using Versioning;
 
-    public abstract class MediaTypeNegotiationAcceptanceTest  : AcceptanceTest
+    public class MediaTypeNegotiationFixture : HttpServerFixture
     {
-        protected MediaTypeNegotiationAcceptanceTest()
+        public MediaTypeNegotiationFixture()
         {
             FilteredControllerTypes.Add( typeof( ValuesController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( Values2Controller ).GetTypeInfo() );

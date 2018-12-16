@@ -10,9 +10,9 @@
     using Microsoft.Extensions.DependencyInjection;
     using System.Reflection;
 
-    public abstract class AdvancedAcceptanceTest : ODataAcceptanceTest
+    public class AdvancedFixture : ODataFixture
     {
-        protected AdvancedAcceptanceTest()
+        public AdvancedFixture()
         {
             FilteredControllerTypes.Add( typeof( OrdersController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( Orders2Controller ).GetTypeInfo() );

@@ -10,7 +10,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_query_string_and_split_into_two_types : BasicAcceptanceTest
+    [Collection( nameof( BasicCollection ) )]
+    public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
     {
         [Theory]
         [InlineData( nameof( ValuesController ), "1.0" )]
@@ -26,7 +27,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.Should().BeEquivalentTo( new { controller = controller, version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller, version = apiVersion } );
         }
 
         [Fact]
@@ -103,7 +104,9 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
-            content.Should().BeEquivalentTo( new { controller = controller, query = "Foo", version = apiVersion } );
+            content.Should().BeEquivalentTo( new { controller, query = "Foo", version = apiVersion } );
         }
+
+        public when_using_a_query_string_and_split_into_two_types( BasicFixture fixture ) : base( fixture ) { }
     }
 }

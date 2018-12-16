@@ -74,5 +74,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        public when_using_a_url_segment_and_split_into_two_types( BasicFixture fixture ) : base( fixture ) { }
     }
 }

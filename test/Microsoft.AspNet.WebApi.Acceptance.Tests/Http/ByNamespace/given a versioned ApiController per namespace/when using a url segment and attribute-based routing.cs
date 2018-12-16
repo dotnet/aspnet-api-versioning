@@ -1,14 +1,13 @@
 ﻿namespace given_a_versioned_ApiController_per_namespace
 {
     using FluentAssertions;
+    using Microsoft.Web;
     using Microsoft.Web.Http.ByNamespace;
     using System.Threading.Tasks;
     using Xunit;
 
-    public class when_using_a_url_segment_and_attributeX2Dbased_routing : ByNamespaceAcceptanceTest
+    public class when_using_a_url_segment_and_attributeX2Dbased_routing : AcceptanceTest, IClassFixture<HelloWorldFixture>
     {
-        public when_using_a_url_segment_and_attributeX2Dbased_routing() : base( SetupKind.HelloWorld ) { }
-
         [Fact]
         public async Task then_get_should_should_return_200_for_an_unspecified_version()
         {
@@ -39,5 +38,7 @@
             // assert
             content.Should().Be( expected );
         }
+
+        public when_using_a_url_segment_and_attributeX2Dbased_routing( HelloWorldFixture fixture ) : base( fixture ) { }
     }
 }

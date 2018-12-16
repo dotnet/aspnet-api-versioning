@@ -1,6 +1,7 @@
 ﻿namespace given_a_versioned_ODataController_using_conventions
 {
     using FluentAssertions;
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Conventions;
     using Microsoft.Web;
     using System.Linq;
@@ -9,7 +10,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_query_string_and_split_into_two_types : ConventionsAcceptanceTest
+    [Collection( nameof( ConventionsODataCollection ) )]
+    public class when_using_a_query_string_and_split_into_two_types : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "api/people?api-version=1.0" )]
@@ -104,5 +106,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
+
+        public when_using_a_query_string_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }
     }
 }

@@ -9,10 +9,9 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_query_string : ByNamespaceAcceptanceTest
+    [Collection( nameof( AgreementsCollection ) )]
+    public class when_using_a_query_string : AcceptanceTest
     {
-        public when_using_a_query_string() : base( SetupKind.Agreements ) { }
-
         [Theory]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.AgreementsController", "1.0" )]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V2.AgreementsController", "2.0" )]
@@ -60,5 +59,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
+
+        public when_using_a_query_string( AgreementsFixture fixture ) : base( fixture ) { }
     }
 }

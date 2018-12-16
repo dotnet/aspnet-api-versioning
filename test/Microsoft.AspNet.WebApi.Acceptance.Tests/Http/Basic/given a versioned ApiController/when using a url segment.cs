@@ -12,7 +12,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_url_segment : BasicAcceptanceTest
+    [Collection( nameof( BasicCollection ) )]
+    public class when_using_a_url_segment : AcceptanceTest
     {
         [Theory]
         [InlineData( "api/v1/helloworld", null )]
@@ -67,5 +68,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        public when_using_a_url_segment( BasicFixture fixture ) : base( fixture ) { }
     }
 }

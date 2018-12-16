@@ -13,23 +13,25 @@ namespace Microsoft.AspNetCore.Mvc
     using static System.Net.Http.HttpMethod;
 
     [Trait( "Kind", "Acceptance" )]
-    public abstract partial class AcceptanceTest : IDisposable
+#if WEBAPI
+    [Trait( "Framework", "Web API" )]
+#else
+    [Trait( "Framework", "ASP.NET Core" )]
+#endif
+    public abstract class AcceptanceTest
     {
         const string JsonMediaType = "application/json";
         static readonly HttpMethod Patch = new HttpMethod( "PATCH" );
-        readonly FilteredControllerTypes filteredControllerTypes = new FilteredControllerTypes();
-        bool disposed;
+        readonly HttpServerFixture fixture;
 
-        ~AcceptanceTest() => Dispose( false );
+        protected AcceptanceTest( HttpServerFixture fixture ) => this.fixture = fixture;
 
-        public void Dispose()
-        {
-            Dispose( true );
-            GC.SuppressFinalize( this );
-        }
+        protected HttpClient Client => fixture.Client;
 
         HttpRequestMessage CreateRequest<TEntity>( string requestUri, TEntity entity, HttpMethod method )
         {
+            AddDefaultAcceptHeaderIfNecessary();
+
             var request = new HttpRequestMessage( method, requestUri );
 
             if ( !Equals( entity, default( TEntity ) ) )
@@ -38,18 +40,13 @@ namespace Microsoft.AspNetCore.Mvc
                 request.Content = new ObjectContent<TEntity>( entity, formatter, JsonMediaType );
             }
 
-            Client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( JsonMediaType ) );
-
             return request;
         }
 
         HttpRequestMessage CreateRequest( string requestUri, HttpContent content, HttpMethod method )
         {
-            var request = new HttpRequestMessage( method, requestUri ) { Content = content };
-
-            Client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( JsonMediaType ) );
-
-            return request;
+            AddDefaultAcceptHeaderIfNecessary();
+            return new HttpRequestMessage( method, requestUri ) { Content = content };
         }
 
         protected virtual Task<HttpResponseMessage> GetAsync( string requestUri ) => Client.SendAsync( CreateRequest( requestUri, default( object ), Get ) );
@@ -67,5 +64,21 @@ namespace Microsoft.AspNetCore.Mvc
         protected virtual Task<HttpResponseMessage> PatchAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Patch ) );
 
         protected virtual Task<HttpResponseMessage> DeleteAsync( string requestUri ) => Client.SendAsync( CreateRequest( requestUri, default( object ), Delete ) );
+
+        void AddDefaultAcceptHeaderIfNecessary()
+        {
+            var accept = Client.DefaultRequestHeaders.Accept;
+            var comparer = StringComparer.OrdinalIgnoreCase;
+
+            foreach ( var item in accept )
+            {
+                if ( comparer.Equals( item.MediaType, JsonMediaType ) )
+                {
+                    return;
+                }
+            }
+
+            accept.Add( new MediaTypeWithQualityHeaderValue( JsonMediaType ) );
+        }
     }
 }

@@ -1,12 +1,13 @@
 ﻿namespace given_a_versioned_Controller_per_namespace
 {
     using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ByNamespace;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_an_action : ByNamespaceAcceptanceTest
+    public class when_using_an_action : AcceptanceTest, IClassFixture<OrdersFixture>
     {
         [Theory]
         [InlineData( "api/orders/42?api-version=1.0" )]
@@ -67,6 +68,6 @@
             response.StatusCode.Should().Be( NoContent );
         }
 
-        public when_using_an_action() : base( SetupKind.Orders ) { }
+        public when_using_an_action( OrdersFixture fixture ) : base( fixture ) { }
     }
 }

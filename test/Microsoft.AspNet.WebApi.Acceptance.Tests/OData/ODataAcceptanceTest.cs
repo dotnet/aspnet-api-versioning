@@ -1,24 +1,15 @@
 ﻿namespace Microsoft.AspNet.OData
 {
     using FluentAssertions;
-    using Microsoft.AspNet.OData.Routing;
-    using Microsoft.OData.UriParser;
     using Microsoft.Web;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static System.Net.HttpStatusCode;
 
     [Trait( "Framework", "OData" )]
     public abstract class ODataAcceptanceTest : AcceptanceTest
     {
-        protected ODataAcceptanceTest() => FilteredControllerTypes.Add( typeof( VersionedMetadataController ) );
-
-        protected IODataPathHandler TestPathHandler { get; } = new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses };
-
-        protected ODataUriResolver TestUriResolver { get; } = new UnqualifiedCallAndEnumPrefixFreeResolver() { EnableCaseInsensitive = true };
-
         [Fact]
         public async Task then_the_service_document_should_allow_an_unspecified_version()
         {
@@ -106,5 +97,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        protected ODataAcceptanceTest( ODataFixture fixture ) : base( fixture ) { }
     }
 }

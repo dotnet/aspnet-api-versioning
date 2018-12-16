@@ -10,9 +10,9 @@
     using Microsoft.Extensions.DependencyInjection;
     using System.Reflection;
 
-    public abstract class ConventionsAcceptanceTest : ODataAcceptanceTest
+    public class ConventionsFixture : ODataFixture
     {
-        protected ConventionsAcceptanceTest()
+        public ConventionsFixture()
         {
             FilteredControllerTypes.Add( typeof( OrdersController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( PeopleController ).GetTypeInfo() );

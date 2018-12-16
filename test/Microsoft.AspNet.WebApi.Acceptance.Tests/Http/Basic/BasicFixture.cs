@@ -5,9 +5,9 @@
     using System.Web.Http;
     using System.Web.Http.Routing;
 
-    public abstract class BasicAcceptanceTest : AcceptanceTest
+    public class BasicFixture : HttpServerFixture
     {
-        protected BasicAcceptanceTest()
+        public BasicFixture()
         {
             var constraintResolver = new DefaultInlineConstraintResolver()
             {

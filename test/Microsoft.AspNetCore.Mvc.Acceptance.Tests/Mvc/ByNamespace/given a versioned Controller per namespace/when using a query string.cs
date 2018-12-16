@@ -9,7 +9,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_query_string : ByNamespaceAcceptanceTest
+    [Collection( nameof( AgreementsCollection ) )]
+    public class when_using_a_query_string : AcceptanceTest
     {
         [Theory]
         [InlineData( "Microsoft.AspNetCore.Mvc.ByNamespace.Controllers.V1.AgreementsController", "1.0" )]
@@ -26,7 +27,7 @@
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
-            content.Should().BeEquivalentTo( new { controller = controller, apiVersion = apiVersion, accountId = "42" } );
+            content.Should().BeEquivalentTo( new { controller, apiVersion, accountId = "42" } );
         }
 
         [Fact]
@@ -59,6 +60,6 @@
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
 
-        public when_using_a_query_string() : base( SetupKind.Agreements ) { }
+        public when_using_a_query_string( AgreementsFixture fixture ) : base( fixture ) { }
     }
 }

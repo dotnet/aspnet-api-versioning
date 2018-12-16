@@ -9,13 +9,8 @@
     using System.Threading.Tasks;
     using Xunit;
 
-    public class when_accessing_a_view_using_convention_routing : UIAcceptanceTest
+    public class when_accessing_a_view_using_convention_routing : AcceptanceTest, IClassFixture<UIFixture>
     {
-        public when_accessing_a_view_using_convention_routing()
-        {
-            FilteredControllerTypes.Add( typeof( HomeController ).GetTypeInfo() );
-        }
-
         [Theory]
         [InlineData( "http://localhost" )]
         [InlineData( "http://localhost/home" )]
@@ -23,6 +18,7 @@
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange
+            Client.DefaultRequestHeaders.Clear();
             Client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( "text/html" ) );
 
             // act
@@ -30,6 +26,11 @@
 
             // assert
             response.Content.Headers.ContentType.MediaType.Should().Be( "text/html" );
+        }
+
+        public when_accessing_a_view_using_convention_routing( UIFixture fixture ) : base( fixture )
+        {
+            fixture.FilteredControllerTypes.Add( typeof( HomeController ).GetTypeInfo() );
         }
     }
 }

@@ -6,13 +6,13 @@
     using System.Web.Http;
     using System.Web.Http.Routing;
 
-    public abstract class ConventionsAcceptanceTest : AcceptanceTest
+    public class ConventionsFixture : HttpServerFixture
     {
-        protected ConventionsAcceptanceTest()
+        public ConventionsFixture()
         {
             var constraintResolver = new DefaultInlineConstraintResolver()
             {
-                ConstraintMap = { ["apiVersion"] = typeof( ApiVersionRouteConstraint ) }
+                ConstraintMap = { ["apiVersion"] = typeof( ApiVersionRouteConstraint ) },
             };
 
             FilteredControllerTypes.Add( typeof( ValuesController ) );
