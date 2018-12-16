@@ -10,7 +10,7 @@
     /// </summary>
     static partial class TypeExtensions
     {
-        static readonly TypeInfo ODataController = typeof( ODataController ).GetTypeInfo();
+        static readonly Type ODataRoutingAttributeType = typeof( ODataRoutingAttribute );
         static readonly TypeInfo MetadataController = typeof( MetadataController ).GetTypeInfo();
         static readonly Type Delta = typeof( IDelta );
         static readonly Type ODataPath = typeof( ODataPath );
@@ -18,9 +18,9 @@
         static readonly Type ODataActionParameters = typeof( ODataActionParameters );
         static readonly Type ODataParameterHelper = typeof( ODataParameterHelper );
 
-        internal static bool IsODataController( this Type controllerType ) => ODataController.IsAssignableFrom( controllerType );
+        internal static bool IsODataController( this Type controllerType ) => Attribute.IsDefined( controllerType, ODataRoutingAttributeType );
 
-        internal static bool IsODataController( this TypeInfo controllerType ) => ODataController.IsAssignableFrom( controllerType );
+        internal static bool IsODataController( this TypeInfo controllerType ) => Attribute.IsDefined( controllerType, ODataRoutingAttributeType );
 
         internal static bool IsMetadataController( this TypeInfo controllerType ) => MetadataController.IsAssignableFrom( controllerType );
 
