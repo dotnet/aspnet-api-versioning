@@ -1,13 +1,13 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Conventions
 {
-    using Controllers;
+    using Microsoft.AspNetCore.Mvc.Conventions.Controllers;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
     using System.Reflection;
-    using Versioning;
-    using Versioning.Conventions;
 
-    public abstract class ConventionsAcceptanceTest : AcceptanceTest
+    public class ConventionsFixture : HttpServerFixture
     {
-        protected ConventionsAcceptanceTest()
+        public ConventionsFixture()
         {
             FilteredControllerTypes.Add( typeof( ValuesController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( Values2Controller ).GetTypeInfo() );

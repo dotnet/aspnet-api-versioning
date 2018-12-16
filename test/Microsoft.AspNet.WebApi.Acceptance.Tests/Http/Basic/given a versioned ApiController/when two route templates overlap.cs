@@ -1,13 +1,14 @@
 ﻿namespace given_a_versioned_ApiController
 {
     using FluentAssertions;
+    using Microsoft.Web;
     using Microsoft.Web.Http.Basic;
-    using System;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_two_route_templates_overlap : BasicAcceptanceTest
+    [Collection( nameof( BasicCollection ) )]
+    public class when_two_route_templates_overlap : AcceptanceTest
     {
         [Fact]
         public async Task then_the_higher_precedence_route_should_be_selected_during_the_first_request()
@@ -55,5 +56,7 @@
             result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
             response.StatusCode.Should().Be( InternalServerError );
         }
+
+        public when_two_route_templates_overlap( BasicFixture fixture ) : base( fixture ) { }
     }
 }

@@ -9,10 +9,9 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_url_segment_and_conventionX2Dbased_routing : ByNamespaceAcceptanceTest
+    [Collection( nameof( AgreementsCollection ) )]
+    public class when_using_a_url_segment_and_conventionX2Dbased_routing : AcceptanceTest
     {
-        public when_using_a_url_segment_and_conventionX2Dbased_routing() : base( SetupKind.Agreements ) { }
-
         [Theory]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.AgreementsController", "1" )]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V2.AgreementsController", "2" )]
@@ -45,5 +44,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        public when_using_a_url_segment_and_conventionX2Dbased_routing( AgreementsFixture fixture ) : base( fixture ) { }
     }
 }

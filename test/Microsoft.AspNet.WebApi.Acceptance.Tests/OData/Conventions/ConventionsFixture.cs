@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.AspNet.OData.Conventions
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Configuration;
     using Microsoft.AspNet.OData.Conventions.Controllers;
@@ -8,9 +9,9 @@
     using System.Web.Http;
     using static Microsoft.OData.ServiceLifetime;
 
-    public abstract class ConventionsAcceptanceTest : ODataAcceptanceTest
+    public class ConventionsFixture : ODataFixture
     {
-        protected ConventionsAcceptanceTest()
+        public ConventionsFixture()
         {
             FilteredControllerTypes.Add( typeof( OrdersController ) );
             FilteredControllerTypes.Add( typeof( PeopleController ) );
@@ -49,8 +50,8 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver ) );
+            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver ) );
             Configuration.EnsureInitialized();
         }
     }

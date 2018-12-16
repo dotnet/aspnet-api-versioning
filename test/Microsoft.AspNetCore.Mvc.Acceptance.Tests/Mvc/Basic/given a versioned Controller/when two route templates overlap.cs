@@ -1,22 +1,15 @@
 ﻿namespace given_a_versioned_Controller
 {
     using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Basic;
-    using Microsoft.AspNetCore.Mvc.Basic.Controllers;
     using Microsoft.AspNetCore.Mvc.Internal;
     using System;
-    using System.Reflection;
     using System.Threading.Tasks;
     using Xunit;
 
-    public class when_two_route_templates_overlap : BasicAcceptanceTest
+    public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<OverlappingRouteTemplateFixture>
     {
-        public when_two_route_templates_overlap()
-        {
-            FilteredControllerTypes.Clear();
-            FilteredControllerTypes.Add( typeof( OverlappingRouteTemplateController ).GetTypeInfo() );
-        }
-
         [Fact]
         public async Task then_the_higher_precedence_route_should_be_selected_during_the_first_request()
         {
@@ -63,5 +56,7 @@
             result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
             act.Should().Throw<AmbiguousActionException>();
         }
+
+        public when_two_route_templates_overlap( OverlappingRouteTemplateFixture fixture ) : base( fixture ) { }
     }
 }

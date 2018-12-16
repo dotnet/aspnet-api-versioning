@@ -1,12 +1,14 @@
 ﻿namespace given_a_versioned_Controller
 {
     using FluentAssertions;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Basic;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_an_action : BasicAcceptanceTest
+    [Collection( nameof( BasicCollection ) )]
+    public class when_using_an_action : AcceptanceTest
     {
         [Theory]
         [InlineData( "api/orders/42?api-version=0.9" )]
@@ -69,5 +71,7 @@
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
+
+        public when_using_an_action( BasicFixture fixture ) : base( fixture ) { }
     }
 }

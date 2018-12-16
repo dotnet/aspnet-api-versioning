@@ -1,14 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.OData
 {
     using FluentAssertions;
-    using Microsoft.AspNet.OData;
-    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.ApplicationParts;
-    using Microsoft.AspNetCore.OData.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
     using System.Net.Http;
-    using System.Reflection;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
@@ -16,21 +10,6 @@
     [Trait( "Framework", "OData" )]
     public abstract class ODataAcceptanceTest : AcceptanceTest
     {
-        protected ODataAcceptanceTest() => FilteredControllerTypes.Add( typeof( VersionedMetadataController ).GetTypeInfo() );
-
-        protected override void OnConfigurePartManager( ApplicationPartManager partManager )
-        {
-            base.OnConfigurePartManager( partManager );
-
-            partManager.ApplicationParts.Add(
-                new TestApplicationPart(
-                    typeof( OrderModelConfiguration ),
-                    typeof( PersonModelConfiguration ),
-                    typeof( CustomerModelConfiguration ) ) );
-        }
-
-        protected override void OnConfigureServices( IServiceCollection services ) => services.AddOData().EnableApiVersioning();
-
         [Fact]
         public async Task then_the_service_document_should_allow_an_unspecified_version()
         {
@@ -118,5 +97,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        protected ODataAcceptanceTest( ODataFixture fixture ) : base( fixture ) { }
     }
 }

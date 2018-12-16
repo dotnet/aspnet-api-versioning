@@ -10,7 +10,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AcceptanceTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AgreementsCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AdvancedODataCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BasicODataCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BasicCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConventionsODataCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConventionsCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpContentExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpServerFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OneApiError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OneApiErrorResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OneApiInnerError.cs" />

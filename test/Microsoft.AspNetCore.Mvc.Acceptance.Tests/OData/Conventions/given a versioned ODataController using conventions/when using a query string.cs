@@ -2,6 +2,7 @@
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Conventions;
     using System.Linq;
     using System.Net.Http;
@@ -9,7 +10,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_query_string : ConventionsAcceptanceTest
+    [Collection( nameof( ConventionsODataCollection ) )]
+    public class when_using_a_query_string : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "api/orders?api-version=1.0" )]
@@ -55,5 +57,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
+
+        public when_using_a_query_string( ConventionsFixture fixture ) : base( fixture ) { }
     }
 }

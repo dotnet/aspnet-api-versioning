@@ -2,11 +2,13 @@
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Advanced;
     using System.Threading.Tasks;
     using Xunit;
 
-    public class when_orders_is_v3 : AdvancedAcceptanceTest
+    [Collection( nameof( AdvancedODataCollection ) )]
+    public class when_orders_is_v3 : ODataAcceptanceTest
     {
         [Fact]
         public async Task then_get_should_return_200()
@@ -35,5 +37,7 @@
             // assert
             order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v3.0" } );
         }
+
+        public when_orders_is_v3( AdvancedFixture fixture ) : base( fixture ) { }
     }
 }

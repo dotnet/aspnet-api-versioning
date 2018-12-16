@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Web.OData.Basic.Controllers
+﻿namespace Microsoft.AspNet.OData.Basic.Controllers
 {
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Models;

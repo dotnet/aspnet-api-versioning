@@ -12,9 +12,9 @@
     using static Microsoft.OData.ServiceLifetime;
     using static System.Web.Http.RouteParameter;
 
-    public abstract class AdvancedAcceptanceTest : ODataAcceptanceTest
+    public class AdvancedFixture : ODataFixture
     {
-        protected AdvancedAcceptanceTest()
+        public AdvancedFixture()
         {
             FilteredControllerTypes.Add( typeof( OrdersController ) );
             FilteredControllerTypes.Add( typeof( Orders2Controller ) );
@@ -37,7 +37,7 @@
                 ModelConfigurations =
                 {
                     new PersonModelConfiguration(),
-                    new OrderModelConfiguration( supportedApiVersion: new ApiVersion( 2, 0 ) )
+                    new OrderModelConfiguration( supportedApiVersion: new ApiVersion( 2, 0 ) ),
                 }
             };
             var models = modelBuilder.GetEdmModels();
@@ -49,8 +49,8 @@
 
         void OnConfigureContainer( IContainerBuilder builder )
         {
-            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => TestUriResolver );
-            builder.AddService( Singleton, typeof( IODataPathHandler ), sp => TestPathHandler );
+            builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver );
+            builder.AddService( Singleton, typeof( IODataPathHandler ), sp => PathHandler );
         }
     }
 }

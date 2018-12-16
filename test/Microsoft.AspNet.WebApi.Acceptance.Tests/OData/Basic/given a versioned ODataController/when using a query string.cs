@@ -55,5 +55,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
+
+        public when_using_a_query_string( BasicFixture fixture ) : base( fixture ) { }
     }
 }

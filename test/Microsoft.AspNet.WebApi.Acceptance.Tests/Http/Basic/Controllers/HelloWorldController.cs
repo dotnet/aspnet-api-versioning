@@ -11,7 +11,7 @@
         public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
 
         [Route( "{id:int}", Name = "GetMessageById" )]
-        public IHttpActionResult Get( int id ) => Ok( new { controller = GetType().Name, id = id, version = Request.GetRequestedApiVersion().ToString() } );
+        public IHttpActionResult Get( int id ) => Ok( new { controller = GetType().Name, id, version = Request.GetRequestedApiVersion().ToString() } );
 
         [Route]
         public IHttpActionResult Post() => CreatedAtRoute( "GetMessageById", new { id = 42 }, default( object ) );

@@ -70,5 +70,7 @@
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
+
+        public when_using_an_action( BasicFixture fixture ) : base( fixture ) { }
     }
 }

@@ -11,7 +11,8 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_a_query_string_and_split_into_two_types : BasicAcceptanceTest
+    [Collection( nameof( BasicCollection ) )]
+    public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
     {
         [Theory]
         [InlineData( nameof( ValuesController ), "1.0" )]
@@ -64,5 +65,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "ApiVersionUnspecified" );
         }
+
+        public when_using_a_query_string_and_split_into_two_types( BasicFixture fixture ) : base( fixture ) { }
     }
 }

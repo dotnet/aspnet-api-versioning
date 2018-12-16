@@ -2,13 +2,15 @@
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Advanced;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_people_is_any_version : AdvancedAcceptanceTest
+    [Collection( nameof( AdvancedODataCollection ) )]
+    public class when_people_is_any_version : ODataAcceptanceTest
     {
         [Fact]
         public async Task then_patch_should_return_400_for_an_unsupported_version()
@@ -24,5 +26,7 @@
             response.StatusCode.Should().Be( BadRequest );
             content.Error.Code.Should().Be( "UnsupportedApiVersion" );
         }
+
+        public when_people_is_any_version( AdvancedFixture fixture ) : base( fixture ) { }
     }
 }

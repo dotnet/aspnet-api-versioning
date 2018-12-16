@@ -1,37 +1,32 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
-    using ApplicationParts;
-    using AspNetCore.Routing;
-    using Builder;
-    using Extensions.DependencyInjection;
-    using Hosting;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc.ApplicationParts;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Net.Http;
     using System.Reflection;
-    using TestHost;
-    using Versioning;
-    using Xunit;
     using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
-    [Trait( "Framework", "ASP.NET Core" )]
-    public abstract partial class AcceptanceTest : IDisposable
+    public abstract partial class HttpServerFixture
     {
         readonly Lazy<TestServer> server;
         readonly Lazy<HttpClient> client;
 
-        protected AcceptanceTest()
+        protected HttpServerFixture()
         {
             server = new Lazy<TestServer>( CreateServer );
             client = new Lazy<HttpClient>( CreateAndInitializeHttpClient );
         }
 
-        protected TestServer Server => server.Value;
+        public TestServer Server => server.Value;
 
-        protected HttpClient Client => client.Value;
-
-        protected ICollection<TypeInfo> FilteredControllerTypes => filteredControllerTypes;
+        public HttpClient Client => client.Value;
 
         protected virtual void Dispose( bool disposing )
         {
@@ -58,6 +53,15 @@
             }
         }
 
+        protected virtual void OnConfigurePartManager( ApplicationPartManager partManager ) =>
+            partManager.ApplicationParts.Add( new TestApplicationPart( FilteredControllerTypes ) );
+
+        protected virtual void OnConfigureServices( IServiceCollection services ) { }
+
+        protected abstract void OnAddApiVersioning( ApiVersioningOptions options );
+
+        protected virtual void OnConfigureRoutes( IRouteBuilder routeBuilder ) { }
+
         TestServer CreateServer()
         {
             var builder = new WebHostBuilder()
@@ -71,7 +75,9 @@
         HttpClient CreateAndInitializeHttpClient()
         {
             var newClient = Server.CreateClient();
+
             newClient.BaseAddress = new Uri( "http://localhost" );
+
             return newClient;
         }
 
@@ -98,14 +104,5 @@
 
             return contentRoot.FullName;
         }
-
-        protected virtual void OnConfigurePartManager( ApplicationPartManager partManager ) =>
-            partManager.ApplicationParts.Add( new TestApplicationPart( FilteredControllerTypes ) );
-
-        protected virtual void OnConfigureServices( IServiceCollection services ) { }
-
-        protected abstract void OnAddApiVersioning( ApiVersioningOptions options );
-
-        protected virtual void OnConfigureRoutes( IRouteBuilder routeBuilder ) { }
     }
 }

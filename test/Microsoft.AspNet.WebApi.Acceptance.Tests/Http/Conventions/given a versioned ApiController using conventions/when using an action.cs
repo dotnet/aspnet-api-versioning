@@ -1,12 +1,14 @@
 ﻿namespace given_a_versioned_ApiController_using_conventions
 {
     using FluentAssertions;
+    using Microsoft.Web;
     using Microsoft.Web.Http.Conventions;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    public class when_using_an_action : ConventionsAcceptanceTest
+    [Collection( nameof( ConventionsCollection ) )]
+    public class when_using_an_action : AcceptanceTest
     {
         [Theory]
         [InlineData( "api/orders/42?api-version=0.9" )]
@@ -69,5 +71,7 @@
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
+
+        public when_using_an_action( ConventionsFixture fixture ) : base( fixture ) { }
     }
 }
