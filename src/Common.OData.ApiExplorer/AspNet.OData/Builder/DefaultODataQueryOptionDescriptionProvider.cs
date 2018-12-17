@@ -21,7 +21,7 @@
         const char Space = ' ';
 
         /// <inheritdoc />
-        public string Describe( AllowedQueryOptions queryOption, ODataQueryOptionDescriptionContext context )
+        public virtual string Describe( AllowedQueryOptions queryOption, ODataQueryOptionDescriptionContext context )
         {
             Arg.NotNull( context, nameof( context ) );
 
