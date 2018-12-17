@@ -6,19 +6,20 @@
   <RepositoryUrl>https://github.com/Microsoft/aspnet-api-versioning</RepositoryUrl>
   <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
   <PackageProjectUrl>https://github.com/Microsoft/aspnet-api-versioning/wiki</PackageProjectUrl>
-  <PackageLicenseUrl>https://raw.githubusercontent.com/Microsoft/aspnet-api-versioning/master/LICENSE</PackageLicenseUrl>
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-  <IncludeSymbols>true</IncludeSymbols>
-  <IncludeSource>true</IncludeSource>
-  <IncludeBuildOutput>true</IncludeBuildOutput>
+  <PackageLicenseExpression>MIT</PackageLicenseExpression>
   <MinClientVersion>2.5</MinClientVersion>
   <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
   <NoWarn>NU5118;$(NoWarn)</NoWarn>
  </PropertyGroup>
-
+ 
  <ItemGroup Label="NuGet">
-  <!-- allow build-specific, one-time release notes from the command-line without modifying the source project -->
-  <ReleaseNotes Include="$(BuildReleaseNotes.Split('|'))" />
+  <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="" Visible="false" />
  </ItemGroup>
 
+ <!-- allow build-specific, one-time release notes from the command-line without modifying the source project -->
+ <ItemGroup Label="NuGet">
+  <ReleaseNotes Include="$(BuildReleaseNotes.Split('|'))" />
+ </ItemGroup>
+ 
 </Project>
