@@ -65,16 +65,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( string ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( string ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = default( object ),
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -103,16 +100,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( string ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( string ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = default( object ),
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -141,16 +135,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( string ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( string ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = default( object ),
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -179,16 +170,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( string ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( string ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = default( object ),
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -217,16 +205,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( int ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( int ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = default( object ),
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -255,16 +240,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( int ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( int ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = default( object ),
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -293,16 +275,13 @@
                     Name = name,
                     Source = Query,
                     Type = typeof( bool ),
+                    DefaultValue = (object) false,
+                    IsRequired = false,
                     ModelMetadata = new { Description = "Test" },
                     ParameterDescriptor = new
                     {
                         Name = name,
                         ParameterType = typeof( bool ),
-                    },
-                    RouteInfo = new
-                    {
-                        DefaultValue = false,
-                        IsOptional = true,
                     },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -360,16 +339,13 @@
                         Name = "$select",
                         Source = Query,
                         Type = typeof( string ),
+                        DefaultValue = default( object ),
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$select",
                             ParameterType = typeof( string ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = default( object ),
-                            IsOptional = true,
                         },
                     },
                     new
@@ -377,16 +353,13 @@
                         Name = "$expand",
                         Source = Query,
                         Type = typeof( string ),
+                        DefaultValue = default( object ),
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$expand",
                             ParameterType = typeof( string ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = default( object ),
-                            IsOptional = true,
                         },
                     },
                     new
@@ -394,16 +367,13 @@
                         Name = "$filter",
                         Source = Query,
                         Type = typeof( string ),
+                        DefaultValue = default( object ),
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$filter",
                             ParameterType = typeof( string ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = default( object ),
-                            IsOptional = true,
                         },
                     },
                 },
@@ -442,16 +412,13 @@
                         Name = "$select",
                         Source = Query,
                         Type = typeof( string ),
+                        DefaultValue = default( object ),
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$select",
                             ParameterType = typeof( string ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = default( object ),
-                            IsOptional = true,
                         },
                     },
                     new
@@ -459,16 +426,13 @@
                         Name = "$filter",
                         Source = Query,
                         Type = typeof( string ),
+                        DefaultValue = default( object ),
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$filter",
                             ParameterType = typeof( string ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = default( object ),
-                            IsOptional = true,
                         },
                     },
                     new
@@ -476,16 +440,13 @@
                         Name = "$orderby",
                         Source = Query,
                         Type = typeof( string ),
+                        DefaultValue = default( object ),
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$orderby",
                             ParameterType = typeof( string ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = default( object ),
-                            IsOptional = true,
                         },
                     },
                     new
@@ -493,16 +454,13 @@
                         Name = "$count",
                         Source = Query,
                         Type = typeof( bool ),
+                        DefaultValue = (object) false,
+                        IsRequired = false,
                         ModelMetadata = new { Description = "Test" },
                         ParameterDescriptor = new
                         {
                             Name = "$count",
                             ParameterType = typeof( bool ),
-                        },
-                        RouteInfo = new
-                        {
-                            DefaultValue = ( object ) false,
-                            IsOptional = true,
                         },
                     },
                 },

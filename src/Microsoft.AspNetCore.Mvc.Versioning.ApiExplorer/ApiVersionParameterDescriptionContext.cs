@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
@@ -158,7 +157,7 @@
         }
 
         /// <summary>
-        /// Adds the description for an API version expressed as a header.
+        /// Adds the description for an API version expressed as a route parameter in a URL segment.
         /// </summary>
         protected virtual void UpdateUrlSegment()
         {
@@ -175,10 +174,22 @@
                 return;
             }
 
+            parameter.IsRequired = true;
+            parameter.DefaultValue = ApiVersion.ToString();
             parameter.ModelMetadata = ModelMetadata;
             parameter.Type = ModelMetadata.ModelType;
             parameter.RouteInfo.IsOptional = false;
-            parameter.RouteInfo.DefaultValue = ApiVersion.ToString();
+            parameter.RouteInfo.DefaultValue = parameter.DefaultValue;
+
+            if ( parameter.ParameterDescriptor == null )
+            {
+                parameter.ParameterDescriptor = new ParameterDescriptor()
+                {
+                    Name = parameter.Name,
+                    ParameterType = typeof( ApiVersion ),
+                };
+            }
+
             RemoveAllParametersExcept( parameter );
         }
 
@@ -239,16 +250,28 @@
 
             var parameter = new ApiParameterDescription()
             {
-                Name = name,
+                DefaultValue = ApiVersion.ToString(),
+                IsRequired = !optional,
                 ModelMetadata = ModelMetadata,
-                Source = source,
-                RouteInfo = new ApiParameterRouteInfo()
+                Name = name,
+                ParameterDescriptor = new ParameterDescriptor()
                 {
-                    DefaultValue = ApiVersion.ToString(),
-                    IsOptional = optional,
+                    Name = name,
+                    ParameterType = typeof( ApiVersion ),
                 },
+                Source = source,
                 Type = ModelMetadata.ModelType,
             };
+
+            if ( source == BindingSource.Path )
+            {
+                parameter.IsRequired = true;
+                parameter.RouteInfo = new ApiParameterRouteInfo()
+                {
+                    DefaultValue = ApiVersion.ToString(),
+                    IsOptional = false,
+                };
+            }
 
             optional = true;
             parameters.Add( parameter );
@@ -258,7 +281,7 @@
 
         void RemoveAllParametersExcept( ApiParameterDescription parameter )
         {
-            // note: in a scenario where multiple api version parameters are allowed, we can remove all other parameters because
+            // in a scenario where multiple api version parameters are allowed, we can remove all other parameters because
             // the api version must be specified in the path. this will avoid unwanted, duplicate api version parameters
             var collections = new ICollection<ApiParameterDescription>[] { ApiDescription.ParameterDescriptions, parameters };
 
