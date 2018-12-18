@@ -3,7 +3,7 @@
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Data.OData;
+    using Microsoft.OData;
     using Microsoft.Examples.Models;
     using System;
     using System.Collections.Generic;

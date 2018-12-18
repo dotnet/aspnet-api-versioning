@@ -6,10 +6,11 @@
     /// <summary>
     /// Represents a RESTful service of orders.
     /// </summary>
+    [ApiController]
     [ApiVersion( "1.0" )]
     [ApiVersion( "0.9", Deprecated = true )]
     [Route( "api/[controller]" )]
-    public class OrdersController : Controller
+    public class OrdersController : ControllerBase
     {
         /// <summary>
         /// Gets a single order.

@@ -8,9 +8,10 @@
     /// <summary>
     /// Represents a RESTful service of orders.
     /// </summary>
+    [ApiController]
     [ApiVersion( "3.0" )]
     [Route( "api/[controller]" )]
-    public class OrdersController : Controller
+    public class OrdersController : ControllerBase
     {
         const string ByIdRouteName = "GetOrderById-" + nameof( V3 );
 

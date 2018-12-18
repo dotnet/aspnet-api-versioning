@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.0</TargetFrameworks>
+  <TargetFrameworks>netcoreapp2.2;net461</TargetFrameworks>
+  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.2</TargetFrameworks>
   <RootNamespace>Microsoft.AspNetCore</RootNamespace>
   <AssetTargetFallback>$(AssetTargetFallback);portable-net451+win8</AssetTargetFallback>
   <PreserveCompilationContext>true</PreserveCompilationContext>
@@ -14,9 +14,9 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
-  <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.1.1" />
+  <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+  <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.3.0" />
  </ItemGroup>
 
  <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Label="Shared" />

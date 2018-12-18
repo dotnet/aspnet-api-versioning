@@ -1,13 +1,10 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
+    [ApiController]
     [Route( "api/v{version:apiVersion}/[controller]" )]
-    public class HelloWorldController : Controller
+    public class HelloWorldController : ControllerBase
     {
         // GET api/v{version}/helloworld
         [HttpGet]

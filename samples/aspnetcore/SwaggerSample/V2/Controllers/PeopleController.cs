@@ -8,9 +8,10 @@
     /// <summary>
     /// Represents a RESTful people service.
     /// </summary>
+    [ApiController]
     [ApiVersion( "2.0" )]
     [Route( "api/v{api-version:apiVersion}/[controller]" )]
-    public class PeopleController : Controller
+    public class PeopleController : ControllerBase
     {
         const string ByIdRouteName = "GetPersonById" + nameof( V2 );
 
