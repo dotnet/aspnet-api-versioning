@@ -3,7 +3,8 @@
     using System;
     using System.Threading.Tasks;
 
-    public sealed class TestController : Controller
+    [ApiController]
+    public sealed class TestController : ControllerBase
     {
         [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );

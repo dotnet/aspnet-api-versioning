@@ -3,12 +3,13 @@
     using System;
     using System.Threading.Tasks;
 
+    [ApiController]
     [ApiVersion( "2.0" )]
     [ApiVersion( "3.0" )]
     [ApiVersion( "1.8", Deprecated = true )]
     [ApiVersion( "1.9", Deprecated = true )]
     [ControllerName( "Test" )]
-    public sealed class TestVersion2Controller : Controller
+    public sealed class TestVersion2Controller : ControllerBase
     {
         [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );

@@ -4,8 +4,9 @@
     using Microsoft.AspNetCore.Mvc;
     using System;
 
+    [ApiController]
     [Route( "api/v{version:apiVersion}/helloworld" )]
-    public class HelloWorld2Controller : Controller
+    public class HelloWorld2Controller : ControllerBase
     {
         [HttpGet]
         public IActionResult Get() => Ok( new { Controller = nameof( HelloWorld2Controller ), Version = HttpContext.GetRequestedApiVersion().ToString() } );

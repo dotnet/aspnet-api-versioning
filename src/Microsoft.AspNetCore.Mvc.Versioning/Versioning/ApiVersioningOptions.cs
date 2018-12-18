@@ -21,11 +21,10 @@
         /// <summary>
         /// Gets or sets a value indicating whether to use web API behaviors.
         /// </summary>
-        /// <value>True to use web API behaviors; otherwise, false. The default value is <c>false</c>.</value>
-        /// <remarks>Setting this property to <c>true</c> applies API versioning policies only to controllers that
-        /// have the ApiControllerAttribute applied. A value of <c>true</c> is only effective when using ASP.NET Core
-        /// 2.1 or above. The default value of <c>false</c> retains backward capability with the existing behaviors
-        /// before the API behavior feature was introduced.</remarks>
-        public bool UseApiBehavior { get; set; }
+        /// <value>True to use web API behaviors; otherwise, false. The default value is <c>true</c>.</value>
+        /// <remarks>When this property is set to <c>true</c>, API versioning policies only apply to controllers that
+        /// have the ApiControllerAttribute applied. When this property is set to <c>false</c>, API versioning
+        /// policies are considers for all controllers. This was default behavior prior to ASP.NET Core 2.2.</remarks>
+        public bool UseApiBehavior { get; set; } = true;
     }
 }

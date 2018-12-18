@@ -4,7 +4,7 @@
     using System;
 
     [Route( "api/values" )]
-    public class Values2Controller : Controller
+    public class Values2Controller : ControllerBase
     {
         [HttpGet]
         public IActionResult Get() => Ok( new { Controller = nameof( Values2Controller ), Version = HttpContext.GetRequestedApiVersion().ToString() } );

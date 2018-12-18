@@ -117,12 +117,14 @@
             controllerBuilder.Verify( cb => cb.Action( method ), Once() );
         }
 
-        public sealed class UndecoratedController : Controller
+        [ApiController]
+        public sealed class UndecoratedController : ControllerBase
         {
             public IActionResult Get() => Ok();
         }
 
-        public sealed class DecoratedController : Controller
+        [ApiController]
+        public sealed class DecoratedController : ControllerBase
         {
             public IActionResult Get() => Ok();
 

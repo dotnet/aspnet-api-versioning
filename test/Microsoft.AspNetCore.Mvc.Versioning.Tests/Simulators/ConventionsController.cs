@@ -3,8 +3,9 @@
     using System;
     using System.Threading.Tasks;
 
+    [ApiController]
     [Route( "api/[controller]" )]
-    public sealed class ConventionsController : Controller
+    public sealed class ConventionsController : ControllerBase
     {
         [HttpGet]
         public string Get() => "Test (1.0)";

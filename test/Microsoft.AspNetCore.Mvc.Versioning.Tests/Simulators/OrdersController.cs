@@ -4,9 +4,10 @@
     using System;
     using System.Threading.Tasks;
 
+    [ApiController]
     [ApiVersion( "2015-11-15" )]
     [ApiVersion( "2016-06-06" )]
-    public class OrdersController : Controller
+    public class OrdersController : ControllerBase
     {
         [HttpGet]
         public Task<IActionResult> Get() => Task.FromResult<IActionResult>( Ok( "Version 2015-11-15" ) );

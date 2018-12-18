@@ -141,7 +141,8 @@
             internal IDictionary<TypeInfo, IControllerConventionBuilder> ProtectedControllerConventionBuilders => ControllerConventionBuilders;
         }
 
-        sealed class StubController : Controller
+        [ApiController]
+        sealed class StubController : ControllerBase
         {
             public IActionResult Get() => Ok();
         }
@@ -149,7 +150,8 @@
 
     namespace v2
     {
-        sealed class UndecoratedController : Controller
+        [ApiController]
+        sealed class UndecoratedController : ControllerBase
         {
             public IActionResult Get() => Ok();
         }

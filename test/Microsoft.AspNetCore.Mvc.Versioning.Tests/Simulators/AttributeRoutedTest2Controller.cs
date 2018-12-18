@@ -3,11 +3,12 @@
     using System;
     using System.Threading.Tasks;
 
+    [ApiController]
     [AdvertiseApiVersions( "1.0" )]
     [ApiVersion( "2.0" )]
     [ApiVersion( "3.0" )]
     [Route( "api/attributed" )]
-    public sealed class AttributeRoutedTest2Controller : Controller
+    public sealed class AttributeRoutedTest2Controller : ControllerBase
     {
         [HttpGet]
         public Task<string> Get() => Task.FromResult( "Test" );

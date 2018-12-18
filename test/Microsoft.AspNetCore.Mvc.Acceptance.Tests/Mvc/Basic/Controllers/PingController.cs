@@ -2,9 +2,10 @@
 {
     using System;
 
+    [ApiController]
     [ApiVersionNeutral]
     [Route( "api/[controller]" )]
-    public class PingController : Controller
+    public class PingController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get() => NoContent();
