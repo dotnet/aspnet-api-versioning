@@ -15,7 +15,6 @@
     using System.Net.Http;
     using System.Reflection;
     using System.Reflection.Emit;
-    using static System.StringComparison;
 #if WEBAPI
     using IActionResult = System.Web.Http.IHttpActionResult;
 #endif
@@ -26,11 +25,14 @@
     public static partial class TypeExtensions
     {
         static readonly Type VoidType = typeof( void );
-        static readonly Type ActionResultType = typeof( IActionResult );
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         static readonly Type ODataValueOfT = typeof( ODataValue<> );
         static readonly Type SingleResultOfT = typeof( SingleResult<> );
+        static readonly Type ActionResultType = typeof( IActionResult );
+#if !WEBAPI
+        static readonly Type ActionResultOfT = typeof( ActionResult<> );
+#endif
 
         /// <summary>
         /// Substitutes the specified type, if required.
@@ -157,7 +159,11 @@
 
             var typeArg = typeArgs[0];
 
-            if ( typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() || typeDef.Equals( SingleResultOfT ) )
+#if WEBAPI
+            if ( typeDef.IsDelta() || typeDef.IsODataValue() || typeDef.IsSingleResult() )
+#else
+            if ( typeDef.IsDelta() || typeDef.IsODataValue() || typeDef.IsSingleResult() || typeDef.IsActionResult() )
+#endif
             {
                 return typeArg;
             }
@@ -189,7 +195,11 @@
 
             var typeArg = typeArgs[0];
 
-            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.Equals( ODataValueOfT ) || typeDef.IsActionResult() || typeDef.Equals( SingleResultOfT ) )
+#if WEBAPI
+            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.IsODataValue() || typeDef.IsSingleResult() )
+#else
+            if ( typeDef.Equals( IEnumerableOfT ) || typeDef.IsDelta() || typeDef.IsODataValue() || typeDef.IsSingleResult() || typeDef.IsActionResult() )
+#endif
             {
                 innerType = typeArg;
             }
@@ -284,12 +294,18 @@
             return false;
         }
 
-        static bool IsActionResult( this Type type ) =>
-            type.IsGenericType &&
-            type.GetGenericTypeDefinition().FullName.Equals( "Microsoft.AspNetCore.Mvc.ActionResult`1", Ordinal );
+        static bool IsSingleResult( this Type type ) => type.Is( SingleResultOfT );
 
-        static bool IsSingleResult( this Type type ) => SingleResultOfT.IsAssignableFrom( type );
+        static bool IsODataValue( this Type type ) => type.Is( ODataValueOfT );
 
+        static bool Is( this Type type, Type typeDefinition ) => type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeDefinition );
+
+#if WEBAPI
+        static bool ShouldExtractInnerType( this Type type ) => type.IsDelta() || type.IsSingleResult();
+#else
         static bool ShouldExtractInnerType( this Type type ) => type.IsDelta() || type.IsSingleResult() || type.IsActionResult();
+
+        static bool IsActionResult( this Type type ) => type.Is( ActionResultOfT );
+#endif
     }
 }
