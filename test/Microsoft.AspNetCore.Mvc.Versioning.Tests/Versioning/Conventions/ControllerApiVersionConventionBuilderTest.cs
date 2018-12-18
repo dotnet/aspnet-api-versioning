@@ -101,16 +101,18 @@
                 } );
         }
 
-        sealed class UndecoratedController : Controller
+        [ApiController]
+        sealed class UndecoratedController : ControllerBase
         {
             public IActionResult Get() => Ok();
         }
 
+        [ApiController]
         [ApiVersion( "2.0" )]
         [ApiVersion( "0.9", Deprecated = true )]
         [AdvertiseApiVersions( "3.0" )]
         [AdvertiseApiVersions( "3.0-Beta", Deprecated = true )]
-        sealed class DecoratedController : Controller
+        sealed class DecoratedController : ControllerBase
         {
             public IActionResult Get() => Ok();
         }

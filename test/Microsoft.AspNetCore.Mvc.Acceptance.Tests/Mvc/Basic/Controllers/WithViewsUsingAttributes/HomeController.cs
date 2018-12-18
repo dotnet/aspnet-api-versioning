@@ -2,7 +2,6 @@
 {
     using System;
 
-    [ApiVersionNeutral]
     [Route( "" )]
     [Route( "[controller]" )]
     public class HomeController : Controller

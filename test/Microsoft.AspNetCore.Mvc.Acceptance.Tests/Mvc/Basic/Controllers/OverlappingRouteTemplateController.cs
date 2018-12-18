@@ -3,9 +3,10 @@
     using Microsoft.AspNetCore.Mvc;
     using System;
 
+    [ApiController]
     [ApiVersion( "1.0" )]
     [Route( "api/v{version:apiVersion}/values" )]
-    public class OverlappingRouteTemplateController : Controller
+    public class OverlappingRouteTemplateController : ControllerBase
     {
         [HttpGet( "{id:int}/{childId}" )]
         public IActionResult Get( int id, string childId ) => Ok( new { id, childId } );

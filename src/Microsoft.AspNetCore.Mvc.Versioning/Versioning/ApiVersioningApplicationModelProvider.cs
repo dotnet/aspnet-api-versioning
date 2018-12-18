@@ -17,6 +17,7 @@
     public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
     {
         readonly IOptions<ApiVersioningOptions> options;
+        readonly Lazy<Func<ControllerModel, bool>> isApiController = new Lazy<Func<ControllerModel, bool>>( NewIsApiControllerFunc );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningApplicationModelProvider"/> class.
@@ -45,7 +46,12 @@
             var implicitVersionModel = new ApiVersionModel( Options.DefaultApiVersion );
             var conventionBuilder = Options.Conventions;
             var application = context.Result;
-            var controllers = FilterControllers( application.Controllers );
+            IEnumerable<ControllerModel> controllers = application.Controllers;
+
+            if ( Options.UseApiBehavior )
+            {
+                controllers = controllers.Where( isApiController.Value );
+            }
 
             foreach ( var controller in controllers )
             {
@@ -58,37 +64,6 @@
 
         /// <inheritdoc />
         public virtual void OnProvidersExecuting( ApplicationModelProviderContext context ) { }
-
-        IEnumerable<ControllerModel> FilterControllers( IEnumerable<ControllerModel> controllers )
-        {
-            Contract.Requires( controllers != null );
-            Contract.Ensures( Contract.Result<IEnumerable<ControllerModel>>() != null );
-
-            if ( !Options.UseApiBehavior )
-            {
-                return controllers;
-            }
-
-            var assembly = typeof( ControllerAttribute ).Assembly;
-            var apiBehaviorSupported = assembly.ExportedTypes.Any( t => t.Name == "ApiControllerAttribute" );
-
-            return apiBehaviorSupported ? controllers.Where( IsApiController ) : controllers;
-        }
-
-        static bool IsApiController( ControllerModel controller )
-        {
-            if ( controller.Attributes.Any( IsApiBehaviorMetadata ) )
-            {
-                return true;
-            }
-
-            var controllerAssembly = controller.ControllerType.Assembly;
-            var assemblyAttributes = controllerAssembly.GetCustomAttributes();
-
-            return assemblyAttributes.Any( IsApiBehaviorMetadata );
-        }
-
-        static bool IsApiBehaviorMetadata( object attribute ) => attribute.GetType().GetInterfaces().Any( i => i.Name == "IApiBehaviorMetadata" );
 
         static bool IsDecoratedWithAttributes( ControllerModel controller )
         {
@@ -130,6 +105,13 @@
             {
                 ApplyImplicitConventions( controller, implicitVersionModel );
             }
+        }
+
+        static Func<ControllerModel, bool> NewIsApiControllerFunc()
+        {
+            var type = Type.GetType( "Microsoft.AspNetCore.Mvc.ApplicationModels.ApiBehaviorApplicationModelProvider, Microsoft.AspNetCore.Mvc.Core", throwOnError: true );
+            var method = type.GetRuntimeMethods().Single( m => m.Name == "IsApiController" );
+            return (Func<ControllerModel, bool>) method.CreateDelegate( typeof( Func<ControllerModel, bool> ) );
         }
     }
 }
