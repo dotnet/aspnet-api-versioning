@@ -94,17 +94,14 @@
 
             return new ApiParameterDescription()
             {
+                DefaultValue = defaultValue,
+                IsRequired = false,
                 ModelMetadata = new ODataQueryOptionModelMetadata( Settings.ModelMetadataProvider, type, description ),
                 Name = name,
                 ParameterDescriptor = new ParameterDescriptor()
                 {
                     Name = name,
                     ParameterType = type,
-                },
-                RouteInfo = new ApiParameterRouteInfo()
-                {
-                    DefaultValue = defaultValue,
-                    IsOptional = true,
                 },
                 Source = Query,
                 Type = type,

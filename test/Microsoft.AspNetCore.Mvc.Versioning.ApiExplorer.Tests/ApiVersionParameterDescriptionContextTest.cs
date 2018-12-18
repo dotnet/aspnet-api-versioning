@@ -21,13 +21,13 @@
             // arrange
             var version = new ApiVersion( 1, 0 );
             var description = NewApiDescription( version );
-            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
+            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
                 ApiVersionParameterSource = new QueryStringApiVersionReader()
             };
-            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
+            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
 
             // act
             context.AddParameter( "api-version", Query );
@@ -39,12 +39,9 @@
                     Name = "api-version",
                     ModelMetadata = modelMetadata,
                     Source = BindingSource.Query,
-                    RouteInfo = new ApiParameterRouteInfo()
-                    {
-                        DefaultValue = "1.0",
-                        IsOptional = false
-                    },
-                    Type = typeof( string )
+                    DefaultValue = (object) "1.0",
+                    IsRequired = true,
+                    Type = typeof( string ),
                 },
                 o => o.ExcludingMissingMembers() );
         }
@@ -55,13 +52,13 @@
             // arrange
             var version = new ApiVersion( 1, 0 );
             var description = NewApiDescription( version );
-            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
+            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
                 ApiVersionParameterSource = new HeaderApiVersionReader()
             };
-            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
+            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
 
             // act
             context.AddParameter( "api-version", Header );
@@ -73,12 +70,9 @@
                     Name = "api-version",
                     ModelMetadata = modelMetadata,
                     Source = BindingSource.Header,
-                    RouteInfo = new ApiParameterRouteInfo()
-                    {
-                        DefaultValue = "1.0",
-                        IsOptional = false
-                    },
-                    Type = typeof( string )
+                    DefaultValue = (object) "1.0",
+                    IsRequired = true,
+                    Type = typeof( string ),
                 },
                 o => o.ExcludingMissingMembers() );
         }
@@ -98,13 +92,13 @@
             };
             var version = new ApiVersion( 1, 0 );
             var description = NewApiDescription( version, parameter );
-            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
+            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
                 ApiVersionParameterSource = new UrlSegmentApiVersionReader()
             };
-            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
+            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
 
             // act
             context.AddParameter( "api-version", Path );
@@ -116,13 +110,15 @@
                     Name = "api-version",
                     ModelMetadata = modelMetadata,
                     Source = BindingSource.Path,
+                    DefaultValue = (object) "1.0",
+                    IsRequired = true,
                     RouteInfo = new ApiParameterRouteInfo()
                     {
                         DefaultValue = "1.0",
                         IsOptional = false,
-                        Constraints = parameter.RouteInfo.Constraints
+                        Constraints = parameter.RouteInfo.Constraints,
                     },
-                    Type = typeof( string )
+                    Type = typeof( string ),
                 },
                 o => o.ExcludingMissingMembers() );
         }
@@ -161,15 +157,17 @@
                 new
                 {
                     Name = "api-version",
-                    ModelMetadata = modelMetadata,
+                    ModelMetadata = modelMetadata.Object,
                     Source = BindingSource.Path,
+                    DefaultValue = (object) "1.0",
+                    IsRequired = true,
                     RouteInfo = new ApiParameterRouteInfo()
                     {
                         DefaultValue = "1.0",
                         IsOptional = false,
-                        Constraints = parameter.RouteInfo.Constraints
+                        Constraints = parameter.RouteInfo.Constraints,
                     },
-                    Type = typeof( string )
+                    Type = typeof( string ),
                 },
                 o => o.ExcludingMissingMembers() );
         }
@@ -183,7 +181,7 @@
                 Name = "api-version",
                 RouteInfo = new ApiParameterRouteInfo()
                 {
-                    Constraints = new IRouteConstraint[] { new ApiVersionRouteConstraint() }
+                    Constraints = new IRouteConstraint[] { new ApiVersionRouteConstraint() },
                 },
                 Source = BindingSource.Path
             };
@@ -193,7 +191,7 @@
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
-                ApiVersionParameterSource = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() )
+                ApiVersionParameterSource = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() ),
             };
             var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
 
@@ -218,26 +216,26 @@
                 ActionDescriptor = new ActionDescriptor() { Properties = { [typeof( ApiVersionModel )] = new ApiVersionModel( version ) } },
                 SupportedRequestFormats =
                 {
-                new ApiRequestFormat() { MediaType = Json }
+                    new ApiRequestFormat() { MediaType = Json },
                 },
                 SupportedResponseTypes =
                 {
-                new ApiResponseType()
-                {
-                    ApiResponseFormats =
+                    new ApiResponseType()
+                    {
+                        ApiResponseFormats =
                         {
-                            new ApiResponseFormat() { MediaType = Json }
-                        }
-                }
-                }
+                            new ApiResponseFormat() { MediaType = Json },
+                        },
+                    },
+                },
             };
-            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
+            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
-                ApiVersionParameterSource = new MediaTypeApiVersionReader()
+                ApiVersionParameterSource = new MediaTypeApiVersionReader(),
             };
-            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
+            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
 
             // act
             context.AddParameter( "v", MediaTypeParameter );
@@ -253,14 +251,14 @@
             // arrange
             var version = new ApiVersion( 1, 0 );
             var description = NewApiDescription( version );
-            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
+            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
                 ApiVersionParameterSource = new QueryStringApiVersionReader(),
-                AssumeDefaultVersionWhenUnspecified = true
+                AssumeDefaultVersionWhenUnspecified = true,
             };
-            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
+            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
 
             // act
             context.AddParameter( "api-version", Query );
@@ -272,12 +270,9 @@
                     Name = "api-version",
                     ModelMetadata = modelMetadata,
                     Source = BindingSource.Query,
-                    RouteInfo = new ApiParameterRouteInfo()
-                    {
-                        DefaultValue = "1.0",
-                        IsOptional = true
-                    },
-                    Type = typeof( string )
+                    DefaultValue = (object) "1.0",
+                    IsRequired = false,
+                    Type = typeof( string ),
                 },
                 o => o.ExcludingMissingMembers() );
         }
@@ -288,21 +283,21 @@
             // arrange
             var version = new ApiVersion( 1, 0 );
             var description = NewApiDescription( version );
-            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) );
+            var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
             var options = new ApiExplorerOptions()
             {
                 DefaultApiVersion = version,
                 ApiVersionParameterSource = Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader() )
             };
-            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata.Object, options );
+            var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
 
             // act
             context.AddParameter( "api-version", Query );
             context.AddParameter( "api-version", Header );
 
             // assert
-            description.ParameterDescriptions[0].RouteInfo.IsOptional.Should().BeFalse();
-            description.ParameterDescriptions[1].RouteInfo.IsOptional.Should().BeTrue();
+            description.ParameterDescriptions[0].IsRequired.Should().BeTrue();
+            description.ParameterDescriptions[1].IsRequired.Should().BeFalse();
         }
 
         static ApiDescription NewApiDescription( ApiVersion apiVersion, params ApiParameterDescription[] parameters )
