@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.PlatformAbstractions;
     using Swashbuckle.AspNetCore.Swagger;
     using System.IO;
@@ -19,23 +18,17 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
-        /// <param name="env">The current hosting environment.</param>
-        public Startup( IHostingEnvironment env )
+        /// <param name="configuration">The current configuration.</param>
+        public Startup( IConfiguration configuration )
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath( env.ContentRootPath )
-                .AddJsonFile( "appsettings.json", optional: true, reloadOnChange: true )
-                .AddJsonFile( $"appsettings.{env.EnvironmentName}.json", optional: true )
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
         /// <summary>
         /// Gets the current configuration.
         /// </summary>
         /// <value>The current application configuration.</value>
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         /// <summary>
         /// Configures services for the application.
@@ -83,17 +76,13 @@
         }
 
         /// <summary>
-        /// Configures the application using the provided builder, hosting environment, and logging factory.
+        /// Configures the application using the provided builder, hosting environment, and API version description provider.
         /// </summary>
         /// <param name="app">The current application builder.</param>
         /// <param name="env">The current hosting environment.</param>
-        /// <param name="loggerFactory">The logging factory used for instrumentation.</param>
         /// <param name="provider">The API version descriptor provider used to enumerate defined API versions.</param>
-        public void Configure( IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApiVersionDescriptionProvider provider )
+        public void Configure( IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider )
         {
-            loggerFactory.AddConsole( Configuration.GetSection( "Logging" ) );
-            loggerFactory.AddDebug();
-
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(

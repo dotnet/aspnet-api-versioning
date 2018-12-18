@@ -1,28 +1,25 @@
 ﻿namespace Microsoft.Examples.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
+    [ApiController]
     [Route( "api/values" )]
-    public class Values2Controller : Controller
+    public class Values2Controller : ControllerBase
     {
         // GET api/values?api-version=2.0
         [HttpGet]
-        public string Get() => $"Controller = {GetType().Name}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string Get( ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nVersion = {apiVersion}";
 
         // GET api/values/{id}?api-version=2.0
         [HttpGet( "{id:int}" )]
-        public string Get( int id ) => $"Controller = {GetType().Name}\nId = {id}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string Get( int id, ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nId = {id}\nVersion = {apiVersion}";
 
         // GET api/values?api-version=3.0
         [HttpGet]
-        public string GetV3() => $"Controller = {GetType().Name}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string GetV3( ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nVersion = {apiVersion}";
 
         // GET api/values/{id}?api-version=3.0
         [HttpGet( "{id:int}" )]
-        public string GetV3( int id ) => $"Controller = {GetType().Name}\nId = {id}\nVersion = {HttpContext.GetRequestedApiVersion()}";
+        public string GetV3( int id, ApiVersion apiVersion ) => $"Controller = {GetType().Name}\nId = {id}\nVersion = {apiVersion}";
     }
 }

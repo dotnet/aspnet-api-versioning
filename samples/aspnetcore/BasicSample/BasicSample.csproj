@@ -1,25 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
  <PropertyGroup>
-  <TargetFramework>netcoreapp2.0</TargetFramework>
+  <TargetFramework>netcoreapp2.2</TargetFramework>
+  <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  <RootNamespace>Microsoft.Examples</RootNamespace>
  </PropertyGroup>
 
  <ItemGroup>
-  <Content Update="wwwroot\**\*;Views;Areas\**\Views;appsettings.json;web.config">
-   <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-  </Content>
+  <PackageReference Include="Microsoft.AspNetCore.App" />
+  <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
  </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\..\src\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
- </ItemGroup>
-
- <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
- </ItemGroup>
-
- <ItemGroup>
-  <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
  </ItemGroup>
 
 </Project>

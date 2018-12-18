@@ -3,9 +3,10 @@
     using Microsoft.AspNetCore.Mvc;
     using Models;
 
+    [ApiController]
     [Route( "[controller]" )]
     [Route( "v{version:apiVersion}/[controller]" )]
-    public class AgreementsController : Controller
+    public class AgreementsController : ControllerBase
     {
         // GET ~/v1/agreements/{accountId}
         // GET ~/agreements/{accountId}?api-version=1.0
