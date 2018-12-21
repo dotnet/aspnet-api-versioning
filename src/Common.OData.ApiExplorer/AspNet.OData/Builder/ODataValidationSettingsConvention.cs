@@ -139,23 +139,6 @@
             return NewParameterDescription( GetName( Count ), description, typeof( bool ), defaultValue: false );
         }
 
-        static bool IsSupportHttpMethod( string httpMethod )
-        {
-            Contract.Requires( !string.IsNullOrEmpty( httpMethod ) );
-
-            switch ( httpMethod.ToUpperInvariant() )
-            {
-                // query or function
-                case "GET":
-
-                // action
-                case "POST":
-                    return true;
-            }
-
-            return false;
-        }
-
         string GetName( AllowedQueryOptions option )
         {
             Contract.Requires( option == Filter || ( option > Filter && option < Supported && ( (int) option % 2 == 0 ) ) );

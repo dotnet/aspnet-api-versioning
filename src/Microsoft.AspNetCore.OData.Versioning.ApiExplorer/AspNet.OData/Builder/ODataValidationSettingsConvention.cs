@@ -1,10 +1,14 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static Microsoft.AspNetCore.Http.StatusCodes;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
@@ -20,7 +24,7 @@
         {
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
 
-            if ( !IsSupportHttpMethod( apiDescription.HttpMethod ) )
+            if ( !IsSupported( apiDescription ) )
             {
                 return;
             }
@@ -155,6 +159,23 @@
 
             resultType = responseType;
             return true;
+        }
+
+        static bool IsSupported( ApiDescription apiDescription )
+        {
+            Contract.Requires( apiDescription != null );
+
+            switch ( apiDescription.HttpMethod.ToUpperInvariant() )
+            {
+                case "GET":
+                    // query or function
+                    return true;
+                case "POST":
+                    // action
+                    return apiDescription.Operation()?.IsAction() == true;
+            }
+
+            return false;
         }
     }
 }
