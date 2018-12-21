@@ -44,10 +44,10 @@
 
                     // configure query options (which cannot otherwise be configured by OData conventions)
                     options.QueryOptions.Controller<V2.PeopleController>()
-                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
+                                        .Action( c => c.Get( default ) ).Allow( Skip | Count ).AllowTop( 100 );
 
                     options.QueryOptions.Controller<V3.PeopleController>()
-                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
+                                        .Action( c => c.Get( default ) ).Allow( Skip | Count ).AllowTop( 100 );
                 } );
             services.AddSwaggerGen(
                 options =>
