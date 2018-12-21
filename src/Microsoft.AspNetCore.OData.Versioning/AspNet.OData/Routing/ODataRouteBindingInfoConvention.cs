@@ -12,6 +12,7 @@
     using System.Linq;
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Linq.Enumerable;
     using static System.StringComparison;
 
@@ -37,7 +38,7 @@
             Contract.Requires( context != null );
             Contract.Requires( action != null );
 
-            var model = action.GetApiVersionModel();
+            var model = action.GetApiVersionModel( Explicit | Implicit );
             var mappings = RouteCollectionProvider.Items;
             var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
 
