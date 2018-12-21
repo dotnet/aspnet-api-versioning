@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
+    using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -9,7 +10,6 @@
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
     using System.Web.Http.Tracing;
-    using Microsoft.Web.Http.Versioning;
     using static ApiVersion;
     using static System.Net.HttpStatusCode;
     using static System.String;

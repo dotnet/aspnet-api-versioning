@@ -30,13 +30,7 @@
                 return false;
             }
 
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
-
-            if ( values.TryGetValue( routeKey, out string value ) )
-            {
-                feature.RawRequestedApiVersion = value;
-            }
-            else
+            if ( !values.TryGetValue( routeKey, out string value ) )
             {
                 return false;
             }
@@ -45,6 +39,10 @@
             {
                 return !IsNullOrEmpty( value );
             }
+
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+
+            feature.RawRequestedApiVersion = value;
 
             if ( TryParse( value, out var requestedVersion ) )
             {

@@ -29,13 +29,7 @@
                 return false;
             }
 
-            var properties = request.ApiVersionProperties();
-
-            if ( values.TryGetValue( parameterName, out string value ) )
-            {
-                properties.RawRequestedApiVersion = value;
-            }
-            else
+            if ( !values.TryGetValue( parameterName, out string value ) )
             {
                 return false;
             }
@@ -44,6 +38,10 @@
             {
                 return !IsNullOrEmpty( value );
             }
+
+            var properties = request.ApiVersionProperties();
+
+            properties.RawRequestedApiVersion = value;
 
             if ( TryParse( value, out var requestedVersion ) )
             {
