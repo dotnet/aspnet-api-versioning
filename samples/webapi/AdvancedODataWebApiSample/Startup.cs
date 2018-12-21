@@ -11,6 +11,7 @@ namespace Microsoft.Examples
     using Microsoft.OData;
     using Microsoft.OData.UriParser;
     using Microsoft.Web.Http.Versioning;
+    using System;
     using System.Web.Http;
     using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static Microsoft.OData.ServiceLifetime;
@@ -24,11 +25,17 @@ namespace Microsoft.Examples
             var httpServer = new HttpServer( configuration );
 
             configuration.AddApiVersioning(
-                o =>
+                options =>
                 {
-                    o.ReportApiVersions = true;
-                    o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.ApiVersionReader = ApiVersionReader.Combine(
+                    // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+                    options.ReportApiVersions = true;
+
+                    // allows a client to make a request without specifying an api version. the value of
+                    // options.DefaultApiVersion will be 'assumed'; this is meant to grandfather in legacy apis
+                    options.AssumeDefaultVersionWhenUnspecified = true;
+
+                    // allow multiple locations to request an api version
+                    options.ApiVersionReader = ApiVersionReader.Combine(
                         new QueryStringApiVersionReader(),
                         new HeaderApiVersionReader( "api-version", "x-ms-version" ) );
                 } );
@@ -44,8 +51,14 @@ namespace Microsoft.Examples
             var models = modelBuilder.GetEdmModels();
             var batchHandler = new DefaultODataBatchHandler( httpServer );
 
+            // NOTE: when you mix OData and non-Data controllers in Web API, it's RECOMMENDED to only use
+            // convention-based routing. using attribute routing may not work as expected due to limitations
+            // in the underlying routing system. the order of route registration is important as well.
+            //
+            // DO NOT use configuration.MapHttpAttributeRoutes();
             configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureContainer, batchHandler );
             configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{id}", new { id = Optional } );
+            
             appBuilder.UseWebApi( httpServer );
         }
 
@@ -53,6 +66,21 @@ namespace Microsoft.Examples
         {
             builder.AddService<IODataPathHandler>( Singleton, sp => new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses } );
             builder.AddService<ODataUriResolver>( Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver() { EnableCaseInsensitive = true } );
+        }
+
+        public static string ContentRootPath
+        {
+            get
+            {
+                var app = AppDomain.CurrentDomain;
+
+                if ( string.IsNullOrEmpty( app.RelativeSearchPath ) )
+                {
+                    return app.BaseDirectory;
+                }
+
+                return app.RelativeSearchPath;
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Microsoft.Examples
 {
     using global::Owin;
     using Microsoft.Web.Http.Routing;
+    using System;
     using System.Web.Http;
     using System.Web.Http.Routing;
 
@@ -17,9 +18,24 @@ namespace Microsoft.Examples
             var httpServer = new HttpServer( configuration );
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
+            configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             configuration.MapHttpAttributeRoutes( constraintResolver );
             builder.UseWebApi( httpServer );
+        }
+
+        public static string ContentRootPath
+        {
+            get
+            {
+                var app = AppDomain.CurrentDomain;
+
+                if ( string.IsNullOrEmpty( app.RelativeSearchPath ) )
+                {
+                    return app.BaseDirectory;
+                }
+
+                return app.RelativeSearchPath;
+            }
         }
     }
 }

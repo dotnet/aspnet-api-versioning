@@ -33,12 +33,11 @@ namespace Microsoft.Examples
         /// <param name="builder">The current application builder.</param>
         public void Configuration( IAppBuilder builder )
         {
-            const string routePrefix = default( string );
             var configuration = new HttpConfiguration();
             var httpServer = new HttpServer( configuration );
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
+            configuration.AddApiVersioning( options => options.ReportApiVersions = true );
 
             // note: this is required to make the default swagger json settings match the odata conventions applied by EnableLowerCamelCase()
             configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -57,10 +56,10 @@ namespace Microsoft.Examples
             // INFO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
 
             // WHEN VERSIONING BY: query string, header, or media type
-            configuration.MapVersionedODataRoutes( "odata", routePrefix, models, ConfigureContainer );
+            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureContainer );
 
             // WHEN VERSIONING BY: url segment
-            //configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureContainer );
+            // configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureContainer );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
@@ -75,10 +74,10 @@ namespace Microsoft.Examples
 
                     // configure query options (which cannot otherwise be configured by OData conventions)
                     options.QueryOptions.Controller<V2.PeopleController>()
-                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
+                                        .Action( c => c.Get( default ) ).Allow( Skip | Count ).AllowTop( 100 );
 
                     options.QueryOptions.Controller<V3.PeopleController>()
-                                        .Action( c => c.Get( default( ODataQueryOptions<Person> ) ) ).Allow( Skip | Count ).AllowTop( 100 );
+                                        .Action( c => c.Get( default ) ).Allow( Skip | Count ).AllowTop( 100 );
                 } );
 
             configuration.EnableSwagger(
@@ -118,13 +117,31 @@ namespace Microsoft.Examples
             builder.UseWebApi( httpServer );
         }
 
+        /// <summary>
+        /// Get the root content path.
+        /// </summary>
+        /// <value>The root content path of the application.</value>
+        public static string ContentRootPath
+        {
+            get
+            {
+                var app = AppDomain.CurrentDomain;
+
+                if ( string.IsNullOrEmpty( app.RelativeSearchPath ) )
+                {
+                    return app.BaseDirectory;
+                }
+
+                return app.RelativeSearchPath;
+            }
+        }
+
         static string XmlCommentsFilePath
         {
             get
             {
-                var basePath = AppDomain.CurrentDomain.RelativeSearchPath;
                 var fileName = typeof( Startup ).GetTypeInfo().Assembly.GetName().Name + ".xml";
-                return Path.Combine( basePath, fileName );
+                return Path.Combine( ContentRootPath, fileName );
             }
         }
 

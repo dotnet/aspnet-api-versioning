@@ -28,11 +28,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{915BB224-B1D0-4E27-A348-67FCC77AAA44}"
+	ProjectSection(SolutionItems) = preProject
+		samples\directory.build.props = samples\directory.build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "webapi", "webapi", "{F446ED94-368F-4F67-913B-16E82CA80DFC}"
-	ProjectSection(SolutionItems) = preProject
-		samples\webapi\directory.build.targets = samples\webapi\directory.build.targets
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspnetcore", "aspnetcore", "{900DD210-8500-4D89-A05D-C9526935A719}"
 EndProject
