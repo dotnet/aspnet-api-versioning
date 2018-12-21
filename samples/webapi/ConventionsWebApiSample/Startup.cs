@@ -6,6 +6,7 @@ namespace Microsoft.Examples
     using global::Owin;
     using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning.Conventions;
+    using System;
     using System.Web.Http;
     using System.Web.Http.Routing;
 
@@ -24,13 +25,14 @@ namespace Microsoft.Examples
                     // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
                     options.ReportApiVersions = true;
 
-                    // apply api versions using conventions rather than attributes
                     options.Conventions.Controller<ValuesController>().HasApiVersion( 1, 0 );
+
                     options.Conventions.Controller<Values2Controller>()
                                        .HasApiVersion( 2, 0 )
                                        .HasApiVersion( 3, 0 )
                                        .Action( c => c.GetV3() ).MapToApiVersion( 3, 0 )
-                                       .Action( c => c.GetV3( default( int ) ) ).MapToApiVersion( 3, 0 );
+                                       .Action( c => c.GetV3( default ) ).MapToApiVersion( 3, 0 );
+
                     options.Conventions.Controller<HelloWorldController>()
                                        .HasApiVersion( 1, 0 )
                                        .HasApiVersion( 2, 0 )
@@ -39,6 +41,21 @@ namespace Microsoft.Examples
 
             configuration.MapHttpAttributeRoutes( constraintResolver );
             builder.UseWebApi( httpServer );
+        }
+
+        public static string ContentRootPath
+        {
+            get
+            {
+                var app = AppDomain.CurrentDomain;
+
+                if ( string.IsNullOrEmpty( app.RelativeSearchPath ) )
+                {
+                    return app.BaseDirectory;
+                }
+
+                return app.RelativeSearchPath;
+            }
         }
     }
 }

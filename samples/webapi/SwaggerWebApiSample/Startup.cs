@@ -5,6 +5,7 @@ namespace Microsoft.Examples
     using global::Owin;
     using Microsoft.Web.Http.Routing;
     using Swashbuckle.Application;
+    using System;
     using System.IO;
     using System.Reflection;
     using System.Web.Http;
@@ -28,7 +29,7 @@ namespace Microsoft.Examples
             var httpServer = new HttpServer( configuration );
 
             // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            configuration.AddApiVersioning( o => o.ReportApiVersions = true );
+            configuration.AddApiVersioning( options => options.ReportApiVersions = true );
             configuration.MapHttpAttributeRoutes( constraintResolver );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. VersionedApiExplorer vs IApiExplorer)
@@ -80,13 +81,31 @@ namespace Microsoft.Examples
             builder.UseWebApi( httpServer );
         }
 
+        /// <summary>
+        /// Get the root content path.
+        /// </summary>
+        /// <value>The root content path of the application.</value>
+        public static string ContentRootPath
+        {
+            get
+            {
+                var app = AppDomain.CurrentDomain;
+
+                if ( string.IsNullOrEmpty( app.RelativeSearchPath ) )
+                {
+                    return app.BaseDirectory;
+                }
+
+                return app.RelativeSearchPath;
+            }
+        }
+
         static string XmlCommentsFilePath
         {
             get
             {
-                var basePath = System.AppDomain.CurrentDomain.RelativeSearchPath;
                 var fileName = typeof( Startup ).GetTypeInfo().Assembly.GetName().Name + ".xml";
-                return Path.Combine( basePath, fileName );
+                return Path.Combine( ContentRootPath, fileName );
             }
         }
     }

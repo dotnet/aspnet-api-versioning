@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <!-- ASP.NET Web API uses the older project style. Define an empty target for 'Pack' to avoid MSB4057 during solution builds. -->
-  <Target Name="Pack" Condition="false" />
-
-</Project>
