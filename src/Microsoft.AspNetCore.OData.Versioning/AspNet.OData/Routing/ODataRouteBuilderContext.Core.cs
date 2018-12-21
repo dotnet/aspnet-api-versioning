@@ -6,7 +6,6 @@
     using Microsoft.OData;
     using Microsoft.OData.Edm;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Reflection;
     using static Microsoft.OData.ODataUrlKeyDelimiter;
