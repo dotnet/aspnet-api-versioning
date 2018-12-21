@@ -63,5 +63,16 @@
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
             return apiDescription.EntitySet()?.EntityType();
         }
+
+        /// <summary>
+        /// Gets the operation associated with the API description.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the operation for.</param>
+        /// <returns>The associated <see cref="IEdmOperation">EDM operation</see> or <c>null</c> if there is no associated operation.</returns>
+        public static IEdmOperation Operation( this ApiDescription apiDescription )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            return apiDescription.GetProperty<IEdmOperation>();
+        }
     }
 }

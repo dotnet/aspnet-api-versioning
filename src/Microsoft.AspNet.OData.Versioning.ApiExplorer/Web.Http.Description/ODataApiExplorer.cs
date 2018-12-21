@@ -461,6 +461,16 @@
                     Properties = { [typeof( IEdmModel )] = routeBuilderContext.EdmModel },
                 };
 
+                if ( routeBuilderContext.EntitySet != null )
+                {
+                    apiDescription.Properties[typeof( IEdmEntitySet )] = routeBuilderContext.EntitySet;
+                }
+
+                if ( routeBuilderContext.Operation != null )
+                {
+                    apiDescription.Properties[typeof( IEdmOperation )] = routeBuilderContext.Operation;
+                }
+
                 apiDescription.ParameterDescriptions.AddRange( routeBuilderContext.ParameterDescriptions );
                 apiDescription.SupportedRequestBodyFormatters.AddRange( requestFormatters );
                 apiDescription.SupportedResponseFormatters.AddRange( responseFormatters );

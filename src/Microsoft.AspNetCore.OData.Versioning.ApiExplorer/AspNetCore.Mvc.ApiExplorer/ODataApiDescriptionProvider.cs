@@ -412,6 +412,16 @@
                     Properties = { [typeof( IEdmModel )] = routeContext.EdmModel },
                 };
 
+                if ( routeContext.EntitySet != null )
+                {
+                    apiDescription.Properties[typeof( IEdmEntitySet )] = routeContext.EntitySet;
+                }
+
+                if ( routeContext.Operation != null )
+                {
+                    apiDescription.Properties[typeof( IEdmOperation )] = routeContext.Operation;
+                }
+
                 foreach ( var parameter in parameters )
                 {
                     apiDescription.ParameterDescriptions.Add( parameter );
