@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
     using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.OData.Edm;
     using System;
     using System.Diagnostics.Contracts;
     using System.Web.Http.Controllers;
@@ -18,7 +19,7 @@
         {
             Arg.NotNull( apiDescription, nameof( apiDescription ) );
 
-            if ( !IsSupportHttpMethod( apiDescription.HttpMethod.Method ) )
+            if ( !IsSupported( apiDescription ) )
             {
                 return;
             }
@@ -135,6 +136,23 @@
             descriptor.Configuration = action.Configuration;
 
             return parameter;
+        }
+
+        static bool IsSupported( ApiDescription apiDescription )
+        {
+            Contract.Requires( apiDescription != null );
+
+            switch ( apiDescription.HttpMethod.Method.ToUpperInvariant() )
+            {
+                case "GET":
+                    // query or function
+                    return true;
+                case "POST":
+                    // action
+                    return apiDescription.Operation()?.IsAction() == true;
+            }
+
+            return false;
         }
     }
 }
