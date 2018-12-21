@@ -72,6 +72,7 @@
             services.AddTransient<IApplicationModelProvider, ODataApplicationModelProvider>();
             services.AddTransient<IActionDescriptorProvider, ODataActionDescriptorProvider>();
             services.AddSingleton<IActionDescriptorChangeProvider>( ODataActionDescriptorChangeProvider.Instance );
+            services.TryAddEnumerable( Transient<IApiControllerSpecification, ODataControllerSpecification>() );
             services.AddModelConfigurationsAsServices( partManager );
         }
 

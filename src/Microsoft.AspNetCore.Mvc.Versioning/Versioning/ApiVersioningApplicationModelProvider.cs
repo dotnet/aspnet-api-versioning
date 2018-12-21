@@ -4,10 +4,7 @@
     using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
-    using System.Reflection;
 
     /// <summary>
     /// Represents an <see cref="IApplicationModelProvider">application model provider</see>, which
@@ -17,16 +14,19 @@
     public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
     {
         readonly IOptions<ApiVersioningOptions> options;
-        readonly Lazy<Func<ControllerModel, bool>> isApiController = new Lazy<Func<ControllerModel, bool>>( NewIsApiControllerFunc );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningApplicationModelProvider"/> class.
         /// </summary>
         /// <param name="options">The current <see cref="ApiVersioningOptions">API versioning options</see>.</param>
-        public ApiVersioningApplicationModelProvider( IOptions<ApiVersioningOptions> options )
+        /// <param name="controllerFilter">The <see cref="IApiControllerFilter">filter</see> used for API controllers.</param>
+        public ApiVersioningApplicationModelProvider( IOptions<ApiVersioningOptions> options, IApiControllerFilter controllerFilter )
         {
             Arg.NotNull( options, nameof( options ) );
+            Arg.NotNull( controllerFilter, nameof( controllerFilter ) );
+
             this.options = options;
+            ControllerFilter = controllerFilter;
         }
 
         /// <summary>
@@ -34,6 +34,12 @@
         /// </summary>
         /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
         protected ApiVersioningOptions Options => options.Value;
+
+        /// <summary>
+        /// Gets the filter used for API controllers.
+        /// </summary>
+        /// <value>The <see cref="IApiControllerFilter"/> used to filter API controllers.</value>
+        protected IApiControllerFilter ControllerFilter { get; }
 
         /// <inheritdoc />
         public int Order { get; protected set; }
@@ -46,11 +52,11 @@
             var implicitVersionModel = new ApiVersionModel( Options.DefaultApiVersion );
             var conventionBuilder = Options.Conventions;
             var application = context.Result;
-            IEnumerable<ControllerModel> controllers = application.Controllers;
+            var controllers = application.Controllers;
 
             if ( Options.UseApiBehavior )
             {
-                controllers = controllers.Where( isApiController.Value );
+                controllers = ControllerFilter.Apply( controllers );
             }
 
             foreach ( var controller in controllers )
@@ -105,13 +111,6 @@
             {
                 ApplyImplicitConventions( controller, implicitVersionModel );
             }
-        }
-
-        static Func<ControllerModel, bool> NewIsApiControllerFunc()
-        {
-            var type = Type.GetType( "Microsoft.AspNetCore.Mvc.ApplicationModels.ApiBehaviorApplicationModelProvider, Microsoft.AspNetCore.Mvc.Core", throwOnError: true );
-            var method = type.GetRuntimeMethods().Single( m => m.Name == "IsApiController" );
-            return (Func<ControllerModel, bool>) method.CreateDelegate( typeof( Func<ControllerModel, bool> ) );
         }
     }
 }

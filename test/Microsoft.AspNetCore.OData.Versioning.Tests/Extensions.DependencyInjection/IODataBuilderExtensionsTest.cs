@@ -36,6 +36,7 @@
             services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType.Name == "ODataApplicationModelProvider" ).Should().BeTrue();
             services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataActionDescriptorProvider" ).Should().BeTrue();
             services.Any( sd => sd.ServiceType == typeof( IActionDescriptorChangeProvider ) && sd.ImplementationInstance.GetType().Name == "ODataActionDescriptorChangeProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IApiControllerSpecification ) && sd.ImplementationType == typeof( ODataControllerSpecification ) ).Should().BeTrue();
         }
 
         [Fact]
@@ -60,6 +61,7 @@
             services.Any( sd => sd.ServiceType == typeof( IApplicationModelProvider ) && sd.ImplementationType.Name == "ODataApplicationModelProvider" ).Should().BeTrue();
             services.Any( sd => sd.ServiceType == typeof( IActionDescriptorProvider ) && sd.ImplementationType.Name == "ODataActionDescriptorProvider" ).Should().BeTrue();
             services.Any( sd => sd.ServiceType == typeof( IActionDescriptorChangeProvider ) && sd.ImplementationInstance.GetType().Name == "ODataActionDescriptorChangeProvider" ).Should().BeTrue();
+            services.Any( sd => sd.ServiceType == typeof( IApiControllerSpecification ) && sd.ImplementationType == typeof( ODataControllerSpecification ) ).Should().BeTrue();
         }
     }
 }
