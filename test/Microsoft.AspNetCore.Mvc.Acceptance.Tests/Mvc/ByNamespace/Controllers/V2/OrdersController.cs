@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc.ByNamespace.Models;
     using System;
 
+    [ApiController]
     [Route( "api/[controller]" )]
     public class OrdersController : V1.OrdersController
     {

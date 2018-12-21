@@ -3,9 +3,8 @@
     using AspNetCore.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Models;
-    using System;
-    using System.Collections.Generic;
 
+    [ApiController]
     [Route( "api/[controller]" )]
     public class HelloWorldController : ControllerBase
     {

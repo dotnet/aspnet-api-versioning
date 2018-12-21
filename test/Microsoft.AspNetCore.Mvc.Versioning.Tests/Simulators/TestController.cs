@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-    [ApiController]
     public sealed class TestController : ControllerBase
     {
         [HttpGet]

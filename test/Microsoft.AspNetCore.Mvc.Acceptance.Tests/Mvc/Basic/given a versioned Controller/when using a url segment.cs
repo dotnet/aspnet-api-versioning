@@ -97,4 +97,10 @@
 
         public when_using_a_url_segment( BasicFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( BasicEndpointCollection ) )]
+    public class when_using_a_url_segment_ : when_using_a_url_segment
+    {
+        public when_using_a_url_segment_( BasicEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

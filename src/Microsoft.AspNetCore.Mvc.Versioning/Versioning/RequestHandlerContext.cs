@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Http;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
     sealed class RequestHandlerContext
@@ -31,6 +32,8 @@
         internal string Code { get; set; }
 
         internal string[] AllowedMethods { get; set; }
+
+        internal IList<object> Metadata { get; set; }
 
         internal void ReportApiVersions( HttpResponse response )
         {

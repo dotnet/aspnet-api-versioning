@@ -11,6 +11,7 @@
     using System.IO;
     using System.Net.Http;
     using System.Reflection;
+    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
     using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
     public abstract partial class HttpServerFixture
@@ -27,6 +28,8 @@
         public TestServer Server => server.Value;
 
         public HttpClient Client => client.Value;
+
+        public bool EnableEndpointRouting { get; protected set; }
 
         protected virtual void Dispose( bool disposing )
         {
@@ -87,7 +90,7 @@
 
             OnConfigurePartManager( partManager );
             services.Add( Singleton( partManager ) );
-            services.AddMvc();
+            services.AddMvc( options => options.EnableEndpointRouting = EnableEndpointRouting ).SetCompatibilityVersion( Latest );
             services.AddApiVersioning( OnAddApiVersioning );
             OnConfigureServices( services );
         }

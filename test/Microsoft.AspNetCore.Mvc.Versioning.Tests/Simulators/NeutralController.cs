@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-    [ApiController]
     [ApiVersionNeutral]
     public sealed class NeutralController : ControllerBase
     {

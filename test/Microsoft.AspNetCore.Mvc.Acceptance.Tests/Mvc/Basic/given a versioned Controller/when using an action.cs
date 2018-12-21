@@ -74,4 +74,10 @@
 
         public when_using_an_action( BasicFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( BasicEndpointCollection ) )]
+    public class when_using_an_action_ : when_using_an_action
+    {
+        public when_using_an_action_( BasicEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

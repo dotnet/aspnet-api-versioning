@@ -47,4 +47,10 @@
 
         public when_using_a_url_segment( AgreementsFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( AgreementsEndpointCollection ) )]
+    public class when_using_a_url_segment_ : when_using_a_url_segment
+    {
+        public when_using_a_url_segment_( AgreementsEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

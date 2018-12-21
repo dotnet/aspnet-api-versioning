@@ -63,4 +63,10 @@
 
         public when_using_a_query_string_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( ConventionsEndpointCollection ) )]
+    public class when_using_a_query_string_and_split_into_two_types_ : when_using_a_query_string_and_split_into_two_types
+    {
+        public when_using_a_query_string_and_split_into_two_types_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

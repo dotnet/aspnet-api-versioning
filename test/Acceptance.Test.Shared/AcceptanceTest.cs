@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.Mvc
 #else
     [Trait( "Framework", "ASP.NET Core" )]
 #endif
-    public abstract class AcceptanceTest
+    public abstract partial class AcceptanceTest
     {
         const string JsonMediaType = "application/json";
         static readonly HttpMethod Patch = new HttpMethod( "PATCH" );

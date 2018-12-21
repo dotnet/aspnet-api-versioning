@@ -109,4 +109,10 @@
 
         public when_using_a_query_string_and_split_into_two_types( BasicFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( BasicEndpointCollection ) )]
+    public class when_using_a_query_string_and_split_into_two_types_ : when_using_a_query_string_and_split_into_two_types
+    {
+        public when_using_a_query_string_and_split_into_two_types_( BasicEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

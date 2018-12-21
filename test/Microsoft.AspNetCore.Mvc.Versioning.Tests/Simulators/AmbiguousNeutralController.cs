@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-    [ApiController]
     [ApiVersionNeutral]
     [ControllerName( "Ambiguous" )]
     public sealed class AmbiguousNeutralController : ControllerBase

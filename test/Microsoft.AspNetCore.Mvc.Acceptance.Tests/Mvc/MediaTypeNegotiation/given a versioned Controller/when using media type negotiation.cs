@@ -60,6 +60,8 @@
             // arrange
             var example = new { controller = "", version = "" };
 
+            Client.DefaultRequestHeaders.Clear();
+
             // act
             var response = await GetAsync( requestUrl ).EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsExampleAsync( example );
@@ -74,6 +76,7 @@
             // arrange
             var content = new StringContent( "{\"text\":\"Test\"}", UTF8 );
 
+            Client.DefaultRequestHeaders.Clear();
             content.Headers.ContentType = Parse( "application/json;v=1.0" );
 
             // act
@@ -84,5 +87,10 @@
         }
 
         public when_using_media_type_negotiation( MediaTypeNegotiationFixture fixture ) : base( fixture ) { }
+    }
+
+    public class when_using_media_type_negotiation_ : when_using_media_type_negotiation, IClassFixture<MediaTypeNegotiationEndpointFixture>
+    {
+        public when_using_media_type_negotiation_( MediaTypeNegotiationEndpointFixture fixture ) : base( fixture ) { }
     }
 }
