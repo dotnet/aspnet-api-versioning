@@ -54,9 +54,22 @@
 
             // assert
             result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
-            act.Should().Throw<AmbiguousActionException>();
+
+            if ( UsingEndpointRouting )
+            {
+                act.Should().Throw<Exception>().And.GetType().Name.Should().Be( "AmbiguousMatchException" );
+            }
+            else
+            {
+                act.Should().Throw<AmbiguousActionException>();
+            }
         }
 
         public when_two_route_templates_overlap( OverlappingRouteTemplateFixture fixture ) : base( fixture ) { }
+    }
+
+    public class when_two_route_templates_overlap_ : when_two_route_templates_overlap, IClassFixture<OverlappingRouteTemplateEndpointFixture>
+    {
+        public when_two_route_templates_overlap_( OverlappingRouteTemplateEndpointFixture fixture ) : base( fixture ) { }
     }
 }

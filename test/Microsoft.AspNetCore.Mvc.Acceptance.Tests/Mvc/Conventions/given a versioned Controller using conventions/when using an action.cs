@@ -74,4 +74,10 @@
 
         public when_using_an_action( ConventionsFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( ConventionsEndpointCollection ) )]
+    public class when_using_an_action_ : when_using_an_action
+    {
+        public when_using_an_action_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

@@ -4,7 +4,6 @@
     using System;
     using System.Threading.Tasks;
 
-    [ApiController]
     [ApiVersion( "2015-11-15" )]
     [ApiVersion( "2016-06-06" )]
     public class OrdersController : ControllerBase

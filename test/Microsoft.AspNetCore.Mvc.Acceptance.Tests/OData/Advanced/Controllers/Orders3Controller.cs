@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.OData.Models;
 
+    [ApiController]
     [ApiVersion( "3.0" )]
     [Route( "api/orders" )]
     public class Orders3Controller : ControllerBase

@@ -1,10 +1,12 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Abstractions
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
+    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using System;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Text;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Linq.Enumerable;
 
@@ -100,6 +102,48 @@
         {
             Arg.NotNull( action, nameof( action ) );
             return action.MappingTo( apiVersion ) > None;
+        }
+
+        internal static string ExpandSignature( this ActionDescriptor action )
+        {
+            Contract.Requires( action != null );
+            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+
+            if ( !( action is ControllerActionDescriptor controllerAction ) )
+            {
+                return action.DisplayName;
+            }
+
+            var signature = new StringBuilder();
+            var controllerType = controllerAction.ControllerTypeInfo;
+
+            signature.Append( controllerType.GetTypeDisplayName() );
+            signature.Append( '.' );
+            signature.Append( controllerAction.MethodInfo.Name );
+            signature.Append( '(' );
+
+            using ( var parameter = action.Parameters.GetEnumerator() )
+            {
+                if ( parameter.MoveNext() )
+                {
+                    var parameterType = parameter.Current.ParameterType;
+
+                    signature.Append( parameterType.GetTypeDisplayName( false ) );
+
+                    while ( parameter.MoveNext() )
+                    {
+                        parameterType = parameter.Current.ParameterType;
+                        signature.Append( ", " );
+                        signature.Append( parameterType.GetTypeDisplayName( false ) );
+                    }
+                }
+            }
+
+            signature.Append( ") (" );
+            signature.Append( controllerType.Assembly.GetName().Name );
+            signature.Append( ')' );
+
+            return signature.ToString();
         }
     }
 }

@@ -2,7 +2,6 @@
 {
     using Models;
 
-    [ApiController]
     public class AgreementsController : ControllerBase
     {
         [HttpGet]

@@ -32,11 +32,18 @@
 
             // act
             var response = await PostAsync( "api/ping", entity );
-            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
             response.StatusCode.Should().Be( MethodNotAllowed );
             response.Content.Headers.Allow.Should().BeEquivalentTo( "GET" );
+
+            if ( UsingEndpointRouting )
+            {
+                return;
+            }
+
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
             content.Error.Should().BeEquivalentTo(
                 new
                 {
@@ -54,11 +61,18 @@
 
             // act
             var response = await PostAsync( "api/ping?additionalQuery=true", entity );
-            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
             response.StatusCode.Should().Be( MethodNotAllowed );
             response.Content.Headers.Allow.Should().BeEquivalentTo( "GET" );
+
+            if ( UsingEndpointRouting )
+            {
+                return;
+            }
+
+            var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
+
             content.Error.Should().BeEquivalentTo(
                 new
                 {
@@ -70,5 +84,10 @@
 
         public when_no_version_is_specified( BasicFixture fixture ) : base( fixture ) { }
     }
-}
 
+    [Collection( nameof( BasicEndpointCollection ) )]
+    public class when_no_version_is_specified_ : when_no_version_is_specified
+    {
+        public when_no_version_is_specified_( BasicEndpointFixture fixture ) : base( fixture ) { }
+    }
+}

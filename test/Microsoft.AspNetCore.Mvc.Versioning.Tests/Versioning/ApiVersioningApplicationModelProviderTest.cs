@@ -20,6 +20,7 @@
             var type = typeof( object );
             var attributes = new object[]
             {
+                new ApiControllerAttribute(),
                 new ApiVersionAttribute( "1.0" ),
                 new ApiVersionAttribute( "2.0" ),
                 new ApiVersionAttribute( "3.0" ),
@@ -30,9 +31,10 @@
             {
                 Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) }
             };
-            var options = Options.Create( new ApiVersioningOptions() );
+            var options = Options.Create( new ApiVersioningOptions() { UseApiBehavior = true } );
+            var filter = new DefaultApiControllerFilter( Array.Empty<IApiControllerSpecification>() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
-            var provider = new ApiVersioningApplicationModelProvider( options );
+            var provider = new ApiVersioningApplicationModelProvider( options, filter );
 
             context.Result.Controllers.Add( controller );
 
@@ -63,9 +65,10 @@
             {
                 Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
-            var options = Options.Create( new ApiVersioningOptions() );
+            var options = Options.Create( new ApiVersioningOptions() { UseApiBehavior = false } );
+            var filter = new DefaultApiControllerFilter( Array.Empty<IApiControllerSpecification>() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
-            var provider = new ApiVersioningApplicationModelProvider( options );
+            var provider = new ApiVersioningApplicationModelProvider( options, filter );
 
             context.Result.Controllers.Add( controller );
 
@@ -87,9 +90,10 @@
             {
                 Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
-            var options = Options.Create( new ApiVersioningOptions() );
+            var options = Options.Create( new ApiVersioningOptions() { UseApiBehavior = false } );
+            var filter = new DefaultApiControllerFilter( Array.Empty<IApiControllerSpecification>() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
-            var provider = new ApiVersioningApplicationModelProvider( options );
+            var provider = new ApiVersioningApplicationModelProvider( options, filter );
 
             context.Result.Controllers.Add( controller );
 
@@ -120,9 +124,10 @@
             {
                 Actions = { new ActionModel( actionMethod, new object[0] ) }
             };
-            var options = Options.Create( new ApiVersioningOptions() { DefaultApiVersion = v1 } );
+            var options = Options.Create( new ApiVersioningOptions() { DefaultApiVersion = v1, UseApiBehavior = false } );
+            var filter = new DefaultApiControllerFilter( Array.Empty<IApiControllerSpecification>() );
             var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
-            var provider = new ApiVersioningApplicationModelProvider( options );
+            var provider = new ApiVersioningApplicationModelProvider( options, filter );
 
             context.Result.Controllers.Add( controller );
 
@@ -142,8 +147,8 @@
             var type = typeof( object );
             var attributes = new object[]
             {
-                new ApiVersionAttribute( "1.0" ),
                 new ApiControllerAttribute(),
+                new ApiVersionAttribute( "1.0" ),
             };
             var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), EmptyTypes );
             var apiController = new ControllerModel( type.GetTypeInfo(), attributes )
@@ -157,8 +162,9 @@
             var controllers = new[] { apiController, uiController };
             var controllerTypes = new[] { apiController.ControllerType, uiController.ControllerType };
             var options = Options.Create( new ApiVersioningOptions() { UseApiBehavior = true } );
+            var filter = new DefaultApiControllerFilter( new IApiControllerSpecification[] { new ApiBehaviorSpecification() } );
             var context = new ApplicationModelProviderContext( controllerTypes );
-            var provider = new ApiVersioningApplicationModelProvider( options );
+            var provider = new ApiVersioningApplicationModelProvider( options, filter );
 
             context.Result.Controllers.Add( apiController );
             context.Result.Controllers.Add( uiController );

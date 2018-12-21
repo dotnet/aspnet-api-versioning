@@ -4,6 +4,7 @@
  <Import Condition=" '$(MSBuildProjectExtension)' != '.shproj' " Project="..\build\common.props" />
 
  <PropertyGroup>
+  <IsTestProject>true</IsTestProject>
   <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
   <IsAspNetCore>$(MSBuildProjectName.StartsWith('Microsoft.AspNetCore'))</IsAspNetCore>
  </PropertyGroup>

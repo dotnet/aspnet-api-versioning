@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using System;
 
+    [ApiController]
     [ApiVersion( "2.0" )]
     [Route( "api/values" )]
     public class Values2Controller : ControllerBase

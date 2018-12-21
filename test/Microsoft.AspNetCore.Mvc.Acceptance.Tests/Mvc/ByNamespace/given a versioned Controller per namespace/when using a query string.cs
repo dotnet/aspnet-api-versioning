@@ -62,4 +62,10 @@
 
         public when_using_a_query_string( AgreementsFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( AgreementsEndpointCollection ) )]
+    public class when_using_a_query_string_ : when_using_a_query_string
+    {
+        public when_using_a_query_string_( AgreementsEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

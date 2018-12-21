@@ -34,4 +34,9 @@
             fixture.FilteredControllerTypes.Add( typeof( HomeController ).GetTypeInfo() );
         }
     }
+
+    public class when_accessing_a_view_using_attribute_routing_ : when_accessing_a_view_using_attribute_routing, IClassFixture<UIEndpointFixture>
+    {
+        public when_accessing_a_view_using_attribute_routing_( UIEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

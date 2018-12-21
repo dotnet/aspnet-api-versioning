@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-    [ApiController]
     [ApiVersion( "1.0" )]
     public sealed class AmbiguousTooController : ControllerBase
     {

@@ -68,4 +68,10 @@
 
         public when_using_a_url_segment( ConventionsFixture fixture ) : base( fixture ) { }
     }
+
+    [Collection( nameof( ConventionsEndpointCollection ) )]
+    public class when_using_a_url_segment_ : when_using_a_url_segment
+    {
+        public when_using_a_url_segment_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
+    }
 }

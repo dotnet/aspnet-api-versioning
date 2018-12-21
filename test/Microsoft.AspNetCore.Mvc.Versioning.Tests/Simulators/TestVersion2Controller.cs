@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
 
-    [ApiController]
     [ApiVersion( "2.0" )]
     [ApiVersion( "3.0" )]
     [ApiVersion( "1.8", Deprecated = true )]

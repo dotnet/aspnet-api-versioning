@@ -18,6 +18,7 @@
         protected override void OnAddApiVersioning( ApiVersioningOptions options )
         {
             options.ReportApiVersions = true;
+            options.UseApiBehavior = false;
             options.Conventions.Add( new VersionByNamespaceConvention() );
         }
 

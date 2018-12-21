@@ -60,12 +60,15 @@
             services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ErrorResponses ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
             services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
+            services.TryAddSingleton<IApiControllerFilter, DefaultApiControllerFilter>();
             services.TryAddSingleton<ReportApiVersionsAttribute>();
             services.TryAddSingleton( OnRequestIReportApiVersions );
             services.TryAddEnumerable( Transient<IPostConfigureOptions<MvcOptions>, ApiVersioningMvcOptionsSetup>() );
             services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
             services.TryAddEnumerable( Transient<IApplicationModelProvider, ApiVersioningApplicationModelProvider>() );
             services.TryAddEnumerable( Transient<IActionDescriptorProvider, ApiVersionCollator>() );
+            services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
+            services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
             services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
         }
 

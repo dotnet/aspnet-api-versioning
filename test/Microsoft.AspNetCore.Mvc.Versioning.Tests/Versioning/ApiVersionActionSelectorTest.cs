@@ -50,7 +50,9 @@
         public async Task select_best_candidate_should_return_correct_versionedX2C_conventionX2Dbased_controller( string version, Type controllerType )
         {
             // arrange
-            using ( var server = new WebServer( setupRoutes: routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
+            void ConfigureOptions( ApiVersioningOptions options ) => options.UseApiBehavior = false;
+
+            using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 var response = await server.Client.GetAsync( $"api/test?api-version={version}" );
 
@@ -139,7 +141,13 @@
         public async Task select_best_candidate_should_return_400_for_unmatchedX2C_conventionX2Dbased_controller_version()
         {
             // arrange
-            using ( var server = new WebServer( options => options.ReportApiVersions = true, routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.ReportApiVersions = true;
+                options.UseApiBehavior = false;
+            }
+
+            using ( var server = new WebServer( ConfigureOptions, routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 // act
                 var response = await server.Client.GetAsync( "http://localhost/api/test?api-version=4.0" );
@@ -155,7 +163,13 @@
         public async Task select_best_candidate_should_return_400_for_conventionX2Dbased_controller_with_bad_version()
         {
             // arrange
-            using ( var server = new WebServer( options => options.ReportApiVersions = true, routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.ReportApiVersions = true;
+                options.UseApiBehavior = false;
+            }
+
+            using ( var server = new WebServer( ConfigureOptions, routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 // act
                 var response = await server.Client.GetAsync( "http://localhost/api/test?api-version=2016-06-32" );
@@ -213,7 +227,7 @@
                 var response = await server.Client.SendAsync( request );
 
                 // assert
-                var content = await  response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync();
                 content.Should().Contain( "api/attributed" );
                 content.Should().NotContain( "?api-version=1.0" );
             }
@@ -260,7 +274,11 @@
         {
             // arrange
             var controllerType = typeof( TestController ).GetTypeInfo();
-            Action<ApiVersioningOptions> versioningSetup = o => o.AssumeDefaultVersionWhenUnspecified = true;
+            Action<ApiVersioningOptions> versioningSetup = options =>
+            {
+                options.UseApiBehavior = false;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            };
             Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
 
             using ( var server = new WebServer( versioningSetup, routesSetup ) )
@@ -280,10 +298,14 @@
         {
             // arrange
             var controllerType = typeof( TestController ).GetTypeInfo();
-            Action<ApiVersioningOptions> versioningSetup = o => o.DefaultApiVersion = new ApiVersion( 42, 0 );
-            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
 
-            using ( var server = new WebServer( versioningSetup, routesSetup ) )
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.UseApiBehavior = false;
+                options.DefaultApiVersion = new ApiVersion( 42, 0 );
+            }
+
+            using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 await server.Client.GetAsync( "api/test?api-version=42.0" );
 
@@ -300,15 +322,16 @@
         {
             // arrange
             var controllerType = typeof( OrdersController ).GetTypeInfo();
-            Action<ApiVersioningOptions> versioningSetup = o =>
+
+            void ConfigureOptions( ApiVersioningOptions options )
             {
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.ApiVersionSelector = new LowestImplementedApiVersionSelector( o );
+                options.UseApiBehavior = false;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ApiVersionSelector = new LowestImplementedApiVersionSelector( options );
 
-            };
-            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
+            }
 
-            using ( var server = new WebServer( versioningSetup, routesSetup ) )
+            using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 await server.Client.GetAsync( "api/orders" );
 
@@ -349,13 +372,17 @@
         public void select_best_candidate_should_throw_exception_for_ambiguously_versionedX2C_conventionX2Dbased_controller()
         {
             // arrange
-            Action<ApiVersioningOptions> versioningSetup = o => o.AssumeDefaultVersionWhenUnspecified = true;
-            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.UseApiBehavior = false;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            }
+
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
                           $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousToo2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
                           $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousTooController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
-            using ( var server = new WebServer( versioningSetup, routesSetup ) )
+            using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 Func<Task> test = () => server.Client.GetAsync( "api/ambiguoustoo" );
 
@@ -374,7 +401,7 @@
                           $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
                           $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
-            using ( var server = new WebServer( o => o.AssumeDefaultVersionWhenUnspecified = true ) )
+            using ( var server = new WebServer( options => options.AssumeDefaultVersionWhenUnspecified = true ) )
             {
                 Func<Task> test = () => server.Client.GetAsync( "api/attributed-ambiguous" );
 
@@ -389,13 +416,17 @@
         public void select_best_candidate_should_throw_exception_for_ambiguous_neutral_and_versionedX2C_conventionX2Dbased_controller()
         {
             // arrange
-            Action<ApiVersioningOptions> versioningSetup = o => o.AssumeDefaultVersionWhenUnspecified = true;
-            Action<IRouteBuilder> routesSetup = r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.UseApiBehavior = false;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            }
+
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
                           $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
                           $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
-            using ( var server = new WebServer( versioningSetup, routesSetup ) )
+            using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 Func<Task> test = () => server.Client.GetAsync( "api/ambiguous" );
 
@@ -412,13 +443,14 @@
             // arrange
             var currentVersion = new ApiVersion( 4, 0 );
             var controllerType = typeof( AttributeRoutedTest4Controller ).GetTypeInfo();
-            Action<ApiVersioningOptions> setup = o =>
-            {
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.ApiVersionSelector = new CurrentImplementationApiVersionSelector( o );
-            };
 
-            using ( var server = new WebServer( setupApiVersioning: setup ) )
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ApiVersionSelector = new CurrentImplementationApiVersionSelector( options );
+            }
+
+            using ( var server = new WebServer( setupApiVersioning: ConfigureOptions ) )
             {
                 await server.Client.GetAsync( "api/attributed" );
 
@@ -436,14 +468,15 @@
             // arrange
             var currentVersion = new ApiVersion( 3, 0 );
             var controllerType = typeof( TestVersion2Controller ).GetTypeInfo();
-            Action<ApiVersioningOptions> versioningSetup = o =>
-            {
-                o.AssumeDefaultVersionWhenUnspecified = true;
-                o.ApiVersionSelector = new CurrentImplementationApiVersionSelector( o );
-            };
-            Action<IRouteBuilder> routeSetup = routes => routes.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" );
 
-            using ( var server = new WebServer( versioningSetup, routeSetup ) )
+            void ConfigureOptions( ApiVersioningOptions options )
+            {
+                options.UseApiBehavior = false;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ApiVersionSelector = new CurrentImplementationApiVersionSelector( options );
+            }
+
+            using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
                 await server.Client.GetAsync( "api/test" );
 
@@ -470,7 +503,7 @@
             var deprecated = new[] { new ApiVersion( 4, 0 ) };
             var implemented = supported.Union( deprecated ).OrderBy( v => v ).ToArray();
 
-            using ( var server = new WebServer( o => o.ReportApiVersions = true ) )
+            using ( var server = new WebServer( options => options.ReportApiVersions = true ) )
             {
                 await server.Client.GetAsync( $"api/{versionSegment}/attributed" );
 
@@ -501,9 +534,10 @@
         public async Task select_controller_should_return_400_when_requested_api_version_is_ambiguous()
         {
             // arrange
-            Action<ApiVersioningOptions> versioningSetup = o => o.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
+            void ConfigureOptions( ApiVersioningOptions options ) =>
+                options.ApiVersionReader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
-            using ( var server = new WebServer( versioningSetup ) )
+            using ( var server = new WebServer( ConfigureOptions ) )
             {
                 server.Client.DefaultRequestHeaders.TryAddWithoutValidation( "api-version", "1.0" );
 
@@ -519,13 +553,15 @@
         public async Task select_controller_should_resolve_controller_action_using_api_versioning_conventions()
         {
             // arrange
-            Action<ApiVersioningOptions> versioningSetup = o => o.Conventions.Controller<ConventionsController>()
-                                                                             .HasApiVersion( 1, 0 )
-                                                                             .HasApiVersion( 2, 0 )
-                                                                             .AdvertisesApiVersion( 3, 0 )
-                                                                             .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
-                                                                             .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
-            using ( var server = new WebServer( versioningSetup ) )
+            void ConfigureOptions( ApiVersioningOptions options ) =>
+                options.Conventions.Controller<ConventionsController>()
+                                   .HasApiVersion( 1, 0 )
+                                   .HasApiVersion( 2, 0 )
+                                   .AdvertisesApiVersion( 3, 0 )
+                                   .Action( c => c.GetV2() ).MapToApiVersion( 2, 0 )
+                                   .Action( c => c.GetV2( default ) ).MapToApiVersion( 2, 0 );
+
+            using ( var server = new WebServer( ConfigureOptions ) )
             {
                 var response = await server.Client.GetAsync( $"api/conventions/1?api-version=2.0" );
 
