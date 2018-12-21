@@ -21,6 +21,7 @@
         /// <returns>All available orders.</returns>
         /// <response code="200">The successfully retrieved orders.</response>
         [HttpGet]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( IEnumerable<Order> ), 200 )]
         public IActionResult Get()
         {
@@ -42,6 +43,7 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet( "{id:int}", Name = ByIdRouteName )]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), 200 )]
         [ProducesResponseType( 400 )]
         [ProducesResponseType( 404 )]
@@ -55,6 +57,7 @@
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
         [HttpPost]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), 201 )]
         [ProducesResponseType( 400 )]
         public IActionResult Post( [FromBody] Order order )

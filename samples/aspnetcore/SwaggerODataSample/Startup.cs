@@ -13,6 +13,7 @@
     using System.IO;
     using System.Reflection;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
+    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -25,7 +26,9 @@
         /// <param name="services">The collection of services to configure the application with.</param>
         public void ConfigureServices( IServiceCollection services )
         {
-            services.AddMvc();
+            // the sample application always uses the latest version, but you may want an explict version such as Version_2_2
+            // note: Endpoint Routing is enabled by default; however, it is unsupported by OData and MUST be false
+            services.AddMvc( options => options.EnableEndpointRouting = false ).SetCompatibilityVersion( Latest );
             services.AddApiVersioning( options => options.ReportApiVersions = true );
             services.AddOData().EnableApiVersioning();
             services.AddODataApiExplorer(
@@ -107,7 +110,7 @@
         {
             var info = new Info()
             {
-                Title = $"Sample API {description.ApiVersion}",
+                Title = "Sample API",
                 Version = description.ApiVersion.ToString(),
                 Description = "A sample application with Swagger, Swashbuckle, and API versioning.",
                 Contact = new Contact() { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },

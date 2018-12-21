@@ -20,6 +20,7 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet( "{id:int}", Name = "GetOrderById" )]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), 200 )]
         [ProducesResponseType( 404 )]
         public IActionResult Get( int id ) => Ok( new Order() { Id = id, Customer = "John Doe" } );
@@ -33,6 +34,7 @@
         /// <response code="400">The order is invalid.</response>
         [HttpPost]
         [MapToApiVersion( "1.0" )]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), 201 )]
         [ProducesResponseType( 400 )]
         public IActionResult Post( [FromBody] Order order )

@@ -9,6 +9,7 @@
     using Swashbuckle.AspNetCore.Swagger;
     using System.IO;
     using System.Reflection;
+    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -36,20 +37,26 @@
         /// <param name="services">The collection of services to configure the application with.</param>
         public void ConfigureServices( IServiceCollection services )
         {
-            // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
-            // note: the specified format code will format the version as "'v'major[.minor][-status]"
+            // the sample application always uses the latest version, but you may want an explict version such as Version_2_2
+            // note: Endpoint Routing is enabled by default; however, if you need legacy style routing via IRouter, change it to false
+            services.AddMvc( options => options.EnableEndpointRouting = true ).SetCompatibilityVersion( Latest );
+            services.AddApiVersioning(
+                options =>
+                {
+                    // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+                    options.ReportApiVersions = true;
+                } );
             services.AddVersionedApiExplorer(
                 options =>
                 {
+                    // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                    // note: the specified format code will format the version as "'v'major[.minor][-status]"
                     options.GroupNameFormat = "'v'VVV";
 
                     // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
                 } );
-
-            services.AddMvc();
-            services.AddApiVersioning( options => options.ReportApiVersions = true );
             services.AddSwaggerGen(
                 options =>
                 {
@@ -110,7 +117,7 @@
         {
             var info = new Info()
             {
-                Title = $"Sample API {description.ApiVersion}",
+                Title = "Sample API",
                 Version = description.ApiVersion.ToString(),
                 Description = "A sample application with Swagger, Swashbuckle, and API versioning.",
                 Contact = new Contact() { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },
