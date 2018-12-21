@@ -1,1 +1,2 @@
-﻿
+﻿Fixed a scenario where **ODataAttributeRouteInfo** was not generated for some actions
+Added ODataControllerSpecification to identify OData controllers as API controllers
