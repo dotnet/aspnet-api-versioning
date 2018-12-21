@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
 
     public class Startup
     {
@@ -20,7 +21,9 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices( IServiceCollection services )
         {
-            services.AddMvc();
+            // the sample application always uses the latest version, but you may want an explict version such as Version_2_2
+            // note: Endpoint Routing is enabled by default; however, if you need legacy style routing via IRouter, change it to false
+            services.AddMvc( options => options.EnableEndpointRouting = true ).SetCompatibilityVersion( Latest );
             services.AddApiVersioning(
                 options =>
                 {

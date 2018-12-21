@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
 
     public class Startup
     {
@@ -19,10 +20,15 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices( IServiceCollection services )
         {
-            services.AddMvc();
-
-            // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-            services.AddApiVersioning( options => options.ReportApiVersions = true );
+            // the sample application always uses the latest version, but you may want an explict version such as Version_2_2
+            // note: Endpoint Routing is enabled by default; however, it is unsupported by OData and MUST be false
+            services.AddMvc( options => options.EnableEndpointRouting = false ).SetCompatibilityVersion( Latest );
+            services.AddApiVersioning(
+                options =>
+                {
+                    // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+                    options.ReportApiVersions = true;
+                } );
             services.AddOData().EnableApiVersioning();
         }
 

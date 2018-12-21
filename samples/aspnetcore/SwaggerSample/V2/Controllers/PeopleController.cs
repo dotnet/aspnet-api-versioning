@@ -21,6 +21,7 @@
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
         [HttpGet]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( IEnumerable<Person> ), 200 )]
         public IActionResult Get()
         {
@@ -60,6 +61,7 @@
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
         [HttpGet( "{id:int}", Name = ByIdRouteName )]
+        [Produces( "application/json" )]
         [ProducesResponseType( typeof( Person ), 200 )]
         [ProducesResponseType( 404 )]
         public IActionResult Get( int id ) =>
