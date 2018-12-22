@@ -10,11 +10,9 @@
     /// </summary>
     [ApiController]
     [ApiVersion( "2.0" )]
-    [Route( "api/v{api-version:apiVersion}/[controller]" )]
+    [Route( "api/v{version:apiVersion}/[controller]" )]
     public class PeopleController : ControllerBase
     {
-        const string ByIdRouteName = "GetPersonById" + nameof( V2 );
-
         /// <summary>
         /// Gets all people.
         /// </summary>
@@ -60,7 +58,7 @@
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [HttpGet( "{id:int}", Name = ByIdRouteName )]
+        [HttpGet( "{id:int}" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Person ), 200 )]
         [ProducesResponseType( 404 )]

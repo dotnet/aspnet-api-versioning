@@ -7,14 +7,14 @@
     [Route( "api/[controller]" )]
     public class OrdersController : ControllerBase
     {
-        [HttpGet( "{id}", Name = "GetOrderByIdV1" )]
+        [HttpGet( "{id}" )]
         public virtual IActionResult Get( int id ) => Ok();
 
         [HttpPost]
         public virtual IActionResult Post( [FromBody] Order order )
         {
-            order.Id = 1;
-            return CreatedAtRoute( "GetOrderByIdV1", new { id = order.Id }, order );
+            order.Id = 42;
+            return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
         }
 
         [HttpPut( "{id}" )]

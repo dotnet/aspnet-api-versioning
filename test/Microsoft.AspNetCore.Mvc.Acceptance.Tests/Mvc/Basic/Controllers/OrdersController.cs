@@ -12,7 +12,7 @@
         [ApiVersion( "2.0" )]
         public IActionResult Get() => Ok();
 
-        [HttpGet( "{id}", Name = "GetOrderById" )]
+        [HttpGet( "{id}" )]
         [ApiVersion( "0.9" )]
         [ApiVersion( "1.0" )]
         [ApiVersion( "2.0" )]
@@ -24,7 +24,7 @@
         public IActionResult Post( [FromBody] Order order )
         {
             order.Id = 42;
-            return CreatedAtRoute( "GetOrderById", new { id = order.Id }, order );
+            return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
         }
 
         [HttpPut( "{id}" )]

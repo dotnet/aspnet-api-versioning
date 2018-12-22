@@ -16,7 +16,7 @@
         [Route]
         public override IHttpActionResult Post( [FromBody] Order order )
         {
-            order.Id = 2;
+            order.Id = 42;
             return CreatedAtRoute( "GetOrderByIdV2", new { id = order.Id }, order );
         }
 

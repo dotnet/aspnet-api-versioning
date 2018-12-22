@@ -10,14 +10,14 @@
         [HttpGet]
         public IActionResult Get() => Ok();
 
-        [HttpGet( "{id}", Name = "GetOrderById" )]
+        [HttpGet( "{id}" )]
         public IActionResult Get( int id ) => Ok();
 
         [HttpPost]
         public IActionResult Post( [FromBody] Order order )
         {
             order.Id = 42;
-            return CreatedAtRoute( "GetOrderById", new { id = order.Id }, order );
+            return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
         }
 
         [HttpPut( "{id}" )]

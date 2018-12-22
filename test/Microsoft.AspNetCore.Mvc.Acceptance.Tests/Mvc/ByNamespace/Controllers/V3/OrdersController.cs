@@ -10,14 +10,14 @@
         [HttpGet]
         public override IActionResult Get() => Ok();
 
-        [HttpGet( "{id}", Name = "GetOrderByIdV3" )]
+        [HttpGet( "{id}" )]
         public override IActionResult Get( int id ) => Ok();
 
         [HttpPost]
         public override IActionResult Post( [FromBody] Order order )
         {
-            order.Id = 3;
-            return CreatedAtRoute( "GetOrderByIdV3", new { id = order.Id }, order );
+            order.Id = 42;
+            return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
         }
 
         [HttpPut( "{id}" )]

@@ -2,7 +2,6 @@
 {
     using Microsoft.Web.Http;
     using Models;
-    using System.Collections.Generic;
     using System.Web.Http;
 
     [ApiVersion( "1.0" )]

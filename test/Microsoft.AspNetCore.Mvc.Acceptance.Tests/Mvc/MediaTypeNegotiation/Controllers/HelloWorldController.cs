@@ -1,20 +1,20 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.MediaTypeNegotiation.Controllers
 {
-    using AspNetCore.Routing;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
+    using Microsoft.AspNetCore.Mvc.MediaTypeNegotiation.Models;
+    using Microsoft.AspNetCore.Routing;
 
     [ApiController]
     [Route( "api/[controller]" )]
     public class HelloWorldController : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get() => Ok( new { Controller = nameof( HelloWorldController ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+        public IActionResult Get( ApiVersion apiVersion ) => Ok( new { Controller = nameof( HelloWorldController ), Version = apiVersion.ToString() } );
 
-        [HttpGet( "{id:int}", Name = "GetMessageById" )]
-        public IActionResult Get( int id ) => Ok( new { Controller = GetType().Name, Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+        [HttpGet( "{id:int}" )]
+        public IActionResult Get( int id, ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Id = id, Version = apiVersion.ToString() } );
 
         [HttpPost]
-        public IActionResult Post( Message message ) => CreatedAtRoute( "GetMessageById", new { id = 42 }, message );
+        public IActionResult Post( Message message, ApiVersion apiVersion ) => CreatedAtAction( nameof( Get ), new { id = 42 }, message );
     }
 }

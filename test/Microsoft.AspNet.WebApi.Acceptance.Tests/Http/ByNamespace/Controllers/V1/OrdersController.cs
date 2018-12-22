@@ -13,7 +13,7 @@
         [Route]
         public virtual IHttpActionResult Post( [FromBody] Order order )
         {
-            order.Id = 1;
+            order.Id = 42;
             return CreatedAtRoute( "GetOrderByIdV1", new { id = order.Id }, order );
         }
 

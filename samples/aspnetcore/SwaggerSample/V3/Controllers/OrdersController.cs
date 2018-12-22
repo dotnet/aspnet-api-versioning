@@ -13,8 +13,6 @@
     [Route( "api/[controller]" )]
     public class OrdersController : ControllerBase
     {
-        const string ByIdRouteName = "GetOrderById-" + nameof( V3 );
-
         /// <summary>
         /// Retrieves all orders.
         /// </summary>
@@ -44,7 +42,7 @@
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [HttpGet( "{id:int}", Name = ByIdRouteName )]
+        [HttpGet( "{id:int}" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), 200 )]
         [ProducesResponseType( 400 )]
@@ -64,14 +62,8 @@
         [ProducesResponseType( 400 )]
         public IActionResult Post( [FromBody] Order order )
         {
-            if ( !ModelState.IsValid )
-            {
-                return BadRequest( ModelState );
-            }
-
             order.Id = 42;
-
-            return CreatedAtRoute( ByIdRouteName, new { id = order.Id }, order );
+            return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
         }
 
         /// <summary>
