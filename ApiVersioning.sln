@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		CONTRIBUTING.md = CONTRIBUTING.md
 		LICENSE = LICENSE
 		nuget.config = nuget.config
 		README.md = README.md
@@ -38,12 +39,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspnetcore", "aspnetcore", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicSample", "samples\aspnetcore\BasicSample\BasicSample.csproj", "{59389B47-8280-411E-B840-D097AA1DCDEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicWebApiSample", "samples\webapi\BasicWebApiSample\BasicWebApiSample.csproj", "{D1DF9ECC-7D2F-4982-8E45-BD690EF80906}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicWebApiSample", "samples\webapi\BasicWebApiSample\BasicWebApiSample.csproj", "{D1DF9ECC-7D2F-4982-8E45-BD690EF80906}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3BAC97ED-1A8E-4F5A-A716-DB5255F51C81} = {3BAC97ED-1A8E-4F5A-A716-DB5255F51C81}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicODataWebApiSample", "samples\webapi\BasicODataWebApiSample\BasicODataWebApiSample.csproj", "{8C09CD67-5153-413C-B870-2FC7488C2D53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicODataWebApiSample", "samples\webapi\BasicODataWebApiSample\BasicODataWebApiSample.csproj", "{8C09CD67-5153-413C-B870-2FC7488C2D53}"
 	ProjectSection(ProjectDependencies) = postProject
 		{48A2B488-23AB-4C83-AE30-0B8B735C4562} = {48A2B488-23AB-4C83-AE30-0B8B735C4562}
 	EndProjectSection
@@ -60,13 +61,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.WebApi.Ver
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.Tests", "test\Microsoft.AspNet.OData.Versioning.Tests\Microsoft.AspNet.OData.Versioning.Tests.csproj", "{D87E54CC-C2D6-4AE5-806D-AE825B051C66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedODataWebApiSample", "samples\webapi\AdvancedODataWebApiSample\AdvancedODataWebApiSample.csproj", "{E496EED0-F8C9-4FE9-83E6-75E47A3C41A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedODataWebApiSample", "samples\webapi\AdvancedODataWebApiSample\AdvancedODataWebApiSample.csproj", "{E496EED0-F8C9-4FE9-83E6-75E47A3C41A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByNamespaceWebApiSample", "samples\webapi\ByNamespaceWebApiSample\ByNamespaceWebApiSample.csproj", "{A02A4245-3AEB-4549-9037-D89DFDC7E74D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByNamespaceWebApiSample", "samples\webapi\ByNamespaceWebApiSample\ByNamespaceWebApiSample.csproj", "{A02A4245-3AEB-4549-9037-D89DFDC7E74D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConventionsWebApiSample", "samples\webapi\ConventionsWebApiSample\ConventionsWebApiSample.csproj", "{C1F89961-7134-4D97-BA3A-2693FD1CBF4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConventionsWebApiSample", "samples\webapi\ConventionsWebApiSample\ConventionsWebApiSample.csproj", "{C1F89961-7134-4D97-BA3A-2693FD1CBF4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConventionsODataWebApiSample", "samples\webapi\ConventionsODataWebApiSample\ConventionsODataWebApiSample.csproj", "{9A22600C-7768-4D16-B67D-514F55942FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConventionsODataWebApiSample", "samples\webapi\ConventionsODataWebApiSample\ConventionsODataWebApiSample.csproj", "{9A22600C-7768-4D16-B67D-514F55942FAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConventionsSample", "samples\aspnetcore\ConventionsSample\ConventionsSample.csproj", "{1EFC221F-35CF-4B55-BD59-240D5B808E14}"
 EndProject
@@ -94,9 +95,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Mvc.Ve
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaggerSample", "samples\aspnetcore\SwaggerSample\SwaggerSample.csproj", "{D95BC932-50F7-4014-970E-0C6E8400BE25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerWebApiSample", "samples\webapi\SwaggerWebApiSample\SwaggerWebApiSample.csproj", "{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaggerWebApiSample", "samples\webapi\SwaggerWebApiSample\SwaggerWebApiSample.csproj", "{6BEDE228-4BE9-499E-B1E6-93B6B0AC62DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwaggerODataWebApiSample", "samples\webapi\SwaggerODataWebApiSample\SwaggerODataWebApiSample.csproj", "{F3986F7B-AF76-43D1-A44F-303023A08CD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwaggerODataWebApiSample", "samples\webapi\SwaggerODataWebApiSample\SwaggerODataWebApiSample.csproj", "{F3986F7B-AF76-43D1-A44F-303023A08CD3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNet.OData.Versioning.ApiExplorer", "src\Microsoft.AspNet.OData.Versioning.ApiExplorer\Microsoft.AspNet.OData.Versioning.ApiExplorer.csproj", "{1B255310-A2B7-437F-804F-6E1D8C940A17}"
 EndProject
