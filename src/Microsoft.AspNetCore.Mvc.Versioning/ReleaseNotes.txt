@@ -1,4 +1,4 @@
 ﻿Support Endpoint Routing (#413)
-ApiVersioningOptions.UseApiBehavior now defaults to true
-Enhanced API controller filtering with IApiControllerSpecification
-Add ApiBehaviorSpecification to match ApiControllerAttribute
+ApiVersioningOptions.UseApiBehavior defaults to true
+Add IApiControllerSpecification for API controllers
+Add ApiBehaviorSpecification for [ApiController]

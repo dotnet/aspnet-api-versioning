@@ -1,1 +1,1 @@
-﻿Fixed exploring query options for `POST` when the controller action is not an EDM action
+﻿Fixed query options for non-action POST
