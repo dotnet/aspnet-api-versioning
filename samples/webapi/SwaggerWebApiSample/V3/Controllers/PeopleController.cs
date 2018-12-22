@@ -10,7 +10,7 @@
     /// Represents a RESTful people service.
     /// </summary>
     [ApiVersion( "3.0" )]
-    [RoutePrefix( "api/v{api-version:apiVersion}/people" )]
+    [RoutePrefix( "api/v{version:apiVersion}/people" )]
     public class PeopleController : ApiController
     {
         const string ByIdRouteName = "GetPersonById" + nameof( V3 );
