@@ -8,4 +8,8 @@
     <Import Project="..\build\nuget.props" />
   </ImportGroup>
 
+ <PropertyGroup>
+  <IsTestProject>false</IsTestProject>
+ </PropertyGroup>
+
 </Project>
