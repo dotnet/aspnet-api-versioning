@@ -57,9 +57,10 @@
             var entity = default( object );
 
             // act
-            var response = await PostAsync( $"api/{version}/helloworld", entity ).EnsureSuccessStatusCode();
+            var response = await PostAsync( $"api/{version}/helloworld", entity );
 
             // assert
+            response.StatusCode.Should().Be( Created );
             response.Headers.Location.Should().Be( new Uri( $"http://localhost/api/{version}/HelloWorld/42" ) );
         }
 

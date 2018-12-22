@@ -3,6 +3,7 @@
     using FluentAssertions;
     using Microsoft.Web;
     using Microsoft.Web.Http.Basic;
+    using System;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
@@ -40,6 +41,7 @@
 
             // assert
             response.StatusCode.Should().Be( Created );
+            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/orders/42" ) );
         }
 
         [Fact]

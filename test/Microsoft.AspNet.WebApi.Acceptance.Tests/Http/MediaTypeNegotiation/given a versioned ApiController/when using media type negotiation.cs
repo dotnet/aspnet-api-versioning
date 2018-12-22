@@ -76,9 +76,10 @@
             var content = new ObjectContent( entity.GetType(), entity, new JsonMediaTypeFormatter(), mediaType );
 
             // act
-            var response = await PostAsync( "api/helloworld", content ).EnsureSuccessStatusCode();
+            var response = await PostAsync( "api/helloworld", content );
 
             // assert
+            response.StatusCode.Should().Be( Created );
             response.Headers.Location.Should().Be( new Uri( "http://localhost/api/helloworld/42" ) );
         }
 

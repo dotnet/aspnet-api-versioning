@@ -80,9 +80,10 @@
             content.Headers.ContentType = Parse( "application/json;v=1.0" );
 
             // act
-            var response = await PostAsync( "api/helloworld", content ).EnsureSuccessStatusCode();
+            var response = await PostAsync( "api/helloworld", content );
 
             // assert
+            response.StatusCode.Should().Be( Created );
             response.Headers.Location.Should().Be( new Uri( "http://localhost/api/HelloWorld/42" ) );
         }
 

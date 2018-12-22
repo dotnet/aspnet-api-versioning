@@ -3,6 +3,7 @@
     using FluentAssertions;
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Conventions;
+    using System;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
@@ -41,6 +42,7 @@
 
             // assert
             response.StatusCode.Should().Be( Created );
+            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/Customers(42)" ) );
         }
 
         [Fact]

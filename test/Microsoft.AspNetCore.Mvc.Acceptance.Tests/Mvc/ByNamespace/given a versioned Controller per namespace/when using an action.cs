@@ -3,6 +3,7 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ByNamespace;
+    using System;
     using System.Threading.Tasks;
     using Xunit;
     using static System.Net.HttpStatusCode;
@@ -37,6 +38,7 @@
 
             // assert
             response.StatusCode.Should().Be( Created );
+            response.Headers.Location.Should().Be( new Uri( "http://localhost/api/Orders/42" ) );
         }
 
         [Fact]
