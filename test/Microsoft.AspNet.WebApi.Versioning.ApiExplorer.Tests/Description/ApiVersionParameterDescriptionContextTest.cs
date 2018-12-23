@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using FluentAssertions;
+    using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning;
     using Moq;
     using System.Collections.ObjectModel;
@@ -11,6 +12,7 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
     using System.Web.Http.Filters;
+    using System.Web.Http.Routing;
     using Xunit;
     using static Microsoft.Web.Http.Versioning.ApiVersionParameterLocation;
     using static System.Web.Http.Description.ApiParameterSource;
@@ -93,7 +95,12 @@
             // arrange
             var configuration = new HttpConfiguration();
             var action = NewActionDescriptor();
-            var description = new ApiDescription() { ActionDescriptor = action };
+            var route = new HttpRoute() { Constraints = { ["api-version"] = new ApiVersionRouteConstraint() } };
+            var description = new ApiDescription()
+            {
+                ActionDescriptor = action,
+                Route = route,
+            };
             var version = new ApiVersion( 1, 0 );
             var options = new ApiExplorerOptions( configuration );
             var context = new ApiVersionParameterDescriptionContext( description, version, options );
@@ -129,7 +136,12 @@
             // arrange
             var configuration = new HttpConfiguration();
             var action = NewActionDescriptor();
-            var description = new ApiDescription() { ActionDescriptor = action };
+            var route = new HttpRoute() { Constraints = { ["api-version"] = new ApiVersionRouteConstraint() } };
+            var description = new ApiDescription()
+            {
+                ActionDescriptor = action,
+                Route = route,
+            };
             var version = new ApiVersion( 1, 0 );
             var options = new ApiExplorerOptions( configuration );
             var context = new ApiVersionParameterDescriptionContext( description, version, options );
@@ -151,7 +163,12 @@
             // arrange
             var configuration = new HttpConfiguration();
             var action = NewActionDescriptor();
-            var description = new ApiDescription() { ActionDescriptor = action };
+            var route = new HttpRoute() { Constraints = { ["api-version"] = new ApiVersionRouteConstraint() } };
+            var description = new ApiDescription()
+            {
+                ActionDescriptor = action,
+                Route = route,
+            };
             var version = new ApiVersion( 1, 0 );
             var options = new ApiExplorerOptions( configuration );
             var context = new ApiVersionParameterDescriptionContext( description, version, options );
