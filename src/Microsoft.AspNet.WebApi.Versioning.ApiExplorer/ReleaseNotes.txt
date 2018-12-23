@@ -1,1 +1,1 @@
-﻿
+﻿Improved exploring API version in URL path (#419)
