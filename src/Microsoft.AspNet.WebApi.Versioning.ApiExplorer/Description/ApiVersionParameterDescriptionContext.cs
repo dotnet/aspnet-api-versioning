@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
+    using Microsoft.Web.Http.Routing;
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
@@ -146,7 +147,17 @@
         /// </summary>
         protected virtual void UpdateUrlSegment()
         {
-            var parameter = ApiDescription.ParameterDescriptions.FirstOrDefault( p => p.Source == FromUri && p.ParameterDescriptor == null );
+            // use the route constraints to determine the user-defined name of the route parameter; expect and support only one
+            var constraints = ApiDescription.Route.Constraints;
+            var routeParameterName = constraints.Where( p => p.Value is ApiVersionRouteConstraint ).Select( p => p.Key ).FirstOrDefault();
+
+            if ( string.IsNullOrEmpty( routeParameterName ) )
+            {
+                return;
+            }
+
+            // find and update the parameter description for the api version route parameter
+            var parameter = ApiDescription.ParameterDescriptions.FirstOrDefault( p => routeParameterName.Equals( p.Name, OrdinalIgnoreCase ) );
 
             if ( parameter == null )
             {
@@ -161,6 +172,7 @@
                 Configuration = action.Configuration,
                 ActionDescriptor = action,
             };
+
             RemoveAllParametersExcept( parameter );
         }
 
@@ -208,7 +220,7 @@
 
         void RemoveAllParametersExcept( ApiParameterDescription parameter )
         {
-            // note: in a scenario where multiple api version parameters are allowed, we can remove all other parameters because
+            // in a scenario where multiple api version parameters are allowed, we can remove all other parameters because
             // the api version must be specified in the path. this will avoid unwanted, duplicate api version parameters
             var collections = new ICollection<ApiParameterDescription>[] { ApiDescription.ParameterDescriptions, parameters };
 
