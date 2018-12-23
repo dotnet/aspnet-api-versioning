@@ -20,7 +20,7 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices( IServiceCollection services )
         {
-            // the sample application always uses the latest version, but you may want an explict version such as Version_2_2
+            // the sample application always uses the latest version, but you may want an explicit version such as Version_2_2
             // note: Endpoint Routing is enabled by default; however, it is unsupported by OData and MUST be false
             services.AddMvc( options => options.EnableEndpointRouting = false ).SetCompatibilityVersion( Latest );
             services.AddApiVersioning(
