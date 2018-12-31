@@ -61,6 +61,35 @@
         }
 
         [Fact]
+        public async Task then_get_returns_400_or_405_with_invalid_id()
+        {
+            // arrange
+            var requestUrl = "api/values/abc?api-version=2.0";
+            var statusCode = UsingEndpointRouting ? NotFound : BadRequest;
+
+            // act
+            var response = await GetAsync( requestUrl );
+
+            // assert
+            response.StatusCode.Should().Be( statusCode );
+        }
+
+        [Theory]
+        [InlineData( "1.0" )]
+        [InlineData( "2.0" )]
+        public async Task then_delete_should_return_405( string apiVersion )
+        {
+            // arrange
+            var requestUrl = $"api/values/42?api-version={apiVersion}";
+
+            // act
+            var response = await DeleteAsync( requestUrl );
+
+            // assert
+            response.StatusCode.Should().Be( MethodNotAllowed );
+        }
+
+        [Fact]
         public async Task then_get_should_return_400_for_an_unsupported_version()
         {
             // arrange
