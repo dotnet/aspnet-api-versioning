@@ -2,14 +2,13 @@
 {
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
-    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.Examples.Models;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
     using Microsoft.Extensions.PlatformAbstractions;
-    using Swashbuckle.AspNetCore.Swagger;
+    using Swashbuckle.AspNetCore.SwaggerGen;
     using System.IO;
     using System.Reflection;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
@@ -49,23 +48,10 @@
                     options.QueryOptions.Controller<V3.PeopleController>()
                                         .Action( c => c.Get( default ) ).Allow( Skip | Count ).AllowTop( 100 );
                 } );
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen(
                 options =>
                 {
-                    // resolve the IApiVersionDescriptionProvider service
-                    // note: that we have to build a temporary service provider here because one has not been created yet
-                    using ( var serviceProvider = services.BuildServiceProvider() )
-                    {
-                        var provider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
-
-                        // add a swagger document for each discovered API version
-                        // note: you might choose to skip or document deprecated API versions differently
-                        foreach ( var description in provider.ApiVersionDescriptions )
-                        {
-                            options.SwaggerDoc( description.GroupName, CreateInfoForApiVersion( description ) );
-                        }
-                    }
-
                     // add a custom operation filter which sets default values
                     options.OperationFilter<SwaggerDefaultValues>();
 
@@ -104,26 +90,6 @@
                 var fileName = typeof( Startup ).GetTypeInfo().Assembly.GetName().Name + ".xml";
                 return Path.Combine( basePath, fileName );
             }
-        }
-
-        static Info CreateInfoForApiVersion( ApiVersionDescription description )
-        {
-            var info = new Info()
-            {
-                Title = "Sample API",
-                Version = description.ApiVersion.ToString(),
-                Description = "A sample application with Swagger, Swashbuckle, and API versioning.",
-                Contact = new Contact() { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },
-                TermsOfService = "Shareware",
-                License = new License() { Name = "MIT", Url = "https://opensource.org/licenses/MIT" }
-            };
-
-            if ( description.IsDeprecated )
-            {
-                info.Description += " This API version has been deprecated.";
-            }
-
-            return info;
         }
     }
 }
