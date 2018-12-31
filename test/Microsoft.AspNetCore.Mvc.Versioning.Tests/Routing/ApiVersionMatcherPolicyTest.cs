@@ -157,46 +157,6 @@
         }
 
         [Fact]
-        public async Task apply_should_use_405_endpoint_for_unmatched_api_version()
-        {
-            // arrange
-            var feature = new Mock<IApiVersioningFeature>();
-            var errorResponses = new Mock<IErrorResponseProvider>();
-            var result = new Mock<IActionResult>();
-
-            feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
-            feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
-            result.Setup( r => r.ExecuteResultAsync( It.IsAny<ActionContext>() ) ).Returns( CompletedTask );
-            errorResponses.Setup( er => er.CreateResponse( It.IsAny<ErrorResponseContext>() ) ).Returns( result.Object );
-
-            var options = Options.Create( new ApiVersioningOptions() { ErrorResponses = errorResponses.Object } );
-            var policy = new ApiVersionMatcherPolicy( options, NewReporter(), NewLoggerFactory() );
-            var context = new EndpointSelectorContext();
-            var items = new object[]
-            {
-                new ActionDescriptor()
-                {
-                    DisplayName = "Test",
-                    ActionConstraints = new IActionConstraintMetadata[]{ new HttpMethodActionConstraint(new[] { "POST" }) },
-                    Properties = { [typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) ) },
-                },
-            };
-            var endpoint = new Endpoint( c => CompletedTask, new EndpointMetadataCollection( items ), default );
-            var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, new[] { 0 } );
-            var httpContext = NewHttpContext( feature );
-
-            candidates.SetValidity( 0, false );
-
-            // act
-            await policy.ApplyAsync( httpContext, context, candidates );
-            await context.Endpoint.RequestDelegate( httpContext );
-
-            // assert
-            result.Verify( r => r.ExecuteResultAsync( It.IsAny<ActionContext>() ), Once() );
-            errorResponses.Verify( er => er.CreateResponse( It.Is<ErrorResponseContext>( c => c.StatusCode == 405 && c.ErrorCode == "UnsupportedApiVersion" ) ), Once() );
-        }
-
-        [Fact]
         public async Task apply_should_use_400_endpoint_for_invalid_api_version()
         {
             // arrange

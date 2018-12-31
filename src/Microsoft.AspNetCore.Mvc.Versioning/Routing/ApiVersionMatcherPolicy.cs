@@ -101,53 +101,51 @@
             {
                 for ( var i = 0; i < finalMatches.Count; i++ )
                 {
-                    candidates.SetValidity( finalMatches[i].index, true );
+                    var (index, _, valid) = finalMatches[i];
+                    candidates.SetValidity( index, valid );
                 }
             }
 
             return CompletedTask;
         }
 
-        static IReadOnlyList<(int index, ActionDescriptor action)> EvaluateApiVersion(
+        static IReadOnlyList<(int index, ActionDescriptor action, bool valid)> EvaluateApiVersion(
             HttpContext httpContext,
             CandidateSet candidates,
             ApiVersion apiVersion )
         {
             Contract.Requires( httpContext != null );
             Contract.Requires( candidates != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<(int index, ActionDescriptor action)>>() != null );
+            Contract.Ensures( Contract.Result<IReadOnlyList<(int, ActionDescriptor, bool)>>() != null );
 
-            var bestMatches = new List<(int index, ActionDescriptor action)>();
-            var implicitMatches = new List<(int, ActionDescriptor)>();
+            var bestMatches = new List<(int index, ActionDescriptor action, bool)>();
+            var implicitMatches = new List<(int, ActionDescriptor, bool)>();
 
             for ( var i = 0; i < candidates.Count; i++ )
             {
-                if ( !candidates.IsValidCandidate( i ) )
-                {
-                    continue;
-                }
-
                 ref var candidate = ref candidates[i];
                 var action = candidate.Endpoint.Metadata?.GetMetadata<ActionDescriptor>();
 
                 if ( action == null )
                 {
-                    candidates.SetValidity( i, false );
                     continue;
                 }
 
+                // remember whether the candidate is currently valid. a matching api version will not
+                // make the candidate valid; however, we want to short-circuit with 400 if no candidates
+                // match the api version at all.
                 switch ( action.MappingTo( apiVersion ) )
                 {
                     case Explicit:
-                        bestMatches.Add( (i, action) );
+                        bestMatches.Add( (i, action, candidates.IsValidCandidate( i )) );
                         break;
                     case Implicit:
-                        implicitMatches.Add( (i, action) );
+                        implicitMatches.Add( (i, action, candidates.IsValidCandidate( i )) );
                         break;
                 }
 
                 // perf: always make the candidate invalid so we only need to loop through the
-                // final, best matches for any remaining, valid candidates
+                // final, best matches for any remaining candidates
                 candidates.SetValidity( i, false );
             }
 

@@ -1,4 +1,1 @@
-﻿Support Endpoint Routing (#413)
-ApiVersioningOptions.UseApiBehavior defaults to true
-Add IApiControllerSpecification for API controllers
-Add ApiBehaviorSpecification for [ApiController]
+﻿Fix 404 and 405 endpoint matching (#423)

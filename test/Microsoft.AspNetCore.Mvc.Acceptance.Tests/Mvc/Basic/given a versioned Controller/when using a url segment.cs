@@ -65,6 +65,34 @@
         }
 
         [Fact]
+        public async Task then_get_returns_400_or_405_with_invalid_id()
+        {
+            // arrange
+            var requestUrl = "api/v2/helloworld/abc";
+            var statusCode = UsingEndpointRouting ? NotFound : BadRequest;
+
+            // act
+            var response = await GetAsync( requestUrl );
+
+            // assert
+            response.StatusCode.Should().Be( statusCode );
+        }
+
+        [Theory]
+        [InlineData( "api/v1/helloworld/42" )]
+        [InlineData( "api/v2/helloworld/42" )]
+        public async Task then_delete_should_return_405( string requestUrl )
+        {
+            // arrange
+
+            // act
+            var response = await DeleteAsync( requestUrl );
+
+            // assert
+            response.StatusCode.Should().Be( MethodNotAllowed );
+        }
+
+        [Fact]
         public async Task then_get_should_return_400_for_an_unsupported_version()
         {
             // arrange
