@@ -132,7 +132,7 @@
 
             if ( clrTypeMatchesEdmType )
             {
-                return clrType;
+                return generatedEdmTypes.GetOrAdd( typeKey, clrType.GetTypeInfo() );
             }
 
             var signature = new ClassSignature( clrType, properties, apiVersion );
