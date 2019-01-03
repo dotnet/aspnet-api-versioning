@@ -143,9 +143,10 @@
                 virtualPathRoot = context.VirtualPathRoot ?? string.Empty;
             }
 
-            for ( var i = 0; i < routes.Count; i++ )
+            // HACK: do NOT use a normal 'for' loop here because the IIS implementation does not support indexing
+            foreach ( var route in routes )
             {
-                var otherRouteData = routes[i].GetRouteData( virtualPathRoot, request );
+                var otherRouteData = route.GetRouteData( virtualPathRoot, request );
 
                 if ( otherRouteData != null &&
                     !routeData.Equals( otherRouteData ) &&
