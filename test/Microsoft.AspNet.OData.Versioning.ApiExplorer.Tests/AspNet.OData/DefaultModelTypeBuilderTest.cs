@@ -8,6 +8,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Reflection.Emit;
     using Microsoft.Extensions.DependencyInjection;
     using Xunit;
 
@@ -375,6 +376,29 @@
 
             Assert.Equal( "Manager", attributeWithParams.AllowedRoles[0] );
             Assert.Equal( "Employer", attributeWithParams.AllowedRoles[1] );
+        }
+
+        [Fact]
+        public void substitute_should_resolve_types_that_reference_a_model_that_match_the_edm()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+
+            var shipment = modelBuilder.EntitySet<Shipment>( "Shipments" ).EntityType;
+            shipment.Ignore( s => s.ShippedOn );
+            var originalType = typeof(Shipment);
+
+            modelBuilder.EntitySet<Address>("Addresses");
+            var addressType = typeof(Address);
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+
+            // act
+            addressType.SubstituteIfNecessary( context );
+            var substitutionType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            Assert.False( substitutionType is TypeBuilder );
         }
 
         public static IEnumerable<object[]> SubstitutionNotRequiredData
