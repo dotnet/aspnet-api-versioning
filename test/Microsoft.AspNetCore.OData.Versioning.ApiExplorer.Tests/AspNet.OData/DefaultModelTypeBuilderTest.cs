@@ -252,7 +252,7 @@
             // arrange
             var modelBuilder = new ODataConventionModelBuilder();
             var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
-            contact.Ignore( c => c.Email  );
+            contact.Ignore( c => c.Email );
             var action = contact.Action( "PlanInterview" );
 
             action.Parameter<DateTime>( "when" );
@@ -315,7 +315,7 @@
         [Fact]
         public void substitute_should_generate_types_for_actions_with_the_same_name_in_different_controllers()
         {
-            // arrange 
+            // arrange
             var modelBuilder = new ODataConventionModelBuilder();
             var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
             var action = contact.Action( "PlanMeeting" );
@@ -330,7 +330,7 @@
             action.Parameter<DateTime>( "when" );
             action.CollectionParameter<Employee>( "attendees" );
             action.Parameter<string>( "project" );
-            
+
             var context = NewContext( modelBuilder.GetEdmModel() );
             var model = context.Model;
 
@@ -338,7 +338,7 @@
             var operations = model.FindDeclaredOperations( qualifiedName ).Select( o => (IEdmAction) o ).ToArray();
             var services = new ServiceCollection();
             services.AddSingleton( model );
-            
+
             // act
             var contactActionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operations[0], ApiVersion.Default, contact.Name );
             var employeesActionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operations[1], ApiVersion.Default, employee.Name );
@@ -354,6 +354,28 @@
             employeesActionType.Should().HaveProperty<DateTimeOffset>( "when" );
             Assert.NotNull(employeesActionType.GetRuntimeProperty( "attendees" ));
             employeesActionType.Should().HaveProperty<string>( "project" );
+        }
+
+        [Fact]
+        public void substitute_should_get_attributes_from_property_that_has_attributes_that_takes_params()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            var employee = modelBuilder.EntitySet<Employee>( "Employees" ).EntityType;
+            employee.Ignore( e => e.FirstName );
+            var originalType = typeof( Employee );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+
+            // act
+            var substitutionType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            var property = substitutionType.GetRuntimeProperty( "Salary" );
+            var attributeWithParams = property.GetCustomAttribute<AllowedRolesAttribute>();
+
+            Assert.Equal( "Manager", attributeWithParams.AllowedRoles[0] );
+            Assert.Equal( "Employer", attributeWithParams.AllowedRoles[1] );
         }
 
         [Fact]
@@ -377,28 +399,6 @@
 
             // assert
             Assert.False( substitutionType is TypeBuilder );
-        }
-
-        [Fact]
-        public void substitute_should_get_attributes_from_property_that_has_attributes_that_takes_params()
-        {
-            // arrange
-            var modelBuilder = new ODataConventionModelBuilder();
-            var employee = modelBuilder.EntitySet<Employee>( "Employees" ).EntityType;
-            employee.Ignore( e => e.FirstName );
-            var originalType = typeof( Employee );
-            
-            var context = NewContext( modelBuilder.GetEdmModel() );
-
-            // act
-            var substitutionType = originalType.SubstituteIfNecessary( context );
-
-            // assert
-            var property = substitutionType.GetRuntimeProperty( "Salary" );
-            var attributeWithParams = property.GetCustomAttribute<AllowedRolesAttribute>();
-
-            Assert.Equal( "Manager", attributeWithParams.AllowedRoles[0] );
-            Assert.Equal( "Employer", attributeWithParams.AllowedRoles[1] );
         }
 
         public static IEnumerable<object[]> SubstitutionNotRequiredData
