@@ -1,2 +1,1 @@
-﻿Fixed query options for non-action POST
-Fix tracking CLR types that match the EDM (#425)
+﻿Fix tracking CLR types that match the EDM (#425)
