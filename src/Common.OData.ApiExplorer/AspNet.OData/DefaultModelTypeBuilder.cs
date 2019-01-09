@@ -28,10 +28,9 @@
     {
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
-        readonly ConcurrentDictionary<EdmTypeKey, TypeInfo> generatedEdmTypes = new ConcurrentDictionary<EdmTypeKey, TypeInfo>();
-        readonly ConcurrentDictionary<EdmTypeKey, TypeBuilder> unfinishedTypes = new ConcurrentDictionary<EdmTypeKey, TypeBuilder>();
+        readonly ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, TypeInfo>> generatedEdmTypesPerVersion = new ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, TypeInfo>>();
         readonly HashSet<EdmTypeKey> visitedEdmTypes = new HashSet<EdmTypeKey>();
-        readonly Dictionary<EdmTypeKey, List<PropertyDependency>> dependencies = new Dictionary<EdmTypeKey, List<PropertyDependency>>();
+        readonly List<PropertyDependency> dependencies = new List<PropertyDependency>();
 
         /// <inheritdoc />
         public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel )
@@ -43,8 +42,16 @@
             Contract.Ensures( Contract.Result<Type>() != null );
 
             var typeKey = new EdmTypeKey( structuredType, apiVersion );
+            GenerateTypesForEdmModel( edmModel, apiVersion ).TryGetValue( typeKey, out var type );
+            return type;
+        }
 
-            if ( generatedEdmTypes.TryGetValue( typeKey, out var generatedType ) )
+        private Type GenerateTypeIfNeeded( IEdmStructuredType structuredType, ApiVersion apiVersion, IEdmModel edmModel, ConcurrentDictionary<EdmTypeKey, TypeInfo> edmTypes )
+        {
+            var clrType = structuredType.GetClrType(edmModel);
+            var typeKey = new EdmTypeKey( structuredType, apiVersion );
+
+            if ( edmTypes.TryGetValue( typeKey, out var generatedType ) )
             {
                 return generatedType;
             }
@@ -92,7 +99,7 @@
                             continue;
                         }
 
-                        var newItemType = NewStructuredType( elementType.ToStructuredType(), itemType, apiVersion, edmModel );
+                        var newItemType = GenerateTypeIfNeeded( elementType.ToStructuredType(), apiVersion, edmModel, edmTypes );
 
                         if ( newItemType is TypeBuilder )
                         {
@@ -110,7 +117,7 @@
                 {
                     if ( !visitedEdmTypes.Contains( propertyTypeKey ) )
                     {
-                        propertyType = NewStructuredType( structuredTypeRef.ToStructuredType(), propertyType, apiVersion, edmModel );
+                        propertyType = GenerateTypeIfNeeded( structuredTypeRef.ToStructuredType(), apiVersion, edmModel, edmTypes );
                         if ( propertyType is TypeBuilder )
                         {
                             hasUnfinishedTypes = true;
@@ -132,31 +139,30 @@
 
             if ( clrTypeMatchesEdmType )
             {
-                return generatedEdmTypes.GetOrAdd( typeKey, clrType.GetTypeInfo() );
+                return edmTypes.GetOrAdd( typeKey, clrType.GetTypeInfo() );
             }
 
             var signature = new ClassSignature( clrType, properties, apiVersion );
 
             if ( hasUnfinishedTypes )
             {
-                if ( !unfinishedTypes.TryGetValue( typeKey, out var typeBuilder ) )
+                if ( !edmTypes.TryGetValue( typeKey, out var type ) )
                 {
-                    typeBuilder = CreateTypeBuilderFromSignature( signature );
+                    TypeBuilder typeBuilder = CreateTypeBuilderFromSignature( signature );
 
                     foreach ( var propertyDependency in dependentProperties )
                     {
                         propertyDependency.DependentType = typeBuilder;
+                        dependencies.Add( propertyDependency );
                     }
 
-                    dependencies.Add( typeKey, dependentProperties );
-                    ResolveForUnfinishedTypes();
-                    return ResolveDependencies( typeBuilder, typeKey );
+                    return edmTypes.GetOrAdd( typeKey, typeBuilder );
                 }
 
-                return typeBuilder;
+                return type;
             }
 
-            return generatedEdmTypes.GetOrAdd( typeKey, CreateTypeInfoFromSignature( signature ) );
+            return edmTypes.GetOrAdd( typeKey, CreateTypeInfoFromSignature( signature ) );
         }
 
         /// <inheritdoc />
@@ -211,81 +217,55 @@
             return typeBuilder;
         }
 
-        Type ResolveDependencies( TypeBuilder typeBuilder, EdmTypeKey typeKey )
+        private ConcurrentDictionary<EdmTypeKey, TypeInfo> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )
         {
-            var keys = dependencies.Keys.ToArray();
-
-            unfinishedTypes.GetOrAdd( typeKey, typeBuilder );
-
-            foreach ( var key in keys )
+            if ( generatedEdmTypesPerVersion.TryGetValue( apiVersion, out var edmTypes ) )
             {
-                var propertyDependencies = dependencies[key];
+                return edmTypes;
+            }
 
-                for ( var x = propertyDependencies.Count - 1; x >= 0; x-- )
+            edmTypes = new ConcurrentDictionary<EdmTypeKey, TypeInfo>();
+            foreach ( var element in model.SchemaElements )
+            {
+                if ( element is IEdmStructuredType structuredType )
                 {
-                    var propertyDependency = propertyDependencies[x];
-                    Type dependentOnType = null;
-
-                    if ( unfinishedTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnTypeBuilder ) )
-                    {
-                        dependentOnType = dependentOnTypeBuilder;
-                    }
-                    else if ( generatedEdmTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnTypeInfo ) )
-                    {
-                        dependentOnType = dependentOnTypeInfo;
-                    }
-
-                    if ( dependentOnType != null )
-                    {
-                        if ( propertyDependency.IsCollection )
-                        {
-                            var collectionType = IEnumerableOfT.MakeGenericType( typeBuilder );
-                            AddProperty( propertyDependency.DependentType, collectionType, propertyDependency.PropertyName );
-                        }
-                        else
-                        {
-                            AddProperty( propertyDependency.DependentType, typeBuilder, propertyDependency.PropertyName );
-                        }
-
-                        propertyDependencies.Remove( propertyDependency );
-                    }
-                }
-
-                if ( propertyDependencies.Count == 0 )
-                {
-                    dependencies.Remove( key );
-
-                    if ( unfinishedTypes.TryRemove( key, out var type ) )
-                    {
-                        generatedEdmTypes.GetOrAdd( key, type.CreateTypeInfo() );
-                    }
+                    GenerateTypeIfNeeded( structuredType, apiVersion, model, edmTypes );
                 }
             }
 
-            if ( !dependencies.ContainsKey( typeKey ) )
-            {
-                generatedEdmTypes.GetOrAdd( typeKey, typeBuilder.CreateTypeInfo() );
-            }
-
-            if ( generatedEdmTypes.TryGetValue( typeKey, out var generatedType ) )
-            {
-                return generatedType;
-            }
-
-            return typeBuilder;
+            var generatedEdmTypes = ResolveDependencies( edmTypes );
+            return generatedEdmTypesPerVersion.GetOrAdd( apiVersion, generatedEdmTypes );
         }
 
-        void ResolveForUnfinishedTypes()
+        private ConcurrentDictionary<EdmTypeKey, TypeInfo> ResolveDependencies( ConcurrentDictionary<EdmTypeKey, TypeInfo> edmTypes )
         {
-            var keys = unfinishedTypes.Keys;
-
-            foreach ( var key in keys )
+            for ( var i = dependencies.Count - 1; i >= 0; i-- )
             {
-                if ( unfinishedTypes.TryGetValue( key, out var type ) )
+                var propertyDependency = dependencies[i];
+                edmTypes.TryGetValue( propertyDependency.DependentOnTypeKey, out var dependentOnType );
+
+                if ( propertyDependency.IsCollection )
                 {
-                    ResolveDependencies( type, key );
+                    dependentOnType = IEnumerableOfT.MakeGenericType( dependentOnType ).GetTypeInfo();
                 }
+
+                AddProperty( propertyDependency.DependentType, dependentOnType, propertyDependency.PropertyName );
+                dependencies.RemoveAt( i );
             }
+
+            var generatedEdmTypes = new ConcurrentDictionary<EdmTypeKey, TypeInfo>();
+            foreach ( var typePair in edmTypes )
+            {
+                var type = typePair.Value;
+                if ( type is TypeBuilder typeBuilder )
+                {
+                    type = typeBuilder.CreateTypeInfo();
+                }
+
+                generatedEdmTypes.GetOrAdd( typePair.Key, type );
+            }
+
+            return generatedEdmTypes;
         }
 
         static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name )
