@@ -2,6 +2,7 @@
 {
     using FluentAssertions;
     using Microsoft.AspNet.OData.Builder;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http;
     using System;
@@ -9,7 +10,6 @@
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
-    using Microsoft.Extensions.DependencyInjection;
     using Xunit;
 
     public class DefaultModelTypeBuilderTest
@@ -179,6 +179,7 @@
             substitutedType.Should().HaveProperty<string>( nameof( Employer.LastName ) );
 
             var employees = substitutedType.GetProperty( nameof( Employer.Employees ) ).PropertyType.GetGenericArguments()[0];
+
             substitutedType.Should().Be( employees.GetProperty( nameof( Employee.Employer ) ).PropertyType );
         }
 
@@ -234,6 +235,7 @@
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
             var services = new ServiceCollection();
+
             services.AddSingleton( model );
 
             // act
@@ -252,7 +254,9 @@
             // arrange
             var modelBuilder = new ODataConventionModelBuilder();
             var contact = modelBuilder.EntitySet<Contact>( "Contacts" ).EntityType;
+
             contact.Ignore( c => c.Email );
+
             var action = contact.Action( "PlanInterview" );
 
             action.Parameter<DateTime>( "when" );
@@ -264,6 +268,7 @@
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
             var services = new ServiceCollection();
+
             services.AddSingleton( model );
 
             // act
@@ -272,9 +277,10 @@
             // assert
             substitutionType.GetRuntimeProperties().Should().HaveCount( 3 );
             substitutionType.Should().HaveProperty<DateTimeOffset>( "when" );
-            var contactType = substitutionType.GetRuntimeProperty( "interviewer" ).PropertyType;
-            contactType.Should().Be( substitutionType.GetRuntimeProperty( "interviewee" ).PropertyType );
 
+            var contactType = substitutionType.GetRuntimeProperty( "interviewer" ).PropertyType;
+
+            contactType.Should().Be( substitutionType.GetRuntimeProperty( "interviewee" ).PropertyType );
             contactType.GetRuntimeProperties().Should().HaveCount( 5 );
             contactType.Should().HaveProperty<int>( "ContactId" );
             contactType.Should().HaveProperty<string>( "FirstName" );
@@ -300,6 +306,7 @@
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
             var services = new ServiceCollection();
+
             services.AddSingleton( model );
 
             // act
@@ -325,18 +332,18 @@
             action.CollectionParameter<string>( "topics" );
 
             var employee = modelBuilder.EntitySet<Employee>( "Employees" ).EntityType;
-            action = employee.Action( "PlanMeeting" );
 
+            action = employee.Action( "PlanMeeting" );
             action.Parameter<DateTime>( "when" );
             action.CollectionParameter<Employee>( "attendees" );
             action.Parameter<string>( "project" );
 
             var context = NewContext( modelBuilder.GetEdmModel() );
             var model = context.Model;
-
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operations = model.FindDeclaredOperations( qualifiedName ).Select( o => (IEdmAction) o ).ToArray();
             var services = new ServiceCollection();
+
             services.AddSingleton( model );
 
             // act
@@ -352,7 +359,7 @@
 
             employeesActionType.GetRuntimeProperties().Should().HaveCount( 3 );
             employeesActionType.Should().HaveProperty<DateTimeOffset>( "when" );
-            Assert.NotNull(employeesActionType.GetRuntimeProperty( "attendees" ));
+            employeesActionType.GetRuntimeProperty( "attendees" ).Should().NotBeNull();
             employeesActionType.Should().HaveProperty<string>( "project" );
         }
 
@@ -362,8 +369,9 @@
             // arrange
             var modelBuilder = new ODataConventionModelBuilder();
             var employee = modelBuilder.EntitySet<Employee>( "Employees" ).EntityType;
-            employee.Ignore( e => e.FirstName );
             var originalType = typeof( Employee );
+
+            employee.Ignore( e => e.FirstName );
 
             var context = NewContext( modelBuilder.GetEdmModel() );
 
@@ -374,8 +382,7 @@
             var property = substitutionType.GetRuntimeProperty( "Salary" );
             var attributeWithParams = property.GetCustomAttribute<AllowedRolesAttribute>();
 
-            Assert.Equal( "Manager", attributeWithParams.AllowedRoles[0] );
-            Assert.Equal( "Employer", attributeWithParams.AllowedRoles[1] );
+            attributeWithParams.AllowedRoles.Should().BeEquivalentTo( new[] { "Manager", "Employer" } );
         }
 
         [Fact]
@@ -383,22 +390,22 @@
         {
             // arrange
             var modelBuilder = new ODataConventionModelBuilder();
-
             var shipment = modelBuilder.EntitySet<Shipment>( "Shipments" ).EntityType;
-            shipment.Ignore( s => s.ShippedOn );
             var originalType = typeof( Shipment );
-
-            modelBuilder.EntitySet<Address>( "Addresses" );
             var addressType = typeof( Address );
+
+            shipment.Ignore( s => s.ShippedOn );
+            modelBuilder.EntitySet<Address>( "Addresses" );
 
             var context = NewContext( modelBuilder.GetEdmModel() );
 
             // act
             addressType.SubstituteIfNecessary( context );
+
             var substitutionType = originalType.SubstituteIfNecessary( context );
 
             // assert
-            Assert.False( substitutionType is TypeBuilder );
+            substitutionType.Should().NotBeOfType<TypeBuilder>();
         }
 
         public static IEnumerable<object[]> SubstitutionNotRequiredData
