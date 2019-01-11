@@ -1,1 +1,2 @@
 ﻿Fix tracking CLR types that match the EDM (#425)
+Fix type generation with circular references (#431)
