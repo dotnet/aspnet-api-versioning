@@ -1,6 +1,7 @@
 ﻿namespace System.Web.Http.Description
 {
     using Microsoft;
+    using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -11,6 +12,44 @@
     /// </summary>
     public static class ApiDescriptionExtensions
     {
+        /// <summary>
+        /// Gets the API version associated with the API description.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the API version for.</param>
+        /// <returns>The associated <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
+        /// <remarks>This method always returns <c>null</c> unless the <paramref name="apiDescription">API description</paramref>
+        /// is of type <see cref="VersionedApiDescription"/>.</remarks>
+        public static ApiVersion GetApiVersion( this ApiDescription apiDescription )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+
+            if ( apiDescription is VersionedApiDescription versionedApiDescription )
+            {
+                return versionedApiDescription.ApiVersion;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the associated API description is deprecated.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to evaluate.</param>
+        /// <returns><c>True</c> if the <see cref="ApiDescription">API description</see> is deprecated; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method always returns <c>false</c> unless the <paramref name="apiDescription">API description</paramref>
+        /// is of type <see cref="VersionedApiDescription"/>.</remarks>
+        public static bool IsDeprecated( this ApiDescription apiDescription )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+
+            if ( apiDescription is VersionedApiDescription versionedApiDescription )
+            {
+                return versionedApiDescription.IsDeprecated;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Gets the group name associated with the API description.
         /// </summary>

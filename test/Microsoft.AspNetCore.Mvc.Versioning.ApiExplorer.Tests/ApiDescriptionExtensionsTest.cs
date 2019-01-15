@@ -3,13 +3,14 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Formatters;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Moq;
     using Xunit;
 
     public class ApiDescriptionExtensionsTest
     {
         [Fact]
-        public void get_api_version_should_associated_value()
+        public void get_api_version_should_return_associated_value()
         {
             // arrange
             var version = new ApiVersion( 42, 0 );
@@ -38,6 +39,35 @@
 
             // assert
             value.Should().Be( version );
+        }
+
+        [Theory]
+        [InlineData( 0, 9, true )]
+        [InlineData( 1, 0, false )]
+        public void is_deprecated_should_match_model( int majorVersion, int minorVersion, bool expected )
+        {
+            // arrange
+            var apiVersion = new ApiVersion( majorVersion, minorVersion );
+            var model = new ApiVersionModel(
+                supportedVersions: new[] { new ApiVersion( 1, 0 ) },
+                deprecatedVersions: new[] { new ApiVersion( 0, 9 ) } );
+            var description = new ApiDescription
+            {
+                ActionDescriptor = new ActionDescriptor()
+                {
+                    Properties = { [typeof( ApiVersionModel )] = model },
+                },
+                Properties =
+                {
+                    [typeof(ApiVersion)] = apiVersion,
+                }
+            };
+
+            // act
+            var deprecated = description.IsDeprecated();
+
+            // assert
+            deprecated.Should().Be( expected );
         }
 
         [Fact]

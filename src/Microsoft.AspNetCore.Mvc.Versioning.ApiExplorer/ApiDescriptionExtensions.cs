@@ -1,10 +1,12 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 {
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using System;
     using System.ComponentModel;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.ComponentModel.EditorBrowsableState;
     using static System.Globalization.CultureInfo;
     using static System.Linq.Enumerable;
@@ -21,6 +23,21 @@
         /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the API version for.</param>
         /// <returns>The associated <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
         public static ApiVersion GetApiVersion( this ApiDescription apiDescription ) => apiDescription.GetProperty<ApiVersion>();
+
+        /// <summary>
+        /// Gets a value indicating whether the associated API description is deprecated.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to evaluate.</param>
+        /// <returns><c>True</c> if the <see cref="ApiDescription">API description</see> is deprecated; otherwise, <c>false</c>.</returns>
+        public static bool IsDeprecated( this ApiDescription apiDescription )
+        {
+            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+
+            var apiVersion = apiDescription.GetApiVersion();
+            var model = apiDescription.ActionDescriptor.GetApiVersionModel( Explicit | Implicit );
+
+            return model.DeprecatedApiVersions.Contains( apiVersion );
+        }
 
         /// <summary>
         /// Sets the API version associated with the API description.
