@@ -13,7 +13,7 @@
         {
             Contract.Assert( context != null );
 
-            if ( context.Metadata.ModelType.IsAssignableFrom( ApiVersionType ) )
+            if ( ApiVersionType.IsAssignableFrom( context.Metadata.ModelType ) )
             {
                 return binder;
             }
