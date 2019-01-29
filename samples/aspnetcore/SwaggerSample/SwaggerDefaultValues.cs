@@ -1,11 +1,9 @@
 ﻿namespace Microsoft.Examples
 {
-    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Swashbuckle.AspNetCore.Swagger;
     using Swashbuckle.AspNetCore.SwaggerGen;
     using System.Linq;
-    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
 
     /// <summary>
     /// Represents the Swagger/Swashbuckle operation filter used to document the implicit API version parameter.
@@ -22,10 +20,8 @@
         public void Apply( Operation operation, OperationFilterContext context )
         {
             var apiDescription = context.ApiDescription;
-            var apiVersion = apiDescription.GetApiVersion();
-            var model = apiDescription.ActionDescriptor.GetApiVersionModel( Explicit | Implicit );
 
-            operation.Deprecated = model.DeprecatedApiVersions.Contains( apiVersion );
+            operation.Deprecated = apiDescription.IsDeprecated();
 
             if ( operation.Parameters == null )
             {

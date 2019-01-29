@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Examples
 {
-    using Microsoft.Web.Http.Description;
     using Swashbuckle.Swagger;
     using System.Linq;
     using System.Web.Http.Description;
@@ -20,10 +19,7 @@
         /// <param name="apiDescription">The API description being filtered.</param>
         public void Apply( Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription )
         {
-            if ( apiDescription is VersionedApiDescription versionedApiDescription )
-            {
-                operation.deprecated = versionedApiDescription.IsDeprecated;
-            }
+            operation.deprecated = apiDescription.IsDeprecated();
 
             if ( operation.parameters == null )
             {
