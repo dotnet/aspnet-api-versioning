@@ -1,1 +1,1 @@
-﻿Fix 404 and 405 endpoint matching (#423)
+﻿Fix ApiVersion model binding (#452)
