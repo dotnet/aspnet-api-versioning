@@ -8,9 +8,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using System.Reflection;
 
     /// <summary>
-    /// Defines the behavior of a convention builder for a controller action.
+    /// Defines the behavior of a convention builder for a controller.
     /// </summary>
-    public partial interface IActionConventionBuilder : IMapToApiVersionConventionBuilder
+    public partial interface IControllerConventionBuilder : IDeclareApiVersionConventionBuilder
     {
         /// <summary>
         /// Gets the type of controller the convention builder is for.

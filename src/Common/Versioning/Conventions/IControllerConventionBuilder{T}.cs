@@ -4,20 +4,16 @@ namespace Microsoft.Web.Http.Versioning.Conventions
 namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
-    using System;
     using System.Reflection;
 #if WEBAPI
     using System.Web.Http.Controllers;
 #endif
 
     /// <summary>
-    /// Defines the behavior of a convention builder for a controller action.
+    /// Defines the behavior of a convention builder for a controller.
     /// </summary>
     /// <typeparam name="T">The type of item the convention builder is for.</typeparam>
-#if !WEBAPI
-    [CLSCompliant( false )]
-#endif
-    public interface IActionConventionBuilder<T> : IMapToApiVersionConventionBuilder
+    public partial interface IControllerConventionBuilder<T> : IDeclareApiVersionConventionBuilder
 #if WEBAPI
         where T : IHttpController
 #endif
