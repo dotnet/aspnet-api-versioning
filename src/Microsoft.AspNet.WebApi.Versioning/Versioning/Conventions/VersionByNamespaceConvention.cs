@@ -12,11 +12,11 @@
         /// <summary>
         /// Applies a controller convention given the specified builder and model.
         /// </summary>
-        /// <param name="controller">The <see cref="IApiVersionConventionBuilder">builder</see> used to apply conventions.</param>
+        /// <param name="controller">The <see cref="IControllerConventionBuilder">builder</see> used to apply conventions.</param>
         /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">descriptor</see> to build conventions from.</param>
         /// <returns>True if any conventions were applied to the <paramref name="controllerDescriptor">descriptor</paramref>;
         /// otherwise, false.</returns>
-        public virtual bool Apply( IApiVersionConventionBuilder controller, HttpControllerDescriptor controllerDescriptor )
+        public virtual bool Apply( IControllerConventionBuilder controller, HttpControllerDescriptor controllerDescriptor )
         {
             Arg.NotNull( controller, nameof( controller ) );
             Arg.NotNull( controllerDescriptor, nameof( controller ) );
