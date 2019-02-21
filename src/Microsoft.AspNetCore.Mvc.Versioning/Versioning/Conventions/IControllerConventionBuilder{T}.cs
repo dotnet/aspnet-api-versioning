@@ -7,7 +7,7 @@
     /// Provides additional implementation specific to ASP.NET Core.
     /// </content>
     [CLSCompliant( false )]
-    public partial interface IControllerConventionBuilder<T> : IApiVersionConvention<ControllerModel>
+    public partial interface IControllerConventionBuilder<out T> : IApiVersionConvention<ControllerModel>
     {
     }
 }

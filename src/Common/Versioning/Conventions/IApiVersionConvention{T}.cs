@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// Defines the behavior of an API version convention.
     /// </summary>
     /// <typeparam name="T">The <see cref="Type">type</see> of item to apply the convention to.</typeparam>
-    public interface IApiVersionConvention<T>
+    public interface IApiVersionConvention<in T>
     {
         /// <summary>
         /// Applies the API version convention.
