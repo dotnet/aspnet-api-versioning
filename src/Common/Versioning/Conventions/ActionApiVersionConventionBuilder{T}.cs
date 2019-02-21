@@ -13,8 +13,15 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a builder for API versions applied to a controller action.
     /// </summary>
+    /// <typeparam name="T">The type of item the convention builder is for.</typeparam>
+#if !WEBAPI
+    [CLSCompliant( false )]
+#endif
 #pragma warning disable SA1619 // Generic type parameters should be documented partial class; false positive
-    public partial class ActionApiVersionConventionBuilder<T> : ActionApiVersionConventionBuilderBase, IApiVersionConventionBuilder
+    public partial class ActionApiVersionConventionBuilder<T> :
+        ActionApiVersionConventionBuilderBase,
+        IActionConventionBuilder,
+        IActionConventionBuilder<T>
 #pragma warning restore SA1619
     {
         /// <summary>
@@ -124,14 +131,24 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             return this;
         }
 
-        void IApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
+#pragma warning disable CA1033 // Interface methods should be callable by child types
+        Type IActionConventionBuilder.ControllerType => typeof( T );
+#pragma warning restore CA1033 // Interface methods should be callable by child types
 
-        void IApiVersionConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
 
-        void IApiVersionConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
 
-        void IApiVersionConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
 
-        void IApiVersionConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
+
+        void IDeclareApiVersionConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
+
+        void IMapToApiVersionConventionBuilder.MapToApiVersion( ApiVersion apiVersion ) => MapToApiVersion( apiVersion );
+
+        IActionConventionBuilder IActionConventionBuilder.Action( MethodInfo actionMethod ) => Action( actionMethod );
+
+        IActionConventionBuilder<T> IActionConventionBuilder<T>.Action( MethodInfo actionMethod ) => Action( actionMethod );
     }
 }

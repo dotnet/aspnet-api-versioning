@@ -8,7 +8,7 @@
     /// Provides additional implementation specific to Microsoft ASP.NET Core.
     /// </content>
     [CLSCompliant( false )]
-    public partial class ControllerApiVersionConventionBuilder : IActionConventionBuilder
+    public partial class ControllerApiVersionConventionBuilder
     {
         /// <summary>
         /// Attempts to get the convention for the specified action method.

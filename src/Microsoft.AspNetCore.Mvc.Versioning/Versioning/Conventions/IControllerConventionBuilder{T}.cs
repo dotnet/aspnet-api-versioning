@@ -4,10 +4,10 @@
     using System;
 
     /// <content>
-    /// Provides additional implementation specific to Microsoft ASP.NET Core.
+    /// Provides additional implementation specific to ASP.NET Core.
     /// </content>
     [CLSCompliant( false )]
-    public partial class ActionApiVersionConventionBuilder : IActionConventionBuilder
+    public partial interface IControllerConventionBuilder<T> : IApiVersionConvention<ControllerModel>
     {
     }
 }

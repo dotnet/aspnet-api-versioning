@@ -7,7 +7,7 @@
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Web API.
     /// </content>
-    public partial class ControllerApiVersionConventionBuilder : IActionConventionBuilder
+    public partial class ControllerApiVersionConventionBuilder
     {
         /// <summary>
         /// Gets a value indicating whether the builder has any related action conventions.

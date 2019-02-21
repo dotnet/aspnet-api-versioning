@@ -11,7 +11,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// <summary>
     /// Represents a builder for API versions applied to a controller action.
     /// </summary>
-    public partial class ActionApiVersionConventionBuilder : ActionApiVersionConventionBuilderBase, IApiVersionConventionBuilder
+#if !WEBAPI
+    [CLSCompliant( false )]
+#endif
+    public class ActionApiVersionConventionBuilder : ActionApiVersionConventionBuilderBase, IActionConventionBuilder
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilder"/> class.
@@ -125,14 +128,18 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             return this;
         }
 
-        void IApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
+        void IDeclareApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
 
-        void IApiVersionConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.HasApiVersion( ApiVersion apiVersion ) => HasApiVersion( apiVersion );
 
-        void IApiVersionConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.HasDeprecatedApiVersion( ApiVersion apiVersion ) => HasDeprecatedApiVersion( apiVersion );
 
-        void IApiVersionConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.AdvertisesApiVersion( ApiVersion apiVersion ) => AdvertisesApiVersion( apiVersion );
 
-        void IApiVersionConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
+        void IDeclareApiVersionConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
+
+        void IMapToApiVersionConventionBuilder.MapToApiVersion( ApiVersion apiVersion ) => MapToApiVersion( apiVersion );
+
+        IActionConventionBuilder IActionConventionBuilder.Action( MethodInfo actionMethod ) => Action( actionMethod );
     }
 }
