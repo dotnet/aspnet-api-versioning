@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #if !WEBAPI
     [CLSCompliant( false )]
 #endif
-    public interface IActionConventionBuilder<T> : IMapToApiVersionConventionBuilder
+    public interface IActionConventionBuilder<out T> : IMapToApiVersionConventionBuilder
 #if WEBAPI
         where T : IHttpController
 #endif
