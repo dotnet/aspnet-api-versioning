@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// Defines the behavior of a convention builder for a controller.
     /// </summary>
     /// <typeparam name="T">The type of item the convention builder is for.</typeparam>
-    public partial interface IControllerConventionBuilder<T> : IDeclareApiVersionConventionBuilder
+    public partial interface IControllerConventionBuilder<out T> : IDeclareApiVersionConventionBuilder
 #if WEBAPI
         where T : IHttpController
 #endif

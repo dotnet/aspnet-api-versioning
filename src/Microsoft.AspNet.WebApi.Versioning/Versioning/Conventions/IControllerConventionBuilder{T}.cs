@@ -6,7 +6,7 @@
     /// <content>
     /// Provides additional implementation specific to ASP.NET Web API.
     /// </content>
-    public partial interface IControllerConventionBuilder<T> : IApiVersionConvention<HttpControllerDescriptor>
+    public partial interface IControllerConventionBuilder<out T> : IApiVersionConvention<HttpControllerDescriptor>
     {
     }
 }
