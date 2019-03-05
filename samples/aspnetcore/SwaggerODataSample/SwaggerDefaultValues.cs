@@ -21,7 +21,7 @@
         {
             var apiDescription = context.ApiDescription;
 
-            operation.Deprecated = apiDescription.IsDeprecated();
+            operation.Deprecated |= apiDescription.IsDeprecated();
 
             if ( operation.Parameters == null )
             {
