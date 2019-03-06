@@ -112,5 +112,24 @@
         [HttpGet]
         [ResponseType( typeof( ODataValue<IEnumerable<Person>> ) )]
         public IHttpActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
+
+        /// <summary>
+        /// Gets the home address of a person.
+        /// </summary>
+        /// <param name="key">The person identifier.</param>
+        /// <returns>The person's home address.</returns>
+        /// <response code="200">The home address was successfully retrieved.</response>
+        /// <response code="404">The person does not exist.</response>
+        [HttpGet]
+        [ResponseType( typeof( Address ) )]
+        public IHttpActionResult GetHomeAddress( int key ) =>
+            Ok( new Address()
+            {
+                Id = 42,
+                Street = "123 Some Place",
+                City = "Seattle",
+                State = "WA",
+                ZipCode = "98101"
+            } );
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Examples.Models
 {
+    using Microsoft.AspNet.OData.Builder;
     using System;
     using System.ComponentModel.DataAnnotations;
 
@@ -41,5 +42,17 @@
         /// </summary>
         /// <value>The person's telephone number.</value>
         public string Phone { get; set; }
+
+        /// <summary>
+        /// Gets or sets the person's home address.
+        /// </summary>
+        /// <value>The person's home address.</value>
+        public Address HomeAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets the person's work address.
+        /// </summary>
+        /// <value>The person's work address.</value>
+        public Address WorkAddress { get; set; }
     }
 }
