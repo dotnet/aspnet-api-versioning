@@ -1,7 +1,9 @@
 ﻿namespace Microsoft.Examples.Models
 {
+    using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Query;
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
     /// <summary>
@@ -41,5 +43,12 @@
         /// </summary>
         /// <value>The description of the order.</value>
         public string Description { get; set; }
+
+        /// <summary>
+        /// Gets a list of line items in the order.
+        /// </summary>
+        /// <value>The <see cref="IList{T}">list</see> of order <see cref="LineItem">line items</see>.</value>
+        [Contained]
+        public virtual IList<LineItem> LineItems { get; } = new List<LineItem>();
     }
 }

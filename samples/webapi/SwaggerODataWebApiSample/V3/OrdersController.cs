@@ -143,5 +143,28 @@
             var rating = (int) parameters["rating"];
             return StatusCode( NoContent );
         }
+
+        /// <summary>
+        /// Gets the line items for the specified order.
+        /// </summary>
+        /// <param name="key">The order identifier.</param>
+        /// <returns>The order line items.</returns>
+        /// <response code="200">The line items were successfully retrieved.</response>
+        /// <response code="404">The order does not exist.</response>
+        [HttpGet]
+        [ODataRoute( "({key})/LineItems" )]
+        [ResponseType( typeof( ODataValue<IEnumerable<LineItem>> ) )]
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public IHttpActionResult LineItems( int key )
+        {
+            var lineItems = new[]
+            {
+                new LineItem() { Number = 1, Quantity = 1, UnitPrice = 2m, Description = "Dry erase wipes" },
+                new LineItem() { Number = 2, Quantity = 1, UnitPrice = 3.5m, Description = "Dry erase eraser" },
+                new LineItem() { Number = 3, Quantity = 1, UnitPrice = 5m, Description = "Dry erase markers" },
+            };
+
+            return Ok( lineItems );
+        }
     }
 }
