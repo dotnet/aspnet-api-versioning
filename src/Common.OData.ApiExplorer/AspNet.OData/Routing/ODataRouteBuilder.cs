@@ -222,12 +222,14 @@
                 var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
                 var parameter = parameters.Current;
                 var name = parameter.Name;
+                actionParameters.TryGetValue( name, out var mappedParameter );
 #if WEBAPI
-                var routeParameterName = actionParameters[name].ParameterDescriptor.ParameterName;
+                var routeParameterName = mappedParameter?.ParameterDescriptor?.ParameterName ?? name;
 #elif API_EXPLORER
-                var routeParameterName = actionParameters[name].ParameterDescriptor.Name;
+
+                var routeParameterName = mappedParameter?.ParameterDescriptor?.Name ?? name;
 #else
-                var routeParameterName = actionParameters[name].Name;
+                var routeParameterName = mappedParameter?.Name ?? name;
 #endif
 
                 builder.Append( '(' );
@@ -239,12 +241,14 @@
                 {
                     parameter = parameters.Current;
                     name = parameter.Name;
+                    actionParameters.TryGetValue( name, out mappedParameter );
 #if WEBAPI
-                    routeParameterName = actionParameters[name].ParameterDescriptor.ParameterName;
+                    routeParameterName = mappedParameter?.ParameterDescriptor?.ParameterName ?? name;
 #elif API_EXPLORER
-                    routeParameterName = actionParameters[name].ParameterDescriptor.Name;
+
+                    routeParameterName = mappedParameter?.ParameterDescriptor?.Name ?? name;
 #else
-                    routeParameterName = actionParameters[name].Name;
+                    routeParameterName = mappedParameter?.Name ?? name;
 #endif
                     builder.Append( ',' );
                     builder.Append( name );
