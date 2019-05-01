@@ -4,6 +4,7 @@
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Examples.Models;
+    using System.Collections.Generic;
     using System.Linq;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static Microsoft.AspNetCore.Http.StatusCodes;
@@ -68,5 +69,30 @@
         [ProducesResponseType( Status404NotFound )]
         [EnableQuery( AllowedQueryOptions = Select )]
         public SingleResult<Order> MostExpensive() => SingleResult.Create( new[] { new Order() { Id = 42, Customer = "Bill Mei" } }.AsQueryable() );
+
+        /// <summary>
+        /// Gets the line items for the specified order.
+        /// </summary>
+        /// <param name="key">The order identifier.</param>
+        /// <returns>The order line items.</returns>
+        /// <response code="200">The line items were successfully retrieved.</response>
+        /// <response code="404">The order does not exist.</response>
+        [HttpGet]
+        [ODataRoute( "({key})/LineItems" )]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
+        [EnableQuery( AllowedQueryOptions = Select )]
+        public IActionResult LineItems( int key )
+        {
+            var lineItems = new[]
+            {
+                new LineItem() { Number = 1, Quantity = 1, UnitPrice = 2m, Description = "Dry erase wipes" },
+                new LineItem() { Number = 2, Quantity = 1, UnitPrice = 3.5m, Description = "Dry erase eraser" },
+                new LineItem() { Number = 3, Quantity = 1, UnitPrice = 5m, Description = "Dry erase markers" },
+            };
+
+            return Ok( lineItems );
+        }
     }
 }

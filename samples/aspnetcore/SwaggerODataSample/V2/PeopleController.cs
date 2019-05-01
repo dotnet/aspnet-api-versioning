@@ -120,5 +120,26 @@
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
         public IActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
+
+        /// <summary>
+        /// Gets the home address of a person.
+        /// </summary>
+        /// <param name="key">The person identifier.</param>
+        /// <returns>The person's home address.</returns>
+        /// <response code="200">The home address was successfully retrieved.</response>
+        /// <response code="404">The person does not exist.</response>
+        [HttpGet]
+        [Produces( "application/json" )]
+        [ProducesResponseType( typeof( Address ), Status200OK )]
+        [ProducesResponseType( Status404NotFound )]
+        public IActionResult GetHomeAddress( int key ) =>
+            Ok( new Address()
+            {
+                Id = 42,
+                Street = "123 Some Place",
+                City = "Seattle",
+                State = "WA",
+                ZipCode = "98101"
+            } );
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Examples.Models
 {
-    using Microsoft.AspNet.OData.Builder;
     using System;
     using System.ComponentModel.DataAnnotations;
 
