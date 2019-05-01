@@ -135,6 +135,7 @@
                 case EntitySet:
                     builder.Append( controllerName );
                     AppendEntityKeysFromConvention( builder );
+                    AppendNavigationPropertyFromConvention( builder );
                     break;
                 case BoundOperation:
                     builder.Append( controllerName );
@@ -200,6 +201,23 @@
             {
                 builder.Append( ')' );
             }
+        }
+
+        void AppendNavigationPropertyFromConvention( StringBuilder builder )
+        {
+            Contract.Requires( builder != null );
+
+            var actionName = Context.ActionDescriptor.ActionName;
+            var properties = Context.EntitySet.EntityType().NavigationProperties();
+            var property = properties.FirstOrDefault( p => actionName.EndsWith( p.Name, OrdinalIgnoreCase ) );
+
+            if ( property == null )
+            {
+                return;
+            }
+
+            builder.Append( '/' );
+            builder.Append( property.Name );
         }
 
         void AppendParametersFromConvention( StringBuilder builder, IEdmOperation operation )
