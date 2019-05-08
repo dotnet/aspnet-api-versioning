@@ -1,12 +1,10 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
+    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
-    using Microsoft.OData;
     using System;
     using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Routing.RouteDirection;
@@ -50,48 +48,50 @@
             Arg.NotNull( route, nameof( route ) );
             Arg.NotNull( values, nameof( values ) );
 
-            if ( routeDirection == UrlGeneration )
-            {
-                return base.Match( httpContext, route, routeKey, values, routeDirection );
-            }
-
-            var request = httpContext.Request;
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
-
-            if ( !TryGetRequestedApiVersion( httpContext, feature, out var requestedVersion ) )
+            if ( routeDirection == UrlGeneration || !TryGetRequestedApiVersion( httpContext, out var requestedVersion ) )
             {
                 // note: if an error occurs reading the api version, still let the base constraint
                 // match the request. the IActionSelector will produce 400 during action selection.
                 return base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
-            if ( requestedVersion != null )
+            var matched = false;
+
+            try
             {
-                return ApiVersion == requestedVersion && base.Match( httpContext, route, routeKey, values, routeDirection );
+                matched = base.Match( httpContext, route, routeKey, values, routeDirection );
+            }
+            catch ( InvalidOperationException )
+            {
+                // note: the base implementation of Match will setup the container. if this happens more
+                // than once, an exception is thrown. this most often occurs when policy allows implicitly
+                // matching an api version and all routes must be visited to determine their candidacy. if
+                // this happens, delete the container and retry.
+                httpContext.Request.DeleteRequestContainer( true );
+                matched = base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
-            var options = httpContext.RequestServices.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
-
-            if ( options.DefaultApiVersion != ApiVersion || !base.Match( httpContext, route, routeKey, values, routeDirection ) )
+            if ( !matched )
             {
                 return false;
             }
 
-            if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
+            if ( requestedVersion == null )
             {
-                feature.RequestedApiVersion = ApiVersion;
+                // we definitely matched the route, but not necessarily the api version so
+                // track this route as a matching candidate
+                httpContext.ODataVersioningFeature().MatchingRoutes[ApiVersion] = RouteName;
+                return false;
             }
 
-            return true;
+            return ApiVersion == requestedVersion;
         }
 
-        static bool IsServiceDocumentOrMetadataRoute( RouteValueDictionary values ) =>
-            values.TryGetValue( "odataPath", out var value ) && ( value == null || Equals( value, "$metadata" ) );
-
-        static bool TryGetRequestedApiVersion( HttpContext httpContext, IApiVersioningFeature feature, out ApiVersion apiVersion )
+        static bool TryGetRequestedApiVersion( HttpContext httpContext, out ApiVersion apiVersion )
         {
             Contract.Requires( httpContext != null );
-            Contract.Requires( feature != null );
+
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
 
             try
             {

@@ -15,7 +15,6 @@
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
-    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -79,7 +78,7 @@
         /// </summary>
         /// <param name="action">The <see cref="ControllerActionDescriptor">controller action descriptor</see> to evaluate.</param>
         /// <returns>True if the <paramref name="action"/> should be mapped as an OData action or function; otherwise, false.</returns>
-        /// <remarks>This method will match any OData action that explicitly or implicitly matches matches the API version applied
+        /// <remarks>This method will match any OData action that explicitly or implicitly matches the API version applied
         /// to the associated <see cref="ApiVersionModel">model</see>.</remarks>
         public virtual bool ShouldMapAction( ControllerActionDescriptor action )
         {

@@ -1,8 +1,10 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
+    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.OData;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Net.Http;
@@ -52,42 +54,50 @@
                 return base.Match( request, route, parameterName, values, routeDirection );
             }
 
-            var properties = request.ApiVersionProperties();
-            var requestedVersion = GetRequestedApiVersionOrReturnBadRequest( request, properties );
+            var requestedVersion = GetRequestedApiVersionOrReturnBadRequest( request );
+            var matched = false;
 
-            if ( requestedVersion != null )
+            try
             {
-                if ( ApiVersion == requestedVersion && base.Match( request, route, parameterName, values, routeDirection ) )
-                {
-                    DecorateUrlHelperWithApiVersionRouteValueIfNecessary( request, values );
-                    return true;
-                }
+                matched = base.Match( request, route, parameterName, values, routeDirection );
+            }
+            catch ( InvalidOperationException )
+            {
+                // note: the base implementation of Match will setup the container. if this happens more
+                // than once, an exception is thrown. this most often occurs when policy allows implicitly
+                // matching an api version and all routes must be visited to determine their candidacy. if
+                // this happens, delete the container and retry.
+                request.DeleteRequestContainer( true );
+                matched = base.Match( request, route, parameterName, values, routeDirection );
+            }
 
+            if ( !matched )
+            {
                 return false;
             }
 
-            var options = request.GetApiVersioningOptions();
-
-            if ( options.DefaultApiVersion != ApiVersion || !base.Match( request, route, parameterName, values, routeDirection ) )
+            if ( requestedVersion == null )
             {
+                // we definitely matched the route, but not necessarily the api version so
+                // track this route as a matching candidate
+                request.ODataApiVersionProperties().MatchingRoutes[ApiVersion] = RouteName;
                 return false;
             }
 
-            if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
+            if ( ApiVersion == requestedVersion )
             {
-                properties.RequestedApiVersion = ApiVersion;
+                DecorateUrlHelperWithApiVersionRouteValueIfNecessary( request, values );
+                return true;
             }
 
-            return true;
+            return false;
         }
 
-        static bool IsServiceDocumentOrMetadataRoute( IDictionary<string, object> values ) =>
-            values.TryGetValue( "odataPath", out var value ) && ( value == null || Equals( value, "$metadata" ) );
-
-        static ApiVersion GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request, ApiVersionRequestProperties properties )
+        static ApiVersion GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request )
         {
             Contract.Requires( request != null );
-            Contract.Requires( properties != null );
+
+            var properties = request.ApiVersionProperties();
 
             try
             {

@@ -1,11 +1,9 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
-    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Routing;
@@ -14,10 +12,7 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Linq;
-    using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 
     /// <summary>
     /// Represents the logic for selecting an API-versioned, action method with additional support for OData actions.
