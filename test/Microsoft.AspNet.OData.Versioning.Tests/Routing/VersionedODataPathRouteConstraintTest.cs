@@ -29,9 +29,6 @@
             var parameterName = (string) null;
             var values = new Dictionary<string, object>();
             var routeDirection = UriGeneration;
-            var pathHandler = new Mock<IODataPathHandler>().Object;
-            var model = new Mock<IEdmModel>().Object;
-            var routingConventions = Enumerable.Empty<IODataRoutingConvention>();
             var constraint = new VersionedODataPathRouteConstraint( "odata", Default );
 
             // act
@@ -59,14 +56,12 @@
         }
 
         [Theory]
-        [InlineData( "http://localhost", null, "1.0", true )]
-        [InlineData( "http://localhost", null, "2.0", false )]
-        [InlineData( "http://localhost/$metadata", "$metadata", "1.0", true )]
-        [InlineData( "http://localhost/$metadata", "$metadata", "2.0", false )]
-        public void match_should_return_expected_result_for_service_and_metadata_document( string requestUri, string odataPath, string apiVersionValue, bool expected )
+        [InlineData( "http://localhost?api-version=2.0", null )]
+        [InlineData( "http://localhost/$metadata?api-version=2.0", "$metadata" )]
+        public void match_should_return_expected_result_for_service_and_metadata_document( string requestUri, string odataPath )
         {
             // arrange
-            var apiVersion = Parse( apiVersionValue );
+            var apiVersion = new ApiVersion( 2, 0 );
             var request = new HttpRequestMessage( Get, requestUri );
             var values = new Dictionary<string, object>() { [nameof( odataPath )] = odataPath };
             var constraint = NewVersionedODataPathRouteConstraint( request, Test.EmptyModel, apiVersion );
@@ -75,14 +70,14 @@
             var result = constraint.Match( request, null, null, values, UriResolution );
 
             // assert
-            result.Should().Be( expected );
+            result.Should().BeTrue();
         }
 
         [Theory]
-        [InlineData( "http://localhost/", null, false )]
-        [InlineData( "http://localhost/$metadata", "$metadata", false )]
-        [InlineData( "http://localhost/Tests(1)", "Tests(1)", true )]
-        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( string requestUri, string odataPath, bool allowImplicitVersioning )
+        [InlineData( "http://localhost/", null )]
+        [InlineData( "http://localhost/$metadata", "$metadata" )]
+        [InlineData( "http://localhost/Tests(1)", "Tests(1)" )]
+        public void match_should_return_expected_result_when_controller_is_implicitly_versioned( string requestUri, string odataPath )
         {
             // arrange
             var apiVersion = new ApiVersion( 2, 0 );
@@ -92,17 +87,14 @@
                 request,
                 Test.Model,
                 apiVersion,
-                o =>
-                {
-                    o.DefaultApiVersion = apiVersion;
-                    o.AssumeDefaultVersionWhenUnspecified = allowImplicitVersioning;
-                } );
+                options => options.AssumeDefaultVersionWhenUnspecified = true );
 
             // act
             var result = constraint.Match( request, null, null, values, UriResolution );
 
             // assert
-            result.Should().BeTrue();
+            result.Should().BeFalse();
+            request.ODataApiVersionProperties().MatchingRoutes.Should().Equal( new Dictionary<ApiVersion, string>() { [apiVersion] = "odata" } );
         }
 
         [Fact]
