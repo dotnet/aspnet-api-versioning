@@ -2,7 +2,7 @@
 
  <PropertyGroup>
   <TargetFrameworks>netcoreapp2.2</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461</TargetFrameworks>
+  <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);net461</TargetFrameworks>
   <RootNamespace>Microsoft</RootNamespace>
  </PropertyGroup>
 
