@@ -18,6 +18,7 @@
 #endif
     using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static ODataRouteActionType;
+    using static ODataRouteTemplateGenerationKind;
     using static System.Linq.Enumerable;
     using static System.String;
     using static System.StringComparison;
@@ -297,6 +298,11 @@
             template.Append( "{" );
             template.Append( name );
             template.Append( "}" );
+
+            if ( Context.RouteTemplateGeneration == Server )
+            {
+                return;
+            }
 
             if ( typeDef.TypeKind == EdmTypeKind.Enum )
             {

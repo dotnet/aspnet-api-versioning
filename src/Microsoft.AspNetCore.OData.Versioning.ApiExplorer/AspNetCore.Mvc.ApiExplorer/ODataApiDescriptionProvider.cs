@@ -497,36 +497,44 @@
             var parameterType = parameter.ParameterType;
             var bindingInfo = parameter.BindingInfo;
 
-            if ( bindingInfo != null )
+            bool IsSpecialBindingSource( BindingInfo info, Type type )
             {
-                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
+                if ( info == null )
                 {
-                    bindingInfo.BindingSource = Special;
+                    return false;
                 }
 
+                if ( ( type.IsODataQueryOptions() || type.IsODataPath() ) && info.BindingSource == Custom )
+                {
+                    info.BindingSource = Special;
+                    return true;
+                }
+
+                return false;
+            }
+
+            if ( IsSpecialBindingSource( bindingInfo, parameterType ) )
+            {
                 return;
             }
 
-            parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
-
-            if ( bindingInfo.BindingSource != null )
+            if ( bindingInfo == null )
             {
-                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
-                {
-                    bindingInfo.BindingSource = Special;
-                }
+                parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
 
-                return;
+                if ( IsSpecialBindingSource( bindingInfo, parameterType ) )
+                {
+                    return;
+                }
             }
 
             var key = default( IEdmNamedElement );
             var paramName = parameter.Name;
-            var source = Query;
+            var source = bindingInfo.BindingSource;
 
             switch ( context.RouteContext.ActionType )
             {
                 case EntitySet:
-
                     var keys = context.RouteContext.EntitySet.EntityType().Key().ToArray();
 
                     key = keys.FirstOrDefault( k => k.Name.Equals( paramName, OrdinalIgnoreCase ) );
@@ -553,7 +561,6 @@
                     break;
                 case BoundOperation:
                 case UnboundOperation:
-
                     var operation = context.RouteContext.Operation;
 
                     if ( operation == null )
@@ -576,9 +583,12 @@
                     }
 
                     break;
+                default:
+                    source = Query;
+                    break;
             }
 
-            bindingInfo.BindingSource = source;
+            bindingInfo.BindingSource = source ?? Query;
             parameter.BindingInfo = bindingInfo;
         }
 
