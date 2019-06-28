@@ -22,6 +22,7 @@
     using System.Web.Http.Dispatcher;
     using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;
 #endif
+    using static ODataRouteTemplateGenerationKind;
 
     sealed partial class ODataRouteBuilderContext
     {
@@ -34,8 +35,12 @@
         internal ODataApiExplorerOptions Options { get; }
 
         internal IList<ApiParameterDescription> ParameterDescriptions { get; }
+
+        internal ODataRouteTemplateGenerationKind RouteTemplateGeneration { get; } = Client;
 #else
         internal IList<ParameterDescriptor> ParameterDescriptions => ActionDescriptor.Parameters;
+
+        internal ODataRouteTemplateGenerationKind RouteTemplateGeneration { get; } = Server;
 #endif
 
         internal IEdmModel EdmModel { get; }

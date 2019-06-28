@@ -42,6 +42,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteActionType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteBuilderContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataRouteTemplateGenerationKind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\StructuredTypeResolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeSubstitutionContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\TypeExtensions.cs" />
