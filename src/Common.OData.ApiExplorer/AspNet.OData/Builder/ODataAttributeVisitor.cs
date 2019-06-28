@@ -129,7 +129,7 @@
 
                 if ( attribute.AllowedArithmeticOperators == AllowedArithmeticOperators.None )
                 {
-                    attribute.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
+                    context.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
                 }
                 else
                 {
@@ -138,7 +138,7 @@
 
                 if ( attribute.AllowedFunctions == AllowedFunctions.None )
                 {
-                    attribute.AllowedFunctions = AllowedFunctions.None;
+                    context.AllowedFunctions = AllowedFunctions.None;
                 }
                 else
                 {
@@ -147,7 +147,7 @@
 
                 if ( attribute.AllowedLogicalOperators == AllowedLogicalOperators.None )
                 {
-                    attribute.AllowedLogicalOperators = AllowedLogicalOperators.None;
+                    context.AllowedLogicalOperators = AllowedLogicalOperators.None;
                 }
                 else
                 {
@@ -156,7 +156,7 @@
 
                 if ( attribute.AllowedQueryOptions == AllowedQueryOptions.None )
                 {
-                    attribute.AllowedQueryOptions = AllowedQueryOptions.None;
+                    AllowedQueryOptions = AllowedQueryOptions.None;
                 }
                 else
                 {
@@ -250,7 +250,12 @@
         {
             Contract.Requires( querySettings != null );
 
-            if ( querySettings.Countable == true )
+            if ( !querySettings.Countable.HasValue )
+            {
+                return;
+            }
+
+            if ( querySettings.Countable.Value )
             {
                 AllowedQueryOptions |= Count;
             }
@@ -348,22 +353,59 @@
 
             foreach ( var property in allowedProperties )
             {
-                queryableProperties.Add( property );
+                if ( !queryableProperties.Contains( property, comparer ) )
+                {
+                    queryableProperties.Add( property );
+                }
             }
         }
 
-        static bool IsSelectEnabled( ModelBoundQuerySettings querySettings ) =>
-            ( querySettings.DefaultSelectType != null && querySettings.DefaultSelectType.Value != Disabled ) ||
-            querySettings.SelectConfigurations.Any( p => p.Value != Disabled );
+        bool IsSelectEnabled( ModelBoundQuerySettings querySettings )
+        {
+            if ( !querySettings.DefaultSelectType.HasValue )
+            {
+                return AllowedQueryOptions.HasFlag( Select ) ||
+                       querySettings.SelectConfigurations.Any( p => p.Value != Disabled );
+            }
 
-        static bool IsExpandEnabled( ModelBoundQuerySettings querySettings ) =>
-            ( querySettings.DefaultExpandType != null && querySettings.DefaultExpandType.Value != Disabled ) ||
-            querySettings.ExpandConfigurations.Any( p => p.Value.ExpandType != Disabled );
+            return querySettings.DefaultSelectType.Value != Disabled ||
+                   querySettings.SelectConfigurations.Any( p => p.Value != Disabled );
+        }
 
-        static bool IsFilterEnabled( ModelBoundQuerySettings querySettings ) =>
-            querySettings.DefaultEnableFilter == true || querySettings.FilterConfigurations.Any( p => p.Value );
+        bool IsExpandEnabled( ModelBoundQuerySettings querySettings )
+        {
+            if ( !querySettings.DefaultExpandType.HasValue )
+            {
+                return AllowedQueryOptions.HasFlag( Expand ) ||
+                       querySettings.ExpandConfigurations.Any( p => p.Value.ExpandType != Disabled );
+            }
 
-        static bool IsOrderByEnabled( ModelBoundQuerySettings querySettings ) =>
-            querySettings.DefaultEnableOrderBy == true || querySettings.OrderByConfigurations.Any( p => p.Value );
+            return querySettings.DefaultExpandType.Value != Disabled ||
+                   querySettings.ExpandConfigurations.Any( p => p.Value.ExpandType != Disabled );
+        }
+
+        bool IsFilterEnabled( ModelBoundQuerySettings querySettings )
+        {
+            if ( !querySettings.DefaultEnableFilter.HasValue )
+            {
+                return AllowedQueryOptions.HasFlag( Filter ) ||
+                       querySettings.FilterConfigurations.Any( p => p.Value );
+            }
+
+            return querySettings.DefaultEnableFilter.Value ||
+                   querySettings.FilterConfigurations.Any( p => p.Value );
+        }
+
+        bool IsOrderByEnabled( ModelBoundQuerySettings querySettings )
+        {
+            if ( !querySettings.DefaultEnableOrderBy.HasValue )
+            {
+                return AllowedQueryOptions.HasFlag( OrderBy ) ||
+                       querySettings.OrderByConfigurations.Any( p => p.Value );
+            }
+
+            return querySettings.DefaultEnableOrderBy.Value ||
+                   querySettings.OrderByConfigurations.Any( p => p.Value );
+        }
     }
 }
