@@ -175,6 +175,7 @@
             }
 
             var useParentheses = Context.UrlKeyDelimiter == Parentheses;
+            var keySeparator = ',';
 
             if ( useParentheses )
             {
@@ -182,7 +183,8 @@
             }
             else
             {
-                builder.Append( '/' );
+                keySeparator = '/';
+                builder.Append( keySeparator );
             }
 
             if ( entityKeys.Length == 1 )
@@ -191,8 +193,11 @@
             }
             else
             {
-                for ( var i = 0; i < entityKeys.Length; i++ )
+                ExpandParameterTemplate( builder, entityKeys[0], parameterKeys[0].Name );
+
+                for ( var i = 1; i < entityKeys.Length; i++ )
                 {
+                    builder.Append( keySeparator );
                     ExpandParameterTemplate( builder, entityKeys[i], parameterKeys[i].Name );
                 }
             }
