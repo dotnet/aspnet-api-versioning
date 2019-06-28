@@ -39,7 +39,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the allowed arthmetic operators.
+        /// Gets or sets the allowed arithmetic operators.
         /// </summary>
         /// <value>One or more of the <see cref="AllowedArithmeticOperators"/> values.</value>
         public AllowedArithmeticOperators AllowedArithmeticOperators { get; set; }
