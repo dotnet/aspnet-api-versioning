@@ -1,2 +1,5 @@
-﻿Fixed not all actions had ODataAttributeRouteInfo
-Added ODataControllerSpecification for OData APIs
+﻿Generate navigation property templates by convention (#463)
+Fix selecting the assumed, default API version (#471)
+Fix overriding global query settings (#488)
+Add appropriate separators for composite keys (#500)
+Fix client vs server route template generation (#502)
