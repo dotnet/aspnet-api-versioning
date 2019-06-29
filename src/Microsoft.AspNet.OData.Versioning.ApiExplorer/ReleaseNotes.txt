@@ -1,2 +1,4 @@
-﻿Fix tracking CLR types that match the EDM (#425)
-Fix type generation with circular references (#431)
+﻿Generate navigation property templates by convention (#463)
+Fix overriding global query settings (#488)
+Add appropriate separators for composite keys (#500)
+Fix client vs server route template generation (#502)
