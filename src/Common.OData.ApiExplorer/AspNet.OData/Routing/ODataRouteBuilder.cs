@@ -177,6 +177,7 @@
 
             var useParentheses = Context.UrlKeyDelimiter == Parentheses;
             var keySeparator = ',';
+            var keyAsSegment = false;
 
             if ( useParentheses )
             {
@@ -185,6 +186,7 @@
             else
             {
                 keySeparator = '/';
+                keyAsSegment = true;
                 builder.Append( keySeparator );
             }
 
@@ -199,7 +201,7 @@
                 for ( var i = 1; i < entityKeys.Length; i++ )
                 {
                     builder.Append( keySeparator );
-                    ExpandParameterTemplate( builder, entityKeys[i], parameterKeys[i].Name );
+                    ExpandParameterTemplate( builder, entityKeys[i], parameterKeys[i].Name, keyAsSegment );
                 }
             }
 
@@ -280,13 +282,16 @@
             }
         }
 
-        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key ) => ExpandParameterTemplate( template, key.Type, key.Name );
+        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key ) =>
+            ExpandParameterTemplate( template, key.Type, key.Name, keyAsSegment: false );
 
-        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key, string name ) => ExpandParameterTemplate( template, key.Type, name );
+        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key, string name, bool keyAsSegment = false ) =>
+            ExpandParameterTemplate( template, key.Type, name, keyAsSegment );
 
-        void ExpandParameterTemplate( StringBuilder template, IEdmOperationParameter parameter, string name ) => ExpandParameterTemplate( template, parameter.Type, name );
+        void ExpandParameterTemplate( StringBuilder template, IEdmOperationParameter parameter, string name ) =>
+            ExpandParameterTemplate( template, parameter.Type, name, keyAsSegment: false );
 
-        void ExpandParameterTemplate( StringBuilder template, IEdmTypeReference typeReference, string name )
+        void ExpandParameterTemplate( StringBuilder template, IEdmTypeReference typeReference, string name, bool keyAsSegment )
         {
             Contract.Requires( template != null );
             Contract.Requires( typeReference != null );
@@ -299,7 +304,7 @@
             template.Append( name );
             template.Append( "}" );
 
-            if ( Context.RouteTemplateGeneration == Server )
+            if ( Context.RouteTemplateGeneration == Server || keyAsSegment )
             {
                 return;
             }
