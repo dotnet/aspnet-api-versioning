@@ -17,7 +17,7 @@
         /// <remarks>
         /// <para>
         /// Configuration of the API versioning middleware is not necessary unless you explicitly
-        /// want to control when the middleware is added in the pipline. API versioning automatically configures
+        /// want to control when the middleware is added in the pipeline. API versioning automatically configures
         /// the required middleware, which is usually early enough for dependent middleware.
         /// </para>
         /// <para>

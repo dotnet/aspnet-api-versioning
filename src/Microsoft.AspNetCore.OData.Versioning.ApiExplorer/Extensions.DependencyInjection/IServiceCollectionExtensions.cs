@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection
 {
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
     using System;
@@ -50,18 +51,29 @@
         {
             services.AddVersionedApiExplorer();
             services.TryAdd( Singleton<IOptionsFactory<ODataApiExplorerOptions>, ApiExplorerOptionsFactory<ODataApiExplorerOptions>>() );
-            services.Replace( Singleton<IOptionsFactory<ApiExplorerOptions>>( sp => new ODataApiExplorerOptionsAdapter( sp.GetRequiredService<IOptionsFactory<ODataApiExplorerOptions>>() ) ) );
-            services.Replace( Singleton( typeof( ApiExplorerOptions ), sp => sp.GetRequiredService<ODataApiExplorerOptions>() ) );
+            services.Replace( Singleton<IOptionsFactory<ApiExplorerOptions>, ODataApiExplorerOptionsAdapter>() );
             services.TryAddEnumerable( Transient<IApiDescriptionProvider, ODataApiDescriptionProvider>() );
         }
 
         sealed class ODataApiExplorerOptionsAdapter : IOptionsFactory<ApiExplorerOptions>
         {
+            readonly IOptions<ODataApiVersioningOptions> options;
             readonly IOptionsFactory<ODataApiExplorerOptions> factory;
 
-            internal ODataApiExplorerOptionsAdapter( IOptionsFactory<ODataApiExplorerOptions> factory ) => this.factory = factory;
+            public ODataApiExplorerOptionsAdapter(
+                IOptions<ODataApiVersioningOptions> options,
+                IOptionsFactory<ODataApiExplorerOptions> factory )
+            {
+                this.options = options;
+                this.factory = factory;
+            }
 
-            public ApiExplorerOptions Create( string name ) => factory.Create( name );
+            public ApiExplorerOptions Create( string name )
+            {
+                var newOptions = factory.Create( name );
+                newOptions.UseQualifiedNames = options.Value.UseQualifiedNames;
+                return newOptions;
+            }
         }
     }
 }

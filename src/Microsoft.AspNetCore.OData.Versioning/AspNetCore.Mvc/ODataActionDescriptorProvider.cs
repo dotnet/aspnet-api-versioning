@@ -3,9 +3,10 @@
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc.Abstractions;
-    using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.Options;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -13,21 +14,21 @@
     sealed class ODataActionDescriptorProvider : IActionDescriptorProvider
     {
         readonly IODataRouteCollectionProvider routeCollectionProvider;
-        readonly ApplicationPartManager partManager;
         readonly IModelMetadataProvider modelMetadataProvider;
+        readonly IOptions<ODataApiVersioningOptions> options;
 
         public ODataActionDescriptorProvider(
             IODataRouteCollectionProvider routeCollectionProvider,
-            ApplicationPartManager partManager,
-            IModelMetadataProvider modelMetadataProvider )
+            IModelMetadataProvider modelMetadataProvider,
+            IOptions<ODataApiVersioningOptions> options )
         {
             Contract.Requires( routeCollectionProvider != null );
-            Contract.Requires( partManager != null );
             Contract.Requires( modelMetadataProvider != null );
+            Contract.Requires( options != null );
 
             this.routeCollectionProvider = routeCollectionProvider;
-            this.partManager = partManager;
             this.modelMetadataProvider = modelMetadataProvider;
+            this.options = options;
         }
 
         public int Order => 0;
@@ -45,7 +46,7 @@
             var conventions = new IODataActionDescriptorConvention[]
             {
                 new ImplicitHttpMethodConvention(),
-                new ODataRouteBindingInfoConvention( routeCollectionProvider, modelMetadataProvider ),
+                new ODataRouteBindingInfoConvention( routeCollectionProvider, modelMetadataProvider, options ),
             };
 
             foreach ( var action in ODataActions( results ) )

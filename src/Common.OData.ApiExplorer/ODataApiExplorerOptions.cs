@@ -7,12 +7,14 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using System;
+    using System.ComponentModel;
 #if WEBAPI
     using System.Web.Http;
     using System.Web.Http.Description;
 #else
     using Microsoft.AspNetCore.Mvc;
 #endif
+    using static System.ComponentModel.EditorBrowsableState;
 
     /// <summary>
     /// Represents the possible API versioning options for an OData API explorer.
@@ -36,7 +38,19 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// Gets or sets a value indicating whether qualified names are used when building URLs for operations (e.g. actions and functions).
         /// </summary>
         /// <value>True if qualified names are used when building URLs for operations; otherwise, false. The default value is <c>false</c>.</value>
-        public bool UseQualifiedOperationNames { get; set; }
+        [EditorBrowsable( Never )]
+        [Obsolete( "This property will be removed in the next major version. Use UseQualifiedNames instead.", error: true )]
+        public bool UseQualifiedOperationNames
+        {
+            get => UseQualifiedNames;
+            set => UseQualifiedNames = value;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether qualified names are used when building URLs.
+        /// </summary>
+        /// <value>True if qualified names are used when building URLs; otherwise, false. The default value is <c>false</c>.</value>
+        public bool UseQualifiedNames { get; set; }
 
         /// <summary>
         /// Gets or sets the convention builder used to describe OData query options.
