@@ -1,9 +1,12 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Filters;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using System;
+    using System.Threading.Tasks;
+    using static System.Threading.Tasks.Task;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core.
@@ -49,8 +52,15 @@
 
             if ( !model.IsApiVersionNeutral )
             {
-                reporter.Report( response.Headers, model );
+                response.OnStarting( ReportApiVersions, (response.Headers, model) );
             }
+        }
+
+        Task ReportApiVersions( object state )
+        {
+            var (headers, model) = ((IHeaderDictionary, ApiVersionModel)) state;
+            reporter.Report( headers, model );
+            return CompletedTask;
         }
     }
 }
