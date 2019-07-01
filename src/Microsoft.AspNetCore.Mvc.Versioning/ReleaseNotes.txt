@@ -1,1 +1,1 @@
-﻿Fix ApiVersion model binding (#452)
+﻿Add API version parameter to Content-Type (#484)

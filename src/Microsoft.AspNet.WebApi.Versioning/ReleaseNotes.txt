@@ -1,1 +1,1 @@
-﻿Fix non-OWIN route enumeration (#428)
+﻿Add API version parameter to Content-Type (#484)
