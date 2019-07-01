@@ -62,6 +62,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionParameterSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionReaderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IApiVersionSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IErrorResponseProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Versioning\IReportApiVersions.cs" />

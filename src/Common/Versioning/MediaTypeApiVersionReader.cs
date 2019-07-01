@@ -27,12 +27,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </summary>
     public partial class MediaTypeApiVersionReader : IApiVersionReader
     {
-        string parameterName = "v";
+        string parameterName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaTypeApiVersionReader"/> class.
         /// </summary>
-        public MediaTypeApiVersionReader() { }
+        public MediaTypeApiVersionReader() => parameterName = "v";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaTypeApiVersionReader"/> class.

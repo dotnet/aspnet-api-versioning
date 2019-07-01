@@ -57,6 +57,11 @@
                 configuration.Filters.Add( new ReportApiVersionsAttribute() );
             }
 
+            if ( options.ApiVersionReader.VersionsByMediaType() )
+            {
+                configuration.Filters.Add( new ApplyContentTypeVersionActionFilter( options.ApiVersionReader ) );
+            }
+
             configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
             configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
         }

@@ -62,6 +62,7 @@
             services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
             services.TryAddSingleton<IApiControllerFilter, DefaultApiControllerFilter>();
             services.TryAddSingleton<ReportApiVersionsAttribute>();
+            services.AddSingleton<ApplyContentTypeVersionActionFilter>();
             services.TryAddSingleton( OnRequestIReportApiVersions );
             services.TryAddEnumerable( Transient<IPostConfigureOptions<MvcOptions>, ApiVersioningMvcOptionsSetup>() );
             services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
