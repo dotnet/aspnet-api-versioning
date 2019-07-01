@@ -143,11 +143,7 @@
                     AppendEntityKeysFromConvention( builder );
                     segments.Add( builder.ToString() );
                     builder.Clear();
-#if API_EXPLORER
-                    builder.Append( Context.Options.UseQualifiedOperationNames ? Context.Operation.ShortQualifiedName() : Context.Operation.Name );
-#else
-                    builder.Append( Context.Operation.ShortQualifiedName() );
-#endif
+                    builder.Append( Context.Options.UseQualifiedNames ? Context.Operation.ShortQualifiedName() : Context.Operation.Name );
                     AppendParametersFromConvention( builder, Context.Operation );
                     break;
                 case UnboundOperation:

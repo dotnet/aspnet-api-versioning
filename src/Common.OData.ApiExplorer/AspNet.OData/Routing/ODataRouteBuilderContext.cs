@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Versioning;
 #endif
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
@@ -38,6 +39,8 @@
 
         internal ODataRouteTemplateGenerationKind RouteTemplateGeneration { get; } = Client;
 #else
+        internal ODataApiVersioningOptions Options { get; }
+
         internal IList<ParameterDescriptor> ParameterDescriptions => ActionDescriptor.Parameters;
 
         internal ODataRouteTemplateGenerationKind RouteTemplateGeneration { get; } = Server;

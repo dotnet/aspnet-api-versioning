@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNet.OData;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
@@ -15,10 +16,14 @@
     {
         private IODataPathTemplateHandler templateHandler;
 
-        internal ODataRouteBuilderContext( ODataRouteMapping routeMapping, ControllerActionDescriptor actionDescriptor )
+        internal ODataRouteBuilderContext(
+            ODataRouteMapping routeMapping,
+            ControllerActionDescriptor actionDescriptor,
+            ODataApiVersioningOptions options )
         {
             Contract.Requires( routeMapping != null );
             Contract.Requires( actionDescriptor != null );
+            Contract.Requires( options != null );
 
             ApiVersion = routeMapping.ApiVersion;
             serviceProvider = routeMapping.Services;
@@ -27,6 +32,7 @@
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = routeMapping.Route;
             ActionDescriptor = actionDescriptor;
+            Options = options;
             UrlKeyDelimiter = serviceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter ?? Parentheses;
 
             var container = EdmModel.EntityContainer;

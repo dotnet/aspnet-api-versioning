@@ -5,6 +5,8 @@
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.Options;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -18,20 +20,27 @@
 
     sealed class ODataRouteBindingInfoConvention : IODataActionDescriptorConvention
     {
+        readonly IOptions<ODataApiVersioningOptions> options;
+
         internal ODataRouteBindingInfoConvention(
             IODataRouteCollectionProvider routeCollectionProvider,
-            IModelMetadataProvider modelMetadataProvider )
+            IModelMetadataProvider modelMetadataProvider,
+            IOptions<ODataApiVersioningOptions> options )
         {
             Contract.Requires( routeCollectionProvider != null );
             Contract.Requires( modelMetadataProvider != null );
+            Contract.Requires( options != null );
 
             RouteCollectionProvider = routeCollectionProvider;
             ModelMetadataProvider = modelMetadataProvider;
+            this.options = options;
         }
 
         IODataRouteCollectionProvider RouteCollectionProvider { get; }
 
         IModelMetadataProvider ModelMetadataProvider { get; }
+
+        ODataApiVersioningOptions Options => options.Value;
 
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
@@ -95,7 +104,7 @@
             Contract.Requires( mapping != null );
             Contract.Requires( routeInfos != null );
 
-            var routeContext = new ODataRouteBuilderContext( mapping, action );
+            var routeContext = new ODataRouteBuilderContext( mapping, action, Options );
             var routeBuilder = new ODataRouteBuilder( routeContext );
             var parameterContext = new ActionParameterContext( routeBuilder, routeContext );
 

@@ -31,5 +31,11 @@
                 conventions = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether qualified names are used when building URLs.
+        /// </summary>
+        /// <value>True if qualified names are used when building URLs; otherwise, false. The default value is <c>false</c>.</value>
+        public bool UseQualifiedNames { get; set; }
     }
 }

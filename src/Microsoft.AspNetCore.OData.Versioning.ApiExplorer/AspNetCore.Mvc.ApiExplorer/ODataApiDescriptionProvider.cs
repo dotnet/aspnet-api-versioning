@@ -365,7 +365,7 @@
             var relativePath = action.AttributeRouteInfo?.Template;
 
             // note: if path happens to be built adhead of time, it's expected to be qualified; rebuild it as necessary
-            if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedOperationNames )
+            if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedNames )
             {
                 var builder = new ODataRouteBuilder( routeContext );
                 relativePath = builder.Build();
