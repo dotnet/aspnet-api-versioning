@@ -2,3 +2,4 @@
 Fix overriding global query settings (#488)
 Add appropriate separators for composite keys (#500)
 Fix client vs server route template generation (#502)
+UseQualifiedNames option replaces UseQualifiedOperationNames
