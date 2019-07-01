@@ -28,12 +28,13 @@
 
             // act
             var response = await GetAsync( "api/values" ).EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsExampleAsync( example );
+            var body = response.Content;
+            var content = await body.ReadAsExampleAsync( example );
 
             // assert
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
+            body.Headers.ContentType.Parameters.Single( p => p.Name == "v" ).Value.Should().Be( apiVersion );
             content.Should().BeEquivalentTo( new { controller, version = apiVersion } );
-
         }
 
         [Fact]
@@ -64,9 +65,11 @@
 
             // act
             var response = await GetAsync( requestUrl ).EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsExampleAsync( example );
+            var body = response.Content;
+            var content = await body.ReadAsExampleAsync( example );
 
             // assert
+            body.Headers.ContentType.Parameters.Single( p => p.Name == "v" ).Value.Should().Be( apiVersion );
             content.Should().BeEquivalentTo( new { controller, version = apiVersion } );
         }
 

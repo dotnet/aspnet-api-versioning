@@ -29,6 +29,11 @@
                 options.Filters.AddService<ReportApiVersionsAttribute>();
             }
 
+            if ( value.ApiVersionReader.VersionsByMediaType() )
+            {
+                options.Filters.AddService<ApplyContentTypeVersionActionFilter>();
+            }
+
             var modelMetadataDetailsProviders = options.ModelMetadataDetailsProviders;
 
             modelMetadataDetailsProviders.Insert( 0, new SuppressChildValidationMetadataProvider( typeof( ApiVersion ) ) );
