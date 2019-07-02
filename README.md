@@ -1,4 +1,4 @@
-![VSTS Build Status](https://microsoft.visualstudio.com/_apis/public/build/definitions/8d47e068-03c8-4cdc-aa9b-fc6929290322/25012/badge "Build Status")
+[![Build status](https://microsoft.visualstudio.com/OS/_apis/build/status/aspnet.api.versioning/Release)](https://microsoft.visualstudio.com/OS/_build/latest?definitionId=25025 "Build status")
 
 # ASP.NET API Versioning
 
