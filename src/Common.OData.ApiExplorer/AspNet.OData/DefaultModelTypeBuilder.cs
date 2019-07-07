@@ -315,7 +315,7 @@
             return assemblyBuilder.DefineDynamicModule( "<module>" );
         }
 
-        static string GetNameFromAttribute( PropertyInfo property )
+        static string GetNameFromAttribute( MemberInfo property )
         {
             return property.GetCustomAttribute<System.Runtime.Serialization.DataMemberAttribute>()?.Name;
         }

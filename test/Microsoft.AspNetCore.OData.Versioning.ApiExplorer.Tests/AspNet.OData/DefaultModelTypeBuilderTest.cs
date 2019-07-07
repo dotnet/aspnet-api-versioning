@@ -408,6 +408,24 @@
             substitutionType.Should().NotBeOfType<TypeBuilder>();
         }
 
+        [Fact]
+        public void substituted_type_should_have_renamed_with_attribute_properties_from_original_type()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            modelBuilder.EntitySet<Contact>( "Contacts" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Contact );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.Should().HaveProperty<string>(nameof( Contact.FirstName ) );
+        }
+
+
         public static IEnumerable<object[]> SubstitutionNotRequiredData
         {
             get
