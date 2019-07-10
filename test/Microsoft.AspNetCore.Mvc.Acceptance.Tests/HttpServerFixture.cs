@@ -65,11 +65,19 @@
 
         protected virtual void OnConfigureRoutes( IRouteBuilder routeBuilder ) { }
 
+#if !NET461
+        protected virtual void OnConfigureEndpoints( IEndpointRouteBuilder routeBuilder )
+        {
+            routeBuilder.MapControllers();
+            routeBuilder.MapDefaultControllerRoute();
+        }
+#endif
+
         TestServer CreateServer()
         {
             var builder = new WebHostBuilder()
-                .Configure( app => app.UseMvc( OnConfigureRoutes ).UseMvcWithDefaultRoute() )
                 .ConfigureServices( OnDefaultConfigureServices )
+                .Configure( OnConfigureApplication )
                 .UseContentRoot( GetContentRoot() );
 
             return new TestServer( builder );
@@ -78,9 +86,7 @@
         HttpClient CreateAndInitializeHttpClient()
         {
             var newClient = Server.CreateClient();
-
             newClient.BaseAddress = new Uri( "http://localhost" );
-
             return newClient;
         }
 
@@ -93,6 +99,23 @@
             services.AddMvc( options => options.EnableEndpointRouting = EnableEndpointRouting ).SetCompatibilityVersion( Latest );
             services.AddApiVersioning( OnAddApiVersioning );
             OnConfigureServices( services );
+        }
+
+        void OnConfigureApplication( IApplicationBuilder app )
+        {
+#if NET461
+            app.UseMvc( OnConfigureRoutes ).UseMvcWithDefaultRoute();
+#else
+            if ( EnableEndpointRouting )
+            {
+                app.UseRouting();
+                app.UseEndpoints( OnConfigureEndpoints );
+            }
+            else
+            {
+                app.UseMvc( OnConfigureRoutes ).UseMvcWithDefaultRoute();
+            }
+#endif
         }
 
         string GetContentRoot()

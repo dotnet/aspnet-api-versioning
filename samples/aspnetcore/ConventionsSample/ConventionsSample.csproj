@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
  <PropertyGroup>
-  <TargetFramework>netcoreapp2.2</TargetFramework>
-  <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  <TargetFramework>netcoreapp3.0</TargetFramework>
   <RootNamespace>Microsoft.Examples</RootNamespace>
  </PropertyGroup>
-
- <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.App" />
-  <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
- </ItemGroup>
  
  <ItemGroup>
   <ProjectReference Include="..\..\..\src\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />

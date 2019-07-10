@@ -20,7 +20,7 @@
     /// Represents the <see cref="IEndpointSelectorPolicy">endpoint selector policy</see> for API versions.
     /// </summary>
     [CLSCompliant( false )]
-    public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
+    public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     {
         readonly IOptions<ApiVersioningOptions> options;
 
@@ -71,42 +71,6 @@
             }
 
             return false;
-        }
-
-        /// <inheritdoc />
-        public Task ApplyAsync( HttpContext httpContext, EndpointSelectorContext context, CandidateSet candidates )
-        {
-            Arg.NotNull( httpContext, nameof( httpContext ) );
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
-
-            if ( IsRequestedApiVersionAmbiguous( httpContext, context, out var apiVersion ) )
-            {
-                return CompletedTask;
-            }
-
-            if ( apiVersion == null && Options.AssumeDefaultVersionWhenUnspecified )
-            {
-                apiVersion = TrySelectApiVersion( httpContext, candidates );
-                httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
-            }
-
-            var finalMatches = EvaluateApiVersion( httpContext, candidates, apiVersion );
-
-            if ( finalMatches.Count == 0 )
-            {
-                context.Endpoint = ClientError( httpContext, candidates );
-            }
-            else
-            {
-                for ( var i = 0; i < finalMatches.Count; i++ )
-                {
-                    var (index, _, valid) = finalMatches[i];
-                    candidates.SetValidity( index, valid );
-                }
-            }
-
-            return CompletedTask;
         }
 
         static IReadOnlyList<(int index, ActionDescriptor action, bool valid)> EvaluateApiVersion(
@@ -166,33 +130,6 @@
             }
 
             return bestMatches.ToArray();
-        }
-
-        bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, EndpointSelectorContext context, out ApiVersion apiVersion )
-        {
-            Contract.Requires( httpContext != null );
-            Contract.Requires( context != null );
-
-            try
-            {
-                apiVersion = httpContext.GetRequestedApiVersion();
-            }
-            catch ( AmbiguousApiVersionException ex )
-            {
-                Logger.LogInformation( ex.Message );
-                apiVersion = default;
-
-                var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
-                {
-                    Code = AmbiguousApiVersion,
-                    Message = ex.Message,
-                };
-
-                context.Endpoint = new BadRequestHandler( handlerContext );
-                return true;
-            }
-
-            return false;
         }
 
         ApiVersion TrySelectApiVersion( HttpContext httpContext, CandidateSet candidates )

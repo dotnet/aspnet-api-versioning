@@ -126,7 +126,11 @@
                 }
             }
 
+#if NETCOREAPP3_0
+            var genericPartIndex = type.Name.IndexOf( '`', StringComparison.Ordinal );
+#else
             var genericPartIndex = type.Name.IndexOf( '`' );
+#endif
 
             if ( genericPartIndex <= 0 )
             {

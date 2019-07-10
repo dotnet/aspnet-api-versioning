@@ -7,6 +7,8 @@
   <IsTestProject>true</IsTestProject>
   <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
   <IsAspNetCore>$(MSBuildProjectName.StartsWith('Microsoft.AspNetCore'))</IsAspNetCore>
+  <TestHostVersion>2.2.0</TestHostVersion>
+  <TestHostVersion Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">3.0.0-*</TestHostVersion>
  </PropertyGroup>
 
  <ItemGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
@@ -22,7 +24,7 @@
 
  <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
   <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(TestHostVersion)" />
  </ItemGroup>
 
 </Project>

@@ -3,7 +3,10 @@
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Basic;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+#if !NETCOREAPP
     using Microsoft.AspNetCore.Mvc.Internal;
+#endif
     using System;
     using System.Threading.Tasks;
     using Xunit;

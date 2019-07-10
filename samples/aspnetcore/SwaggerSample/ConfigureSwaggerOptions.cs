@@ -3,8 +3,9 @@
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
-    using Swashbuckle.AspNetCore.Swagger;
+    using Microsoft.OpenApi.Models;
     using Swashbuckle.AspNetCore.SwaggerGen;
+    using System;
 
     /// <summary>
     /// Configures the Swagger generation options.
@@ -32,16 +33,15 @@
             }
         }
 
-        static Info CreateInfoForApiVersion( ApiVersionDescription description )
+        static OpenApiInfo CreateInfoForApiVersion( ApiVersionDescription description )
         {
-            var info = new Info()
+            var info = new OpenApiInfo()
             {
                 Title = "Sample API",
                 Version = description.ApiVersion.ToString(),
                 Description = "A sample application with Swagger, Swashbuckle, and API versioning.",
-                Contact = new Contact() { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },
-                TermsOfService = "Shareware",
-                License = new License() { Name = "MIT", Url = "https://opensource.org/licenses/MIT" }
+                Contact = new OpenApiContact() { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },
+                License = new OpenApiLicense() { Name = "MIT", Url = new Uri( "https://opensource.org/licenses/MIT" ) }
             };
 
             if ( description.IsDeprecated )
