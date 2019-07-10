@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Versioning
+﻿namespace Microsoft.AspNetCore.Mvc.Simulators
 {
     using System;
     using System.Threading.Tasks;

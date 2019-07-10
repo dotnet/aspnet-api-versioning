@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Examples
 {
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +9,6 @@
     using Swashbuckle.AspNetCore.SwaggerGen;
     using System.IO;
     using System.Reflection;
-    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -38,9 +36,7 @@
         /// <param name="services">The collection of services to configure the application with.</param>
         public void ConfigureServices( IServiceCollection services )
         {
-            // the sample application always uses the latest version, but you may want an explicit version such as Version_2_2
-            // note: Endpoint Routing is enabled by default; however, if you need legacy style routing via IRouter, change it to false
-            services.AddMvc( options => options.EnableEndpointRouting = true ).SetCompatibilityVersion( Latest );
+            services.AddControllers();
             services.AddApiVersioning(
                 options =>
                 {
@@ -74,11 +70,11 @@
         /// Configures the application using the provided builder, hosting environment, and API version description provider.
         /// </summary>
         /// <param name="app">The current application builder.</param>
-        /// <param name="env">The current hosting environment.</param>
         /// <param name="provider">The API version descriptor provider used to enumerate defined API versions.</param>
-        public void Configure( IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider )
+        public void Configure( IApplicationBuilder app, IApiVersionDescriptionProvider provider )
         {
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints( builder => builder.MapControllers() );
             app.UseSwagger();
             app.UseSwaggerUI(
                 options =>

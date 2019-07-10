@@ -1,1 +1,1 @@
-﻿Ensure implicitly versioned ActionModel has associated ControllerModel (#519)
+﻿

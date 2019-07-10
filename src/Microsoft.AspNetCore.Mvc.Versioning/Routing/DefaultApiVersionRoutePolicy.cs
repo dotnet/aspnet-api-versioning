@@ -1,7 +1,11 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Routing
 {
     using Microsoft.AspNetCore.Mvc.Abstractions;
+#if NETSTANDARD2_0
     using Microsoft.AspNetCore.Mvc.Internal;
+#else
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+#endif
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;

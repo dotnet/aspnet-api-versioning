@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>netcoreapp2.2;net461</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.2</TargetFrameworks>
+  <TargetFrameworks>net461;netcoreapp3.0</TargetFrameworks>
+  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp3.0</TargetFrameworks>
   <RootNamespace>Microsoft.AspNetCore</RootNamespace>
   <AssetTargetFallback>$(AssetTargetFallback);portable-net451+win8</AssetTargetFallback>
   <PreserveCompilationContext>true</PreserveCompilationContext>
@@ -10,15 +10,34 @@
 
  <ItemGroup>
   <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
-  <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Versioning\Microsoft.AspNetCore.OData.Versioning.csproj" />
+  <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Versioning\Microsoft.AspNetCore.OData.Versioning.csproj" Condition=" '$(TargetFramework)' == 'net461' " />
  </ItemGroup>
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
   <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
   <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.3.0" />
  </ItemGroup>
 
- <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Label="Shared" />
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.0.0-*" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+  <Compile Remove="OData\**\*.cs" />
+ </ItemGroup>
+
+ <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Condition=" '$(TargetFramework)' == 'net461' " />
+
+ <!-- TEMP: cannot use the shared project until odata supports netcoreapp3.0 so just link the relevant files instead for now -->
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+  <Compile Include="..\Acceptance.Test.Shared\**\*.cs"
+           Exclude="..\Acceptance.Test.Shared\**\*OData*.cs"
+           Link="%(RecursiveDir)%(Filename)%(Extension)"
+           Visible="false" />
+ </ItemGroup>
 
 </Project>

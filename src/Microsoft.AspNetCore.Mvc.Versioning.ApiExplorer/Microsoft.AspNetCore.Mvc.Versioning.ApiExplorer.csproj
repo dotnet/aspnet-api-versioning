@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>3.2.0</VersionPrefix>
-  <AssemblyVersion>3.2.0.0</AssemblyVersion>
-  <TargetFramework>netstandard2.0</TargetFramework>
+  <VersionPrefix>4.0.0</VersionPrefix>
+  <AssemblyVersion>4.0.0.0</AssemblyVersion>
+  <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
   <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
   <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
@@ -16,7 +16,7 @@
   <ProjectReference Include="..\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
  </ItemGroup>
 
- <ItemGroup>
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
   <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="[2.2.0,3.0.0)" />
  </ItemGroup>
 

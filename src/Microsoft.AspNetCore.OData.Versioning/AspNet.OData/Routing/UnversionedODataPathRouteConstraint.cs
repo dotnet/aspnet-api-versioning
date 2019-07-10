@@ -50,7 +50,7 @@
                 // is implicitly matching an api version allowed?
                 if ( options.AssumeDefaultVersionWhenUnspecified || IsServiceDocumentOrMetadataRoute( values ) )
                 {
-                    var odata = httpContext.Features.Get<IODataVersioningFeature>();
+                    var odata = httpContext.ODataVersioningFeature();
                     var model = new ApiVersionModel( odata.MatchingRoutes.Keys, Array.Empty<ApiVersion>() );
                     var selector = httpContext.RequestServices.GetRequiredService<IApiVersionSelector>();
                     var requestedApiVersion = feature.RequestedApiVersion = selector.SelectVersion( httpContext.Request, model );

@@ -31,14 +31,14 @@
             }
 
             var hostBuilder = new WebHostBuilder()
-                .Configure( app => app.UseMvc( setupRoutes ) )
                 .ConfigureServices(
                     services =>
                     {
-                        services.AddMvc();
+                        services.AddMvc( options => options.EnableEndpointRouting = false );
                         services.AddApiVersioning( setupApiVersioning );
                         services.Replace( Singleton<IActionSelector, TestApiVersionActionSelector>() );
-                    } );
+                    } )
+                .Configure( app => app.UseMvc( setupRoutes ) );
 
             server = new TestServer( hostBuilder );
             Client = server.CreateClient();
