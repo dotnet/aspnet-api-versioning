@@ -1,15 +1,17 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using Abstractions;
-    using AspNetCore.Routing;
-    using Builder;
-    using Controllers;
-    using Conventions;
-    using Extensions.DependencyInjection;
     using FluentAssertions;
-    using Infrastructure;
-    using Internal;
-    using Simulators;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+#if !NETCOREAPP
+    using Microsoft.AspNetCore.Mvc.Internal;
+#endif
+    using Microsoft.AspNetCore.Mvc.Simulators;
+    using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Linq;
     using System.Net.Http;
@@ -257,7 +259,7 @@
             // arrange
             var controllerType = typeof( AttributeRoutedTestController ).GetTypeInfo();
 
-            using ( var server = new WebServer( o => o.DefaultApiVersion = new ApiVersion( 42, 0 ) ) )
+            using ( var server = new WebServer( options => options.DefaultApiVersion = new ApiVersion( 42, 0 ) ) )
             {
                 await server.Client.GetAsync( "api/attributed?api-version=42.0" );
 
@@ -350,12 +352,12 @@
         }
 
         [Fact]
-        public void select_best_candidate_should_throw_exception_for_ambiguously_versionedX2C_attributeX2Dbased_controller()
+        public async Task select_best_candidate_should_throw_exception_for_ambiguously_versionedX2C_attributeX2Dbased_controller()
         {
             // arrange
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguous2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguous3Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AttributeRoutedAmbiguous2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AttributeRoutedAmbiguous3Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( o => o.AssumeDefaultVersionWhenUnspecified = true ) )
             {
@@ -364,12 +366,12 @@
                 // act
 
                 // assert
-                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
+                await test.Should().ThrowAsync<AmbiguousActionException>().WithMessage( message );
             }
         }
 
         [Fact]
-        public void select_best_candidate_should_throw_exception_for_ambiguously_versionedX2C_conventionX2Dbased_controller()
+        public async Task select_best_candidate_should_throw_exception_for_ambiguously_versionedX2C_conventionX2Dbased_controller()
         {
             // arrange
             void ConfigureOptions( ApiVersioningOptions options )
@@ -377,10 +379,9 @@
                 options.UseApiBehavior = false;
                 options.AssumeDefaultVersionWhenUnspecified = true;
             }
-
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousToo2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousTooController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AmbiguousToo2Controller.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AmbiguousTooController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
@@ -389,17 +390,17 @@
                 // act
 
                 // assert
-                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
+                await test.Should().ThrowAsync<AmbiguousActionException>().WithMessage( message );
             }
         }
 
         [Fact]
-        public void select_best_candidate_should_throw_exception_for_ambiguous_neutral_and_versionedX2C_attributeX2Dbased_controller()
+        public async Task select_best_candidate_should_throw_exception_for_ambiguous_neutral_and_versionedX2C_attributeX2Dbased_controller()
         {
             // arrange
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AttributeRoutedAmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AttributeRoutedAmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AttributeRoutedAmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( options => options.AssumeDefaultVersionWhenUnspecified = true ) )
             {
@@ -408,12 +409,12 @@
                 // act
 
                 // assert
-                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
+                await test.Should().ThrowAsync<AmbiguousActionException>().WithMessage( message );
             }
         }
 
         [Fact]
-        public void select_best_candidate_should_throw_exception_for_ambiguous_neutral_and_versionedX2C_conventionX2Dbased_controller()
+        public async Task select_best_candidate_should_throw_exception_for_ambiguous_neutral_and_versionedX2C_conventionX2Dbased_controller()
         {
             // arrange
             void ConfigureOptions( ApiVersioningOptions options )
@@ -423,8 +424,8 @@
             }
 
             var message = $"Multiple actions matched. The following actions matched route data and had all constraints satisfied:{NewLine}{NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
-                          $"Microsoft.AspNetCore.Mvc.Versioning.AmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AmbiguousNeutralController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests){NewLine}" +
+                          $"Microsoft.AspNetCore.Mvc.Simulators.AmbiguousController.Get() (Microsoft.AspNetCore.Mvc.Versioning.Tests)";
 
             using ( var server = new WebServer( ConfigureOptions, r => r.MapRoute( "default", "api/{controller}/{action=Get}/{id?}" ) ) )
             {
@@ -433,7 +434,7 @@
                 // act
 
                 // assert
-                test.Should().Throw<AmbiguousActionException>().WithMessage( message );
+                await test.Should().ThrowAsync<AmbiguousActionException>().WithMessage( message );
             }
         }
 

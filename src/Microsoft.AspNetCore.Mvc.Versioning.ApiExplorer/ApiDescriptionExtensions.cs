@@ -73,7 +73,11 @@
             var relativePath = apiDescription.RelativePath;
             var token = '{' + parameter.Name + '}';
             var value = apiDescription.GetApiVersion().ToString( options.SubstitutionFormat, InvariantCulture );
+#if NETSTANDARD2_0
             var newRelativePath = relativePath.Replace( token, value );
+#else
+            var newRelativePath = relativePath.Replace( token, value, StringComparison.Ordinal );
+#endif
 
             if ( relativePath == newRelativePath )
             {

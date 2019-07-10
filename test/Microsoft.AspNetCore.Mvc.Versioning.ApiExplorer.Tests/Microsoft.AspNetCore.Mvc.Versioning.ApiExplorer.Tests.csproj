@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>netcoreapp2.2;net461</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.2</TargetFrameworks>
+  <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
+  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp3.0</TargetFrameworks>
   <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
   <PreserveCompilationContext>true</PreserveCompilationContext>
  </PropertyGroup>
@@ -11,7 +11,7 @@
   <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.csproj" />
  </ItemGroup>
 
- <ItemGroup>
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
   <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
   <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="2.2.0" />
  </ItemGroup>

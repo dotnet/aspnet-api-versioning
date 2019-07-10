@@ -1,1 +1,1 @@
-﻿Update Authenticode signature to use SHA256
+﻿

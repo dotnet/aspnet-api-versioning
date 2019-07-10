@@ -1,9 +1,13 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Hosting;
     using System;
     using System.Diagnostics.Contracts;
     using static System.String;
+#if NETSTANDARD2_0
+    using IWebHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+#endif
 
     /// <summary>
     /// Represents the default implementation for creating HTTP error responses related to API versioning.
@@ -55,7 +59,7 @@
                 return default;
             }
 
-            var environment = (IHostingEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IHostingEnvironment ) );
+            var environment = (IWebHostEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IWebHostEnvironment ) );
 
             if ( environment?.IsDevelopment() == true )
             {
