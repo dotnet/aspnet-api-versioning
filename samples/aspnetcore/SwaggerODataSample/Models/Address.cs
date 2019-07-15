@@ -36,5 +36,19 @@
         /// </summary>
         /// <value>The address zip code.</value>
         public string ZipCode { get; set; }
+        /// <summary>
+        /// Gets or sets the sub address.
+        /// </summary>
+        public SubAddress SubAddress { get; set; }
+
+    }
+
+    public class SubAddress
+    {
+        public int Id { get; set; }
+        /// <summary>
+        /// Person inner adderrss
+        /// </summary>
+        public Address InnerAddress { get; set; }
     }
 }
