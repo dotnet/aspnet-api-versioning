@@ -96,21 +96,29 @@
             const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance;
 
             var properties = new List<ClassProperty>();
-            var structuralProperties = structuredType.Properties().ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
+            var structuralProperties = new Dictionary<string, IEdmProperty>( StringComparer.OrdinalIgnoreCase );
+            var mappedClrProperties = new Dictionary<PropertyInfo, IEdmProperty>();
             var clrTypeMatchesEdmType = true;
             var hasUnfinishedTypes = false;
             var dependentProperties = new List<PropertyDependency>();
 
+            foreach ( var property in structuredType.Properties() )
+            {
+                structuralProperties.Add( property.Name, property );
+                var clrProperty = edmModel.GetAnnotationValue<ClrPropertyInfoAnnotation>( property )?.ClrPropertyInfo;
+                if ( clrProperty != null )
+                {
+                    mappedClrProperties.Add( clrProperty, property );
+                }
+            }
+
             foreach ( var property in clrType.GetProperties( bindingFlags ) )
             {
-                if ( !structuralProperties.TryGetValue( property.Name, out var structuralProperty ) )
+                if ( !structuralProperties.TryGetValue( property.Name, out var structuralProperty ) &&
+                     !mappedClrProperties.TryGetValue( property, out structuralProperty ) )
                 {
-                    var name = GetNameFromAttribute( property );
-                    if ( string.IsNullOrEmpty( name ) || !structuralProperties.TryGetValue( name, out structuralProperty ) )
-                    {
-                        clrTypeMatchesEdmType = false;
-                        continue;
-                    }
+                    clrTypeMatchesEdmType = false;
+                    continue;
                 }
 
                 var structuredTypeRef = structuralProperty.Type;
@@ -313,11 +321,6 @@
             var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly( name, Run );
 #endif
             return assemblyBuilder.DefineDynamicModule( "<module>" );
-        }
-
-        static string GetNameFromAttribute( MemberInfo property )
-        {
-            return property.GetCustomAttribute<System.Runtime.Serialization.DataMemberAttribute>()?.Name;
         }
 
         sealed class BuilderContext

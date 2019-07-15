@@ -422,7 +422,7 @@
             var substitutedType = originalType.SubstituteIfNecessary( context );
 
             // assert
-            substitutedType.Should().HaveProperty<string>(nameof( Contact.FirstName ) );
+            substitutedType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
         }
 
 
