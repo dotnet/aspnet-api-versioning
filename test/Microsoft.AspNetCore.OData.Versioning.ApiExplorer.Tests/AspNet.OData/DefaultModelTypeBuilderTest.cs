@@ -1,4 +1,7 @@
-﻿namespace Microsoft.AspNet.OData
+﻿using System.Runtime.Serialization;
+using FluentAssertions.Common;
+
+namespace Microsoft.AspNet.OData
 {
     using FluentAssertions;
     using Microsoft.AspNet.OData.Builder;
@@ -423,6 +426,8 @@
 
             // assert
             substitutedType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
+            substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).Should().NotBeNull();
+            substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).HasAttribute<DataMemberAttribute>();
         }
 
 
