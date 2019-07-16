@@ -1,9 +1,8 @@
-﻿using System.Runtime.Serialization;
-using FluentAssertions.Common;
-
-namespace Microsoft.AspNet.OData
+﻿namespace Microsoft.AspNet.OData
 {
     using FluentAssertions;
+    using FluentAssertions.Common;
+    using System.Runtime.Serialization;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.DependencyInjection;
@@ -429,7 +428,6 @@ namespace Microsoft.AspNet.OData
             substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).Should().NotBeNull();
             substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).HasAttribute<DataMemberAttribute>();
         }
-
 
         public static IEnumerable<object[]> SubstitutionNotRequiredData
         {
