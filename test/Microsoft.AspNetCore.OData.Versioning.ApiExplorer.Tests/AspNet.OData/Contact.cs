@@ -1,5 +1,4 @@
-﻿
-namespace Microsoft.AspNet.OData
+﻿namespace Microsoft.AspNet.OData
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
@@ -17,9 +16,9 @@ namespace Microsoft.AspNet.OData
         public string LastName { get; set; }
 
         [DataMember]
-        public string Email { get; set; }
+        public Email Email { get; set; }
 
-        [DataMember]
+        [DataMember( Name = "telephone" )]
         public string Phone { get; set; }
 
         [DataMember]

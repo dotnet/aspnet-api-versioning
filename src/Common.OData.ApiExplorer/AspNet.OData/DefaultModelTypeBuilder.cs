@@ -141,7 +141,7 @@
                         {
                             clrTypeMatchesEdmType = false;
                             hasUnfinishedTypes = true;
-                            dependentProperties.Add( new PropertyDependency( elementKey, true, property.Name ) );
+                            dependentProperties.Add( new PropertyDependency( elementKey, true, property.Name, property.DeclaredAttributes() ) );
                             continue;
                         }
 
@@ -174,7 +174,7 @@
                     {
                         clrTypeMatchesEdmType = false;
                         hasUnfinishedTypes = true;
-                        dependentProperties.Add( new PropertyDependency( propertyTypeKey, false, property.Name ) );
+                        dependentProperties.Add( new PropertyDependency( propertyTypeKey, false, property.Name, property.DeclaredAttributes() ) );
                         continue;
                     }
                 }
@@ -244,12 +244,7 @@
             {
                 var type = property.Type;
                 var name = property.Name;
-                var propertyBuilder = AddProperty( typeBuilder, type, name );
-
-                foreach ( var attribute in property.Attributes )
-                {
-                    propertyBuilder.SetCustomAttribute( attribute );
-                }
+                AddProperty( typeBuilder, type, name, property.Attributes );
             }
 
             return typeBuilder;
@@ -270,7 +265,7 @@
                     dependentOnType = IEnumerableOfT.MakeGenericType( dependentOnType ).GetTypeInfo();
                 }
 
-                AddProperty( propertyDependency.DependentType, dependentOnType, propertyDependency.PropertyName );
+                AddProperty( propertyDependency.DependentType, dependentOnType, propertyDependency.PropertyName, propertyDependency.CustomAttributes );
             }
 
             var keys = edmTypes.Keys.ToArray();
@@ -288,7 +283,7 @@
             return edmTypes;
         }
 
-        static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name )
+        static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name, IEnumerable<CustomAttributeBuilder> customAttributes )
         {
             const MethodAttributes propertyMethodAttributes = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
             var field = addTo.DefineField( "_" + name, shouldBeAdded, FieldAttributes.Private );
@@ -308,6 +303,11 @@
             il.Emit( OpCodes.Ret );
             propertyBuilder.SetGetMethod( getter );
             propertyBuilder.SetSetMethod( setter );
+
+            foreach ( var attribute in customAttributes )
+            {
+                propertyBuilder.SetCustomAttribute( attribute );
+            }
 
             return propertyBuilder;
         }
