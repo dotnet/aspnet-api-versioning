@@ -1,26 +1,28 @@
-﻿using System.Runtime.Serialization;
-
+﻿
 namespace Microsoft.AspNet.OData
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
+
     [DataContract]
     public class Contact
     {
         [DataMember]
         public int ContactId { get; set; }
-        [DataMember(Name = "first_name")]
+
+        [DataMember( Name = "first_name" )]
         public string FirstName { get; set; }
-        [DataMember]
 
+        [DataMember]
         public string LastName { get; set; }
-        [DataMember]
 
+        [DataMember]
         public string Email { get; set; }
-        [DataMember]
 
+        [DataMember]
         public string Phone { get; set; }
-        [DataMember]
 
+        [DataMember]
         public List<Address> Addresses { get; set; }
     }
 }
