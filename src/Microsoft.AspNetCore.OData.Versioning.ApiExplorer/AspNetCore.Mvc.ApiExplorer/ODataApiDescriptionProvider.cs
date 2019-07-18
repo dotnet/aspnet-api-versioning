@@ -8,12 +8,10 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
-    using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.AspNetCore.Routing.Template;
@@ -26,7 +24,6 @@
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
     using System.Threading.Tasks;
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
     using static Microsoft.AspNetCore.Http.StatusCodes;
@@ -132,9 +129,9 @@
         protected MvcOptions MvcOptions { get; }
 
         /// <summary>
-        /// Gets the order prescendence of the current API description provider.
+        /// Gets the order precedence of the current API description provider.
         /// </summary>
-        /// <value>The order prescendence of the current API description provider. The default value is -100.</value>
+        /// <value>The order precedence of the current API description provider. The default value is -100.</value>
         public virtual int Order => AfterApiVersioning;
 
         /// <summary>
@@ -144,10 +141,8 @@
         /// <remarks>The default implementation performs no action.</remarks>
         public virtual void OnProvidersExecuted( ApiDescriptionProviderContext context )
         {
-            var ignoreApiExplorerSettings = !Options.UseApiExplorerSettings;
             var mappings = RouteCollectionProvider.Items;
             var results = context.Results;
-
             var groupNameFormat = Options.GroupNameFormat;
             var formatProvider = CultureInfo.CurrentCulture;
 
@@ -164,8 +159,9 @@
 
                 if ( model.IsApiVersionNeutral )
                 {
-                    foreach ( var mapping in mappings )
+                    for ( var i = 0; i < mappings.Count; i++ )
                     {
+                        var mapping = mappings[i];
                         var descriptions = new List<ApiDescription>();
                         var groupName = mapping.ApiVersion.ToString( groupNameFormat, formatProvider );
 
@@ -183,8 +179,9 @@
                 }
                 else
                 {
-                    foreach ( var apiVersion in model.DeclaredApiVersions )
+                    for ( var i = 0; i < model.DeclaredApiVersions.Count; i++ )
                     {
+                        var apiVersion = model.DeclaredApiVersions[i];
                         var groupName = apiVersion.ToString( groupNameFormat, formatProvider );
 
                         if ( !mappings.TryGetValue( apiVersion, out var mappingsPerApiVersion ) )
@@ -192,8 +189,9 @@
                             continue;
                         }
 
-                        foreach ( var mapping in mappingsPerApiVersion )
+                        for ( var j = 0; j < mappingsPerApiVersion.Count; j++ )
                         {
+                            var mapping = mappingsPerApiVersion[j];
                             var descriptions = new List<ApiDescription>();
 
                             foreach ( var apiDescription in NewODataApiDescriptions( action, groupName, mapping ) )
@@ -364,7 +362,7 @@
 
             var relativePath = action.AttributeRouteInfo?.Template;
 
-            // note: if path happens to be built adhead of time, it's expected to be qualified; rebuild it as necessary
+            // note: if path happens to be built ahead of time, it's expected to be qualified; rebuild it as necessary
             if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedNames )
             {
                 var builder = new ODataRouteBuilder( routeContext );
@@ -422,14 +420,15 @@
                     apiDescription.Properties[typeof( IEdmOperation )] = routeContext.Operation;
                 }
 
-                foreach ( var parameter in parameters )
+                for ( var i = 0; i < parameters.Count; i++ )
                 {
+                    var parameter = parameters[i];
                     apiDescription.ParameterDescriptions.Add( parameter );
                 }
 
-                foreach ( var apiResponseType in apiResponseTypes )
+                for ( var i = 0; i < apiResponseTypes.Count; i++ )
                 {
-                    apiDescription.SupportedResponseTypes.Add( apiResponseType );
+                    apiDescription.SupportedResponseTypes.Add( apiResponseTypes[i] );
                 }
 
                 PopulateApiVersionParameters( apiDescription, mapping.ApiVersion );
@@ -445,8 +444,9 @@
 
             if ( action.Parameters != null )
             {
-                foreach ( var actionParameter in action.Parameters )
+                for ( var i = 0; i < action.Parameters.Count; i++ )
                 {
+                    var actionParameter = action.Parameters[i];
                     var metadata = MetadataProvider.GetMetadataForType( actionParameter.ParameterType );
 
                     UpdateBindingInfo( context, actionParameter, metadata );
@@ -460,8 +460,9 @@
 
             if ( action.BoundProperties != null )
             {
-                foreach ( var actionParameter in action.BoundProperties )
+                for ( var i = 0; i < action.BoundProperties.Count; i++ )
                 {
+                    var actionParameter = action.BoundProperties[i];
                     var visitor = new PseudoModelBindingVisitor( context, actionParameter );
                     var modelMetadata = context.MetadataProvider.GetMetadataForProperty(
                         containerType: action.ControllerTypeInfo.AsType(),
