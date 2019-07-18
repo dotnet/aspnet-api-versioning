@@ -1,5 +1,4 @@
-﻿Generate navigation property templates by convention (#463)
-Fix overriding global query settings (#488)
-Add appropriate separators for composite keys (#500)
-Fix client vs server route template generation (#502)
-UseQualifiedNames option replaces UseQualifiedOperationNames
+﻿Support array URL syntax for collection parameters (#496)
+Support DataMemberAttribute (#511)
+Support inherited ODataValue<T> (#513)
+Preserve attributes during model substitution (#520)
