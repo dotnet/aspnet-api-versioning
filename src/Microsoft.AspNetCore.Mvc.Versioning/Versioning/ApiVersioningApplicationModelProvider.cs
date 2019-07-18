@@ -59,8 +59,10 @@
                 controllers = ControllerFilter.Apply( controllers );
             }
 
-            foreach ( var controller in controllers )
+            for ( var i = 0; i < controllers.Count; i++ )
             {
+                var controller = controllers[i];
+
                 if ( !conventionBuilder.ApplyTo( controller ) )
                 {
                     ApplyAttributeOrImplicitConventions( controller, implicitVersionModel );
@@ -75,8 +77,10 @@
         {
             Contract.Requires( controller != null );
 
-            foreach ( var attribute in controller.Attributes )
+            for ( var i = 0; i < controller.Attributes.Count; i++ )
             {
+                var attribute = controller.Attributes[i];
+
                 if ( attribute is IApiVersionProvider || attribute is IApiVersionNeutral )
                 {
                     return true;
@@ -91,8 +95,10 @@
             Contract.Requires( controller != null );
             Contract.Requires( implicitVersionModel != null );
 
-            foreach ( var action in controller.Actions )
+            for ( var i = 0; i < controller.Actions.Count; i++ )
             {
+                var action = controller.Actions[i];
+                action.SetProperty( controller );
                 action.SetProperty( implicitVersionModel );
             }
         }
