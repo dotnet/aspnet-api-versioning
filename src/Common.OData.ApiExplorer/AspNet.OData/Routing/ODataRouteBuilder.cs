@@ -94,7 +94,6 @@
 #else
             var controllerDescriptor = Context.ActionDescriptor;
 #endif
-            var controllerName = controllerDescriptor.ControllerName;
 
             if ( Context.IsAttributeRouted )
             {
@@ -103,32 +102,47 @@
 #else
                 var prefix = controllerDescriptor.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>().FirstOrDefault()?.Prefix?.Trim( '/' );
 #endif
-                var template = Context.RouteTemplate;
+                AppendEntitySetOrOperationFromAttributes( segments, prefix );
+            }
+            else
+            {
+                AppendEntitySetOrOperationFromConvention( segments, controllerDescriptor.ControllerName );
+            }
+        }
 
-                if ( IsNullOrEmpty( prefix ) )
+        void AppendEntitySetOrOperationFromAttributes( IList<string> segments, string prefix )
+        {
+            var template = Context.RouteTemplate;
+
+            if ( Context.IsOperation && Context.RouteTemplateGeneration == Client )
+            {
+                template = FixUpArrayParameters( template, Context.Operation );
+            }
+
+            if ( IsNullOrEmpty( prefix ) )
+            {
+                segments.Add( template );
+            }
+            else
+            {
+                if ( IsNullOrEmpty( template ) )
                 {
-                    segments.Add( Context.RouteTemplate );
+                    segments.Add( prefix );
+                }
+                else if ( template[0] == '(' && Context.UrlKeyDelimiter == Parentheses )
+                {
+                    segments.Add( prefix + template );
                 }
                 else
                 {
-                    if ( IsNullOrEmpty( template ) )
-                    {
-                        segments.Add( prefix );
-                    }
-                    else if ( template[0] == '(' && Context.UrlKeyDelimiter == Parentheses )
-                    {
-                        segments.Add( prefix + template );
-                    }
-                    else
-                    {
-                        segments.Add( prefix );
-                        segments.Add( template );
-                    }
+                    segments.Add( prefix );
+                    segments.Add( template );
                 }
-
-                return;
             }
+        }
 
+        void AppendEntitySetOrOperationFromConvention( IList<string> segments, string controllerName )
+        {
             var builder = new StringBuilder();
 
             switch ( Context.ActionType )
@@ -244,33 +258,23 @@
                 var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
                 var parameter = parameters.Current;
                 var name = parameter.Name;
-#if WEBAPI
-                var routeParameterName = actionParameters[name].ParameterDescriptor.ParameterName;
-#elif API_EXPLORER
-                var routeParameterName = actionParameters[name].ParameterDescriptor.Name;
-#else
-                var routeParameterName = actionParameters[name].Name;
-#endif
+                var routeParameterName = GetRouteParameterName( actionParameters, name );
 
                 builder.Append( '(' );
                 builder.Append( name );
                 builder.Append( '=' );
+
                 ExpandParameterTemplate( builder, parameter, routeParameterName );
 
                 while ( parameters.MoveNext() )
                 {
                     parameter = parameters.Current;
                     name = parameter.Name;
-#if WEBAPI
-                    routeParameterName = actionParameters[name].ParameterDescriptor.ParameterName;
-#elif API_EXPLORER
-                    routeParameterName = actionParameters[name].ParameterDescriptor.Name;
-#else
-                    routeParameterName = actionParameters[name].Name;
-#endif
+                    routeParameterName = GetRouteParameterName( actionParameters, name );
                     builder.Append( ',' );
                     builder.Append( name );
                     builder.Append( '=' );
+
                     ExpandParameterTemplate( builder, parameter, routeParameterName );
                 }
 
@@ -305,29 +309,128 @@
                 return;
             }
 
-            if ( typeDef.TypeKind == EdmTypeKind.Enum )
+            switch ( typeDef.TypeKind )
             {
-                var fullName = typeReference.FullName();
+                case EdmTypeKind.Collection:
+                    template.Insert( offset, '[' );
+                    template.Append( ']' );
+                    break;
+                case EdmTypeKind.Enum:
+                    var fullName = typeReference.FullName();
 
-                if ( !Context.AllowUnqualifiedEnum )
-                {
-                    template.Insert( offset, fullName );
-                    offset += fullName.Length;
-                }
+                    if ( !Context.AllowUnqualifiedEnum )
+                    {
+                        template.Insert( offset, fullName );
+                        offset += fullName.Length;
+                    }
 
-                template.Insert( offset, '\'' );
-                template.Append( '\'' );
-                return;
+                    template.Insert( offset, '\'' );
+                    template.Append( '\'' );
+                    break;
+                default:
+                    var type = typeDef.GetClrType( Context.EdmModel );
+
+                    if ( quotedTypes.TryGetValue( type, out var prefix ) )
+                    {
+                        template.Insert( offset, prefix );
+                        offset += prefix.Length;
+                        template.Insert( offset, '\'' );
+                        template.Append( '\'' );
+                    }
+
+                    break;
+            }
+        }
+
+        string FixUpArrayParameters( string template, IEdmOperation operation )
+        {
+            Contract.Requires( !IsNullOrEmpty( template ) );
+            Contract.Requires( operation != null );
+
+            if ( !operation.IsFunction() )
+            {
+                return template;
             }
 
-            var type = typeDef.GetClrType( Context.EdmModel );
-
-            if ( quotedTypes.TryGetValue( type, out var prefix ) )
+            int IndexOfToken( StringBuilder builder, string token )
             {
-                template.Insert( offset, prefix );
-                offset += prefix.Length;
-                template.Insert( offset, '\'' );
-                template.Append( '\'' );
+                var index = -1;
+
+                for ( var i = 0; i < builder.Length; i++ )
+                {
+                    if ( builder[i] != '{' )
+                    {
+                        continue;
+                    }
+
+                    index = i;
+                    ++i;
+
+                    var matched = true;
+
+                    for ( var j = 0; j < token.Length; i++, j++ )
+                    {
+                        if ( builder[i] != token[j] )
+                        {
+                            matched = false;
+                            break;
+                        }
+                    }
+
+                    if ( matched )
+                    {
+                        break;
+                    }
+
+                    while ( builder[i] != '}' )
+                    {
+                        ++i;
+                    }
+                }
+
+                return index;
+            }
+
+            void InsertBrackets( StringBuilder builder, string token )
+            {
+                var index = IndexOfToken( builder, token );
+
+                if ( index >= 0 )
+                {
+                    builder.Insert( index, '[' ).Insert( index + token.Length + 3, ']' );
+                }
+            }
+
+            var collectionParameters = from param in operation.Parameters
+                                       where param.Type.TypeKind() == EdmTypeKind.Collection &&
+                                             param.Name != "bindingParameter"
+                                       select param;
+
+            using ( var parameters = collectionParameters.GetEnumerator() )
+            {
+                if ( !parameters.MoveNext() )
+                {
+                    return template;
+                }
+
+                var buffer = new StringBuilder( template );
+                var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
+                var parameter = parameters.Current;
+                var name = parameter.Name;
+                var routeParameterName = GetRouteParameterName( actionParameters, name );
+
+                InsertBrackets( buffer, routeParameterName );
+
+                while ( parameters.MoveNext() )
+                {
+                    parameter = parameters.Current;
+                    name = parameter.Name;
+                    routeParameterName = GetRouteParameterName( actionParameters, name );
+
+                    InsertBrackets( buffer, routeParameterName );
+                }
+
+                return buffer.ToString();
             }
         }
 
@@ -414,6 +517,17 @@
             }
 
             return queryParameters;
+        }
+
+        static string GetRouteParameterName( IReadOnlyDictionary<string, ApiParameterDescription> actionParameters, string name )
+        {
+#if WEBAPI
+            return actionParameters[name].ParameterDescriptor.ParameterName;
+#elif API_EXPLORER
+            return actionParameters[name].ParameterDescriptor.Name;
+#else
+            return actionParameters[name].Name;
+#endif
         }
 
         static bool IsBuiltInParameter( Type parameterType ) => ODataQueryOptionsType.IsAssignableFrom( parameterType ) || ODataActionParametersType.IsAssignableFrom( parameterType );
