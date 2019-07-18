@@ -1,6 +1,8 @@
 ﻿namespace Microsoft.AspNet.OData
 {
     using FluentAssertions;
+    using FluentAssertions.Common;
+    using System.Runtime.Serialization;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.DependencyInjection;
@@ -207,7 +209,7 @@
             nextType.Should().HaveProperty<int>( nameof( Contact.ContactId ) );
             nextType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
             nextType.Should().HaveProperty<string>( nameof( Contact.LastName ) );
-            nextType.Should().HaveProperty<string>( nameof( Contact.Email ) );
+            nextType.Should().HaveProperty<Email>( nameof( Contact.Email ) );
             nextType.Should().HaveProperty<string>( nameof( Contact.Phone ) );
             nextType = nextType.GetRuntimeProperty( nameof( Contact.Addresses ) ).PropertyType.GetGenericArguments()[0];
             nextType.GetRuntimeProperties().Should().HaveCount( 5 );
@@ -406,6 +408,61 @@
 
             // assert
             substitutionType.Should().NotBeOfType<TypeBuilder>();
+        }
+
+        [Fact]
+        public void substituted_type_should_have_renamed_with_attribute_properties_from_original_type()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            modelBuilder.EntitySet<Contact>( "Contacts" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Contact );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
+            substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).Should().NotBeNull();
+            substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).HasAttribute<DataMemberAttribute>();
+        }
+
+        [Fact]
+        public void substituted_type_should_keep_custom_attributes_on_dependency_property()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            modelBuilder.EntitySet<Contact>( "Contacts" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Contact );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.GetRuntimeProperty( nameof( Contact.Email ) ).Should().NotBeNull();
+            substitutedType.GetRuntimeProperty( nameof( Contact.Email ) ).HasAttribute<DataMemberAttribute>();
+        }
+
+        [Fact]
+        public void substituted_type_should_keep_custom_attributes_on_collection_dependency_property()
+        {
+            // arrange
+            var modelBuilder = new ODataConventionModelBuilder();
+            modelBuilder.EntitySet<Contact>( "Contacts" );
+
+            var context = NewContext( modelBuilder.GetEdmModel() );
+            var originalType = typeof( Contact );
+
+            // act
+            var substitutedType = originalType.SubstituteIfNecessary( context );
+
+            // assert
+            substitutedType.GetRuntimeProperty( nameof( Contact.Addresses ) ).Should().NotBeNull();
+            substitutedType.GetRuntimeProperty( nameof( Contact.Addresses ) ).HasAttribute<DataMemberAttribute>();
         }
 
         public static IEnumerable<object[]> SubstitutionNotRequiredData
