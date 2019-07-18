@@ -296,7 +296,27 @@
 
         static bool IsSingleResult( this Type type ) => type.Is( SingleResultOfT );
 
-        static bool IsODataValue( this Type type ) => type.Is( ODataValueOfT );
+        static bool IsODataValue( this Type type )
+        {
+            while ( type != null )
+            {
+                if ( !type.IsGenericType )
+                {
+                    return false;
+                }
+
+                var typeDef = type.GetGenericTypeDefinition();
+
+                if ( typeDef.Equals( ODataValueOfT ) )
+                {
+                    return true;
+                }
+
+                type = type.BaseType;
+            }
+
+            return false;
+        }
 
         static bool Is( this Type type, Type typeDefinition ) => type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeDefinition );
 
