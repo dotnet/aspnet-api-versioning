@@ -1,1 +1,1 @@
-﻿Add API version parameter to Content-Type (#484)
+﻿Ensure implicitly versioned ActionModel has associated ControllerModel (#519)
