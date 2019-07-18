@@ -9,6 +9,7 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
@@ -521,12 +522,16 @@
 
         static string GetRouteParameterName( IReadOnlyDictionary<string, ApiParameterDescription> actionParameters, string name )
         {
+            if ( !actionParameters.TryGetValue( name, out var parameter ) )
+            {
+                return name;
+            }
 #if WEBAPI
-            return actionParameters[name].ParameterDescriptor.ParameterName;
+            return parameter.ParameterDescriptor.ParameterName;
 #elif API_EXPLORER
-            return actionParameters[name].ParameterDescriptor.Name;
+            return parameter.ParameterDescriptor.Name;
 #else
-            return actionParameters[name].Name;
+            return parameter.Name;
 #endif
         }
 
