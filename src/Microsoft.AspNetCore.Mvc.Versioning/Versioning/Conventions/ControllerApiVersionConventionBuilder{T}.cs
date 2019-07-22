@@ -9,7 +9,7 @@
     /// </content>
     /// <typeparam name="T">The <see cref="Type">type</see> of <see cref="ICommonModel">model</see>.</typeparam>
     [CLSCompliant( false )]
-    public partial class ControllerApiVersionConventionBuilder<T> : IActionConventionBuilder<T>
+    public partial class ControllerApiVersionConventionBuilder<T>
     {
         /// <summary>
         /// Attempts to get the convention for the specified action method.

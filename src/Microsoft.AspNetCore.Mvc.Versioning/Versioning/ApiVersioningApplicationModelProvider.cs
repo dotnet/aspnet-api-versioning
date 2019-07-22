@@ -110,7 +110,7 @@
 
             if ( IsDecoratedWithAttributes( controller ) )
             {
-                var conventions = new ControllerApiVersionConventionBuilder<ControllerModel>();
+                var conventions = new ControllerApiVersionConventionBuilder( controller.ControllerType );
                 conventions.ApplyTo( controller );
             }
             else

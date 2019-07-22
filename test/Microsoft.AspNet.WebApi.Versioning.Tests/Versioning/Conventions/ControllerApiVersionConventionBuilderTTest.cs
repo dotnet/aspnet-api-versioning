@@ -74,7 +74,7 @@
             var configuration = new HttpConfiguration();
             var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var controllerDescriptor = mock.Object;
-            var controllerBuilder = default( ControllerApiVersionConventionBuilder<UndecoratedController> );
+            var controllerBuilder = default( IControllerConventionBuilder<UndecoratedController> );
 
             mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
             controllerDescriptor.Configuration = configuration;
@@ -109,7 +109,7 @@
             var configuration = new HttpConfiguration();
             var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var controllerDescriptor = mock.Object;
-            var controllerBuilder = default( ControllerApiVersionConventionBuilder<UndecoratedController> );
+            var controllerBuilder = default( IControllerConventionBuilder<UndecoratedController> );
 
             mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
             controllerDescriptor.Configuration = configuration;
@@ -146,7 +146,7 @@
             var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
             var controllerDescriptor = mock.Object;
             var attributes = new Collection<IApiVersionProvider>( typeof( DecoratedController ).GetCustomAttributes().OfType<IApiVersionProvider>().ToList() );
-            var controllerBuilder = default( ControllerApiVersionConventionBuilder<DecoratedController> );
+            var controllerBuilder = default( IControllerConventionBuilder<DecoratedController> );
 
             mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( attributes );
             controllerDescriptor.Configuration = configuration;

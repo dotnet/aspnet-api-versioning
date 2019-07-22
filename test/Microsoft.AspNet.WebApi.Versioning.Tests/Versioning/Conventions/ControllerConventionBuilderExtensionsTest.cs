@@ -8,21 +8,20 @@
     using Xunit;
     using static Moq.Times;
 
-    public class ActionConventionBuilderExtensionsTest
+    public class ControllerConventionBuilderExtensionsTest
     {
         [Fact]
         public void action_should_map_method_from_action_delegate_expression()
         {
             // arrange
             var method = typeof( StubController ).GetMethod( nameof( StubController.Delete ) );
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<StubController>();
-            var actionBuilder = new Mock<ActionApiVersionConventionBuilder<StubController>>( controllerBuilder );
+            var builder = new Mock<ControllerApiVersionConventionBuilder<StubController>>();
 
             // act
-            actionBuilder.Object.Action( c => c.Delete() );
+            builder.Object.Action( c => c.Delete() );
 
             // assert
-            actionBuilder.Verify( b => b.Action( method ), Once() );
+            builder.Verify( b => b.Action( method ), Once() );
         }
 
         [Fact]
@@ -30,25 +29,23 @@
         {
             // arrange
             var method = typeof( StubController ).GetMethod( nameof( StubController.Get ) );
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<StubController>();
-            var actionBuilder = new Mock<ActionApiVersionConventionBuilder<StubController>>( controllerBuilder );
+            var builder = new Mock<ControllerApiVersionConventionBuilder<StubController>>();
 
             // act
-            actionBuilder.Object.Action( c => c.Get() );
+            builder.Object.Action( c => c.Get() );
 
             // assert
-            actionBuilder.Verify( b => b.Action( method ), Once() );
+            builder.Verify( b => b.Action( method ), Once() );
         }
 
         [Fact]
         public void action_should_throw_exception_when_func_delegate_expression_is_not_a_method()
         {
             // arrange
-            var controllerBuilder = new ControllerApiVersionConventionBuilder<StubController>();
-            var actionBuilder = new Mock<ActionApiVersionConventionBuilder<StubController>>( controllerBuilder ).Object;
+            var builder = new Mock<ControllerApiVersionConventionBuilder<StubController>>().Object;
 
             // act
-            Action action = () => actionBuilder.Action( c => c.Timeout );
+            Action action = () => builder.Action( c => c.Timeout );
 
             // assert
             action.Should().Throw<InvalidOperationException>().And
@@ -62,7 +59,7 @@
             const string methodName = nameof( StubController.Post );
             var controllerType = typeof( StubController );
             var method = controllerType.GetMethods().Single( m => m.Name == methodName && m.GetParameters().Length == 0 );
-            var builder = new Mock<ActionApiVersionConventionBuilder>( new ControllerApiVersionConventionBuilder( controllerType ) );
+            var builder = new Mock<ControllerApiVersionConventionBuilder>( controllerType );
 
             // act
             builder.Object.Action( methodName );
@@ -78,7 +75,7 @@
             const string methodName = nameof( StubController.Post );
             var controllerType = typeof( StubController );
             var method = controllerType.GetMethods().Single( m => m.Name == methodName && m.GetParameters().Length == 1 );
-            var builder = new Mock<ActionApiVersionConventionBuilder>( new ControllerApiVersionConventionBuilder( controllerType ) );
+            var builder = new Mock<ControllerApiVersionConventionBuilder>( controllerType );
 
             // act
             builder.Object.Action( methodName, typeof( int ) );
@@ -92,7 +89,7 @@
         {
             // arrange
             var message = "An action method with the name 'NoSuchMethod' could not be found. The method must be public, non-static, and not have the NonActionAttribute applied.";
-            var builder = new Mock<ActionApiVersionConventionBuilder>( new ControllerApiVersionConventionBuilder( typeof( StubController ) ) );
+            var builder = new Mock<ControllerApiVersionConventionBuilder>( typeof( StubController ) );
 
             // act
             Action actionConvention = () => builder.Object.Action( "NoSuchMethod" );
