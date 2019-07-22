@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>3.1.0</VersionPrefix>
-  <AssemblyVersion>3.1.0.0</AssemblyVersion>
+  <VersionPrefix>4.0.0</VersionPrefix>
+  <AssemblyVersion>4.0.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioned API Explorer</AssemblyTitle>
   <Description>The API Explorer for Microsoft ASP.NET Web API Versioning.</Description>
