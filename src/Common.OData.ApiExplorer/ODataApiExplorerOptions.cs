@@ -35,18 +35,6 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         public bool UseApiExplorerSettings { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether qualified names are used when building URLs for operations (e.g. actions and functions).
-        /// </summary>
-        /// <value>True if qualified names are used when building URLs for operations; otherwise, false. The default value is <c>false</c>.</value>
-        [EditorBrowsable( Never )]
-        [Obsolete( "This property will be removed in the next major version. Use UseQualifiedNames instead.", error: true )]
-        public bool UseQualifiedOperationNames
-        {
-            get => UseQualifiedNames;
-            set => UseQualifiedNames = value;
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether qualified names are used when building URLs.
         /// </summary>
         /// <value>True if qualified names are used when building URLs; otherwise, false. The default value is <c>false</c>.</value>
