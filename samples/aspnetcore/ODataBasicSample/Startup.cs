@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Examples
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
+    using static Microsoft.OData.ODataUrlKeyDelimiter;
 
     public class Startup
     {
@@ -39,6 +41,11 @@
                 routeBuilder =>
                 {
                     var models = modelBuilder.GetEdmModels();
+
+                    // the following will not work as expected
+                    // BUG: https://github.com/OData/WebApi/issues/1837
+                    // routeBuilder.SetDefaultODataOptions( new ODataOptions() { UrlKeyDelimiter = Parentheses } );
+                    routeBuilder.ServiceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter = Parentheses;
                     routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
                     routeBuilder.MapVersionedODataRoutes( "odata-bypath", "v{version:apiVersion}", models );
                 } );
