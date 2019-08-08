@@ -9,7 +9,6 @@
     using System;
     using System.Diagnostics.Contracts;
     using System.Reflection;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static System.Linq.Enumerable;
 
     partial class ODataRouteBuilderContext
@@ -33,7 +32,7 @@
             Route = routeMapping.Route;
             ActionDescriptor = actionDescriptor;
             Options = options;
-            UrlKeyDelimiter = serviceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter ?? Parentheses;
+            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( serviceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
 
             var container = EdmModel.EntityContainer;
 

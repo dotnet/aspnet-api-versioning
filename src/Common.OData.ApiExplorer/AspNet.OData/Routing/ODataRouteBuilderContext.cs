@@ -23,6 +23,7 @@
     using System.Web.Http.Dispatcher;
     using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;
 #endif
+    using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static ODataRouteTemplateGenerationKind;
 
     sealed partial class ODataRouteBuilderContext
@@ -99,5 +100,9 @@
 
             return ODataRouteActionType.Unknown;
         }
+
+        // Slash became the default 4/18/2018
+        // REF: https://github.com/OData/WebApi/pull/1393
+        static ODataUrlKeyDelimiter UrlKeyDelimiterOrDefault( ODataUrlKeyDelimiter urlKeyDelimiter ) => urlKeyDelimiter ?? Slash;
     }
 }

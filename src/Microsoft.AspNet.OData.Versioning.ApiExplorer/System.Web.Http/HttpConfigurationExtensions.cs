@@ -2,7 +2,6 @@
 {
     using Microsoft;
     using Microsoft.OData;
-    using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
     using System.Collections.Concurrent;
     using System.Diagnostics.Contracts;
@@ -70,12 +69,12 @@
         {
             Contract.Requires( configuration != null );
 
-            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) && value is ODataUrlKeyDelimiter delimiter )
+            if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) )
             {
-                return delimiter;
+                return value as ODataUrlKeyDelimiter;
             }
 
-            return ODataUrlKeyDelimiter.Parentheses;
+            return default;
         }
     }
 }

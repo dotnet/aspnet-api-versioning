@@ -9,7 +9,6 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
@@ -122,7 +121,10 @@
 
             if ( IsNullOrEmpty( prefix ) )
             {
-                segments.Add( template );
+                if ( !IsNullOrEmpty( template ) )
+                {
+                    segments.Add( template );
+                }
             }
             else
             {
@@ -130,7 +132,7 @@
                 {
                     segments.Add( prefix );
                 }
-                else if ( template[0] == '(' && Context.UrlKeyDelimiter == Parentheses )
+                else if ( template[0] == '(' )
                 {
                     segments.Add( prefix + template );
                 }
@@ -181,7 +183,7 @@
             var entityKeys = ( Context.EntitySet?.EntityType().Key() ?? Empty<IEdmStructuralProperty>() ).ToArray();
             var parameterKeys = Context.ParameterDescriptions.Where( p => p.Name.StartsWith( ODataRouteConstants.Key, OrdinalIgnoreCase ) ).ToArray();
 
-            if ( entityKeys.Length != parameterKeys.Length )
+            if ( entityKeys.Length == 0 || entityKeys.Length != parameterKeys.Length )
             {
                 return;
             }
@@ -203,16 +205,16 @@
 
             if ( entityKeys.Length == 1 )
             {
-                ExpandParameterTemplate( builder, entityKeys[0], ODataRouteConstants.Key );
+                ExpandParameterTemplate( builder, entityKeys[0].Type, ODataRouteConstants.Key, keyAsSegment );
             }
             else
             {
-                ExpandParameterTemplate( builder, entityKeys[0], parameterKeys[0].Name );
+                ExpandParameterTemplate( builder, entityKeys[0].Type, parameterKeys[0].Name, keyAsSegment );
 
                 for ( var i = 1; i < entityKeys.Length; i++ )
                 {
                     builder.Append( keySeparator );
-                    ExpandParameterTemplate( builder, entityKeys[i], parameterKeys[i].Name, keyAsSegment );
+                    ExpandParameterTemplate( builder, entityKeys[i].Type, parameterKeys[i].Name, keyAsSegment );
                 }
             }
 
@@ -282,12 +284,6 @@
                 builder.Append( ')' );
             }
         }
-
-        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key ) =>
-            ExpandParameterTemplate( template, key.Type, key.Name, keyAsSegment: false );
-
-        void ExpandParameterTemplate( StringBuilder template, IEdmStructuralProperty key, string name, bool keyAsSegment = false ) =>
-            ExpandParameterTemplate( template, key.Type, name, keyAsSegment );
 
         void ExpandParameterTemplate( StringBuilder template, IEdmOperationParameter parameter, string name ) =>
             ExpandParameterTemplate( template, parameter.Type, name, keyAsSegment: false );
