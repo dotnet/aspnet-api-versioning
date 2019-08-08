@@ -12,7 +12,6 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static System.Linq.Enumerable;
 
     partial class ODataRouteBuilderContext
@@ -43,7 +42,7 @@
             ActionDescriptor = actionDescriptor;
             ParameterDescriptions = parameterDescriptions;
             Options = options;
-            UrlKeyDelimiter = configuration.GetUrlKeyDelimiter() ?? Parentheses;
+            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( configuration.GetUrlKeyDelimiter() );
 
             var container = EdmModel.EntityContainer;
 
