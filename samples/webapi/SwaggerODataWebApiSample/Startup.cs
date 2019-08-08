@@ -5,10 +5,8 @@ namespace Microsoft.Examples
     using global::Owin;
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
-    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Configuration;
-    using Microsoft.Examples.Models;
     using Microsoft.OData;
     using Microsoft.OData.UriParser;
     using Newtonsoft.Json.Serialization;
@@ -87,38 +85,38 @@ namespace Microsoft.Examples
                 } );
 
             configuration.EnableSwagger(
-                           "{apiVersion}/swagger",
-                           swagger =>
-                           {
-                               // build a swagger document and endpoint for each discovered API version
-                               swagger.MultipleApiVersions(
-                                  ( apiDescription, version ) => apiDescription.GetGroupName() == version,
-                                  info =>
-                                  {
-                                      foreach ( var group in apiExplorer.ApiDescriptions )
-                                      {
-                                          var description = "A sample application with Swagger, Swashbuckle, OData, and API versioning.";
+                "{apiVersion}/swagger",
+                swagger =>
+                {
+                    // build a swagger document and endpoint for each discovered API version
+                    swagger.MultipleApiVersions(
+                        ( apiDescription, version ) => apiDescription.GetGroupName() == version,
+                        info =>
+                        {
+                            foreach ( var group in apiExplorer.ApiDescriptions )
+                            {
+                                var description = "A sample application with Swagger, Swashbuckle, OData, and API versioning.";
 
-                                          if ( group.IsDeprecated )
-                                          {
-                                              description += " This API version has been deprecated.";
-                                          }
+                                if ( group.IsDeprecated )
+                                {
+                                    description += " This API version has been deprecated.";
+                                }
 
-                                          info.Version( group.Name, $"Sample API {group.ApiVersion}" )
-                                              .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
-                                              .Description( description )
-                                              .License( l => l.Name( "MIT" ).Url( "https://opensource.org/licenses/MIT" ) )
-                                              .TermsOfService( "Shareware" );
-                                      }
-                                  } );
+                                info.Version( group.Name, $"Sample API {group.ApiVersion}" )
+                                    .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
+                                    .Description( description )
+                                    .License( l => l.Name( "MIT" ).Url( "https://opensource.org/licenses/MIT" ) )
+                                    .TermsOfService( "Shareware" );
+                            }
+                        } );
 
-                               // add a custom operation filter which documents the implicit API version parameter
-                               swagger.OperationFilter<SwaggerDefaultValues>();
+                    // add a custom operation filter which documents the implicit API version parameter
+                    swagger.OperationFilter<SwaggerDefaultValues>();
 
-                               // integrate xml comments
-                               swagger.IncludeXmlComments( XmlCommentsFilePath );
-                           } )
-                        .EnableSwaggerUi( swagger => swagger.EnableDiscoveryUrlSelector() );
+                    // integrate xml comments
+                    swagger.IncludeXmlComments( XmlCommentsFilePath );
+                } )
+                .EnableSwaggerUi( swagger => swagger.EnableDiscoveryUrlSelector() );
 
             builder.UseWebApi( httpServer );
         }
