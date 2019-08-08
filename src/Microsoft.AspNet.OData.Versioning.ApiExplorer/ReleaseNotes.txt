@@ -1,4 +1,1 @@
-﻿Support array URL syntax for collection parameters (#496)
-Support DataMemberAttribute (#511)
-Support inherited ODataValue<T> (#513)
-Preserve attributes during model substitution (#520)
+﻿Fix key as segment route template generation (#526)
