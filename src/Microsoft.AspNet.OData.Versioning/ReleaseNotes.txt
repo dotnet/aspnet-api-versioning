@@ -1,5 +1,2 @@
-﻿Generate navigation property templates by convention (#463)
-Fix selecting the assumed, default API version (#471)
-Fix overriding global query settings (#488)
-Add appropriate separators for composite keys (#500)
-Fix client vs server route template generation (#502)
+﻿Fix container builder regression in OData 7.2+ (#525)
+Fix key as segment route template generation (#526)

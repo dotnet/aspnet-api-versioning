@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>3.2.1</VersionPrefix>
+  <VersionPrefix>3.2.2</VersionPrefix>
   <AssemblyVersion>3.2.0.0</AssemblyVersion>
   <TargetFramework>netstandard2.0</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning for OData v4.0</AssemblyTitle>

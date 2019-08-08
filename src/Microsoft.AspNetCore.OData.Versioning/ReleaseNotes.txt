@@ -1,1 +1,1 @@
-﻿Ensure implicitly versioned ActionModel has associated ControllerModel (#519)
+﻿Fix key as segment route template generation (#526)
