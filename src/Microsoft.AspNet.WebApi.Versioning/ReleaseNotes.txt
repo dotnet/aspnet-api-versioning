@@ -1,1 +1,1 @@
-﻿Add API version parameter to Content-Type (#484)
+﻿Fix resolution of media type parameter name (#528)

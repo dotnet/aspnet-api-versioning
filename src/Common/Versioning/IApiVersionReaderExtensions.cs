@@ -5,6 +5,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using static ApiVersionParameterLocation;
 
     internal static class IApiVersionReaderExtensions
@@ -25,15 +27,24 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
         sealed class DescriptionContext : IApiVersionParameterDescriptionContext
         {
-            internal string ParameterName { get; private set; }
+            readonly StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+            readonly List<string> parameterNames = new List<string>();
+
+            internal string ParameterName => parameterNames.Count == 0 ? default : parameterNames[0];
+
+            internal IReadOnlyList<string> ParameterNames => parameterNames;
 
             internal bool HasMediaTypeApiVersion { get; private set; }
 
             public void AddParameter( string name, ApiVersionParameterLocation location )
             {
-                if ( HasMediaTypeApiVersion |= location == MediaTypeParameter )
+                var mediaTypeParameter = location == MediaTypeParameter && !string.IsNullOrEmpty( name );
+
+                HasMediaTypeApiVersion |= mediaTypeParameter;
+
+                if ( mediaTypeParameter && !parameterNames.Contains( name, comparer ) )
                 {
-                    ParameterName = name;
+                    parameterNames.Add( name );
                 }
             }
         }
