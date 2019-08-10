@@ -1,1 +1,1 @@
-﻿Fix key as segment route template generation (#526)
+﻿Fix NRE in unversioned route constraint (#531)
