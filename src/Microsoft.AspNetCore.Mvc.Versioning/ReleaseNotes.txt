@@ -1,1 +1,1 @@
-﻿Ensure implicitly versioned ActionModel has associated ControllerModel (#519)
+﻿Fix resolution of media type parameter name (#528)
