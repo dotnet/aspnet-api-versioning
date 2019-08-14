@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.Web.Http.Simulators.Configuration;
+    using Microsoft.Web.Http.Simulators.Models;
     using Microsoft.Web.Http.Versioning.Conventions;
     using System.Collections;
     using System.Collections.Generic;
@@ -69,6 +70,31 @@
             var models = builder.GetEdmModels();
 
             configuration.MapVersionedODataRoutes( "odata", "api/v{apiVersion}", models );
+
+            return configuration;
+        }
+
+        public static HttpConfiguration NewProductAndSupplierConfiguration()
+        {
+            var configuration = new HttpConfiguration();
+            var controllerTypeResolver = new ControllerTypeCollection(
+               typeof( Simulators.V3.ProductsController ),
+               typeof( Simulators.V3.SuppliersController ) );
+
+            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+            configuration.AddApiVersioning();
+
+            var builder = new VersionedODataModelBuilder( configuration )
+            {
+                DefaultModelConfiguration = ( b, v ) =>
+                {
+                    b.EntitySet<Product>( "Products" ).EntityType.HasKey( p => p.Id );
+                    b.EntitySet<Supplier>( "Suppliers" ).EntityType.HasKey( s => s.Id );
+                }
+            };
+            var models = builder.GetEdmModels();
+
+            configuration.MapVersionedODataRoutes( "odata", "api", models );
 
             return configuration;
         }

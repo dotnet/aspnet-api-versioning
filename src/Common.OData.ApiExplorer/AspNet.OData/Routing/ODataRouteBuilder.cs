@@ -13,6 +13,8 @@
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
 #if WEBAPI
     using System.Web.Http.Description;
 #endif
@@ -24,7 +26,9 @@
     using static System.StringComparison;
 #if WEBAPI
     using static System.Web.Http.Description.ApiParameterSource;
+    using static Microsoft.AspNet.OData.Routing.ODataRouteConstants;
 #else
+    using static Microsoft.AspNet.OData.Routing.ODataRouteConstants;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 #endif
 #if !API_EXPLORER
@@ -181,7 +185,7 @@
 
             // REF: http://odata.github.io/WebApi/#13-06-KeyValueBinding
             var entityKeys = ( Context.EntitySet?.EntityType().Key() ?? Empty<IEdmStructuralProperty>() ).ToArray();
-            var parameterKeys = Context.ParameterDescriptions.Where( p => p.Name.StartsWith( ODataRouteConstants.Key, OrdinalIgnoreCase ) ).ToArray();
+            var parameterKeys = Context.ParameterDescriptions.Where( p => p.Name.StartsWith( Key, OrdinalIgnoreCase ) ).ToArray();
 
             if ( entityKeys.Length == 0 || entityKeys.Length != parameterKeys.Length )
             {
@@ -205,7 +209,7 @@
 
             if ( entityKeys.Length == 1 )
             {
-                ExpandParameterTemplate( builder, entityKeys[0].Type, ODataRouteConstants.Key, keyAsSegment );
+                ExpandParameterTemplate( builder, entityKeys[0].Type, Key, keyAsSegment );
             }
             else
             {
@@ -229,16 +233,17 @@
             Contract.Requires( builder != null );
 
             var actionName = Context.ActionDescriptor.ActionName;
-            var properties = Context.EntitySet.EntityType().NavigationProperties();
-            var property = properties.FirstOrDefault( p => actionName.EndsWith( p.Name, OrdinalIgnoreCase ) );
+            var navigationProperties = new Lazy<IEdmNavigationProperty[]>( Context.EntitySet.EntityType().NavigationProperties().ToArray );
+#if API_EXPLORER
+            var refLink = TryAppendNavigationPropertyLink( builder, actionName, navigationProperties );
+#else
+            var refLink = TryAppendNavigationPropertyLink( builder, actionName );
+#endif
 
-            if ( property == null )
+            if ( !refLink )
             {
-                return;
+                TryAppendNavigationProperty( builder, actionName, navigationProperties );
             }
-
-            builder.Append( '/' );
-            builder.Append( property.Name );
         }
 
         void AppendParametersFromConvention( StringBuilder builder, IEdmOperation operation )
@@ -481,8 +486,9 @@
             var keys = ( Context.EntitySet?.EntityType().Key() ?? Empty<IEdmStructuralProperty>() ).ToArray();
             var operation = Context.Operation;
 
-            foreach ( var parameter in parameterDescriptions )
+            for ( var i = 0; i < parameterDescriptions.Count; i++ )
             {
+                var parameter = parameterDescriptions[i];
 #if WEBAPI
                 if ( parameter.Source != FromUri )
 #elif API_EXPLORER
@@ -514,6 +520,125 @@
             }
 
             return queryParameters;
+        }
+
+        bool TryAppendNavigationProperty( StringBuilder builder, string name, Lazy<IEdmNavigationProperty[]> navigationProperties )
+        {
+            Contract.Requires( builder != null );
+            Contract.Requires( navigationProperties != null );
+
+            // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/PropertyRoutingConvention.cs
+            const string NavigationPropertyPrefix = @"(?:Get|(?:Post|Put|Delete|Patch)To)(\w+)";
+            const string NavigationProperty = "^" + NavigationPropertyPrefix + "$";
+            const string NavigationPropertyFromDeclaringType = "^" + NavigationPropertyPrefix + @"From(\w+)$";
+            var match = Regex.Match( name, NavigationPropertyFromDeclaringType, RegexOptions.Singleline );
+
+            if ( !match.Success )
+            {
+                match = Regex.Match( name, NavigationProperty, RegexOptions.Singleline );
+
+                if ( !match.Success )
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var navigationPropertyName = match.Groups[2].Value;
+
+                builder.Append( '/' );
+
+                if ( Context.Options.UseQualifiedNames )
+                {
+                    var navigationProperty = navigationProperties.Value.First( p => p.Name.Equals( navigationPropertyName, OrdinalIgnoreCase ) );
+                    builder.Append( navigationProperty.Type.ShortQualifiedName() );
+                }
+                else
+                {
+                    builder.Append( navigationPropertyName );
+                }
+            }
+
+            var propertyName = match.Groups[1].Value;
+
+            builder.Append( '/' );
+            builder.Append( propertyName );
+
+            return true;
+        }
+#if API_EXPLORER
+        bool TryAppendNavigationPropertyLink( StringBuilder builder, string name, Lazy<IEdmNavigationProperty[]> navigationProperties )
+#else
+        static bool TryAppendNavigationPropertyLink( StringBuilder builder, string name )
+#endif
+        {
+            // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/RefRoutingConvention.cs
+            const string NavigationPropertyLinkPrefix = "(?:Create|Delete|Get)Ref";
+            const string NavigationPropertyLink = "^" + NavigationPropertyLinkPrefix + "$";
+            const string NavigationPropertyLinkTo = "^" + NavigationPropertyLinkPrefix + @"To(\w+)$";
+            const string NavigationPropertyLinkFrom = "^" + NavigationPropertyLinkPrefix + @"To(\w+)From(\w+)$";
+            var patterns = new[] { NavigationPropertyLinkFrom, NavigationPropertyLinkTo, NavigationPropertyLink };
+            var i = 0;
+            var match = Regex.Match( name, patterns[i], RegexOptions.Singleline );
+
+            while ( !match.Success && ++i < patterns.Length )
+            {
+                match = Regex.Match( name, patterns[i], RegexOptions.Singleline );
+            }
+
+            if ( !match.Success )
+            {
+                return false;
+            }
+
+            var propertyName = match.Groups[1].Value;
+
+            builder.Append( '/' );
+
+            switch ( match.Groups.Count )
+            {
+                case 1:
+                    builder.Append( '{' ).Append( NavigationProperty ).Append( '}' );
+#if API_EXPLORER
+                    AddOrReplaceNavigationPropertyParameter();
+#endif
+                    break;
+                case 2:
+                case 3:
+                    builder.Append( propertyName );
+#if API_EXPLORER
+                    var parameters = Context.ParameterDescriptions;
+
+                    for ( i = 0; i < parameters.Count; i++ )
+                    {
+                        if ( parameters[i].Name.Equals( NavigationProperty, OrdinalIgnoreCase ) )
+                        {
+                            parameters.RemoveAt( i );
+                            break;
+                        }
+                    }
+#endif
+                    break;
+            }
+
+            builder.Append( "/$ref" );
+
+#if API_EXPLORER
+            if ( name.StartsWith( "DeleteRef", OrdinalIgnoreCase ) )
+            {
+                var property = navigationProperties.Value.First( p => p.Name.Equals( propertyName, OrdinalIgnoreCase ) );
+
+                if ( property.TargetMultiplicity() == EdmMultiplicity.Many )
+                {
+                    AddOrReplaceRefIdQueryParameter();
+                }
+            }
+            else if ( name.StartsWith( "CreateRef", OrdinalIgnoreCase ) )
+            {
+                AddOrReplaceIdBodyParameter();
+            }
+#endif
+            return true;
         }
 
         static string GetRouteParameterName( IReadOnlyDictionary<string, ApiParameterDescription> actionParameters, string name )

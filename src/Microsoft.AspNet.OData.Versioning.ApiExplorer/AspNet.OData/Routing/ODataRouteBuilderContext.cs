@@ -34,8 +34,8 @@
             Contract.Requires( options != null );
 
             ApiVersion = apiVersion;
-            serviceProvider = configuration.GetODataRootContainer( route );
-            EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
+            Services = configuration.GetODataRootContainer( route );
+            EdmModel = Services.GetRequiredService<IEdmModel>();
             routeAttribute = actionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = route;
@@ -78,7 +78,7 @@
 
                 if ( parameter != null && parameter.ParameterType.IsODataActionParameters() )
                 {
-                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( serviceProvider, action, apiVersion.Value, controllerName ) );
+                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( Services, action, apiVersion.Value, controllerName ) );
                     break;
                 }
             }

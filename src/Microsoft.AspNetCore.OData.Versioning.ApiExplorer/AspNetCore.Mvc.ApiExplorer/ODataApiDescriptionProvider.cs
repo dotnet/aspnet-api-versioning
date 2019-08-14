@@ -383,21 +383,24 @@
             var declaredReturnType = GetDeclaredReturnType( action );
             var runtimeReturnType = GetRuntimeReturnType( declaredReturnType );
             var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes, runtimeReturnType, mapping.Services );
-            var routeContext = new ODataRouteBuilderContext( mapping, action, Options );
-            var parameterContext = new ApiParameterContext( MetadataProvider, routeContext, ModelTypeBuilder );
-            var parameters = GetParameters( parameterContext );
+            var routeContext = new ODataRouteBuilderContext( mapping, action, Options ) { ModelMetadataProvider = MetadataProvider };
 
             if ( routeContext.IsRouteExcluded )
             {
                 yield break;
             }
 
-            foreach ( var parameter in parameters )
+            var parameterContext = new ApiParameterContext( MetadataProvider, routeContext, ModelTypeBuilder );
+            var parameters = GetParameters( parameterContext );
+
+            for ( var i = 0; i < parameters.Count; i++ )
             {
-                routeContext.ParameterDescriptions.Add( parameter );
+                routeContext.ParameterDescriptions.Add( parameters[i] );
             }
 
             var relativePath = BuildRelativePath( action, routeContext );
+
+            parameters = routeContext.ParameterDescriptions;
 
             foreach ( var httpMethod in GetHttpMethods( action ) )
             {
@@ -422,8 +425,7 @@
 
                 for ( var i = 0; i < parameters.Count; i++ )
                 {
-                    var parameter = parameters[i];
-                    apiDescription.ParameterDescriptions.Add( parameter );
+                    apiDescription.ParameterDescriptions.Add( parameters[i] );
                 }
 
                 for ( var i = 0; i < apiResponseTypes.Count; i++ )

@@ -3,6 +3,7 @@
     using FluentAssertions;
     using Microsoft.AspNet.OData;
     using System.Linq;
+    using System.Net.Http;
     using System.Web.Http;
     using Xunit;
     using static System.Net.Http.HttpMethod;
@@ -130,6 +131,45 @@
                         RelativePath = relativePaths[3],
                         Version = apiVersion
                     }
+                },
+                options => options.ExcludingMissingMembers() );
+        }
+
+        [Fact]
+        public void api_description_group_should_explore_navigation_properties()
+        {
+            // arrange
+            var Patch = new HttpMethod( "PATCH" );
+            var Version = new ApiVersion( 3, 0 );
+            var apiExplorer = new ODataApiExplorer( TestConfigurations.NewProductAndSupplierConfiguration() );
+            var descriptionGroup = apiExplorer.ApiDescriptions[Version];
+
+            // act
+            var descriptions = descriptionGroup.ApiDescriptions;
+
+            // assert
+            descriptions.Should().BeEquivalentTo(
+                new[]
+                {
+                    new { HttpMethod = Get, Version, RelativePath = "api/Products" },
+                    new { HttpMethod = Get, Version, RelativePath = "api/Suppliers" },
+                    new { HttpMethod = Get, Version, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = Get, Version, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = Get, Version, RelativePath = "api/Products/{key}/Supplier" },
+                    new { HttpMethod = Get, Version, RelativePath = "api/Suppliers/{key}/Products" },
+                    new { HttpMethod = Get, Version, RelativePath = "api/Products/{key}/Supplier/$ref" },
+                    new { HttpMethod = Put, Version, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = Put, Version, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = Put, Version, RelativePath = "api/Products/{key}/Supplier/$ref" },
+                    new { HttpMethod = Post, Version, RelativePath = "api/Products" },
+                    new { HttpMethod = Post, Version, RelativePath = "api/Suppliers" },
+                    new { HttpMethod = Post, Version, RelativePath = "api/Suppliers/{key}/Products/$ref" },
+                    new { HttpMethod = Patch, Version, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = Patch, Version, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = Delete, Version, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = Delete, Version, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = Delete, Version, RelativePath = "api/Products/{key}/Supplier/$ref" },
+                    new { HttpMethod = Delete, Version, RelativePath = "api/Suppliers/{key}/Products/$ref?$id={$id}" },
                 },
                 options => options.ExcludingMissingMembers() );
         }

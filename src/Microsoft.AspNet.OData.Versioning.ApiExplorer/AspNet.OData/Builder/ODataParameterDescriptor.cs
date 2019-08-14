@@ -3,14 +3,13 @@
     using System;
     using System.Web.Http.Controllers;
 
-    sealed class ODataQueryOptionParameterDescriptor : HttpParameterDescriptor
+    sealed class ODataParameterDescriptor : HttpParameterDescriptor
     {
-        private string prefix = "$";
-
-        internal ODataQueryOptionParameterDescriptor( string name, Type type, object defaultValue )
+        internal ODataParameterDescriptor( string name, Type type, bool optional = false, object defaultValue = default )
         {
             ParameterName = name;
             ParameterType = type;
+            IsOptional = optional;
             DefaultValue = defaultValue;
         }
 
@@ -20,10 +19,8 @@
 
         public override object DefaultValue { get; }
 
-        public override string Prefix => prefix;
+        public override string Prefix { get; }
 
-        public override bool IsOptional => true;
-
-        internal void SetPrefix( string value ) => prefix = value ?? string.Empty;
+        public override bool IsOptional { get; }
     }
 }

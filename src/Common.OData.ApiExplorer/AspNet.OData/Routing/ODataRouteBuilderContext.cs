@@ -28,8 +28,9 @@
 
     sealed partial class ODataRouteBuilderContext
     {
-        readonly IServiceProvider serviceProvider;
         readonly ODataRouteAttribute routeAttribute;
+
+        internal IServiceProvider Services { get; }
 
         internal ApiVersion ApiVersion { get; }
 
@@ -71,7 +72,7 @@
 
         internal bool IsBound => IsOperation && EntitySet != null;
 
-        internal bool AllowUnqualifiedEnum => serviceProvider.GetRequiredService<ODataUriResolver>() is StringAsEnumResolver;
+        internal bool AllowUnqualifiedEnum => Services.GetRequiredService<ODataUriResolver>() is StringAsEnumResolver;
 
         internal static ODataRouteActionType GetActionType( IEdmEntitySet entitySet, IEdmOperation operation )
         {

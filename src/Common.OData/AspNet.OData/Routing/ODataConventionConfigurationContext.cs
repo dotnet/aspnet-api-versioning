@@ -23,7 +23,7 @@
         public string RouteName { get; }
 
         /// <summary>
-        /// Gets the entity data model (EDM) associcated with the routing conventions.
+        /// Gets the entity data model (EDM) associated with the routing conventions.
         /// </summary>
         /// <value>The current <see cref="IEdmModel">EDM model</see>.</value>
         public IEdmModel EdmModel { get; }

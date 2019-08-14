@@ -107,8 +107,6 @@
             const string GroupName = "v3";
 
             group.GroupName.Should().Be( GroupName );
-
-
             group.Items.Should().BeEquivalentTo(
                 new[]
                 {
@@ -125,6 +123,25 @@
                     new { HttpMethod = "POST", GroupName, RelativePath = "api/People" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People/NewHires(Since={since})" },
                     new { HttpMethod = "POST", GroupName, RelativePath = "api/People/{key}/Promote" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Products" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Products" },
+                    new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/Supplier" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/Supplier/$ref" },
+                    new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}/Supplier/$ref" },
+                    new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}/Supplier/$ref" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Suppliers" },
+                    new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = "PUT", GroupName, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}/Products" },
+                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Suppliers/{key}/Products/$ref" },
+                    new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}/Products/$ref?$id={$id}" },
                 },
                 options => options.ExcludingMissingMembers() );
         }

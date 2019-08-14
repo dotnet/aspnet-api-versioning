@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\IModelConfiguration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Builder\VersionedODataModelBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\ODataConventionConfigurationContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\ODataId.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\VersionedAttributeRoutingConvention.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNet.OData\Routing\VersionedODataRoutingConventions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OData.Edm\ApiVersionAnnotation.cs" />

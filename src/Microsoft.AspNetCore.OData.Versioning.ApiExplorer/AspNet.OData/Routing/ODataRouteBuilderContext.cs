@@ -3,6 +3,7 @@
     using Microsoft.AspNet.OData;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
@@ -26,15 +27,15 @@
             Contract.Requires( options != null );
 
             ApiVersion = routeMapping.ApiVersion;
-            serviceProvider = routeMapping.Services;
-            EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
+            Services = routeMapping.Services;
+            EdmModel = Services.GetRequiredService<IEdmModel>();
             routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = routeMapping.Route;
             ActionDescriptor = actionDescriptor;
             ParameterDescriptions = new List<ApiParameterDescription>();
             Options = options;
-            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( serviceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
+            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( Services.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
 
             var container = EdmModel.EntityContainer;
 
@@ -53,9 +54,9 @@
             ActionType = GetActionType( EntitySet, Operation );
         }
 
-        internal IServiceProvider Services => serviceProvider;
-
         internal IODataPathTemplateHandler PathTemplateHandler =>
-            templateHandler ?? ( templateHandler = serviceProvider.GetRequiredService<IODataPathTemplateHandler>() );
+            templateHandler ?? ( templateHandler = Services.GetRequiredService<IODataPathTemplateHandler>() );
+
+        internal IModelMetadataProvider ModelMetadataProvider { get; set; }
     }
 }

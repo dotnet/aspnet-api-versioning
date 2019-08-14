@@ -208,7 +208,6 @@
 
             var description = CreateResponseDescription( actionDescriptor );
             var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
-            var assembliesResolver = actionDescriptor.Configuration.Services.GetAssembliesResolver();
             var returnType = description.ResponseType ?? description.DeclaredType;
             var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder );
 
