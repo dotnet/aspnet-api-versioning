@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Project="build\signing.targets" />
+ <Import Project="build\signing.targets" />
 
-  <Target Name="AfterSolutionBuild" AfterTargets="Build">
+ <Target Name="AfterSolutionBuild" AfterTargets="Build">
 
-    <PropertyGroup>
-      <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-      <BuildProperties>Configuration=$(Configuration)</BuildProperties>
-      <BuildProperties Condition=" ('$(Platform)' != '') AND ('$(Platform)' != 'AnyCPU') AND ('$(Platform)' != 'Any CPU') ">$(BuildProperties);Platform=$(Platform)</BuildProperties>
-    </PropertyGroup>
+  <PropertyGroup>
+   <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+   <BuildProperties>Configuration=$(Configuration)</BuildProperties>
+   <BuildProperties Condition=" ('$(Platform)' != '') AND ('$(Platform)' != 'AnyCPU') AND ('$(Platform)' != 'Any CPU') ">$(BuildProperties);Platform=$(Platform)</BuildProperties>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <Projects Include="src\**\*.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+   <Projects Include="src\**\*.csproj" />
+  </ItemGroup>
 
-    <MSBuild Projects="@(Projects)" Targets="GetTargetPath" Properties="$(BuildProperties)" UnloadProjectsOnCompletion="true">
-      <Output TaskParameter="TargetOutputs" ItemName="TargetFiles" />
-    </MSBuild>
+  <MSBuild Projects="@(Projects)" Targets="GetTargetPaths" Properties="$(BuildProperties)" UnloadProjectsOnCompletion="true">
+   <Output TaskParameter="TargetOutputs" ItemName="TargetFiles" />
+  </MSBuild>
 
-    <PropertyGroup>
-      <!-- transform list to pipe-separated values so we can forward it as a parameter using a build property -->
-      <SigningProperties>
-        SourceDir=$(MSBuildThisFileDirectory)\src;
-        FilesToSign=@(TargetFiles->'%(Identity)','|')
-      </SigningProperties>
-    </PropertyGroup>
+  <PropertyGroup>
+   <!-- transform list to pipe-separated values so we can forward it as a parameter using a build property -->
+   <SigningProperties>
+    SourceDir=$(MSBuildThisFileDirectory)\src;
+    FilesToSign=@(TargetFiles->'%(Identity)','|')
+   </SigningProperties>
+  </PropertyGroup>
 
-    <MSBuild Projects ="$(MSBuildThisFileFullPath)" Targets="WriteCodeSigningFileList" Properties="$(SigningProperties)" />
+  <MSBuild Projects ="$(MSBuildThisFileFullPath)" Targets="WriteCodeSigningFileList" Properties="$(SigningProperties)" />
 
-  </Target>
+ </Target>
 
 </Project>

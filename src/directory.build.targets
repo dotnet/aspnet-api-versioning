@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup Label="Common">
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile Condition=" '$(DocumentationFile)' == '' " >bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+ <PropertyGroup Label="Common">
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <DocumentationFile Condition=" '$(DocumentationFile)' == '' " >bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+ </PropertyGroup>
+
+ <ImportGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
+  <Import Project="..\build\resource.targets" />
+  <Import Project="..\build\file-version.targets" />
+  <Import Project="..\build\nuget.targets" />
+ </ImportGroup>
+
+ <Target Name="GetTargetPath" Outputs="$(TargetPath)" />
+
+ <Target Name="GetTargetPaths" Outputs="@(TargetFiles)">
+
+  <PropertyGroup>
+   <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' " >$(TargetFramework)</TargetFrameworks>
+   <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+   <BuildProperties>Configuration=$(Configuration)</BuildProperties>
+   <BuildProperties Condition=" ('$(Platform)' != '') AND ('$(Platform)' != 'AnyCPU') AND ('$(Platform)' != 'Any CPU') ">$(BuildProperties);Platform=$(Platform)</BuildProperties>
   </PropertyGroup>
 
-  <ImportGroup Condition=" '$(MSBuildProjectExtension)' != '.shproj' ">
-    <Import Project="..\build\resource.targets" />
-    <Import Project="..\build\file-version.targets" />
-    <Import Project="..\build\nuget.targets" />
-  </ImportGroup>
+  <ItemGroup>
+   <_TargetFrameworks Include="$(TargetFrameworks.Split(';'))" />
+  </ItemGroup>
 
-  <Target Name="GetTargetPath" Outputs="$(TargetPath)" />
+  <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="GetTargetPath" Properties="$(BuildProperties);TargetFramework=%(_TargetFrameworks.Identity)" UnloadProjectsOnCompletion="true">
+   <Output TaskParameter="TargetOutputs" ItemName="TargetFiles" />
+  </MSBuild>
+
+ </Target>
 
 </Project>
