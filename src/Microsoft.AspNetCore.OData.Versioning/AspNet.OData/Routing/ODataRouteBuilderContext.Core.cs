@@ -25,14 +25,14 @@
             Contract.Requires( options != null );
 
             ApiVersion = routeMapping.ApiVersion;
-            serviceProvider = routeMapping.Services;
-            EdmModel = serviceProvider.GetRequiredService<IEdmModel>();
+            Services = routeMapping.Services;
+            EdmModel = Services.GetRequiredService<IEdmModel>();
             routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             Route = routeMapping.Route;
             ActionDescriptor = actionDescriptor;
             Options = options;
-            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( serviceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
+            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( Services.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
 
             var container = EdmModel.EntityContainer;
 
@@ -51,9 +51,7 @@
             ActionType = GetActionType( EntitySet, Operation );
         }
 
-        internal IServiceProvider Services => serviceProvider;
-
         internal IODataPathTemplateHandler PathTemplateHandler =>
-            templateHandler ?? ( templateHandler = serviceProvider.GetRequiredService<IODataPathTemplateHandler>() );
+            templateHandler ?? ( templateHandler = Services.GetRequiredService<IODataPathTemplateHandler>() );
     }
 }

@@ -20,7 +20,6 @@
         /// </summary>
         /// <returns>All available orders.</returns>
         /// <response code="200">Orders successfully retrieved.</response>
-        /// <response code="400">The order is invalid.</response>
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
         [ODataRoute]

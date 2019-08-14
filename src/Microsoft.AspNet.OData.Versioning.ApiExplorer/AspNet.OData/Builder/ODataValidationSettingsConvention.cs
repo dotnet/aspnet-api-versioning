@@ -1,9 +1,13 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
     using Microsoft.AspNet.OData.Extensions;
+    using Microsoft.AspNet.OData.Routing;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
+    using Microsoft.OData.UriParser;
     using System;
     using System.Diagnostics.Contracts;
+    using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
@@ -33,17 +37,16 @@
             visitor.Visit( apiDescription );
 
             var options = visitor.AllowedQueryOptions;
-            var action = apiDescription.ActionDescriptor;
             var parameterDescriptions = apiDescription.ParameterDescriptions;
 
             if ( options.HasFlag( Select ) )
             {
-                parameterDescriptions.Add( SetAction( NewSelectParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewSelectParameter( context ), apiDescription ) );
             }
 
             if ( options.HasFlag( Expand ) )
             {
-                parameterDescriptions.Add( SetAction( NewExpandParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewExpandParameter( context ), apiDescription ) );
             }
 
             if ( singleResult )
@@ -53,27 +56,27 @@
 
             if ( options.HasFlag( Filter ) )
             {
-                parameterDescriptions.Add( SetAction( NewFilterParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewFilterParameter( context ), apiDescription ) );
             }
 
             if ( options.HasFlag( OrderBy ) )
             {
-                parameterDescriptions.Add( SetAction( NewOrderByParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewOrderByParameter( context ), apiDescription ) );
             }
 
             if ( options.HasFlag( Top ) )
             {
-                parameterDescriptions.Add( SetAction( NewTopParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewTopParameter( context ), apiDescription ) );
             }
 
             if ( options.HasFlag( Skip ) )
             {
-                parameterDescriptions.Add( SetAction( NewSkipParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewSkipParameter( context ), apiDescription ) );
             }
 
             if ( options.HasFlag( Count ) )
             {
-                parameterDescriptions.Add( SetAction( NewCountParameter( context ), action ) );
+                parameterDescriptions.Add( SetAction( NewCountParameter( context ), apiDescription ) );
             }
         }
 
@@ -124,16 +127,28 @@
             return true;
         }
 
-        static ApiParameterDescription SetAction( ApiParameterDescription parameter, HttpActionDescriptor action )
+        static ApiParameterDescription SetAction( ApiParameterDescription parameter, ApiDescription apiDescription )
         {
             Contract.Requires( parameter != null );
-            Contract.Requires( action != null );
+            Contract.Requires( apiDescription != null );
             Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
 
+            var action = apiDescription.ActionDescriptor;
             var descriptor = parameter.ParameterDescriptor;
 
             descriptor.ActionDescriptor = action;
             descriptor.Configuration = action.Configuration;
+
+            if ( descriptor is ODataQueryOptionParameterDescriptor odataDescriptor && apiDescription.Route is ODataRoute route )
+            {
+                var container = apiDescription.ActionDescriptor.Configuration.GetODataRootContainer( route );
+                var omitPrefix = container.GetRequiredService<ODataUriResolver>().EnableNoDollarQueryOptions;
+
+                if ( omitPrefix )
+                {
+                    odataDescriptor.SetPrefix( string.Empty );
+                }
+            }
 
             return parameter;
         }
