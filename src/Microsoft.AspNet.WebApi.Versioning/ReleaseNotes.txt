@@ -1,1 +1,1 @@
-﻿Fix resolution of media type parameter name (#528)
+﻿Update Authenticode signature to use SHA256

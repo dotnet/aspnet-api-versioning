@@ -1,1 +1,1 @@
-﻿Fix NRE in unversioned route constraint (#531)
+﻿Update Authenticode signature to use SHA256

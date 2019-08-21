@@ -1,1 +1,1 @@
-﻿Fix key as segment route template generation (#526)
+﻿Update Authenticode signature to use SHA256

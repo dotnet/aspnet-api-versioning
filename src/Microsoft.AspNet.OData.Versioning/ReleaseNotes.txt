@@ -1,2 +1,1 @@
-﻿Fix container builder regression in OData 7.2+ (#525)
-Fix key as segment route template generation (#526)
+﻿Update Authenticode signature to use SHA256
