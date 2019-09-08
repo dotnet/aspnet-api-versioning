@@ -18,7 +18,7 @@
         /// Gets or sets the street address.
         /// </summary>
         /// <value>The street address.</value>
-        [DataMember]
+        [DataMember( Order = 0 )]
         public string Street { get; set; }
 
         /// <summary>
@@ -29,17 +29,17 @@
         public string City { get; set; }
 
         /// <summary>
+        /// Gets or sets the address zip code.
+        /// </summary>
+        /// <value>The address zip code.</value>
+        [DataMember( Name = "zip", Order = 1 )]
+        public string ZipCode { get; set; }
+        /// <summary>
         /// Gets or sets the address state.
         /// </summary>
         /// <value>The address state.</value>
         [DataMember]
         public string State { get; set; }
 
-        /// <summary>
-        /// Gets or sets the address zip code.
-        /// </summary>
-        /// <value>The address zip code.</value>
-        [DataMember(Name = "zip")]
-        public string ZipCode { get; set; }
     }
 }

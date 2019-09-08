@@ -63,6 +63,9 @@
                     // add a custom operation filter which sets default values
                     options.OperationFilter<SwaggerDefaultValues>();
 
+                    // reordering properties in swagger documentation according to the DataMember attribute (if defined)
+                    options.SchemaFilter<PropertyReorderFilter>();
+
                     // integrate xml comments
                     options.IncludeXmlComments( XmlCommentsFilePath );
                 } );
