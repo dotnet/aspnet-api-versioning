@@ -20,7 +20,7 @@ namespace Microsoft.Examples
                  || context.SystemType.GetCustomAttribute<DataContractAttribute>() == null ) return;
 
             schema.Properties = ReorderProperties( schema.Properties,
-                context.SystemType.GetProperties().ExtractAttributes() );
+                context.SystemType.GetProperties().ExtractPropertyOrder() );
         }
 
         private static IDictionary<string, Schema> ReorderProperties( IDictionary<string, Schema> properties, IEnumerable<PropertyOrder> clrProps )
@@ -39,14 +39,18 @@ namespace Microsoft.Examples
 
     internal static class OrderExtension
     {
-        internal static IEnumerable<PropertyOrder> ExtractAttributes( this IEnumerable<PropertyInfo> props )
+        internal static IEnumerable<PropertyOrder> ExtractPropertyOrder( this IEnumerable<PropertyInfo> props )
         {
             return props
                 .Select( p => new { p, attr = p.GetCustomAttribute<DataMemberAttribute>() } )
                 .Select( _ => new PropertyOrder
                 {
-                    Name = _.attr != null && _.attr.IsNameSetExplicitly ? _.attr.Name : _.p.Name.ToLowerInvariant(),
-                    Order = _.attr != null ? _.attr.Order < 0 ? int.MaxValue : _.attr.Order : _.p.MetadataToken
+                    Name = _.attr != null && _.attr.IsNameSetExplicitly
+                        ? _.attr.Name
+                        : _.p.Name.ToLowerInvariant(),
+                    Order = _.attr?.Order >= 0 // if no Order defined in the attribute then it has value -1 
+                        ? _.attr.Order
+                        : _.p.MetadataToken // use original declaration order
                 } );
         }
     }
