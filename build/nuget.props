@@ -4,7 +4,7 @@
  <PropertyGroup Label="NuGet">
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/Microsoft/aspnet-api-versioning</RepositoryUrl>
-  <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>
+  <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
   <PackageProjectUrl>https://github.com/Microsoft/aspnet-api-versioning/wiki</PackageProjectUrl>
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   <PackageLicenseExpression>MIT</PackageLicenseExpression>
