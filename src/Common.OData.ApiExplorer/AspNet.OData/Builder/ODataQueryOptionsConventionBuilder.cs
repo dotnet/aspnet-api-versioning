@@ -137,13 +137,13 @@
             {
                 var controller = GetController( description );
 
-                if ( !controller.IsODataController() )
-                {
-                    continue;
-                }
-
                 if ( !conventions.TryGetValue( controller, out var convention ) )
                 {
+                    if ( !controller.IsODataController() && !IsODataLike( description ) )
+                    {
+                        continue;
+                    }
+
                     if ( !ConventionBuilders.TryGetValue( controller, out var builder ) )
                     {
                         builder = new ODataControllerQueryOptionsConventionBuilder( controller );

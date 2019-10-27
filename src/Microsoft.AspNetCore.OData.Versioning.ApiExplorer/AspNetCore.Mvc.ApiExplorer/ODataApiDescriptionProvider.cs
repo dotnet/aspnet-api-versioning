@@ -330,18 +330,6 @@
 
         static Type GetRuntimeReturnType( Type declaredReturnType ) => declaredReturnType == typeof( object ) ? default : declaredReturnType;
 
-        static IReadOnlyList<IApiRequestMetadataProvider> GetRequestMetadataAttributes( ControllerActionDescriptor action )
-        {
-            Contract.Requires( action != null );
-
-            if ( action.FilterDescriptors == null )
-            {
-                return default;
-            }
-
-            return action.FilterDescriptors.Select( fd => fd.Filter ).OfType<IApiRequestMetadataProvider>().ToArray();
-        }
-
         static IReadOnlyList<IApiResponseMetadataProvider> GetResponseMetadataAttributes( ControllerActionDescriptor action )
         {
             Contract.Requires( action != null );
@@ -378,7 +366,6 @@
             Contract.Requires( mapping != null );
             Contract.Ensures( Contract.Result<ApiDescription>() != null );
 
-            var requestMetadataAttributes = GetRequestMetadataAttributes( action );
             var responseMetadataAttributes = GetResponseMetadataAttributes( action );
             var declaredReturnType = GetDeclaredReturnType( action );
             var runtimeReturnType = GetRuntimeReturnType( declaredReturnType );

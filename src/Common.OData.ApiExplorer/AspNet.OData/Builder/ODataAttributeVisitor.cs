@@ -68,28 +68,6 @@
             }
         }
 
-        static void ClearCollectionIfItContainsAllProperties( IList<string> list, ISet<string> set )
-        {
-            Contract.Requires( list != null );
-            Contract.Requires( set != null );
-
-            if ( list.Count != set.Count )
-            {
-                return;
-            }
-
-            for ( var i = 0; i < list.Count; i++ )
-            {
-                if ( !set.Contains( list[i] ) )
-                {
-                    return;
-                }
-            }
-
-            // avoid verbose messages by clearing the list when it contains all possible properties
-            list.Clear();
-        }
-
         void VisitModel( IEdmStructuredType modelType )
         {
             Contract.Requires( modelType != null );

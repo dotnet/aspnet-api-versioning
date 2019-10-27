@@ -354,7 +354,7 @@
                 return template;
             }
 
-            int IndexOfToken( StringBuilder builder, string token )
+            static int IndexOfToken( StringBuilder builder, string token )
             {
                 var index = -1;
 
@@ -393,7 +393,7 @@
                 return index;
             }
 
-            void InsertBrackets( StringBuilder builder, string token )
+            static void InsertBrackets( StringBuilder builder, string token )
             {
                 var index = IndexOfToken( builder, token );
 

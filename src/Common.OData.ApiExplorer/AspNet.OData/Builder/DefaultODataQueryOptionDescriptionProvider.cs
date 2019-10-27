@@ -30,26 +30,18 @@
                 throw new ArgumentException( SR.MultipleQueryOptionsNotAllowed, nameof( queryOption ) );
             }
 
-            switch ( queryOption )
+            return queryOption switch
             {
-                case Filter:
-                    return DescribeFilter( context );
-                case Expand:
-                    return DescribeExpand( context );
-                case Select:
-                    return DescribeSelect( context );
-                case OrderBy:
-                    return DescribeOrderBy( context );
-                case Top:
-                    return DescribeTop( context );
-                case Skip:
-                    return DescribeSkip( context );
-                case Count:
-                    return DescribeCount( context );
-            }
-
+                Filter => DescribeFilter( context ),
+                Expand => DescribeExpand( context ),
+                Select => DescribeSelect( context ),
+                OrderBy => DescribeOrderBy( context ),
+                Top => DescribeTop( context ),
+                Skip => DescribeSkip( context ),
+                Count => DescribeCount( context ),
 #pragma warning disable CA1308 // Normalize strings to uppercase
-            throw new ArgumentException( SR.UnsupportedQueryOption.FormatDefault( queryOption.ToString().ToLowerInvariant() ), nameof( queryOption ) );
+                _ => throw new ArgumentException( SR.UnsupportedQueryOption.FormatDefault( queryOption.ToString().ToLowerInvariant() ), nameof( queryOption ) ),
+            };
 #pragma warning restore CA1308
         }
 
