@@ -165,17 +165,12 @@
         {
             Contract.Requires( apiDescription != null );
 
-            switch ( apiDescription.HttpMethod.ToUpperInvariant() )
+            return apiDescription.HttpMethod.ToUpperInvariant() switch
             {
-                case "GET":
-                    // query or function
-                    return true;
-                case "POST":
-                    // action
-                    return apiDescription.Operation()?.IsAction() == true;
-            }
-
-            return false;
+                "GET" => true,
+                "POST" => apiDescription.Operation()?.IsAction() == true,
+                _ => false,
+            };
         }
     }
 }

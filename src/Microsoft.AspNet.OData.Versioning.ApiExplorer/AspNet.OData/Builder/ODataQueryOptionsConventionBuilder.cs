@@ -10,6 +10,10 @@
     {
         static Type GetKey( Type type ) => type;
 
-        static Type GetController( ApiDescription apiDescription ) => apiDescription.ActionDescriptor.ControllerDescriptor.ControllerType;
+        static Type GetController( ApiDescription apiDescription ) =>
+            apiDescription.ActionDescriptor.ControllerDescriptor.ControllerType;
+
+        static bool IsODataLike( ApiDescription description ) =>
+            description.ActionDescriptor.GetCustomAttributes<EnableQueryAttribute>( inherit: true ).Count > 0;
     }
 }

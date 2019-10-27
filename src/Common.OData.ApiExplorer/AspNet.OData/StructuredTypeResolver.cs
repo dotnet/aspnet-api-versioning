@@ -16,6 +16,11 @@
         {
             Contract.Requires( type != null );
 
+            if ( model == null )
+            {
+                return default;
+            }
+
             var structuredTypes = model.SchemaElements.OfType<IEdmStructuredType>();
             var structuredType = structuredTypes.FirstOrDefault( t => type.Equals( t.GetClrType( model ) ) );
 

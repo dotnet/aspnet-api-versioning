@@ -137,7 +137,7 @@
                     return builder.Action( methods[0] );
             }
 
-            argumentTypes = argumentTypes ?? Type.EmptyTypes;
+            argumentTypes ??= Type.EmptyTypes;
             methods = methods.Where( m => SignatureMatches( m, argumentTypes ) ).ToArray();
 
             if ( methods.Length == 1 )

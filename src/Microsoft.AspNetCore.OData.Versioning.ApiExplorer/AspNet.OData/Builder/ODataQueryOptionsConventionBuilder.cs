@@ -1,9 +1,7 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
-    using Microsoft.AspNet.OData.Query;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
-    using Microsoft.AspNetCore.Mvc.ModelBinding;
     using System;
     using System.Reflection;
 
@@ -23,6 +21,16 @@
             }
 
             return typeof( object ).GetTypeInfo();
+        }
+
+        static bool IsODataLike( ApiDescription description )
+        {
+            if ( description.ActionDescriptor is ControllerActionDescriptor action )
+            {
+                return Attribute.IsDefined( action.ControllerTypeInfo, typeof( EnableQueryAttribute ), inherit: true );
+            }
+
+            return false;
         }
     }
 }
