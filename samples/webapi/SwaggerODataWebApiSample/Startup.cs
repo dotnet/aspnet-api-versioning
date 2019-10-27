@@ -47,6 +47,8 @@ namespace Microsoft.Examples
                     new AllConfigurations(),
                     new PersonModelConfiguration(),
                     new OrderModelConfiguration(),
+                    new ProductConfiguration(),
+                    new SupplierConfiguration(),
                 }
             };
             var models = modelBuilder.GetEdmModels();

@@ -147,6 +147,8 @@
         [ProducesResponseType( Status404NotFound )]
         public IActionResult CreateRefToProducts( [FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link ) => NoContent();
 
+        // TODO: OData doesn't seem to currently support this action in ASP.NET Core, but it works in Web API
+
         /// <summary>
         /// Unlinks a product from a supplier.
         /// </summary>

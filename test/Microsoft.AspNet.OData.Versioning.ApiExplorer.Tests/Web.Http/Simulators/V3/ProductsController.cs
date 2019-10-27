@@ -44,7 +44,7 @@
         /// <summary>
         /// Creates a new product.
         /// </summary>
-        /// <param name="order">The product to create.</param>
+        /// <param name="product">The product to create.</param>
         /// <returns>The created product.</returns>
         /// <response code="201">The product was successfully created.</response>
         /// <response code="204">The product was successfully created.</response>

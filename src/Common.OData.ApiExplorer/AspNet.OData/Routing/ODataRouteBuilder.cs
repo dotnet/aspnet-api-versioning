@@ -671,7 +671,7 @@
                 }
             }
 
-            return parameter.Name.StartsWith( ODataRouteConstants.Key, OrdinalIgnoreCase );
+            return parameter.Name.StartsWith( Key, OrdinalIgnoreCase );
         }
 
         static bool IsFunctionParameter( IEdmOperation operation, ApiParameterDescription parameter )

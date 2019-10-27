@@ -76,6 +76,7 @@
             var services = Context.Services;
             var omitPrefix = services.GetRequiredService<ODataUriResolver>().EnableNoDollarQueryOptions;
             var name = omitPrefix ? "id" : "$id";
+            var description = Context.Options.RelatedEntityIdParameterDescription;
             var type = typeof( Uri );
 
             if ( parameter == null )
@@ -85,7 +86,7 @@
             }
 
             parameter.IsRequired = true;
-            parameter.ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider, type, default );
+            parameter.ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider, type, description );
             parameter.Name = name;
             parameter.ParameterDescriptor.Name = name;
             parameter.ParameterDescriptor.ParameterType = type;

@@ -165,6 +165,9 @@
   <data name="OrderByQueryOptionDesc" xml:space="preserve">
     <value>Specifies the order in which items are returned.</value>
   </data>
+  <data name="RelatedEntityIdParamDesc" xml:space="preserve">
+    <value>The related entity identifier</value>
+  </data>
   <data name="SelectQueryOptionDesc" xml:space="preserve">
     <value>Limits the properties returned in the result.</value>
   </data>

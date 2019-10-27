@@ -42,7 +42,7 @@
             ActionDescriptor = actionDescriptor;
             ParameterDescriptions = parameterDescriptions;
             Options = options;
-            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( configuration.GetUrlKeyDelimiter() );
+            UrlKeyDelimiter = UrlKeyDelimiterOrDefault( configuration.GetUrlKeyDelimiter() ?? Services.GetService<IODataPathHandler>()?.UrlKeyDelimiter );
 
             var container = EdmModel.EntityContainer;
 

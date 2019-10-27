@@ -1,14 +1,14 @@
 ﻿namespace Microsoft.Examples.V3
 {
     using Microsoft.AspNet.OData;
-    using Microsoft.AspNet.OData.Simulators.Models;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Examples.Models;
     using Microsoft.Web.Http;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using static Microsoft.AspNetCore.Http.StatusCodes;
+    using System.Web.Http;
+    using System.Web.Http.Description;
+    using static System.Net.HttpStatusCode;
 
     /// <summary>
     /// Represents a RESTful service of suppliers.
@@ -24,8 +24,7 @@
         /// <returns>All available suppliers.</returns>
         /// <response code="200">Products successfully retrieved.</response>
         [EnableQuery]
-        [Produces( "application/json" )]
-        [ProducesResponseType( typeof( ODataValue<IEnumerable<Supplier>> ), Status200OK )]
+        [ResponseType( typeof( ODataValue<IEnumerable<Supplier>> ) )]
         public IQueryable<Supplier> Get() => suppliers;
 
         /// <summary>
@@ -36,24 +35,19 @@
         /// <response code="200">The supplier was successfully retrieved.</response>
         /// <response code="404">The supplier does not exist.</response>
         [EnableQuery]
-        [Produces( "application/json" )]
-        [ProducesResponseType( typeof( Supplier ), Status200OK )]
-        [ProducesResponseType( Status404NotFound )]
+        [ResponseType( typeof( Supplier ) )]
         public SingleResult<Supplier> Get( [FromODataUri] int key ) => SingleResult.Create( suppliers.Where( p => p.Id == key ) );
 
         /// <summary>
         /// Creates a new supplier.
         /// </summary>
-        /// <param name="order">The supplier to create.</param>
+        /// <param name="supplier">The supplier to create.</param>
         /// <returns>The created supplier.</returns>
         /// <response code="201">The supplier was successfully created.</response>
         /// <response code="204">The supplier was successfully created.</response>
         /// <response code="400">The supplier is invalid.</response>
-        [Produces( "application/json" )]
-        [ProducesResponseType( typeof( Supplier ), Status201Created )]
-        [ProducesResponseType( Status204NoContent )]
-        [ProducesResponseType( Status400BadRequest )]
-        public IActionResult Post( [FromBody]Supplier supplier )
+        [ResponseType( typeof( Supplier ) )]
+        public IHttpActionResult Post( [FromBody] Supplier supplier )
         {
             if ( !ModelState.IsValid )
             {
@@ -75,12 +69,8 @@
         /// <response code="204">The supplier was successfully updated.</response>
         /// <response code="400">The supplier is invalid.</response>
         /// <response code="404">The supplier does not exist.</response>
-        [Produces( "application/json" )]
-        [ProducesResponseType( typeof( Supplier ), Status200OK )]
-        [ProducesResponseType( Status204NoContent )]
-        [ProducesResponseType( Status400BadRequest )]
-        [ProducesResponseType( Status404NotFound )]
-        public IActionResult Patch( [FromODataUri] int key, Delta<Supplier> delta )
+        [ResponseType( typeof( Supplier ) )]
+        public IHttpActionResult Patch( [FromODataUri] int key, Delta<Supplier> delta )
         {
             if ( !ModelState.IsValid )
             {
@@ -104,12 +94,8 @@
         /// <response code="204">The supplier was successfully updated.</response>
         /// <response code="400">The supplier is invalid.</response>
         /// <response code="404">The supplier does not exist.</response>
-        [Produces( "application/json" )]
-        [ProducesResponseType( typeof( Supplier ), Status200OK )]
-        [ProducesResponseType( Status204NoContent )]
-        [ProducesResponseType( Status400BadRequest )]
-        [ProducesResponseType( Status404NotFound )]
-        public IActionResult Put( [FromODataUri] int key, [FromBody]Supplier update )
+        [ResponseType( typeof( Supplier ) )]
+        public IHttpActionResult Put( [FromODataUri] int key, [FromBody] Supplier update )
         {
             if ( !ModelState.IsValid )
             {
@@ -125,9 +111,7 @@
         /// <param name="key">The supplier to delete.</param>
         /// <returns>None</returns>
         /// <response code="204">The supplier was successfully deleted.</response>
-        [ProducesResponseType( Status204NoContent )]
-        [ProducesResponseType( Status404NotFound )]
-        public IActionResult Delete( [FromODataUri] int key ) => NoContent();
+        public IHttpActionResult Delete( [FromODataUri] int key ) => StatusCode( NoContent );
 
         /// <summary>
         /// Gets the products associated with the supplier.
@@ -145,9 +129,7 @@
         /// <param name="link">The product identifier.</param>
         /// <returns>None</returns>
         [HttpPost]
-        [ProducesResponseType( Status204NoContent )]
-        [ProducesResponseType( Status404NotFound )]
-        public IActionResult CreateRefToProducts( [FromODataUri] int key, string navigationProperty, [FromBody] Uri link ) => NoContent();
+        public IHttpActionResult CreateRefToProducts( [FromODataUri] int key, string navigationProperty, [FromBody] Uri link ) => StatusCode( NoContent );
 
         /// <summary>
         /// Unlinks a product from a supplier.
@@ -156,16 +138,14 @@
         /// <param name="relatedKey">The related product identifier.</param>
         /// <param name="navigationProperty">The product to unlink.</param>
         /// <returns>None</returns>
-        [ProducesResponseType( Status204NoContent )]
-        [ProducesResponseType( Status404NotFound )]
-        public IActionResult DeleteRefToProducts( [FromODataUri] int key, [FromODataUri] string relatedKey, string navigationProperty ) => NoContent();
+        public IHttpActionResult DeleteRefToProducts( [FromODataUri] int key, [FromODataUri] string relatedKey, string navigationProperty ) => StatusCode( NoContent );
 
         private static Supplier NewSupplier( int id ) =>
             new Supplier()
             {
                 Id = id,
                 Name = "Supplier " + id.ToString(),
-                Products =
+                Products = new List<Product>()
                 {
                     new Product()
                     {
