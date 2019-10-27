@@ -205,6 +205,15 @@ namespace Microsoft {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The related entity identifier.
+        /// </summary>
+        internal static string RelatedEntityIdParamDesc {
+            get {
+                return ResourceManager.GetString("RelatedEntityIdParamDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Limits the properties returned in the result..
         /// </summary>
         internal static string SelectQueryOptionDesc {

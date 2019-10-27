@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Simulators.V3
 {
     using Microsoft.AspNet.OData;
-    using Microsoft.Web.Http.Description;
     using Microsoft.Web.Http.Simulators.Models;
     using System;
     using System.Collections.Generic;
@@ -42,13 +41,13 @@
         /// <summary>
         /// Creates a new supplier.
         /// </summary>
-        /// <param name="order">The supplier to create.</param>
+        /// <param name="supplier">The supplier to create.</param>
         /// <returns>The created supplier.</returns>
         /// <response code="201">The supplier was successfully created.</response>
         /// <response code="204">The supplier was successfully created.</response>
         /// <response code="400">The supplier is invalid.</response>
         [ResponseType( typeof( Supplier ) )]
-        public IHttpActionResult Post( [FromBody]Supplier supplier )
+        public IHttpActionResult Post( [FromBody] Supplier supplier )
         {
             if ( !ModelState.IsValid )
             {
@@ -96,7 +95,7 @@
         /// <response code="400">The supplier is invalid.</response>
         /// <response code="404">The supplier does not exist.</response>
         [ResponseType( typeof( Supplier ) )]
-        public IHttpActionResult Put( [FromODataUri] int key, [FromBody]Supplier update )
+        public IHttpActionResult Put( [FromODataUri] int key, [FromBody] Supplier update )
         {
             if ( !ModelState.IsValid )
             {
@@ -112,7 +111,7 @@
         /// <param name="key">The supplier to delete.</param>
         /// <returns>None</returns>
         /// <response code="204">The supplier was successfully deleted.</response>
-        public IHttpActionResult Delete( [FromODataUri] int key ) => StatusCode(NoContent);
+        public IHttpActionResult Delete( [FromODataUri] int key ) => StatusCode( NoContent );
 
         /// <summary>
         /// Gets the products associated with the supplier.

@@ -61,7 +61,7 @@
                 parameters.Add( parameter );
             }
 
-            var descriptor = new ODataQueryOptionParameterDescriptor( name, typeof( Uri ), default( Uri ) )
+            var descriptor = new ODataQueryOptionParameterDescriptor( name, typeof( Uri ), default( Uri ), optional: false )
             {
                 ActionDescriptor = Context.ActionDescriptor,
                 Configuration = Context.ActionDescriptor.Configuration,
@@ -69,6 +69,7 @@
 
             parameter.Name = name;
             parameter.Source = FromUri;
+            parameter.Documentation = Context.Options.RelatedEntityIdParameterDescription;
             parameter.ParameterDescriptor = descriptor;
 
             if ( omitPrefix )

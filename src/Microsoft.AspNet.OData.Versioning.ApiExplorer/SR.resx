@@ -168,6 +168,9 @@
   <data name="OrderByQueryOptionDesc" xml:space="preserve">
     <value>Specifies the order in which items are returned.</value>
   </data>
+  <data name="RelatedEntityIdParamDesc" xml:space="preserve">
+    <value>The related entity identifier</value>
+  </data>
   <data name="RequiredInterfaceNotImplemented" xml:space="preserve">
     <value>The type {0} does not implement the {1} interface.</value>
   </data>
