@@ -85,6 +85,7 @@
                     // routeBuilder.SetDefaultODataOptions( new ODataOptions() { UrlKeyDelimiter = Parentheses } );
                     routeBuilder.ServiceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter = Parentheses;
                     routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() );
+                    routeBuilder.Count();
                 } );
             app.UseSwagger();
             app.UseSwaggerUI(
