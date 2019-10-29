@@ -43,11 +43,8 @@
         /// <param name="actions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ActionDescriptor">actions</see>
         /// to add to the selection result.</param>
         [CLSCompliant( false )]
-        public void AddCandidates( IEnumerable<ActionDescriptor> actions )
-        {
-            Arg.NotNull( actions, nameof( actions ) );
-            candidateActions.AddRange( actions );
-        }
+        public void AddCandidates( IEnumerable<ActionDescriptor> actions ) =>
+            candidateActions.AddRange( actions ?? throw new ArgumentNullException( nameof( actions ) ) );
 
         /// <summary>
         /// Adds the specified matching actions to the selection result.
@@ -55,10 +52,7 @@
         /// <param name="matches">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ActionDescriptor">matching actions</see>
         /// to add to the selection result.</param>
         [CLSCompliant( false )]
-        public void AddMatches( IEnumerable<ActionDescriptor> matches )
-        {
-            Arg.NotNull( matches, nameof( matches ) );
-            matchingActions.AddRange( matches );
-        }
+        public void AddMatches( IEnumerable<ActionDescriptor> matches ) =>
+            matchingActions.AddRange( matches ?? throw new ArgumentNullException( nameof( matches ) ) );
     }
 }

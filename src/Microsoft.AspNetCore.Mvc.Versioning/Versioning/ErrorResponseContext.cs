@@ -17,10 +17,8 @@
         /// <param name="message">The error message.</param>
         /// <param name="messageDetail">The detailed error message, if any.</param>
         [CLSCompliant( false )]
-        public ErrorResponseContext( HttpRequest request, int statusCode, string errorCode, string message, string messageDetail )
+        public ErrorResponseContext( HttpRequest request, int statusCode, string errorCode, string message, string? messageDetail )
         {
-            Arg.NotNull( request, nameof( request ) );
-
             Request = request;
             StatusCode = statusCode;
             ErrorCode = errorCode;

@@ -21,7 +21,6 @@
     using Microsoft.OData.UriParser;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
@@ -71,10 +70,10 @@
             IOptions<ODataApiExplorerOptions> options,
             IOptions<MvcOptions> mvcOptions )
         {
-            Arg.NotNull( routeCollectionProvider, nameof( routeCollectionProvider ) );
-            Arg.NotNull( metadataProvider, nameof( metadataProvider ) );
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( mvcOptions, nameof( mvcOptions ) );
+            if ( mvcOptions == null )
+            {
+                throw new ArgumentNullException( nameof( mvcOptions ) );
+            }
 
             RouteCollectionProvider = routeCollectionProvider;
             ModelTypeBuilder = new DefaultModelTypeBuilder();
@@ -141,6 +140,11 @@
         /// <remarks>The default implementation performs no action.</remarks>
         public virtual void OnProvidersExecuted( ApiDescriptionProviderContext context )
         {
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             var mappings = RouteCollectionProvider.Items;
             var results = context.Results;
             var groupNameFormat = Options.GroupNameFormat;
@@ -189,7 +193,7 @@
                             continue;
                         }
 
-                        for ( var j = 0; j < mappingsPerApiVersion.Count; j++ )
+                        for ( var j = 0; j < mappingsPerApiVersion!.Count; j++ )
                         {
                             var mapping = mappingsPerApiVersion[j];
                             var descriptions = new List<ApiDescription>();
@@ -224,8 +228,6 @@
         /// <returns>True if the <paramref name="action"/> is visible; otherwise, false.</returns>
         protected bool IsVisible( ActionDescriptor action )
         {
-            Arg.NotNull( action, nameof( action ) );
-
             var ignoreApiExplorerSettings = !Options.UseApiExplorerSettings;
 
             if ( ignoreApiExplorerSettings )
@@ -245,9 +247,6 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> used to populate parameters with.</param>
         protected virtual void PopulateApiVersionParameters( ApiDescription apiDescription, ApiVersion apiVersion )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
@@ -261,8 +260,10 @@
         /// <param name="uriResolver">The associated <see cref="ODataUriResolver">OData URI resolver</see>.</param>
         protected virtual void ExploreQueryOptions( IEnumerable<ApiDescription> apiDescriptions, ODataUriResolver uriResolver )
         {
-            Arg.NotNull( apiDescriptions, nameof( apiDescriptions ) );
-            Arg.NotNull( uriResolver, nameof( uriResolver ) );
+            if ( uriResolver == null )
+            {
+                throw new ArgumentNullException( nameof( uriResolver ) );
+            }
 
             var queryOptions = Options.QueryOptions;
             var settings = new ODataQueryOptionSettings()
@@ -278,8 +279,6 @@
 
         static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action )
         {
-            Contract.Requires( action != null );
-
             var actionConstraints = ( action.ActionConstraints ?? Array.Empty<IActionConstraintMetadata>() ).OfType<HttpMethodActionConstraint>();
             var httpMethods = new HashSet<string>( actionConstraints.SelectMany( ac => ac.HttpMethods ), StringComparer.OrdinalIgnoreCase );
 
@@ -288,8 +287,10 @@
                 return httpMethods;
             }
 
-            foreach ( var supportedHttpMethod in SupportedHttpMethodConventions )
+            for ( var i = 0; i < SupportedHttpMethodConventions.Length; i++ )
             {
+                var supportedHttpMethod = SupportedHttpMethodConventions[i];
+
                 if ( action.MethodInfo.Name.StartsWith( supportedHttpMethod, OrdinalIgnoreCase ) )
                 {
                     httpMethods.Add( supportedHttpMethod );
@@ -304,7 +305,7 @@
             return httpMethods;
         }
 
-        static Type GetDeclaredReturnType( ControllerActionDescriptor action )
+        static Type? GetDeclaredReturnType( ControllerActionDescriptor action )
         {
             var declaredReturnType = action.MethodInfo.ReturnType;
 
@@ -328,12 +329,20 @@
             return unwrappedType;
         }
 
-        static Type GetRuntimeReturnType( Type declaredReturnType ) => declaredReturnType == typeof( object ) ? default : declaredReturnType;
+        static Type? GetRuntimeReturnType( Type declaredReturnType ) => declaredReturnType == typeof( object ) ? default : declaredReturnType;
 
-        static IReadOnlyList<IApiResponseMetadataProvider> GetResponseMetadataAttributes( ControllerActionDescriptor action )
+        static IReadOnlyList<IApiRequestMetadataProvider>? GetRequestMetadataAttributes( ControllerActionDescriptor action )
         {
-            Contract.Requires( action != null );
+            if ( action.FilterDescriptors == null )
+            {
+                return default;
+            }
 
+            return action.FilterDescriptors.Select( fd => fd.Filter ).OfType<IApiRequestMetadataProvider>().ToArray();
+        }
+
+        static IReadOnlyList<IApiResponseMetadataProvider>? GetResponseMetadataAttributes( ControllerActionDescriptor action )
+        {
             if ( action.FilterDescriptors == null )
             {
                 return default;
@@ -342,12 +351,8 @@
             return action.FilterDescriptors.Select( fd => fd.Filter ).OfType<IApiResponseMetadataProvider>().ToArray();
         }
 
-        static string BuildRelativePath( ControllerActionDescriptor action, ODataRouteBuilderContext routeContext )
+        static string? BuildRelativePath( ControllerActionDescriptor action, ODataRouteBuilderContext routeContext )
         {
-            Contract.Requires( action != null );
-            Contract.Requires( routeContext != null );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
-
             var relativePath = action.AttributeRouteInfo?.Template;
 
             // note: if path happens to be built ahead of time, it's expected to be qualified; rebuild it as necessary
@@ -362,14 +367,11 @@
 
         IEnumerable<ApiDescription> NewODataApiDescriptions( ControllerActionDescriptor action, string groupName, ODataRouteMapping mapping )
         {
-            Contract.Requires( action != null );
-            Contract.Requires( mapping != null );
-            Contract.Ensures( Contract.Result<ApiDescription>() != null );
-
+            var requestMetadataAttributes = GetRequestMetadataAttributes( action );
             var responseMetadataAttributes = GetResponseMetadataAttributes( action );
             var declaredReturnType = GetDeclaredReturnType( action );
-            var runtimeReturnType = GetRuntimeReturnType( declaredReturnType );
-            var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes, runtimeReturnType, mapping.Services );
+            var runtimeReturnType = GetRuntimeReturnType( declaredReturnType! );
+            var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes!, runtimeReturnType!, mapping.Services );
             var routeContext = new ODataRouteBuilderContext( mapping, action, Options ) { ModelMetadataProvider = MetadataProvider };
 
             if ( routeContext.IsRouteExcluded )
@@ -413,6 +415,33 @@
                 for ( var i = 0; i < parameters.Count; i++ )
                 {
                     apiDescription.ParameterDescriptions.Add( parameters[i] );
+                }
+
+                if ( apiDescription.ParameterDescriptions.Count > 0 )
+                {
+                    var contentTypes = GetDeclaredContentTypes( requestMetadataAttributes );
+
+                    for ( var i = 0; i < apiDescription.ParameterDescriptions.Count; i++ )
+                    {
+                        var parameter = apiDescription.ParameterDescriptions[i];
+
+                        if ( parameter.Source == Body )
+                        {
+                            var requestFormats = GetSupportedFormats( contentTypes, parameter.Type );
+
+                            for ( var j = 0; j < requestFormats.Count; j++ )
+                            {
+                                apiDescription.SupportedRequestFormats.Add( requestFormats[j] );
+                            }
+                        }
+                        else if ( parameter.Source == FormFile )
+                        {
+                            for ( var j = 0; j < contentTypes.Count; j++ )
+                            {
+                                apiDescription.SupportedRequestFormats.Add( new ApiRequestFormat() { MediaType = contentTypes[j] } );
+                            }
+                        }
+                    }
                 }
 
                 for ( var i = 0; i < apiResponseTypes.Count; i++ )
@@ -478,16 +507,74 @@
             return context.Results;
         }
 
-        void UpdateBindingInfo( ApiParameterContext context, ParameterDescriptor parameter, ModelMetadata metadata )
+        static MediaTypeCollection GetDeclaredContentTypes( IReadOnlyList<IApiRequestMetadataProvider>? requestMetadataAttributes )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( parameter != null );
-            Contract.Requires( metadata != null );
+            var contentTypes = new MediaTypeCollection();
 
+            if ( requestMetadataAttributes != null )
+            {
+                for ( var i = 0; i < requestMetadataAttributes.Count; i++ )
+                {
+                    requestMetadataAttributes[i].SetContentTypes( contentTypes );
+                }
+            }
+
+            return contentTypes;
+        }
+
+        IReadOnlyList<ApiRequestFormat> GetSupportedFormats( MediaTypeCollection contentTypes, Type type )
+        {
+            if ( contentTypes.Count == 0 )
+            {
+                contentTypes = new MediaTypeCollection() { default( string ) };
+            }
+
+            var results = new List<ApiRequestFormat>( capacity: contentTypes.Count );
+
+            for ( var i = 0; i < contentTypes.Count; i++ )
+            {
+                for ( var j = 0; j < MvcOptions.InputFormatters.Count; j++ )
+                {
+                    var formatter = MvcOptions.InputFormatters[j];
+
+                    if ( !( formatter is IApiRequestFormatMetadataProvider requestFormatMetadataProvider ) )
+                    {
+                        continue;
+                    }
+
+                    IReadOnlyList<string>? supportedTypes;
+
+                    try
+                    {
+                        supportedTypes = requestFormatMetadataProvider.GetSupportedContentTypes( contentTypes[i], type );
+                    }
+                    catch ( InvalidOperationException )
+                    {
+                        // BUG: https://github.com/OData/WebApi/issues/1750
+                        supportedTypes = null;
+                    }
+
+                    if ( supportedTypes == null )
+                    {
+                        continue;
+                    }
+
+                    for ( var k = 0; k < supportedTypes.Count; k++ )
+                    {
+                        results.Add( new ApiRequestFormat() { Formatter = formatter, MediaType = supportedTypes[k], } );
+                    }
+                }
+            }
+
+            return results.ToArray();
+        }
+
+        static void UpdateBindingInfo( ApiParameterContext context, ParameterDescriptor parameter, ModelMetadata metadata )
+        {
             var parameterType = parameter.ParameterType;
             var bindingInfo = parameter.BindingInfo;
 
-            bool IsSpecialBindingSource( BindingInfo info, Type type )
+            static bool IsSpecialBindingSource( BindingInfo info, Type type )
             {
                 if ( info == null )
                 {
@@ -584,19 +671,16 @@
 
         IReadOnlyList<ApiResponseType> GetApiResponseTypes( IReadOnlyList<IApiResponseMetadataProvider> responseMetadataAttributes, Type responseType, IServiceProvider serviceProvider )
         {
-            Contract.Requires( responseMetadataAttributes != null );
-            Contract.Requires( responseType != null );
-            Contract.Requires( serviceProvider != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ApiResponseType>>() != null );
-
             var results = new List<ApiResponseType>();
             var objectTypes = new Dictionary<int, Type>();
             var contentTypes = new MediaTypeCollection();
 
             if ( responseMetadataAttributes != null )
             {
-                foreach ( var metadataAttribute in responseMetadataAttributes )
+                for ( var i = 0; i < responseMetadataAttributes.Count; i++ )
                 {
+                    var metadataAttribute = responseMetadataAttributes[i];
+
                     metadataAttribute.SetContentTypes( contentTypes );
 
                     var canInferResponseType = metadataAttribute.Type == typeof( void ) &&
@@ -605,7 +689,7 @@
 
                     if ( canInferResponseType )
                     {
-                        objectTypes[metadataAttribute.StatusCode] = responseType;
+                        objectTypes[metadataAttribute.StatusCode] = responseType!;
                     }
                     else if ( metadataAttribute.Type != null )
                     {
@@ -641,18 +725,20 @@
                     ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ),
                 };
 
-                foreach ( var contentType in contentTypes )
+                for ( var i = 0; i < contentTypes.Count; i++ )
                 {
                     foreach ( var responseTypeMetadataProvider in responseTypeMetadataProviders )
                     {
-                        var formatterSupportedContentTypes = default( IReadOnlyList<string> );
+                        IReadOnlyList<string>? formatterSupportedContentTypes;
 
                         try
                         {
-                            formatterSupportedContentTypes = responseTypeMetadataProvider.GetSupportedContentTypes( contentType, objectType.Value );
+                            formatterSupportedContentTypes = responseTypeMetadataProvider.GetSupportedContentTypes( contentTypes[i], objectType.Value );
                         }
                         catch ( InvalidOperationException )
                         {
+                            // BUG: https://github.com/OData/WebApi/issues/1750
+                            formatterSupportedContentTypes = null;
                         }
 
                         if ( formatterSupportedContentTypes == null )
@@ -660,13 +746,15 @@
                             continue;
                         }
 
-                        foreach ( var formatterSupportedContentType in formatterSupportedContentTypes )
+                        for ( var j = 0; j < formatterSupportedContentTypes.Count; j++ )
                         {
-                            apiResponseType.ApiResponseFormats.Add( new ApiResponseFormat()
+                            var responseFormat = new ApiResponseFormat()
                             {
                                 Formatter = (IOutputFormatter) responseTypeMetadataProvider,
-                                MediaType = formatterSupportedContentType,
-                            } );
+                                MediaType = formatterSupportedContentTypes[j],
+                            };
+
+                            apiResponseType.ApiResponseFormats.Add( responseFormat );
                         }
                     }
                 }

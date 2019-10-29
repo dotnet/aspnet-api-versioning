@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// <remarks>For information about API version formatting, review <see cref="ApiVersionFormatProvider"/>
         /// as well as the <see cref="ApiVersion.ToString(string)"/> and <see cref="ApiVersion.ToString(string, IFormatProvider)"/>
         /// methods.</remarks>
-        public string GroupNameFormat { get; set; }
+        public string GroupNameFormat { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the format used to format the API version value substituted in route templates.

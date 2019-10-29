@@ -5,7 +5,6 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 
     /// <summary>
@@ -20,11 +19,7 @@
         /// Initializes a new instance of the <see cref="ApiVersionCollator"/> class.
         /// </summary>
         /// <param name="options">The current <see cref="ApiVersioningOptions">API versioning options</see>.</param>
-        public ApiVersionCollator( IOptions<ApiVersioningOptions> options )
-        {
-            Arg.NotNull( options, nameof( options ) );
-            this.options = options;
-        }
+        public ApiVersionCollator( IOptions<ApiVersioningOptions> options ) => this.options = options;
 
         /// <summary>
         /// Gets the API versioning options associated with the collator.
@@ -38,6 +33,11 @@
         /// <inheritdoc />
         public virtual void OnProvidersExecuted( ActionDescriptorProviderContext context )
         {
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             foreach ( var actions in GroupActionsByController( context.Results ) )
             {
                 var collatedModel = CollateModel( actions );
@@ -77,7 +77,10 @@
         /// </remarks>
         protected virtual string GetControllerName( ActionDescriptor action )
         {
-            Arg.NotNull( action, nameof( action ) );
+            if ( action == null )
+            {
+                throw new ArgumentNullException( nameof( action ) );
+            }
 
             if ( !action.RouteValues.TryGetValue( "controller", out var key ) )
             {
@@ -92,9 +95,6 @@
 
         IEnumerable<IEnumerable<ActionDescriptor>> GroupActionsByController( IEnumerable<ActionDescriptor> actions )
         {
-            Contract.Requires( actions != null );
-            Contract.Ensures( Contract.Result<IEnumerable<IEnumerable<ActionDescriptor>>>() != null );
-
             var groups = new Dictionary<string, List<ActionDescriptor>>( StringComparer.OrdinalIgnoreCase );
 
             foreach ( var action in actions )
@@ -120,14 +120,14 @@
             }
         }
 
-        static string TrimTrailingNumbers( string name )
+        static string TrimTrailingNumbers( string? name )
         {
             if ( string.IsNullOrEmpty( name ) )
             {
-                return name;
+                return string.Empty;
             }
 
-            var last = name.Length - 1;
+            var last = name!.Length - 1;
 
             for ( var i = last; i >= 0; i-- )
             {

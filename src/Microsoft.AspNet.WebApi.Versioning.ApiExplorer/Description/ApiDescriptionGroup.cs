@@ -14,11 +14,7 @@
         /// Initializes a new instance of the <see cref="ApiDescriptionGroup"/> class.
         /// </summary>
         /// <param name="apiVersion">The <see cref="Http.ApiVersion">API version</see> associated with the group.</param>
-        public ApiDescriptionGroup( ApiVersion apiVersion )
-        {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            ApiVersion = apiVersion;
-        }
+        public ApiDescriptionGroup( ApiVersion apiVersion ) => ApiVersion = apiVersion;
 
         /// <summary>
         /// Gets the version associated with the group of APIs.
@@ -30,7 +26,7 @@
         /// Gets or sets the name of the API description group.
         /// </summary>
         /// <value>The API version description group name.</value>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets a value indicating whether API version is deprecated for all described APIs in the group.

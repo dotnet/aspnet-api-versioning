@@ -1,10 +1,8 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
-    using System;
-    using System.Diagnostics.Contracts;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Primitives;
+    using System.Threading.Tasks;
 
     sealed class MethodNotAllowedHandler : RequestHandler
     {
@@ -25,9 +23,6 @@
 
             internal AllowHeaderResult( IActionResult inner, string[] allowedMethods )
             {
-                Contract.Requires( inner != null );
-                Contract.Requires( allowedMethods != null );
-
                 this.inner = inner;
                 this.allowedMethods = allowedMethods;
             }

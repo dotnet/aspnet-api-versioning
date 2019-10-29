@@ -6,7 +6,6 @@
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
@@ -23,11 +22,8 @@
         /// </summary>
         /// <param name="routeName">The name of the route this constraint is associated with.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the route constraint.</param>
-        public VersionedODataPathRouteConstraint( string routeName, ApiVersion apiVersion ) : base( routeName )
-        {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            ApiVersion = apiVersion;
-        }
+        public VersionedODataPathRouteConstraint( string routeName, ApiVersion apiVersion )
+            : base( routeName ) => ApiVersion = apiVersion;
 
         /// <summary>
         /// Gets the API version matched by the current OData path route constraint.
@@ -46,8 +42,10 @@
         /// <returns>True if this instance equals a specified route; otherwise, false.</returns>
         public override bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
         {
-            Arg.NotNull( request, nameof( request ) );
-            Arg.NotNull( values, nameof( values ) );
+            if ( values == null )
+            {
+                throw new ArgumentNullException( nameof( values ) );
+            }
 
             if ( routeDirection == UriGeneration )
             {
@@ -55,7 +53,7 @@
             }
 
             var requestedVersion = GetRequestedApiVersionOrReturnBadRequest( request );
-            var matched = false;
+            bool matched;
 
             try
             {
@@ -93,10 +91,8 @@
             return false;
         }
 
-        static ApiVersion GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request )
+        static ApiVersion? GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request )
         {
-            Contract.Requires( request != null );
-
             var properties = request.ApiVersionProperties();
 
             try
@@ -112,14 +108,15 @@
 
         static void DecorateUrlHelperWithApiVersionRouteValueIfNecessary( HttpRequestMessage request, IDictionary<string, object> values )
         {
-            Contract.Requires( request != null );
-            Contract.Requires( values != null );
-
-            var apiVersion = default( object );
-            var routeConstraintName = nameof( apiVersion );
+            object apiVersion;
+            string routeConstraintName;
             var configuration = request.GetConfiguration();
 
-            if ( configuration != null )
+            if ( configuration == null )
+            {
+                routeConstraintName = nameof( apiVersion );
+            }
+            else
             {
                 routeConstraintName = configuration.GetApiVersioningOptions().RouteConstraintName;
             }

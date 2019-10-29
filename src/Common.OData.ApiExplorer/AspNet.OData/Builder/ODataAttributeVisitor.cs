@@ -11,7 +11,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
 #if WEBAPI
@@ -24,19 +23,17 @@
     sealed partial class ODataAttributeVisitor
     {
         readonly ODataQueryOptionDescriptionContext context;
-        readonly Type resultType;
-        readonly IEdmModel model;
+        readonly Type? resultType;
+        readonly IEdmModel? model;
         readonly StructuredTypeResolver typeResolver;
 
         internal ODataAttributeVisitor(
             ODataQueryOptionDescriptionContext context,
-            IEdmModel model,
+            IEdmModel? model,
             AllowedQueryOptions allowedQueryOptions,
-            Type resultType,
+            Type? resultType,
             bool singleResult )
         {
-            Contract.Requires( context != null );
-
             this.context = context;
             AllowedQueryOptions = allowedQueryOptions;
             this.resultType = resultType;
@@ -51,8 +48,6 @@
 
         internal void Visit( ApiDescription apiDescription )
         {
-            Contract.Requires( apiDescription != null );
-
             VisitAction( apiDescription.ActionDescriptor );
 
             if ( resultType == null )
@@ -70,8 +65,6 @@
 
         void VisitModel( IEdmStructuredType modelType )
         {
-            Contract.Requires( modelType != null );
-
             var querySettings = model.GetAnnotationValue<ModelBoundQuerySettings>( modelType );
 
             if ( querySettings == null )
@@ -97,8 +90,6 @@
 
         void VisitEnableQuery( IReadOnlyList<EnableQueryAttribute> attributes )
         {
-            Contract.Requires( attributes != null );
-
             var @default = new EnableQueryAttribute();
 
             for ( var i = 0; i < attributes.Count; i++ )
@@ -195,9 +186,6 @@
 
         void VisitExpand( ModelBoundQuerySettings querySettings, ICollection<string> properties )
         {
-            Contract.Requires( querySettings != null );
-            Contract.Requires( properties != null );
-
             var @default = new ExpandConfiguration();
 
             bool IsExpandAllowed( ExpandConfiguration expand )
@@ -226,8 +214,6 @@
 
         void VisitCount( ModelBoundQuerySettings querySettings )
         {
-            Contract.Requires( querySettings != null );
-
             if ( !querySettings.Countable.HasValue )
             {
                 return;
@@ -245,8 +231,6 @@
 
         void VisitMaxTop( ModelBoundQuerySettings querySettings )
         {
-            Contract.Requires( querySettings != null );
-
             if ( querySettings.MaxTop != null && querySettings.MaxTop.Value > 0 )
             {
                 context.MaxTop = querySettings.MaxTop;
@@ -262,13 +246,6 @@
             Dictionary<string, TSetting> configurations,
             Func<TSetting, bool> allowed )
         {
-            Contract.Requires( querySettings != null );
-            Contract.Requires( properties != null );
-            Contract.Requires( enabled != null );
-            Contract.Requires( queryableProperties != null );
-            Contract.Requires( configurations != null );
-            Contract.Requires( allowed != null );
-
             if ( !enabled( querySettings ) )
             {
                 AllowedQueryOptions &= ~option;
@@ -292,7 +269,7 @@
             {
                 var name = property.Key;
 
-                // note: remember that model bound attributes might be using hardcode attributes. we need
+                // note: remember that model bound attributes might be using hard-coded attributes. we need
                 // to account for a substituted type on a down-level model where the property does not exist
                 if ( !properties.Contains( name ) )
                 {

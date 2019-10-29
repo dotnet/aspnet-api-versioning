@@ -2,20 +2,17 @@
 {
     using Microsoft.OData.Edm;
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
 
     sealed class StructuredTypeResolver
     {
-        readonly IEdmModel model;
+        readonly IEdmModel? model;
 
-        internal StructuredTypeResolver( IEdmModel model ) => this.model = model;
+        internal StructuredTypeResolver( IEdmModel? model ) => this.model = model;
 
-        internal IEdmStructuredType GetStructuredType( Type type )
+        internal IEdmStructuredType? GetStructuredType( Type type )
         {
-            Contract.Requires( type != null );
-
             if ( model == null )
             {
                 return default;

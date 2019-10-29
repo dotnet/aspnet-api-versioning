@@ -5,7 +5,6 @@
     using Microsoft.Web.Http.Versioning.Conventions;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -23,11 +22,7 @@
         /// <remarks>This constructor resolves the current <see cref="IHttpControllerSelector"/> from the
         /// <see cref="ServicesExtensions.GetHttpControllerSelector(ServicesContainer)"/> extension method via the
         /// <see cref="HttpConfiguration.Services"/>.</remarks>
-        public VersionedODataModelBuilder( HttpConfiguration configuration )
-        {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Configuration = configuration;
-        }
+        public VersionedODataModelBuilder( HttpConfiguration configuration ) => Configuration = configuration;
 
         /// <summary>
         /// Gets the associated HTTP configuration.
@@ -48,8 +43,6 @@
         /// for all known OData routes.</returns>
         protected virtual IReadOnlyList<ApiVersion> GetApiVersions()
         {
-            Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersion>>() != null );
-
             var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
@@ -125,11 +118,8 @@
             controllerBuilder.ApplyTo( controllerDescriptor );
         }
 
-        static HttpControllerDescriptor FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
+        static HttpControllerDescriptor? FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
         {
-            Contract.Requires( controllerDescriptors != null );
-            Contract.Requires( controllerType != null );
-
             foreach ( var controllerDescriptor in controllerDescriptors )
             {
                 if ( controllerDescriptor is IEnumerable<HttpControllerDescriptor> groupedControllerDescriptors )

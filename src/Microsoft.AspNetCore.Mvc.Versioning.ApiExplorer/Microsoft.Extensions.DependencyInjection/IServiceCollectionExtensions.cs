@@ -4,7 +4,6 @@
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Diagnostics.Contracts;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -20,11 +19,7 @@
         /// <returns>The original <paramref name="services"/> object.</returns>
         public static IServiceCollection AddVersionedApiExplorer( this IServiceCollection services )
         {
-            Arg.NotNull( services, nameof( services ) );
-            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
-
             AddApiExplorerServices( services );
-
             return services;
         }
 
@@ -36,19 +31,17 @@
         /// <returns>The original <paramref name="services"/> object.</returns>
         public static IServiceCollection AddVersionedApiExplorer( this IServiceCollection services, Action<ApiExplorerOptions> setupAction )
         {
-            Arg.NotNull( services, nameof( services ) );
-            Arg.NotNull( setupAction, nameof( setupAction ) );
-            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
-
             AddApiExplorerServices( services );
             services.Configure( setupAction );
-
             return services;
         }
 
         static void AddApiExplorerServices( IServiceCollection services )
         {
-            Contract.Requires( services != null );
+            if ( services == null )
+            {
+                throw new ArgumentNullException( nameof( services ) );
+            }
 
             services.AddMvcCore().AddApiExplorer();
             services.TryAdd( Singleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>() );

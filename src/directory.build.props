@@ -9,6 +9,7 @@
   </ImportGroup>
 
  <PropertyGroup>
+  <Nullable>enable</Nullable>
   <IsTestProject>false</IsTestProject>
  </PropertyGroup>
 

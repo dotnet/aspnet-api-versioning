@@ -24,7 +24,10 @@
         /// <param name="validationSettings">The <see cref="ODataValidationSettings">validation settings</see> to derive the description context from.</param>
         protected internal ODataQueryOptionDescriptionContext( ODataValidationSettings validationSettings )
         {
-            Arg.NotNull( validationSettings, nameof( validationSettings ) );
+            if ( validationSettings == null )
+            {
+                throw new ArgumentNullException( nameof( validationSettings ) );
+            }
 
             AllowedArithmeticOperators = validationSettings.AllowedArithmeticOperators;
             AllowedFunctions = validationSettings.AllowedFunctions;

@@ -10,7 +10,6 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
@@ -27,10 +26,6 @@
             IModelMetadataProvider modelMetadataProvider,
             IOptions<ODataApiVersioningOptions> options )
         {
-            Contract.Requires( routeCollectionProvider != null );
-            Contract.Requires( modelMetadataProvider != null );
-            Contract.Requires( options != null );
-
             RouteCollectionProvider = routeCollectionProvider;
             ModelMetadataProvider = modelMetadataProvider;
             this.options = options;
@@ -44,9 +39,6 @@
 
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( action != null );
-
             var model = action.GetApiVersionModel( Explicit | Implicit );
             var mappings = RouteCollectionProvider.Items;
             var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
@@ -74,7 +66,7 @@
                         continue;
                     }
 
-                    foreach ( var mapping in mappingsPerApiVersion )
+                    foreach ( var mapping in mappingsPerApiVersion! )
                     {
                         UpdateBindingInfo( action, mapping, routeInfos );
                     }
@@ -86,31 +78,26 @@
                 return;
             }
 
-            using ( var iterator = routeInfos.GetEnumerator() )
-            {
-                iterator.MoveNext();
-                action.AttributeRouteInfo = iterator.Current;
+            using var iterator = routeInfos.GetEnumerator();
 
-                while ( iterator.MoveNext() )
-                {
-                    context.Results.Add( Clone( action, iterator.Current ) );
-                }
+            iterator.MoveNext();
+            action.AttributeRouteInfo = iterator.Current;
+
+            while ( iterator.MoveNext() )
+            {
+                context.Results.Add( Clone( action, iterator.Current ) );
             }
         }
 
         void UpdateBindingInfo( ControllerActionDescriptor action, ODataRouteMapping mapping, ICollection<ODataAttributeRouteInfo> routeInfos )
         {
-            Contract.Requires( action != null );
-            Contract.Requires( mapping != null );
-            Contract.Requires( routeInfos != null );
-
             var routeContext = new ODataRouteBuilderContext( mapping, action, Options );
             var routeBuilder = new ODataRouteBuilder( routeContext );
             var parameterContext = new ActionParameterContext( routeBuilder, routeContext );
 
-            foreach ( var parameter in action.Parameters )
+            for ( var i = 0; i < action.Parameters.Count; i++ )
             {
-                UpdateBindingInfo( parameterContext, parameter );
+                UpdateBindingInfo( parameterContext, action.Parameters[i] );
             }
 
             var routeInfo = new ODataAttributeRouteInfo()
@@ -124,9 +111,6 @@
 
         void UpdateBindingInfo( ActionParameterContext context, ParameterDescriptor parameter )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( parameter != null );
-
             var parameterType = parameter.ParameterType;
             var bindingInfo = parameter.BindingInfo;
 
@@ -219,10 +203,6 @@
 
         static ControllerActionDescriptor Clone( ControllerActionDescriptor action, AttributeRouteInfo attributeRouteInfo )
         {
-            Contract.Requires( action != null );
-            Contract.Requires( attributeRouteInfo != null );
-            Contract.Ensures( Contract.Result<ControllerActionDescriptor>() != null );
-
             var clone = new ControllerActionDescriptor()
             {
                 ActionConstraints = action.ActionConstraints,
@@ -244,8 +224,6 @@
 
         static void UpdateControllerName( ControllerActionDescriptor action )
         {
-            Contract.Requires( action != null );
-
             if ( !action.RouteValues.TryGetValue( "controller", out var key ) )
             {
                 key = action.ControllerName;

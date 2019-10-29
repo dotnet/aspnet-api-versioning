@@ -17,10 +17,8 @@
         /// <param name="errorCode">The associated error code.</param>
         /// <param name="message">The error message.</param>
         /// <param name="messageDetail">The detailed error message, if any.</param>
-        public ErrorResponseContext( HttpRequestMessage request, HttpStatusCode statusCode, string errorCode, string message, string messageDetail )
+        public ErrorResponseContext( HttpRequestMessage request, HttpStatusCode statusCode, string errorCode, string message, string? messageDetail )
         {
-            Arg.NotNull( request, nameof( request ) );
-
             Request = request;
             StatusCode = statusCode;
             ErrorCode = errorCode;

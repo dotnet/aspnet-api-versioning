@@ -6,7 +6,6 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using System;
-    using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Routing.RouteDirection;
 
     /// <summary>
@@ -21,11 +20,7 @@
         /// <param name="routeName">The name of the route this constraint is associated with.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the route constraint.</param>
         public VersionedODataPathRouteConstraint( string routeName, ApiVersion apiVersion )
-            : base( routeName )
-        {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            ApiVersion = apiVersion;
-        }
+            : base( routeName ) => ApiVersion = apiVersion;
 
         /// <summary>
         /// Gets the API version matched by the current OData path route constraint.
@@ -44,9 +39,10 @@
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
         public override bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
         {
-            Arg.NotNull( httpContext, nameof( httpContext ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( values, nameof( values ) );
+            if ( httpContext == null )
+            {
+                throw new ArgumentNullException( nameof( httpContext ) );
+            }
 
             if ( routeDirection == UrlGeneration || !TryGetRequestedApiVersion( httpContext, out var requestedVersion ) )
             {
@@ -55,7 +51,7 @@
                 return base.Match( httpContext, route, routeKey, values, routeDirection );
             }
 
-            var matched = false;
+            bool matched;
 
             try
             {
@@ -87,10 +83,8 @@
             return ApiVersion == requestedVersion;
         }
 
-        static bool TryGetRequestedApiVersion( HttpContext httpContext, out ApiVersion apiVersion )
+        static bool TryGetRequestedApiVersion( HttpContext httpContext, out ApiVersion? apiVersion )
         {
-            Contract.Requires( httpContext != null );
-
             var feature = httpContext.Features.Get<IApiVersioningFeature>();
 
             try

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text;
     using System.Web.Http.Controllers;
@@ -12,9 +11,6 @@
     {
         public override ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
-            Contract.Requires( context != null );
-            Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
-
             var request = context.Request;
             var requestedVersion = context.RequestedVersion;
             var result = new ControllerSelectionResult()
@@ -28,7 +24,7 @@
                 return result;
             }
 
-            var bestMatches = SelectBestCandidates( context.DirectRouteCandidates, requestedVersion );
+            var bestMatches = SelectBestCandidates( context.DirectRouteCandidates!, requestedVersion );
 
             switch ( bestMatches.Count )
             {
@@ -52,9 +48,6 @@
 
         static Exception CreateAmbiguousControllerException( IEnumerable<HttpControllerDescriptor> candidates )
         {
-            Contract.Requires( candidates != null );
-            Contract.Ensures( Contract.Result<Exception>() != null );
-
             var set = new HashSet<Type>( candidates.Select( c => c.ControllerType ) );
             var builder = new StringBuilder();
 

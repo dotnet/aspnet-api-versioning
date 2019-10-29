@@ -20,11 +20,8 @@
         /// <param name="httpContext">The current <see cref="HttpContext">HTTP context</see>.</param>
         /// <param name="matchingActions">The <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ActionDescriptor">actions</see> matching the current route.</param>
         /// <param name="requestedVersion">The currently requested <see cref="ApiVersion"/>. This parameter can be <c>null</c>.</param>
-        public ActionSelectionContext( HttpContext httpContext, IReadOnlyList<ActionDescriptor> matchingActions, ApiVersion requestedVersion )
+        public ActionSelectionContext( HttpContext httpContext, IReadOnlyList<ActionDescriptor> matchingActions, ApiVersion? requestedVersion )
         {
-            Arg.NotNull( httpContext, nameof( httpContext ) );
-            Arg.NotNull( matchingActions, nameof( matchingActions ) );
-
             allVersions = new Lazy<ApiVersionModel>( CreateAggregatedModel );
             HttpContext = httpContext;
             MatchingActions = matchingActions;
@@ -55,7 +52,7 @@
         /// <value>The currently requested <see cref="ApiVersion">API version</see>.</value>
         /// <remarks>This property may be <c>null</c> if the client did request an explicit version. Implementors should update this property when
         /// implicit API version matching is allowed and a version has been selected.</remarks>
-        public ApiVersion RequestedVersion { get; set; }
+        public ApiVersion? RequestedVersion { get; set; }
 
         ApiVersionModel CreateAggregatedModel() => MatchingActions.Select( action => action.GetApiVersionModel() ).Aggregate();
     }

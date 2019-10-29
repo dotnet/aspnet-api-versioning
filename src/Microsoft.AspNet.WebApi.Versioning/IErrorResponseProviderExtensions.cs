@@ -6,10 +6,10 @@
 
     static class IErrorResponseProviderExtensions
     {
-        internal static HttpResponseMessage BadRequest( this IErrorResponseProvider responseProvider, HttpRequestMessage request, string code, string message, string messageDetail = null ) =>
+        internal static HttpResponseMessage BadRequest( this IErrorResponseProvider responseProvider, HttpRequestMessage request, string code, string message, string? messageDetail = null ) =>
             responseProvider.CreateResponse( new ErrorResponseContext( request, HttpStatusCode.BadRequest, code, message, messageDetail ) );
 
-        internal static HttpResponseMessage MethodNotAllowed( this IErrorResponseProvider responseProvider, HttpRequestMessage request, string code, string message, string messageDetail = null ) =>
+        internal static HttpResponseMessage MethodNotAllowed( this IErrorResponseProvider responseProvider, HttpRequestMessage request, string code, string message, string? messageDetail = null ) =>
             responseProvider.CreateResponse( new ErrorResponseContext( request, HttpStatusCode.MethodNotAllowed, code, message, messageDetail ) );
     }
 }

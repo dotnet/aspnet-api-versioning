@@ -11,7 +11,6 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static ServiceDescriptor;
 
@@ -28,11 +27,12 @@
         /// <returns>The original <paramref name="builder"/> object.</returns>
         public static IODataBuilder EnableApiVersioning( this IODataBuilder builder )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Contract.Ensures( Contract.Result<IODataBuilder>() != null );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             AddODataServices( builder.Services );
-
             return builder;
         }
 
@@ -44,9 +44,10 @@
         /// <returns>The original <paramref name="builder"/> object.</returns>
         public static IODataBuilder EnableApiVersioning( this IODataBuilder builder, Action<ODataApiVersioningOptions> setupAction )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( setupAction, nameof( setupAction ) );
-            Contract.Ensures( Contract.Result<IODataBuilder>() != null );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             var services = builder.Services;
 
@@ -58,8 +59,6 @@
 
         static void AddODataServices( IServiceCollection services )
         {
-            Contract.Requires( services != null );
-
             // note: if we end up creating a new ApplicationPartManager here we won't fail, but the setup
             // will not register any model configurations automatically. this is almost certainly because
             // services.AddMvcCore() hasn't be called yet, which is unexpected
@@ -76,13 +75,10 @@
             services.AddModelConfigurationsAsServices( partManager );
         }
 
-        static T GetService<T>( this IServiceCollection services ) => (T) services.LastOrDefault( d => d.ServiceType == typeof( T ) )?.ImplementationInstance;
+        static T GetService<T>( this IServiceCollection services ) => (T) services.LastOrDefault( d => d.ServiceType == typeof( T ) )?.ImplementationInstance!;
 
         static void AddModelConfigurationsAsServices( this IServiceCollection services, ApplicationPartManager partManager )
         {
-            Contract.Requires( services != null );
-            Contract.Requires( partManager != null );
-
             var feature = new ModelConfigurationFeature();
             var modelConfigurationType = typeof( IModelConfiguration );
 
@@ -96,8 +92,6 @@
 
         static void ConfigureDefaultFeatureProviders( ApplicationPartManager partManager )
         {
-            Contract.Requires( partManager != null );
-
             if ( !partManager.FeatureProviders.OfType<ModelConfigurationFeatureProvider>().Any() )
             {
                 partManager.FeatureProviders.Add( new ModelConfigurationFeatureProvider() );

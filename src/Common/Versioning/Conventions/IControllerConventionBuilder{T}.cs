@@ -5,18 +5,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System.Reflection;
-#if WEBAPI
-    using System.Web.Http.Controllers;
-#endif
 
     /// <summary>
     /// Defines the behavior of a convention builder for a controller.
     /// </summary>
     /// <typeparam name="T">The type of item the convention builder is for.</typeparam>
     public partial interface IControllerConventionBuilder<out T> : IDeclareApiVersionConventionBuilder
-#if WEBAPI
-        where T : IHttpController
-#endif
     {
         /// <summary>
         /// Gets or creates a convention builder for the specified controller action method.

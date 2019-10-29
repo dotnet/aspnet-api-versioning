@@ -4,7 +4,7 @@
     using Microsoft.OData;
     using Microsoft.Web.Http.Description;
     using System.Collections.Concurrent;
-    using System.Diagnostics.Contracts;
+    using System.ComponentModel.DataAnnotations;
     using System.Web.Http.Description;
     using System.Web.Http.Routing;
 
@@ -24,7 +24,7 @@
         /// <remarks>This method always replaces the <see cref="IApiExplorer"/> with a new instance of <see cref="ODataApiExplorer"/>. This method also
         /// configures the <see cref="ODataApiExplorer"/> to not use <see cref="ApiExplorerSettingsAttribute"/>, which enables exploring all OData
         /// controllers without additional configuration.</remarks>
-        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration ) => configuration.AddODataApiExplorer( _ => { } );
+        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration ) => configuration.AddODataApiExplorer( default );
 
         /// <summary>
         /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.
@@ -33,15 +33,11 @@
         /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
         /// <returns>The newly registered <see cref="ODataApiExplorer">versioned API explorer</see>.</returns>
         /// <remarks>This method always replaces the <see cref="IApiExplorer"/> with a new instance of <see cref="ODataApiExplorer"/>.</remarks>
-        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration, Action<ODataApiExplorerOptions> setupAction )
+        public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration, Action<ODataApiExplorerOptions>? setupAction )
         {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNull( setupAction, nameof( setupAction ) );
-            Contract.Ensures( Contract.Result<ODataApiExplorer>() != null );
-
             var options = new ODataApiExplorerOptions( configuration );
 
-            setupAction( options );
+            setupAction?.Invoke( options );
 
             var apiExplorer = new ODataApiExplorer( configuration, options );
             configuration.Services.Replace( typeof( IApiExplorer ), apiExplorer );
@@ -50,14 +46,10 @@
 
         internal static IServiceProvider GetODataRootContainer( this HttpConfiguration configuration, IHttpRoute route )
         {
-            Contract.Requires( configuration != null );
-            Contract.Requires( route != null );
-            Contract.Ensures( Contract.Result<IServiceProvider>() != null );
-
             var containers = (ConcurrentDictionary<string, IServiceProvider>) configuration.Properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
             var routeName = configuration.Routes.GetRouteName( route );
 
-            if ( containers.TryGetValue( routeName, out var serviceProvider ) )
+            if ( !string.IsNullOrEmpty( routeName ) && containers.TryGetValue( routeName!, out var serviceProvider ) )
             {
                 return serviceProvider;
             }
@@ -65,10 +57,8 @@
             throw new InvalidOperationException( SR.NullContainer );
         }
 
-        internal static ODataUrlKeyDelimiter GetUrlKeyDelimiter( this HttpConfiguration configuration )
+        internal static ODataUrlKeyDelimiter? GetUrlKeyDelimiter( this HttpConfiguration configuration )
         {
-            Contract.Requires( configuration != null );
-
             if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) )
             {
                 return value as ODataUrlKeyDelimiter;

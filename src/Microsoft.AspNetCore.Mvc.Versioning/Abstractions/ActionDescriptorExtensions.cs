@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
@@ -31,9 +30,6 @@
         /// <returns>The <see cref="ApiVersionModel">API version information</see> for the action.</returns>
         public static ApiVersionModel GetApiVersionModel( this ActionDescriptor action, ApiVersionMapping mapping )
         {
-            Arg.NotNull( action, nameof( action ) );
-            Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
-
             switch ( mapping )
             {
                 case Explicit:
@@ -68,10 +64,8 @@
         /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
         /// <returns>One of the <see cref="ApiVersionMapping"/> values.</returns>
-        public static ApiVersionMapping MappingTo( this ActionDescriptor action, ApiVersion apiVersion )
+        public static ApiVersionMapping MappingTo( this ActionDescriptor action, ApiVersion? apiVersion )
         {
-            Arg.NotNull( action, nameof( action ) );
-
             var model = action.GetApiVersionModel();
 
             if ( model.IsApiVersionNeutral || ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) ) )
@@ -80,9 +74,9 @@
             }
             else if ( model.DeclaredApiVersions.Count == 0 )
             {
-                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
+                var parentModel = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
 
-                if ( model != null && ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) ) )
+                if ( parentModel != null && ( apiVersion != null && parentModel.DeclaredApiVersions.Contains( apiVersion ) ) )
                 {
                     return Implicit;
                 }
@@ -98,17 +92,10 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
         /// <returns>True if the <paramref name="action"/> explicitly or implicitly maps to the specified
         /// <paramref name="apiVersion">API version</paramref>; otherwise, false.</returns>
-        public static bool IsMappedTo( this ActionDescriptor action, ApiVersion apiVersion )
-        {
-            Arg.NotNull( action, nameof( action ) );
-            return action.MappingTo( apiVersion ) > None;
-        }
+        public static bool IsMappedTo( this ActionDescriptor action, ApiVersion? apiVersion ) => action.MappingTo( apiVersion ) > None;
 
         internal static string ExpandSignature( this ActionDescriptor action )
         {
-            Contract.Requires( action != null );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
-
             if ( !( action is ControllerActionDescriptor controllerAction ) )
             {
                 return action.DisplayName;

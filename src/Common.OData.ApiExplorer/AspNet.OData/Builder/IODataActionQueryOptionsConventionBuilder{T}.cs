@@ -14,8 +14,11 @@
     [CLSCompliant( false )]
 #endif
     public interface IODataActionQueryOptionsConventionBuilder<T>
+        where T : notnull
 #if WEBAPI
-        where T : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+       , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
     {
         /// <summary>

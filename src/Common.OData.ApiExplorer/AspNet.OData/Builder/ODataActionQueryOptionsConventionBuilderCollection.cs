@@ -3,7 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
@@ -22,11 +22,8 @@
         /// Initializes a new instance of the <see cref="ODataActionQueryOptionsConventionBuilderCollection"/> class.
         /// </summary>
         /// <param name="controllerBuilder">The associated <see cref="ODataControllerQueryOptionsConventionBuilder">controller convention builder</see>.</param>
-        public ODataActionQueryOptionsConventionBuilderCollection( ODataControllerQueryOptionsConventionBuilder controllerBuilder )
-        {
-            Arg.NotNull( controllerBuilder, nameof( controllerBuilder ) );
+        public ODataActionQueryOptionsConventionBuilderCollection( ODataControllerQueryOptionsConventionBuilder controllerBuilder ) =>
             this.controllerBuilder = controllerBuilder;
-        }
 
         /// <summary>
         /// Gets or adds a controller action convention builder for the specified method.
@@ -35,8 +32,6 @@
         /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder">controller action convention builder</see>.</returns>
         protected internal virtual ODataActionQueryOptionsConventionBuilder GetOrAdd( MethodInfo actionMethod )
         {
-            Arg.NotNull( actionMethod, nameof( actionMethod ) );
-
             var mapping = actionBuilderMappings.FirstOrDefault( m => m.Method == actionMethod );
 
             if ( mapping == null )
@@ -60,18 +55,28 @@
         /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
         /// <param name="actionBuilder">The <see cref="ODataActionQueryOptionsConventionBuilder">controller action convention builder</see> or <c>null</c>.</param>
         /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-        public virtual bool TryGetValue( MethodInfo actionMethod, out ODataActionQueryOptionsConventionBuilder actionBuilder )
+#if NETCOREAPP3_0
+        public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ODataActionQueryOptionsConventionBuilder? actionBuilder )
+#else
+        public virtual bool TryGetValue( MethodInfo? actionMethod, out ODataActionQueryOptionsConventionBuilder? actionBuilder )
+#endif
         {
-            actionBuilder = null;
-
             if ( actionMethod == null )
             {
+                actionBuilder = null;
                 return false;
             }
 
             var mapping = actionBuilderMappings.FirstOrDefault( m => m.Method == actionMethod );
 
-            return ( actionBuilder = mapping?.Builder ) != null;
+            if ( mapping == null )
+            {
+                actionBuilder = null;
+                return false;
+            }
+
+            actionBuilder = mapping.Builder;
+            return true;
         }
 
         /// <summary>
@@ -92,9 +97,6 @@
         {
             internal ActionBuilderMapping( MethodInfo method, ODataActionQueryOptionsConventionBuilder builder )
             {
-                Contract.Requires( method != null );
-                Contract.Requires( builder != null );
-
                 Method = method;
                 Builder = builder;
             }

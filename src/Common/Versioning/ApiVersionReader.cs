@@ -9,7 +9,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static System.String;
 #if WEBAPI
@@ -32,10 +31,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
         public static IApiVersionReader Combine( params IApiVersionReader[] apiVersionReaders )
         {
-            Arg.NotNull( apiVersionReaders, nameof( apiVersionReaders ) );
-            Contract.Ensures( Contract.Result<IApiVersionReader>() != null );
-            Contract.EndContractBlock();
-
             if ( apiVersionReaders.Length == 0 )
             {
                 throw new ArgumentException( SR.ZeroApiVersionReaders, nameof( apiVersionReaders ) );
@@ -55,10 +50,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
         public static IApiVersionReader Combine( IEnumerable<IApiVersionReader> apiVersionReaders )
         {
-            Arg.NotNull( apiVersionReaders, nameof( apiVersionReaders ) );
-            Contract.Ensures( Contract.Result<IApiVersionReader>() != null );
-            Contract.EndContractBlock();
-
             var items = apiVersionReaders.ToArray();
 
             if ( items.Length == 0 )
@@ -73,14 +64,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         {
             readonly IApiVersionReader[] apiVersionReaders;
 
-            internal CombinedApiVersionReader( IApiVersionReader[] apiVersionReaders )
-            {
-                Contract.Requires( apiVersionReaders != null );
-                Contract.Requires( apiVersionReaders.Length > 0 );
+            internal CombinedApiVersionReader( IApiVersionReader[] apiVersionReaders ) =>
                 this.apiVersionReaders = apiVersionReaders;
-            }
 
-            public string Read( HttpRequest request )
+            public string? Read( HttpRequest request )
             {
                 var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
 
@@ -90,7 +77,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
                     if ( !IsNullOrEmpty( version ) )
                     {
-                        versions.Add( version );
+                        versions.Add( version! );
                     }
                 }
 

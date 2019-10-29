@@ -8,7 +8,6 @@
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
@@ -40,10 +39,10 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
         public VersionedAttributeRoutingConvention( string routeName, HttpConfiguration configuration, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
         {
-            Arg.NotNull( routeName, nameof( routeName ) );
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNull( pathTemplateHandler, nameof( pathTemplateHandler ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            if ( configuration == null )
+            {
+                throw new ArgumentNullException( nameof( configuration ) );
+            }
 
             this.routeName = routeName;
             ODataPathTemplateHandler = pathTemplateHandler;
@@ -92,10 +91,10 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
         public VersionedAttributeRoutingConvention( string routeName, IEnumerable<HttpControllerDescriptor> controllers, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
         {
-            Arg.NotNull( routeName, nameof( routeName ) );
-            Arg.NotNull( controllers, nameof( controllers ) );
-            Arg.NotNull( pathTemplateHandler, nameof( pathTemplateHandler ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            if ( controllers == null )
+            {
+                throw new ArgumentNullException( nameof( controllers ) );
+            }
 
             this.routeName = routeName;
             ODataPathTemplateHandler = pathTemplateHandler;
@@ -111,25 +110,16 @@
         /// <param name="controller">The <see cref="HttpControllerDescriptor">controller descriptor</see> to evaluate.</param>
         /// <returns>True if the <paramref name="controller"/> should be mapped as an OData controller; otherwise, false.</returns>
         /// <remarks>The default implementation always returns <c>true</c>.</remarks>
-        public virtual bool ShouldMapController( HttpControllerDescriptor controller )
-        {
-            Arg.NotNull( controller, nameof( controller ) );
-
-            return true;
-        }
+        public virtual bool ShouldMapController( HttpControllerDescriptor controller ) => true;
 
         /// <summary>
         /// Returns a value indicating whether the specified action should be mapped using attribute routing conventions.
         /// </summary>
         /// <param name="action">The <see cref="HttpActionDescriptor">action descriptor</see> to evaluate.</param>
         /// <returns>True if the <paramref name="action"/> should be mapped as an OData action or function; otherwise, false.</returns>
-        /// <remarks>This method will match any OData action that explicitly or implicitly matches matches the API version applied
+        /// <remarks>This method will match any OData action that explicitly or implicitly matches the API version applied
         /// to the associated <see cref="ApiVersionModel">model</see>.</remarks>
-        public virtual bool ShouldMapAction( HttpActionDescriptor action )
-        {
-            Arg.NotNull( action, nameof( action ) );
-            return action.IsMappedTo( ApiVersion );
-        }
+        public virtual bool ShouldMapAction( HttpActionDescriptor action ) => action.IsMappedTo( ApiVersion );
 
         /// <summary>
         /// Selects the controller for OData requests.
@@ -137,8 +127,13 @@
         /// <param name="odataPath">The OData path.</param>
         /// <param name="request">The request.</param>
         /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected controller.</returns>
-        public virtual string SelectController( ODataPath odataPath, HttpRequestMessage request )
+        public virtual string? SelectController( ODataPath odataPath, HttpRequestMessage request )
         {
+            if ( request == null )
+            {
+                throw new ArgumentNullException( nameof( request ) );
+            }
+
             var values = new Dictionary<string, object>();
 
             foreach ( var attributeMapping in AttributeMappings )
@@ -165,8 +160,13 @@
         /// <param name="controllerContext">The controller context.</param>
         /// <param name="actionMap">The action map.</param>
         /// <returns><c>null</c> if the request isn't handled by this convention; otherwise, the name of the selected action.</returns>
-        public virtual string SelectAction( ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap )
+        public virtual string? SelectAction( ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap )
         {
+            if ( controllerContext == null )
+            {
+                throw new ArgumentNullException( nameof( controllerContext ) );
+            }
+
             var request = controllerContext.Request;
             var properties = request.Properties;
 
@@ -232,17 +232,12 @@
 
         static IEnumerable<string> GetODataRoutePrefixes( HttpControllerDescriptor controllerDescriptor )
         {
-            Contract.Assert( controllerDescriptor != null );
-            Contract.Ensures( Contract.Result<IEnumerable<string>>() != null );
-
             var prefixAttributes = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>( inherit: false );
             return GetODataRoutePrefixes( prefixAttributes, controllerDescriptor.ControllerType.FullName );
         }
 
         IEnumerable<ODataPathTemplate> GetODataPathTemplates( string prefix, HttpActionDescriptor action )
         {
-            Contract.Assert( action != null );
-
             var routeAttributes = action.GetCustomAttributes<ODataRouteAttribute>( inherit: false );
             var serviceProvider = action.Configuration.GetODataRootContainer( routeName );
             var controllerName = action.ControllerDescriptor.ControllerName;

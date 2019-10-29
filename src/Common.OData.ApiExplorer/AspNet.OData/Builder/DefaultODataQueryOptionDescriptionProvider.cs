@@ -3,7 +3,6 @@
     using Microsoft.AspNet.OData.Query;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Text;
     using static Microsoft.AspNet.OData.Query.AllowedArithmeticOperators;
     using static Microsoft.AspNet.OData.Query.AllowedLogicalOperators;
@@ -23,8 +22,6 @@
         /// <inheritdoc />
         public virtual string Describe( AllowedQueryOptions queryOption, ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-
             if ( ( queryOption < Filter || queryOption > Supported ) || ( queryOption != Filter && ( (int) queryOption % 2 != 0 ) ) )
             {
                 throw new ArgumentException( SR.MultipleQueryOptionsNotAllowed, nameof( queryOption ) );
@@ -41,8 +38,8 @@
                 Count => DescribeCount( context ),
 #pragma warning disable CA1308 // Normalize strings to uppercase
                 _ => throw new ArgumentException( SR.UnsupportedQueryOption.FormatDefault( queryOption.ToString().ToLowerInvariant() ), nameof( queryOption ) ),
-            };
 #pragma warning restore CA1308
+            };
         }
 
         /// <summary>
@@ -52,8 +49,10 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeFilter( ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var description = new StringBuilder();
 
@@ -84,8 +83,10 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeExpand( ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var description = new StringBuilder();
 
@@ -114,8 +115,10 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeSelect( ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var description = new StringBuilder();
 
@@ -138,8 +141,10 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeOrderBy( ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var description = new StringBuilder();
 
@@ -168,8 +173,10 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeTop( ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var description = new StringBuilder();
 
@@ -191,8 +198,10 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeSkip( ODataQueryOptionDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var description = new StringBuilder();
 
@@ -212,19 +221,10 @@
         /// </summary>
         /// <param name="context">The current <see cref="ODataQueryOptionDescriptionContext">description context</see>.</param>
         /// <returns>The query option description.</returns>
-        protected virtual string DescribeCount( ODataQueryOptionDescriptionContext context )
-        {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
-
-            return SR.CountQueryOptionDesc;
-        }
+        protected virtual string DescribeCount( ODataQueryOptionDescriptionContext context ) => SR.CountQueryOptionDesc;
 
         static void AppendAllowedOptions( StringBuilder description, ODataQueryOptionDescriptionContext context )
         {
-            Contract.Requires( description != null );
-            Contract.Requires( context != null );
-
             if ( context.AllowedLogicalOperators != AllowedLogicalOperators.None &&
                  context.AllowedLogicalOperators != AllowedLogicalOperators.All )
             {
@@ -336,28 +336,24 @@
 
         static string ToCommaSeparatedValues( IEnumerable<string> values )
         {
-            Contract.Requires( values != null );
-            Contract.Ensures( Contract.Result<string>() != null );
+            using var iterator = values.GetEnumerator();
 
-            using ( var iterator = values.GetEnumerator() )
+            if ( !iterator.MoveNext() )
             {
-                if ( !iterator.MoveNext() )
-                {
-                    return string.Empty;
-                }
-
-                var csv = new StringBuilder();
-
-                csv.Append( iterator.Current );
-
-                while ( iterator.MoveNext() )
-                {
-                    csv.Append( ", " );
-                    csv.Append( iterator.Current );
-                }
-
-                return csv.ToString();
+                return string.Empty;
             }
+
+            var csv = new StringBuilder();
+
+            csv.Append( iterator.Current );
+
+            while ( iterator.MoveNext() )
+            {
+                csv.Append( ", " );
+                csv.Append( iterator.Current );
+            }
+
+            return csv.ToString();
         }
     }
 }

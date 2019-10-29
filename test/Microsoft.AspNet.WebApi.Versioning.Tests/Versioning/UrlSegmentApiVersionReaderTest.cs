@@ -62,7 +62,7 @@
             reader.AddParameters( context.Object );
 
             // assert
-            context.Verify( c => c.AddParameter( null, Path ), Times.Once() );
+            context.Verify( c => c.AddParameter( string.Empty, Path ), Times.Once() );
         }
     }
 }

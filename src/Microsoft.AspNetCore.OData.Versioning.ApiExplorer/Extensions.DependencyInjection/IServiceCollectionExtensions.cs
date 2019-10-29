@@ -5,7 +5,6 @@
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Diagnostics.Contracts;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -21,11 +20,7 @@
         /// <returns>The original <paramref name="services"/> object.</returns>
         public static IServiceCollection AddODataApiExplorer( this IServiceCollection services )
         {
-            Arg.NotNull( services, nameof( services ) );
-            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
-
             AddApiExplorerServices( services );
-
             return services;
         }
 
@@ -37,13 +32,8 @@
         /// <returns>The original <paramref name="services"/> object.</returns>
         public static IServiceCollection AddODataApiExplorer( this IServiceCollection services, Action<ODataApiExplorerOptions> setupAction )
         {
-            Arg.NotNull( services, nameof( services ) );
-            Arg.NotNull( setupAction, nameof( setupAction ) );
-            Contract.Ensures( Contract.Result<IServiceCollection>() != null );
-
             AddApiExplorerServices( services );
             services.Configure( setupAction );
-
             return services;
         }
 
@@ -55,6 +45,7 @@
             services.TryAddEnumerable( Transient<IApiDescriptionProvider, ODataApiDescriptionProvider>() );
         }
 
+#pragma warning disable CA1812
         sealed class ODataApiExplorerOptionsAdapter : IOptionsFactory<ApiExplorerOptions>
         {
             readonly IOptions<ODataApiVersioningOptions> options;
@@ -75,5 +66,6 @@
                 return newOptions;
             }
         }
+#pragma warning restore CA1812
     }
 }

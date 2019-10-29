@@ -14,10 +14,8 @@
         /// <param name="request">The <see cref="HttpRequestMessage">HTTP request</see> to read the API version from.</param>
         /// <returns>The raw, unparsed service API version value read from the request or <c>null</c> if request does not contain an API version.</returns>
         /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
-        public virtual string Read( HttpRequestMessage request )
+        public virtual string? Read( HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-
             if ( reentrant )
             {
                 return null;

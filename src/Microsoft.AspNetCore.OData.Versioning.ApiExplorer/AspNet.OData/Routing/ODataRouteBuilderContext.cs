@@ -7,25 +7,19 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
-    using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
     using static System.Linq.Enumerable;
 
     partial class ODataRouteBuilderContext
     {
-        private IODataPathTemplateHandler templateHandler;
+        private IODataPathTemplateHandler? templateHandler;
 
         internal ODataRouteBuilderContext(
             ODataRouteMapping routeMapping,
             ControllerActionDescriptor actionDescriptor,
             ODataApiExplorerOptions options )
         {
-            Contract.Requires( routeMapping != null );
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( options != null );
-
             ApiVersion = routeMapping.ApiVersion;
             Services = routeMapping.Services;
             EdmModel = Services.GetRequiredService<IEdmModel>();
@@ -55,8 +49,8 @@
         }
 
         internal IODataPathTemplateHandler PathTemplateHandler =>
-            templateHandler ?? ( templateHandler = Services.GetRequiredService<IODataPathTemplateHandler>() );
+            templateHandler ??= Services.GetRequiredService<IODataPathTemplateHandler>();
 
-        internal IModelMetadataProvider ModelMetadataProvider { get; set; }
+        internal IModelMetadataProvider? ModelMetadataProvider { get; set; }
     }
 }

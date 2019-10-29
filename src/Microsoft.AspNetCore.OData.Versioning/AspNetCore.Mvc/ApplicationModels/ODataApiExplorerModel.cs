@@ -19,7 +19,10 @@
         /// <param name="other">The other <see cref="ApiExplorerModel">model</see> to copy from.</param>
         public ODataApiExplorerModel( ApiExplorerModel other ) : base( other )
         {
-            Arg.NotNull( other, nameof( other ) );
+            if ( other == null )
+            {
+                throw new ArgumentNullException( nameof( other ) );
+            }
 
             IsVisible = null;
             IsODataVisible = other.IsVisible;
@@ -31,7 +34,10 @@
         /// <param name="other">The other <see cref="ODataApiExplorerModel">model</see> to copy from.</param>
         public ODataApiExplorerModel( ODataApiExplorerModel other ) : base( other )
         {
-            Arg.NotNull( other, nameof( other ) );
+            if ( other == null )
+            {
+                throw new ArgumentNullException( nameof( other ) );
+            }
 
             IsVisible = null;
             IsODataVisible = other.IsODataVisible;

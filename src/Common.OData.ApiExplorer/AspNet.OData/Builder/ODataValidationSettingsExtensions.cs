@@ -2,15 +2,11 @@
 {
     using Microsoft.AspNet.OData.Query;
     using System;
-    using System.Diagnostics.Contracts;
 
     static class ODataValidationSettingsExtensions
     {
         internal static void CopyFrom( this ODataValidationSettings original, ODataValidationSettings source )
         {
-            Contract.Requires( original != null );
-            Contract.Requires( source != null );
-
             original.AllowedArithmeticOperators = source.AllowedArithmeticOperators;
             original.AllowedFunctions = source.AllowedFunctions;
             original.AllowedLogicalOperators = source.AllowedLogicalOperators;

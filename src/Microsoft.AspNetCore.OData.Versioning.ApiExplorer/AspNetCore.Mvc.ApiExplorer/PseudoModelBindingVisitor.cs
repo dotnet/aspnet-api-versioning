@@ -7,15 +7,11 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
 
     sealed class PseudoModelBindingVisitor
     {
         internal PseudoModelBindingVisitor( ApiParameterContext context, ParameterDescriptor parameter )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( parameter != null );
-
             Context = context;
             Parameter = parameter;
         }
@@ -63,6 +59,8 @@
                 newContainerName = GetName( containerName, bindingContext );
             }
 
+            source ??= ambientSource;
+
             for ( var i = 0; i < modelMetadata.Properties.Count; i++ )
             {
                 var propertyMetadata = modelMetadata.Properties[i];
@@ -71,18 +69,19 @@
 
                 if ( Visited.Add( key ) )
                 {
-                    Visit( propertyContext, source ?? ambientSource, newContainerName );
+                    Visit( propertyContext, source, newContainerName );
                 }
                 else
                 {
-                    Context.Results.Add( CreateResult( propertyContext, source ?? ambientSource, newContainerName ) );
+                    Context.Results.Add( CreateResult( propertyContext, source, newContainerName ) );
                 }
             }
         }
 
         ApiParameterDescription CreateResult( ApiParameterDescriptionContext bindingContext, BindingSource source, string containerName )
         {
-            var type = bindingContext.ModelMetadata.ModelType;
+            var modelMetadata = bindingContext.ModelMetadata;
+            var type = modelMetadata.ModelType;
 
             if ( type.IsODataActionParameters() && Context.RouteContext.Operation?.IsAction() == true )
             {
@@ -95,9 +94,14 @@
                 type = type.SubstituteIfNecessary( new TypeSubstitutionContext( Context.Services, Context.TypeBuilder ) );
             }
 
+            if ( !type.Equals( modelMetadata.ModelType ) )
+            {
+                modelMetadata = new SubstitutedModelMetadata( modelMetadata, type );
+            }
+
             return new ApiParameterDescription()
             {
-                ModelMetadata = bindingContext.ModelMetadata,
+                ModelMetadata = modelMetadata,
                 Name = GetName( containerName, bindingContext ),
                 Source = source,
                 Type = type,

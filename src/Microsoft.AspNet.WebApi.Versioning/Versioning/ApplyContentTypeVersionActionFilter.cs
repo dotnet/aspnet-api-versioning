@@ -58,7 +58,7 @@
             }
 
             versionParameter.Value = apiVersion.ToString();
-            headers.ContentType = contentType;
+            headers!.ContentType = contentType;
         }
     }
 }

@@ -5,7 +5,7 @@
 
     sealed class ApiParameterDescriptionContext
     {
-        internal ApiParameterDescriptionContext( ModelMetadata metadata, BindingInfo bindingInfo, string propertyName )
+        internal ApiParameterDescriptionContext( ModelMetadata metadata, BindingInfo? bindingInfo, string? propertyName )
         {
             ModelMetadata = metadata;
             BinderModelName = BinderModelName = bindingInfo?.BinderModelName ?? metadata.BinderModelName;

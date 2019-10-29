@@ -6,15 +6,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static ApiVersion;
 
     /// <summary>
     /// Represents the base implementation for the metadata that describes the <see cref="ApiVersion">API versions</see> associated with a service.
     /// </summary>
-    [SuppressMessage( "Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "An accessor property is provided, but the values are typed; not strings." )]
     public abstract class ApiVersionsBaseAttribute : Attribute
     {
         readonly Lazy<int> computedHashCode;
@@ -24,7 +21,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
         /// </summary>
         /// <param name="version">The <see cref="ApiVersion">API version</see>.</param>
-        protected ApiVersionsBaseAttribute( ApiVersion version ) : this( new[] { version } ) => Arg.NotNull( version, nameof( version ) );
+        protected ApiVersionsBaseAttribute( ApiVersion version ) : this( new[] { version } ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -32,8 +29,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="versions">An <see cref="Array">array</see> of <see cref="ApiVersion">API versions</see>.</param>
         protected ApiVersionsBaseAttribute( params ApiVersion[] versions )
         {
-            Arg.NotNull( versions, nameof( versions ) );
-
             computedHashCode = new Lazy<int>( () => ComputeHashCode( versions ) );
             this.versions = new Lazy<IReadOnlyList<ApiVersion>>( () => versions );
         }
@@ -42,7 +37,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
         /// </summary>
         /// <param name="version">The API version string.</param>
-        public ApiVersionsBaseAttribute( string version ) : this( new[] { version } ) => Arg.NotNullOrEmpty( version, nameof( version ) );
+        public ApiVersionsBaseAttribute( string version ) : this( new[] { version } ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -51,16 +46,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         [CLSCompliant( false )]
         public ApiVersionsBaseAttribute( params string[] versions )
         {
-            Arg.NotNull( versions, nameof( versions ) );
-
             computedHashCode = new Lazy<int>( () => ComputeHashCode( Versions ) );
             this.versions = new Lazy<IReadOnlyList<ApiVersion>>( () => versions.Select( Parse ).Distinct().ToSortedReadOnlyList() );
         }
 
         static int ComputeHashCode( IEnumerable<ApiVersion> versions )
         {
-            Contract.Requires( versions != null );
-
             var hashCode = 0;
 
             using ( var iterator = versions.GetEnumerator() )
@@ -95,7 +86,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// </summary>
         /// <param name="obj">The <see cref="object">object</see> to be evaluated.</param>
         /// <returns>True if the current instance equals the specified object; otherwise, false.</returns>
-        public override bool Equals( object obj ) => ( obj is ApiVersionsBaseAttribute ) && GetHashCode() == obj.GetHashCode();
+        public override bool Equals( object? obj ) => ( obj is ApiVersionsBaseAttribute ) && GetHashCode() == obj.GetHashCode();
 
         /// <summary>
         /// Returns a hash code for the current instance.

@@ -33,12 +33,6 @@
         /// <inheritdoc />
         public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel )
         {
-            Arg.NotNull( structuredType, nameof( structuredType ) );
-            Arg.NotNull( clrType, nameof( clrType ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( edmModel, nameof( edmModel ) );
-            Contract.Ensures( Contract.Result<Type>() != null );
-
             var typeKey = new EdmTypeKey( structuredType, apiVersion );
             var edmTypes = generatedEdmTypesPerVersion.GetOrAdd( apiVersion, key => GenerateTypesForEdmModel( edmModel, apiVersion: key ) );
 
@@ -48,11 +42,10 @@
         /// <inheritdoc />
         public Type NewActionParameters( IServiceProvider services, IEdmAction action, ApiVersion apiVersion, string controllerName )
         {
-            Arg.NotNull( services, nameof( services ) );
-            Arg.NotNull( action, nameof( action ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( controllerName, nameof( controllerName ) );
-            Contract.Ensures( Contract.Result<Type>() != null );
+            if ( action == null )
+            {
+                throw new ArgumentNullException( nameof( action ) );
+            }
 
             var name = controllerName + "." + action.FullName() + "Parameters";
             var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, p, this ) );
@@ -88,7 +81,7 @@
             }
 
             var edmModel = context.EdmModel;
-            var clrType = structuredType.GetClrType( edmModel );
+            var clrType = structuredType.GetClrType( edmModel )!;
             var visitedEdmTypes = context.VisitedEdmTypes;
 
             visitedEdmTypes.Add( typeKey );
@@ -105,7 +98,9 @@
             foreach ( var property in structuredType.Properties() )
             {
                 structuralProperties.Add( property.Name, property );
+
                 var clrProperty = edmModel.GetAnnotationValue<ClrPropertyInfoAnnotation>( property )?.ClrPropertyInfo;
+
                 if ( clrProperty != null )
                 {
                     mappedClrProperties.Add( clrProperty, property );
@@ -134,7 +129,7 @@
                     {
                         visitedEdmTypes.Add( propertyTypeKey );
 
-                        var itemType = elementType.Definition.GetClrType( edmModel );
+                        var itemType = elementType.Definition.GetClrType( edmModel )!;
                         var elementKey = new EdmTypeKey( elementType, apiVersion );
 
                         if ( visitedEdmTypes.Contains( elementKey ) )
@@ -183,7 +178,7 @@
                 properties.Add( new ClassProperty( property, propertyType ) );
             }
 
-            var type = default( TypeInfo );
+            TypeInfo type;
 
             if ( clrTypeMatchesEdmType )
             {
@@ -207,8 +202,10 @@
                 var typeBuilder = CreateTypeBuilderFromSignature( context.ModuleBuilder, signature );
                 var dependencies = context.Dependencies;
 
-                foreach ( var propertyDependency in dependentProperties )
+                for ( var i = 0; i < dependentProperties.Count; i++ )
                 {
+                    var propertyDependency = dependentProperties[i];
+
                     propertyDependency.DependentType = typeBuilder;
                     dependencies.Add( propertyDependency );
                 }
@@ -229,19 +226,18 @@
 
         static TypeBuilder CreateTypeBuilderFromSignature( ModuleBuilder moduleBuilder, ClassSignature @class )
         {
-            Contract.Requires( moduleBuilder != null );
-            Contract.Requires( @class != null );
-            Contract.Ensures( Contract.Result<TypeBuilder>() != null );
-
             var typeBuilder = moduleBuilder.DefineType( @class.Name, TypeAttributes.Class );
+            var attributes = @class.Attributes;
+            var properties = @class.Properties;
 
-            foreach ( var attribute in @class.Attributes )
+            for ( var i = 0; i < attributes.Count; i++ )
             {
-                typeBuilder.SetCustomAttribute( attribute );
+                typeBuilder.SetCustomAttribute( attributes[i] );
             }
 
-            foreach ( var property in @class.Properties )
+            for ( var i = 0; i < properties.Length; i++ )
             {
+                ref var property = ref properties[i];
                 var type = property.Type;
                 var name = property.Name;
                 AddProperty( typeBuilder, type, name, property.Attributes );
@@ -265,7 +261,7 @@
                     dependentOnType = IEnumerableOfT.MakeGenericType( dependentOnType ).GetTypeInfo();
                 }
 
-                AddProperty( propertyDependency.DependentType, dependentOnType, propertyDependency.PropertyName, propertyDependency.CustomAttributes );
+                AddProperty( propertyDependency.DependentType!, dependentOnType, propertyDependency.PropertyName, propertyDependency.CustomAttributes );
             }
 
             var keys = edmTypes.Keys.ToArray();
@@ -283,7 +279,7 @@
             return edmTypes;
         }
 
-        static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name, IEnumerable<CustomAttributeBuilder> customAttributes )
+        static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name, IReadOnlyList<CustomAttributeBuilder> customAttributes )
         {
             const MethodAttributes propertyMethodAttributes = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
             var field = addTo.DefineField( "_" + name, shouldBeAdded, FieldAttributes.Private );
@@ -304,9 +300,9 @@
             propertyBuilder.SetGetMethod( getter );
             propertyBuilder.SetSetMethod( setter );
 
-            foreach ( var attribute in customAttributes )
+            for ( var i = 0; i < customAttributes.Count; i++ )
             {
-                propertyBuilder.SetCustomAttribute( attribute );
+                propertyBuilder.SetCustomAttribute( customAttributes[i] );
             }
 
             return propertyBuilder;

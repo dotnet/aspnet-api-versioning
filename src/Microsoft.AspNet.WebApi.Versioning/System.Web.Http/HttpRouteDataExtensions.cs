@@ -1,16 +1,13 @@
 ﻿namespace System.Web.Http
 {
-    using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using Microsoft.Web.Http.Routing;
+    using System.Collections.Generic;
     using System.Web.Http.Routing;
 
     static class HttpRouteDataExtensions
     {
-        internal static CandidateAction[] GetDirectRouteCandidates( this IHttpRouteData routeData )
+        internal static CandidateAction[]? GetDirectRouteCandidates( this IHttpRouteData routeData )
         {
-            Contract.Requires( routeData != null );
-
             var subRoutes = routeData.GetSubRoutes();
 
             if ( subRoutes == null )

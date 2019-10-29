@@ -6,24 +6,19 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Routing;
-    using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Threading;
-    using static ApiVersionMapping;
-    using static ErrorCodes;
-    using static System.Globalization.CultureInfo;
 
     /// <content>
     /// Provides additional implementation specific to ASP.NET Core 2.2.
     /// </content>
     public partial class ApiVersionActionSelector
     {
-        Cache cache;
+        Cache? cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionActionSelector"/> class.
@@ -40,12 +35,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             ILoggerFactory loggerFactory,
             IApiVersionRoutePolicy routePolicy )
         {
-            Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
-            Arg.NotNull( actionConstraintCache, nameof( actionConstraintCache ) );
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( loggerFactory, nameof( loggerFactory ) );
-            Arg.NotNull( routePolicy, nameof( routePolicy ) );
-
             this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
             this.actionConstraintCache = actionConstraintCache;
             this.options = options;
@@ -78,8 +67,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         {
             public Cache( ActionDescriptorCollection actions )
             {
-                Contract.Requires( actions != null );
-
                 Version = actions.Version;
                 RouteKeys = IdentifyRouteKeysForActionSelection( actions );
                 BuildOrderedSetOfKeysForRouteValues( actions );
@@ -95,9 +82,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static string[] IdentifyRouteKeysForActionSelection( ActionDescriptorCollection actions )
             {
-                Contract.Requires( actions != null );
-                Contract.Ensures( Contract.Result<string[]>() != null );
-
                 var routeKeys = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
 
                 for ( var i = 0; i < actions.Items.Count; i++ )
@@ -118,8 +102,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             void BuildOrderedSetOfKeysForRouteValues( ActionDescriptorCollection actions )
             {
-                Contract.Requires( actions != null );
-
                 for ( var i = 0; i < actions.Items.Count; i++ )
                 {
                     var action = actions.Items[i];

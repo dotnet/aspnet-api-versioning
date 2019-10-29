@@ -3,15 +3,12 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
 
     sealed partial class ODataAttributeVisitor
     {
         void VisitAction( ActionDescriptor action )
         {
-            Contract.Requires( action != null );
-
             if ( !( action is ControllerActionDescriptor controllerAction ) )
             {
                 return;

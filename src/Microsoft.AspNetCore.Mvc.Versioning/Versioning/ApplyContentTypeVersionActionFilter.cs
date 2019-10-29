@@ -1,9 +1,12 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Versioning
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Filters;
     using Microsoft.Extensions.Primitives;
     using Microsoft.Net.Http.Headers;
+    using System;
     using System.Threading.Tasks;
     using static System.StringComparison;
     using static System.Threading.Tasks.Task;
@@ -19,6 +22,11 @@
 
         public void OnActionExecuting( ActionExecutingContext context )
         {
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             var httpContext = context.HttpContext;
             var response = httpContext.Response;
 

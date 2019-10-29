@@ -1,18 +1,15 @@
 ﻿namespace System.Web.Http
 {
-    using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Web.Http.Controllers;
-    using System.Web.Http.Routing;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Routing;
+    using System.Collections.Generic;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Routing;
 
     static class HttpRouteExtensions
     {
-        internal static CandidateAction[] GetDirectRouteCandidates( this IHttpRoute route )
+        internal static CandidateAction[]? GetDirectRouteCandidates( this IHttpRoute route )
         {
-            Contract.Requires( route != null );
-
             var dataTokens = route.DataTokens;
 
             if ( dataTokens == null )

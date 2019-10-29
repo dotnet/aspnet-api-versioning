@@ -1,8 +1,7 @@
 ﻿namespace System.Web.Http
 {
-    using Microsoft;
+    using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
     using System.Web.Http.Routing;
     using static System.Reflection.BindingFlags;
@@ -20,8 +19,10 @@
         /// <see cref="IHttpRoute">routes</see> mapped to their name.</returns>
         public static IReadOnlyDictionary<string, IHttpRoute> ToDictionary( this HttpRouteCollection routes )
         {
-            Arg.NotNull( routes, nameof( routes ) );
-            Contract.Ensures( Contract.Result<IReadOnlyDictionary<string, IHttpRoute>>() != null );
+            if ( routes == null )
+            {
+                throw new ArgumentNullException( nameof( routes ) );
+            }
 
             const string HostedHttpRouteCollection = "System.Web.Http.WebHost.Routing.HostedHttpRouteCollection";
 
@@ -37,9 +38,6 @@
 
         static IReadOnlyDictionary<string, IHttpRoute> CopyToDictionary( this HttpRouteCollection routes )
         {
-            Contract.Requires( routes != null );
-            Contract.Ensures( Contract.Result<IReadOnlyDictionary<string, IHttpRoute>>() != null );
-
             var items = new KeyValuePair<string, IHttpRoute>[routes.Count];
 
             routes.CopyTo( items, 0 );
@@ -57,9 +55,6 @@
 
         static IReadOnlyDictionary<string, IHttpRoute> BuildDictionaryFromKeys( this HttpRouteCollection routes )
         {
-            Contract.Requires( routes != null );
-            Contract.Ensures( Contract.Result<IReadOnlyDictionary<string, IHttpRoute>>() != null );
-
             var keys = routes.Keys();
             var dictionary = new Dictionary<string, IHttpRoute>( routes.Count, StringComparer.OrdinalIgnoreCase );
 
@@ -74,9 +69,6 @@
 
         static IReadOnlyList<string> Keys( this HttpRouteCollection routes )
         {
-            Contract.Requires( routes != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<string>>() != null );
-
             var collection = GetDictionaryKeys( routes );
             var keys = new string[collection.Count];
 
@@ -87,9 +79,6 @@
 
         static ICollection<string> GetDictionaryKeys( HttpRouteCollection routes )
         {
-            Contract.Requires( routes != null );
-            Contract.Ensures( Contract.Result<ICollection<string>>() != null );
-
             // HACK: System.Web.Routing.RouteCollection doesn't expose the names associated with registered routes. The
             // HostedHttpRouteCollection could have provided an adapter to support it, but didn't. Instead, it always throws
             // NotSupportedException for the HttpRouteCollection.CopyTo method. This only happens when hosted on IIS. The

@@ -42,7 +42,7 @@
         }
 
         /// <summary>
-        /// Returns a hash code for the especified <see cref="VersionedApiDescription">API description</see>.
+        /// Returns a hash code for the specified <see cref="VersionedApiDescription">API description</see>.
         /// </summary>
         /// <param name="obj">The object to get a hash code for.</param>
         /// <returns>The hash code of the specified object.</returns>
@@ -79,8 +79,8 @@
         /// <returns>True if the two API descriptions are equal; otherwise, false.</returns>
         public virtual bool Equals( ApiDescription x, ApiDescription y )
         {
-            var id1 = default( string );
-            var id2 = default( string );
+            string id1;
+            string id2;
 
             if ( x == null )
             {
@@ -115,7 +115,7 @@
         }
 
         /// <summary>
-        /// Returns a hash code for the especified <see cref="ApiDescription">API description</see>.
+        /// Returns a hash code for the specified <see cref="ApiDescription">API description</see>.
         /// </summary>
         /// <param name="obj">The object to get a hash code for.</param>
         /// <returns>The hash code of the specified object.</returns>
@@ -126,7 +126,7 @@
                 return GetHashCode( other );
             }
 
-            var id = obj.ID;
+            var id = obj?.ID;
 
             return id == null ? 0 : comparer.GetHashCode( id );
         }
@@ -192,7 +192,7 @@
             return result;
         }
 
-        int CompareStrings( string string1, string string2 )
+        int CompareStrings( string? string1, string? string2 )
         {
             if ( string1 == null )
             {

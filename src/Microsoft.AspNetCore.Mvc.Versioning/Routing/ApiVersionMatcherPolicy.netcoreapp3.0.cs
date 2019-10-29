@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.Mvc.Routing
     using Microsoft.AspNetCore.Routing.Matching;
     using Microsoft.Extensions.Logging;
     using System;
-    using System.Diagnostics.Contracts;
     using System.Threading.Tasks;
     using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
     using static System.Threading.Tasks.Task;
@@ -19,8 +18,15 @@ namespace Microsoft.AspNetCore.Mvc.Routing
         /// <inheritdoc />
         public Task ApplyAsync( HttpContext httpContext, CandidateSet candidates )
         {
-            Arg.NotNull( httpContext, nameof( httpContext ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            if ( httpContext == null )
+            {
+                throw new ArgumentNullException( nameof( httpContext ) );
+            }
+
+            if ( candidates == null )
+            {
+                throw new ArgumentNullException( nameof( candidates ) );
+            }
 
             if ( IsRequestedApiVersionAmbiguous( httpContext, out var apiVersion ) )
             {
@@ -33,7 +39,7 @@ namespace Microsoft.AspNetCore.Mvc.Routing
                 httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
             }
 
-            var finalMatches = EvaluateApiVersion( httpContext, candidates, apiVersion );
+            var finalMatches = EvaluateApiVersion( candidates, apiVersion );
 
             if ( finalMatches.Count == 0 )
             {
@@ -51,10 +57,8 @@ namespace Microsoft.AspNetCore.Mvc.Routing
             return CompletedTask;
         }
 
-        bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, out ApiVersion apiVersion )
+        bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, out ApiVersion? apiVersion )
         {
-            Contract.Requires( httpContext != null );
-
             try
             {
                 apiVersion = httpContext.GetRequestedApiVersion();

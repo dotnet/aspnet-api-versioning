@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Web.Http.Routing
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.Web.Http.Routing
 {
     using System;
     using System.Collections.Generic;
@@ -6,11 +8,11 @@
     using System.Web.Http.Routing;
     using static System.Linq.Expressions.Expression;
 
-    sealed class ParsedRouteAdapter<T> : IParsedRoute
+    sealed class ParsedRouteAdapter<T> : IParsedRoute where T : notnull
     {
         static readonly Lazy<Func<T, IEnumerable<object>>> pathSegmentsAccessor = new Lazy<Func<T, IEnumerable<object>>>( NewPathSegmentsAccessor );
-        static readonly Lazy<Func<T, IDictionary<string, object>, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>> bindFunc =
-            new Lazy<Func<T, IDictionary<string, object>, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>>( NewBindFunc );
+        static readonly Lazy<Func<T, IDictionary<string, object>?, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>> bindFunc =
+            new Lazy<Func<T, IDictionary<string, object>?, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>>( NewBindFunc );
         readonly T adapted;
         readonly Lazy<IReadOnlyList<IPathSegment>> pathSegments;
 
@@ -20,7 +22,7 @@
             pathSegments = new Lazy<IReadOnlyList<IPathSegment>>( AdaptToPathSegments );
         }
 
-        public IBoundRouteTemplate Bind( IDictionary<string, object> currentValues, IDictionary<string, object> values, HttpRouteValueDictionary defaultValues, HttpRouteValueDictionary constraints )
+        public IBoundRouteTemplate Bind( IDictionary<string, object>? currentValues, IDictionary<string, object> values, HttpRouteValueDictionary defaultValues, HttpRouteValueDictionary constraints )
         {
             var boundRouteTemplate = bindFunc.Value( adapted, currentValues, values, defaultValues, constraints );
             var adapterType = typeof( BoundRouteTemplateAdapter<> ).MakeGenericType( boundRouteTemplate.GetType() );
@@ -71,7 +73,7 @@
             return lambda.Compile();
         }
 
-        static Func<T, IDictionary<string, object>, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object> NewBindFunc()
+        static Func<T, IDictionary<string, object>?, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object> NewBindFunc()
         {
             var o = Parameter( typeof( T ), "o" );
             var currentValues = Parameter( typeof( IDictionary<string, object> ), "currentValues" );
@@ -81,7 +83,7 @@
             var parameterTypes = new[] { typeof( IDictionary<string, object> ), typeof( IDictionary<string, object> ), typeof( HttpRouteValueDictionary ), typeof( HttpRouteValueDictionary ) };
             var method = typeof( T ).GetRuntimeMethod( nameof( Bind ), parameterTypes );
             var body = Call( o, method, currentValues, values, defaultValues, constraints );
-            var lambda = Lambda<Func<T, IDictionary<string, object>, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>>( body, o, currentValues, values, defaultValues, constraints );
+            var lambda = Lambda<Func<T, IDictionary<string, object>?, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>>( body, o, currentValues, values, defaultValues, constraints );
 
             return lambda.Compile();
         }

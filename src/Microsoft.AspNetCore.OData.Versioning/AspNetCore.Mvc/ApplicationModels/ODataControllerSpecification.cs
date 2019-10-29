@@ -12,7 +12,11 @@
         /// <inheritdoc />
         public bool IsSatisfiedBy( ControllerModel controller )
         {
-            Arg.NotNull( controller, nameof( controller ) );
+            if ( controller == null )
+            {
+                throw new ArgumentNullException( nameof( controller ) );
+            }
+
             return controller.ControllerType.IsODataController();
         }
     }

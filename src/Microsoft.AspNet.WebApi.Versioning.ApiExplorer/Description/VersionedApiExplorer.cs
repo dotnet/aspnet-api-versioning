@@ -1,12 +1,9 @@
 ﻿namespace Microsoft.Web.Http.Description
 {
     using Microsoft.Web.Http.Routing;
-    using Microsoft.Web.Http.Versioning;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Formatting;
@@ -32,7 +29,7 @@
         static readonly Regex actionVariableRegex = new Regex( $"{{{RouteValueKeys.Action}}}", Compiled | IgnoreCase | CultureInvariant );
         static readonly Regex controllerVariableRegex = new Regex( $"{{{RouteValueKeys.Controller}}}", Compiled | IgnoreCase | CultureInvariant );
         readonly Lazy<ApiDescriptionGroupCollection> apiDescriptions;
-        IDocumentationProvider documentationProvider;
+        IDocumentationProvider? documentationProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
@@ -47,9 +44,6 @@
         /// <param name="options">The associated <see cref="ApiExplorerOptions">API explorer options</see>.</param>
         public VersionedApiExplorer( HttpConfiguration configuration, ApiExplorerOptions options )
         {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNull( options, nameof( options ) );
-
             Configuration = configuration;
             Options = options;
             apiDescriptions = new Lazy<ApiDescriptionGroupCollection>( InitializeApiDescriptions );
@@ -93,7 +87,7 @@
         /// <value>The <see cref="IDocumentationProvider">documentation provider</see> used to document APIs.</value>
         public IDocumentationProvider DocumentationProvider
         {
-            get => documentationProvider ?? ( documentationProvider = Configuration.Services.GetDocumentationProvider() );
+            get => documentationProvider ??= Configuration.Services.GetDocumentationProvider();
             set => documentationProvider = value;
         }
 
@@ -105,10 +99,17 @@
         /// <returns>A <see cref="Collection{T}">collection</see> of <see cref="HttpMethod">HTTP method</see>.</returns>
         protected virtual Collection<HttpMethod> GetHttpMethodsSupportedByAction( IHttpRoute route, HttpActionDescriptor actionDescriptor )
         {
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
 
-            IList<HttpMethod> supportedMethods = new List<HttpMethod>();
+            if ( actionDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( actionDescriptor ) );
+            }
+
+            IList<HttpMethod> supportedMethods;
             IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
             var httpMethodConstraint = route.Constraints.Values.OfType<HttpMethodConstraint>().FirstOrDefault();
 
@@ -134,9 +135,15 @@
         /// <returns>True if the action should be explored; otherwise, false.</returns>
         protected virtual bool ShouldExploreAction( string actionRouteParameterValue, HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
         {
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            if ( actionDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( actionDescriptor ) );
+            }
+
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
 
             var setting = actionDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
 
@@ -158,9 +165,15 @@
         /// <returns>True if the controller should be explored; otherwise, false.</returns>
         protected virtual bool ShouldExploreController( string controllerRouteParameterValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route, ApiVersion apiVersion )
         {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
+
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
 
             var setting = controllerDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
 
@@ -174,8 +187,10 @@
         /// <returns>The group name for the specified <paramref name="apiVersion">API version</paramref>.</returns>
         protected virtual string GetGroupName( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( apiVersion == null )
+            {
+                throw new ArgumentNullException( nameof( apiVersion ) );
+            }
 
             return apiVersion.ToString( Options.GroupNameFormat, InvariantCulture );
         }
@@ -187,8 +202,6 @@
         /// <see cref="ApiDescriptionGroup">API description groups</see>.</returns>
         protected virtual ApiDescriptionGroupCollection InitializeApiDescriptions()
         {
-            Contract.Ensures( Contract.Result<ApiDescriptionGroupCollection>() != null );
-
             Configuration.EnsureInitialized();
 
             var newApiDescriptions = new ApiDescriptionGroupCollection();
@@ -204,8 +217,9 @@
 
             foreach ( var apiVersion in FlattenApiVersions( controllerMappings ) )
             {
-                foreach ( var route in routes )
+                for ( var i = 0; i < routes.Length; i++ )
                 {
+                    var route = routes[i];
                     var directRouteCandidates = route.GetDirectRouteCandidates();
                     var directRouteController = GetDirectRouteController( directRouteCandidates, apiVersion );
                     var apiDescriptionGroup = newApiDescriptions.GetOrAdd( apiVersion, GetGroupName );
@@ -217,11 +231,12 @@
                     // E.g. a controller with Post() and PostComment(). When the route template is {controller}, it produces POST /controller and POST /controller.
                     descriptionsFromRoute = RemoveInvalidApiDescriptions( descriptionsFromRoute, apiVersion );
 
-                    foreach ( var description in descriptionsFromRoute )
+                    for ( var j = 0; j < descriptionsFromRoute.Count; j++ )
                     {
                         // Do not add the description if the previous route has a matching description with the same HTTP method and relative path.
                         // E.g. having two routes with the templates "api/Values/{id}" and "api/{controller}/{id}" can potentially produce the same
                         // relative path "api/Values/{id}" but only the first one matters.
+                        var description = descriptionsFromRoute[j];
                         var index = apiDescriptionGroup.ApiDescriptions.IndexOf( description, Comparer );
 
                         if ( index < 0 )
@@ -248,8 +263,10 @@
                 }
             }
 
-            foreach ( var apiDescriptionGroup in newApiDescriptions )
+            for ( var i = 0; i < newApiDescriptions.Count; i++ )
             {
+                var apiDescriptionGroup = newApiDescriptions[i];
+
                 SortApiDescriptionGroup( apiDescriptionGroup );
 
                 if ( Options.SubstituteApiVersionInUrl )
@@ -271,7 +288,10 @@
         /// <remarks>The default implementation sorts API descriptions by HTTP method, path, and API version.</remarks>
         protected virtual void SortApiDescriptionGroup( ApiDescriptionGroup apiDescriptionGroup )
         {
-            Arg.NotNull( apiDescriptionGroup, nameof( apiDescriptionGroup ) );
+            if ( apiDescriptionGroup == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescriptionGroup ) );
+            }
 
             if ( apiDescriptionGroup.ApiDescriptions.Count < 2 )
             {
@@ -294,11 +314,22 @@
         /// <param name="parameterDescriptions">The associated <see cref="ICollection{T}">collection</see> of <see cref="ApiParameterDescription">parameter descriptions</see>.</param>
         /// <param name="expandedRouteTemplate">The expanded route template, if any.</param>
         /// <returns>True if the operation succeeded; otherwise, false.</returns>
-        protected virtual bool TryExpandUriParameters( IHttpRoute route, IParsedRoute parsedRoute, ICollection<ApiParameterDescription> parameterDescriptions, out string expandedRouteTemplate )
+        protected virtual bool TryExpandUriParameters( IHttpRoute route, IParsedRoute parsedRoute, ICollection<ApiParameterDescription> parameterDescriptions, out string? expandedRouteTemplate )
         {
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( parsedRoute, nameof( parsedRoute ) );
-            Arg.NotNull( parameterDescriptions, nameof( parameterDescriptions ) );
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
+
+            if ( parsedRoute == null )
+            {
+                throw new ArgumentNullException( nameof( parsedRoute ) );
+            }
+
+            if ( parameterDescriptions == null )
+            {
+                throw new ArgumentNullException( nameof( parameterDescriptions ) );
+            }
 
             var parameterValuesForRoute = new Dictionary<string, object>( StringComparer.OrdinalIgnoreCase );
             var emitPrefixes = ShouldEmitPrefixes( parameterDescriptions );
@@ -382,9 +413,6 @@
 
         static IEnumerable<IHttpRoute> FlattenRoutes( IEnumerable<IHttpRoute> routes )
         {
-            Contract.Requires( routes != null );
-            Contract.Ensures( Contract.Result<IEnumerable<IHttpRoute>>() != null );
-
             foreach ( var route in routes )
             {
                 if ( route is IEnumerable<IHttpRoute> nested )
@@ -403,9 +431,6 @@
 
         IEnumerable<ApiVersion> FlattenApiVersions( IDictionary<string, HttpControllerDescriptor> controllerMapping )
         {
-            Contract.Requires( controllerMapping != null );
-            Contract.Ensures( Contract.Result<IEnumerable<ApiVersion>>() != null );
-
             var services = Configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
@@ -475,11 +500,8 @@
             return supported.OrderBy( v => v );
         }
 
-        static HttpControllerDescriptor FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
+        static HttpControllerDescriptor? FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
         {
-            Contract.Requires( controllerDescriptors != null );
-            Contract.Requires( controllerType != null );
-
             foreach ( var controllerDescriptor in controllerDescriptors )
             {
                 if ( controllerDescriptor is IEnumerable<HttpControllerDescriptor> groupedControllerDescriptors )
@@ -501,10 +523,8 @@
             return default;
         }
 
-        static HttpControllerDescriptor GetDirectRouteController( CandidateAction[] candidates, ApiVersion apiVersion )
+        static HttpControllerDescriptor? GetDirectRouteController( CandidateAction[]? candidates, ApiVersion apiVersion )
         {
-            Contract.Requires( apiVersion != null );
-
             if ( candidates == null )
             {
                 return default;
@@ -520,11 +540,11 @@
 
                 switch ( action.MappingTo( apiVersion ) )
                 {
-                    case ApiVersionMapping.Explicit:
+                    case Explicit:
                         bestMatch = action;
                         bestMatches.Add( action.ControllerDescriptor );
                         break;
-                    case ApiVersionMapping.Implicit:
+                    case Implicit:
                         implicitMatches.Add( action.ControllerDescriptor );
                         break;
                 }
@@ -536,7 +556,7 @@
                     bestMatches.UnionWith( implicitMatches );
                     break;
                 case 1:
-                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
+                    if ( bestMatch!.GetApiVersionModel().IsApiVersionNeutral )
                     {
                         bestMatches.UnionWith( implicitMatches );
                     }
@@ -561,11 +581,20 @@
             IHttpRoute route,
             ApiVersion apiVersion )
         {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
-            Arg.NotNull( candidateActionDescriptors, nameof( candidateActionDescriptors ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
+
+            if ( candidateActionDescriptors == null )
+            {
+                throw new ArgumentNullException( nameof( candidateActionDescriptors ) );
+            }
+
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
 
             var descriptions = new Collection<VersionedApiDescription>();
 
@@ -574,8 +603,9 @@
                 return descriptions;
             }
 
-            foreach ( var actionDescriptor in candidateActionDescriptors )
+            for ( var i = 0; i < candidateActionDescriptors.Count; i++ )
             {
+                var actionDescriptor = candidateActionDescriptors[i];
                 var actionName = actionDescriptor.ActionName;
 
                 if ( !ShouldExploreAction( actionName, actionDescriptor, route, apiVersion ) )
@@ -606,14 +636,19 @@
         /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
         protected virtual Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
         {
-            Arg.NotNull( controllerMappings, nameof( controllerMappings ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
+            if ( controllerMappings == null )
+            {
+                throw new ArgumentNullException( nameof( controllerMappings ) );
+            }
+
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
 
             var apiDescriptions = new Collection<VersionedApiDescription>();
             var routeTemplate = route.RouteTemplate;
-            var controllerVariableValue = default( string );
+            string controllerVariableValue;
 
             if ( controllerVariableRegex.IsMatch( routeTemplate ) )
             {
@@ -658,9 +693,6 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> used to populate parameters with.</param>
         protected virtual void PopulateApiVersionParameters( ApiDescription apiDescription, ApiVersion apiVersion )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, Options );
 
@@ -674,12 +706,6 @@
             Collection<VersionedApiDescription> apiDescriptions,
             ApiVersion apiVersion )
         {
-            Contract.Requires( route != null );
-            Contract.Requires( localPath != null );
-            Contract.Requires( controllerDescriptor != null );
-            Contract.Requires( apiDescriptions != null );
-            Contract.Requires( apiVersion != null );
-
             if ( controllerDescriptor.IsAttributeRouted() )
             {
                 return;
@@ -687,12 +713,13 @@
 
             var controllerServices = controllerDescriptor.Configuration.Services;
             var actionMappings = controllerServices.GetActionSelector().GetActionMapping( controllerDescriptor );
-            var actionVariableValue = default( string );
 
             if ( actionMappings == null )
             {
                 return;
             }
+
+            string actionVariableValue;
 
             if ( actionVariableRegex.IsMatch( localPath ) )
             {
@@ -722,20 +749,15 @@
 
         void PopulateActionDescriptions(
             IEnumerable<HttpActionDescriptor> actionDescriptors,
-            string actionVariableValue,
+            string? actionVariableValue,
             IHttpRoute route,
             string localPath,
             Collection<VersionedApiDescription> apiDescriptions,
             ApiVersion apiVersion )
         {
-            Contract.Requires( actionDescriptors != null );
-            Contract.Requires( route != null );
-            Contract.Requires( apiDescriptions != null );
-            Contract.Requires( apiVersion != null );
-
             foreach ( var actionDescriptor in actionDescriptors )
             {
-                if ( ShouldExploreAction( actionVariableValue, actionDescriptor, route, apiVersion ) && !actionDescriptor.IsAttributeRouted() )
+                if ( ShouldExploreAction( actionVariableValue ?? string.Empty, actionDescriptor, route, apiVersion ) && !actionDescriptor.IsAttributeRouted() )
                 {
                     PopulateActionDescriptions( actionDescriptor, route, localPath, apiDescriptions, apiVersion );
                 }
@@ -749,12 +771,6 @@
             Collection<VersionedApiDescription> apiDescriptions,
             ApiVersion apiVersion )
         {
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( route != null );
-            Contract.Requires( localPath != null );
-            Contract.Requires( apiDescriptions != null );
-            Contract.Requires( apiVersion != null );
-
             var parsedRoute = RouteParser.Parse( localPath );
             var parameterDescriptions = CreateParameterDescriptions( actionDescriptor, parsedRoute, route.Defaults );
 
@@ -785,12 +801,12 @@
             var model = actionDescriptor.GetApiVersionModel();
             var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
 
-            foreach ( var method in supportedMethods )
+            for ( var i = 0; i < supportedMethods.Count; i++ )
             {
                 var apiDescription = new VersionedApiDescription()
                 {
                     Documentation = documentation,
-                    HttpMethod = method,
+                    HttpMethod = supportedMethods[i],
                     RelativePath = finalPath,
                     ActionDescriptor = actionDescriptor,
                     Route = route,
@@ -814,8 +830,10 @@
         /// <returns>A new <see cref="ResponseDescription">response description</see>.</returns>
         protected virtual ResponseDescription CreateResponseDescription( HttpActionDescriptor actionDescriptor )
         {
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
-            Contract.Ensures( Contract.Result<ResponseDescription>() != null );
+            if ( actionDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( actionDescriptor ) );
+            }
 
             var responseType = actionDescriptor.GetCustomAttributes<ResponseTypeAttribute>().FirstOrDefault()?.ResponseType;
 
@@ -831,8 +849,6 @@
 
         static bool ShouldEmitPrefixes( ICollection<ApiParameterDescription> parameterDescriptions )
         {
-            Contract.Requires( parameterDescriptions != null );
-
             // Determine if there are two or more complex objects from the Uri so TryExpandUriParameters needs to emit prefixes.
             return parameterDescriptions.Count( parameter =>
                          parameter.Source == FromUri &&
@@ -843,10 +859,6 @@
 
         static Type GetCollectionElementType( Type collectionType )
         {
-            Contract.Requires( collectionType != null );
-            Contract.Assert( !typeof( IDictionary ).IsAssignableFrom( collectionType ) );
-            Contract.Ensures( Contract.Result<Type>() != null );
-
             var elementType = collectionType.GetElementType();
 
             if ( elementType == null )
@@ -859,9 +871,6 @@
 
         static void AddPlaceholderForProperties( Dictionary<string, object> parameterValuesForRoute, IEnumerable<PropertyInfo> properties, string prefix )
         {
-            Contract.Requires( parameterValuesForRoute != null );
-            Contract.Requires( properties != null );
-
             foreach ( var property in properties )
             {
                 var queryParameterName = prefix + property.Name;
@@ -877,8 +886,6 @@
 
         static void AddPlaceholder( IDictionary<string, object> parameterValuesForRoute, string queryParameterName )
         {
-            Contract.Requires( parameterValuesForRoute != null );
-
             if ( !parameterValuesForRoute.ContainsKey( queryParameterName ) )
             {
                 parameterValuesForRoute.Add( queryParameterName, $"{{{queryParameterName}}}" );
@@ -887,11 +894,6 @@
 
         IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IParsedRoute parsedRoute, IDictionary<string, object> routeDefaults )
         {
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( parsedRoute != null );
-            Contract.Requires( routeDefaults != null );
-            Contract.Ensures( Contract.Result<IList<ApiParameterDescription>>() != null );
-
             IList<ApiParameterDescription> parameterDescriptions = new List<ApiParameterDescription>();
             var actionBinding = GetActionBinding( actionDescriptor );
 
@@ -902,9 +904,9 @@
 
                 if ( parameterBindings != null )
                 {
-                    foreach ( var parameter in parameterBindings )
+                    for ( var i = 0; i < parameterBindings.Length; i++ )
                     {
-                        parameterDescriptions.Add( CreateParameterDescriptionFromBinding( parameter ) );
+                        parameterDescriptions.Add( CreateParameterDescriptionFromBinding( parameterBindings[i] ) );
                     }
                 }
             }
@@ -914,9 +916,9 @@
 
                 if ( parameters != null )
                 {
-                    foreach ( var parameter in parameters )
+                    for ( var i = 0; i < parameters.Count; i++ )
                     {
-                        parameterDescriptions.Add( CreateParameterDescription( parameter ) );
+                        parameterDescriptions.Add( CreateParameterDescription( parameters[i] ) );
                     }
                 }
             }
@@ -930,15 +932,16 @@
 
         static void AddUndeclaredRouteParameters( IParsedRoute parsedRoute, IDictionary<string, object> routeDefaults, IList<ApiParameterDescription> parameterDescriptions )
         {
-            Contract.Requires( parsedRoute != null );
-            Contract.Requires( routeDefaults != null );
-            Contract.Requires( parameterDescriptions != null );
-
-            foreach ( var content in parsedRoute.PathSegments.OfType<IPathContentSegment>() )
+            for ( var i = 0; i < parsedRoute.PathSegments.Count; i++ )
             {
-                foreach ( var subSegment in content.Subsegments )
+                if ( !( parsedRoute.PathSegments[i] is IPathContentSegment content ) )
                 {
-                    if ( subSegment is IPathParameterSubsegment parameter )
+                    continue;
+                }
+
+                for ( var j = 0; j < content.Subsegments.Count; j++ )
+                {
+                    if ( content.Subsegments[j] is IPathParameterSubsegment parameter )
                     {
                         var parameterName = parameter.ParameterName;
 
@@ -954,19 +957,28 @@
         }
 
         /// <summary>
-        /// Creates a parameter description from the speicfied descriptor.
+        /// Creates a parameter description from the specified descriptor.
         /// </summary>
         /// <param name="parameterDescriptor">The <see cref="HttpParameterDescriptor">parameter descriptor</see> to create a description from.</param>
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription CreateParameterDescription( HttpParameterDescriptor parameterDescriptor )
         {
-            Arg.NotNull( parameterDescriptor, nameof( parameterDescriptor ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
+            if ( parameterDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( parameterDescriptor ) );
+            }
+
+            var name = parameterDescriptor.Prefix;
+
+            if ( IsNullOrEmpty( name ) )
+            {
+                name = parameterDescriptor.ParameterName;
+            }
 
             return new ApiParameterDescription()
             {
                 ParameterDescriptor = parameterDescriptor,
-                Name = parameterDescriptor.Prefix ?? parameterDescriptor.ParameterName,
+                Name = name,
                 Documentation = DocumentationProvider?.GetDocumentation( parameterDescriptor ),
                 Source = Unknown,
             };
@@ -974,9 +986,6 @@
 
         ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding )
         {
-            Contract.Requires( parameterBinding != null );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var parameterDescription = CreateParameterDescription( parameterBinding.Descriptor );
 
             if ( parameterBinding.WillReadBody )
@@ -993,14 +1002,11 @@
 
         static Collection<VersionedApiDescription> RemoveInvalidApiDescriptions( Collection<VersionedApiDescription> apiDescriptions, ApiVersion apiVersion )
         {
-            Contract.Requires( apiDescriptions != null );
-            Contract.Requires( apiVersion != null );
-            Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
-
             var filteredDescriptions = new Dictionary<string, VersionedApiDescription>( StringComparer.OrdinalIgnoreCase );
 
-            foreach ( var description in apiDescriptions )
+            for ( var i = 0; i < apiDescriptions.Count; i++ )
             {
+                var description = apiDescriptions[i];
                 var apiDescriptionId = description.GetUniqueID();
 
                 if ( filteredDescriptions.ContainsKey( apiDescriptionId ) )
@@ -1021,9 +1027,6 @@
 
         static bool MatchRegexConstraint( IHttpRoute route, string parameterName, string parameterValue )
         {
-            Contract.Requires( route != null );
-            Contract.Requires( !string.IsNullOrEmpty( parameterName ) );
-
             var constraints = route.Constraints;
 
             if ( constraints == null )
@@ -1050,10 +1053,8 @@
             return Regex.IsMatch( parameterValue, $"^({constraintsRule})$", CultureInvariant | IgnoreCase );
         }
 
-        static HttpActionBinding GetActionBinding( HttpActionDescriptor actionDescriptor )
+        static HttpActionBinding? GetActionBinding( HttpActionDescriptor actionDescriptor )
         {
-            Contract.Requires( actionDescriptor != null );
-
             var controllerDescriptor = actionDescriptor.ControllerDescriptor;
 
             if ( controllerDescriptor == null )

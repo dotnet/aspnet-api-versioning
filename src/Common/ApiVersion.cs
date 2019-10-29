@@ -11,8 +11,6 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using static System.DateTime;
     using static System.Globalization.CultureInfo;
@@ -27,7 +25,7 @@ namespace Microsoft.AspNetCore.Mvc
     {
         const string ParsePattern = @"^(\d{4}-\d{2}-\d{2})?\.?(\d{0,9})\.?(\d{0,9})\.?-?(.*)$";
         const string GroupVersionFormat = "yyyy-MM-dd";
-        static Lazy<ApiVersion> defaultVersion = new Lazy<ApiVersion>( () => new ApiVersion( 1, 0 ) );
+        static readonly Lazy<ApiVersion> defaultVersion = new Lazy<ApiVersion>( () => new ApiVersion( 1, 0 ) );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -42,11 +40,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="groupVersion">The group version.</param>
         /// <param name="status">The version status.</param>
         public ApiVersion( DateTime groupVersion, string status )
-            : this( new DateTime?( groupVersion ), null, null, status )
-        {
-            Arg.NotNullOrEmpty( status, nameof( status ) );
-            RequireValidStatus( status );
-        }
+            : this( new DateTime?( groupVersion ), null, null, status ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -54,11 +48,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="majorVersion">The major version.</param>
         /// <param name="minorVersion">The minor version.</param>
         public ApiVersion( int majorVersion, int minorVersion )
-            : this( null, new int?( majorVersion ), new int?( minorVersion ), null )
-        {
-            Arg.InRange( majorVersion, 0, int.MaxValue, nameof( majorVersion ) );
-            Arg.InRange( minorVersion, 0, int.MaxValue, nameof( minorVersion ) );
-        }
+            : this( null, new int?( majorVersion ), new int?( minorVersion ), null ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -66,14 +56,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="majorVersion">The major version.</param>
         /// <param name="minorVersion">The minor version.</param>
         /// <param name="status">The version status.</param>
-        public ApiVersion( int majorVersion, int minorVersion, string status )
-            : this( null, new int?( majorVersion ), new int?( minorVersion ), status )
-        {
-            Arg.InRange( majorVersion, 0, int.MaxValue, nameof( majorVersion ) );
-            Arg.InRange( minorVersion, 0, int.MaxValue, nameof( minorVersion ) );
-            Arg.NotNullOrEmpty( status, nameof( status ) );
-            RequireValidStatus( status );
-        }
+        public ApiVersion( int majorVersion, int minorVersion, string? status )
+            : this( null, new int?( majorVersion ), new int?( minorVersion ), status ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -82,11 +66,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="majorVersion">The major version.</param>
         /// <param name="minorVersion">The minor version.</param>
         public ApiVersion( DateTime groupVersion, int majorVersion, int minorVersion )
-            : this( new DateTime?( groupVersion ), new int?( majorVersion ), new int?( minorVersion ), null )
-        {
-            Arg.InRange( majorVersion, 0, int.MaxValue, nameof( majorVersion ) );
-            Arg.InRange( minorVersion, 0, int.MaxValue, nameof( minorVersion ) );
-        }
+            : this( new DateTime?( groupVersion ), new int?( majorVersion ), new int?( minorVersion ), null ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -95,33 +75,37 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="majorVersion">The major version.</param>
         /// <param name="minorVersion">The minor version.</param>
         /// <param name="status">The version status.</param>
-        public ApiVersion( DateTime groupVersion, int majorVersion, int minorVersion, string status )
-            : this( new DateTime?( groupVersion ), new int?( majorVersion ), new int?( minorVersion ), status )
-        {
-            Arg.InRange( majorVersion, 0, int.MaxValue, nameof( majorVersion ) );
-            Arg.InRange( minorVersion, 0, int.MaxValue, nameof( minorVersion ) );
-            Arg.NotNullOrEmpty( status, nameof( status ) );
-            RequireValidStatus( status );
-        }
+        public ApiVersion( DateTime groupVersion, int majorVersion, int minorVersion, string? status )
+            : this( new DateTime?( groupVersion ), new int?( majorVersion ), new int?( minorVersion ), status ) { }
 
-        internal ApiVersion( DateTime? groupVersion, int? majorVersion, int? minorVersion, string status )
+        internal ApiVersion( DateTime? groupVersion, int? majorVersion, int? minorVersion, string? status )
         {
-            GroupVersion = groupVersion;
-            MajorVersion = majorVersion;
-            MinorVersion = minorVersion;
-            Status = IsNullOrEmpty( status ) ? null : status;
-        }
+            if ( majorVersion.HasValue && majorVersion.Value < 0 )
+            {
+                throw new ArgumentOutOfRangeException( nameof( majorVersion ) );
+            }
 
-        [DebuggerStepThrough]
-        [ContractArgumentValidator]
-        static void RequireValidStatus( string status )
-        {
-            if ( !IsValidStatus( status ) )
+            if ( minorVersion.HasValue && minorVersion.Value < 0 )
+            {
+                throw new ArgumentOutOfRangeException( nameof( minorVersion ) );
+            }
+
+            if ( IsNullOrEmpty( status ) )
+            {
+                Status = null;
+            }
+            else if ( !IsValidStatus( status ) )
             {
                 throw new ArgumentException( SR.ApiVersionBadStatus.FormatDefault( status ), nameof( status ) );
             }
+            else
+            {
+                Status = status;
+            }
 
-            Contract.EndContractBlock();
+            GroupVersion = groupVersion;
+            MajorVersion = majorVersion;
+            MinorVersion = minorVersion;
         }
 
         /// <summary>
@@ -158,16 +142,15 @@ namespace Microsoft.AspNetCore.Mvc
         /// <remarks>The version status typically allows services to indicate pre-release or test
         /// versions that are not release quality or guaranteed to be supported. Example values
         /// might include "Alpha", "Beta", "RC", etc.</remarks>
-        public string Status { get; }
+        public string? Status { get; }
 
         /// <summary>
         /// Gets a value indicating whether the specified status is valid.
         /// </summary>
         /// <param name="status">The status to evaluate.</param>
         /// <returns>True if the status is valid; otherwise, false.</returns>
-        /// <remarks>The status must be alphabetic or alpanumeric, start with a letter, and contain no spaces.</remarks>
-        [Pure]
-        public static bool IsValidStatus( string status ) => IsNullOrEmpty( status ) ? false : IsMatch( status, @"^[a-zA-Z][a-zA-Z0-9]*$", Singleline );
+        /// <remarks>The status must be alphabetic or alphanumeric, start with a letter, and contain no spaces.</remarks>
+        public static bool IsValidStatus( string? status ) => IsNullOrEmpty( status ) ? false : IsMatch( status, @"^[a-zA-Z][a-zA-Z0-9]*$", Singleline );
 
         /// <summary>
         /// Parses the specified text into an API version.
@@ -177,9 +160,6 @@ namespace Microsoft.AspNetCore.Mvc
         /// <exception cref="FormatException">The specified group version or version status is invalid.</exception>
         public static ApiVersion Parse( string text )
         {
-            Arg.NotNullOrEmpty( text, nameof( text ) );
-            Contract.Ensures( Contract.Result<ApiVersion>() != null );
-
             var match = Match( text, ParsePattern, Singleline );
 
             if ( !match.Success )
@@ -242,10 +222,12 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="text">The text to parse.</param>
         /// <param name="version">The parsed <see cref="ApiVersion">API version</see>, if the operation is successful.</param>
         /// <returns>True if the operation succeeded; otherwise false.</returns>
-        public static bool TryParse( string text, out ApiVersion version )
+#if NETAPPCORE3_0
+        public static bool TryParse( string text, [NotNullWhen( true )] out ApiVersion? version )
+#else
+        public static bool TryParse( string? text, out ApiVersion? version )
+#endif
         {
-            Contract.Ensures( ( Contract.Result<bool>() && Contract.ValueAtReturn( out version ) != null ) || ( !Contract.Result<bool>() && Contract.ValueAtReturn( out version ) == null ) );
-
             version = null;
 
             if ( IsNullOrEmpty( text ) )
@@ -328,8 +310,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// Determines whether the current object equals another object.
         /// </summary>
         /// <param name="obj">The <see cref="object">object</see> to evaluate.</param>
-        /// <returns>True if the specified objet is equal to the current instance; otherwise, false.</returns>
-        public override bool Equals( object obj ) => Equals( obj as ApiVersion );
+        /// <returns>True if the specified object is equal to the current instance; otherwise, false.</returns>
+        public override bool Equals( object? obj ) => Equals( obj as ApiVersion );
 
         /// <summary>
         /// Gets a hash code for the current instance.
@@ -373,8 +355,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version1">The <see cref="ApiVersion"/> to compare.</param>
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True if the objects are equal; otherwise, false.</returns>
-        public static bool operator ==( ApiVersion version1, ApiVersion version2 ) =>
-            ReferenceEquals( version1, null ) ? ReferenceEquals( version2, null ) : version1.Equals( version2 );
+        public static bool operator ==( ApiVersion? version1, ApiVersion? version2 ) =>
+            version1 is null ? version2 is null : version1.Equals( version2 );
 
         /// <summary>
         /// Overloads the inequality operator.
@@ -382,8 +364,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version1">The <see cref="ApiVersion"/> to compare.</param>
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True if the objects are not equal; otherwise, false.</returns>
-        public static bool operator !=( ApiVersion version1, ApiVersion version2 ) =>
-             ReferenceEquals( version1, null ) ? !ReferenceEquals( version2, null ) : !version1.Equals( version2 );
+        public static bool operator !=( ApiVersion? version1, ApiVersion? version2 ) =>
+             version1 is null ? version2 is object : !version1.Equals( version2 );
 
         /// <summary>
         /// Overloads the less than operator.
@@ -391,8 +373,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version1">The <see cref="ApiVersion"/> to compare.</param>
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is less than the second object; otherwise, false.</returns>
-        public static bool operator <( ApiVersion version1, ApiVersion version2 ) =>
-            ReferenceEquals( version1, null ) ? !ReferenceEquals( version2, null ) : version1.CompareTo( version2 ) < 0;
+        public static bool operator <( ApiVersion? version1, ApiVersion? version2 ) =>
+            version1 is null ? version2 is object : version1.CompareTo( version2 ) < 0;
 
         /// <summary>
         /// Overloads the less than or equal to operator.
@@ -400,8 +382,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version1">The <see cref="ApiVersion"/> to compare.</param>
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is less than or equal to the second object; otherwise, false.</returns>
-        public static bool operator <=( ApiVersion version1, ApiVersion version2 ) =>
-            ReferenceEquals( version1, null ) ? true : version1.CompareTo( version2 ) <= 0;
+        public static bool operator <=( ApiVersion? version1, ApiVersion? version2 ) =>
+            version1 is null ? true : version1.CompareTo( version2 ) <= 0;
 
         /// <summary>
         /// Overloads the greater than operator.
@@ -409,8 +391,8 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version1">The <see cref="ApiVersion"/> to compare.</param>
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is greater than the second object; otherwise, false.</returns>
-        public static bool operator >( ApiVersion version1, ApiVersion version2 ) =>
-            ReferenceEquals( version1, null ) ? false : version1.CompareTo( version2 ) > 0;
+        public static bool operator >( ApiVersion? version1, ApiVersion? version2 ) =>
+            version1 is null ? false : version1.CompareTo( version2 ) > 0;
 
         /// <summary>
         /// Overloads the greater than or equal to operator.
@@ -418,15 +400,15 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version1">The <see cref="ApiVersion"/> to compare.</param>
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is greater than or equal to the second object; otherwise, false.</returns>
-        public static bool operator >=( ApiVersion version1, ApiVersion version2 ) =>
-            ReferenceEquals( version1, null ) ? ReferenceEquals( version2, null ) : version1.CompareTo( version2 ) >= 0;
+        public static bool operator >=( ApiVersion? version1, ApiVersion? version2 ) =>
+            version1 is null ? version2 is null : version1.CompareTo( version2 ) >= 0;
 
         /// <summary>
         /// Determines whether the current object equals another object.
         /// </summary>
         /// <param name="other">The <see cref="ApiVersion">other</see> to evaluate.</param>
-        /// <returns>True if the specified objet is equal to the current instance; otherwise, false.</returns>
-        public virtual bool Equals( ApiVersion other )
+        /// <returns>True if the specified object is equal to the current instance; otherwise, false.</returns>
+        public virtual bool Equals( ApiVersion? other )
         {
             if ( other == null )
             {
@@ -448,7 +430,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <paramref name="other"/> object, or negative one if the current object is less than the
         /// <paramref name="other"/> object.</returns>
         /// <remarks>The version <see cref="Status">status</see> is not included in comparisons.</remarks>
-        public virtual int CompareTo( ApiVersion other )
+        public virtual int CompareTo( ApiVersion? other )
         {
             if ( other == null )
             {
@@ -512,10 +494,12 @@ namespace Microsoft.AspNetCore.Mvc
         /// This implementation should typically use an <see cref="InvariantCulture">invariant culture</see>.</param>
         /// <returns>The <see cref="string">string</see> representation of the version.</returns>
         /// <exception cref="FormatException">The specified <paramref name="format"/> is not one of the supported format values.</exception>
-        public virtual string ToString( string format, IFormatProvider formatProvider )
+        public virtual string ToString( string? format, IFormatProvider? formatProvider )
         {
             var provider = ApiVersionFormatProvider.GetInstance( formatProvider );
+#pragma warning disable CA1062 // Validate arguments of public methods (false positive)
             return provider.Format( format, this, formatProvider );
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
     }
 }

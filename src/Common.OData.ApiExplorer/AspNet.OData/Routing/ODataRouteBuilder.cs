@@ -9,7 +9,6 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using System.Text;
@@ -64,8 +63,6 @@
 
         void BuildPath( StringBuilder builder )
         {
-            Contract.Requires( builder != null );
-
             var segments = new List<string>();
 
             AppendRoutePrefix( segments );
@@ -76,8 +73,6 @@
 
         void AppendRoutePrefix( IList<string> segments )
         {
-            Contract.Requires( segments != null );
-
             var prefix = Context.Route.RoutePrefix?.Trim( '/' );
 
             if ( IsNullOrEmpty( prefix ) )
@@ -85,14 +80,12 @@
                 return;
             }
 
-            prefix = RemoveRouteConstraints( prefix );
+            prefix = RemoveRouteConstraints( prefix! );
             segments.Add( prefix );
         }
 
         void AppendEntitySetOrOperation( IList<string> segments )
         {
-            Contract.Requires( segments != null );
-
 #if WEBAPI
             var controllerDescriptor = Context.ActionDescriptor.ControllerDescriptor;
 #else
@@ -114,35 +107,35 @@
             }
         }
 
-        void AppendEntitySetOrOperationFromAttributes( IList<string> segments, string prefix )
+        void AppendEntitySetOrOperationFromAttributes( IList<string> segments, string? prefix )
         {
             var template = Context.RouteTemplate;
 
-            if ( Context.IsOperation && Context.RouteTemplateGeneration == Client )
+            if ( Context.IsOperation && Context.RouteTemplateGeneration == Client && !IsNullOrEmpty( template ) )
             {
-                template = FixUpArrayParameters( template, Context.Operation );
+                template = FixUpArrayParameters( template!, Context.Operation! );
             }
 
             if ( IsNullOrEmpty( prefix ) )
             {
                 if ( !IsNullOrEmpty( template ) )
                 {
-                    segments.Add( template );
+                    segments.Add( template! );
                 }
             }
             else
             {
                 if ( IsNullOrEmpty( template ) )
                 {
-                    segments.Add( prefix );
+                    segments.Add( prefix! );
                 }
-                else if ( template[0] == '(' )
+                else if ( template![0] == '(' )
                 {
                     segments.Add( prefix + template );
                 }
                 else
                 {
-                    segments.Add( prefix );
+                    segments.Add( prefix! );
                     segments.Add( template );
                 }
             }
@@ -164,11 +157,11 @@
                     AppendEntityKeysFromConvention( builder );
                     segments.Add( builder.ToString() );
                     builder.Clear();
-                    builder.Append( Context.Options.UseQualifiedNames ? Context.Operation.ShortQualifiedName() : Context.Operation.Name );
-                    AppendParametersFromConvention( builder, Context.Operation );
+                    builder.Append( Context.Options.UseQualifiedNames ? Context.Operation.ShortQualifiedName() : Context.Operation!.Name );
+                    AppendParametersFromConvention( builder, Context.Operation! );
                     break;
                 case UnboundOperation:
-                    builder.Append( Context.Operation.Name );
+                    builder.Append( Context.Operation!.Name );
                     AppendParametersFromConvention( builder, Context.Operation );
                     break;
             }
@@ -181,8 +174,6 @@
 
         void AppendEntityKeysFromConvention( StringBuilder builder )
         {
-            Contract.Requires( builder != null );
-
             // REF: http://odata.github.io/WebApi/#13-06-KeyValueBinding
             var entityKeys = ( Context.EntitySet?.EntityType().Key() ?? Empty<IEdmStructuralProperty>() ).ToArray();
             var parameterKeys = Context.ParameterDescriptions.Where( p => p.Name.StartsWith( Key, OrdinalIgnoreCase ) ).ToArray();
@@ -230,8 +221,6 @@
 
         void AppendNavigationPropertyFromConvention( StringBuilder builder )
         {
-            Contract.Requires( builder != null );
-
             var actionName = Context.ActionDescriptor.ActionName;
             var navigationProperties = new Lazy<IEdmNavigationProperty[]>( Context.EntitySet.EntityType().NavigationProperties().ToArray );
 #if API_EXPLORER
@@ -248,46 +237,42 @@
 
         void AppendParametersFromConvention( StringBuilder builder, IEdmOperation operation )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( operation != null );
-
             if ( !operation.IsFunction() )
             {
                 return;
             }
 
-            using ( var parameters = operation.Parameters.Where( p => p.Name != "bindingParameter" ).GetEnumerator() )
+            using var parameters = operation.Parameters.Where( p => p.Name != "bindingParameter" ).GetEnumerator();
+
+            if ( !parameters.MoveNext() )
             {
-                if ( !parameters.MoveNext() )
-                {
-                    return;
-                }
+                return;
+            }
 
-                var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
-                var parameter = parameters.Current;
-                var name = parameter.Name;
-                var routeParameterName = GetRouteParameterName( actionParameters, name );
+            var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
+            var parameter = parameters.Current;
+            var name = parameter.Name;
+            var routeParameterName = GetRouteParameterName( actionParameters, name );
 
-                builder.Append( '(' );
+            builder.Append( '(' );
+            builder.Append( name );
+            builder.Append( '=' );
+
+            ExpandParameterTemplate( builder, parameter, routeParameterName );
+
+            while ( parameters.MoveNext() )
+            {
+                parameter = parameters.Current;
+                name = parameter.Name;
+                routeParameterName = GetRouteParameterName( actionParameters, name );
+                builder.Append( ',' );
                 builder.Append( name );
                 builder.Append( '=' );
 
                 ExpandParameterTemplate( builder, parameter, routeParameterName );
-
-                while ( parameters.MoveNext() )
-                {
-                    parameter = parameters.Current;
-                    name = parameter.Name;
-                    routeParameterName = GetRouteParameterName( actionParameters, name );
-                    builder.Append( ',' );
-                    builder.Append( name );
-                    builder.Append( '=' );
-
-                    ExpandParameterTemplate( builder, parameter, routeParameterName );
-                }
-
-                builder.Append( ')' );
             }
+
+            builder.Append( ')' );
         }
 
         void ExpandParameterTemplate( StringBuilder template, IEdmOperationParameter parameter, string name ) =>
@@ -295,10 +280,6 @@
 
         void ExpandParameterTemplate( StringBuilder template, IEdmTypeReference typeReference, string name, bool keyAsSegment )
         {
-            Contract.Requires( template != null );
-            Contract.Requires( typeReference != null );
-            Contract.Requires( !IsNullOrEmpty( name ) );
-
             var typeDef = typeReference.Definition;
             var offset = template.Length;
 
@@ -330,7 +311,7 @@
                     template.Append( '\'' );
                     break;
                 default:
-                    var type = typeDef.GetClrType( Context.EdmModel );
+                    var type = typeDef.GetClrType( Context.EdmModel )!;
 
                     if ( quotedTypes.TryGetValue( type, out var prefix ) )
                     {
@@ -346,9 +327,6 @@
 
         string FixUpArrayParameters( string template, IEdmOperation operation )
         {
-            Contract.Requires( !IsNullOrEmpty( template ) );
-            Contract.Requires( operation != null );
-
             if ( !operation.IsFunction() )
             {
                 return template;
@@ -408,38 +386,35 @@
                                              param.Name != "bindingParameter"
                                        select param;
 
-            using ( var parameters = collectionParameters.GetEnumerator() )
-            {
-                if ( !parameters.MoveNext() )
-                {
-                    return template;
-                }
+            using var parameters = collectionParameters.GetEnumerator();
 
-                var buffer = new StringBuilder( template );
-                var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
-                var parameter = parameters.Current;
-                var name = parameter.Name;
-                var routeParameterName = GetRouteParameterName( actionParameters, name );
+            if ( !parameters.MoveNext() )
+            {
+                return template;
+            }
+
+            var buffer = new StringBuilder( template );
+            var actionParameters = Context.ParameterDescriptions.ToDictionary( p => p.Name, StringComparer.OrdinalIgnoreCase );
+            var parameter = parameters.Current;
+            var name = parameter.Name;
+            var routeParameterName = GetRouteParameterName( actionParameters, name );
+
+            InsertBrackets( buffer, routeParameterName );
+
+            while ( parameters.MoveNext() )
+            {
+                parameter = parameters.Current;
+                name = parameter.Name;
+                routeParameterName = GetRouteParameterName( actionParameters, name );
 
                 InsertBrackets( buffer, routeParameterName );
-
-                while ( parameters.MoveNext() )
-                {
-                    parameter = parameters.Current;
-                    name = parameter.Name;
-                    routeParameterName = GetRouteParameterName( actionParameters, name );
-
-                    InsertBrackets( buffer, routeParameterName );
-                }
-
-                return buffer.ToString();
             }
+
+            return buffer.ToString();
         }
 
         void BuildQuery( StringBuilder builder )
         {
-            Contract.Requires( builder != null );
-
             var queryParameters = GetQueryParameters( Context.ParameterDescriptions );
 
             if ( queryParameters.Count == 0 )
@@ -479,9 +454,6 @@
 
         IList<ApiParameterDescription> GetQueryParameters( IList<ApiParameterDescription> parameterDescriptions )
         {
-            Contract.Requires( parameterDescriptions != null );
-            Contract.Ensures( Contract.Result<IList<ApiParameterDescription>>() != null );
-
             var queryParameters = new List<ApiParameterDescription>();
             var keys = ( Context.EntitySet?.EntityType().Key() ?? Empty<IEdmStructuralProperty>() ).ToArray();
             var operation = Context.Operation;
@@ -524,9 +496,6 @@
 
         bool TryAppendNavigationProperty( StringBuilder builder, string name, Lazy<IEdmNavigationProperty[]> navigationProperties )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( navigationProperties != null );
-
             // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/PropertyRoutingConvention.cs
             const string NavigationPropertyPrefix = @"(?:Get|(?:Post|Put|Delete|Patch)To)(\w+)";
             const string NavigationProperty = "^" + NavigationPropertyPrefix + "$";
@@ -656,13 +625,11 @@
 #endif
         }
 
-        static bool IsBuiltInParameter( Type parameterType ) => ODataQueryOptionsType.IsAssignableFrom( parameterType ) || ODataActionParametersType.IsAssignableFrom( parameterType );
+        static bool IsBuiltInParameter( Type parameterType ) =>
+            ODataQueryOptionsType.IsAssignableFrom( parameterType ) || ODataActionParametersType.IsAssignableFrom( parameterType );
 
         static bool IsKey( IReadOnlyList<IEdmStructuralProperty> keys, ApiParameterDescription parameter )
         {
-            Contract.Requires( keys != null );
-            Contract.Requires( parameter != null );
-
             foreach ( var key in keys )
             {
                 if ( key.Name.Equals( parameter.Name, OrdinalIgnoreCase ) )
@@ -674,10 +641,8 @@
             return parameter.Name.StartsWith( Key, OrdinalIgnoreCase );
         }
 
-        static bool IsFunctionParameter( IEdmOperation operation, ApiParameterDescription parameter )
+        static bool IsFunctionParameter( IEdmOperation? operation, ApiParameterDescription parameter )
         {
-            Contract.Requires( parameter != null );
-
             if ( operation == null || !operation.IsFunction() )
             {
                 return false;

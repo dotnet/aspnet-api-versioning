@@ -6,7 +6,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
 #if WEBAPI
@@ -17,11 +16,8 @@
 
     static class EdmExtensions
     {
-        internal static Type GetClrType( this IEdmType edmType, IEdmModel edmModel )
+        internal static Type? GetClrType( this IEdmType edmType, IEdmModel edmModel )
         {
-            Contract.Requires( edmType != null );
-            Contract.Requires(edmModel != null );
-
             if ( !( edmType is IEdmSchemaType schemaType ) )
             {
                 return null;
@@ -37,6 +33,7 @@
 
             var element = (IEdmSchemaType) edmType;
             var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>(element);
+
             if ( annotationValue != null )
             {
                 return annotationValue.ClrType;
@@ -45,7 +42,7 @@
             return null;
         }
 
-        static Type DeriveFromWellKnowPrimitive( string edmFullName )
+        static Type? DeriveFromWellKnowPrimitive( string edmFullName )
         {
             switch ( edmFullName )
             {

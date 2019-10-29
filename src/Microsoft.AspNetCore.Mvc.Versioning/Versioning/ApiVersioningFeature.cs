@@ -11,25 +11,21 @@
     public sealed class ApiVersioningFeature : IApiVersioningFeature
     {
         readonly HttpContext context;
-        string rawApiVersion;
-        ApiVersion apiVersion;
+        string? rawApiVersion;
+        ApiVersion? apiVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningFeature"/> class.
         /// </summary>
         /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
         [CLSCompliant( false )]
-        public ApiVersioningFeature( HttpContext context )
-        {
-            Arg.NotNull( context, nameof( context ) );
-            this.context = context;
-        }
+        public ApiVersioningFeature( HttpContext context ) => this.context = context;
 
         /// <summary>
         /// Gets or sets the raw, unparsed API version for the current request.
         /// </summary>
         /// <value>The unparsed API version value for the current request.</value>
-        public string RawRequestedApiVersion
+        public string? RawRequestedApiVersion
         {
             get
             {
@@ -50,7 +46,7 @@
         /// <value>The current <see cref="ApiVersion">API version</see> for the current request.</value>
         /// <remarks>If an API version was not provided for the current request or the value
         /// provided is invalid, this property will return <c>null</c>.</remarks>
-        public ApiVersion RequestedApiVersion
+        public ApiVersion? RequestedApiVersion
         {
             get
             {

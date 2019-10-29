@@ -3,7 +3,6 @@
     using Microsoft.AspNet.OData.Routing.Conventions;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Provides utility functions to create OData routing conventions with support for API versioning.
@@ -27,15 +26,16 @@
         /// possibly with new or updated <see cref="IODataRoutingConvention">OData routing conventions</see>.</returns>
         public static IList<IODataRoutingConvention> AddOrUpdate( IList<IODataRoutingConvention> routingConventions )
         {
-            Arg.NotNull( routingConventions, nameof( routingConventions ) );
+            if ( routingConventions == null )
+            {
+                throw new ArgumentNullException( nameof( routingConventions ) );
+            }
+
             return EnsureConventions( routingConventions );
         }
 
         static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
         {
-            Contract.Requires( conventions != null );
-            Contract.Ensures( Contract.Result<IList<IODataRoutingConvention>>() != null );
-
             var hasVersionedMetadataConvention = false;
 
             for ( var i = conventions.Count - 1; i >= 0; i-- )

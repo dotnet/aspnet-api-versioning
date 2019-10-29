@@ -25,11 +25,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="DefaultApiVersionSelector"/> class.
         /// </summary>
         /// <param name="options">The <see cref="ApiVersioningOptions">API versioning options</see> associated with the selector.</param>
-        public DefaultApiVersionSelector( ApiVersioningOptions options )
-        {
-            Arg.NotNull( options, nameof( options ) );
-            this.options = options;
-        }
+        public DefaultApiVersionSelector( ApiVersioningOptions options ) => this.options = options;
 
         /// <summary>
         /// Selects an API version given the specified HTTP request and API version information.

@@ -9,24 +9,18 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Routing.RouteDirection;
 
     sealed class UnversionedODataPathRouteConstraint : IRouteConstraint
     {
-        readonly ApiVersion apiVersion;
+        readonly ApiVersion? apiVersion;
         readonly IEnumerable<IRouteConstraint> innerConstraints;
 
-        internal UnversionedODataPathRouteConstraint( IEnumerable<IRouteConstraint> innerConstraints )
-        {
-            Contract.Requires( innerConstraints != null );
+        internal UnversionedODataPathRouteConstraint( IEnumerable<IRouteConstraint> innerConstraints ) =>
             this.innerConstraints = innerConstraints;
-        }
 
         internal UnversionedODataPathRouteConstraint( IRouteConstraint innerConstraint, ApiVersion apiVersion )
         {
-            Contract.Requires( innerConstraint != null );
-
             innerConstraints = new[] { innerConstraint };
             this.apiVersion = apiVersion;
         }

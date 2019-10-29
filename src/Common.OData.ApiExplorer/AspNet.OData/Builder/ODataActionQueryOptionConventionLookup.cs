@@ -3,5 +3,5 @@
     using System;
     using System.Reflection;
 
-    delegate bool ODataActionQueryOptionConventionLookup( MethodInfo action, ODataQueryOptionSettings settings, out IODataQueryOptionsConvention convention );
+    delegate bool ODataActionQueryOptionConventionLookup( MethodInfo action, ODataQueryOptionSettings settings, out IODataQueryOptionsConvention? convention );
 }

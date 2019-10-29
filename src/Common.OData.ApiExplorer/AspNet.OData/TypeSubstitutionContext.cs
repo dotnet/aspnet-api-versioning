@@ -27,9 +27,6 @@
         /// <param name="modelTypeBuilder">The associated <see cref="IModelTypeBuilder">model type builder</see>.</param>
         public TypeSubstitutionContext( IEdmModel model, IModelTypeBuilder modelTypeBuilder )
         {
-            Arg.NotNull( model, nameof( model ) );
-            Arg.NotNull( modelTypeBuilder, nameof( modelTypeBuilder ) );
-
             this.model = new Lazy<IEdmModel>( () => model );
             apiVersion = new Lazy<ApiVersion>( () => Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Default );
             ModelTypeBuilder = modelTypeBuilder;
@@ -43,9 +40,6 @@
         /// <param name="modelTypeBuilder">The associated <see cref="IModelTypeBuilder">model type builder</see>.</param>
         public TypeSubstitutionContext( IServiceProvider serviceProvider, IModelTypeBuilder modelTypeBuilder )
         {
-            Arg.NotNull( serviceProvider, nameof( serviceProvider ) );
-            Arg.NotNull( modelTypeBuilder, nameof( modelTypeBuilder ) );
-
             model = new Lazy<IEdmModel>( serviceProvider.GetRequiredService<IEdmModel> );
             apiVersion = new Lazy<ApiVersion>( () => Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Default );
             ModelTypeBuilder = modelTypeBuilder;

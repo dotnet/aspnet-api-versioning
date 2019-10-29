@@ -34,9 +34,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>This constructor adds the "api-version" query string parameter if no other query parameter names are specified.</remarks>
         public QueryStringApiVersionReader( IEnumerable<string> parameterNames )
         {
-            Arg.NotNull( parameterNames, nameof( parameterNames ) );
-
-            ParameterNames.AddRange( parameterNames );
+            ParameterNames.AddRange( parameterNames ?? throw new ArgumentNullException( nameof( parameterNames ) ) );
 
             if ( ParameterNames.Count == 0 )
             {
@@ -51,8 +49,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>This constructor adds the "api-version" query string parameter if no other query parameter names are specified.</remarks>
         public QueryStringApiVersionReader( params string[] parameterNames )
         {
-            Arg.NotNull( parameterNames, nameof( parameterNames ) );
-
             ParameterNames.AddRange( parameterNames );
 
             if ( ParameterNames.Count == 0 )
@@ -74,7 +70,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
         public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             foreach ( var name in ParameterNames )
             {

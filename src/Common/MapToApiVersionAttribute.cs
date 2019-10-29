@@ -10,7 +10,6 @@ namespace Microsoft.AspNetCore.Mvc
     using Microsoft.AspNetCore.Mvc.Versioning;
 #endif
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using static System.AttributeTargets;
 
     /// <summary>
@@ -20,8 +19,6 @@ namespace Microsoft.AspNetCore.Mvc
     [CLSCompliant( false )]
 #endif
     [AttributeUsage( Method, AllowMultiple = true, Inherited = false )]
-    [SuppressMessage( "Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "An accessor property is provided, but the values are typed; not strings." )]
-    [SuppressMessage( "Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Justification = "Allows extensibility." )]
     public class MapToApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     {
         /// <summary>

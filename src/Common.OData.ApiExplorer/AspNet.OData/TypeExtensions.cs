@@ -10,7 +10,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
@@ -24,7 +23,6 @@
     /// </summary>
     public static partial class TypeExtensions
     {
-        static readonly Type VoidType = typeof( void );
         static readonly Type HttpResponseType = typeof( HttpResponseMessage );
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         static readonly Type ODataValueOfT = typeof( ODataValue<> );
@@ -43,27 +41,32 @@
         /// provided <paramref name="context"/>.</returns>
         public static Type SubstituteIfNecessary( this Type type, TypeSubstitutionContext context )
         {
-            Arg.NotNull( type, nameof( type ) );
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( Contract.Result<Type>() != null );
+            if ( type == null )
+            {
+                throw new ArgumentNullException( nameof( type ) );
+            }
+
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var openTypes = new Stack<Type>();
-            var holder = new Lazy<Tuple<ApiVersion, StructuredTypeResolver>>(
-                () => Tuple.Create( context.ApiVersion, new StructuredTypeResolver( context.Model ) ) );
+            var apiVersion = context.ApiVersion;
+            var resolver = new StructuredTypeResolver( context.Model );
 
             if ( IsSubstitutableGeneric( type, openTypes, out var innerType ) )
             {
-                var (apiVersion, resolver) = holder.Value;
-                var structuredType = resolver.GetStructuredType( innerType );
+                var structuredType = resolver.GetStructuredType( innerType! );
 
                 if ( structuredType == null )
                 {
                     return type;
                 }
 
-                var newType = context.ModelTypeBuilder.NewStructuredType( structuredType, innerType, apiVersion, context.Model );
+                var newType = context.ModelTypeBuilder.NewStructuredType( structuredType, innerType!, apiVersion, context.Model );
 
-                if ( innerType.Equals( newType ) )
+                if ( innerType!.Equals( newType ) )
                 {
                     return type.ShouldExtractInnerType() ? innerType : type;
                 }
@@ -73,7 +76,6 @@
 
             if ( CanBeSubstituted( type ) )
             {
-                var (apiVersion, resolver) = holder.Value;
                 var structuredType = resolver.GetStructuredType( type );
 
                 if ( structuredType != null )
@@ -87,9 +89,6 @@
 
         internal static IEnumerable<CustomAttributeBuilder> DeclaredAttributes( this MemberInfo member )
         {
-            Contract.Requires( member != null );
-            Contract.Ensures( Contract.Result<IEnumerable<CustomAttributeBuilder>>() != null );
-
             foreach ( var attribute in member.CustomAttributes )
             {
                 var ctor = attribute.Constructor;
@@ -133,17 +132,12 @@
 
         internal static void Deconstruct<T1, T2>( this Tuple<T1, T2> tuple, out T1 item1, out T2 item2 )
         {
-            Contract.Requires( tuple != null );
-
             item1 = tuple.Item1;
             item2 = tuple.Item2;
         }
 
         internal static Type ExtractInnerType( this Type type )
         {
-            Contract.Requires( type != null );
-            Contract.Ensures( Contract.Result<Type>() != null );
-
             if ( !type.IsGenericType )
             {
                 return type;
@@ -171,11 +165,8 @@
             return type;
         }
 
-        static bool IsSubstitutableGeneric( Type type, Stack<Type> openTypes, out Type innerType )
+        static bool IsSubstitutableGeneric( Type type, Stack<Type> openTypes, out Type? innerType )
         {
-            Contract.Requires( type != null );
-            Contract.Requires( openTypes != null );
-
             innerType = default;
 
             if ( !type.IsGenericType )
@@ -223,7 +214,7 @@
             while ( innerType.IsEnumerable( out var nextType ) )
             {
                 openTypes.Push( IEnumerableOfT );
-                innerType = nextType;
+                innerType = nextType!;
             }
 
             return true;
@@ -231,10 +222,6 @@
 
         static Type CloseGeneric( Stack<Type> openTypes, Type innerType )
         {
-            Contract.Requires( openTypes != null );
-            Contract.Requires( openTypes.Count > 0 );
-            Contract.Requires( innerType != null );
-
             var type = openTypes.Pop();
 
             if ( type.ShouldExtractInnerType() )
@@ -254,20 +241,15 @@
 
         static bool CanBeSubstituted( Type type )
         {
-            Contract.Requires( type != null );
-
             return Type.GetTypeCode( type ) == TypeCode.Object &&
                   !type.IsValueType &&
-                  !type.Equals( VoidType ) &&
                   !type.Equals( ActionResultType ) &&
                   !type.Equals( HttpResponseType ) &&
                   !type.IsODataActionParameters();
         }
 
-        internal static bool IsEnumerable( this Type type, out Type itemType )
+        internal static bool IsEnumerable( this Type type, out Type? itemType )
         {
-            Contract.Requires( type != null );
-
             itemType = default;
 
             if ( !type.IsGenericType )

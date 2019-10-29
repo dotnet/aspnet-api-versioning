@@ -18,9 +18,12 @@
         /// <remarks>This method will return <c>null</c> no service API version was requested or the requested
         /// service API version is in an invalid format.</remarks>
         /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
-        public static ApiVersion GetRequestedApiVersion( this HttpContext context )
+        public static ApiVersion? GetRequestedApiVersion( this HttpContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var feature = context.Features.Get<IApiVersioningFeature>();
             return feature?.RequestedApiVersion;

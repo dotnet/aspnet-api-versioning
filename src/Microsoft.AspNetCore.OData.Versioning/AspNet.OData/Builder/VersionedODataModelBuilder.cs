@@ -8,7 +8,6 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static System.Linq.Enumerable;
 
     /// <content>
@@ -39,9 +38,10 @@
             IOptions<ApiVersioningOptions> options,
             IEnumerable<IModelConfiguration> modelConfigurations )
         {
-            Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( modelConfigurations, nameof( modelConfigurations ) );
+            if ( modelConfigurations == null )
+            {
+                throw new ArgumentNullException( nameof( modelConfigurations ) );
+            }
 
             ActionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
             this.options = options;
@@ -71,8 +71,6 @@
         /// for all known OData routes.</returns>
         protected virtual IReadOnlyList<ApiVersion> GetApiVersions()
         {
-            Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersion>>() != null );
-
             var items = ActionDescriptorCollectionProvider.ActionDescriptors.Items;
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();

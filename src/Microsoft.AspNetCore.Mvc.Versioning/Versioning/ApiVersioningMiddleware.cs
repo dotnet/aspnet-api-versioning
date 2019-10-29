@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Versioning
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Microsoft.AspNetCore.Http;
     using System.Threading.Tasks;

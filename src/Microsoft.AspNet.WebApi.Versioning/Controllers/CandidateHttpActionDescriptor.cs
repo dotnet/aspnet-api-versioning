@@ -4,7 +4,6 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.Contracts;
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
@@ -20,9 +19,6 @@
         {
             internal CandidateHttpActionDescriptor( CandidateActionWithParams action )
             {
-                Contract.Requires( action != null );
-                Contract.Assume( action.ActionDescriptor != null );
-
                 CandidateAction = action;
                 Configuration = action.ActionDescriptor.Configuration;
                 ControllerDescriptor = action.ActionDescriptor.ControllerDescriptor;

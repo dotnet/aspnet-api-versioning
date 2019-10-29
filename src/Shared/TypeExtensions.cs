@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Text;
 
     // REF: https://raw.githubusercontent.com/aspnet/Common/dev/shared/Microsoft.Extensions.TypeNameHelper.Sources/TypeNameHelper.cs
@@ -37,8 +36,6 @@
         /// <returns>The pretty printed type name.</returns>
         internal static string GetTypeDisplayName( this Type type, bool fullName = true, bool includeGenericParameterNames = false )
         {
-            Contract.Requires( type != null );
-
             var builder = new StringBuilder();
             ProcessType( builder, type, new DisplayNameOptions( fullName, includeGenericParameterNames ) );
             return builder.ToString();
@@ -46,9 +43,6 @@
 
         static void ProcessType( StringBuilder builder, Type type, DisplayNameOptions options )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( type != null );
-
             if ( type.IsGenericType )
             {
                 var genericArguments = type.GetGenericArguments();
@@ -77,14 +71,11 @@
 
         static void ProcessArrayType( StringBuilder builder, Type type, DisplayNameOptions options )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( type != null );
-
             var innerType = type;
 
             while ( innerType.IsArray )
             {
-                innerType = innerType.GetElementType();
+                innerType = innerType.GetElementType()!;
             }
 
             ProcessType( builder, innerType, options );
@@ -94,29 +85,24 @@
                 builder.Append( '[' );
                 builder.Append( ',', type.GetArrayRank() - 1 );
                 builder.Append( ']' );
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
         }
 
         static void ProcessGenericType( StringBuilder builder, Type type, Type[] genericArguments, int length, DisplayNameOptions options )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( type != null );
-            Contract.Requires( genericArguments != null );
-            Contract.Requires( length > 0 );
-
             var offset = 0;
 
             if ( type.IsNested )
             {
-                offset = type.DeclaringType.GetGenericArguments().Length;
+                offset = type.DeclaringType!.GetGenericArguments().Length;
             }
 
             if ( options.FullName )
             {
                 if ( type.IsNested )
                 {
-                    ProcessGenericType( builder, type.DeclaringType, genericArguments, offset, options );
+                    ProcessGenericType( builder, type.DeclaringType!, genericArguments, offset, options );
                     builder.Append( '+' );
                 }
                 else if ( !string.IsNullOrEmpty( type.Namespace ) )
@@ -161,7 +147,7 @@
             builder.Append( '>' );
         }
 
-        struct DisplayNameOptions
+        readonly struct DisplayNameOptions
         {
             internal DisplayNameOptions( bool fullName, bool includeGenericParameterNames )
             {

@@ -4,6 +4,7 @@
  <PropertyGroup>
   <LangVersion>latest</LangVersion>
   <IsTestProject>false</IsTestProject>
+  <IsPackable>false</IsPackable>
  </PropertyGroup>
 
 </Project>

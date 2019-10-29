@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using System.Web.Http;
@@ -15,17 +14,12 @@
 
         internal HttpControllerTypeCache( HttpConfiguration configuration )
         {
-            Contract.Requires( configuration != null );
-
             this.configuration = configuration;
             cache = new Lazy<Dictionary<string, ILookup<string, Type>>>( InitializeCache );
         }
 
         static string GetControllerName( Type type )
         {
-            Contract.Requires( type != null );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
-
             // allow authors to specify a controller name via an attribute. this is required for controllers that
             // do not use attribute-based routing, but support versioning. in the pure Convention-Over-Configuration
             // model, this is not otherwise possible because each controller type maps to a different route
@@ -73,8 +67,6 @@
 
         Dictionary<string, ILookup<string, Type>> InitializeCache()
         {
-            Contract.Ensures( Contract.Result<Dictionary<string, ILookup<string, Type>>>() != null );
-
             var services = configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
@@ -87,14 +79,16 @@
 
         internal Dictionary<string, ILookup<string, Type>> Cache => cache.Value;
 
-        internal ICollection<Type> GetControllerTypes( string controllerName )
+        internal ICollection<Type> GetControllerTypes( string? controllerName )
         {
-            Contract.Requires( !string.IsNullOrEmpty( controllerName ) );
-            Contract.Ensures( Contract.Result<ICollection<Type>>() != null );
+            if ( string.IsNullOrEmpty( controllerName ) )
+            {
+                return Type.EmptyTypes;
+            }
 
             var set = new HashSet<Type>();
 
-            if ( cache.Value.TryGetValue( controllerName, out var lookup ) )
+            if ( cache.Value.TryGetValue( controllerName!, out var lookup ) )
             {
                 foreach ( var grouping in lookup )
                 {

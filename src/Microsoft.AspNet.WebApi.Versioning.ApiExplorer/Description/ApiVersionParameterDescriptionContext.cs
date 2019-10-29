@@ -4,7 +4,6 @@
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http.Formatting;
     using System.Net.Http.Headers;
@@ -34,9 +33,10 @@
             ApiVersion apiVersion,
             ApiExplorerOptions options )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( options, nameof( options ) );
+            if ( options == null )
+            {
+                throw new ArgumentNullException( nameof( options ) );
+            }
 
             ApiDescription = apiDescription;
             ApiVersion = apiVersion;
@@ -88,7 +88,7 @@
         /// <param name="location">One of the <see cref="ApiVersionParameterLocation"/> values.</param>
         public virtual void AddParameter( string name, ApiVersionParameterLocation location )
         {
-            var add = default( Action<string> );
+            Action<string> add;
 
             switch ( location )
             {
@@ -120,8 +120,6 @@
         /// <param name="name">The name of the query string parameter.</param>
         protected virtual void AddQueryString( string name )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-
             if ( !HasPathParameter )
             {
                 ApiDescription.ParameterDescriptions.Add( NewApiVersionParameter( name, FromUri ) );
@@ -134,8 +132,6 @@
         /// <param name="name">The name of the header.</param>
         protected virtual void AddHeader( string name )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-
             if ( !HasPathParameter )
             {
                 ApiDescription.ParameterDescriptions.Add( NewApiVersionParameter( name, Unknown ) );
@@ -182,8 +178,6 @@
         /// <param name="name">The name of the media type parameter.</param>
         protected virtual void AddMediaTypeParameter( string name )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-
             var parameter = new NameValueHeaderValue( name, ApiVersion.ToString() );
 
             CloneFormattersAndAddMediaTypeParameter( parameter, ApiDescription.SupportedRequestBodyFormatters );
@@ -196,9 +190,6 @@
 
         ApiParameterDescription NewApiVersionParameter( string name, ApiParameterSource source, bool allowOptional )
         {
-            Contract.Requires( !string.IsNullOrEmpty( name ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var action = ApiDescription.ActionDescriptor;
             var parameter = new ApiParameterDescription()
             {
@@ -240,9 +231,6 @@
 
         static void CloneFormattersAndAddMediaTypeParameter( NameValueHeaderValue parameter, ICollection<MediaTypeFormatter> formatters )
         {
-            Contract.Requires( parameter != null );
-            Contract.Requires( formatters != null );
-
             var originalFormatters = formatters.ToArray();
 
             formatters.Clear();

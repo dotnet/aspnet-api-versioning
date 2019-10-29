@@ -13,7 +13,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 #if WEBAPI
     using System.Net.Http.Headers;
@@ -27,41 +26,23 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </summary>
     public partial class MediaTypeApiVersionReader : IApiVersionReader
     {
-        string parameterName;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaTypeApiVersionReader"/> class.
         /// </summary>
-        public MediaTypeApiVersionReader() => parameterName = "v";
+        public MediaTypeApiVersionReader() => ParameterName = "v";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaTypeApiVersionReader"/> class.
         /// </summary>
         /// <param name="parameterName">The name of the query string parameter to read the service API version from.</param>
-        public MediaTypeApiVersionReader( string parameterName )
-        {
-            Arg.NotNullOrEmpty( parameterName, nameof( parameterName ) );
-            this.parameterName = parameterName;
-        }
+        public MediaTypeApiVersionReader( string parameterName ) => ParameterName = parameterName;
 
         /// <summary>
         /// Gets or sets the name of the media type parameter to read the service API version from.
         /// </summary>
         /// <value>The name of the media type parameter to read the service API version from.
         /// The default value is "v".</value>
-        public string ParameterName
-        {
-            get
-            {
-                Contract.Ensures( !string.IsNullOrEmpty( parameterName ) );
-                return parameterName;
-            }
-            set
-            {
-                Arg.NotNullOrEmpty( value, nameof( value ) );
-                parameterName = value;
-            }
-        }
+        public string ParameterName { get; set; }
 
         /// <summary>
         /// Reads the requested API version from the HTTP Accept header.
@@ -71,10 +52,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <returns>The API version read or <c>null</c>.</returns>
         /// <remarks>The default implementation will return the first defined API version ranked by the media type
         /// quality parameter.</remarks>
-        protected virtual string ReadAcceptHeader( IEnumerable<MediaTypeWithQualityHeaderValue> accept )
+        protected virtual string? ReadAcceptHeader( IEnumerable<MediaTypeWithQualityHeaderValue> accept )
         {
-            Arg.NotNull( accept, nameof( accept ) );
-
             var comparer = StringComparer.OrdinalIgnoreCase;
             var contentTypes = from entry in accept
                                orderby entry.Quality descending
@@ -109,9 +88,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// </summary>
         /// <param name="contentType">The Content-Type <see cref="MediaTypeHeaderValue">header</see> to read from.</param>
         /// <returns>The API version read or <c>null</c>.</returns>
-        protected virtual string ReadContentTypeHeader( MediaTypeHeaderValue contentType )
+        protected virtual string? ReadContentTypeHeader( MediaTypeHeaderValue contentType )
         {
-            Arg.NotNull( contentType, nameof( contentType ) );
+            if ( contentType == null )
+            {
+                throw new ArgumentNullException( nameof( contentType ) );
+            }
 
             var comparer = StringComparer.OrdinalIgnoreCase;
 
@@ -139,7 +121,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
         public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             context.AddParameter( ParameterName, MediaTypeParameter );
         }
     }

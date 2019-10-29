@@ -13,7 +13,6 @@
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static Microsoft.OData.ServiceLifetime;
     using static System.Reflection.BindingFlags;
@@ -66,13 +65,18 @@
             string routeName,
             string routePrefix,
             IEnumerable<IEdmModel> models,
-            Action<IContainerBuilder> configureAction,
-            Action<ODataConventionConfigurationContext> configureRoutingConventions )
+            Action<IContainerBuilder>? configureAction,
+            Action<ODataConventionConfigurationContext>? configureRoutingConventions )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
-            Arg.NotNull( models, nameof( models ) );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
+
+            if ( models == null )
+            {
+                throw new ArgumentNullException( nameof( models ) );
+            }
 
             IEnumerable<IODataRoutingConvention> ConfigureRoutingConventions( IEdmModel model, string versionedRouteName, ApiVersion apiVersion )
             {
@@ -99,7 +103,8 @@
             foreach ( var model in models )
             {
                 var versionedRouteName = routeName;
-                var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+                var annotation = model.GetAnnotationValue<ApiVersionAnnotation>( model ) ?? throw new ArgumentException( LocalSR.MissingAnnotation.FormatDefault( typeof( ApiVersionAnnotation ).Name ) );
+                var apiVersion = annotation.ApiVersion;
                 var routeConstraint = MakeVersionedODataRouteConstraint( apiVersion, ref versionedRouteName );
                 var preConfigureAction = builder.ConfigureDefaultServices(
                     container =>
@@ -160,7 +165,7 @@
             string routeName,
             string routePrefix,
             IEnumerable<IEdmModel> models,
-            Func<ODataBatchHandler> newBatchHandler ) =>
+            Func<ODataBatchHandler>? newBatchHandler ) =>
             MapVersionedODataRoutes( builder, routeName, routePrefix, models, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), newBatchHandler );
 
         /// <summary>
@@ -208,12 +213,17 @@
             IEnumerable<IEdmModel> models,
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions,
-            Func<ODataBatchHandler> newBatchHandler )
+            Func<ODataBatchHandler>? newBatchHandler )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
-            Arg.NotNull( models, nameof( models ) );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ODataRoute>>() != null );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
+
+            if ( models == null )
+            {
+                throw new ArgumentNullException( nameof( models ) );
+            }
 
             var serviceProvider = builder.ServiceProvider;
             var options = serviceProvider.GetRequiredService<ODataOptions>();
@@ -233,7 +243,8 @@
             foreach ( var model in models )
             {
                 var versionedRouteName = routeName;
-                var apiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+                var annotation = model.GetAnnotationValue<ApiVersionAnnotation>( model ) ?? throw new ArgumentException( LocalSR.MissingAnnotation.FormatDefault( typeof( ApiVersionAnnotation ).Name ) );
+                var apiVersion = annotation.ApiVersion;
                 var routeConstraint = MakeVersionedODataRouteConstraint( apiVersion, ref versionedRouteName );
 
                 IEnumerable<IODataRoutingConvention> NewRouteConventions( IServiceProvider services )
@@ -282,7 +293,7 @@
             string routeName,
             string routePrefix,
             ApiVersion apiVersion,
-            Action<IContainerBuilder> configureAction ) =>
+            Action<IContainerBuilder>? configureAction ) =>
             MapVersionedODataRoute( builder, routeName, routePrefix, apiVersion, configureAction, default );
 
         /// <summary>
@@ -300,13 +311,13 @@
             string routeName,
             string routePrefix,
             ApiVersion apiVersion,
-            Action<IContainerBuilder> configureAction,
-            Action<ODataConventionConfigurationContext> configureRoutingConventions )
+            Action<IContainerBuilder>? configureAction,
+            Action<ODataConventionConfigurationContext>? configureRoutingConventions )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ODataRoute>() != null );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             IEnumerable<IODataRoutingConvention> NewRoutingConventions( IServiceProvider serviceProvider )
             {
@@ -379,7 +390,7 @@
             string routePrefix,
             IEdmModel model,
             ApiVersion apiVersion,
-            ODataBatchHandler batchHandler ) =>
+            ODataBatchHandler? batchHandler ) =>
             MapVersionedODataRoute( builder, routeName, routePrefix, model, apiVersion, new DefaultODataPathHandler(), VersionedODataRoutingConventions.CreateDefault(), batchHandler );
 
         /// <summary>
@@ -429,13 +440,12 @@
             ApiVersion apiVersion,
             IODataPathHandler pathHandler,
             IEnumerable<IODataRoutingConvention> routingConventions,
-            ODataBatchHandler batchHandler )
+            ODataBatchHandler? batchHandler )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
-            Arg.NotNull( model, nameof( model ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ODataRoute>() != null );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             IEnumerable<IODataRoutingConvention> NewRoutingConventions( IServiceProvider serviceProvider )
             {
@@ -485,24 +495,18 @@
 
         static void EnsureMetadataController( this IRouteBuilder builder )
         {
-            Contract.Requires( builder != null );
             var applicationPartManager = builder.ServiceProvider.GetRequiredService<ApplicationPartManager>();
             applicationPartManager.ApplicationParts.Add( new AssemblyPart( typeof( VersionedMetadataController ).Assembly ) );
         }
 
         static void ConfigurePathHandler( this IRouteBuilder builder, IServiceProvider rootContainer )
         {
-            Contract.Requires( rootContainer != null );
-
             var options = builder.ServiceProvider.GetRequiredService<ODataOptions>();
             rootContainer.ConfigurePathHandler( options );
         }
 
         static void ConfigurePathHandler( this IServiceProvider rootContainer, ODataOptions options )
         {
-            Contract.Requires( rootContainer != null );
-            Contract.Requires( options != null );
-
             var pathHandler = rootContainer.GetRequiredService<IODataPathHandler>();
 
             if ( pathHandler != null && pathHandler.UrlKeyDelimiter == null )
@@ -513,24 +517,16 @@
 
         static void ConfigureBatchHandler( this IRouteBuilder builder, IServiceProvider rootContainer, ODataRoute route )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( rootContainer != null );
-            Contract.Requires( route != null );
-
             if ( rootContainer.GetService<ODataBatchHandler>() is ODataBatchHandler batchHandler )
             {
                 batchHandler.Configure( builder, route );
             }
         }
 
-        static void ConfigureBatchHandler( this IRouteBuilder builder, ODataBatchHandler batchHandler, ODataRoute route ) => batchHandler?.Configure( builder, route );
+        static void ConfigureBatchHandler( this IRouteBuilder builder, ODataBatchHandler? batchHandler, ODataRoute route ) => batchHandler?.Configure( builder, route );
 
         static void Configure( this ODataBatchHandler batchHandler, IRouteBuilder builder, ODataRoute route )
         {
-            Contract.Requires( batchHandler != null );
-            Contract.Requires( builder != null );
-            Contract.Requires( route != null );
-
             batchHandler.ODataRoute = route;
             batchHandler.ODataRouteName = route.Name;
 
@@ -553,11 +549,6 @@
             IEnumerable<IRouteConstraint> unversionedConstraints,
             IInlineConstraintResolver inlineConstraintResolver )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( !IsNullOrEmpty( routeName ) );
-            Contract.Requires( unversionedConstraints != null );
-            Contract.Requires( inlineConstraintResolver != null );
-
             routeName += UnversionedRouteSuffix;
 
             var constraint = new UnversionedODataPathRouteConstraint( unversionedConstraints );
@@ -573,11 +564,6 @@
             ApiVersion apiVersion,
             IInlineConstraintResolver inlineConstraintResolver )
         {
-            Contract.Requires( builder != null );
-            Contract.Requires( !IsNullOrEmpty( routeName ) );
-            Contract.Requires( apiVersion != null );
-            Contract.Requires( inlineConstraintResolver != null );
-
             routeName += UnversionedRouteSuffix;
 
             var innerConstraint = new ODataPathRouteConstraint( routeName );
@@ -589,9 +575,6 @@
 
         static IRouteConstraint MakeVersionedODataRouteConstraint( ApiVersion apiVersion, ref string versionedRouteName )
         {
-            Contract.Requires( !IsNullOrEmpty( versionedRouteName ) );
-            Contract.Ensures( Contract.Result<IRouteConstraint>() != null );
-
             if ( apiVersion == null )
             {
                 return new ODataPathRouteConstraint( versionedRouteName );

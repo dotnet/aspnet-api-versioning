@@ -13,11 +13,7 @@
         /// Initializes a new instance of the <see cref="OriginalTypeAttribute"/> class.
         /// </summary>
         /// <param name="type">The original type.</param>
-        public OriginalTypeAttribute( Type type )
-        {
-            Arg.NotNull( type, nameof( type ) );
-            Type = type;
-        }
+        public OriginalTypeAttribute( Type type ) => Type = type;
 
         /// <summary>
         /// Gets the original type.

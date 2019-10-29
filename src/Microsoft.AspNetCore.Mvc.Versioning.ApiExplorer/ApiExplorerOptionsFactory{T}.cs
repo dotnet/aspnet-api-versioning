@@ -28,10 +28,6 @@
             IEnumerable<IConfigureOptions<T>> setups,
             IEnumerable<IPostConfigureOptions<T>> postConfigures )
         {
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( setups, nameof( setups ) );
-            Arg.NotNull( postConfigures, nameof( postConfigures ) );
-
             optionsHolder = options;
             Setups = setups;
             PostConfigures = postConfigures;

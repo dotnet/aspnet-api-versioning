@@ -23,6 +23,6 @@
         /// Gets or sets the corresponding OData template.
         /// </summary>
         /// <value>The <see cref="ODataPathTemplate">OData path template</see> for the action.</value>
-        public ODataPathTemplate ODataTemplate { get; set; }
+        public ODataPathTemplate? ODataTemplate { get; set; }
     }
 }

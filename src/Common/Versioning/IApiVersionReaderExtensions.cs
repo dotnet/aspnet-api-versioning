@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             readonly StringComparer comparer = StringComparer.OrdinalIgnoreCase;
             readonly List<string> parameterNames = new List<string>();
 
-            internal string ParameterName => parameterNames.Count == 0 ? default : parameterNames[0];
+            internal string ParameterName => parameterNames.Count == 0 ? string.Empty : parameterNames[0];
 
             internal IReadOnlyList<string> ParameterNames => parameterNames;
 

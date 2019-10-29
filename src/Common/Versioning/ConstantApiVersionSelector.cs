@@ -25,11 +25,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ConstantApiVersionSelector"/> class.
         /// </summary>
         /// <param name="version">The constant <see cref="ApiVersion">API version</see> the selector returns.</param>
-        public ConstantApiVersionSelector( ApiVersion version )
-        {
-            Arg.NotNull( version, nameof( version ) );
-            this.version = version;
-        }
+        public ConstantApiVersionSelector( ApiVersion version ) => this.version = version;
 
         /// <summary>
         /// Selects an API version given the specified HTTP request and API version information.

@@ -1,11 +1,12 @@
-﻿#if WEBAPI
+﻿#pragma warning disable CA1812
+
+#if WEBAPI
 namespace Microsoft.Web.Http.Versioning
 #else
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
     using System;
-    using System.Diagnostics.Contracts;
     using static System.String;
 
     sealed class ApiVersionModelDebugView
@@ -13,11 +14,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         const string Comma = ", ";
         readonly ApiVersionModel model;
 
-        public ApiVersionModelDebugView( ApiVersionModel model )
-        {
-            Contract.Requires( model != null );
-            this.model = model;
-        }
+        public ApiVersionModelDebugView( ApiVersionModel model ) => this.model = model;
 
         public bool VersionNeutral => model.IsApiVersionNeutral;
 

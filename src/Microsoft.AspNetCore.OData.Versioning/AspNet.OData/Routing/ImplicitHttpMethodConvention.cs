@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Internal;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static System.StringComparison;
 
@@ -24,9 +23,6 @@
 
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( action != null );
-
             var odataActionWithExplicitHttpMethods =
                 action.ActionConstraints != null &&
                 action.ActionConstraints.OfType<HttpMethodActionConstraint>().Any();
@@ -45,9 +41,6 @@
 
         static string GetImplicitHttpMethod( ControllerActionDescriptor action )
         {
-            Contract.Requires( action != null );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
-
             const int Post = 2;
 
             foreach ( var supportedHttpMethod in SupportedHttpMethodConventions )

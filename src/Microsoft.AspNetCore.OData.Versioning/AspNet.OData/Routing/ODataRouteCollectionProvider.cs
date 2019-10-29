@@ -4,7 +4,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Represents an object that manages the collection of registered OData routes.
@@ -23,11 +22,7 @@
         public IODataRouteCollection Items => items;
 
         /// <inheritdoc />
-        public void Add( ODataRouteMapping item )
-        {
-            Arg.NotNull( item, nameof( item ) );
-            items.Add( item );
-        }
+        public void Add( ODataRouteMapping item ) => items.Add( item ?? throw new ArgumentNullException( nameof( item ) ) );
 
         sealed class ODataRouteCollection : IODataRouteCollection
         {
@@ -50,7 +45,7 @@
 
             public int IndexOf( ODataRouteMapping item ) => items.IndexOf( item );
 
-            public bool TryGetValue( ApiVersion key, out IReadOnlyList<ODataRouteMapping> value )
+            public bool TryGetValue( ApiVersion key, out IReadOnlyList<ODataRouteMapping>? value )
             {
                 if ( dictionary.TryGetValue( key, out var list ) )
                 {
@@ -66,8 +61,6 @@
 
             internal void Add( ODataRouteMapping item )
             {
-                Contract.Requires( item != null );
-
                 var key = item.ApiVersion;
 
                 if ( dictionary.TryGetValue( key, out var list ) )

@@ -6,7 +6,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
 #if WEBAPI
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
@@ -20,21 +19,11 @@
     /// </summary>
     public partial class ODataQueryOptionsConventionBuilder
     {
-        IODataQueryOptionDescriptionProvider descriptionProvider = new DefaultODataQueryOptionDescriptionProvider();
-
         /// <summary>
         /// Gets or sets the provider used to describe query options.
         /// </summary>
         /// <value>The <see cref="IODataQueryOptionDescriptionProvider">provider</see> used to describe OData query options.</value>
-        public IODataQueryOptionDescriptionProvider DescriptionProvider
-        {
-            get => descriptionProvider;
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                descriptionProvider = value;
-            }
-        }
+        public IODataQueryOptionDescriptionProvider DescriptionProvider { get; set; } = new DefaultODataQueryOptionDescriptionProvider();
 
         /// <summary>
         /// Gets the count of configured conventions.
@@ -60,12 +49,13 @@
         /// <typeparam name="TController">The <see cref="Type">type</see> of controller to build conventions for.</typeparam>
         /// <returns>A new or existing <see cref="ODataControllerQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataControllerQueryOptionsConventionBuilder<TController> Controller<TController>()
+            where TController : notnull
 #if WEBAPI
-            where TController : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+       , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
         {
-            Contract.Ensures( Contract.Result<ODataControllerQueryOptionsConventionBuilder<TController>>() != null );
-
             var key = GetKey( typeof( TController ) );
 
             if ( !ConventionBuilders.TryGetValue( key, out var builder ) )
@@ -90,8 +80,10 @@
         /// <returns>A new or existing <see cref="ODataControllerQueryOptionsConventionBuilder"/>.</returns>
         public virtual ODataControllerQueryOptionsConventionBuilder Controller( Type controllerType )
         {
-            Arg.NotNull( controllerType, nameof( controllerType ) );
-            Contract.Ensures( Contract.Result<ODataControllerQueryOptionsConventionBuilder>() != null );
+            if ( controllerType == null )
+            {
+                throw new ArgumentNullException( nameof( controllerType ) );
+            }
 
             var key = GetKey( controllerType );
 
@@ -114,11 +106,7 @@
         /// Adds a new OData query option convention.
         /// </summary>
         /// <param name="convention">The <see cref="IODataQueryOptionsConvention">convention</see> to be applied.</param>
-        public virtual void Add( IODataQueryOptionsConvention convention )
-        {
-            Arg.NotNull( convention, nameof( convention ) );
-            Conventions.Add( convention );
-        }
+        public virtual void Add( IODataQueryOptionsConvention convention ) => Conventions.Add( convention );
 
         /// <summary>
         /// Applies the defined OData query option conventions to the specified API description.
@@ -128,8 +116,10 @@
         /// <param name="queryOptionSettings">The <see cref="ODataQueryOptionSettings">settings</see> used to apply OData query option conventions.</param>
         public virtual void ApplyTo( IEnumerable<ApiDescription> apiDescriptions, ODataQueryOptionSettings queryOptionSettings )
         {
-            Arg.NotNull( apiDescriptions, nameof( apiDescriptions ) );
-            Arg.NotNull( queryOptionSettings, nameof( queryOptionSettings ) );
+            if ( apiDescriptions == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescriptions ) );
+            }
 
             var conventions = new Dictionary<TypeInfo, IODataQueryOptionsConvention>();
 

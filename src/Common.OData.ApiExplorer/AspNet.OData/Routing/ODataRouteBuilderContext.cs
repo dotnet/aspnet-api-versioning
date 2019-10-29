@@ -28,7 +28,7 @@
 
     sealed partial class ODataRouteBuilderContext
     {
-        readonly ODataRouteAttribute routeAttribute;
+        readonly ODataRouteAttribute? routeAttribute;
 
         internal IServiceProvider Services { get; }
 
@@ -50,15 +50,15 @@
 
         internal IEdmModel EdmModel { get; }
 
-        internal string RouteTemplate { get; }
+        internal string? RouteTemplate { get; }
 
         internal ODataRoute Route { get; }
 
         internal ControllerActionDescriptor ActionDescriptor { get; }
 
-        internal IEdmEntitySet EntitySet { get; }
+        internal IEdmEntitySet? EntitySet { get; }
 
-        internal IEdmOperation Operation { get; }
+        internal IEdmOperation? Operation { get; }
 
         internal ODataRouteActionType ActionType { get; }
 
@@ -104,6 +104,6 @@
 
         // Slash became the default 4/18/2018
         // REF: https://github.com/OData/WebApi/pull/1393
-        static ODataUrlKeyDelimiter UrlKeyDelimiterOrDefault( ODataUrlKeyDelimiter urlKeyDelimiter ) => urlKeyDelimiter ?? Slash;
+        static ODataUrlKeyDelimiter UrlKeyDelimiterOrDefault( ODataUrlKeyDelimiter? urlKeyDelimiter ) => urlKeyDelimiter ?? Slash;
     }
 }

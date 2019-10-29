@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Versioning
 {
-    using System.Diagnostics.Contracts;
+    using System;
     using System.Net.Http;
     using System.Web.Http;
     using static System.String;
@@ -17,7 +17,11 @@
         /// <returns>The generated <see cref="HttpResponseMessage">response</see>.</returns>
         public virtual HttpResponseMessage CreateResponse( ErrorResponseContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             return context.Request.CreateErrorResponse( context.StatusCode, CreateErrorContent( context ) );
         }
 
@@ -26,17 +30,15 @@
         /// </summary>
         /// <param name="context">The <see cref="ErrorResponseContext">error context</see> used to create the error content.</param>
         /// <returns>A <see cref="HttpError">HTTP error</see> representing the error content.</returns>
-        protected virtual HttpError CreateErrorContent( ErrorResponseContext context )
-        {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( Contract.Result<HttpError>() != null );
-
-            return IsODataRequest( context ) ? CreateODataError( context ) : CreateWebApiError( context );
-        }
+        protected virtual HttpError CreateErrorContent( ErrorResponseContext context ) =>
+            IsODataRequest( context ) ? CreateODataError( context ) : CreateWebApiError( context );
 
         static bool IsODataRequest( ErrorResponseContext context )
         {
-            Contract.Requires( context != null );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var request = context.Request;
             var routeValues = request.GetRouteData();
@@ -56,9 +58,6 @@
 
         static HttpError CreateWebApiError( ErrorResponseContext context )
         {
-            Contract.Requires( context != null );
-            Contract.Ensures( Contract.Result<HttpError>() != null );
-
             var error = new HttpError();
             var root = new HttpError() { ["Error"] = error };
 
@@ -82,9 +81,6 @@
 
         static HttpError CreateODataError( ErrorResponseContext context )
         {
-            Contract.Requires( context != null );
-            Contract.Ensures( Contract.Result<HttpError>() != null );
-
             var error = new HttpError();
 
             if ( !IsNullOrEmpty( context.ErrorCode ) )

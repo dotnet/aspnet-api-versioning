@@ -9,12 +9,8 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
-    using System.Threading.Tasks;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
-    using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
-    using static System.Threading.Tasks.Task;
 
     /// <summary>
     /// Represents the <see cref="IEndpointSelectorPolicy">endpoint selector policy</see> for API versions.
@@ -35,10 +31,6 @@
             IReportApiVersions reportApiVersions,
             ILoggerFactory loggerFactory )
         {
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( reportApiVersions, nameof( reportApiVersions ) );
-            Arg.NotNull( loggerFactory, nameof( loggerFactory ) );
-
             this.options = options;
             ApiVersionReporter = reportApiVersions;
             Logger = loggerFactory.CreateLogger( GetType() );
@@ -58,7 +50,10 @@
         /// <inheritdoc />
         public bool AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints )
         {
-            Arg.NotNull( endpoints, nameof( endpoints ) );
+            if ( endpoints == null )
+            {
+                throw new ArgumentNullException( nameof( endpoints ) );
+            }
 
             for ( var i = 0; i < endpoints.Count; i++ )
             {
@@ -73,15 +68,8 @@
             return false;
         }
 
-        static IReadOnlyList<(int index, ActionDescriptor action, bool valid)> EvaluateApiVersion(
-            HttpContext httpContext,
-            CandidateSet candidates,
-            ApiVersion apiVersion )
+        static IReadOnlyList<(int index, ActionDescriptor action, bool valid)> EvaluateApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
         {
-            Contract.Requires( httpContext != null );
-            Contract.Requires( candidates != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<(int, ActionDescriptor, bool)>>() != null );
-
             var bestMatches = new List<(int index, ActionDescriptor action, bool)>();
             var implicitMatches = new List<(int, ActionDescriptor, bool)>();
 
@@ -134,9 +122,6 @@
 
         ApiVersion TrySelectApiVersion( HttpContext httpContext, CandidateSet candidates )
         {
-            Contract.Requires( httpContext != null );
-            Contract.Requires( candidates != null );
-
             var models = new List<ApiVersionModel>();
 
             for ( var i = 0; i < candidates.Count; i++ )

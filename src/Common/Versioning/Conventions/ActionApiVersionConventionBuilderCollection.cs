@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
@@ -26,11 +26,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilderCollection"/> class.
         /// </summary>
         /// <param name="controllerBuilder">The associated <see cref="ControllerApiVersionConventionBuilder">controller convention builder</see>.</param>
-        public ActionApiVersionConventionBuilderCollection( ControllerApiVersionConventionBuilder controllerBuilder )
-        {
-            Arg.NotNull( controllerBuilder, nameof( controllerBuilder ) );
+        public ActionApiVersionConventionBuilderCollection( ControllerApiVersionConventionBuilder controllerBuilder ) =>
             this.controllerBuilder = controllerBuilder;
-        }
 
         /// <summary>
         /// Gets or adds a controller action convention builder for the specified method.
@@ -39,8 +36,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder">controller action convention builder</see>.</returns>
         protected internal virtual ActionApiVersionConventionBuilder GetOrAdd( MethodInfo actionMethod )
         {
-            Arg.NotNull( actionMethod, nameof( actionMethod ) );
-
             var mapping = actionBuilderMappings.FirstOrDefault( m => m.Method == actionMethod );
 
             if ( mapping == null )
@@ -64,18 +59,28 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
         /// <param name="actionBuilder">The <see cref="ActionApiVersionConventionBuilder">controller action convention builder</see> or <c>null</c>.</param>
         /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-        public virtual bool TryGetValue( MethodInfo actionMethod, out ActionApiVersionConventionBuilder actionBuilder )
+#if NETCOREAPP3_0
+        public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ActionApiVersionConventionBuilder? actionBuilder )
+#else
+        public virtual bool TryGetValue( MethodInfo? actionMethod, out ActionApiVersionConventionBuilder? actionBuilder )
+#endif
         {
-            actionBuilder = null;
-
             if ( actionMethod == null )
             {
+                actionBuilder = null;
                 return false;
             }
 
             var mapping = actionBuilderMappings.FirstOrDefault( m => m.Method == actionMethod );
 
-            return ( actionBuilder = mapping?.Builder ) != null;
+            if ( mapping == null )
+            {
+                actionBuilder = null;
+                return false;
+            }
+
+            actionBuilder = mapping.Builder;
+            return true;
         }
 
         /// <summary>
@@ -96,9 +101,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         {
             internal ActionBuilderMapping( MethodInfo method, ActionApiVersionConventionBuilder builder )
             {
-                Contract.Requires( method != null );
-                Contract.Requires( builder != null );
-
                 Method = method;
                 Builder = builder;
             }

@@ -21,14 +21,9 @@
         [CLSCompliant( false )]
         public ODataConventionConfigurationContext( string routeName, IEdmModel edmModel, ApiVersion apiVersion, IList<IODataRoutingConvention> routingConventions )
         {
-            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
-            Arg.NotNull( edmModel, nameof( edmModel ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( routingConventions, nameof( routingConventions ) );
-
             RouteName = routeName;
             EdmModel = edmModel;
-            ApiVersion = ApiVersion;
+            ApiVersion = apiVersion;
             RoutingConventions = routingConventions;
         }
     }

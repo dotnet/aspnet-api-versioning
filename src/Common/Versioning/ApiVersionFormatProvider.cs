@@ -7,8 +7,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Reflection;
     using System.Text;
@@ -29,7 +27,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     ///     </listheader>
     ///     <item>
     ///         <term>"F"</term>
-    ///         <description>The full, formatted API version where optional, absent components are ommitted.</description>
+    ///         <description>The full, formatted API version where optional, absent components are omitted.</description>
     ///         <description>
     ///             <para>2017-01-01 -> 2017-01-01</para>
     ///             <para>2017-01-01.1 -> 2017-01-01.1</para>
@@ -176,7 +174,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     ///     </item>
     ///     <item>
     ///         <term>"S"</term>
-    ///         <description>The API version version status.</description>
+    ///         <description>The API version status.</description>
     ///         <description>
     ///             <para>1.0-Beta -> Beta</para>
     ///         </description>
@@ -200,8 +198,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ApiVersionFormatProvider"/> class.
         /// </summary>
         /// <param name="dateTimeFormat">The <see cref="DateTimeFormatInfo"/> used by the format provider.</param>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract" )]
-        public ApiVersionFormatProvider( DateTimeFormatInfo dateTimeFormat ) : this( dateTimeFormat, dateTimeFormat?.Calendar ) { }
+        public ApiVersionFormatProvider( DateTimeFormatInfo dateTimeFormat )
+            : this( dateTimeFormat ?? throw new ArgumentNullException( nameof( dateTimeFormat ) ), dateTimeFormat.Calendar ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionFormatProvider"/> class.
@@ -216,9 +214,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="calendar">The <see cref="Calendar"/> used by the format provider.</param>
         public ApiVersionFormatProvider( DateTimeFormatInfo dateTimeFormat, Calendar calendar )
         {
-            Arg.NotNull( dateTimeFormat, nameof( dateTimeFormat ) );
-            Arg.NotNull( calendar, nameof( calendar ) );
-
             DateTimeFormat = dateTimeFormat;
             Calendar = calendar;
         }
@@ -253,10 +248,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// </summary>
         /// <param name="formatProvider">The <see cref="IFormatProvider">format provider</see> used to retrieve the instance.</param>
         /// <returns>An <see cref="ApiVersionFormatProvider"/> object.</returns>
-        public static ApiVersionFormatProvider GetInstance( IFormatProvider formatProvider )
+        public static ApiVersionFormatProvider GetInstance( IFormatProvider? formatProvider )
         {
-            Contract.Ensures( Contract.Result<ApiVersionFormatProvider>() != null );
-
             if ( formatProvider is ApiVersionFormatProvider provider )
             {
                 return provider;
@@ -267,17 +260,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 return CurrentCulture;
             }
 
-            if ( ( provider = formatProvider.GetFormat( typeof( ApiVersionFormatProvider ) ) as ApiVersionFormatProvider ) == null )
+            if ( formatProvider.GetFormat( typeof( ApiVersionFormatProvider ) ) is ApiVersionFormatProvider customProvider )
             {
-                if ( formatProvider is CultureInfo culture )
-                {
-                    return new ApiVersionFormatProvider( culture.DateTimeFormat, culture.Calendar );
-                }
-
-                return CurrentCulture;
+                return customProvider;
             }
 
-            return provider;
+            if ( formatProvider is CultureInfo culture )
+            {
+                return new ApiVersionFormatProvider( culture.DateTimeFormat, culture.Calendar );
+            }
+
+            return CurrentCulture;
         }
 
         /// <summary>
@@ -287,12 +280,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="format">The format string for the API version. This parameter can be <c>null</c> or empty.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to apply the format.</param>
         /// <returns>A formatted <see cref="string">string</see> representing the API version.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract" )]
-        protected virtual string FormatAllParts( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
+        protected virtual string FormatAllParts( ApiVersion apiVersion, string? format, IFormatProvider? formatProvider )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( formatProvider, nameof( formatProvider ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( apiVersion == null )
+            {
+                throw new ArgumentNullException( nameof( apiVersion ) );
+            }
 
             var text = new StringBuilder();
 
@@ -345,22 +338,21 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="format">The format string for the group version.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to apply the format.</param>
         /// <returns>A formatted <see cref="string">string</see> representing the group version.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract" )]
-        protected virtual string FormatGroupVersionPart( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
+        protected virtual string FormatGroupVersionPart( ApiVersion apiVersion, string? format, IFormatProvider? formatProvider )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNullOrEmpty( format, nameof( format ) );
-            Arg.NotNull( formatProvider, nameof( formatProvider ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( apiVersion == null )
+            {
+                throw new ArgumentNullException( nameof( apiVersion ) );
+            }
 
-            if ( apiVersion.GroupVersion == null )
+            if ( apiVersion.GroupVersion == null || IsNullOrEmpty( format ) )
             {
                 return Empty;
             }
 
             var groupVersion = apiVersion.GroupVersion.Value;
 
-            switch ( format[0] )
+            switch ( format![0] )
             {
                 case 'G':
                     // G, GG
@@ -376,46 +368,44 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 case 'M':
                     var month = Calendar.GetMonth( groupVersion );
 
-                    switch ( format.Length )
-                    {
-                        case 1: // M
-                            return month.ToString( formatProvider );
-                        case 2: // MM
-                            return month.ToString( "00", formatProvider );
-                        case 3: // MMM
-                            return DateTimeFormat.GetAbbreviatedMonthName( month );
-                    }
-
+                    // M
+                    // MM
+                    // MMM
                     // MMMM*
-                    return DateTimeFormat.GetMonthName( month );
-                case 'd':
-                    switch ( format.Length )
+                    return format.Length switch
                     {
-                        case 1: // d
-                            return Calendar.GetDayOfMonth( groupVersion ).ToString( formatProvider );
-                        case 2: // dd
-                            return Calendar.GetDayOfMonth( groupVersion ).ToString( "00", formatProvider );
-                        case 3: // ddd
-                            return DateTimeFormat.GetAbbreviatedDayName( Calendar.GetDayOfWeek( groupVersion ) );
-                    }
+                        1 => month.ToString( formatProvider ),
+                        2 => month.ToString( "00", formatProvider ),
+                        3 => DateTimeFormat.GetAbbreviatedMonthName( month ),
+                        _ => DateTimeFormat.GetMonthName( month ),
+                    };
+                case 'd':
 
+                    // d
+                    // dd
+                    // ddd
                     // dddd*
-                    return DateTimeFormat.GetDayName( Calendar.GetDayOfWeek( groupVersion ) );
+                    return format.Length switch
+                    {
+                        1 => Calendar.GetDayOfMonth( groupVersion ).ToString( formatProvider ),
+                        2 => Calendar.GetDayOfMonth( groupVersion ).ToString( "00", formatProvider ),
+                        3 => DateTimeFormat.GetAbbreviatedDayName( Calendar.GetDayOfWeek( groupVersion ) ),
+                        _ => DateTimeFormat.GetDayName( Calendar.GetDayOfWeek( groupVersion ) ),
+                    };
                 case 'y':
                     var year = Calendar.GetYear( groupVersion );
 
-                    switch ( format.Length )
-                    {
-                        case 1: // y
-                            return ( year % 100 ).ToString( formatProvider );
-                        case 2: // yy
-                            return ( year % 100 ).ToString( "00", formatProvider );
-                        case 3: // yyy
-                            return year.ToString( "000", formatProvider );
-                    }
-
+                    // y
+                    // yy
+                    // yyy
                     // yyyy*
-                    return year.ToString( formatProvider );
+                    return format.Length switch
+                    {
+                        1 => ( year % 100 ).ToString( formatProvider ),
+                        2 => ( year % 100 ).ToString( "00", formatProvider ),
+                        3 => year.ToString( "000", formatProvider ),
+                        _ => year.ToString( formatProvider ),
+                    };
             }
 
             return groupVersion.ToString( format, formatProvider );
@@ -428,13 +418,17 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="format">The format string for the version.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to apply the format.</param>
         /// <returns>A formatted <see cref="string">string</see> representing the version.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract" )]
         protected virtual string FormatVersionPart( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNullOrEmpty( format, nameof( format ) );
-            Arg.NotNull( formatProvider, nameof( formatProvider ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( apiVersion == null )
+            {
+                throw new ArgumentNullException( nameof( apiVersion ) );
+            }
+
+            if ( IsNullOrEmpty( format ) )
+            {
+                throw new ArgumentNullException( nameof( format ) );
+            }
 
             switch ( format[0] )
             {
@@ -456,13 +450,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="format">The format string for the status.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to apply the format.</param>
         /// <returns>A formatted <see cref="string">string</see> representing the status.</returns>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract" )]
         protected virtual string FormatStatusPart( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNullOrEmpty( format, nameof( format ) );
-            Arg.NotNull( formatProvider, nameof( formatProvider ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( apiVersion == null )
+            {
+                throw new ArgumentNullException( nameof( apiVersion ) );
+            }
 
             return apiVersion.Status ?? Empty;
         }
@@ -472,14 +465,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// </summary>
         /// <param name="formatType">The <see cref="Type">type</see> of requested formatter.</param>
         /// <returns>A <see cref="DateTimeFormatInfo"/>, <see cref="ICustomFormatter"/>, or <c>null</c> depending on the requested <paramref name="formatType">format type</paramref>.</returns>
-        public virtual object GetFormat( Type formatType )
+        public virtual object? GetFormat( Type? formatType )
         {
             if ( typeof( ICustomFormatter ).Equals( formatType ) )
             {
                 return this;
             }
 
-            if ( GetType().GetTypeInfo().IsAssignableFrom( formatType.GetTypeInfo() ) )
+            if ( formatType != null && GetType().GetTypeInfo().IsAssignableFrom( formatType.GetTypeInfo() ) )
             {
                 return this;
             }
@@ -493,22 +486,22 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="format">The format string to apply to the argument.</param>
         /// <param name="arg">The argument to format.</param>
         /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to format the argument.</param>
-        /// <returns>A <see cref="string">string</see> represeting the formatted argument.</returns>
-        public virtual string Format( string format, object arg, IFormatProvider formatProvider )
+        /// <returns>A <see cref="string">string</see> representing the formatted argument.</returns>
+        public virtual string Format( string? format, object? arg, IFormatProvider? formatProvider )
         {
             if ( !( arg is ApiVersion value ) )
             {
                 return GetDefaultFormat( format, arg, formatProvider );
             }
 
-            formatProvider = formatProvider == null || ReferenceEquals( this, formatProvider ) ? CultureInfo.CurrentCulture : formatProvider;
+            formatProvider = formatProvider is null || ReferenceEquals( this, formatProvider ) ? CultureInfo.CurrentCulture : formatProvider;
 
             if ( IsNullOrEmpty( format ) )
             {
                 return FormatAllParts( value, null, formatProvider );
             }
 
-            var tokens = FormatTokenizer.Tokenize( format );
+            var tokens = FormatTokenizer.Tokenize( format! );
             var text = new StringBuilder();
 
             foreach ( var token in tokens )
@@ -524,7 +517,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             return text.ToString();
         }
 
-        static string GetDefaultFormat( string format, object arg, IFormatProvider formatProvider )
+        static string GetDefaultFormat( string? format, object? arg, IFormatProvider? formatProvider )
         {
             if ( arg == null )
             {
@@ -539,15 +532,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 }
             }
 
-            return arg.ToString();
+            return arg.ToString() ?? Empty;
         }
 
         string GetCustomFormat( ApiVersion value, string format, IFormatProvider formatProvider )
         {
-            Contract.Requires( !IsNullOrEmpty( format ) );
-            Contract.Requires( formatProvider != null );
-            Contract.Ensures( Contract.Result<string>() != null );
-
             switch ( format[0] )
             {
                 case 'F':
@@ -571,11 +560,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
         static string FormatVersionWithoutPadding( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
         {
-            Contract.Requires( apiVersion != null );
-            Contract.Requires( !IsNullOrEmpty( format ) );
-            Contract.Requires( formatProvider != null );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
-
             if ( format.Length == 1 && format[0] == 'v' )
             {
                 return apiVersion.MinorVersion == null ? Empty : apiVersion.MinorVersion.Value.ToString( formatProvider );
@@ -623,11 +607,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
         static string FormatVersionWithPadding( ApiVersion apiVersion, string format, IFormatProvider formatProvider )
         {
-            Contract.Requires( apiVersion != null );
-            Contract.Requires( !IsNullOrEmpty( format ) );
-            Contract.Requires( formatProvider != null );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
-
             SplitFormatSpecifierWithNumber( format, formatProvider, out var specifier, out var count );
 
             const string TwoDigits = "D2";
@@ -682,11 +661,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
         static void SplitFormatSpecifierWithNumber( string format, IFormatProvider formatProvider, out string specifier, out int count )
         {
-            Contract.Requires( !IsNullOrEmpty( format ) );
-            Contract.Requires( formatProvider != null );
-            Contract.Ensures( !IsNullOrEmpty( Contract.ValueAtReturn( out specifier ) ) );
-            Contract.Ensures( Contract.ValueAtReturn( out count ) >= 0 );
-
             count = 2;
 
             if ( format.Length == 1 )
@@ -713,7 +687,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             for ( ; end < format.Length; end++ )
             {
-                if ( !char.IsNumber( format[end] ) )
+                if ( !IsNumber( format[end] ) )
                 {
                     break;
                 }
@@ -725,10 +699,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             }
         }
 
-        static void AppendStatus( StringBuilder text, string status )
+        static void AppendStatus( StringBuilder text, string? status )
         {
-            Contract.Requires( text != null );
-
             if ( !IsNullOrEmpty( status ) )
             {
                 text.Append( '-' );
@@ -751,7 +723,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             internal FormatToken( string format, bool literal, bool invalid )
             {
-                Contract.Requires( format != null );
                 Format = format;
                 IsLiteral = literal;
                 IsInvalid = invalid;
@@ -784,9 +755,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static bool IsEscapeSequence( string sequence )
             {
-                Contract.Requires( sequence != null );
-                Contract.Requires( sequence.Length == 2 );
-
                 switch ( sequence )
                 {
                     case @"\'":
@@ -809,9 +777,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static bool IsSingleCustomFormatSpecifier( string sequence )
             {
-                Contract.Requires( sequence != null );
-                Contract.Requires( sequence.Length == 2 );
-
                 switch ( sequence )
                 {
                     case "%F":
@@ -832,9 +797,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static void EnsureCurrentLiteralSequenceTerminated( ICollection<FormatToken> tokens, StringBuilder token )
             {
-                Contract.Requires( tokens != null );
-                Contract.Requires( token != null );
-
                 if ( token.Length > 0 )
                 {
                     tokens.Add( new FormatToken( token.ToString(), true ) );
@@ -844,11 +806,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static void ConsumeLiteral( ICollection<FormatToken> tokens, StringBuilder token, string format, char ch, ref int i )
             {
-                Contract.Requires( tokens != null );
-                Contract.Requires( token != null );
-                Contract.Requires( !IsNullOrEmpty( format ) );
-                Contract.Requires( i >= 0 );
-
                 EnsureCurrentLiteralSequenceTerminated( tokens, token );
 
                 var delimiter = ch;
@@ -865,11 +822,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static void ConsumeEscapeSequence( ICollection<FormatToken> tokens, StringBuilder token, string format, ref int i )
             {
-                Contract.Requires( tokens != null );
-                Contract.Requires( token != null );
-                Contract.Requires( !IsNullOrEmpty( format ) );
-                Contract.Requires( i >= 0 );
-
                 EnsureCurrentLiteralSequenceTerminated( tokens, token );
                 tokens.Add( new FormatToken( format.Substring( ++i, 1 ), literal: true ) );
                 token.Length = 0;
@@ -877,11 +829,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static void ConsumeSingleCustomFormat( ICollection<FormatToken> tokens, StringBuilder token, string format, ref int i )
             {
-                Contract.Requires( tokens != null );
-                Contract.Requires( token != null );
-                Contract.Requires( !IsNullOrEmpty( format ) );
-                Contract.Requires( i >= 0 );
-
                 EnsureCurrentLiteralSequenceTerminated( tokens, token );
 
                 var start = ++i;
@@ -889,7 +836,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
                 for ( ; end < format.Length; end++ )
                 {
-                    if ( !char.IsNumber( format[end] ) )
+                    if ( !IsNumber( format[end] ) )
                     {
                         break;
                     }
@@ -901,11 +848,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             static void ConsumeCustomFormat( ICollection<FormatToken> tokens, StringBuilder token, string format, char ch, ref int i )
             {
-                Contract.Requires( tokens != null );
-                Contract.Requires( token != null );
-                Contract.Requires( !IsNullOrEmpty( format ) );
-                Contract.Requires( i >= 0 );
-
                 EnsureCurrentLiteralSequenceTerminated( tokens, token );
                 token.Append( ch );
 
@@ -939,9 +881,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             internal static IEnumerable<FormatToken> Tokenize( string format )
             {
-                Contract.Requires( !IsNullOrEmpty( format ) );
-                Contract.Ensures( Contract.Result<IEnumerable<FormatToken>>() != null );
-
                 var tokens = new List<FormatToken>();
                 var token = new StringBuilder();
 

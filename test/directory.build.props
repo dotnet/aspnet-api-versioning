@@ -5,6 +5,7 @@
 
  <PropertyGroup>
   <IsTestProject>true</IsTestProject>
+  <IsPackable>false</IsPackable>
   <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
   <IsAspNetCore>$(MSBuildProjectName.StartsWith('Microsoft.AspNetCore'))</IsAspNetCore>
   <TestHostVersion>2.2.0</TestHostVersion>

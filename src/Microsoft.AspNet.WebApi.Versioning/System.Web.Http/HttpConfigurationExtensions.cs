@@ -1,11 +1,10 @@
 ﻿namespace System.Web.Http
 {
-    using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Controllers;
     using Microsoft.Web.Http.Dispatcher;
     using Microsoft.Web.Http.Versioning;
-    using System.Diagnostics.Contracts;
+    using System;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
 
@@ -23,8 +22,10 @@
         /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
         public static ApiVersioningOptions GetApiVersioningOptions( this HttpConfiguration configuration )
         {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
+            if ( configuration == null )
+            {
+                throw new ArgumentNullException( nameof( configuration ) );
+            }
 
             return (ApiVersioningOptions) configuration.Properties.GetOrAdd( ApiVersioningOptionsKey, key => new ApiVersioningOptions() );
         }
@@ -32,23 +33,25 @@
         /// <summary>
         /// Adds service API versioning to the specified services collection.
         /// </summary>
-        /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use use service versioning.</param>
-        public static void AddApiVersioning( this HttpConfiguration configuration ) => configuration.AddApiVersioning( _ => { } );
+        /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use service versioning.</param>
+        public static void AddApiVersioning( this HttpConfiguration configuration ) => configuration.AddApiVersioning( default );
 
         /// <summary>
         /// Adds service API versioning to the specified services collection.
         /// </summary>
-        /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use use service versioning.</param>
+        /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use service versioning.</param>
         /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-        public static void AddApiVersioning( this HttpConfiguration configuration, Action<ApiVersioningOptions> setupAction )
+        public static void AddApiVersioning( this HttpConfiguration configuration, Action<ApiVersioningOptions>? setupAction )
         {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNull( setupAction, nameof( setupAction ) );
+            if ( configuration == null )
+            {
+                throw new ArgumentNullException( nameof( configuration ) );
+            }
 
             var options = new ApiVersioningOptions();
             var services = configuration.Services;
 
-            setupAction( options );
+            setupAction?.Invoke( options );
             services.Replace( typeof( IHttpControllerSelector ), new ApiVersionControllerSelector( configuration, options ) );
             services.Replace( typeof( IHttpActionSelector ), new ApiVersionActionSelector() );
 

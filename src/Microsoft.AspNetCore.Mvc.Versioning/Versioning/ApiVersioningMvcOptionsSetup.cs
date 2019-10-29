@@ -22,6 +22,11 @@
         /// <inheritdoc />
         public virtual void PostConfigure( string name, MvcOptions options )
         {
+            if ( options == null )
+            {
+                throw new ArgumentNullException( nameof( options ) );
+            }
+
             var value = versioningOptions.Value;
 
             if ( value.ReportApiVersions )

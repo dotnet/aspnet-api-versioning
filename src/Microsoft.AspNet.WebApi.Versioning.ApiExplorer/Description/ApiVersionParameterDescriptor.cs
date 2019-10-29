@@ -33,9 +33,9 @@
         public override bool IsOptional => optional;
 
         /// <summary>
-        /// Gets a value indicating whether the parameter descriptor represents a URL segement.
+        /// Gets a value indicating whether the parameter descriptor represents a URL segment.
         /// </summary>
-        /// <value>True if the parameter descriptor represents a URL segement; otherwise, false.
+        /// <value>True if the parameter descriptor represents a URL segment; otherwise, false.
         /// The default value is <c>false</c>.</value>
         public bool FromPath { get; }
     }

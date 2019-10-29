@@ -11,7 +11,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static System.StringComparison;
 #if WEBAPI
     using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;
@@ -23,7 +22,7 @@
     public partial class VersionedAttributeRoutingConvention
     {
         readonly string routeName;
-        IDictionary<ODataPathTemplate, ControllerActionDescriptor> attributeMappings;
+        IDictionary<ODataPathTemplate, ControllerActionDescriptor>? attributeMappings;
 
         /// <summary>
         /// Gets the <see cref="IODataPathTemplateHandler"/> to be used for parsing the route templates.
@@ -39,29 +38,23 @@
 
         static IEnumerable<string> GetODataRoutePrefixes( IEnumerable<ODataRoutePrefixAttribute> prefixAttributes, string controllerName )
         {
-            Contract.Requires( prefixAttributes != null );
+            using var prefixAttribute = prefixAttributes.GetEnumerator();
 
-            using ( var prefixAttribute = prefixAttributes.GetEnumerator() )
+            if ( !prefixAttribute.MoveNext() )
             {
-                if ( !prefixAttribute.MoveNext() )
-                {
-                    yield return null;
-                    yield break;
-                }
-
-                do
-                {
-                    yield return GetODataRoutePrefix( prefixAttribute.Current, controllerName );
-                }
-                while ( prefixAttribute.MoveNext() );
+                yield return string.Empty;
+                yield break;
             }
+
+            do
+            {
+                yield return GetODataRoutePrefix( prefixAttribute.Current, controllerName );
+            }
+            while ( prefixAttribute.MoveNext() );
         }
 
         static string GetODataRoutePrefix( ODataRoutePrefixAttribute prefixAttribute, string controllerName )
         {
-            Contract.Requires( prefixAttribute != null );
-            Contract.Requires( !string.IsNullOrEmpty( controllerName ) );
-
             var prefix = prefixAttribute.Prefix;
 
             if ( prefix != null && prefix.StartsWith( "/", Ordinal ) )
@@ -74,7 +67,7 @@
                 prefix = prefix.TrimEnd( '/' );
             }
 
-            return prefix;
+            return prefix ?? string.Empty;
         }
 
         static bool IsODataRouteParameter( KeyValuePair<string, object> routeDatum )
@@ -88,12 +81,6 @@
 
         ODataPathTemplate GetODataPathTemplate( string prefix, string pathTemplate, IServiceProvider serviceProvider, string controllerName, string actionName )
         {
-            Contract.Requires( pathTemplate != null );
-            Contract.Requires( serviceProvider != null );
-            Contract.Requires( !string.IsNullOrEmpty( controllerName ) );
-            Contract.Requires( !string.IsNullOrEmpty( actionName ) );
-            Contract.Ensures( Contract.Result<ODataPathTemplate>() != null );
-
             if ( prefix != null && !pathTemplate.StartsWith( "/", Ordinal ) )
             {
                 if ( string.IsNullOrEmpty( pathTemplate ) )

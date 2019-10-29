@@ -3,7 +3,6 @@
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using static System.Linq.Enumerable;
@@ -25,7 +24,10 @@
         /// <param name="controllerModel">The <see cref="ControllerModel">controller model</see> to apply the conventions to.</param>
         public virtual void ApplyTo( ControllerModel controllerModel )
         {
-            Arg.NotNull( controllerModel, nameof( controllerModel ) );
+            if ( controllerModel == null )
+            {
+                throw new ArgumentNullException( nameof( controllerModel ) );
+            }
 
             MergeAttributesWithConventions( controllerModel.Attributes );
             ApplyActionConventions( controllerModel );
@@ -37,12 +39,10 @@
         /// <param name="method">The <see cref="MethodInfo">method</see> representing the action to retrieve the convention for.</param>
         /// <param name="convention">The retrieved <see cref="IApiVersionConvention{T}">convention</see> or <c>null</c>.</param>
         /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
-        protected abstract bool TryGetConvention( MethodInfo method, out IApiVersionConvention<ActionModel> convention );
+        protected abstract bool TryGetConvention( MethodInfo method, out IApiVersionConvention<ActionModel>? convention );
 
         void ApplyActionConventions( ControllerModel controller )
         {
-            Contract.Requires( controller != null );
-
             if ( VersionNeutral )
             {
                 controller.SetProperty( ApiVersionModel.Neutral );
@@ -73,7 +73,7 @@
                 }
 
                 action.SetProperty( controller );
-                actionConvention.ApplyTo( action );
+                actionConvention!.ApplyTo( action );
             }
 
             ApplyInheritedActionConventions( controller.Actions );
@@ -81,8 +81,6 @@
 
         void ApplyInheritedActionConventions( IList<ActionModel> actions )
         {
-            Contract.Requires( actions != null );
-
             var noInheritedApiVersions = SupportedVersions.Count == 0 && DeprecatedVersions.Count == 0 && AdvertisedVersions.Count == 0 && DeprecatedAdvertisedVersions.Count == 0;
 
             if ( noInheritedApiVersions )

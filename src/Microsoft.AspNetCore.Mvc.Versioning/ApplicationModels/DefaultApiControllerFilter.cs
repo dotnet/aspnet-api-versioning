@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 
     /// <summary>
@@ -19,18 +18,12 @@
         /// <param name="specifications">The <see cref="IEnumerable{T}">sequence</see> of
         /// <see cref="IApiControllerSpecification">specifications</see> used by the filter
         /// to identify API controllers.</param>
-        public DefaultApiControllerFilter( IEnumerable<IApiControllerSpecification> specifications )
-        {
-            Arg.NotNull( specifications, nameof( specifications ) );
+        public DefaultApiControllerFilter( IEnumerable<IApiControllerSpecification> specifications ) =>
             this.specifications = specifications.ToArray();
-        }
 
         /// <inheritdoc />
         public IList<ControllerModel> Apply( IList<ControllerModel> controllers )
         {
-            Arg.NotNull( controllers, nameof( controllers ) );
-            Contract.Ensures( Contract.Result<IList<ControllerModel>>() != null );
-
             if ( specifications.Count == 0 )
             {
                 return controllers;
@@ -51,8 +44,6 @@
 
         bool IsApiController( ControllerModel controller )
         {
-            Contract.Requires( controller != null );
-
             for ( var i = 0; i < specifications.Count; i++ )
             {
                 if ( specifications[i].IsSatisfiedBy( controller ) )

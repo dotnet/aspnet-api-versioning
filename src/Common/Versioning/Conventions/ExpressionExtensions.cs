@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -13,9 +12,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     {
         internal static MethodInfo ExtractMethod<TDelegate>( this Expression<TDelegate> expression )
         {
-            Contract.Requires( expression != null );
-            Contract.Ensures( Contract.Result<MethodInfo>() != null );
-
             if ( expression.Body is MethodCallExpression methodCall )
             {
                 return methodCall.Method;

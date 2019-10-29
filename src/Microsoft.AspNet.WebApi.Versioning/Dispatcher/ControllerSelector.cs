@@ -3,7 +3,6 @@
     using Microsoft.Web.Http.Routing;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
@@ -17,12 +16,8 @@
 
         public abstract ControllerSelectionResult SelectController( ControllerSelectionContext context );
 
-        protected static ICollection<HttpControllerDescriptor> SelectBestCandidates( IReadOnlyList<CandidateAction> candidates, ApiVersion apiVersion )
+        protected static ICollection<HttpControllerDescriptor> SelectBestCandidates( IReadOnlyList<CandidateAction> candidates, ApiVersion? apiVersion )
         {
-            Contract.Requires( candidates != null );
-            Contract.Requires( apiVersion != null );
-            Contract.Ensures( Contract.Result<ICollection<HttpControllerDescriptor>>() != null );
-
             var bestMatch = default( HttpActionDescriptor );
             var bestMatches = new HashSet<HttpControllerDescriptor>();
             var implicitMatches = new HashSet<HttpControllerDescriptor>();
@@ -49,7 +44,7 @@
                     bestMatches.UnionWith( implicitMatches );
                     break;
                 case 1:
-                    if ( bestMatch.GetApiVersionModel().IsApiVersionNeutral )
+                    if ( bestMatch!.GetApiVersionModel().IsApiVersionNeutral )
                     {
                         bestMatches.UnionWith( implicitMatches );
                     }
@@ -63,11 +58,8 @@
         protected static bool TryDisambiguateControllerByAction(
             HttpRequestMessage request,
             IEnumerable<HttpControllerDescriptor> controllers,
-            out HttpControllerDescriptor resolvedController )
+            out HttpControllerDescriptor? resolvedController )
         {
-            Contract.Requires( request != null );
-            Contract.Requires( controllers != null );
-
             // note: this method should only legitimately be called to disambiguate actions
             // from different controller types that match the request. this can happen as a
             // result of inheritance with a version-neutral action on a base class. there's
@@ -109,11 +101,8 @@
             return false;
         }
 
-        static IHttpRouteData EnsureRouteDataSet( HttpConfiguration configuration, HttpRequestMessage request )
+        static IHttpRouteData? EnsureRouteDataSet( HttpConfiguration configuration, HttpRequestMessage request )
         {
-            Contract.Requires( configuration != null );
-            Contract.Requires( request != null );
-
             var routeData = request.GetRouteData();
 
             if ( routeData != null )

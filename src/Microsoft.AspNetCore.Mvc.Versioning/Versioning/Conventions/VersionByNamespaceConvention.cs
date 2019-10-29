@@ -19,10 +19,17 @@
         /// otherwise, false.</returns>
         public virtual bool Apply( IControllerConventionBuilder controller, ControllerModel controllerModel )
         {
-            Arg.NotNull( controller, nameof( controller ) );
-            Arg.NotNull( controllerModel, nameof( controller ) );
+            if ( controller == null )
+            {
+                throw new ArgumentNullException( nameof( controller ) );
+            }
 
-            var text = GetRawApiVersion( controllerModel.ControllerType.Namespace );
+            if ( controllerModel == null )
+            {
+                throw new ArgumentNullException( nameof( controllerModel ) );
+            }
+
+            var text = GetRawApiVersion( controllerModel.ControllerType.Namespace! );
 
             if ( !ApiVersion.TryParse( text, out var apiVersion ) )
             {
@@ -33,11 +40,11 @@
 
             if ( deprecated )
             {
-                controller.HasDeprecatedApiVersion( apiVersion );
+                controller.HasDeprecatedApiVersion( apiVersion! );
             }
             else
             {
-                controller.HasApiVersion( apiVersion );
+                controller.HasApiVersion( apiVersion! );
             }
 
             return true;

@@ -1,6 +1,5 @@
 ﻿namespace System.Web.Http
 {
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http.Controllers;
     using System.Web.Http.ModelBinding;
@@ -10,11 +9,7 @@
     {
         internal static bool WillReadUri( this HttpParameterBinding parameterBinding )
         {
-            Contract.Requires( parameterBinding != null );
-
-            var valueProviderParameterBinding = parameterBinding as IValueProviderParameterBinding;
-
-            if ( valueProviderParameterBinding == null )
+            if ( !( parameterBinding is IValueProviderParameterBinding valueProviderParameterBinding ) )
             {
                 return false;
             }
