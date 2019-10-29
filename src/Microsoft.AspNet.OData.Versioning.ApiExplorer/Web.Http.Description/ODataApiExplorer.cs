@@ -11,7 +11,6 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http.Formatting;
     using System.Text.RegularExpressions;
@@ -71,9 +70,10 @@
         /// <returns>True if the action should be explored; otherwise, false.</returns>
         protected override bool ShouldExploreAction( string actionRouteParameterValue, HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
         {
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            if ( actionDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( actionDescriptor ) );
+            }
 
             if ( !( route is ODataRoute ) )
             {
@@ -103,9 +103,15 @@
         /// <returns>True if the controller should be explored; otherwise, false.</returns>
         protected override bool ShouldExploreController( string controllerRouteParameterValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route, ApiVersion apiVersion )
         {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
+
+            if ( route == null )
+            {
+                throw new ArgumentNullException( nameof( route ) );
+            }
 
             if ( typeof( MetadataController ).IsAssignableFrom( controllerDescriptor.ControllerType ) )
             {
@@ -141,10 +147,10 @@
         /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
         protected override Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
         {
-            Arg.NotNull( controllerMappings, nameof( controllerMappings ) );
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<Collection<VersionedApiDescription>>() != null );
+            if ( controllerMappings == null )
+            {
+                throw new ArgumentNullException( nameof( controllerMappings ) );
+            }
 
             if ( !( route is ODataRoute ) )
             {
@@ -187,8 +193,10 @@
         /// <param name="uriResolver">The associated <see cref="ODataUriResolver">OData URI resolver</see>.</param>
         protected virtual void ExploreQueryOptions( IEnumerable<VersionedApiDescription> apiDescriptions, ODataUriResolver uriResolver )
         {
-            Arg.NotNull( apiDescriptions, nameof( apiDescriptions ) );
-            Arg.NotNull( uriResolver, nameof( uriResolver ) );
+            if ( uriResolver == null )
+            {
+                throw new ArgumentNullException( nameof( uriResolver ) );
+            }
 
             var queryOptions = Options.QueryOptions;
             var settings = new ODataQueryOptionSettings()
@@ -202,10 +210,6 @@
 
         ResponseDescription CreateResponseDescriptionWithRoute( HttpActionDescriptor actionDescriptor, IHttpRoute route )
         {
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( actionDescriptor != null );
-            Contract.Ensures( Contract.Result<ResponseDescription>() != null );
-
             var description = CreateResponseDescription( actionDescriptor );
             var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
             var returnType = description.ResponseType ?? description.DeclaredType;
@@ -223,12 +227,6 @@
             Collection<VersionedApiDescription> apiDescriptions,
             ApiVersion apiVersion )
         {
-            Contract.Requires( route != null );
-            Contract.Requires( controllerDescriptor != null );
-            Contract.Requires( actionSelector != null );
-            Contract.Requires( apiDescriptions != null );
-            Contract.Requires( apiVersion != null );
-
             var actionMapping = actionSelector.GetActionMapping( controllerDescriptor );
 
             if ( actionMapping == null )
@@ -236,13 +234,11 @@
                 return;
             }
 
-            const string ActionRouteParameterName = null;
-
             foreach ( var grouping in actionMapping )
             {
                 foreach ( var action in grouping )
                 {
-                    if ( !ShouldExploreAction( ActionRouteParameterName, action, route, apiVersion ) )
+                    if ( !ShouldExploreAction( actionRouteParameterValue: string.Empty, action, route, apiVersion ) )
                     {
                         continue;
                     }
@@ -269,10 +265,8 @@
             }
         }
 
-        static HttpActionBinding GetActionBinding( HttpActionDescriptor actionDescriptor )
+        static HttpActionBinding? GetActionBinding( HttpActionDescriptor actionDescriptor )
         {
-            Contract.Requires( actionDescriptor != null );
-
             var controllerDescriptor = actionDescriptor.ControllerDescriptor;
 
             if ( controllerDescriptor == null )
@@ -300,10 +294,6 @@
 
         ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider )
         {
-            Contract.Requires( parameterBinding != null );
-            Contract.Requires( serviceProvider != null );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var descriptor = parameterBinding.Descriptor;
             var description = CreateParameterDescription( descriptor );
 
@@ -333,10 +323,6 @@
 
         IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route )
         {
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( route != null );
-            Contract.Ensures( Contract.Result<IList<ApiParameterDescription>>() != null );
-
             var list = new List<ApiParameterDescription>();
             var actionBinding = GetActionBinding( actionDescriptor );
 
@@ -389,12 +375,6 @@
            IList<MediaTypeFormatter> requestFormatters,
            IList<MediaTypeFormatter> responseFormatters )
         {
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( parameterDescriptions != null );
-            Contract.Requires( route != null );
-            Contract.Requires( requestFormatters != null );
-            Contract.Requires( responseFormatters != null );
-
             if ( route is ODataRoute )
             {
                 foreach ( var formatter in actionDescriptor.Configuration.Formatters.OfType<ODataMediaTypeFormatter>() )
@@ -428,12 +408,6 @@
             Collection<VersionedApiDescription> apiDescriptions,
             ApiVersion apiVersion )
         {
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( route != null );
-            Contract.Requires( relativePath != null );
-            Contract.Requires( apiDescriptions != null );
-            Contract.Requires( apiVersion != null );
-
             var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
             var responseDescription = CreateResponseDescriptionWithRoute( actionDescriptor, route );
             var responseType = responseDescription.ResponseType ?? responseDescription.DeclaredType;

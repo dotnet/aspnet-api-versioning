@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
 #if WEBAPI
     using System.Web.Http.Controllers;
@@ -45,12 +44,13 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <typeparam name="TController">The <see cref="Type">type</see> of controller to build conventions for.</typeparam>
         /// <returns>A new or existing <see cref="IControllerConventionBuilder{T}"/>.</returns>
         public virtual IControllerConventionBuilder<TController> Controller<TController>()
+            where TController : notnull
 #if WEBAPI
-            where TController : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+            , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
         {
-            Contract.Ensures( Contract.Result<IControllerConventionBuilder<TController>>() != null );
-
             var key = GetKey( typeof( TController ) );
 
             if ( !ControllerConventionBuilders.TryGetValue( key, out var builder ) )
@@ -77,9 +77,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>A new or existing <see cref="IControllerConventionBuilder"/>.</returns>
         public virtual IControllerConventionBuilder Controller( Type controllerType )
         {
-            Arg.NotNull( controllerType, nameof( controllerType ) );
-            Contract.Ensures( Contract.Result<IControllerConventionBuilder>() != null );
-
             var key = GetKey( controllerType );
 
             if ( !ControllerConventionBuilders.TryGetValue( key, out var builder ) )
@@ -96,11 +93,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// Adds a new convention applied to all controllers.
         /// </summary>
         /// <param name="convention">The <see cref="IControllerConvention">convention</see> to be applied.</param>
-        public virtual void Add( IControllerConvention convention )
-        {
-            Arg.NotNull( convention, nameof( convention ) );
-            ControllerConventions.Add( convention );
-        }
+        public virtual void Add( IControllerConvention convention ) => ControllerConventions.Add( convention );
 
         bool InternalApplyTo( Model model )
         {
@@ -122,12 +115,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
             foreach ( var convention in ControllerConventions )
             {
-                applied |= convention.Apply( builder, model );
+                applied |= convention.Apply( builder!, model );
             }
 
             if ( applied )
             {
-                builder.ApplyTo( model );
+                builder!.ApplyTo( model );
             }
 
             return applied;
@@ -138,7 +131,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
             // since this only happens once per controller type, there's no advantage to compiling
             // or caching a strongly-typed activator function
             var builderType = typeof( ControllerApiVersionConventionBuilder<> ).MakeGenericType( controllerType ).GetTypeInfo();
-            return (IControllerConventionBuilder) Activator.CreateInstance( builderType );
+            return (IControllerConventionBuilder) Activator.CreateInstance( builderType )!;
         }
     }
 }

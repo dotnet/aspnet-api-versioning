@@ -20,14 +20,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     public interface IReportApiVersions
     {
         /// <summary>
-        /// Reports the API versions defined in the specified models using the the provided collection of HTTP headers.
+        /// Reports the API versions defined in the specified models using the provided collection of HTTP headers.
         /// </summary>
         /// <param name="headers">The collection of <see cref="HttpResponseHeaders">HTTP response headers</see> used to report API versions.</param>
         /// <param name="apiVersionModel">The <see cref="ApiVersionModel">model</see> containing the API versions to report.</param>
         void Report( HttpResponseHeaders headers, ApiVersionModel apiVersionModel );
 
         /// <summary>
-        /// Reports the API versions defined in the specified models using the the provided collection of HTTP headers.
+        /// Reports the API versions defined in the specified models using the provided collection of HTTP headers.
         /// </summary>
         /// <param name="headers">The collection of <see cref="HttpResponseHeaders">HTTP response headers</see> used to report API versions.</param>
         /// <param name="apiVersionModel">The load on-demand <see cref="ApiVersionModel">model</see> containing the API versions to report.</param>

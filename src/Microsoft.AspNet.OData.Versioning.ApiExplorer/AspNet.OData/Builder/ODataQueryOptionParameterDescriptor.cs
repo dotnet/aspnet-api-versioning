@@ -7,7 +7,7 @@
     {
         private string prefix = "$";
 
-        internal ODataQueryOptionParameterDescriptor( string name, Type type, object defaultValue, bool optional = true )
+        internal ODataQueryOptionParameterDescriptor( string name, Type type, object? defaultValue, bool optional = true )
         {
             ParameterName = name;
             ParameterType = type;
@@ -19,7 +19,7 @@
 
         public override Type ParameterType { get; }
 
-        public override object DefaultValue { get; }
+        public override object? DefaultValue { get; }
 
         public override string Prefix => prefix;
 

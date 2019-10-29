@@ -7,7 +7,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 
     /// <summary>
@@ -49,16 +48,13 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                     SupportedApiVersions = emptyVersions;
                     DeprecatedApiVersions = emptyVersions;
                     break;
+                default:
+                    throw new ArgumentException( $"The kind {kind} is not supported." );
             }
         }
 
         internal ApiVersionModel( ApiVersionModel original, IReadOnlyList<ApiVersion> implemented, IReadOnlyList<ApiVersion> supported, IReadOnlyList<ApiVersion> deprecated )
         {
-            Contract.Requires( original != null );
-            Contract.Requires( implemented != null );
-            Contract.Requires( supported != null );
-            Contract.Requires( deprecated != null );
-
             if ( IsApiVersionNeutral = implemented.Count == 0 )
             {
                 DeclaredApiVersions = emptyVersions;
@@ -82,8 +78,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>The declared version also represents the only implemented and supported API version.</remarks>
         public ApiVersionModel( ApiVersion declaredVersion )
         {
-            Arg.NotNull( declaredVersion, nameof( declaredVersion ) );
-
             DeclaredApiVersions = new[] { declaredVersion };
             ImplementedApiVersions = DeclaredApiVersions;
             SupportedApiVersions = DeclaredApiVersions;
@@ -101,9 +95,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// and the <see cref="DeclaredApiVersions">declared API versions</see> are always empty since no controller or action has been specified.</remarks>
         public ApiVersionModel( IEnumerable<ApiVersion> supportedVersions, IEnumerable<ApiVersion> deprecatedVersions )
         {
-            Arg.NotNull( supportedVersions, nameof( supportedVersions ) );
-            Arg.NotNull( deprecatedVersions, nameof( deprecatedVersions ) );
-
             DeclaredApiVersions = emptyVersions;
             ImplementedApiVersions = supportedVersions.Union( deprecatedVersions ).Distinct().ToSortedReadOnlyList();
             SupportedApiVersions = supportedVersions.ToSortedReadOnlyList();
@@ -122,13 +113,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             IEnumerable<ApiVersion> deprecatedVersions,
             IEnumerable<ApiVersion> advertisedVersions,
             IEnumerable<ApiVersion> deprecatedAdvertisedVersions )
-            : this( supportedVersions.Union( deprecatedVersions ), supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions )
-        {
-            Arg.NotNull( supportedVersions, nameof( supportedVersions ) );
-            Arg.NotNull( deprecatedVersions, nameof( deprecatedVersions ) );
-            Arg.NotNull( advertisedVersions, nameof( advertisedVersions ) );
-            Arg.NotNull( deprecatedAdvertisedVersions, nameof( deprecatedAdvertisedVersions ) );
-        }
+            : this( supportedVersions.Union( deprecatedVersions ), supportedVersions, deprecatedVersions, advertisedVersions, deprecatedAdvertisedVersions ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionModel"/> class.
@@ -145,12 +130,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             IEnumerable<ApiVersion> advertisedVersions,
             IEnumerable<ApiVersion> deprecatedAdvertisedVersions )
         {
-            Arg.NotNull( declaredVersions, nameof( declaredVersions ) );
-            Arg.NotNull( supportedVersions, nameof( supportedVersions ) );
-            Arg.NotNull( deprecatedVersions, nameof( deprecatedVersions ) );
-            Arg.NotNull( advertisedVersions, nameof( advertisedVersions ) );
-            Arg.NotNull( deprecatedAdvertisedVersions, nameof( deprecatedAdvertisedVersions ) );
-
             DeclaredApiVersions = declaredVersions.ToSortedReadOnlyList();
             SupportedApiVersions = supportedVersions.Union( advertisedVersions ).ToSortedReadOnlyList();
             DeprecatedApiVersions = deprecatedVersions.Union( deprecatedAdvertisedVersions ).ToSortedReadOnlyList();

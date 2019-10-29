@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Web.Http.Routing;
 
     sealed class VersionedUrlHelperDecorator : UrlHelper
@@ -12,10 +11,6 @@
 
         internal VersionedUrlHelperDecorator( UrlHelper decorated, string routeConstraintName, object apiVersion )
         {
-            Contract.Requires( decorated != null );
-            Contract.Requires( !string.IsNullOrEmpty( routeConstraintName ) );
-            Contract.Requires( apiVersion != null );
-
             this.decorated = decorated;
             this.routeConstraintName = routeConstraintName;
             this.apiVersion = apiVersion;

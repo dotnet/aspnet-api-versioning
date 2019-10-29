@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Versioning.Conventions
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -20,7 +19,11 @@
         /// <paramref name="controllerDescriptor">controller descriptor</paramref>; otherwise, false.</returns>
         public virtual bool ApplyTo( HttpControllerDescriptor controllerDescriptor )
         {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
+
             return InternalApplyTo( controllerDescriptor );
         }
 
@@ -28,8 +31,6 @@
 
         static bool HasDecoratedActions( HttpControllerDescriptor controllerDescriptor )
         {
-            Contract.Requires( controllerDescriptor != null );
-
             var actionSelector = controllerDescriptor.Configuration.Services.GetActionSelector();
             var actions = actionSelector.GetActionMapping( controllerDescriptor ).SelectMany( g => g );
 

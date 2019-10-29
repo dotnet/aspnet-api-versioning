@@ -7,7 +7,6 @@
     using Microsoft.AspNetCore.Routing;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionParameterLocation;
     using static System.Linq.Enumerable;
     using static System.StringComparison;
@@ -35,10 +34,10 @@
             ModelMetadata modelMetadata,
             ApiExplorerOptions options )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( modelMetadata, nameof( modelMetadata ) );
-            Arg.NotNull( options, nameof( options ) );
+            if ( options == null )
+            {
+                throw new ArgumentNullException( nameof( options ) );
+            }
 
             ApiDescription = apiDescription;
             ApiVersion = apiVersion;
@@ -102,7 +101,7 @@
         /// <param name="location">One of the <see cref="ApiVersionParameterLocation"/> values.</param>
         public virtual void AddParameter( string name, ApiVersionParameterLocation location )
         {
-            var add = default( Action<string> );
+            Action<string> add;
 
             switch ( location )
             {
@@ -134,8 +133,6 @@
         /// <param name="name">The name of the query string parameter.</param>
         protected virtual void AddQueryString( string name )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-
             if ( !HasPathParameter )
             {
                 ApiDescription.ParameterDescriptions.Add( NewApiVersionParameter( name, BindingSource.Query ) );
@@ -148,8 +145,6 @@
         /// <param name="name">The name of the header.</param>
         protected virtual void AddHeader( string name )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-
             if ( !HasPathParameter )
             {
                 ApiDescription.ParameterDescriptions.Add( NewApiVersionParameter( name, BindingSource.Header ) );
@@ -199,8 +194,6 @@
         /// <param name="name">The name of the media type parameter.</param>
         protected virtual void AddMediaTypeParameter( string name )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-
             var requestFormats = ApiDescription.SupportedRequestFormats.ToArray();
             var responseTypes = ApiDescription.SupportedResponseTypes.ToArray();
             var parameter = $"{name}={ApiVersion}";
@@ -244,10 +237,6 @@
 
         ApiParameterDescription NewApiVersionParameter( string name, BindingSource source )
         {
-            Contract.Requires( !string.IsNullOrEmpty( name ) );
-            Contract.Requires( source != null );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var parameter = new ApiParameterDescription()
             {
                 DefaultValue = ApiVersion.ToString(),

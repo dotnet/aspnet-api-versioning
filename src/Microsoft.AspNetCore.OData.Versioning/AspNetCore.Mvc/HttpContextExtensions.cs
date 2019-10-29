@@ -17,7 +17,10 @@
         /// <returns>The <see cref="IODataVersioningFeature"/> associated with the current HTTP context.</returns>
         public static IODataVersioningFeature ODataVersioningFeature( this HttpContext httpContext )
         {
-            Arg.NotNull( httpContext, nameof( httpContext ) );
+            if ( httpContext == null )
+            {
+                throw new ArgumentNullException( nameof( httpContext ) );
+            }
 
             var features = httpContext.Features;
             var feature = features.Get<IODataVersioningFeature>();

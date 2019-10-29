@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Text;
     using System.Text.RegularExpressions;
     using static System.Text.RegularExpressions.RegexOptions;
@@ -16,11 +15,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     /// </summary>
     public partial class VersionByNamespaceConvention
     {
-        static string GetRawApiVersion( string @namespace )
+        static string? GetRawApiVersion( string @namespace )
         {
-            Contract.Requires( !string.IsNullOrEmpty( @namespace ) );
-            Contract.Ensures( Contract.Result<string>() != null );
-
             // 'v' | 'V' : [<year> '-' <month> '-' <day>] : [<major[.minor]>] : [<status>]
             // ex: v2018_04_01_1_1_Beta
             const string Pattern = @"[^\.]?[vV](\d{4})?_?(\d{2})?_?(\d{2})?_?(\d+)?_?(\d*)_?([a-zA-Z][a-zA-Z0-9]*)?[\.$]?";
@@ -44,22 +40,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                 match = match.NextMatch();
             }
 
-            switch ( rawApiVersions.Count )
+            return rawApiVersions.Count switch
             {
-                case 0:
-                    return default;
-                case 1:
-                    return rawApiVersions[0];
-            }
-
-            throw new InvalidOperationException( SR.MultipleApiVersionsInferredFromNamespaces.FormatInvariant( @namespace ) );
+                0 => default,
+                1 => rawApiVersions[0],
+                _ => throw new InvalidOperationException( SR.MultipleApiVersionsInferredFromNamespaces.FormatInvariant( @namespace ) ),
+            };
         }
 
         static void ExtractDateParts( Match match, StringBuilder text )
         {
-            Contract.Requires( match != null );
-            Contract.Requires( text != null );
-
             var year = match.Groups[1];
             var month = match.Groups[2];
             var day = match.Groups[3];
@@ -78,9 +68,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
         static void ExtractNumericParts( Match match, StringBuilder text )
         {
-            Contract.Requires( match != null );
-            Contract.Requires( text != null );
-
             var major = match.Groups[4];
 
             if ( !major.Success )
@@ -116,9 +103,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
         static void ExtractStatusPart( Match match, StringBuilder text )
         {
-            Contract.Requires( match != null );
-            Contract.Requires( text != null );
-
             var status = match.Groups[6];
 
             if ( status.Success && text.Length > 0 )

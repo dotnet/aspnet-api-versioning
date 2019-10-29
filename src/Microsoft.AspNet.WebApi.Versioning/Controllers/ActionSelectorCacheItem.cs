@@ -5,8 +5,6 @@
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
@@ -37,12 +35,10 @@
             readonly IDictionary<HttpActionDescriptor, string[]> actionParameterNames = new Dictionary<HttpActionDescriptor, string[]>();
             readonly ILookup<string, HttpActionDescriptor> combinedActionNameMapping;
             readonly HashSet<HttpMethod> allowedMethods = new HashSet<HttpMethod>();
-            StandardActionSelectionCache standardActions;
+            StandardActionSelectionCache? standardActions;
 
             internal ActionSelectorCacheItem( HttpControllerDescriptor controllerDescriptor )
             {
-                Contract.Requires( controllerDescriptor != null );
-
                 this.controllerDescriptor = controllerDescriptor;
 
                 var allMethods = this.controllerDescriptor.ControllerType.GetMethods( BindingFlags.Instance | BindingFlags.Public );
@@ -119,11 +115,12 @@
                 standardActions = selectionCache;
             }
 
-            internal HttpActionDescriptor SelectAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor> selector )
+            internal HttpActionDescriptor? SelectAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor?> selector )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Requires( selector != null );
-                Contract.Ensures( Contract.Result<HttpActionDescriptor>() != null );
+                if ( selector == null )
+                {
+                    throw new ArgumentNullException( nameof( selector ) );
+                }
 
                 InitializeStandardActions();
 
@@ -136,7 +133,7 @@
 
                 if ( controllerContext.RouteData.GetSubRoutes() == null )
                 {
-                    throw firstAttempt.Exception;
+                    throw firstAttempt.Exception!;
                 }
 
                 var secondAttempt = FindAction( controllerContext, selector, ignoreSubRoutes: true );
@@ -146,20 +143,18 @@
                     return secondAttempt.Action;
                 }
 
-                throw firstAttempt.Exception;
+                throw firstAttempt.Exception!;
             }
 
-            ActionSelectionResult FindAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor> selector, bool ignoreSubRoutes )
+            ActionSelectionResult FindAction( HttpControllerContext controllerContext, Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor?> selector, bool ignoreSubRoutes )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Requires( selector != null );
-                Contract.Ensures( Contract.Result<ActionSelectionResult>() != null );
-
                 var selectedCandidates = FindMatchingActions( controllerContext, ignoreSubRoutes );
 
                 if ( selectedCandidates.Count == 0 )
                 {
+#pragma warning disable CA2000 // Dispose objects before losing scope
                     return new ActionSelectionResult( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 }
 
                 if ( selector( controllerContext, selectedCandidates ) is CandidateHttpActionDescriptor action )
@@ -170,7 +165,9 @@
 
                 if ( selectedCandidates.Count == 1 )
                 {
+#pragma warning disable CA2000 // Dispose objects before losing scope
                     return new ActionSelectionResult( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 }
 
                 var ambiguityList = CreateAmbiguousMatchList( selectedCandidates );
@@ -182,9 +179,6 @@
 
             IReadOnlyList<CandidateHttpActionDescriptor> FindMatchingActions( HttpControllerContext controllerContext, bool ignoreSubRoutes = false, bool ignoreVerbs = false )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<IReadOnlyList<CandidateHttpActionDescriptor>>() != null );
-
                 var routeData = controllerContext.RouteData;
                 var subRoutes = ignoreSubRoutes ? default : routeData.GetSubRoutes();
                 var actionsWithParameters = subRoutes == null ?
@@ -199,11 +193,8 @@
                 return selectedCandidates.Select( c => new CandidateHttpActionDescriptor( c ) ).ToArray();
             }
 
-            [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
             HttpResponseMessage CreateSelectionError( HttpControllerContext controllerContext )
             {
-                Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
-
                 var actionsFoundByParams = FindMatchingActions( controllerContext, ignoreVerbs: true );
 
                 if ( actionsFoundByParams.Count == 0 )
@@ -218,24 +209,8 @@
                 return exceptionFactory.CreateMethodNotAllowedResponse( model.IsApiVersionNeutral, allowedMethods );
             }
 
-            [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposing of response instance." )]
-            static HttpResponseMessage CreateBadRequestResponse( HttpControllerContext controllerContext )
-            {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
-
-                var request = controllerContext.Request;
-                var model = new Lazy<ApiVersionModel>( controllerContext.ControllerDescriptor.GetApiVersionModel );
-                var exceptionFactory = new HttpResponseExceptionFactory( request, model );
-                return exceptionFactory.CreateBadRequestResponse( request.GetRequestedApiVersion() );
-            }
-
-            [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
             HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
-
                 var message = SR.ResourceNotFound.FormatDefault( controllerContext.Request.RequestUri );
                 var messageDetail = SR.ApiControllerActionSelector_ActionNotFound.FormatDefault( controllerDescriptor.ControllerName );
                 return controllerContext.Request.CreateErrorResponse( NotFound, message, messageDetail );
@@ -243,9 +218,6 @@
 
             static List<CandidateActionWithParams> GetInitialCandidateWithParameterListForDirectRoutes( HttpControllerContext controllerContext, IEnumerable<IHttpRouteData> subRoutes, bool ignoreVerbs )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
-
                 var candidateActionWithParams = new List<CandidateActionWithParams>();
 
                 if ( subRoutes == null )
@@ -261,6 +233,11 @@
                 {
                     var combinedParameterNames = GetCombinedParameterNames( queryNameValuePairs, subRouteData.Values );
                     var candidates = subRouteData.Route.GetDirectRouteCandidates();
+
+                    if ( candidates == null )
+                    {
+                        continue;
+                    }
 
                     subRouteData.Values.TryGetValue( RouteValueKeys.Action, out string actionName );
 
@@ -281,25 +258,19 @@
 
             IEnumerable<CandidateActionWithParams> GetInitialCandidateWithParameterListForRegularRoutes( HttpControllerContext controllerContext, bool ignoreVerbs = false )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<IEnumerable<CandidateActionWithParams>>() != null );
-
                 var candidates = GetInitialCandidateList( controllerContext, ignoreVerbs );
                 return GetCandidateActionsWithBindings( controllerContext, candidates );
             }
 
             CandidateAction[] GetInitialCandidateList( HttpControllerContext controllerContext, bool ignoreVerbs = false )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Ensures( Contract.Result<CandidateAction[]>() != null );
-
                 var incomingMethod = controllerContext.Request.Method;
                 var routeData = controllerContext.RouteData;
-                var candidates = default( CandidateAction[] );
+                CandidateAction[] candidates;
 
                 if ( routeData.Values.TryGetValue( RouteValueKeys.Action, out string actionName ) )
                 {
-                    var actionsFoundByName = standardActions.StandardActionNameMapping[actionName].ToArray();
+                    var actionsFoundByName = standardActions!.StandardActionNameMapping![actionName].ToArray();
 
                     if ( actionsFoundByName.Length == 0 )
                     {
@@ -330,11 +301,11 @@
                 {
                     if ( ignoreVerbs )
                     {
-                        candidates = standardActions.StandardCandidateActions;
+                        candidates = standardActions!.StandardCandidateActions!;
                     }
                     else
                     {
-                        candidates = FindActionsForVerb( incomingMethod, standardActions.CacheListVerbs, standardActions.StandardCandidateActions );
+                        candidates = FindActionsForVerb( incomingMethod, standardActions!.CacheListVerbs!, standardActions!.StandardCandidateActions! );
                     }
                 }
 
@@ -348,9 +319,6 @@
 
             static ISet<string> GetCombinedParameterNames( IEnumerable<KeyValuePair<string, string>> queryNameValuePairs, IDictionary<string, object> routeValues )
             {
-                Contract.Requires( routeValues != null );
-                Contract.Ensures( Contract.Result<ISet<string>>() != null );
-
                 var routeParameterNames = new HashSet<string>( routeValues.Keys, OrdinalIgnoreCase );
 
                 routeParameterNames.Remove( RouteValueKeys.Controller );
@@ -371,9 +339,6 @@
 
             List<CandidateActionWithParams> FindActionMatchRequiredRouteAndQueryParameters( IEnumerable<CandidateActionWithParams> candidatesFound )
             {
-                Contract.Requires( candidatesFound != null );
-                Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
-
                 var matches = new List<CandidateActionWithParams>();
 
                 foreach ( var candidate in candidatesFound )
@@ -395,10 +360,6 @@
 
             static CandidateActionWithParams[] GetCandidateActionsWithBindings( HttpControllerContext controllerContext, CandidateAction[] candidatesFound )
             {
-                Contract.Requires( controllerContext != null );
-                Contract.Requires( candidatesFound != null );
-                Contract.Ensures( Contract.Result<CandidateActionWithParams[]>() != null );
-
                 var request = controllerContext.Request;
                 var queryNameValuePairs = request.GetQueryNameValuePairs();
                 var routeData = controllerContext.RouteData;
@@ -411,12 +372,9 @@
 
             static bool IsSubset( string[] actionParameters, ISet<string> routeAndQueryParameters )
             {
-                Contract.Requires( actionParameters != null );
-                Contract.Requires( routeAndQueryParameters != null );
-
-                foreach ( var actionParameter in actionParameters )
+                for ( var i = 0; i < actionParameters.Length; i++ )
                 {
-                    if ( !routeAndQueryParameters.Contains( actionParameter ) )
+                    if ( !routeAndQueryParameters.Contains( actionParameters[i] ) )
                     {
                         return false;
                     }
@@ -427,9 +385,6 @@
 
             static List<CandidateActionWithParams> RunOrderFilter( List<CandidateActionWithParams> candidatesFound )
             {
-                Contract.Requires( candidatesFound != null );
-                Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
-
                 if ( candidatesFound.Count == 0 )
                 {
                     return candidatesFound;
@@ -442,9 +397,6 @@
 
             static List<CandidateActionWithParams> RunPrecedenceFilter( List<CandidateActionWithParams> candidatesFound )
             {
-                Contract.Requires( candidatesFound != null );
-                Contract.Ensures( Contract.Result<List<CandidateActionWithParams>>() != null );
-
                 if ( candidatesFound.Count == 0 )
                 {
                     return candidatesFound;
@@ -457,11 +409,6 @@
 
             static CandidateAction[] FindActionsForVerb( HttpMethod verb, CandidateAction[][] actionsByVerb, CandidateAction[] otherActions )
             {
-                Contract.Requires( verb != null );
-                Contract.Requires( actionsByVerb != null );
-                Contract.Requires( otherActions != null );
-                Contract.Ensures( Contract.Result<CandidateAction[]>() != null );
-
                 for ( var i = 0; i < cacheListVerbKinds.Length; i++ )
                 {
                     if ( ReferenceEquals( verb, cacheListVerbKinds[i] ) )
@@ -475,10 +422,6 @@
 
             static CandidateAction[] FindActionsForVerbWorker( HttpMethod verb, CandidateAction[] candidates )
             {
-                Contract.Requires( verb != null );
-                Contract.Requires( candidates != null );
-                Contract.Ensures( Contract.Result<CandidateAction[]>() != null );
-
                 var listCandidates = new List<CandidateAction>();
                 FindActionsForVerbWorker( verb, candidates, listCandidates );
                 return listCandidates.ToArray();
@@ -486,12 +429,9 @@
 
             static void FindActionsForVerbWorker( HttpMethod verb, CandidateAction[] candidates, List<CandidateAction> listCandidates )
             {
-                Contract.Requires( verb != null );
-                Contract.Requires( candidates != null );
-                Contract.Requires( listCandidates != null );
-
-                foreach ( var candidate in candidates )
+                for ( var i = 0; i < candidates.Length; i++ )
                 {
+                    var candidate = candidates[i];
                     var action = candidate.ActionDescriptor;
 
                     if ( action != null && action.SupportedHttpMethods.Contains( verb ) )
@@ -503,9 +443,6 @@
 
             internal static string CreateAmbiguousMatchList( IEnumerable<HttpActionDescriptor> ambiguousCandidates )
             {
-                Contract.Requires( ambiguousCandidates != null );
-                Contract.Ensures( Contract.Result<string>() != null );
-
                 var exceptionMessageBuilder = new StringBuilder();
 
                 foreach ( var descriptor in ambiguousCandidates )
@@ -531,8 +468,6 @@
 
             static bool IsValidActionMethod( MethodInfo methodInfo )
             {
-                Contract.Requires( methodInfo != null );
-
                 if ( methodInfo.IsSpecialName )
                 {
                     return false;

@@ -13,10 +13,6 @@
         /// Initializes a new instance of the <see cref="ControllerNameAttribute"/> class.
         /// </summary>
         /// <param name="name">The name of the controller.</param>
-        public ControllerNameAttribute( string name ) : base( "controller", name )
-        {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-            Name = name;
-        }
+        public ControllerNameAttribute( string name ) : base( "controller", name ) => Name = name;
     }
 }

@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using System;
     using System.ComponentModel;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
     using static System.ComponentModel.EditorBrowsableState;
 
@@ -38,7 +37,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder{T}"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder<T> IsApiVersionNeutral()
         {
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
             VersionNeutral = true;
             return this;
         }
@@ -50,9 +48,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder{T}"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder<T> HasApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
-
             SupportedVersions.Add( apiVersion );
             return this;
         }
@@ -64,9 +59,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder{T}"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder<T> HasDeprecatedApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
-
             DeprecatedVersions.Add( apiVersion );
             return this;
         }
@@ -78,9 +70,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder{T}"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder<T> AdvertisesApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
-
             AdvertisedVersions.Add( apiVersion );
             return this;
         }
@@ -92,9 +81,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder{T}"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder<T> AdvertisesDeprecatedApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder<T>>() != null );
-
             DeprecatedAdvertisedVersions.Add( apiVersion );
             return this;
         }
@@ -105,12 +91,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="actionMethod">The <see cref="MethodInfo">method</see> representing the controller action.</param>
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
         [EditorBrowsable( Never )]
-        public virtual ActionApiVersionConventionBuilder<T> Action( MethodInfo actionMethod )
-        {
-            Arg.NotNull( actionMethod, nameof( actionMethod ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder<T>>() != null );
-            return ActionBuilders.GetOrAdd( actionMethod );
-        }
+        public virtual ActionApiVersionConventionBuilder<T> Action( MethodInfo actionMethod ) => ActionBuilders.GetOrAdd( actionMethod );
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types
         Type IControllerConventionBuilder.ControllerType => typeof( T );

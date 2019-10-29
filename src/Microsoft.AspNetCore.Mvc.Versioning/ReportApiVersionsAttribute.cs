@@ -25,11 +25,7 @@
         /// Initializes a new instance of the <see cref="ReportApiVersionsAttribute"/> class.
         /// </summary>
         /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
-        public ReportApiVersionsAttribute( IReportApiVersions reportApiVersions )
-        {
-            Arg.NotNull( reportApiVersions, nameof( reportApiVersions ) );
-            reporter = reportApiVersions;
-        }
+        public ReportApiVersionsAttribute( IReportApiVersions reportApiVersions ) => reporter = reportApiVersions;
 
         /// <summary>
         /// Reports the discovered service API versions for the given context before an action has executed.
@@ -41,6 +37,11 @@
         /// streaming to the client.</remarks>
         public override void OnActionExecuting( ActionExecutingContext context )
         {
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             var response = context.HttpContext.Response;
 
             if ( response == null )

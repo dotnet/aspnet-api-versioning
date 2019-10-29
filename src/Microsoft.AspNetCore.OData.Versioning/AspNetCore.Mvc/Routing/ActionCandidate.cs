@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 
     [DebuggerDisplay( "{Action.DisplayName,nq}" )]
@@ -12,8 +11,6 @@
     {
         internal ActionCandidate( ActionDescriptor action )
         {
-            Contract.Requires( action != null );
-
             TotalParameterCount = action.Parameters.Count;
 
             var filteredParameters = new List<string>( TotalParameterCount );

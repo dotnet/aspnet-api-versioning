@@ -7,7 +7,6 @@
     using Microsoft.OData.UriParser;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static Microsoft.AspNet.OData.Routing.ODataRouteConstants;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
     using static System.String;
@@ -43,7 +42,7 @@
                 {
                     DefaultValue = default( string ),
                     IsRequired = true,
-                    ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider, type, default ),
+                    ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider!, type, description: Empty ),
                     Name = NavigationProperty,
                     ParameterDescriptor = new ParameterDescriptor()
                     {
@@ -86,7 +85,7 @@
             }
 
             parameter.IsRequired = true;
-            parameter.ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider, type, description );
+            parameter.ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider!, type, description );
             parameter.Name = name;
             parameter.ParameterDescriptor.Name = name;
             parameter.ParameterDescriptor.ParameterType = type;
@@ -125,7 +124,7 @@
             }
 
             parameter.IsRequired = true;
-            parameter.ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider, type, default );
+            parameter.ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider!, type, description: Empty );
             parameter.ParameterDescriptor.ParameterType = type;
             parameter.Source = Body;
             parameter.Type = type;
@@ -133,18 +132,18 @@
 
         static string RemoveRouteConstraints( string routePrefix )
         {
-            Contract.Requires( !IsNullOrEmpty( routePrefix ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
-
             var parsedTemplate = TemplateParser.Parse( routePrefix );
             var segments = new List<string>( parsedTemplate.Segments.Count );
 
-            foreach ( var segment in parsedTemplate.Segments )
+            for ( var i = 0; i < parsedTemplate.Segments.Count; i++ )
             {
                 var currentSegment = Empty;
+                var parts = parsedTemplate.Segments[i].Parts;
 
-                foreach ( var part in segment.Parts )
+                for ( var j = 0; j < parts.Count; j++ )
                 {
+                    var part = parts[j];
+
                     if ( part.IsLiteral )
                     {
                         currentSegment += part.Text;

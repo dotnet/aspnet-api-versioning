@@ -25,10 +25,7 @@
         /// <see cref="ApiVersioningOptions.RegisterMiddleware"/> to <c>false</c>.
         /// </para>
         /// </remarks>
-        public static IApplicationBuilder UseApiVersioning( this IApplicationBuilder app )
-        {
-            Arg.NotNull( app, nameof( app ) );
-            return app.UseMiddleware<ApiVersioningMiddleware>();
-        }
+        public static IApplicationBuilder UseApiVersioning( this IApplicationBuilder app ) =>
+            app.UseMiddleware<ApiVersioningMiddleware>();
     }
 }

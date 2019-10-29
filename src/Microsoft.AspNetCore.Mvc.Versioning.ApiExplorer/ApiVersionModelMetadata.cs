@@ -23,7 +23,10 @@
         public ApiVersionModelMetadata( IModelMetadataProvider modelMetadataProvider, string description )
             : base( ModelMetadataIdentity.ForType( typeof( string ) ) )
         {
-            Arg.NotNull( modelMetadataProvider, nameof( modelMetadataProvider ) );
+            if ( modelMetadataProvider == null )
+            {
+                throw new ArgumentNullException( nameof( modelMetadataProvider ) );
+            }
 
             inner = modelMetadataProvider.GetMetadataForType( typeof( string ) );
             this.description = description;

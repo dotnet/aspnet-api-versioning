@@ -24,10 +24,13 @@
         /// <param name="odataPath">The OData path.</param>
         /// <param name="request">The request.</param>
         /// <returns>The name of the selected controller or <c>null</c> if the request isn't handled by this convention.</returns>
-        protected virtual string SelectController( ODataPath odataPath, HttpRequest request )
+        protected virtual string? SelectController( ODataPath odataPath, HttpRequest request )
         {
-            Arg.NotNull( odataPath, nameof( odataPath ) );
-            Arg.NotNull( request, nameof( request ) );
+            if ( odataPath == null )
+            {
+                throw new ArgumentNullException( nameof( odataPath ) );
+            }
+
             return odataPath.PathTemplate == "~" || odataPath.PathTemplate == "~/$metadata" ? "VersionedMetadata" : null;
         }
 
@@ -38,11 +41,14 @@
         /// <returns>The name of the selected action or <c>null</c> if the request isn't handled by this convention.</returns>
         /// <remarks>The matching <see cref="IEnumerable{T}">sequence</see> of <see cref="ControllerActionDescriptor">actions</see>
         /// or <c>null</c> if no actions match the convention.</remarks>
-        public virtual IEnumerable<ControllerActionDescriptor> SelectAction( RouteContext routeContext )
+        public virtual IEnumerable<ControllerActionDescriptor>? SelectAction( RouteContext routeContext )
         {
-            Arg.NotNull( routeContext, nameof( routeContext ) );
+            if ( routeContext == null )
+            {
+                throw new ArgumentNullException( nameof( routeContext ) );
+            }
 
-            const IEnumerable<ControllerActionDescriptor> NoActions = default;
+            const IEnumerable<ControllerActionDescriptor>? NoActions = default;
             var httpContext = routeContext.HttpContext;
             var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
             var odataPath = httpContext.ODataFeature().Path;

@@ -6,7 +6,7 @@
     /// <content>
     /// Provides additional implementation specific to Microsoft ASP.NET Web API.
     /// </content>
-    public partial class ActionApiVersionConventionBuilder<T> : IActionConventionBuilder<T> where T : IHttpController
+    public partial class ActionApiVersionConventionBuilder<T> : IActionConventionBuilder<T> where T : notnull, IHttpController
     {
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
-    using System.Diagnostics.Contracts;
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -23,8 +23,10 @@
         /// <inheritdoc />
         public override Task ExecuteBindingAsync( ModelMetadataProvider metadataProvider, HttpActionContext actionContext, CancellationToken cancellationToken )
         {
-            Contract.Assert( metadataProvider != null );
-            Contract.Assert( actionContext != null );
+            if ( actionContext == null )
+            {
+                throw new ArgumentNullException( nameof( actionContext ) );
+            }
 
             var value = actionContext.Request.ApiVersionProperties().RequestedApiVersion;
             SetValue( actionContext, value );

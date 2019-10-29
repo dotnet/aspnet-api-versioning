@@ -35,9 +35,6 @@
 
         static Func<MediaTypeFormatter, MediaTypeFormatter> NewCloneFunction( Type type )
         {
-            Contract.Requires( type != null );
-            Contract.Ensures( Contract.Result<Func<MediaTypeFormatter, MediaTypeFormatter>>() != null );
-
             var clone = NewCopyConstructorActivator( type ) ??
                         NewParameterlessConstructorActivator( type ) ??
                         throw new InvalidOperationException( LocalSR.MediaTypeFormatterNotCloneable.FormatDefault( type.Name, typeof( ICloneable ).Name ) );
@@ -45,10 +42,8 @@
             return instance => CloneMediaTypes( clone( instance ), instance );
         }
 
-        static Func<MediaTypeFormatter, MediaTypeFormatter> NewCopyConstructorActivator( Type type )
+        static Func<MediaTypeFormatter, MediaTypeFormatter>? NewCopyConstructorActivator( Type type )
         {
-            Contract.Requires( type != null );
-
             var constructors = from ctor in type.GetConstructors( Public | NonPublic | Instance )
                                let args = ctor.GetParameters()
                                where args.Length == 1 && type.Equals( args[0].ParameterType )
@@ -69,9 +64,6 @@
 
         static Func<MediaTypeFormatter, MediaTypeFormatter> ReinitializeSupportedMediaTypes( Func<MediaTypeFormatter, MediaTypeFormatter> clone )
         {
-            Contract.Requires( clone != null );
-            Contract.Ensures( Contract.Result<Func<MediaTypeFormatter, MediaTypeFormatter>>() != null );
-
             return formatter =>
             {
                 var instance = clone( formatter );
@@ -80,10 +72,8 @@
             };
         }
 
-        static Func<MediaTypeFormatter, MediaTypeFormatter> NewParameterlessConstructorActivator( Type type )
+        static Func<MediaTypeFormatter, MediaTypeFormatter>? NewParameterlessConstructorActivator( Type type )
         {
-            Contract.Requires( type != null );
-
             var constructors = from ctor in type.GetConstructors( Public | NonPublic | Instance )
                                let args = ctor.GetParameters()
                                where args.Length == 0
@@ -99,15 +89,12 @@
             var @new = New( constructor );
             var lambda = Lambda<Func<MediaTypeFormatter, MediaTypeFormatter>>( @new, formatter );
 
-            return lambda.Compile(); // formatter => new MediaTypeFormatter();
+            // formatter => new MediaTypeFormatter();
+            return lambda.Compile();
         }
 
         static MediaTypeFormatter CloneMediaTypes( MediaTypeFormatter target, MediaTypeFormatter source )
         {
-            Contract.Requires( target != null );
-            Contract.Requires( source != null );
-            Contract.Ensures( Contract.Result<MediaTypeFormatter>() != null );
-
             target.SupportedMediaTypes.Clear();
 
             foreach ( var mediaType in source.SupportedMediaTypes )
@@ -130,8 +117,8 @@
 #pragma warning restore RS0010
         {
             static readonly ConstructorInfo newCollection;
-            static FieldInfo field;
-            static PropertyInfo property;
+            static readonly FieldInfo field;
+            static readonly PropertyInfo property;
 
 #pragma warning disable CA1810 // Initialize reference type static fields inline; cannot be inlined
             static SupportedMediaTypesInitializer()

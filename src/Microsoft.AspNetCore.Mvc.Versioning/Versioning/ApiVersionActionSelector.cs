@@ -12,7 +12,6 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static ApiVersionMapping;
     using static ErrorCodes;
@@ -61,7 +60,10 @@
         /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="ActionDescriptor">actions</see>.</returns>
         public virtual IReadOnlyList<ActionDescriptor> SelectCandidates( RouteContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var cache = Current;
             var keys = cache.RouteKeys;
@@ -90,10 +92,12 @@
         /// <param name="context">The current <see cref="RouteContext">route context</see> to evaluate.</param>
         /// <param name="candidates">The <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="ActionDescriptor">actions</see> to select from.</param>
         /// <returns>The best candidate <see cref="ActionDescriptor">action</see> or <c>null</c> if no candidate matches.</returns>
-        public virtual ActionDescriptor SelectBestCandidate( RouteContext context, IReadOnlyList<ActionDescriptor> candidates )
+        public virtual ActionDescriptor? SelectBestCandidate( RouteContext context, IReadOnlyList<ActionDescriptor> candidates )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var httpContext = context.HttpContext;
 
@@ -135,8 +139,10 @@
         /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of the best matching <see cref="ActionDescriptor">actions</see>.</returns>
         protected virtual IReadOnlyList<ActionDescriptor> SelectBestActions( ActionSelectionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var requestedVersion = context.RequestedVersion;
 
@@ -191,9 +197,12 @@
         /// matching <see cref="ActionDescriptor">action</see>.</param>
         /// <returns>The selected <see cref="ActionDescriptor">action</see> with the API versioning convention applied or <c>null</c>.</returns>
         /// <remarks>This method typically matches a non-API action such as a Razor page.</remarks>
-        protected virtual ActionDescriptor SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
+        protected virtual ActionDescriptor? SelectActionWithoutApiVersionConvention( IReadOnlyList<ActionDescriptor> matches )
         {
-            Arg.NotNull( matches, nameof( matches ) );
+            if ( matches == null )
+            {
+                throw new ArgumentNullException( nameof( matches ) );
+            }
 
             if ( matches.Count != 1 )
             {
@@ -218,9 +227,12 @@
         /// <returns>True if the requested API version is ambiguous; otherwise, false.</returns>
         /// <remarks>This method will also change the <see cref="RouteContext.Handler"/> to an appropriate
         /// error response if the API version is ambiguous.</remarks>
-        protected virtual bool IsRequestedApiVersionAmbiguous( RouteContext context, out ApiVersion apiVersion )
+        protected virtual bool IsRequestedApiVersionAmbiguous( RouteContext context, out ApiVersion? apiVersion )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var httpContext = context.HttpContext;
 
@@ -255,9 +267,15 @@
         /// action constraints have been evaluated.</returns>
         protected virtual IReadOnlyList<ActionDescriptor> EvaluateActionConstraints( RouteContext context, IReadOnlyList<ActionDescriptor> actions )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( actions, nameof( actions ) );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ActionDescriptor>>() != null );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
+            if ( actions == null )
+            {
+                throw new ArgumentNullException( nameof( actions ) );
+            }
 
             var candidates = new List<ActionSelectorCandidate>();
 
@@ -278,11 +296,8 @@
             return matches.Select( candidate => candidate.Action ).ToArray();
         }
 
-        IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )
+        IReadOnlyList<ActionSelectorCandidate>? EvaluateActionConstraintsCore( RouteContext context, IReadOnlyList<ActionSelectorCandidate> candidates, int? startingOrder )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( candidates != null );
-
             var order = default( int? );
 
             for ( var i = 0; i < candidates.Count; i++ )
@@ -382,21 +397,18 @@
         {
             public static readonly StringArrayComparer Ordinal = new StringArrayComparer( StringComparer.Ordinal );
             public static readonly StringArrayComparer OrdinalIgnoreCase = new StringArrayComparer( StringComparer.OrdinalIgnoreCase );
-            private readonly StringComparer valueComparer;
+            readonly StringComparer valueComparer;
 
-            private StringArrayComparer( StringComparer valueComparer )
-            {
-                this.valueComparer = valueComparer;
-            }
+            StringArrayComparer( StringComparer valueComparer ) => this.valueComparer = valueComparer;
 
-            public bool Equals( string[] x, string[] y )
+            public bool Equals( string[]? x, string[]? y )
             {
-                if ( object.ReferenceEquals( x, y ) )
+                if ( ReferenceEquals( x, y ) )
                 {
                     return true;
                 }
 
-                if ( x == null ^ y == null )
+                if ( x == null || y == null )
                 {
                     return false;
                 }

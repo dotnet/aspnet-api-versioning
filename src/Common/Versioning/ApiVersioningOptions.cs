@@ -12,7 +12,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 #endif
     using System;
-    using System.Diagnostics.Contracts;
 #if WEBAPI
     using static Microsoft.Web.Http.Versioning.ApiVersionReader;
 #else
@@ -24,17 +23,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </summary>
     public partial class ApiVersioningOptions
     {
-        string routeConstraintName = "apiVersion";
-        ApiVersion defaultApiVersion = ApiVersion.Default;
-        IApiVersionReader apiVersionReader = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
-        IApiVersionSelector apiVersionSelector;
-        IErrorResponseProvider errorResponseProvider = new DefaultErrorResponseProvider();
-        IApiVersionConventionBuilder conventions = new ApiVersionConventionBuilder();
+        IApiVersionReader? apiVersionReader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningOptions"/> class.
         /// </summary>
-        public ApiVersioningOptions() => apiVersionSelector = new DefaultApiVersionSelector( this );
+        public ApiVersioningOptions() => ApiVersionSelector = new DefaultApiVersionSelector( this );
 
         /// <summary>
         /// Gets or sets the name associated with the API version route constraint.
@@ -44,15 +38,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>The route constraint name is only applicable when versioning using the URL segment method. Changing
         /// this property is only necessary if you prefer an alternate name in for the constraint in your route templates;
         /// for example, "api-version" or simply "version".</remarks>
-        public string RouteConstraintName
-        {
-            get => routeConstraintName;
-            set
-            {
-                Arg.NotNullOrEmpty( value, nameof( value ) );
-                routeConstraintName = value;
-            }
-        }
+        public string RouteConstraintName { get; set; } = "apiVersion";
 
         /// <summary>
         /// Gets or sets a value indicating whether requests report the service API version compatibility
@@ -86,15 +72,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Gets or sets the default API version applied to services that do not have explicit versions.
         /// </summary>
         /// <value>The default <see cref="ApiVersion">API version</see>. The default value is <see cref="ApiVersion.Default"/>.</value>
-        public ApiVersion DefaultApiVersion
-        {
-            get => defaultApiVersion;
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                defaultApiVersion = value;
-            }
-        }
+        public ApiVersion DefaultApiVersion { get; set; } = ApiVersion.Default;
 
         /// <summary>
         /// Gets or sets the service API version reader.
@@ -112,16 +90,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
         public IApiVersionReader ApiVersionReader
         {
-            get
-            {
-                Contract.Ensures( apiVersionReader != null );
-                return apiVersionReader;
-            }
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                apiVersionReader = value;
-            }
+            get => apiVersionReader ??= Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
+            set => apiVersionReader = value;
         }
 
         /// <summary>
@@ -135,19 +105,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public IApiVersionSelector ApiVersionSelector
-        {
-            get
-            {
-                Contract.Ensures( apiVersionSelector != null );
-                return apiVersionSelector;
-            }
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                apiVersionSelector = value;
-            }
-        }
+        public IApiVersionSelector ApiVersionSelector { get; set; }
 
         /// <summary>
         /// Gets or sets the builder used to define API version conventions.
@@ -156,19 +114,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public IApiVersionConventionBuilder Conventions
-        {
-            get
-            {
-                Contract.Ensures( conventions != null );
-                return conventions;
-            }
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                conventions = value;
-            }
-        }
+        public IApiVersionConventionBuilder Conventions { get; set; } = new ApiVersionConventionBuilder();
 
         /// <summary>
         /// Gets or sets the object used to generate HTTP error responses related to API versioning.
@@ -178,18 +124,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public IErrorResponseProvider ErrorResponses
-        {
-            get
-            {
-                Contract.Ensures( errorResponseProvider != null );
-                return errorResponseProvider;
-            }
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                errorResponseProvider = value;
-            }
-        }
+        public IErrorResponseProvider ErrorResponses { get; set; } = new DefaultErrorResponseProvider();
     }
 }

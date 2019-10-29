@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -16,7 +15,7 @@
     public partial class ApiVersionActionSelector : IHttpActionSelector
     {
         readonly object cacheKey = new object();
-        ActionSelectorCacheItem fastCache;
+        ActionSelectorCacheItem? fastCache;
 
         /// <summary>
         /// Selects and returns the action descriptor to invoke given the provided controller context.
@@ -24,10 +23,12 @@
         /// <param name="controllerContext">The current <see cref="HttpControllerContext">controller context</see>.</param>
         /// <returns>The <see cref="HttpActionDescriptor">action descriptor</see> that matches the current
         /// <paramref name="controllerContext">controller context</paramref>.</returns>
-        public virtual HttpActionDescriptor SelectAction( HttpControllerContext controllerContext )
+        public virtual HttpActionDescriptor? SelectAction( HttpControllerContext controllerContext )
         {
-            Arg.NotNull( controllerContext, nameof( controllerContext ) );
-            Contract.Ensures( Contract.Result<HttpActionDescriptor>() != null );
+            if ( controllerContext == null )
+            {
+                throw new ArgumentNullException( nameof( controllerContext ) );
+            }
 
             var internalSelector = GetInternalSelector( controllerContext.ControllerDescriptor );
             return internalSelector.SelectAction( controllerContext, SelectActionVersion );
@@ -41,8 +42,10 @@
         /// specified <paramref name="controllerDescriptor">controller descriptor</paramref>.</returns>
         public virtual ILookup<string, HttpActionDescriptor> GetActionMapping( HttpControllerDescriptor controllerDescriptor )
         {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
-            Contract.Ensures( Contract.Result<ILookup<string, HttpActionDescriptor>>() != null );
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
 
             var actionMappings = ( from descriptor in controllerDescriptor.AsEnumerable()
                                    let selector = GetInternalSelector( descriptor )
@@ -61,10 +64,17 @@
         /// match is found.</returns>
         /// <remarks>This method should return <c>null</c> if either no match is found or the matched action is
         /// ambiguous among the provided list of <paramref name="candidateActions">candidate actions</paramref>.</remarks>
-        protected virtual HttpActionDescriptor SelectActionVersion( HttpControllerContext controllerContext, IReadOnlyList<HttpActionDescriptor> candidateActions )
+        protected virtual HttpActionDescriptor? SelectActionVersion( HttpControllerContext controllerContext, IReadOnlyList<HttpActionDescriptor> candidateActions )
         {
-            Arg.NotNull( controllerContext, nameof( controllerContext ) );
-            Arg.NotNull( candidateActions, nameof( candidateActions ) );
+            if ( controllerContext == null )
+            {
+                throw new ArgumentNullException( nameof( controllerContext ) );
+            }
+
+            if ( candidateActions == null )
+            {
+                throw new ArgumentNullException( nameof( candidateActions ) );
+            }
 
             if ( candidateActions.Count == 0 )
             {
@@ -129,9 +139,6 @@
 
         ActionSelectorCacheItem GetInternalSelector( HttpControllerDescriptor controllerDescriptor )
         {
-            Contract.Requires( controllerDescriptor != null );
-            Contract.Ensures( Contract.Result<ActionSelectorCacheItem>() != null );
-
             controllerDescriptor = Decorator.GetInner( controllerDescriptor );
 
             if ( fastCache == null )

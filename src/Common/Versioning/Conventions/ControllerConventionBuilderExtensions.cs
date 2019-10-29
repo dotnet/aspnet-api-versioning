@@ -27,12 +27,22 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
         public static IActionConventionBuilder<TController> Action<TController>( this IControllerConventionBuilder<TController> builder, Expression<Action<TController>> actionExpression )
+            where TController : notnull
 #if WEBAPI
-            where TController : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+            , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( actionExpression, nameof( actionExpression ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
+
+            if ( actionExpression == null )
+            {
+                throw new ArgumentNullException( nameof( actionExpression ) );
+            }
 
             return builder.Action( actionExpression.ExtractMethod() );
         }
@@ -46,12 +56,23 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
         public static IActionConventionBuilder<TController> Action<TController, TResult>( this IControllerConventionBuilder<TController> builder, Expression<Func<TController, TResult>> actionExpression )
+            where TController : notnull
 #if WEBAPI
-            where TController : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+            , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( actionExpression, nameof( actionExpression ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
+
+            if ( actionExpression == null )
+            {
+                throw new ArgumentNullException( nameof( actionExpression ) );
+            }
+
             return builder.Action( actionExpression.ExtractMethod() );
         }
 
@@ -68,8 +89,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
         public static IActionConventionBuilder Action( this IControllerConventionBuilder builder, string methodName, params Type[] argumentTypes )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNullOrEmpty( methodName, nameof( methodName ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             var method = ActionMethodResolver.Resolve( builder.ControllerType, methodName, argumentTypes );
             return builder.Action( method );

@@ -1,11 +1,10 @@
 ﻿namespace System.Web.Http
 {
-    using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics.Contracts;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
     using static System.ComponentModel.EditorBrowsableState;
@@ -28,19 +27,13 @@
         /// <see cref="HttpActionDescriptorExtensions.MappingTo(HttpActionDescriptor, ApiVersion)"/> instead. Components
         /// such as the <see cref="IApiExplorer"/> may need to know API versions declared by an action's defining controller.</remarks>
         [EditorBrowsable( Never )]
-        public static ApiVersionModel GetApiVersionModel( this HttpControllerDescriptor controllerDescriptor )
-        {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
-            Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
-            return controllerDescriptor.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
-        }
+        public static ApiVersionModel GetApiVersionModel( this HttpControllerDescriptor controllerDescriptor ) =>
+            controllerDescriptor.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
 
         internal static void SetApiVersionModel( this HttpControllerDescriptor controller, ApiVersionModel value ) => controller.SetProperty( value );
 
         internal static bool IsAttributeRouted( this HttpControllerDescriptor controller )
         {
-            Contract.Requires( controller != null );
-
             controller.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
             return value ?? false;
         }
@@ -86,20 +79,21 @@
 
         static T GetProperty<T>( this HttpControllerDescriptor controller )
         {
-            Contract.Requires( controller != null );
+            if ( controller == null )
+            {
+                throw new ArgumentNullException( nameof( controller ) );
+            }
 
             if ( controller.Properties.TryGetValue( typeof( T ), out T value ) )
             {
                 return value;
             }
 
-            return default;
+            return default!;
         }
 
         static void SetProperty<T>( this HttpControllerDescriptor controller, T value )
         {
-            Contract.Requires( controller != null );
-
             controller.Properties.AddOrUpdate( typeof( T ), value, ( key, oldValue ) => value );
 
             if ( controller is IEnumerable<HttpControllerDescriptor> groupedControllerDescriptors )

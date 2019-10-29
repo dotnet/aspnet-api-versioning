@@ -37,11 +37,6 @@
             ILoggerFactory loggerFactory,
             IOptions<ApiVersioningOptions> options )
         {
-            Arg.NotNull( errorResponseProvider, nameof( errorResponseProvider ) );
-            Arg.NotNull( reportApiVersions, nameof( reportApiVersions ) );
-            Arg.NotNull( loggerFactory, nameof( loggerFactory ) );
-            Arg.NotNull( options, nameof( options ) );
-
             ErrorResponseProvider = errorResponseProvider;
             ApiVersionReporter = reportApiVersions;
             Logger = loggerFactory.CreateLogger( GetType() );
@@ -78,12 +73,14 @@
         /// <param name="context">The <see cref="RouteContext">route context</see> to evaluate against.</param>
         /// <param name="selectionResult">The <see cref="ActionSelectionResult">result</see> of action selection.</param>
         /// <returns>The <see cref="ActionDescriptor">action</see> conforming to the policy or <c>null</c>.</returns>
-        public virtual ActionDescriptor Evaluate( RouteContext context, ActionSelectionResult selectionResult )
+        public virtual ActionDescriptor? Evaluate( RouteContext context, ActionSelectionResult selectionResult )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( selectionResult, nameof( selectionResult ) );
+            if ( selectionResult == null )
+            {
+                throw new ArgumentNullException( nameof( selectionResult ) );
+            }
 
-            const ActionDescriptor NoMatch = default;
+            const ActionDescriptor? NoMatch = default;
 
             switch ( selectionResult.MatchingActions.Count )
             {
@@ -106,8 +103,11 @@
         /// <returns>The single, matching <see cref="ActionDescriptor">action</see> conforming to the policy.</returns>
         protected virtual ActionDescriptor OnSingleMatch( RouteContext context, ActionSelectionResult selectionResult )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( selectionResult, nameof( selectionResult ) );
+            if ( selectionResult == null )
+            {
+                throw new ArgumentNullException( nameof( selectionResult ) );
+            }
+
             return selectionResult.BestMatch;
         }
 
@@ -118,10 +118,17 @@
         /// <param name="selectionResult">The current <see cref="ActionSelectionResult">action selection result</see>.</param>
         protected virtual void OnUnmatched( RouteContext context, ActionSelectionResult selectionResult )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( selectionResult, nameof( selectionResult ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
-            const RequestHandler NotFound = default;
+            if ( selectionResult == null )
+            {
+                throw new ArgumentNullException( nameof( selectionResult ) );
+            }
+
+            const RequestHandler? NotFound = default;
             var candidates = selectionResult.CandidateActions;
             var handler = NotFound;
 
@@ -139,7 +146,7 @@
                 handler = builder.Build();
             }
 
-            context.Handler = handler;
+            context.Handler = handler!;
         }
 
         /// <summary>
@@ -150,8 +157,10 @@
         /// <remarks>The default implementation always throws an <see cref="AmbiguousActionException"/>.</remarks>
         protected virtual void OnMultipleMatches( RouteContext context, ActionSelectionResult selectionResult )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( selectionResult, nameof( selectionResult ) );
+            if ( selectionResult == null )
+            {
+                throw new ArgumentNullException( nameof( selectionResult ) );
+            }
 
             var actionNames = Join( NewLine, selectionResult.MatchingActions.Select( a => a.ExpandSignature() ) );
 

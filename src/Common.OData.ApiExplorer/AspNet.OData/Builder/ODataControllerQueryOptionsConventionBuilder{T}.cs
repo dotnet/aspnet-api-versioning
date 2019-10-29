@@ -2,7 +2,6 @@
 {
     using System;
     using System.ComponentModel;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
     using static System.ComponentModel.EditorBrowsableState;
 
@@ -31,22 +30,17 @@
         /// <param name="actionMethod">The <see cref="MethodInfo">method</see> representing the controller action.</param>
         /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         [EditorBrowsable( Never )]
-        public virtual ODataActionQueryOptionsConventionBuilder<T> Action( MethodInfo actionMethod )
-        {
-            Arg.NotNull( actionMethod, nameof( actionMethod ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-            return ActionBuilders.GetOrAdd( actionMethod );
-        }
+        public virtual ODataActionQueryOptionsConventionBuilder<T> Action( MethodInfo actionMethod ) => ActionBuilders.GetOrAdd( actionMethod );
 
         /// <inheritdoc />
         public virtual IODataQueryOptionsConvention Build( ODataQueryOptionSettings settings ) =>
             new ODataControllerQueryOptionConvention( Lookup, settings );
 
-        bool Lookup( MethodInfo action, ODataQueryOptionSettings settings, out IODataQueryOptionsConvention convention )
+        bool Lookup( MethodInfo action, ODataQueryOptionSettings settings, out IODataQueryOptionsConvention? convention )
         {
             if ( ActionBuilders.TryGetValue( action, out var builder ) )
             {
-                convention = builder.Build( settings );
+                convention = builder!.Build( settings );
                 return true;
             }
 

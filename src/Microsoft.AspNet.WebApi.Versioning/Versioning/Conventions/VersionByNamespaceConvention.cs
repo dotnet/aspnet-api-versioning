@@ -18,8 +18,15 @@
         /// otherwise, false.</returns>
         public virtual bool Apply( IControllerConventionBuilder controller, HttpControllerDescriptor controllerDescriptor )
         {
-            Arg.NotNull( controller, nameof( controller ) );
-            Arg.NotNull( controllerDescriptor, nameof( controller ) );
+            if ( controller == null )
+            {
+                throw new ArgumentNullException( nameof( controller ) );
+            }
+
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
 
             var text = GetRawApiVersion( controllerDescriptor.ControllerType.Namespace );
 
@@ -32,11 +39,11 @@
 
             if ( deprecated )
             {
-                controller.HasDeprecatedApiVersion( apiVersion );
+                controller.HasDeprecatedApiVersion( apiVersion! );
             }
             else
             {
-                controller.HasApiVersion( apiVersion );
+                controller.HasApiVersion( apiVersion! );
             }
 
             return true;

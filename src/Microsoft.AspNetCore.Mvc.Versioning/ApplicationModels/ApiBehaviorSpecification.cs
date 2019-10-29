@@ -16,7 +16,7 @@
         public ApiBehaviorSpecification()
         {
             const string ApiBehaviorApplicationModelProviderTypeName = "Microsoft.AspNetCore.Mvc.ApplicationModels.ApiBehaviorApplicationModelProvider, Microsoft.AspNetCore.Mvc.Core";
-            var type = Type.GetType( ApiBehaviorApplicationModelProviderTypeName, throwOnError: true );
+            var type = Type.GetType( ApiBehaviorApplicationModelProviderTypeName, throwOnError: true )!;
             var method = type.GetRuntimeMethods().Single( m => m.Name == "IsApiController" );
 
             IsApiController = (Func<ControllerModel, bool>) method.CreateDelegate( typeof( Func<ControllerModel, bool> ) );
@@ -25,10 +25,6 @@
         Func<ControllerModel, bool> IsApiController { get; }
 
         /// <inheritdoc />
-        public bool IsSatisfiedBy( ControllerModel controller )
-        {
-            Arg.NotNull( controller, nameof( controller ) );
-            return IsApiController( controller );
-        }
+        public bool IsSatisfiedBy( ControllerModel controller ) => IsApiController( controller );
     }
 }

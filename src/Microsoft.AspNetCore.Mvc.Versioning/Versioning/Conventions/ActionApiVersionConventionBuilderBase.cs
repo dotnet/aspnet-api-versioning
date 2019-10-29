@@ -17,7 +17,10 @@
         /// <param name="actionModel">The <see cref="ActionModel">action model</see> to apply the conventions to.</param>
         public virtual void ApplyTo( ActionModel actionModel )
         {
-            Arg.NotNull( actionModel, nameof( actionModel ) );
+            if ( actionModel == null )
+            {
+                throw new ArgumentNullException( nameof( actionModel ) );
+            }
 
             MergeAttributesWithConventions( actionModel.Attributes );
 
@@ -27,7 +30,7 @@
                 return;
             }
 
-            var versionModel = default( ApiVersionModel );
+            ApiVersionModel versionModel;
 
             if ( MappedVersions.Count == 0 )
             {

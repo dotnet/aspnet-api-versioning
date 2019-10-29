@@ -8,7 +8,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Microsoft.AspNetCore.Http;
 #endif
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 #if WEBAPI
     using HttpRequest = System.Net.Http.HttpRequestMessage;
@@ -29,11 +28,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="CurrentImplementationApiVersionSelector"/> class.
         /// </summary>
         /// <param name="options">The <see cref="ApiVersioningOptions">API versioning options</see> associated with the selector.</param>
-        public CurrentImplementationApiVersionSelector( ApiVersioningOptions options )
-        {
-            Arg.NotNull( options, nameof( options ) );
-            this.options = options;
-        }
+        public CurrentImplementationApiVersionSelector( ApiVersioningOptions options ) => this.options = options;
 
         /// <summary>
         /// Selects an API version given the specified HTTP request and API version information.
@@ -42,11 +37,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="model">The <see cref="ApiVersionModel">model</see> to select the version from.</param>
         /// <returns>The selected <see cref="ApiVersion">API version</see>.</returns>
         /// <remarks>This method always returns the default <see cref="ApiVersion.Default">API version</see>.</remarks>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Validated by a code contract." )]
         public virtual ApiVersion SelectVersion( HttpRequest request, ApiVersionModel model )
         {
-            Arg.NotNull( request, nameof( request ) );
-            Arg.NotNull( model, nameof( model ) );
+            if ( model == null )
+            {
+                throw new ArgumentNullException( nameof( model ) );
+            }
 
             switch ( model.ImplementedApiVersions.Count )
             {

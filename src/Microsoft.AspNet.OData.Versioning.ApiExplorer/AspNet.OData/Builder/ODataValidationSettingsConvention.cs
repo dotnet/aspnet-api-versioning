@@ -6,9 +6,7 @@
     using Microsoft.OData.Edm;
     using Microsoft.OData.UriParser;
     using System;
-    using System.Diagnostics.Contracts;
     using System.Web.Http;
-    using System.Web.Http.Controllers;
     using System.Web.Http.Description;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static System.Web.Http.Description.ApiParameterSource;
@@ -21,7 +19,10 @@
         /// <inheritdoc />
         public virtual void ApplyTo( ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
 
             if ( !IsSupported( apiDescription ) )
             {
@@ -88,13 +89,8 @@
         /// <param name="type">The parameter value type.</param>
         /// <param name="defaultValue">The parameter default value, if any.</param>
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
-        protected virtual ApiParameterDescription NewParameterDescription( string name, string description, Type type, object defaultValue = default )
+        protected virtual ApiParameterDescription NewParameterDescription( string name, string description, Type type, object? defaultValue = default )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-            Arg.NotNullOrEmpty( description, nameof( description ) );
-            Arg.NotNull( type, nameof( type ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             return new ApiParameterDescription()
             {
                 Documentation = description,
@@ -104,10 +100,8 @@
             };
         }
 
-        static bool IsSingleResult( ApiDescription description, out Type resultType )
+        static bool IsSingleResult( ApiDescription description, out Type? resultType )
         {
-            Contract.Requires( description != null );
-
             var responseType = description.ResponseDescription.ResponseType;
 
             if ( responseType == null )
@@ -129,10 +123,6 @@
 
         static ApiParameterDescription SetAction( ApiParameterDescription parameter, ApiDescription apiDescription )
         {
-            Contract.Requires( parameter != null );
-            Contract.Requires( apiDescription != null );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var action = apiDescription.ActionDescriptor;
             var descriptor = parameter.ParameterDescriptor;
 
@@ -155,8 +145,6 @@
 
         static bool IsSupported( ApiDescription apiDescription )
         {
-            Contract.Requires( apiDescription != null );
-
             return apiDescription.HttpMethod.Method.ToUpperInvariant() switch
             {
                 "GET" => true,

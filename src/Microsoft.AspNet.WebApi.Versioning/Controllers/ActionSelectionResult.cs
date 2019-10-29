@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Controllers
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Web.Http.Controllers;
 
     /// <content>
@@ -11,23 +10,15 @@
     {
         sealed class ActionSelectionResult
         {
-            internal ActionSelectionResult( HttpActionDescriptor action )
-            {
-                Contract.Requires( action != null );
-                Action = action;
-            }
+            internal ActionSelectionResult( HttpActionDescriptor action ) => Action = action;
 
-            internal ActionSelectionResult( Exception exception )
-            {
-                Contract.Requires( exception != null );
-                Exception = exception;
-            }
+            internal ActionSelectionResult( Exception exception ) => Exception = exception;
 
             internal bool Succeeded => Exception == null;
 
-            internal HttpActionDescriptor Action { get; }
+            internal HttpActionDescriptor? Action { get; }
 
-            internal Exception Exception { get; }
+            internal Exception? Exception { get; }
         }
     }
 }

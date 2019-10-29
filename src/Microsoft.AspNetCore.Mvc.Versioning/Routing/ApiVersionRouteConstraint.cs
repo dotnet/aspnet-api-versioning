@@ -25,6 +25,11 @@
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
         public bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
         {
+            if ( values == null )
+            {
+                throw new ArgumentNullException( nameof( values ) );
+            }
+
             if ( IsNullOrEmpty( routeKey ) )
             {
                 return false;
@@ -38,6 +43,11 @@
             if ( routeDirection == UrlGeneration )
             {
                 return !IsNullOrEmpty( value );
+            }
+
+            if ( httpContext == null )
+            {
+                throw new ArgumentNullException( nameof( httpContext ) );
             }
 
             var feature = httpContext.Features.Get<IApiVersioningFeature>();

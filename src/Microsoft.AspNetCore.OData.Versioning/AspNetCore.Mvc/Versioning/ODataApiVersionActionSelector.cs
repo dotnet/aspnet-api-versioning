@@ -42,7 +42,10 @@
         /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="ActionDescriptor">actions</see>.</returns>
         public override IReadOnlyList<ActionDescriptor> SelectCandidates( RouteContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var odataPath = context.HttpContext.ODataFeature().Path;
             var routeValues = context.RouteData.Values;
@@ -118,10 +121,17 @@
         /// <param name="context">The current <see cref="RouteContext">route context</see> to evaluate.</param>
         /// <param name="candidates">The <see cref="IReadOnlyList{T}">read-only list</see> of candidate <see cref="ActionDescriptor">actions</see> to select from.</param>
         /// <returns>The best candidate <see cref="ActionDescriptor">action</see> or <c>null</c> if no candidate matches.</returns>
-        public override ActionDescriptor SelectBestCandidate( RouteContext context, IReadOnlyList<ActionDescriptor> candidates )
+        public override ActionDescriptor? SelectBestCandidate( RouteContext context, IReadOnlyList<ActionDescriptor> candidates )
         {
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
+            if ( candidates == null )
+            {
+                throw new ArgumentNullException( nameof( candidates ) );
+            }
 
             var httpContext = context.HttpContext;
             var odataRouteCandidate = httpContext.ODataFeature().Path != null;

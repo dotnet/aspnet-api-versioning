@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using System.Web.Http;
@@ -26,7 +25,10 @@
         /// to apply the conventions to.</param>
         public virtual void ApplyTo( HttpControllerDescriptor controllerDescriptor )
         {
-            Arg.NotNull( controllerDescriptor, nameof( controllerDescriptor ) );
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
 
             var attributes = new List<object>();
 
@@ -48,12 +50,10 @@
         /// <param name="method">The <see cref="MethodInfo">method</see> representing the action to retrieve the convention for.</param>
         /// <param name="convention">The retrieved <see cref="IApiVersionConvention{T}">convention</see> or <c>null</c>.</param>
         /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
-        protected abstract bool TryGetConvention( MethodInfo method, out IApiVersionConvention<HttpActionDescriptor> convention );
+        protected abstract bool TryGetConvention( MethodInfo method, out IApiVersionConvention<HttpActionDescriptor>? convention );
 
         void ApplyActionConventions( HttpControllerDescriptor controller )
         {
-            Contract.Requires( controller != null );
-
             var actionSelector = controller.Configuration.Services.GetActionSelector();
             var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g ).ToArray();
 
@@ -87,7 +87,7 @@
                     actionConvention = new ActionApiVersionConventionBuilder( anyController );
                 }
 
-                actionConvention.ApplyTo( action );
+                actionConvention!.ApplyTo( action );
             }
 
             ApplyInheritedActionConventions( actions );
@@ -95,8 +95,6 @@
 
         void ApplyInheritedActionConventions( IReadOnlyList<HttpActionDescriptor> actions )
         {
-            Contract.Requires( actions != null );
-
             var noInheritedApiVersions = SupportedVersions.Count == 0 && DeprecatedVersions.Count == 0 && AdvertisedVersions.Count == 0 && DeprecatedAdvertisedVersions.Count == 0;
 
             if ( noInheritedApiVersions )

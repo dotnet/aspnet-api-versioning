@@ -15,6 +15,6 @@
         /// </summary>
         /// <value>The response content within "value".</value>
         [JsonProperty( "value" )]
-        public T Value { get; set; }
+        public T Value { get; set; } = default!;
     }
 }

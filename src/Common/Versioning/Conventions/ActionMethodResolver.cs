@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
 #if WEBAPI
@@ -16,9 +15,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     {
         internal static MethodInfo Resolve( Type controllerType, string methodName, Type[] argumentTypes )
         {
-            Contract.Requires( controllerType != null );
-            Contract.Requires( !string.IsNullOrEmpty( methodName ) );
-
             var methods = controllerType.GetRuntimeMethods().Where( m => m.Name == methodName && IsAction( m ) ).ToArray();
 
             switch ( methods.Length )
@@ -29,7 +25,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                     return methods[0];
             }
 
-            argumentTypes = argumentTypes ?? Type.EmptyTypes;
+            argumentTypes ??= Type.EmptyTypes;
             methods = methods.Where( m => SignatureMatches( m, argumentTypes ) ).ToArray();
 
             if ( methods.Length == 1 )
@@ -42,8 +38,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
         static bool IsAction( MethodInfo method )
         {
-            Contract.Requires( method != null );
-
             if ( !method.IsPublic || method.IsStatic )
             {
                 return false;
@@ -54,9 +48,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 
         static bool SignatureMatches( MethodInfo method, Type[] argumentTypes )
         {
-            Contract.Requires( method != null );
-            Contract.Requires( argumentTypes != null );
-
             var argTypes = method.GetParameters().Select( p => p.ParameterType ).ToArray();
             return argTypes.SequenceEqual( argumentTypes );
         }

@@ -1,10 +1,12 @@
-﻿namespace Microsoft.Web.Http.Routing
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.Web.Http.Routing
 {
     using System;
     using System.Collections.Generic;
     using static System.Linq.Expressions.Expression;
 
-    sealed class PathContentSegmentAdapter<T> : IPathContentSegment
+    sealed class PathContentSegmentAdapter<T> : IPathContentSegment where T : notnull
     {
         static readonly Lazy<Func<T, bool>> catchAllAccessor = new Lazy<Func<T, bool>>( NewCatchAllAccessor );
         static readonly Lazy<Func<T, IEnumerable<object>>> subsegmentsAccessor = new Lazy<Func<T, IEnumerable<object>>>( NewSubsegmentsAccessor );

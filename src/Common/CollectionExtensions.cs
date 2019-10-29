@@ -11,25 +11,26 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using static System.Globalization.CultureInfo;
     using static System.String;
 
     static partial class CollectionExtensions
     {
-        internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, out TValue value )
+#if NETAPPCORE3_0
+        internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, [NotNullWhen(true)] out TValue value ) where TKey : notnull
+#else
+        internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, out TValue value ) where TKey : notnull
+#endif
         {
-            Contract.Requires( dictionary != null );
-            Contract.Requires( key != null );
-
-            if ( dictionary.TryGetValue( key, out var val ) && ( val is TValue ) )
+            if ( dictionary.TryGetValue( key, out var val ) && val is TValue v )
             {
-                value = (TValue) val;
+                value = v;
                 return true;
             }
 
-            value = default;
+            value = default!;
             return false;
         }
 
@@ -37,9 +38,6 @@ namespace Microsoft.AspNetCore.Mvc
 
         internal static IReadOnlyList<T> ToSortedReadOnlyList<T>( this IEnumerable<T> sequence ) where T : IComparable<T>
         {
-            Contract.Requires( sequence != null );
-            Contract.Ensures( Contract.Result<IReadOnlyList<T>>() != null );
-
             if ( sequence is List<T> list )
             {
                 list.Sort();
@@ -53,9 +51,6 @@ namespace Microsoft.AspNetCore.Mvc
 
         internal static void AddRange<T>( this ICollection<T> collection, IEnumerable<T> items )
         {
-            Contract.Requires( collection != null );
-            Contract.Requires( items != null );
-
             foreach ( var item in items )
             {
                 collection.Add( item );
@@ -64,8 +59,6 @@ namespace Microsoft.AspNetCore.Mvc
 
         internal static string EnsureZeroOrOneApiVersions( this ICollection<string> apiVersions )
         {
-            Contract.Requires( apiVersions != null );
-
             if ( apiVersions.Count < 2 )
             {
                 return apiVersions.SingleOrDefault();
@@ -79,9 +72,6 @@ namespace Microsoft.AspNetCore.Mvc
 
         internal static void UnionWith<T>( this ICollection<T> collection, IEnumerable<T> other )
         {
-            Contract.Requires( collection != null );
-            Contract.Requires( other != null );
-
             if ( collection is ISet<T> set )
             {
                 set.UnionWith( other );

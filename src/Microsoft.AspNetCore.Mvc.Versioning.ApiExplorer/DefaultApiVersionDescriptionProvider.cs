@@ -5,7 +5,6 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Globalization.CultureInfo;
@@ -26,9 +25,6 @@
         /// <param name="apiExplorerOptions">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiExplorerOptions">API explorer options</see>.</param>
         public DefaultApiVersionDescriptionProvider( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider, IOptions<ApiExplorerOptions> apiExplorerOptions )
         {
-            Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
-            Arg.NotNull( apiExplorerOptions, nameof( apiExplorerOptions ) );
-
             apiVersionDescriptions = LazyApiVersionDescriptions.Create( this, actionDescriptorCollectionProvider );
             options = apiExplorerOptions;
         }
@@ -54,9 +50,6 @@
         /// <paramref name="apiVersion">API version</paramref>; otherwise, false.</returns>
         public virtual bool IsDeprecated( ActionDescriptor actionDescriptor, ApiVersion apiVersion )
         {
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-
             var model = actionDescriptor.GetApiVersionModel();
             return !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
         }
@@ -68,8 +61,10 @@
         /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersionDescription">API version descriptions</see>.</returns>
         protected virtual IReadOnlyList<ApiVersionDescription> EnumerateApiVersions( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
         {
-            Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
-            Contract.Ensures( Contract.Result<IReadOnlyList<ApiVersionDescription>>() != null );
+            if ( actionDescriptorCollectionProvider == null )
+            {
+                throw new ArgumentNullException( nameof( actionDescriptorCollectionProvider ) );
+            }
 
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
@@ -84,10 +79,6 @@
 
         void BucketizeApiVersions( IReadOnlyList<ActionDescriptor> actions, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )
         {
-            Contract.Requires( actions != null );
-            Contract.Requires( supported != null );
-            Contract.Requires( deprecated != null );
-
             var declared = new HashSet<ApiVersion>();
             var advertisedSupported = new HashSet<ApiVersion>();
             var advertisedDeprecated = new HashSet<ApiVersion>();
@@ -127,9 +118,6 @@
 
         void AppendDescriptions( ICollection<ApiVersionDescription> descriptions, IEnumerable<ApiVersion> versions, bool deprecated )
         {
-            Contract.Requires( descriptions != null );
-            Contract.Requires( versions != null );
-
             foreach ( var version in versions )
             {
                 var groupName = version.ToString( Options.GroupNameFormat, CurrentCulture );
@@ -144,19 +132,12 @@
 
             LazyApiVersionDescriptions( DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
             {
-                Contract.Requires( apiVersionDescriptionProvider != null );
-                Contract.Requires( actionDescriptorCollectionProvider != null );
-
                 this.apiVersionDescriptionProvider = apiVersionDescriptionProvider;
                 this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
             }
 
             internal static Lazy<IReadOnlyList<ApiVersionDescription>> Create( DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
             {
-                Contract.Requires( apiVersionDescriptionProvider != null );
-                Contract.Requires( actionDescriptorCollectionProvider != null );
-                Contract.Ensures( Contract.Result<Lazy<IReadOnlyList<ApiVersionDescription>>>() != null );
-
                 var descriptions = new LazyApiVersionDescriptions( apiVersionDescriptionProvider, actionDescriptorCollectionProvider );
                 return new Lazy<IReadOnlyList<ApiVersionDescription>>( descriptions.EnumerateApiVersions );
             }

@@ -8,7 +8,7 @@
     /// </content>
     /// <typeparam name="T">The <see cref="Type">type</see> of <see cref="ICommonModel">model</see>.</typeparam>
     [CLSCompliant( false )]
-    public partial class ActionApiVersionConventionBuilderCollection<T>
+    public partial class ActionApiVersionConventionBuilderCollection<T> where T : notnull
     {
     }
 }

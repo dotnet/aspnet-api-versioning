@@ -13,7 +13,7 @@
         /// </summary>
         /// <typeparam name="TController">The <see cref="Type">type</see> of controller to build conventions for.</typeparam>
         /// <returns>A new or existing <see cref="IControllerConventionBuilder{T}"/>.</returns>
-        IControllerConventionBuilder<TController> Controller<TController>() where TController : IHttpController;
+        IControllerConventionBuilder<TController> Controller<TController>() where TController : notnull, IHttpController;
 
         /// <summary>
         /// Applies the defined API version conventions to the specified controller.

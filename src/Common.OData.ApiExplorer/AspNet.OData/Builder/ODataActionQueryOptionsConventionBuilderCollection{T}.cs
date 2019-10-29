@@ -3,7 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
@@ -15,17 +15,14 @@
 #pragma warning restore SA1619
     {
         readonly ODataControllerQueryOptionsConventionBuilder<T> controllerBuilder;
-        readonly IList<ActionBuilderMapping<T>> actionBuilderMappings = new List<ActionBuilderMapping<T>>();
+        readonly IList<ActionBuilderMapping> actionBuilderMappings = new List<ActionBuilderMapping>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataActionQueryOptionsConventionBuilderCollection{T}"/> class.
         /// </summary>
         /// <param name="controllerBuilder">The associated <see cref="ODataControllerQueryOptionsConventionBuilder{T}">controller convention builder</see>.</param>
-        public ODataActionQueryOptionsConventionBuilderCollection( ODataControllerQueryOptionsConventionBuilder<T> controllerBuilder )
-        {
-            Arg.NotNull( controllerBuilder, nameof( controllerBuilder ) );
+        public ODataActionQueryOptionsConventionBuilderCollection( ODataControllerQueryOptionsConventionBuilder<T> controllerBuilder ) =>
             this.controllerBuilder = controllerBuilder;
-        }
 
         /// <summary>
         /// Gets or adds a controller action convention builder for the specified method.
@@ -34,13 +31,11 @@
         /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder{T}">controller action convention builder</see>.</returns>
         protected internal virtual ODataActionQueryOptionsConventionBuilder<T> GetOrAdd( MethodInfo actionMethod )
         {
-            Arg.NotNull( actionMethod, nameof( actionMethod ) );
-
             var mapping = actionBuilderMappings.FirstOrDefault( m => m.Method == actionMethod );
 
             if ( mapping == null )
             {
-                mapping = new ActionBuilderMapping<T>( actionMethod, new ODataActionQueryOptionsConventionBuilder<T>( controllerBuilder ) );
+                mapping = new ActionBuilderMapping( actionMethod, new ODataActionQueryOptionsConventionBuilder<T>( controllerBuilder ) );
                 actionBuilderMappings.Add( mapping );
             }
 
@@ -59,18 +54,28 @@
         /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
         /// <param name="actionBuilder">The <see cref="ODataActionQueryOptionsConventionBuilder{T}">controller action convention builder</see> or <c>null</c>.</param>
         /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-        public virtual bool TryGetValue( MethodInfo actionMethod, out ODataActionQueryOptionsConventionBuilder<T> actionBuilder )
+#if NETCOREAPP3_0
+        public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ODataActionQueryOptionsConventionBuilder<T>? actionBuilder )
+#else
+        public virtual bool TryGetValue( MethodInfo? actionMethod, out ODataActionQueryOptionsConventionBuilder<T>? actionBuilder )
+#endif
         {
-            actionBuilder = null;
-
             if ( actionMethod == null )
             {
+                actionBuilder = null;
                 return false;
             }
 
             var mapping = actionBuilderMappings.FirstOrDefault( m => m.Method == actionMethod );
 
-            return ( actionBuilder = mapping?.Builder ) != null;
+            if ( mapping == null )
+            {
+                actionBuilder = null;
+                return false;
+            }
+
+            actionBuilder = mapping.Builder;
+            return true;
         }
 
         /// <summary>
@@ -87,20 +92,17 @@
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        sealed partial class ActionBuilderMapping<TModel>
+        sealed partial class ActionBuilderMapping
         {
-            internal ActionBuilderMapping( MethodInfo method, ODataActionQueryOptionsConventionBuilder<TModel> builder )
+            internal ActionBuilderMapping( MethodInfo method, ODataActionQueryOptionsConventionBuilder<T> builder )
             {
-                Contract.Requires( method != null );
-                Contract.Requires( builder != null );
-
                 Method = method;
                 Builder = builder;
             }
 
             internal MethodInfo Method { get; }
 
-            internal ODataActionQueryOptionsConventionBuilder<TModel> Builder { get; }
+            internal ODataActionQueryOptionsConventionBuilder<T> Builder { get; }
         }
     }
 }

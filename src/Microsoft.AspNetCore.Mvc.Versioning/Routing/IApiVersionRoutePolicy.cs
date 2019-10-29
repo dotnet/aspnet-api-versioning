@@ -17,6 +17,6 @@
         /// <param name="context">The <see cref="RouteContext">route context</see> to evaluate against.</param>
         /// <param name="selectionResult">The <see cref="ActionSelectionResult">result</see> of action selection.</param>
         /// <returns>The <see cref="ActionDescriptor">action</see> conforming to the policy or <c>null</c>.</returns>
-        ActionDescriptor Evaluate( RouteContext context, ActionSelectionResult selectionResult );
+        ActionDescriptor? Evaluate( RouteContext context, ActionSelectionResult selectionResult );
     }
 }

@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
 #endif
-    using System.Diagnostics.Contracts;
+    using System;
     using static ApiVersionParameterLocation;
 
     /// <summary>
@@ -31,10 +31,12 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
         public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
-            const string FromRouteValueName = null;
-            context.AddParameter( FromRouteValueName, Path );
+            context.AddParameter( name: string.Empty, Path );
         }
     }
 }

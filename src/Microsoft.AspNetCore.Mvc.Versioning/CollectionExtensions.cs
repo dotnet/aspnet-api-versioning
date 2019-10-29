@@ -2,24 +2,31 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
+    using System.Diagnostics.CodeAnalysis;
 
     static partial class CollectionExtensions
     {
-        internal static TValue GetOrDefault<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, TValue defaultValue ) =>
+#if NETCOREAPP3_0
+        [return: MaybeNull]
+        internal static TValue GetOrDefault<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, [AllowNull] TValue defaultValue ) where TKey : notnull =>
+#else
+        internal static TValue GetOrDefault<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, TValue defaultValue ) where TKey : notnull =>
+#endif
             dictionary.TryGetValue( key, out TValue value ) ? value : defaultValue;
 
-        internal static TValue GetOrDefault<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, Func<TValue> defaultValue )
-        {
-            Contract.Requires( defaultValue != null );
-            return dictionary.TryGetValue( key, out TValue value ) ? value : defaultValue();
-        }
+#if NETCOREAPP3_0
+        [return: MaybeNull]
+#endif
+        internal static TValue GetOrDefault<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, Func<TValue> defaultValue ) where TKey : notnull =>
+            dictionary.TryGetValue( key, out TValue value ) ? value : defaultValue();
 
-        internal static void SetOrRemove<TKey, TValue>( this IDictionary<TKey, object> dictionary, TKey key, TValue value )
+#if NETCOREAPP3_0
+        internal static void SetOrRemove<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, [AllowNull] TValue value ) where TKey : notnull
+#else
+        internal static void SetOrRemove<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, TValue value ) where TKey : notnull
+#endif
         {
-            Contract.Requires( dictionary != null );
-
-            if ( value == default && default( TValue ) == null )
+            if ( value == default && !typeof( TValue ).IsValueType )
             {
                 dictionary.Remove( key );
             }
@@ -31,8 +38,6 @@
 
         internal static T AddAndReturn<T>( this ICollection<T> collection, T item )
         {
-            Contract.Requires( collection != null );
-            Contract.Ensures( Contract.Result<T>() != null );
             collection.Add( item );
             return item;
         }

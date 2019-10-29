@@ -2,6 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup Label="NuGet">
+  <IsPackable>true</IsPackable>
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/Microsoft/aspnet-api-versioning</RepositoryUrl>
   <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</PackageIconUrl>

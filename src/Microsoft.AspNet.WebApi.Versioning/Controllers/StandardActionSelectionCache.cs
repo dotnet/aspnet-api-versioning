@@ -11,11 +11,11 @@
     {
         sealed class StandardActionSelectionCache
         {
-            internal ILookup<string, HttpActionDescriptor> StandardActionNameMapping { get; set; }
+            internal ILookup<string, HttpActionDescriptor>? StandardActionNameMapping { get; set; }
 
-            internal CandidateAction[] StandardCandidateActions { get; set; }
+            internal CandidateAction[]? StandardCandidateActions { get; set; }
 
-            internal CandidateAction[][] CacheListVerbs { get; set; }
+            internal CandidateAction[][]? CacheListVerbs { get; set; }
         }
     }
 }

@@ -2,15 +2,11 @@
 namespace Microsoft.AspNetCore.Mvc.Routing
 {
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.AspNetCore.Routing.Matching;
     using Microsoft.Extensions.Logging;
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
     using System.Threading.Tasks;
     using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
     using static System.Threading.Tasks.Task;
@@ -23,9 +19,20 @@ namespace Microsoft.AspNetCore.Mvc.Routing
         /// <inheritdoc />
         public Task ApplyAsync( HttpContext httpContext, EndpointSelectorContext context, CandidateSet candidates )
         {
-            Arg.NotNull( httpContext, nameof( httpContext ) );
-            Arg.NotNull( context, nameof( context ) );
-            Arg.NotNull( candidates, nameof( candidates ) );
+            if ( httpContext == null )
+            {
+                throw new ArgumentNullException( nameof( httpContext ) );
+            }
+
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
+            if ( candidates == null )
+            {
+                throw new ArgumentNullException( nameof( candidates ) );
+            }
 
             if ( IsRequestedApiVersionAmbiguous( httpContext, context, out var apiVersion ) )
             {
@@ -38,7 +45,7 @@ namespace Microsoft.AspNetCore.Mvc.Routing
                 httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
             }
 
-            var finalMatches = EvaluateApiVersion( httpContext, candidates, apiVersion );
+            var finalMatches = EvaluateApiVersion( candidates, apiVersion );
 
             if ( finalMatches.Count == 0 )
             {
@@ -56,11 +63,8 @@ namespace Microsoft.AspNetCore.Mvc.Routing
             return CompletedTask;
         }
 
-        bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, EndpointSelectorContext context, out ApiVersion apiVersion )
+        bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, EndpointSelectorContext context, out ApiVersion? apiVersion )
         {
-            Contract.Requires( httpContext != null );
-            Contract.Requires( context != null );
-
             try
             {
                 apiVersion = httpContext.GetRequestedApiVersion();

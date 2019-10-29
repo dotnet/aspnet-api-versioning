@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web.Http
 {
     using Microsoft.Web.Http.Versioning;
+    using System;
     using System.Web.Http;
     using System.Web.Http.Filters;
 
@@ -17,6 +18,11 @@
         /// response provided that there is a response and the executed action was not version-neutral.</remarks>
         public override void OnActionExecuted( HttpActionExecutedContext actionExecutedContext )
         {
+            if ( actionExecutedContext == null )
+            {
+                throw new ArgumentNullException( nameof( actionExecutedContext ) );
+            }
+
             var response = actionExecutedContext.Response;
 
             if ( response == null )

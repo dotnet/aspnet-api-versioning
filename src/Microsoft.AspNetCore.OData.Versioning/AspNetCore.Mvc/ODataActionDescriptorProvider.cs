@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Mvc
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.AspNetCore.Mvc
 {
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Routing;
@@ -8,7 +10,6 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 
     sealed class ODataActionDescriptorProvider : IActionDescriptorProvider
@@ -22,10 +23,6 @@
             IModelMetadataProvider modelMetadataProvider,
             IOptions<ODataApiVersioningOptions> options )
         {
-            Contract.Requires( routeCollectionProvider != null );
-            Contract.Requires( modelMetadataProvider != null );
-            Contract.Requires( options != null );
-
             this.routeCollectionProvider = routeCollectionProvider;
             this.modelMetadataProvider = modelMetadataProvider;
             this.options = options;
@@ -35,8 +32,6 @@
 
         public void OnProvidersExecuted( ActionDescriptorProviderContext context )
         {
-            Contract.Requires( context != null );
-
             if ( routeCollectionProvider.Items.Count == 0 )
             {
                 return;
@@ -62,9 +57,6 @@
 
         static IEnumerable<ControllerActionDescriptor> ODataActions( IEnumerable<ActionDescriptor> results )
         {
-            Contract.Requires( results != null );
-            Contract.Ensures( Contract.Result<IEnumerable<ControllerActionDescriptor>>() != null );
-
             foreach ( var result in results )
             {
                 if ( result is ControllerActionDescriptor action &&

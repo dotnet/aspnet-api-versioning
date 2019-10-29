@@ -2,7 +2,6 @@
 {
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http.Controllers;
 
@@ -15,11 +14,8 @@
         {
             readonly IReadOnlyList<ILookup<string, HttpActionDescriptor>> actionMappings;
 
-            internal AggregatedActionMapping( IReadOnlyList<ILookup<string, HttpActionDescriptor>> actionMappings )
-            {
-                Contract.Requires( actionMappings != null );
+            internal AggregatedActionMapping( IReadOnlyList<ILookup<string, HttpActionDescriptor>> actionMappings ) =>
                 this.actionMappings = actionMappings;
-            }
 
             public IEnumerable<HttpActionDescriptor> this[string key] =>
                 actionMappings.Where( am => am.Contains( key ) ).SelectMany( am => am[key] );

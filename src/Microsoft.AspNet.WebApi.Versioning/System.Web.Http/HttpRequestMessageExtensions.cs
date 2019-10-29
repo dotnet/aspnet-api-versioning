@@ -1,13 +1,11 @@
 ﻿namespace System.Web.Http
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
-    using System.Net;
-    using System.Net.Http;
-    using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Net;
+    using System.Net.Http;
 
     /// <summary>
     /// Provides extension methods for the <see cref="HttpRequestMessage"/> class.
@@ -16,19 +14,16 @@
     {
         const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
 
-        [SuppressMessage( "Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Handled by the caller." )]
         static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, Func<bool, HttpError> errorCreator )
         {
-            Contract.Requires( request != null );
-            Contract.Requires( errorCreator != null );
-            Contract.Ensures( Contract.Result<HttpResponseMessage>() != null );
-
             var configuration = request.GetConfiguration();
             var error = errorCreator( request.ShouldIncludeErrorDetail() );
 
             if ( configuration == null )
             {
+#pragma warning disable CA2000 // Dispose objects before losing scope
                 configuration = new HttpConfiguration();
+#pragma warning restore CA2000 // Dispose objects before losing scope
                 request.RegisterForDispose( configuration );
                 request.SetConfiguration( configuration );
             }
@@ -38,8 +33,6 @@
 
         internal static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, string message, string messageDetail )
         {
-            Contract.Requires( request != null );
-
             return request.CreateErrorResponse(
                 statusCode,
                 includeErrorDetail =>
@@ -62,14 +55,15 @@
         /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
         public static ApiVersioningOptions GetApiVersioningOptions( this HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-            Contract.Ensures( Contract.Result<ApiVersioningOptions>() != null );
-
             var configuration = request.GetConfiguration();
 
             if ( configuration == null )
             {
-                request.SetConfiguration( configuration = new HttpConfiguration() );
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                configuration = new HttpConfiguration();
+#pragma warning restore CA2000 // Dispose objects before losing scope
+                request.RegisterForDispose( configuration );
+                request.SetConfiguration( configuration );
             }
 
             return configuration.GetApiVersioningOptions();
@@ -82,8 +76,10 @@
         /// <returns>The current <see cref="ApiVersionRequestProperties">API versioning properties</see>.</returns>
         public static ApiVersionRequestProperties ApiVersionProperties( this HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-            Contract.Ensures( Contract.Result<ApiVersionRequestProperties>() != null );
+            if ( request == null )
+            {
+                throw new ArgumentNullException( nameof( request ) );
+            }
 
             if ( !request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
             {
@@ -101,11 +97,6 @@
         /// <remarks>This method will return <c>null</c> no service API version was requested or the requested
         /// service API version is in an invalid format.</remarks>
         /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
-        [SuppressMessage( "Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated by a code contract." )]
-        public static ApiVersion GetRequestedApiVersion( this HttpRequestMessage request )
-        {
-            Arg.NotNull( request, nameof( request ) );
-            return request.ApiVersionProperties().RequestedApiVersion;
-        }
+        public static ApiVersion? GetRequestedApiVersion( this HttpRequestMessage request ) => request.ApiVersionProperties().RequestedApiVersion;
     }
 }

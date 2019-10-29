@@ -17,6 +17,16 @@
         /// <inheritdoc />
         public void PopulateFeature( IEnumerable<ApplicationPart> parts, ModelConfigurationFeature feature )
         {
+            if ( parts == null )
+            {
+                throw new ArgumentNullException( nameof( parts ) );
+            }
+
+            if ( feature == null )
+            {
+                throw new ArgumentNullException( nameof( feature ) );
+            }
+
             foreach ( var part in parts.OfType<IApplicationPartTypeProvider>() )
             {
                 foreach ( var type in part.Types )
@@ -36,6 +46,11 @@
         /// <returns><c>True</c> if the type is a <see cref="IModelConfiguration">model configuration</see>; otherwise <c>false</c>.</returns>
         protected virtual bool IsModelConfiguration( TypeInfo typeInfo )
         {
+            if ( typeInfo == null )
+            {
+                throw new ArgumentNullException( nameof( typeInfo ) );
+            }
+
             if ( !typeInfo.IsClass || typeInfo.IsAbstract || !typeInfo.IsPublic || typeInfo.ContainsGenericParameters )
             {
                 return false;

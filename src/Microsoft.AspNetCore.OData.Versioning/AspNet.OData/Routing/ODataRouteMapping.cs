@@ -17,10 +17,6 @@
         /// <param name="services">The <see cref="IServiceProvider">services</see> associated with the route.</param>
         public ODataRouteMapping( ODataRoute route, ApiVersion apiVersion, IServiceProvider services )
         {
-            Arg.NotNull( route, nameof( route ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( services, nameof( services ) );
-
             Route = route;
             ApiVersion = apiVersion;
             Services = services;

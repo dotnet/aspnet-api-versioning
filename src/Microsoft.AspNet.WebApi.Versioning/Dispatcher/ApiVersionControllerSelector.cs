@@ -7,7 +7,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Net.Http;
     using System.Web.Http;
@@ -35,9 +34,6 @@
         /// associated with the controller selector.</param>
         public ApiVersionControllerSelector( HttpConfiguration configuration, ApiVersioningOptions options )
         {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNull( options, nameof( options ) );
-
             this.configuration = configuration;
             this.options = options;
             controllerInfoCache = new Lazy<ConcurrentDictionary<string, HttpControllerDescriptorGroup>>( InitializeControllerInfoCache );
@@ -50,8 +46,6 @@
         /// <returns>A <see cref="IDictionary{TKey,TValue}">collection</see> of route-to-controller mapping.</returns>
         public virtual IDictionary<string, HttpControllerDescriptor> GetControllerMapping()
         {
-            Contract.Ensures( Contract.Result<IDictionary<string, HttpControllerDescriptor>>() != null );
-
             var mapping = controllerInfoCache.Value.Where( p => p.Value.Count > 0 );
             return mapping.ToDictionary( p => p.Key, p => (HttpControllerDescriptor) p.Value, OrdinalIgnoreCase );
         }
@@ -61,11 +55,8 @@
         /// </summary>
         /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get a controller descriptor for.</param>
         /// <returns>The <see cref="HttpControllerDescriptor">controller descriptor</see> that matches the specified <paramref name="request"/>.</returns>
-        public virtual HttpControllerDescriptor SelectController( HttpRequestMessage request )
+        public virtual HttpControllerDescriptor? SelectController( HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-            Contract.Ensures( Contract.Result<HttpControllerDescriptor>() != null );
-
             EnsureRequestHasValidApiVersion( request );
 
             var context = new ControllerSelectionContext( request, GetControllerName, controllerInfoCache );
@@ -117,10 +108,8 @@
         /// </summary>
         /// <param name="request">The <see cref="HttpRequestMessage">request</see> to the controller name for.</param>
         /// <returns>The name of the controller for the specified <paramref name="request"/>.</returns>
-        public virtual string GetControllerName( HttpRequestMessage request )
+        public virtual string? GetControllerName( HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-
             var routeData = request.GetRouteData();
 
             if ( routeData == null )
@@ -198,18 +187,12 @@
 
         static bool IsDecoratedWithAttributes( HttpControllerDescriptor controller )
         {
-            Contract.Requires( controller != null );
-
             return controller.GetCustomAttributes<IApiVersionProvider>().Count > 0 ||
                    controller.GetCustomAttributes<IApiVersionNeutral>().Count > 0;
         }
 
         static void ApplyImplicitConventions( HttpControllerDescriptor controller, IHttpActionSelector actionSelector, ApiVersionModel implicitVersionModel )
         {
-            Contract.Requires( controller != null );
-            Contract.Requires( actionSelector != null );
-            Contract.Requires( implicitVersionModel != null );
-
             controller.SetApiVersionModel( implicitVersionModel );
 
             var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
@@ -222,10 +205,6 @@
 
         static void ApplyAttributeOrImplicitConventions( HttpControllerDescriptor controller, IHttpActionSelector actionSelector, ApiVersionModel implicitVersionModel )
         {
-            Contract.Requires( controller != null );
-            Contract.Requires( actionSelector != null );
-            Contract.Requires( implicitVersionModel != null );
-
             if ( IsDecoratedWithAttributes( controller ) )
             {
                 var conventions = new ControllerApiVersionConventionBuilder( controller.ControllerType );
@@ -239,10 +218,6 @@
 
         static HttpControllerDescriptor[] ApplyCollatedModels( List<HttpControllerDescriptor> controllers, IHttpActionSelector actionSelector )
         {
-            Contract.Requires( controllers != null );
-            Contract.Requires( actionSelector != null );
-            Contract.Ensures( Contract.Result<HttpControllerDescriptor[]>() != null );
-
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
             var controllerModels = new List<ApiVersionModel>( controllers.Count );
@@ -308,8 +283,6 @@
 
         static void EnsureRequestHasValidApiVersion( HttpRequestMessage request )
         {
-            Contract.Requires( request != null );
-
             try
             {
                 var apiVersion = request.GetRequestedApiVersion();

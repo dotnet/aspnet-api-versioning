@@ -1,19 +1,12 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using FluentAssertions;
-    using Microsoft.OData.Edm;
-    using Moq;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using Microsoft.AspNet.OData;
+    using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
     using System.Web.Http;
     using System.Web.Http.Controllers;
-    using System.Web.Http.Dispatcher;
-    using Microsoft.AspNet.OData;
     using Xunit;
-    using Microsoft.Web.Http;
-    using Microsoft.AspNet.OData.Builder;
-    using Microsoft.Web.Http.Versioning;
 
     public class VersionedAttributeRoutingConventionTest
     {
@@ -22,19 +15,6 @@
 
         [ApiVersion( "1.0" )]
         sealed class ControllerV1 : ODataController { }
-
-        static IEdmModel CreateModel( HttpConfiguration configuration, Type controllerType )
-        {
-            var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
-            var controllerTypes = new List<Type>() { controllerType };
-
-            controllerTypeResolver.Setup( ctr => ctr.GetControllerTypes( It.IsAny<IAssembliesResolver>() ) ).Returns( controllerTypes );
-            configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver.Object );
-
-            var builder = new VersionedODataModelBuilder( configuration );
-
-            return builder.GetEdmModels().Single();
-        }
 
         [Fact]
         public void should_map_controller_should_return_true_for_versionX2Dneutral_controller()

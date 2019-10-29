@@ -19,13 +19,13 @@
         /// Gets or sets the name of the group for the API description.
         /// </summary>
         /// <value>The API version description group name.</value>
-        public string GroupName { get; set; }
+        public string GroupName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the API version.
         /// </summary>
         /// <value>The described <see cref="Http.ApiVersion">API version</see>.</value>
-        public ApiVersion ApiVersion { get; set; }
+        public ApiVersion ApiVersion { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets a value indicating whether API is deprecated.

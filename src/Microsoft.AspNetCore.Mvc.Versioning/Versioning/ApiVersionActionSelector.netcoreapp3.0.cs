@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// </content>
     public partial class ApiVersionActionSelector
     {
-        ActionSelectionTable<ActionDescriptor> cache;
+        ActionSelectionTable<ActionDescriptor>? cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionActionSelector"/> class.
@@ -37,12 +37,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             ILoggerFactory loggerFactory,
             IApiVersionRoutePolicy routePolicy )
         {
-            Arg.NotNull( actionDescriptorCollectionProvider, nameof( actionDescriptorCollectionProvider ) );
-            Arg.NotNull( actionConstraintProviders, nameof( actionConstraintProviders ) );
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( loggerFactory, nameof( loggerFactory ) );
-            Arg.NotNull( routePolicy, nameof( routePolicy ) );
-
             this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
             actionConstraintCache = new ActionConstraintCache( actionDescriptorCollectionProvider, actionConstraintProviders );
             this.options = options;
@@ -170,7 +164,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         {
             readonly IActionDescriptorCollectionProvider collectionProvider;
             readonly IActionConstraintProvider[] actionConstraintProviders;
-            volatile InnerCache currentCache;
+            volatile InnerCache? currentCache;
 
             public ActionConstraintCache(
                 IActionDescriptorCollectionProvider collectionProvider,
@@ -197,7 +191,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 }
             }
 
-            public IReadOnlyList<IActionConstraint> GetActionConstraints( HttpContext httpContext, ActionDescriptor action )
+            public IReadOnlyList<IActionConstraint>? GetActionConstraints( HttpContext httpContext, ActionDescriptor action )
             {
                 var cache = CurrentCache;
 
@@ -226,6 +220,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 for ( var i = 0; i < items.Count; i++ )
                 {
                     var item = items[i];
+
                     if ( !item.IsReusable )
                     {
                         item.Constraint = null;
@@ -246,14 +241,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 return actionConstraints;
             }
 
-            IReadOnlyList<IActionConstraint> GetActionConstraintsFromEntry( CacheEntry entry, HttpContext httpContext, ActionDescriptor action )
+            IReadOnlyList<IActionConstraint>? GetActionConstraintsFromEntry( CacheEntry entry, HttpContext httpContext, ActionDescriptor action )
             {
                 if ( entry.ActionConstraints != null )
                 {
                     return entry.ActionConstraints;
                 }
 
-                var items = new List<ActionConstraintItem>( entry.Items.Count );
+                var items = new List<ActionConstraintItem>( entry.Items!.Count );
 
                 for ( var i = 0; i < entry.Items.Count; i++ )
                 {
@@ -289,7 +284,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 }
             }
 
-            static IReadOnlyList<IActionConstraint> ExtractActionConstraints( List<ActionConstraintItem> items )
+            static IReadOnlyList<IActionConstraint>? ExtractActionConstraints( List<ActionConstraintItem> items )
             {
                 var count = 0;
 
@@ -326,10 +321,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                 private readonly ActionDescriptorCollection actions;
 
-                public InnerCache( ActionDescriptorCollection actions )
-                {
-                    this.actions = actions;
-                }
+                public InnerCache( ActionDescriptorCollection actions ) => this.actions = actions;
 
                 public ConcurrentDictionary<ActionDescriptor, CacheEntry> Entries { get; } =
                     new ConcurrentDictionary<ActionDescriptor, CacheEntry>();
@@ -339,7 +331,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             internal readonly struct CacheEntry
             {
-                public CacheEntry( IReadOnlyList<IActionConstraint> actionConstraints )
+                public CacheEntry( IReadOnlyList<IActionConstraint>? actionConstraints )
                 {
                     ActionConstraints = actionConstraints;
                     Items = null;
@@ -351,9 +343,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                     ActionConstraints = null;
                 }
 
-                public IReadOnlyList<IActionConstraint> ActionConstraints { get; }
+                public IReadOnlyList<IActionConstraint>? ActionConstraints { get; }
 
-                public List<ActionConstraintItem> Items { get; }
+                public List<ActionConstraintItem>? Items { get; }
             }
         }
 

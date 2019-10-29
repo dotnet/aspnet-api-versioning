@@ -3,7 +3,6 @@
     using Microsoft.Web.Http.Routing;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
@@ -31,7 +30,6 @@
 
             internal HttpActionDescriptor ActionDescriptor => CandidateAction.ActionDescriptor;
 
-            [SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called from DebuggerDisplay" )]
             string DebuggerToString()
             {
                 var sb = new StringBuilder();

@@ -8,22 +8,13 @@
     /// </content>
     public partial class ApiExplorerOptions
     {
-        ApiVersion defaultApiVersion = ApiVersion.Default;
-        IApiVersionParameterSource parameterSource;
+        IApiVersionParameterSource? parameterSource;
 
         /// <summary>
         /// Gets or sets the default API version applied to services that do not have explicit versions.
         /// </summary>
         /// <value>The default <see cref="ApiVersion">API version</see>. The default value is <see cref="ApiVersion.Default"/>.</value>
-        public ApiVersion DefaultApiVersion
-        {
-            get => defaultApiVersion;
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                defaultApiVersion = value;
-            }
-        }
+        public ApiVersion DefaultApiVersion { get; set; } = ApiVersion.Default;
 
         /// <summary>
         /// Gets or sets a value indicating whether a default version is assumed when a client does
@@ -40,12 +31,8 @@
         /// <value>The <see cref="IApiVersionParameterSource">API version parameter source</see> used to describe API version parameters.</value>
         public IApiVersionParameterSource ApiVersionParameterSource
         {
-            get => parameterSource ?? ( parameterSource = Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() ) );
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                parameterSource = value;
-            }
+            get => parameterSource ??= Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
+            set => parameterSource = value;
         }
     }
 }

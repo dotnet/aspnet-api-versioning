@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Represents an <see cref="IApplicationModelProvider">application model provider</see>, which
@@ -22,9 +21,6 @@
         /// <param name="controllerFilter">The <see cref="IApiControllerFilter">filter</see> used for API controllers.</param>
         public ApiVersioningApplicationModelProvider( IOptions<ApiVersioningOptions> options, IApiControllerFilter controllerFilter )
         {
-            Arg.NotNull( options, nameof( options ) );
-            Arg.NotNull( controllerFilter, nameof( controllerFilter ) );
-
             this.options = options;
             ControllerFilter = controllerFilter;
         }
@@ -47,7 +43,10 @@
         /// <inheritdoc />
         public virtual void OnProvidersExecuted( ApplicationModelProviderContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             var implicitVersionModel = new ApiVersionModel( Options.DefaultApiVersion );
             var conventionBuilder = Options.Conventions;
@@ -75,8 +74,6 @@
 
         static bool IsDecoratedWithAttributes( ControllerModel controller )
         {
-            Contract.Requires( controller != null );
-
             for ( var i = 0; i < controller.Attributes.Count; i++ )
             {
                 var attribute = controller.Attributes[i];
@@ -92,9 +89,6 @@
 
         static void ApplyImplicitConventions( ControllerModel controller, ApiVersionModel implicitVersionModel )
         {
-            Contract.Requires( controller != null );
-            Contract.Requires( implicitVersionModel != null );
-
             for ( var i = 0; i < controller.Actions.Count; i++ )
             {
                 var action = controller.Actions[i];
@@ -105,9 +99,6 @@
 
         static void ApplyAttributeOrImplicitConventions( ControllerModel controller, ApiVersionModel implicitVersionModel )
         {
-            Contract.Requires( controller != null );
-            Contract.Requires( implicitVersionModel != null );
-
             if ( IsDecoratedWithAttributes( controller ) )
             {
                 var conventions = new ControllerApiVersionConventionBuilder( controller.ControllerType );

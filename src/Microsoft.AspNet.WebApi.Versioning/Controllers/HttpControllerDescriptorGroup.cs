@@ -24,13 +24,7 @@
         /// </summary>
         /// <param name="controllerDescriptors">An <see cref="Array">array</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
-        public HttpControllerDescriptorGroup( params HttpControllerDescriptor[] controllerDescriptors )
-        {
-            Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
-            Arg.InRange( controllerDescriptors.Length, 1, nameof( controllerDescriptors ) );
-
-            descriptors = controllerDescriptors;
-        }
+        public HttpControllerDescriptorGroup( params HttpControllerDescriptor[] controllerDescriptors ) => descriptors = controllerDescriptors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
@@ -40,28 +34,14 @@
         /// <param name="controllerDescriptors">An <see cref="Array">array</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
         public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, params HttpControllerDescriptor[] controllerDescriptors )
-            : base( configuration, controllerName, controllerDescriptors[0].ControllerType )
-        {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNullOrEmpty( controllerName, nameof( controllerName ) );
-            Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
-            Arg.InRange( controllerDescriptors.Length, 1, nameof( controllerDescriptors ) );
-
-            descriptors = controllerDescriptors;
-        }
+            : base( configuration, controllerName, controllerDescriptors[0].ControllerType ) => descriptors = controllerDescriptors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
         /// </summary>
         /// <param name="controllerDescriptors">A <see cref="IReadOnlyList{T}">read-only list</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
-        public HttpControllerDescriptorGroup( IReadOnlyList<HttpControllerDescriptor> controllerDescriptors )
-        {
-            Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
-            Arg.InRange( controllerDescriptors.Count, 1, nameof( controllerDescriptors ) );
-
-            descriptors = controllerDescriptors;
-        }
+        public HttpControllerDescriptorGroup( IReadOnlyList<HttpControllerDescriptor> controllerDescriptors ) => descriptors = controllerDescriptors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
@@ -71,15 +51,7 @@
         /// <param name="controllerDescriptors">A <see cref="IReadOnlyList{T}">read-only list</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
         public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, IReadOnlyList<HttpControllerDescriptor> controllerDescriptors )
-            : base( configuration, controllerName, controllerDescriptors[0].ControllerType )
-        {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNullOrEmpty( controllerName, nameof( controllerName ) );
-            Arg.NotNull( controllerDescriptors, nameof( controllerDescriptors ) );
-            Arg.InRange( controllerDescriptors.Count, 1, nameof( controllerDescriptors ) );
-
-            descriptors = controllerDescriptors;
-        }
+            : base( configuration, controllerName, controllerDescriptors?[0].ControllerType ) => descriptors = controllerDescriptors ?? throw new ArgumentNullException( nameof( controllerDescriptors ) );
 
         /// <summary>
         /// Creates and returns a controller for the specified request.
@@ -93,9 +65,7 @@
         /// the <see cref="IHttpController">controller</see> is created using the first item in the group.</remarks>
         public override IHttpController CreateController( HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-
-            var descriptor = request.ApiVersionProperties().SelectedController;
+            var descriptor = request.ApiVersionProperties().SelectedController!;
             return descriptor.CreateController( request );
         }
 

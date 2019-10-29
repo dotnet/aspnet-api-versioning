@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Routing.Template;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static System.String;
 
     partial class ODataRouteBuilder
@@ -23,18 +22,18 @@
 
         static string RemoveRouteConstraints( string routePrefix )
         {
-            Contract.Requires( !IsNullOrEmpty( routePrefix ) );
-            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
-
             var parsedTemplate = TemplateParser.Parse( routePrefix );
             var segments = new List<string>( parsedTemplate.Segments.Count );
 
-            foreach ( var segment in parsedTemplate.Segments )
+            for ( var i = 0; i < parsedTemplate.Segments.Count; i++ )
             {
                 var currentSegment = Empty;
+                var parts = parsedTemplate.Segments[i].Parts;
 
-                foreach ( var part in segment.Parts )
+                for ( var j = 0; j < parts.Count; j++ )
                 {
+                    var part = parts[j];
+
                     if ( part.IsLiteral )
                     {
                         currentSegment += part.Text;

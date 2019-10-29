@@ -1,6 +1,5 @@
 ﻿namespace System.Web.Http.Description
 {
-    using Microsoft;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Description;
 
@@ -14,10 +13,8 @@
         /// </summary>
         /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the model for.</param>
         /// <returns>The associated <see cref="IEdmModel">EDM model</see> or <c>null</c> if there is no associated model.</returns>
-        public static IEdmModel EdmModel( this ApiDescription apiDescription )
+        public static IEdmModel? EdmModel( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( apiDescription is VersionedApiDescription description )
             {
                 return description.GetProperty<IEdmModel>();
@@ -31,10 +28,8 @@
         /// </summary>
         /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the entity set for.</param>
         /// <returns>The associated <see cref="IEdmEntitySet">entity set</see> or <c>null</c> if there is no associated entity set.</returns>
-        public static IEdmEntitySet EntitySet( this ApiDescription apiDescription )
+        public static IEdmEntitySet? EntitySet( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( !( apiDescription is VersionedApiDescription description ) )
             {
                 return default;
@@ -67,21 +62,15 @@
         /// </summary>
         /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the entity type for.</param>
         /// <returns>The associated <see cref="IEdmEntityType">entity type</see> or <c>null</c> if there is no associated entity type.</returns>
-        public static IEdmEntityType EntityType( this ApiDescription apiDescription )
-        {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            return apiDescription.EntitySet()?.EntityType();
-        }
+        public static IEdmEntityType? EntityType( this ApiDescription apiDescription ) => apiDescription.EntitySet()?.EntityType();
 
         /// <summary>
         /// Gets the operation associated with the API description.
         /// </summary>
         /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the operation for.</param>
         /// <returns>The associated <see cref="IEdmOperation">EDM operation</see> or <c>null</c> if there is no associated operation.</returns>
-        public static IEdmOperation Operation( this ApiDescription apiDescription )
+        public static IEdmOperation? Operation( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( apiDescription is VersionedApiDescription description )
             {
                 return description.GetProperty<IEdmOperation>();

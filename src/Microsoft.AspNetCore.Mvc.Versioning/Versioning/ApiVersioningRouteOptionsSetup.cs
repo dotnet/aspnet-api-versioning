@@ -22,6 +22,11 @@
         /// <inheritdoc />
         public virtual void PostConfigure( string name, RouteOptions options )
         {
+            if ( options == null )
+            {
+                throw new ArgumentNullException( nameof( options ) );
+            }
+
             var key = versioningOptions.Value.RouteConstraintName;
             options.ConstraintMap.Add( key, typeof( ApiVersionRouteConstraint ) );
         }

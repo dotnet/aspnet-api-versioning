@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
 {
     using System;
-    using System.Diagnostics.Contracts;
     using static System.ComponentModel.TypeDescriptor;
     using static System.Nullable;
 
@@ -13,7 +12,6 @@ namespace Microsoft.AspNetCore.Mvc
     {
         internal static bool IsSimpleType( this Type type )
         {
-            Contract.Requires( type != null );
 #if WEBAPI
             return type.IsPrimitive ||
 #else
@@ -29,8 +27,6 @@ namespace Microsoft.AspNetCore.Mvc
 
         internal static bool IsSimpleUnderlyingType( this Type type )
         {
-            Contract.Requires( type != null );
-
             var underlyingType = GetUnderlyingType( type );
 
             if ( underlyingType != null )

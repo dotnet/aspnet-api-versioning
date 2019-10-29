@@ -1,8 +1,6 @@
 ﻿namespace System.Web.Http
 {
-    using Microsoft;
     using Microsoft.Web.Http.Versioning;
-    using System.Diagnostics.Contracts;
     using System.Net.Http;
 
     /// <summary>
@@ -19,8 +17,10 @@
         /// <returns>The current <see cref="ODataApiVersionRequestProperties">OData API versioning properties</see>.</returns>
         public static ODataApiVersionRequestProperties ODataApiVersionProperties( this HttpRequestMessage request )
         {
-            Arg.NotNull( request, nameof( request ) );
-            Contract.Ensures( Contract.Result<ODataApiVersionRequestProperties>() != null );
+            if ( request == null )
+            {
+                throw new ArgumentNullException( nameof( request ) );
+            }
 
             if ( !request.Properties.TryGetValue( ODataApiVersionPropertiesKey, out var value ) || !( value is ODataApiVersionRequestProperties properties ) )
             {

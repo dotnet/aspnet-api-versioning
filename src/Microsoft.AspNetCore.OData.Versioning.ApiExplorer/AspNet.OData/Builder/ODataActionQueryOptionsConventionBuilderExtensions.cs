@@ -21,11 +21,12 @@
         /// An empty array indicates that any property can appear in the $orderby query option.</param>
         /// <returns>The original <paramref name="builder"/>.</returns>
         public static ODataActionQueryOptionsConventionBuilder<TModel> AllowOrderBy<TModel>(
-            this ODataActionQueryOptionsConventionBuilder<TModel> builder, int maxNodeCount, params string[] properties )
+            this ODataActionQueryOptionsConventionBuilder<TModel> builder, int maxNodeCount, params string[] properties ) where TModel : notnull
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
-            Arg.GreaterThanOrEqualTo( maxNodeCount, 0, nameof( maxNodeCount ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
         }
@@ -39,10 +40,12 @@
         /// An empty sequence indicates that any property can appear in the $orderby query option.</param>
         /// <returns>The original <paramref name="builder"/>.</returns>
         public static ODataActionQueryOptionsConventionBuilder<TModel> AllowOrderBy<TModel>(
-            this ODataActionQueryOptionsConventionBuilder<TModel> builder, IEnumerable<string> properties )
+            this ODataActionQueryOptionsConventionBuilder<TModel> builder, IEnumerable<string> properties ) where TModel : notnull
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( default, properties );
         }
@@ -56,10 +59,12 @@
         /// An empty array indicates that any property can appear in the $orderby query option.</param>
         /// <returns>The original <paramref name="builder"/>.</returns>
         public static ODataActionQueryOptionsConventionBuilder<TModel> AllowOrderBy<TModel>(
-            this ODataActionQueryOptionsConventionBuilder<TModel> builder, params string[] properties )
+            this ODataActionQueryOptionsConventionBuilder<TModel> builder, params string[] properties ) where TModel : notnull
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( default, properties.AsEnumerable() );
         }

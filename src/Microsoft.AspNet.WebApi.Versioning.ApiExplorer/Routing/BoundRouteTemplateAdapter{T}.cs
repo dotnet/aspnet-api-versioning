@@ -1,10 +1,12 @@
-﻿namespace Microsoft.Web.Http.Routing
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.Web.Http.Routing
 {
     using System;
     using System.Web.Http.Routing;
     using static System.Linq.Expressions.Expression;
 
-    sealed class BoundRouteTemplateAdapter<T> : IBoundRouteTemplate
+    sealed class BoundRouteTemplateAdapter<T> : IBoundRouteTemplate where T : notnull
     {
         static readonly Lazy<Func<T, string>> boundTemplateAccessor = new Lazy<Func<T, string>>( NewBoundTemplateAccessor );
         static readonly Lazy<Action<T, string>> boundTemplateMutator = new Lazy<Action<T, string>>( NewBoundTemplateMutator );

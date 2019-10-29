@@ -8,7 +8,6 @@
     using Microsoft.Web.Http.Description;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
@@ -25,14 +24,6 @@
             IModelTypeBuilder modelTypeBuilder,
             ODataApiExplorerOptions options )
         {
-            Contract.Requires( configuration != null );
-            Contract.Requires( apiVersion != null );
-            Contract.Requires( route != null );
-            Contract.Requires( actionDescriptor != null );
-            Contract.Requires( parameterDescriptions != null );
-            Contract.Requires( modelTypeBuilder != null );
-            Contract.Requires( options != null );
-
             ApiVersion = apiVersion;
             Services = configuration.GetODataRootContainer( route );
             EdmModel = Services.GetRequiredService<IEdmModel>();
@@ -65,10 +56,6 @@
 
         void ConvertODataActionParametersToTypedModel( IModelTypeBuilder modelTypeBuilder, IEdmAction action, string controllerName )
         {
-            Contract.Requires( modelTypeBuilder != null );
-            Contract.Requires( action != null );
-            Contract.Requires( controllerName != null );
-
             var apiVersion = new Lazy<ApiVersion>( () => EdmModel.GetAnnotationValue<ApiVersionAnnotation>( EdmModel ).ApiVersion );
 
             for ( var i = 0; i < ParameterDescriptions.Count; i++ )

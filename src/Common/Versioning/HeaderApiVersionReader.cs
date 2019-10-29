@@ -4,6 +4,7 @@ namespace Microsoft.Web.Http.Versioning
 namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
+    using System;
     using System.Collections.Generic;
     using static ApiVersionParameterLocation;
     using static System.StringComparer;
@@ -22,21 +23,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="HeaderApiVersionReader"/> class.
         /// </summary>
         /// <param name="headerNames">A <see cref="IEnumerable{T}">sequence</see> of HTTP header names to read the service API version from.</param>
-        public HeaderApiVersionReader( IEnumerable<string> headerNames )
-        {
-            Arg.NotNull( headerNames, nameof( headerNames ) );
-            HeaderNames.AddRange( headerNames );
-        }
+        public HeaderApiVersionReader( IEnumerable<string> headerNames ) =>
+            HeaderNames.AddRange( headerNames ?? throw new ArgumentNullException( nameof( headerNames ) ) );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderApiVersionReader"/> class.
         /// </summary>
         /// <param name="headerNames">An array of HTTP header names to read the service API version from.</param>
-        public HeaderApiVersionReader( params string[] headerNames )
-        {
-            Arg.NotNull( headerNames, nameof( headerNames ) );
-            HeaderNames.AddRange( headerNames );
-        }
+        public HeaderApiVersionReader( params string[] headerNames ) => HeaderNames.AddRange( headerNames );
 
         /// <summary>
         /// Gets a collection of HTTP header names that the service API version can be read from.
@@ -51,7 +45,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
         public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
         {
-            Arg.NotNull( context, nameof( context ) );
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
 
             foreach ( var name in HeaderNames )
             {

@@ -1,14 +1,10 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
-    using Microsoft.AspNet.OData.Routing;
-    using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
     using static Microsoft.AspNetCore.Http.StatusCodes;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
@@ -22,7 +18,10 @@
         /// <inheritdoc />
         public virtual void ApplyTo( ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
 
             if ( !IsSupported( apiDescription ) )
             {
@@ -31,7 +30,7 @@
 
             var context = new ODataQueryOptionDescriptionContext( ValidationSettings );
             var model = apiDescription.EdmModel();
-            var queryOptions = GetQueryOptions( Settings.DefaultQuerySettings, context );
+            var queryOptions = GetQueryOptions( Settings.DefaultQuerySettings!, context );
             var singleResult = IsSingleResult( apiDescription, out var resultType );
             var visitor = new ODataAttributeVisitor( context, model, queryOptions, resultType, singleResult );
 
@@ -89,18 +88,13 @@
         /// <param name="type">The parameter value type.</param>
         /// <param name="defaultValue">The parameter default value, if any.</param>
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
-        protected virtual ApiParameterDescription NewParameterDescription( string name, string description, Type type, object defaultValue = default )
+        protected virtual ApiParameterDescription NewParameterDescription( string name, string description, Type type, object? defaultValue = default )
         {
-            Arg.NotNullOrEmpty( name, nameof( name ) );
-            Arg.NotNullOrEmpty( description, nameof( description ) );
-            Arg.NotNull( type, nameof( type ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             return new ApiParameterDescription()
             {
                 DefaultValue = defaultValue,
                 IsRequired = false,
-                ModelMetadata = new ODataQueryOptionModelMetadata( Settings.ModelMetadataProvider, type, description ),
+                ModelMetadata = new ODataQueryOptionModelMetadata( Settings.ModelMetadataProvider!, type, description ),
                 Name = name,
                 ParameterDescriptor = new ParameterDescriptor()
                 {
@@ -112,10 +106,8 @@
             };
         }
 
-        static bool IsSingleResult( ApiDescription description, out Type resultType )
+        static bool IsSingleResult( ApiDescription description, out Type? resultType )
         {
-            Contract.Requires( description != null );
-
             if ( description.SupportedResponseTypes.Count == 0 )
             {
                 resultType = default;
@@ -163,8 +155,6 @@
 
         static bool IsSupported( ApiDescription apiDescription )
         {
-            Contract.Requires( apiDescription != null );
-
             return apiDescription.HttpMethod.ToUpperInvariant() switch
             {
                 "GET" => true,

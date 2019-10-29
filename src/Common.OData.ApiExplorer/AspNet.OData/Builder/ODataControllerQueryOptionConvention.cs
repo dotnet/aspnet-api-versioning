@@ -4,9 +4,7 @@
 #if !WEBAPI
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
-#endif
-    using System.Diagnostics.Contracts;
-#if WEBAPI
+#else
     using System.Web.Http.Description;
     using ControllerActionDescriptor = System.Web.Http.Controllers.ReflectedHttpActionDescriptor;
 #endif
@@ -20,18 +18,12 @@
             ODataActionQueryOptionConventionLookup lookup,
             ODataQueryOptionSettings settings )
         {
-            Contract.Requires( lookup != null );
-            Contract.Requires( lookup != null );
-            Contract.Requires( settings != null );
-
             this.lookup = lookup;
             this.settings = settings;
         }
 
         public void ApplyTo( ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( !( apiDescription.ActionDescriptor is ControllerActionDescriptor action ) )
             {
                 return;
@@ -42,14 +34,11 @@
                 convention = ImplicitActionConvention( settings );
             }
 
-            convention.ApplyTo( apiDescription );
+            convention!.ApplyTo( apiDescription );
         }
 
         static IODataQueryOptionsConvention ImplicitActionConvention( ODataQueryOptionSettings settings )
         {
-            Contract.Requires( settings != null );
-            Contract.Ensures( Contract.Result<IODataQueryOptionsConvention>() != null );
-
             var validationSettings = new ODataValidationSettings()
             {
                 AllowedArithmeticOperators = AllowedArithmeticOperators.None,

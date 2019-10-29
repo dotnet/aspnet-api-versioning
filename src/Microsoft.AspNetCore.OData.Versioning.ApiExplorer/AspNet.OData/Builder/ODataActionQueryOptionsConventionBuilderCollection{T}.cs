@@ -8,7 +8,7 @@
     /// </content>
     /// <typeparam name="T">The <see cref="Type">type</see> of <see cref="ICommonModel">model</see>.</typeparam>
     [CLSCompliant( false )]
-    public partial class ODataActionQueryOptionsConventionBuilderCollection<T>
+    public partial class ODataActionQueryOptionsConventionBuilderCollection<T> where T : notnull
     {
     }
 }

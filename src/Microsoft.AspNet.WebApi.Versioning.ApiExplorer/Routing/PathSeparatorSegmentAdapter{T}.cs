@@ -1,8 +1,10 @@
-﻿namespace Microsoft.Web.Http.Routing
+﻿#pragma warning disable CA1812
+
+namespace Microsoft.Web.Http.Routing
 {
     using System;
 
-    sealed class PathSeparatorSegmentAdapter<T> : IPathSeparatorSegment
+    sealed class PathSeparatorSegmentAdapter<T> : IPathSeparatorSegment where T : notnull
     {
         readonly T adapted;
 

@@ -1,9 +1,8 @@
 ﻿namespace System.Web.Http.Description
 {
-    using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Description;
-    using System.Diagnostics.Contracts;
+    using System;
     using System.Linq;
     using static System.Globalization.CultureInfo;
 
@@ -19,16 +18,14 @@
         /// <returns>The associated <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
         /// <remarks>This method always returns <c>null</c> unless the <paramref name="apiDescription">API description</paramref>
         /// is of type <see cref="VersionedApiDescription"/>.</remarks>
-        public static ApiVersion GetApiVersion( this ApiDescription apiDescription )
+        public static ApiVersion? GetApiVersion( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( apiDescription is VersionedApiDescription versionedApiDescription )
             {
                 return versionedApiDescription.ApiVersion;
             }
 
-            return null;
+            return default;
         }
 
         /// <summary>
@@ -40,8 +37,6 @@
         /// is of type <see cref="VersionedApiDescription"/>.</remarks>
         public static bool IsDeprecated( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( apiDescription is VersionedApiDescription versionedApiDescription )
             {
                 return versionedApiDescription.IsDeprecated;
@@ -57,16 +52,14 @@
         /// <returns>The associated group name or <c>null</c>.</returns>
         /// <remarks>This method always returns <c>null</c> unless the <paramref name="apiDescription">API description</paramref>
         /// is of type <see cref="VersionedApiDescription"/>.</remarks>
-        public static string GetGroupName( this ApiDescription apiDescription )
+        public static string? GetGroupName( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-
             if ( apiDescription is VersionedApiDescription versionedApiDescription )
             {
                 return versionedApiDescription.GroupName;
             }
 
-            return null;
+            return default;
         }
 
         /// <summary>
@@ -79,8 +72,10 @@
         /// otherwise, the return value will be "{<see cref="ApiDescription.ID"/>}".</remarks>
         public static string GetUniqueID( this ApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Contract.Ensures( !string.IsNullOrEmpty( Contract.Result<string>() ) );
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
 
             if ( apiDescription is VersionedApiDescription versionedApiDescription )
             {
@@ -98,8 +93,15 @@
         /// <returns>True if the <paramref name="apiDescription">API description</paramref> was updated; otherwise, false.</returns>
         public static bool TryUpdateRelativePathAndRemoveApiVersionParameter( this ApiDescription apiDescription, ApiExplorerOptions options )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Arg.NotNull( options, nameof( options ) );
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
+
+            if ( options == null )
+            {
+                throw new ArgumentNullException( nameof( options ) );
+            }
 
             if ( !options.SubstituteApiVersionInUrl || !( apiDescription is VersionedApiDescription versionedApiDescription ) )
             {
@@ -136,14 +138,17 @@
         /// <returns>The value of the property, if present; otherwise, the default value of <typeparamref name="T"/>.</returns>
         public static T GetProperty<T>( this VersionedApiDescription apiDescription )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
 
             if ( apiDescription.Properties.TryGetValue( typeof( T ), out var value ) )
             {
                 return (T) value;
             }
 
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -154,8 +159,12 @@
         /// <param name="value">The value to add or update.</param>
         public static void SetProperty<T>( this VersionedApiDescription apiDescription, T value )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            apiDescription.Properties[typeof( T )] = value;
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
+
+            apiDescription.Properties[typeof( T )] = value!;
         }
     }
 }

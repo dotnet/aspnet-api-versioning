@@ -1,4 +1,6 @@
-﻿#if WEBAPI
+﻿#pragma warning disable CA1040
+
+#if WEBAPI
 namespace Microsoft.Web.Http.Versioning
 #else
 namespace Microsoft.AspNetCore.Mvc.Versioning
@@ -9,7 +11,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     /// <summary>
     /// Defines the behavior of a service that is API version-neutral.
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces", Justification="While a marker interface, this interface is realized as attributes.")]
     public interface IApiVersionNeutral
     {
     }

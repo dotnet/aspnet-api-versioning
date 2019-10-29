@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Text;
     using System.Web.Http;
@@ -17,9 +16,6 @@
 
         public override ControllerSelectionResult SelectController( ControllerSelectionContext context )
         {
-            Contract.Requires( context != null );
-            Contract.Ensures( Contract.Result<ControllerSelectionResult>() != null );
-
             var request = context.Request;
             var requestedVersion = context.RequestedVersion;
             var controllerName = context.ControllerName;
@@ -35,7 +31,7 @@
                 return result;
             }
 
-            var bestMatches = SelectBestCandidates( context.ConventionRouteCandidates, requestedVersion );
+            var bestMatches = SelectBestCandidates( context.ConventionRouteCandidates!, requestedVersion );
 
             switch ( bestMatches.Count )
             {
@@ -43,7 +39,7 @@
                     break;
                 case 1:
                     result.Controller = bestMatches.Single();
-                    result.Controller.SetPossibleCandidates( context.ConventionRouteCandidates.Select( c => c.ActionDescriptor.ControllerDescriptor ).ToArray() );
+                    result.Controller.SetPossibleCandidates( context.ConventionRouteCandidates!.Select( c => c.ActionDescriptor.ControllerDescriptor ).ToArray() );
                     break;
                 default:
                     if ( TryDisambiguateControllerByAction( request, bestMatches, out var resolvedController ) )
@@ -58,13 +54,8 @@
             return result;
         }
 
-        static Exception CreateAmbiguousControllerException( IHttpRoute route, string controllerName, ICollection<Type> matchingTypes )
+        static Exception CreateAmbiguousControllerException( IHttpRoute route, string? controllerName, ICollection<Type> matchingTypes )
         {
-            Contract.Requires( route != null );
-            Contract.Requires( !string.IsNullOrEmpty( controllerName ) );
-            Contract.Requires( matchingTypes != null );
-            Contract.Ensures( Contract.Result<Exception>() != null );
-
             var builder = new StringBuilder();
 
             foreach ( var type in matchingTypes )

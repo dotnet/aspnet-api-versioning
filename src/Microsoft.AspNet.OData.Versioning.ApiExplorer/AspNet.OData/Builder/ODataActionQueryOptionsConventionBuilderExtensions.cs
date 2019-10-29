@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http.Controllers;
@@ -22,11 +23,12 @@
             this ODataActionQueryOptionsConventionBuilder<TController> builder,
             int maxNodeCount,
             params string[] properties )
-            where TController : IHttpController
+            where TController : notnull, IHttpController
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
-            Arg.GreaterThanOrEqualTo( maxNodeCount, 0, nameof( maxNodeCount ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
         }
@@ -42,10 +44,12 @@
         public static ODataActionQueryOptionsConventionBuilder<TController> AllowOrderBy<TController>(
             this ODataActionQueryOptionsConventionBuilder<TController> builder,
             IEnumerable<string> properties )
-            where TController : IHttpController
+            where TController : notnull, IHttpController
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( default, properties );
         }
@@ -61,10 +65,12 @@
         public static ODataActionQueryOptionsConventionBuilder<TController> AllowOrderBy<TController>(
             this ODataActionQueryOptionsConventionBuilder<TController> builder,
             params string[] properties )
-            where TController : IHttpController
+            where TController : notnull, IHttpController
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( default, properties.AsEnumerable() );
         }

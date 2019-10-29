@@ -6,7 +6,6 @@
     using Microsoft.Extensions.Options;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static System.Globalization.CultureInfo;
@@ -29,9 +28,6 @@
         /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured <see cref="ApiExplorerOptions">API explorer options</see>.</param>
         public VersionedApiDescriptionProvider( IModelMetadataProvider metadataProvider, IOptions<ApiExplorerOptions> options )
         {
-            Arg.NotNull( metadataProvider, nameof( metadataProvider ) );
-            Arg.NotNull( options, nameof( options ) );
-
             MetadataProvider = metadataProvider;
             this.options = options;
             modelMetadata = new Lazy<ModelMetadata>( NewModelMetadata );
@@ -50,9 +46,9 @@
         protected ApiExplorerOptions Options => options.Value;
 
         /// <summary>
-        /// Gets the order prescendence of the current API description provider.
+        /// Gets the order precedence of the current API description provider.
         /// </summary>
-        /// <value>The order prescendence of the current API description provider. The default value is 0.</value>
+        /// <value>The order precedence of the current API description provider. The default value is 0.</value>
         public virtual int Order => 0;
 
         /// <summary>
@@ -61,13 +57,7 @@
         /// <param name="actionDescriptor">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> for action being explored.</param>
         /// <returns>True if the action should be explored; otherwise, false.</returns>
-        protected virtual bool ShouldExploreAction( ActionDescriptor actionDescriptor, ApiVersion apiVersion )
-        {
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
-            Arg.NotNull( apiVersion, nameof( actionDescriptor ) );
-
-            return actionDescriptor.IsMappedTo( apiVersion );
-        }
+        protected virtual bool ShouldExploreAction( ActionDescriptor actionDescriptor, ApiVersion apiVersion ) => actionDescriptor.IsMappedTo( apiVersion );
 
         /// <summary>
         /// Populates the API version parameters for the specified API description.
@@ -76,9 +66,6 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> used to populate parameters with.</param>
         protected virtual void PopulateApiVersionParameters( ApiDescription apiDescription, ApiVersion apiVersion )
         {
-            Arg.NotNull( apiDescription, nameof( apiDescription ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-
             var parameterSource = Options.ApiVersionParameterSource;
             var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, modelMetadata.Value, Options );
 
@@ -92,6 +79,11 @@
         /// <remarks>The default implementation performs no action.</remarks>
         public virtual void OnProvidersExecuted( ApiDescriptionProviderContext context )
         {
+            if ( context == null )
+            {
+                throw new ArgumentNullException( nameof( context ) );
+            }
+
             var results = context.Results;
 
             if ( results.Count == 0 )
@@ -100,7 +92,6 @@
             }
 
             var groupResults = new List<ApiDescription>();
-            var parameterSource = Options.ApiVersionParameterSource;
 
             foreach ( var version in FlattenApiVersions( results ) )
             {
@@ -142,9 +133,6 @@
 
         IEnumerable<ApiVersion> FlattenApiVersions( IEnumerable<ApiDescription> descriptions )
         {
-            Contract.Requires( descriptions != null );
-            Contract.Ensures( Contract.Result<IEnumerable<ApiVersion>>() != null );
-
             var versions = new HashSet<ApiVersion>();
 
             foreach ( var description in descriptions )

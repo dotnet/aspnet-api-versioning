@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Routing
 {
+    using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Web.Http;
@@ -22,8 +23,13 @@
         /// <param name="values">The current <see cref="IDictionary{TKey, TValue}">collection</see> of route values.</param>
         /// <param name="routeDirection">The <see cref="HttpRouteDirection">route direction</see> to match.</param>
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
-        public bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection )
+        public bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object?> values, HttpRouteDirection routeDirection )
         {
+            if ( values == null )
+            {
+                throw new ArgumentNullException( nameof( values ) );
+            }
+
             if ( IsNullOrEmpty( parameterName ) )
             {
                 return false;

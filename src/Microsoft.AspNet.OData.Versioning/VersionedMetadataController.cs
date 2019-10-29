@@ -43,7 +43,9 @@
         [HttpOptions]
         public virtual IHttpActionResult GetOptions()
         {
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var response = new HttpResponseMessage( OK );
+#pragma warning restore CA2000 // Dispose objects before losing scope
             var headers = response.Headers;
 
             response.Content = new StringContent( Empty );

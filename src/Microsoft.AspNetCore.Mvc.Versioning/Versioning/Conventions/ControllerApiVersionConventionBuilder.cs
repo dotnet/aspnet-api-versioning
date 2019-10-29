@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
     /// <content>
@@ -16,10 +17,12 @@
         /// <param name="method">The <see cref="MethodInfo">method</see> representing the action to retrieve the convention for.</param>
         /// <param name="convention">The retrieved <see cref="IApiVersionConvention{T}">convention</see> or <c>null</c>.</param>
         /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
-        protected override bool TryGetConvention( MethodInfo method, out IApiVersionConvention<ActionModel> convention )
+#if NETCOREAPP3_0
+        protected override bool TryGetConvention( MethodInfo method, [NotNullWhen( true )] out IApiVersionConvention<ActionModel>? convention )
+#else
+        protected override bool TryGetConvention( MethodInfo method, out IApiVersionConvention<ActionModel>? convention )
+#endif
         {
-            Arg.NotNull( method, nameof( method ) );
-
             if ( ActionBuilders.TryGetValue( method, out var actionBuilder ) )
             {
                 convention = actionBuilder;

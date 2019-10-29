@@ -55,8 +55,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of attributes to merge.</param>
         protected virtual void MergeAttributesWithConventions( IEnumerable<object> attributes )
         {
-            Arg.NotNull( attributes, nameof( attributes ) );
-
             if ( VersionNeutral |= attributes.OfType<IApiVersionNeutral>().Any() )
             {
                 return;

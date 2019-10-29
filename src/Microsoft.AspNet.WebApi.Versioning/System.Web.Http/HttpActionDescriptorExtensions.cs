@@ -1,10 +1,9 @@
 ﻿namespace System.Web.Http
 {
-    using Microsoft;
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
+    using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Web.Http.Controllers;
     using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
@@ -32,8 +31,10 @@
         /// <returns>The <see cref="ApiVersionModel">API version information</see> for the action.</returns>
         public static ApiVersionModel GetApiVersionModel( this HttpActionDescriptor action, ApiVersionMapping mapping )
         {
-            Arg.NotNull( action, nameof( action ) );
-            Contract.Ensures( Contract.Result<ApiVersionModel>() != null );
+            if ( action == null )
+            {
+                throw new ArgumentNullException( nameof( action ) );
+            }
 
             switch ( mapping )
             {
@@ -69,9 +70,12 @@
         /// <param name="action">The <see cref="HttpActionDescriptor">action</see> to evaluate.</param>
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
         /// <returns>One of the <see cref="ApiVersionMapping"/> values.</returns>
-        public static ApiVersionMapping MappingTo( this HttpActionDescriptor action, ApiVersion apiVersion )
+        public static ApiVersionMapping MappingTo( this HttpActionDescriptor action, ApiVersion? apiVersion )
         {
-            Arg.NotNull( action, nameof( action ) );
+            if ( action == null )
+            {
+                throw new ArgumentNullException( nameof( action ) );
+            }
 
             var model = action.GetApiVersionModel();
 
@@ -99,11 +103,7 @@
         /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to test the mapping for.</param>
         /// <returns>True if the <paramref name="action"/> explicitly or implicitly maps to the specified
         /// <paramref name="apiVersion">API version</paramref>; otherwise, false.</returns>
-        public static bool IsMappedTo( this HttpActionDescriptor action, ApiVersion apiVersion )
-        {
-            Arg.NotNull( action, nameof( action ) );
-            return action.MappingTo( apiVersion ) > None;
-        }
+        public static bool IsMappedTo( this HttpActionDescriptor action, ApiVersion apiVersion ) => action.MappingTo( apiVersion ) > None;
 
         internal static bool IsAttributeRouted( this HttpActionDescriptor action ) =>
             action.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value ) && ( value ?? false );

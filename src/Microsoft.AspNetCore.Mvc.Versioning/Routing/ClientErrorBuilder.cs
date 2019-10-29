@@ -11,7 +11,6 @@
     using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using static Microsoft.AspNetCore.Mvc.ApiVersion;
     using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
     using static System.Environment;
@@ -20,36 +19,36 @@
 
     sealed class ClientErrorBuilder
     {
-        internal ApiVersioningOptions Options { get; set; }
+        internal ApiVersioningOptions? Options { get; set; }
 
-        internal IReportApiVersions ApiVersionReporter { get; set; }
+        internal IReportApiVersions? ApiVersionReporter { get; set; }
 
-        internal HttpContext HttpContext { get; set; }
+        internal HttpContext? HttpContext { get; set; }
 
-        internal IReadOnlyCollection<ActionDescriptor> Candidates { get; set; }
+        internal IReadOnlyCollection<ActionDescriptor>? Candidates { get; set; }
 
-        internal ILogger Logger { get; set; }
+        internal ILogger? Logger { get; set; }
 
-        IErrorResponseProvider ErrorResponseProvider => Options.ErrorResponses;
+        IErrorResponseProvider ErrorResponseProvider => Options!.ErrorResponses;
 
         internal RequestHandler Build()
         {
-            var feature = HttpContext.Features.Get<IApiVersioningFeature>();
-            var request = HttpContext.Request;
+            var feature = HttpContext!.Features.Get<IApiVersioningFeature>();
+            var request = HttpContext!.Request;
             var method = request.Method;
             var requestedVersion = feature.RawRequestedApiVersion;
             var parsedVersion = feature.RequestedApiVersion;
             var actionNames = new Lazy<string>( () => Join( NewLine, Candidates.Select( a => a.DisplayName ) ) );
-            var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( Candidates, parsedVersion ) );
+            var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( Candidates!, parsedVersion ) );
             var apiVersions = new Lazy<ApiVersionModel>( Candidates.Select( a => a.GetApiVersionModel() ).Aggregate );
-            var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter, apiVersions );
+            var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter!, apiVersions );
             var url = new Uri( request.GetDisplayUrl() ).SafeFullPath();
 
             if ( parsedVersion == null )
             {
                 if ( IsNullOrEmpty( requestedVersion ) )
                 {
-                    if ( Options.AssumeDefaultVersionWhenUnspecified || Candidates.Any( c => c.GetApiVersionModel().IsApiVersionNeutral ) )
+                    if ( Options!.AssumeDefaultVersionWhenUnspecified || Candidates.Any( c => c.GetApiVersionModel().IsApiVersionNeutral ) )
                     {
                         return VersionNeutralUnmatched( handlerContext, url, method, allowedMethods.Value, actionNames.Value );
                     }
@@ -73,11 +72,8 @@
             return Unmatched( handlerContext, url, method, allowedMethods.Value, actionNames.Value, parsedVersion, requestedVersion );
         }
 
-        static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates, ApiVersion apiVersion )
+        static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates, ApiVersion? apiVersion )
         {
-            Contract.Requires( candidates != null );
-            Contract.Ensures( Contract.Result<HashSet<string>>() != null );
-
             var httpMethods = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
 
             foreach ( var candidate in candidates )
@@ -103,12 +99,7 @@
             IReadOnlyCollection<string> allowedMethods,
             string actionNames )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( !IsNullOrEmpty( requestUrl ) );
-            Contract.Requires( !IsNullOrEmpty( method ) );
-            Contract.Requires( allowedMethods != null );
-
-            Logger.ApiVersionUnspecified( actionNames );
+            Logger!.ApiVersionUnspecified( actionNames );
             context.Code = UnsupportedApiVersion;
 
             if ( allowedMethods.Count == 0 || allowedMethods.Contains( method ) )
@@ -125,22 +116,16 @@
 
         RequestHandler UnspecifiedApiVersion( RequestHandlerContext context, string actionNames )
         {
-            Contract.Requires( context != null );
-
-            Logger.ApiVersionUnspecified( actionNames );
+            Logger!.ApiVersionUnspecified( actionNames );
             context.Code = ApiVersionUnspecified;
             context.Message = SR.ApiVersionUnspecified;
 
             return new BadRequestHandler( context );
         }
 
-        RequestHandler MalformedApiVersion( RequestHandlerContext context, string requestUrl, string requestedVersion )
+        RequestHandler MalformedApiVersion( RequestHandlerContext context, string requestUrl, string? requestedVersion )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( !IsNullOrEmpty( requestUrl ) );
-            Contract.Requires( !IsNullOrEmpty( requestedVersion ) );
-
-            Logger.ApiVersionInvalid( requestedVersion );
+            Logger!.ApiVersionInvalid( requestedVersion );
             context.Code = InvalidApiVersion;
             context.Message = SR.VersionedResourceNotSupported.FormatDefault( requestUrl, requestedVersion );
 
@@ -153,17 +138,10 @@
             string method,
             IReadOnlyCollection<string> allowedMethods,
             string actionNames,
-            ApiVersion parsedVersion,
-            string requestedVersion )
+            ApiVersion? parsedVersion,
+            string? requestedVersion )
         {
-            Contract.Requires( context != null );
-            Contract.Requires( !IsNullOrEmpty( requestUrl ) );
-            Contract.Requires( !IsNullOrEmpty( method ) );
-            Contract.Requires( allowedMethods != null );
-            Contract.Requires( parsedVersion != null );
-            Contract.Requires( !IsNullOrEmpty( requestedVersion ) );
-
-            Logger.ApiVersionUnmatched( parsedVersion, actionNames );
+            Logger!.ApiVersionUnmatched( parsedVersion, actionNames );
             context.Code = UnsupportedApiVersion;
 
             if ( allowedMethods.Count == 0 || allowedMethods.Contains( method ) )

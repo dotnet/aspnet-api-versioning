@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
 
     /// <summary>
@@ -21,11 +20,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// </summary>
         /// <param name="controllerBuilder">The <see cref="ControllerApiVersionConventionBuilder">controller builder</see>
         /// the action builder belongs to.</param>
-        public ActionApiVersionConventionBuilder( ControllerApiVersionConventionBuilder controllerBuilder )
-        {
-            Arg.NotNull( controllerBuilder, nameof( controllerBuilder ) );
+        public ActionApiVersionConventionBuilder( ControllerApiVersionConventionBuilder controllerBuilder ) =>
             ControllerBuilder = controllerBuilder;
-        }
 
         /// <summary>
         /// Gets the controller builder the action builder belongs to.
@@ -53,9 +49,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
         public virtual ActionApiVersionConventionBuilder MapToApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-
             MappedVersions.Add( apiVersion );
             return this;
         }
@@ -66,8 +59,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
         public virtual ActionApiVersionConventionBuilder IsApiVersionNeutral()
         {
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-
             VersionNeutral = true;
             return this;
         }
@@ -79,9 +70,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
         public virtual ActionApiVersionConventionBuilder HasApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-
             SupportedVersions.Add( apiVersion );
             return this;
         }
@@ -93,9 +81,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
         public virtual ActionApiVersionConventionBuilder HasDeprecatedApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-
             DeprecatedVersions.Add( apiVersion );
             return this;
         }
@@ -107,9 +92,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
         public virtual ActionApiVersionConventionBuilder AdvertisesApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-
             AdvertisedVersions.Add( apiVersion );
             return this;
         }
@@ -121,9 +103,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
         public virtual ActionApiVersionConventionBuilder AdvertisesDeprecatedApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-
             DeprecatedAdvertisedVersions.Add( apiVersion );
             return this;
         }

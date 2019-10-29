@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static System.String;
 #if WEBAPI
@@ -22,23 +21,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         const string ValueSeparator = ", ";
 
         public void Report( HttpResponseHeaders headers, Lazy<ApiVersionModel> apiVersionModel ) =>
-            Report( headers, apiVersionModel?.Value );
+            Report( headers, apiVersionModel.Value );
 
         public void Report( HttpResponseHeaders headers, ApiVersionModel apiVersionModel )
         {
-            Arg.NotNull( headers, nameof( headers ) );
-            Arg.NotNull( apiVersionModel, nameof( apiVersionModel ) );
-
             AddApiVersionHeader( headers, ApiSupportedVersions, apiVersionModel.SupportedApiVersions );
             AddApiVersionHeader( headers, ApiDeprecatedVersions, apiVersionModel.DeprecatedApiVersions );
         }
 
         static void AddApiVersionHeader( HttpResponseHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
         {
-            Contract.Requires( headers != null );
-            Contract.Requires( !IsNullOrEmpty( headerName ) );
-            Contract.Requires( versions != null );
-
             if ( versions.Count > 0 &&
 #if WEBAPI
                 !headers.Contains( headerName ) )

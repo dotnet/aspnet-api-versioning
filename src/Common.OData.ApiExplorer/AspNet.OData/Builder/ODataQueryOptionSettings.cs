@@ -7,6 +7,8 @@
     /// </summary>
     public partial class ODataQueryOptionSettings
     {
+        IODataQueryOptionDescriptionProvider? descriptionProvider;
+
         /// <summary>
         /// Gets or sets a value indicating whether query options have the system "$" prefix.
         /// </summary>
@@ -18,6 +20,10 @@
         /// Gets or sets the provider used to describe query options.
         /// </summary>
         /// <value>The <see cref="IODataQueryOptionDescriptionProvider">provider</see> used to describe OData query options.</value>
-        public IODataQueryOptionDescriptionProvider DescriptionProvider { get; set; }
+        public IODataQueryOptionDescriptionProvider DescriptionProvider
+        {
+            get => descriptionProvider ??= new DefaultODataQueryOptionDescriptionProvider();
+            set => descriptionProvider = value;
+        }
     }
 }

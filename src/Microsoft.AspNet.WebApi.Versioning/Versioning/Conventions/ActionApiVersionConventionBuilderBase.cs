@@ -19,7 +19,10 @@
         /// to apply the conventions to.</param>
         public virtual void ApplyTo( HttpActionDescriptor actionDescriptor )
         {
-            Arg.NotNull( actionDescriptor, nameof( actionDescriptor ) );
+            if ( actionDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( actionDescriptor ) );
+            }
 
             var attributes = new List<object>();
 

@@ -13,6 +13,6 @@
         /// </summary>
         /// <value>The <see cref="Uri">URL</see> representing the related entity identifier.</value>
         [JsonProperty( "@odata.id" )]
-        public Uri Value { get; set; }
+        public Uri Value { get; set; } = default!;
     }
 }

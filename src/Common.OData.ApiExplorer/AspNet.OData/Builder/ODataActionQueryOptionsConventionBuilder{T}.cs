@@ -1,9 +1,9 @@
 ﻿namespace Microsoft.AspNet.OData.Builder
 {
     using Microsoft.AspNet.OData.Query;
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
     using static Microsoft.AspNet.OData.Query.AllowedFunctions;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
@@ -21,11 +21,8 @@
         /// </summary>
         /// <param name="controllerBuilder">The <see cref="ODataActionQueryOptionsConventionBuilder{T}">controller builder</see>
         /// the action builder belongs to.</param>
-        public ODataActionQueryOptionsConventionBuilder( ODataControllerQueryOptionsConventionBuilder<T> controllerBuilder )
-        {
-            Arg.NotNull( controllerBuilder, nameof( controllerBuilder ) );
+        public ODataActionQueryOptionsConventionBuilder( ODataControllerQueryOptionsConventionBuilder<T> controllerBuilder ) =>
             ControllerBuilder = controllerBuilder;
-        }
 
         /// <summary>
         /// Gets the controller builder the action builder belongs to.
@@ -48,8 +45,10 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> Use( ODataValidationSettings validationSettings )
         {
-            Arg.NotNull( validationSettings, nameof( validationSettings ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
+            if ( validationSettings == null )
+            {
+                throw new ArgumentNullException( nameof( validationSettings ) );
+            }
 
             ValidationSettings.CopyFrom( validationSettings );
             return this;
@@ -62,8 +61,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> Allow( AllowedArithmeticOperators arithmeticOperators )
         {
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedArithmeticOperators |= arithmeticOperators;
             return this;
         }
@@ -75,8 +72,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> Allow( AllowedFunctions functions )
         {
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedFunctions |= functions;
             return this;
         }
@@ -88,8 +83,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> Allow( AllowedLogicalOperators logicalOperators )
         {
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedLogicalOperators |= logicalOperators;
             return this;
         }
@@ -101,8 +94,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> Allow( AllowedQueryOptions queryOptions )
         {
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedQueryOptions |= queryOptions;
             return this;
         }
@@ -114,9 +105,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> AllowSkip( int max )
         {
-            Arg.GreaterThanOrEqualTo( max, 0, nameof( max ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedQueryOptions |= Skip;
 
             if ( max != default )
@@ -134,9 +122,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> AllowTop( int max )
         {
-            Arg.GreaterThanOrEqualTo( max, 0, nameof( max ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedQueryOptions |= Top;
 
             if ( max != default )
@@ -154,9 +139,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> AllowExpand( int maxDepth )
         {
-            Arg.GreaterThanOrEqualTo( maxDepth, 0, nameof( maxDepth ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedQueryOptions |= Expand;
 
             if ( maxDepth != default )
@@ -174,9 +156,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> AllowAnyAll( int maxExpressionDepth )
         {
-            Arg.GreaterThanOrEqualTo( maxExpressionDepth, 0, nameof( maxExpressionDepth ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedFunctions |= Any | AllowedFunctions.All;
             ValidationSettings.AllowedQueryOptions |= Filter;
 
@@ -195,9 +174,6 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> AllowFilter( int maxNodeCount )
         {
-            Arg.GreaterThanOrEqualTo( maxNodeCount, 0, nameof( maxNodeCount ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
-
             ValidationSettings.AllowedQueryOptions |= Filter;
 
             if ( maxNodeCount != default )
@@ -217,9 +193,10 @@
         /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
         public virtual ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy( int maxNodeCount, IEnumerable<string> properties )
         {
-            Arg.NotNull( properties, nameof( properties ) );
-            Arg.GreaterThanOrEqualTo( maxNodeCount, 0, nameof( maxNodeCount ) );
-            Contract.Ensures( Contract.Result<ODataActionQueryOptionsConventionBuilder<T>>() != null );
+            if ( properties == null )
+            {
+                throw new ArgumentNullException( nameof( properties ) );
+            }
 
             ValidationSettings.AllowedQueryOptions |= OrderBy;
 

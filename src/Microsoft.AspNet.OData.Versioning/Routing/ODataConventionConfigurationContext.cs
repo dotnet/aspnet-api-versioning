@@ -21,16 +21,10 @@
         /// <param name="routingConventions">The initial <see cref="IList{T}">list</see> of <see cref="IODataRoutingConvention">routing conventions</see>.</param>
         public ODataConventionConfigurationContext( HttpConfiguration configuration, string routeName, IEdmModel edmModel, ApiVersion apiVersion, IList<IODataRoutingConvention> routingConventions )
         {
-            Arg.NotNull( configuration, nameof( configuration ) );
-            Arg.NotNullOrEmpty( routeName, nameof( routeName ) );
-            Arg.NotNull( edmModel, nameof( edmModel ) );
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( routingConventions, nameof( routingConventions ) );
-
             Configuration = configuration;
             RouteName = routeName;
             EdmModel = edmModel;
-            ApiVersion = ApiVersion;
+            ApiVersion = apiVersion;
             RoutingConventions = routingConventions;
         }
 

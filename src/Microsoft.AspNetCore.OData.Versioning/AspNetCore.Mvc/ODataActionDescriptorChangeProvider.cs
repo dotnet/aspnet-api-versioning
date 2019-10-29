@@ -5,7 +5,6 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using static System.ComponentModel.EditorBrowsableState;
 
@@ -80,7 +79,7 @@
         sealed class ChangeToken : IChangeToken
         {
             readonly ODataActionDescriptorChangeProvider provider;
-            readonly HashSet<(Action<object> Callback, object State)> callbacks = new HashSet<(Action<object> Callback, object State)>();
+            readonly HashSet<(Action<object> callback, object state)> callbacks = new HashSet<(Action<object> callback, object state)>();
             readonly object syncRoot = new object();
 
             internal ChangeToken( ODataActionDescriptorChangeProvider provider ) => this.provider = provider;
@@ -91,8 +90,6 @@
 
             public IDisposable RegisterChangeCallback( Action<object> callback, object state )
             {
-                Arg.NotNull( callback, nameof( callback ) );
-
                 var item = (callback, state);
 
                 lock ( syncRoot )
@@ -103,7 +100,7 @@
                 return new ChangeSubscription( this, item );
             }
 
-            internal void Remove( (Action<object>, object) item )
+            internal void Remove( (Action<object> callback, object state) item )
             {
                 lock ( syncRoot )
                 {
@@ -113,7 +110,7 @@
 
             internal void Callback()
             {
-                var items = default( (Action<object> Callback, object State)[] );
+                var items = default( (Action<object> callback, object state)[] );
 
                 lock ( syncRoot )
                 {
@@ -124,7 +121,7 @@
                 for ( var i = 0; i < items.Length; i++ )
                 {
                     var item = items[i];
-                    item.Callback( item.State );
+                    item.callback( item.state );
                 }
             }
         }
@@ -135,10 +132,8 @@
             readonly (Action<object>, object) callback;
             bool disposed;
 
-            internal ChangeSubscription( ChangeToken changeToken, (Action<object>, object) callback )
+            internal ChangeSubscription( ChangeToken changeToken, (Action<object> func, object state) callback )
             {
-                Contract.Requires( changeToken != null );
-
                 this.changeToken = changeToken;
                 this.callback = callback;
             }

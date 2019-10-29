@@ -5,7 +5,7 @@
 
     sealed class ODataParameterDescriptor : HttpParameterDescriptor
     {
-        internal ODataParameterDescriptor( string name, Type type, bool optional = false, object defaultValue = default )
+        internal ODataParameterDescriptor( string name, Type type, bool optional = false, object? defaultValue = default )
         {
             ParameterName = name;
             ParameterType = type;
@@ -17,9 +17,9 @@
 
         public override Type ParameterType { get; }
 
-        public override object DefaultValue { get; }
+        public override object? DefaultValue { get; }
 
-        public override string Prefix { get; }
+        public override string Prefix { get; } = string.Empty;
 
         public override bool IsOptional { get; }
     }

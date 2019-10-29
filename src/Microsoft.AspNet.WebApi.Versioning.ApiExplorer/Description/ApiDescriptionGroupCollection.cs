@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.Contracts;
     using System.Web.Http.Description;
 
     /// <summary>
@@ -16,7 +15,15 @@
         /// </summary>
         /// <param name="item">The item to get the key for.</param>
         /// <returns>The key of the item.</returns>
-        protected override ApiVersion GetKeyForItem( ApiDescriptionGroup item ) => item.ApiVersion;
+        protected override ApiVersion GetKeyForItem( ApiDescriptionGroup item )
+        {
+            if ( item == null )
+            {
+                throw new ArgumentNullException( nameof( item ) );
+            }
+
+            return item.ApiVersion;
+        }
 
         /// <summary>
         /// Gets or adds a new API description group for the specified API version.
@@ -33,9 +40,10 @@
         /// <returns>A new or existing <see cref="ApiDescriptionGroup">API description group</see>.</returns>
         public virtual ApiDescriptionGroup GetOrAdd( ApiVersion apiVersion, Func<ApiVersion, string> formatName )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Arg.NotNull( formatName, nameof( formatName ) );
-            Contract.Ensures( Contract.Result<ApiDescriptionGroup>() != null );
+            if ( formatName == null )
+            {
+                throw new ArgumentNullException( nameof( formatName ) );
+            }
 
             if ( Count == 0 || !Dictionary.TryGetValue( apiVersion, out var group ) )
             {
@@ -55,14 +63,9 @@
             {
                 var keys = new List<ApiVersion>();
 
-                foreach ( var item in this )
+                for ( var i = 0; i < Count; i++ )
                 {
-                    var key = GetKeyForItem( item );
-
-                    if ( key != null )
-                    {
-                        keys.Add( key );
-                    }
+                    keys.Add( GetKeyForItem( this[i] ) );
                 }
 
                 return keys.ToSortedReadOnlyList();
@@ -77,9 +80,9 @@
         {
             var flatApiDescriptions = new Collection<ApiDescription>();
 
-            foreach ( var version in ApiVersions )
+            for ( var i = 0; i < ApiVersions.Count; i++ )
             {
-                flatApiDescriptions.AddRange( this[version].ApiDescriptions );
+                flatApiDescriptions.AddRange( this[ApiVersions[i]].ApiDescriptions );
             }
 
             return flatApiDescriptions;

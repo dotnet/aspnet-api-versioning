@@ -6,22 +6,17 @@
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
 
     sealed class ApiParameterContext
     {
-        private ODataPathTemplate pathTemplate;
+        private ODataPathTemplate? pathTemplate;
 
         internal ApiParameterContext(
             IModelMetadataProvider metadataProvider,
             ODataRouteBuilderContext routeContext,
             IModelTypeBuilder modelTypeBuilder )
         {
-            Contract.Requires( metadataProvider != null );
-            Contract.Requires( routeContext != null );
-            Contract.Requires( modelTypeBuilder != null );
-
             RouteContext = routeContext;
             MetadataProvider = metadataProvider;
             TypeBuilder = modelTypeBuilder;
@@ -82,8 +77,6 @@
 
             internal PseudoParameterDescriptionScope( ODataRouteBuilderContext context )
             {
-                Contract.Requires( context != null );
-
                 this.context = context;
 
                 var parameters = context.ParameterDescriptions;
@@ -91,8 +84,10 @@
                 original = parameters.ToArray();
                 parameters.Clear();
 
-                foreach ( var parameter in context.ActionDescriptor.Parameters )
+                for ( var i = 0; i < context.ActionDescriptor.Parameters.Count; i++ )
                 {
+                    var parameter = context.ActionDescriptor.Parameters[i];
+
                     parameters.Add( new ApiParameterDescription()
                     {
                         Name = parameter.Name,
@@ -106,9 +101,9 @@
             {
                 context.ParameterDescriptions.Clear();
 
-                foreach ( var item in original )
+                for ( var i = 0; i < original.Count; i++ )
                 {
-                    context.ParameterDescriptions.Add( item );
+                    context.ParameterDescriptions.Add( original[i] );
                 }
             }
         }

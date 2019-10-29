@@ -19,8 +19,6 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
     /// </summary>
     public partial class ODataApiExplorerOptions : ApiExplorerOptions
     {
-        ODataQueryOptionsConventionBuilder queryOptions = new ODataQueryOptionsConventionBuilder();
-
         /// <summary>
         /// Gets or sets a value indicating whether the API explorer settings are honored.
         /// </summary>
@@ -54,14 +52,6 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public ODataQueryOptionsConventionBuilder QueryOptions
-        {
-            get => queryOptions;
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                queryOptions = value;
-            }
-        }
+        public ODataQueryOptionsConventionBuilder QueryOptions { get; set; } = new ODataQueryOptionsConventionBuilder();
     }
 }

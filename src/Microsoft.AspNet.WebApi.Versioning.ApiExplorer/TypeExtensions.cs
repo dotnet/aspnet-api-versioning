@@ -8,7 +8,7 @@
 
     static class TypeExtensions
     {
-        internal static Type[] GetTypeArgumentsIfMatch( this Type closedType, Type matchingOpenType )
+        internal static Type[]? GetTypeArgumentsIfMatch( this Type closedType, Type matchingOpenType )
         {
             if ( !closedType.IsGenericType )
             {
@@ -23,7 +23,7 @@
         internal static IEnumerable<PropertyInfo> GetBindableProperties( this Type type ) =>
             type.GetProperties( Instance | Public ).Where( p => p.GetGetMethod() != null && p.GetSetMethod() != null );
 
-        internal static Type[] GetGenericBinderTypeArgs( this Type supportedInterfaceType, Type modelType )
+        internal static Type[]? GetGenericBinderTypeArgs( this Type supportedInterfaceType, Type modelType )
         {
             if ( !modelType.IsGenericType || modelType.IsGenericTypeDefinition )
             {

@@ -11,41 +11,25 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
 
     /// <summary>
     /// Represents a versioned variant of the <see cref="ODataModelBuilder"/>.
     /// </summary>
     public partial class VersionedODataModelBuilder
     {
-        Func<ODataModelBuilder> modelBuilderFactory = () => new ODataConventionModelBuilder().EnableLowerCamelCase();
-
         /// <summary>
         /// Gets or sets the factory method used to create model builders.
         /// </summary>
         /// <value>The factory <see cref="Func{TResult}">method</see> used to create <see cref="ODataModelBuilder">model builders</see>.</value>
         /// <remarks>The default implementation creates default instances of the <see cref="ODataConventionModelBuilder"/> class.</remarks>
-        public Func<ODataModelBuilder> ModelBuilderFactory
-        {
-            get
-            {
-                Contract.Ensures( modelBuilderFactory != null );
-                return modelBuilderFactory;
-            }
-            set
-            {
-                Arg.NotNull( value, nameof( value ) );
-                modelBuilderFactory = value;
-            }
-        }
+        public Func<ODataModelBuilder> ModelBuilderFactory { get; set; } = () => new ODataConventionModelBuilder().EnableLowerCamelCase();
 
         /// <summary>
         /// Gets or sets the default model configuration.
         /// </summary>
         /// <value>The <see cref="Action{T1, T2}">method</see> for the default model configuration.
         /// The default value is <c>null</c>.</value>
-        public Action<ODataModelBuilder, ApiVersion> DefaultModelConfiguration { get; set; }
+        public Action<ODataModelBuilder, ApiVersion>? DefaultModelConfiguration { get; set; }
 
         /// <summary>
         /// Gets the list of model configurations associated with the builder.
@@ -58,7 +42,7 @@
         /// </summary>
         /// <value>The <see cref="Action{T1,T2}">action</see> to run after the model has been created. The default
         /// value is <c>null</c>.</value>
-        public Action<ODataModelBuilder, IEdmModel> OnModelCreated { get; set; }
+        public Action<ODataModelBuilder, IEdmModel>? OnModelCreated { get; set; }
 
         /// <summary>
         /// Builds and returns the sequence of EDM models based on the define model configurations.
@@ -66,8 +50,6 @@
         /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
         public virtual IEnumerable<IEdmModel> GetEdmModels()
         {
-            Contract.Ensures( Contract.Result<IEnumerable<IEdmModel>>() != null );
-
             var apiVersions = GetApiVersions();
             var configurations = GetMergedConfigurations();
             var models = new List<IEdmModel>();
@@ -79,8 +61,6 @@
 
         IList<IModelConfiguration> GetMergedConfigurations()
         {
-            Contract.Ensures( Contract.Result<IList<IModelConfiguration>>() != null );
-
             var defaultConfiguration = DefaultModelConfiguration;
 
             if ( defaultConfiguration == null )
@@ -98,10 +78,6 @@
 
         void BuildModelPerApiVersion( IReadOnlyList<ApiVersion> apiVersions, IList<IModelConfiguration> configurations, ICollection<IEdmModel> models )
         {
-            Contract.Requires( apiVersions != null );
-            Contract.Requires( configurations != null );
-            Contract.Requires( models != null );
-
             for ( var i = 0; i < apiVersions.Count; i++ )
             {
                 var apiVersion = apiVersions[i];

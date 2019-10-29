@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
 #endif
     using System;
-    using System.Diagnostics.Contracts;
 #if WEBAPI
     using System.Web.Http.Description;
 #endif
@@ -23,8 +22,6 @@
         /// <param name="settings">The <see cref="ODataQueryOptionSettings">settings</see> used by the convention.</param>
         public ODataValidationSettingsConvention( ODataValidationSettings validationSettings, ODataQueryOptionSettings settings )
         {
-            Arg.NotNull( validationSettings, nameof( validationSettings ) );
-
             ValidationSettings = validationSettings;
             Settings = settings;
         }
@@ -48,9 +45,6 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewFilterParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( Filter, descriptionContext );
             return NewParameterDescription( GetName( Filter ), description, typeof( string ) );
         }
@@ -62,9 +56,6 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewExpandParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( Expand, descriptionContext );
             return NewParameterDescription( GetName( Expand ), description, typeof( string ) );
         }
@@ -76,9 +67,6 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewSelectParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( Select, descriptionContext );
             return NewParameterDescription( GetName( Select ), description, typeof( string ) );
         }
@@ -90,9 +78,6 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewOrderByParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( OrderBy, descriptionContext );
             return NewParameterDescription( GetName( OrderBy ), description, typeof( string ) );
         }
@@ -104,9 +89,6 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewTopParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( Top, descriptionContext );
             return NewParameterDescription( GetName( Top ), description, typeof( int ) );
         }
@@ -118,9 +100,6 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewSkipParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( Skip, descriptionContext );
             return NewParameterDescription( GetName( Skip ), description, typeof( int ) );
         }
@@ -132,17 +111,12 @@
         /// <returns>A new <see cref="ApiParameterDescription">parameter description</see>.</returns>
         protected virtual ApiParameterDescription NewCountParameter( ODataQueryOptionDescriptionContext descriptionContext )
         {
-            Arg.NotNull( descriptionContext, nameof( descriptionContext ) );
-            Contract.Ensures( Contract.Result<ApiParameterDescription>() != null );
-
             var description = Settings.DescriptionProvider.Describe( Count, descriptionContext );
             return NewParameterDescription( GetName( Count ), description, typeof( bool ), defaultValue: false );
         }
 
         string GetName( AllowedQueryOptions option )
         {
-            Contract.Requires( option == Filter || ( option > Filter && option < Supported && ( (int) option % 2 == 0 ) ) );
-
 #pragma warning disable CA1308 // Normalize strings to uppercase
             var name = option.ToString().ToLowerInvariant();
 #pragma warning restore CA1308
@@ -151,9 +125,6 @@
 
         AllowedQueryOptions GetQueryOptions( DefaultQuerySettings settings, ODataQueryOptionDescriptionContext context )
         {
-            Contract.Requires( settings != null );
-            Contract.Requires( context != null );
-
             var queryOptions = ValidationSettings.AllowedQueryOptions;
 
             if ( settings.EnableCount )

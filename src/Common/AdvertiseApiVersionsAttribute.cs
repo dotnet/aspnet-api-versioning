@@ -19,8 +19,6 @@ namespace Microsoft.AspNetCore.Mvc
     /// <remarks>Advertised service API versions indicate the existence of other versioned services, but the implementation of those
     /// services are implemented elsewhere.</remarks>
     [AttributeUsage( Class | Method, AllowMultiple = true, Inherited = false )]
-    [SuppressMessage( "Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "An accessor property is provided, but the values are typed; not strings." )]
-    [SuppressMessage( "Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Justification = "Allows extensibility." )]
     public class AdvertiseApiVersionsAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     {
         ApiVersionProviderOptions options = ApiVersionProviderOptions.Advertised;

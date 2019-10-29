@@ -5,7 +5,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -32,9 +31,10 @@
             int maxNodeCount,
             params string[] properties )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
-            Arg.GreaterThanOrEqualTo( maxNodeCount, 0, nameof( maxNodeCount ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
         }
@@ -50,8 +50,10 @@
             this ODataActionQueryOptionsConventionBuilder builder,
             IEnumerable<string> properties )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( default, properties );
         }
@@ -67,8 +69,10 @@
             this ODataActionQueryOptionsConventionBuilder builder,
             params string[] properties )
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( properties, nameof( properties ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             return builder.AllowOrderBy( default, properties.AsEnumerable() );
         }
@@ -83,12 +87,23 @@
         public static ODataActionQueryOptionsConventionBuilder<TController> Action<TController>(
             this IODataActionQueryOptionsConventionBuilder<TController> builder,
             Expression<Action<TController>> actionExpression )
+            where TController : notnull
 #if WEBAPI
-            where TController : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+       , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( actionExpression, nameof( actionExpression ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
+
+            if ( actionExpression == null )
+            {
+                throw new ArgumentNullException( nameof( actionExpression ) );
+            }
+
             return builder.Action( actionExpression.ExtractMethod() );
         }
 
@@ -103,12 +118,23 @@
         public static ODataActionQueryOptionsConventionBuilder<TController> Action<TController, TResult>(
             this IODataActionQueryOptionsConventionBuilder<TController> builder,
             Expression<Func<TController, TResult>> actionExpression )
+            where TController : notnull
 #if WEBAPI
-            where TController : IHttpController
+#pragma warning disable SA1001 // Commas should be spaced correctly
+       , IHttpController
+#pragma warning restore SA1001 // Commas should be spaced correctly
 #endif
         {
-            Arg.NotNull( builder, nameof( builder ) );
-            Arg.NotNull( actionExpression, nameof( actionExpression ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
+
+            if ( actionExpression == null )
+            {
+                throw new ArgumentNullException( nameof( actionExpression ) );
+            }
+
             return builder.Action( actionExpression.ExtractMethod() );
         }
 
@@ -125,7 +151,10 @@
         /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
         public static ODataActionQueryOptionsConventionBuilder Action( this IODataActionQueryOptionsConventionBuilder builder, string methodName, params Type[] argumentTypes )
         {
-            Arg.NotNull( builder, nameof( builder ) );
+            if ( builder == null )
+            {
+                throw new ArgumentNullException( nameof( builder ) );
+            }
 
             var methods = builder.ControllerType.GetRuntimeMethods().Where( m => m.Name == methodName && IsAction( m ) ).ToArray();
 
@@ -150,8 +179,6 @@
 
         static bool IsAction( MethodInfo method )
         {
-            Contract.Requires( method != null );
-
             if ( !method.IsPublic || method.IsStatic )
             {
                 return false;
@@ -162,18 +189,12 @@
 
         static bool SignatureMatches( MethodInfo method, Type[] argumentTypes )
         {
-            Contract.Requires( method != null );
-            Contract.Requires( argumentTypes != null );
-
             var argTypes = method.GetParameters().Select( p => p.ParameterType ).ToArray();
             return argTypes.SequenceEqual( argumentTypes );
         }
 
         static MethodInfo ExtractMethod<TDelegate>( this Expression<TDelegate> expression )
         {
-            Contract.Requires( expression != null );
-            Contract.Ensures( Contract.Result<MethodInfo>() != null );
-
             if ( expression.Body is MethodCallExpression methodCall )
             {
                 return methodCall.Method;

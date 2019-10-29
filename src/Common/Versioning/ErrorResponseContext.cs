@@ -39,6 +39,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Gets the detailed error message.
         /// </summary>
         /// <value>The detailed error message, if any.</value>
-        public string MessageDetail { get; }
+        public string? MessageDetail { get; }
     }
 }

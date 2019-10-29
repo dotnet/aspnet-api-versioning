@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
 
@@ -21,7 +20,11 @@
         /// <paramref name="controllerModel">controller model</paramref>; otherwise, false.</returns>
         public virtual bool ApplyTo( ControllerModel controllerModel )
         {
-            Arg.NotNull( controllerModel, nameof( controllerModel ) );
+            if ( controllerModel == null )
+            {
+                throw new ArgumentNullException( nameof( controllerModel ) );
+            }
+
             return InternalApplyTo( controllerModel );
         }
 
@@ -29,8 +32,6 @@
 
         static bool HasDecoratedActions( ControllerModel controllerModel )
         {
-            Contract.Requires( controllerModel != null );
-
             foreach ( var action in controllerModel.Actions )
             {
                 var attributes = action.Attributes;

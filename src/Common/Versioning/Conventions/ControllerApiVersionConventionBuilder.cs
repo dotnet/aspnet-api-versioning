@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 #endif
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
 
     /// <summary>
@@ -19,7 +18,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="controllerType">The <see cref="Type">type</see> of controller the convention builder is for.</param>
         public ControllerApiVersionConventionBuilder( Type controllerType )
         {
-            Arg.NotNull( controllerType, nameof( controllerType ) );
 #if WEBAPI
             var webApiController = typeof( System.Web.Http.Controllers.IHttpController );
 
@@ -51,7 +49,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder IsApiVersionNeutral()
         {
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder>() != null );
             VersionNeutral = true;
             return this;
         }
@@ -63,9 +60,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder HasApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder>() != null );
-
             SupportedVersions.Add( apiVersion );
             return this;
         }
@@ -77,9 +71,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder HasDeprecatedApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder>() != null );
-
             DeprecatedVersions.Add( apiVersion );
             return this;
         }
@@ -91,9 +82,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder AdvertisesApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder>() != null );
-
             AdvertisedVersions.Add( apiVersion );
             return this;
         }
@@ -105,9 +93,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <returns>The original <see cref="ControllerApiVersionConventionBuilder"/>.</returns>
         public virtual ControllerApiVersionConventionBuilder AdvertisesDeprecatedApiVersion( ApiVersion apiVersion )
         {
-            Arg.NotNull( apiVersion, nameof( apiVersion ) );
-            Contract.Ensures( Contract.Result<ControllerApiVersionConventionBuilder>() != null );
-
             DeprecatedAdvertisedVersions.Add( apiVersion );
             return this;
         }
@@ -117,12 +102,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// </summary>
         /// <param name="actionMethod">The <see cref="MethodInfo">method</see> representing the controller action.</param>
         /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder"/>.</returns>
-        public virtual ActionApiVersionConventionBuilder Action( MethodInfo actionMethod )
-        {
-            Arg.NotNull( actionMethod, nameof( actionMethod ) );
-            Contract.Ensures( Contract.Result<ActionApiVersionConventionBuilder>() != null );
-            return ActionBuilders.GetOrAdd( actionMethod );
-        }
+        public virtual ActionApiVersionConventionBuilder Action( MethodInfo actionMethod ) => ActionBuilders.GetOrAdd( actionMethod );
 
         void IDeclareApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
 

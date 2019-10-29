@@ -7,7 +7,6 @@
 #endif
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
@@ -24,13 +23,10 @@
 
         internal ClassSignature( Type originalType, IEnumerable<ClassProperty> properties, ApiVersion apiVersion )
         {
-            Contract.Requires( originalType != null );
-            Contract.Requires( properties != null );
-            Contract.Requires( apiVersion != null );
-
             var attributeBuilders = new List<CustomAttributeBuilder>( originalType.DeclaredAttributes() );
 
             attributeBuilders.Insert( 0, new CustomAttributeBuilder( newOriginalType, new object[] { originalType } ) );
+
             Name = originalType.FullName;
             Attributes = attributeBuilders.ToArray();
             Properties = properties.ToArray();
@@ -40,10 +36,6 @@
 
         internal ClassSignature( string name, IEnumerable<ClassProperty> properties, ApiVersion apiVersion )
         {
-            Contract.Requires( !string.IsNullOrEmpty( name ) );
-            Contract.Requires( properties != null );
-            Contract.Requires( apiVersion != null );
-
             Name = name;
             Attributes = NoAttributes;
             Properties = properties.ToArray();
@@ -53,9 +45,9 @@
 
         internal string Name { get; }
 
-        internal IEnumerable<CustomAttributeBuilder> Attributes { get; }
+        internal IReadOnlyList<CustomAttributeBuilder> Attributes { get; }
 
-        internal IReadOnlyList<ClassProperty> Properties { get; }
+        internal ClassProperty[] Properties { get; }
 
         internal ApiVersion ApiVersion { get; }
 
@@ -67,15 +59,17 @@
 
         int ComputeHashCode()
         {
-            if ( Properties.Count == 0 )
+            if ( Properties.Length == 0 )
             {
                 return 0;
             }
 
-            var hash = Properties[0].GetHashCode();
+            ref var property = ref Properties[0];
+            var hash = property.GetHashCode();
 
-            for ( var i = 1; i < Properties.Count; i++ )
+            for ( var i = 1; i < Properties.Length; i++ )
             {
+                property = ref Properties[i];
                 hash = ( hash * 397 ) ^ Properties[i].GetHashCode();
             }
 

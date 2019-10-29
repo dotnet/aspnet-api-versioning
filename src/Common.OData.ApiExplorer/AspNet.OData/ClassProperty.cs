@@ -1,66 +1,57 @@
 ﻿namespace Microsoft.AspNet.OData
 {
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.OData.Edm;
 
-    struct ClassProperty
+    readonly struct ClassProperty
     {
         internal readonly Type Type;
         internal readonly string Name;
 
         internal ClassProperty( PropertyInfo clrProperty, Type propertyType )
         {
-            Contract.Requires( clrProperty != null );
-            Contract.Requires( propertyType != null );
-
             Name = clrProperty.Name;
             Type = propertyType;
-            Attributes = clrProperty.DeclaredAttributes();
+            Attributes = clrProperty.DeclaredAttributes().ToArray();
         }
 
         internal ClassProperty( IServiceProvider services, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
         {
-            Contract.Requires( services != null );
-            Contract.Requires( parameter != null );
-            Contract.Requires( typeBuilder != null );
-
             Name = parameter.Name;
+
             var context = new TypeSubstitutionContext( services, typeBuilder );
+            var edmModel = services.GetRequiredService<IEdmModel>();
 
             if ( parameter.Type.IsCollection() )
             {
                 var collectionType = parameter.Type.AsCollection();
-                var elementType = collectionType.ElementType().Definition.GetClrType( services.GetRequiredService<IEdmModel>() );
+                var elementType = collectionType.ElementType().Definition.GetClrType( edmModel )!;
                 var substitutedType = elementType.SubstituteIfNecessary( context );
 
                 Type = typeof( IEnumerable<> ).MakeGenericType( substitutedType );
             }
             else
             {
-                var parameterType = parameter.Type.Definition.GetClrType( services.GetRequiredService<IEdmModel>() );
+                var parameterType = parameter.Type.Definition.GetClrType( edmModel )!;
 
                 Type = parameterType.SubstituteIfNecessary( context );
             }
 
-            Attributes = AttributesFromOperationParameter( parameter );
+            Attributes = AttributesFromOperationParameter( parameter ).ToArray();
         }
 
-        internal IEnumerable<CustomAttributeBuilder> Attributes { get; }
+        internal IReadOnlyList<CustomAttributeBuilder> Attributes { get; }
 
         public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ Type.GetHashCode();
 
         static IEnumerable<CustomAttributeBuilder> AttributesFromOperationParameter( IEdmOperationParameter parameter )
         {
-            Contract.Requires( parameter != null );
-            Contract.Ensures( Contract.Result<IEnumerable<CustomAttributeBuilder>>() != null );
-
             if ( parameter.Type.IsNullable )
             {
                 yield break;
