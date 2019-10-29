@@ -58,7 +58,7 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
   [samples](../../tree/master/samples/aspnetcore/SwaggerODataSample) )
   <br>Adds additional API explorer support to your ASP.NET Core applications using OData v4.0
 
-You can additional find samples, documentation, and getting started instructions in the [wiki](../../wiki).
+You can find additional samples, documentation, and getting started instructions in the [wiki](../../wiki).
 
 ## Discussion
 
