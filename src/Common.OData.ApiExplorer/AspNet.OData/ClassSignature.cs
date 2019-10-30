@@ -7,25 +7,30 @@
 #endif
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
 
+    [DebuggerDisplay( "{Name,nq} ({ApiVersion,nq})" )]
     sealed class ClassSignature : IEquatable<ClassSignature>
     {
+        static readonly ConstructorInfo newOriginalType = typeof( OriginalTypeAttribute ).GetConstructors()[0];
 #if WEBAPI
         static readonly CustomAttributeBuilder[] NoAttributes = new CustomAttributeBuilder[0];
 #else
         static readonly CustomAttributeBuilder[] NoAttributes = Array.Empty<CustomAttributeBuilder>();
 #endif
-        static readonly ConstructorInfo newOriginalType = typeof( OriginalTypeAttribute ).GetConstructors()[0];
         readonly Lazy<int> hashCode;
 
         internal ClassSignature( Type originalType, IEnumerable<ClassProperty> properties, ApiVersion apiVersion )
         {
-            var attributeBuilders = new List<CustomAttributeBuilder>( originalType.DeclaredAttributes() );
+            var attributeBuilders = new List<CustomAttributeBuilder>
+            {
+                new CustomAttributeBuilder( newOriginalType, new object[] { originalType } ),
+            };
 
-            attributeBuilders.Insert( 0, new CustomAttributeBuilder( newOriginalType, new object[] { originalType } ) );
+            attributeBuilders.AddRange( originalType.DeclaredAttributes() );
 
             Name = originalType.FullName;
             Attributes = attributeBuilders.ToArray();

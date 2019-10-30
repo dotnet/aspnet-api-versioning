@@ -10,7 +10,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
@@ -19,6 +18,7 @@
 #endif
     using static System.Globalization.CultureInfo;
     using static System.Guid;
+    using static System.Reflection.BindingFlags;
     using static System.Reflection.Emit.AssemblyBuilderAccess;
 
     /// <summary>
@@ -69,45 +69,80 @@
             return ResolveDependencies( context );
         }
 
+        static void MapEdmPropertiesToClrProperties(
+            IEdmModel edmModel,
+            IEdmStructuredType edmType,
+            Dictionary<string, IEdmProperty> structuralProperties,
+            Dictionary<PropertyInfo, IEdmProperty> mappedClrProperties )
+        {
+            foreach ( var edmProperty in edmType.Properties() )
+            {
+                structuralProperties.Add( edmProperty.Name, edmProperty );
+
+                var clrProperty = edmModel.GetAnnotationValue<ClrPropertyInfoAnnotation>( edmProperty )?.ClrPropertyInfo;
+
+                if ( clrProperty != null )
+                {
+                    mappedClrProperties.Add( clrProperty, edmProperty );
+                }
+            }
+        }
+
         static Type GenerateTypeIfNeeded( IEdmStructuredType structuredType, BuilderContext context )
         {
-            var apiVersion = context.ApiVersion;
-            var edmTypes = context.EdmTypes;
-            var typeKey = new EdmTypeKey( structuredType, apiVersion );
+            var typeKey = new EdmTypeKey( structuredType, context.ApiVersion );
 
-            if ( edmTypes.TryGetValue( typeKey, out var generatedType ) )
+            if ( context.EdmTypes.TryGetValue( typeKey, out var generatedType ) )
             {
                 return generatedType;
             }
 
-            var edmModel = context.EdmModel;
-            var clrType = structuredType.GetClrType( edmModel )!;
+            var clrType = structuredType.GetClrType( context.EdmModel )!;
             var visitedEdmTypes = context.VisitedEdmTypes;
 
             visitedEdmTypes.Add( typeKey );
 
-            const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance;
-
             var properties = new List<ClassProperty>();
             var structuralProperties = new Dictionary<string, IEdmProperty>( StringComparer.OrdinalIgnoreCase );
             var mappedClrProperties = new Dictionary<PropertyInfo, IEdmProperty>();
-            var clrTypeMatchesEdmType = true;
-            var hasUnfinishedTypes = false;
             var dependentProperties = new List<PropertyDependency>();
 
-            foreach ( var property in structuredType.Properties() )
-            {
-                structuralProperties.Add( property.Name, property );
+            MapEdmPropertiesToClrProperties( context.EdmModel, structuredType, structuralProperties, mappedClrProperties );
 
-                var clrProperty = edmModel.GetAnnotationValue<ClrPropertyInfoAnnotation>( property )?.ClrPropertyInfo;
+            var (clrTypeMatchesEdmType, hasUnfinishedTypes) =
+                BuildSignatureProperties(
+                    clrType,
+                    structuralProperties,
+                    mappedClrProperties,
+                    properties,
+                    dependentProperties,
+                    context );
 
-                if ( clrProperty != null )
-                {
-                    mappedClrProperties.Add( clrProperty, property );
-                }
-            }
+            return ResolveType(
+                typeKey,
+                clrType,
+                clrTypeMatchesEdmType,
+                hasUnfinishedTypes,
+                properties,
+                dependentProperties,
+                context );
+        }
 
-            foreach ( var property in clrType.GetProperties( bindingFlags ) )
+        static Tuple<bool, bool> BuildSignatureProperties(
+            Type clrType,
+            IReadOnlyDictionary<string, IEdmProperty> structuralProperties,
+            IReadOnlyDictionary<PropertyInfo, IEdmProperty> mappedClrProperties,
+            List<ClassProperty> properties,
+            List<PropertyDependency> dependentProperties,
+            BuilderContext context )
+        {
+            var edmModel = context.EdmModel;
+            var apiVersion = context.ApiVersion;
+            var visitedEdmTypes = context.VisitedEdmTypes;
+            var clrTypeMatchesEdmType = true;
+            var hasUnfinishedTypes = false;
+
+            foreach ( var property in clrType.GetProperties( Public | Instance ) )
             {
                 if ( !structuralProperties.TryGetValue( property.Name, out var structuralProperty ) &&
                      !mappedClrProperties.TryGetValue( property, out structuralProperty ) )
@@ -178,6 +213,21 @@
                 properties.Add( new ClassProperty( property, propertyType ) );
             }
 
+            return Tuple.Create( clrTypeMatchesEdmType, hasUnfinishedTypes );
+        }
+
+        static TypeInfo ResolveType(
+            EdmTypeKey typeKey,
+            Type clrType,
+            bool clrTypeMatchesEdmType,
+            bool hasUnfinishedTypes,
+            List<ClassProperty> properties,
+            List<PropertyDependency> dependentProperties,
+            BuilderContext context )
+        {
+            var apiVersion = context.ApiVersion;
+            var edmTypes = context.EdmTypes;
+
             TypeInfo type;
 
             if ( clrTypeMatchesEdmType )
@@ -240,6 +290,7 @@
                 ref var property = ref properties[i];
                 var type = property.Type;
                 var name = property.Name;
+
                 AddProperty( typeBuilder, type, name, property.Attributes );
             }
 
@@ -253,15 +304,15 @@
 
             for ( var i = 0; i < dependencies.Count; i++ )
             {
-                var propertyDependency = dependencies[i];
-                var dependentOnType = edmTypes[propertyDependency.DependentOnTypeKey];
+                var dependency = dependencies[i];
+                var dependentOnType = edmTypes[dependency.DependentOnTypeKey];
 
-                if ( propertyDependency.IsCollection )
+                if ( dependency.IsCollection )
                 {
                     dependentOnType = IEnumerableOfT.MakeGenericType( dependentOnType ).GetTypeInfo();
                 }
 
-                AddProperty( propertyDependency.DependentType!, dependentOnType, propertyDependency.PropertyName, propertyDependency.CustomAttributes );
+                AddProperty( dependency.DependentType!, dependentOnType, dependency.PropertyName, dependency.CustomAttributes );
             }
 
             var keys = edmTypes.Keys.ToArray();
@@ -338,7 +389,7 @@
 
             internal IDictionary<EdmTypeKey, TypeInfo> EdmTypes { get; } = new Dictionary<EdmTypeKey, TypeInfo>();
 
-            internal ICollection<EdmTypeKey> VisitedEdmTypes { get; } = new HashSet<EdmTypeKey>();
+            internal ISet<EdmTypeKey> VisitedEdmTypes { get; } = new HashSet<EdmTypeKey>();
 
             internal IList<PropertyDependency> Dependencies { get; } = new List<PropertyDependency>();
         }

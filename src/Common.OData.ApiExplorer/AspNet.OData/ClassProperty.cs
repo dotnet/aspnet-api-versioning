@@ -5,10 +5,12 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
 
+    [DebuggerDisplay( "{Name,nq}" )]
     readonly struct ClassProperty
     {
         internal readonly Type Type;
