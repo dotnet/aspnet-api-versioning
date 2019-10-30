@@ -110,21 +110,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{2BB57808
 	ProjectSection(SolutionItems) = preProject
 		after.apiversioning.sln.targets = after.apiversioning.sln.targets
 		build\code-analysis.props = build\code-analysis.props
+		build\code-analysis.ruleset = build\code-analysis.ruleset
 		build\common.props = build\common.props
 		build\file-version.targets = build\file-version.targets
+		build\icon.png = build\icon.png
+		build\key.snk = build\key.snk
 		build\nuget.props = build\nuget.props
 		build\nuget.targets = build\nuget.targets
 		build\resource.targets = build\resource.targets
 		build\signing.props = build\signing.props
 		build\signing.targets = build\signing.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{3BDDAF5E-4148-4D7F-9B9A-EA11D0110FEB}"
-	ProjectSection(SolutionItems) = preProject
-		tools\code-analysis.ruleset = tools\code-analysis.ruleset
-		tools\custom-dictionary.xml = tools\custom-dictionary.xml
-		tools\key.snk = tools\key.snk
-		tools\stylecop.json = tools\stylecop.json
+		build\stylecop.json = build\stylecop.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Versioning", "src\Microsoft.AspNetCore.OData.Versioning\Microsoft.AspNetCore.OData.Versioning.csproj", "{59D9CEC0-F8E5-4A1A-B8DD-5117E6A409D5}"
