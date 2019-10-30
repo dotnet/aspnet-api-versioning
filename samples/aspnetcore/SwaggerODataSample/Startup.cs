@@ -84,6 +84,10 @@
                     // BUG: https://github.com/OData/WebApi/issues/1837
                     // routeBuilder.SetDefaultODataOptions( new ODataOptions() { UrlKeyDelimiter = Parentheses } );
                     routeBuilder.ServiceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter = Parentheses;
+
+                    // global odata query options
+                    routeBuilder.Count();
+
                     routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() );
                 } );
             app.UseSwagger();
