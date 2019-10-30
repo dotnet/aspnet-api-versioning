@@ -87,6 +87,7 @@
             {
                 var action = (IEdmAction) Context.RouteContext.Operation;
                 var apiVersion = Context.RouteContext.ApiVersion;
+
                 type = Context.TypeBuilder.NewActionParameters( Context.Services, action, apiVersion, Context.RouteContext.ActionDescriptor.ControllerName );
             }
             else
@@ -94,14 +95,9 @@
                 type = type.SubstituteIfNecessary( new TypeSubstitutionContext( Context.Services, Context.TypeBuilder ) );
             }
 
-            if ( !type.Equals( modelMetadata.ModelType ) )
-            {
-                modelMetadata = new SubstitutedModelMetadata( modelMetadata, type );
-            }
-
             return new ApiParameterDescription()
             {
-                ModelMetadata = modelMetadata,
+                ModelMetadata = modelMetadata.SubstituteIfNecessary( type ),
                 Name = GetName( containerName, bindingContext ),
                 Source = source,
                 Type = type,
@@ -109,7 +105,7 @@
             };
         }
 
-        struct PropertyKey
+        readonly struct PropertyKey
         {
             public readonly Type ContainerType;
             public readonly string PropertyName;

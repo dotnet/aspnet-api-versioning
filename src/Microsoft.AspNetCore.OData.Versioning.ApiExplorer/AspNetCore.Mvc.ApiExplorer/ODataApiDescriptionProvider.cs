@@ -707,22 +707,29 @@
 
             foreach ( var objectType in objectTypes )
             {
+                Type type;
+
                 if ( objectType.Value == typeof( void ) )
                 {
+                    type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) );
+
                     results.Add( new ApiResponseType()
                     {
                         StatusCode = objectType.Key,
-                        Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) ),
+                        Type = type,
+                        ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ).SubstituteIfNecessary( type ),
                     } );
 
                     continue;
                 }
 
+                type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) );
+
                 var apiResponseType = new ApiResponseType()
                 {
                     StatusCode = objectType.Key,
-                    Type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) ),
-                    ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ),
+                    Type = type,
+                    ModelMetadata = MetadataProvider.GetMetadataForType( objectType.Value ).SubstituteIfNecessary( type ),
                 };
 
                 for ( var i = 0; i < contentTypes.Count; i++ )
@@ -779,13 +786,16 @@
             var routeTemplate = TemplateParser.Parse( prefix );
             var routeParameters = new Dictionary<string, ApiParameterRouteInfo>( StringComparer.OrdinalIgnoreCase );
 
-            foreach ( var routeParameter in routeTemplate.Parameters )
+            for ( var i = 0; i < routeTemplate.Parameters.Count; i++ )
             {
+                var routeParameter = routeTemplate.Parameters[i];
                 routeParameters.Add( routeParameter.Name, CreateRouteInfo( routeParameter ) );
             }
 
-            foreach ( var parameter in context.Results )
+            for ( var i = 0; i < context.Results.Count; i++ )
             {
+                var parameter = context.Results[i];
+
                 if ( parameter.Source == Path || parameter.Source == ModelBinding || parameter.Source == Custom )
                 {
                     if ( routeParameters.TryGetValue( parameter.Name, out var routeInfo ) )

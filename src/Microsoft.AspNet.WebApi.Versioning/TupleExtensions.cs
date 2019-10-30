@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Web.Http
 {
     using System;
-    using System.Diagnostics.Contracts;
 
     static class TupleExtensions
     {

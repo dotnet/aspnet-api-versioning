@@ -5,6 +5,8 @@
     using System;
     using System.Collections.Generic;
 
+#pragma warning disable CA1812
+
     sealed class SubstitutedModelMetadata : ModelMetadata
     {
         readonly ModelMetadata inner;
