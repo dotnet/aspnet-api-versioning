@@ -4,15 +4,11 @@
   <PropertyGroup Label="Code Analysis">
     <Features>IOperation</Features>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)..\tools\code-analysis.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)code-analysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup Label="Code Analysis">
-    <CodeAnalysisDictionary Include="$(MSBuildThisFileDirectory)..\tools\custom-dictionary.xml" Link="custom-dictionary.xml" />
-  </ItemGroup>
-
-  <ItemGroup Label="Code Analysis">
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\tools\stylecop.json" Link="stylecop.json" Visible="false" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" Visible="false" />
   </ItemGroup>
 
   <ItemGroup Label="NuGet">
