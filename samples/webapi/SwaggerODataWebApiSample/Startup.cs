@@ -5,6 +5,7 @@ namespace Microsoft.Examples
     using global::Owin;
     using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
+    using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Configuration;
     using Microsoft.OData;
@@ -52,6 +53,9 @@ namespace Microsoft.Examples
                 }
             };
             var models = modelBuilder.GetEdmModels();
+
+            // global odata query options
+            configuration.Count();
 
             // INFO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
 
