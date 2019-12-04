@@ -79,7 +79,7 @@
         sealed class ChangeToken : IChangeToken
         {
             readonly ODataActionDescriptorChangeProvider provider;
-            readonly HashSet<(Action<object> callback, object state)> callbacks = new HashSet<(Action<object> callback, object state)>();
+            readonly HashSet<(Action<object> Callback, object State)> callbacks = new HashSet<(Action<object> Callback, object State)>();
             readonly object syncRoot = new object();
 
             internal ChangeToken( ODataActionDescriptorChangeProvider provider ) => this.provider = provider;
@@ -100,7 +100,7 @@
                 return new ChangeSubscription( this, item );
             }
 
-            internal void Remove( (Action<object> callback, object state) item )
+            internal void Remove( (Action<object> Callback, object State) item )
             {
                 lock ( syncRoot )
                 {
@@ -110,7 +110,7 @@
 
             internal void Callback()
             {
-                var items = default( (Action<object> callback, object state)[] );
+                var items = default( (Action<object> Callback, object State)[] );
 
                 lock ( syncRoot )
                 {
@@ -121,7 +121,7 @@
                 for ( var i = 0; i < items.Length; i++ )
                 {
                     var item = items[i];
-                    item.callback( item.state );
+                    item.Callback( item.State );
                 }
             }
         }
@@ -132,7 +132,7 @@
             readonly (Action<object>, object) callback;
             bool disposed;
 
-            internal ChangeSubscription( ChangeToken changeToken, (Action<object> func, object state) callback )
+            internal ChangeSubscription( ChangeToken changeToken, (Action<object> Func, object State) callback )
             {
                 this.changeToken = changeToken;
                 this.callback = callback;

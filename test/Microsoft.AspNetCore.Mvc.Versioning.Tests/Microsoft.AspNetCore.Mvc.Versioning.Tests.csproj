@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>netcoreapp3.0;net461</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp3.0</TargetFrameworks>
+  <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
+  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp3.1</TargetFrameworks>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PreserveCompilationContext>true</PreserveCompilationContext>
  </PropertyGroup>
@@ -16,7 +16,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <Compile Update="Routing\ApiVersionMatcherPolicyTest.netcoreapp3.0.cs" DependentUpon="Routing\ApiVersionMatcherPolicyTest.cs" />
+  <Compile Update="Routing\ApiVersionMatcherPolicyTest.netcoreapp3.1.cs" DependentUpon="Routing\ApiVersionMatcherPolicyTest.cs" />
   <Compile Update="Routing\ApiVersionMatcherPolicyTest.net461.cs" DependentUpon="Routing\ApiVersionMatcherPolicyTest.cs" />
  </ItemGroup>
 

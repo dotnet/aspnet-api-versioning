@@ -426,7 +426,7 @@
             // assert
             substitutedType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
             substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).Should().NotBeNull();
-            substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).HasAttribute<DataMemberAttribute>();
+            substitutedType.GetRuntimeProperty( nameof( Contact.FirstName ) ).IsDecoratedWith<DataMemberAttribute>();
         }
 
         [Fact]
@@ -444,7 +444,7 @@
 
             // assert
             substitutedType.GetRuntimeProperty( nameof( Contact.Email ) ).Should().NotBeNull();
-            substitutedType.GetRuntimeProperty( nameof( Contact.Email ) ).HasAttribute<DataMemberAttribute>();
+            substitutedType.GetRuntimeProperty( nameof( Contact.Email ) ).IsDecoratedWith<DataMemberAttribute>();
         }
 
         [Fact]
@@ -462,7 +462,7 @@
 
             // assert
             substitutedType.GetRuntimeProperty( nameof( Contact.Addresses ) ).Should().NotBeNull();
-            substitutedType.GetRuntimeProperty( nameof( Contact.Addresses ) ).HasAttribute<DataMemberAttribute>();
+            substitutedType.GetRuntimeProperty( nameof( Contact.Addresses ) ).IsDecoratedWith<DataMemberAttribute>();
         }
 
         public static IEnumerable<object[]> SubstitutionNotRequiredData

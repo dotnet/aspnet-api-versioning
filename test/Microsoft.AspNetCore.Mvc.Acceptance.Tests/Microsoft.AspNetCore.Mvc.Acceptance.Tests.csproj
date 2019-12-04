@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>net461;netcoreapp3.0</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp3.0</TargetFrameworks>
+  <TargetFrameworks>net461;netcoreapp3.1</TargetFrameworks>
+  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp3.1</TargetFrameworks>
   <RootNamespace>Microsoft.AspNetCore</RootNamespace>
   <AssetTargetFallback>$(AssetTargetFallback);portable-net451+win8</AssetTargetFallback>
   <PreserveCompilationContext>true</PreserveCompilationContext>
@@ -22,22 +22,19 @@
   <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.3.0" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
   <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.0.0-*" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
   <Compile Remove="OData\**\*.cs" />
  </ItemGroup>
 
  <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Condition=" '$(TargetFramework)' == 'net461' " />
 
- <!-- TEMP: cannot use the shared project until odata supports netcoreapp3.0 so just link the relevant files instead for now -->
- <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-  <Compile Include="..\Acceptance.Test.Shared\**\*.cs"
-           Exclude="..\Acceptance.Test.Shared\**\*OData*.cs"
-           Link="%(RecursiveDir)%(Filename)%(Extension)"
-           Visible="false" />
+ <!-- TEMP: cannot use the shared project until odata supports netcoreapp3.1 so just link the relevant files instead for now -->
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+  <Compile Include="..\Acceptance.Test.Shared\**\*.cs" Exclude="..\Acceptance.Test.Shared\**\*OData*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" Visible="false" />
  </ItemGroup>
 
 </Project>

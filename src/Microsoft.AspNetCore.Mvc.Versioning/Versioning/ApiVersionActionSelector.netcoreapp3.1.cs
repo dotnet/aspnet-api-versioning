@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0
+﻿#if NETCOREAPP3_1
 namespace Microsoft.AspNetCore.Mvc.Versioning
 {
     using Microsoft.AspNetCore.Http;
