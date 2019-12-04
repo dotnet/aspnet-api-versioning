@@ -12,8 +12,9 @@
   </ItemGroup>
 
   <ItemGroup Label="NuGet">
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6" PrivateAssets="All" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66" PrivateAssets="All" />
+   <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" PrivateAssets="All" />
+   <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="All" />
+   <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-*" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
