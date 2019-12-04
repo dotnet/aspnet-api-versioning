@@ -55,7 +55,7 @@
 
         static string? NullIfEmpty( string value ) => IsNullOrEmpty( value ) ? null : value;
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
         [return: MaybeNull]
 #endif
         static TError NewInnerError<TError>( ErrorResponseContext context, Func<ErrorResponseContext, TError> create )

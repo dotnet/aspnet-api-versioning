@@ -55,7 +55,7 @@
         /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
         /// <param name="actionBuilder">The <see cref="ODataActionQueryOptionsConventionBuilder">controller action convention builder</see> or <c>null</c>.</param>
         /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
         public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ODataActionQueryOptionsConventionBuilder? actionBuilder )
 #else
         public virtual bool TryGetValue( MethodInfo? actionMethod, out ODataActionQueryOptionsConventionBuilder? actionBuilder )

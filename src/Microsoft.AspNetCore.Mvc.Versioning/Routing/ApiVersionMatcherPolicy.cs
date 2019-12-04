@@ -68,9 +68,9 @@
             return false;
         }
 
-        static IReadOnlyList<(int index, ActionDescriptor action, bool valid)> EvaluateApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
+        static IReadOnlyList<(int Index, ActionDescriptor Action, bool Valid)> EvaluateApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
         {
-            var bestMatches = new List<(int index, ActionDescriptor action, bool)>();
+            var bestMatches = new List<(int Index, ActionDescriptor Action, bool)>();
             var implicitMatches = new List<(int, ActionDescriptor, bool)>();
 
             for ( var i = 0; i < candidates.Count; i++ )
@@ -107,7 +107,7 @@
                     bestMatches.AddRange( implicitMatches );
                     break;
                 case 1:
-                    var model = bestMatches[0].action.GetApiVersionModel();
+                    var model = bestMatches[0].Action.GetApiVersionModel();
 
                     if ( model.IsApiVersionNeutral )
                     {

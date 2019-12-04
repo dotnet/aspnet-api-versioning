@@ -39,7 +39,7 @@
         /// <param name="key">The <see cref="ApiVersion">API version</see> to evaluate.</param>
         /// <param name="value">A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ODataRouteMapping">mapped OData routes</see>.</param>
         /// <returns>True if the value was successfully retrieved; otherwise, false.</returns>
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
         bool TryGetValue( ApiVersion key, [NotNullWhen( true )] out IReadOnlyList<ODataRouteMapping>? value );
 #else
         bool TryGetValue( ApiVersion key, out IReadOnlyList<ODataRouteMapping>? value );
