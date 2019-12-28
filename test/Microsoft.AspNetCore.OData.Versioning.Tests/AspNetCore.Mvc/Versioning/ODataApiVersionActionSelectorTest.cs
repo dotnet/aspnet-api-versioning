@@ -21,17 +21,16 @@
         public async Task select_best_candidate_should_return_correct_versionedX2C_attributeX2Dbased_controller( string version, Type controllerType )
         {
             // arrange
-            using ( var server = new WebServer() )
-            {
-                await server.Client.GetAsync( $"api/tests?api-version={version}" );
+            using var server = new WebServer();
 
-                // act
-                var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
+            await server.Client.GetAsync( $"api/tests?api-version={version}" );
 
-                // assert
-                action.GetProperty<ApiVersionModel>().SupportedApiVersions.Should().Contain( Parse( version ) );
-                action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType.GetTypeInfo() );
-            }
+            // act
+            var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
+
+            // assert
+            action.GetProperty<ApiVersionModel>().SupportedApiVersions.Should().Contain( Parse( version ) );
+            action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType.GetTypeInfo() );
         }
 
         [Theory]
@@ -41,17 +40,15 @@
         {
             // arrange
             var controllerType = typeof( VersionNeutralController ).GetTypeInfo();
+            using var server = new WebServer();
+            
+            await server.Client.GetAsync( requestUri );
 
-            using ( var server = new WebServer() )
-            {
-                await server.Client.GetAsync( requestUri );
+            // act
+            var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
 
-                // act
-                var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
-
-                // assert
-                action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType );
-            }
+            // assert
+            action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType );
         }
     }
 }

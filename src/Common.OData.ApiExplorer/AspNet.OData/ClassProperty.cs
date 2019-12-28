@@ -50,8 +50,11 @@
 
         internal IReadOnlyList<CustomAttributeBuilder> Attributes { get; }
 
+#if WEBAPI
         public override int GetHashCode() => ( Name.GetHashCode() * 397 ) ^ Type.GetHashCode();
-
+#else
+        public override int GetHashCode() => HashCode.Combine( Name, Type );
+#endif
         static IEnumerable<CustomAttributeBuilder> AttributesFromOperationParameter( IEdmOperationParameter parameter )
         {
             if ( parameter.Type.IsNullable )

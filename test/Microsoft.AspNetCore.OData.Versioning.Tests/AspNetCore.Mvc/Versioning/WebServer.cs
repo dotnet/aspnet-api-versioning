@@ -22,21 +22,14 @@
 
         public WebServer( Action<ApiVersioningOptions> setupApiVersioning = null, Action<IRouteBuilder> setupRoutes = null )
         {
-            if ( setupApiVersioning == null )
-            {
-                setupApiVersioning = _ => { };
-            }
-
-            if ( setupRoutes == null )
-            {
-                setupRoutes = _ => { };
-            }
+            setupApiVersioning ??= _ => { };
+            setupRoutes ??= _ => { };
 
             var hostBuilder = new WebHostBuilder()
                 .ConfigureServices(
                     services =>
                     {
-                        services.AddMvc();
+                        services.AddMvc( options => options.EnableEndpointRouting = false );
                         services.AddApiVersioning( setupApiVersioning );
                         services.AddOData().EnableApiVersioning();
                         services.Replace( Singleton<IActionSelector, TestODataApiVersionActionSelector>() );

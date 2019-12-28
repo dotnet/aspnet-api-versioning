@@ -20,6 +20,7 @@
                 .ConfigureServices(
                     services =>
                     {
+                        services.AddMvcCore( options => options.EnableEndpointRouting = false );
                         services.AddApiVersioning( options => options.ReportApiVersions = true );
                         services.AddOData().EnableApiVersioning();
                         services.AddODataApiExplorer( options => options.GroupNameFormat = "'v'VVV" );

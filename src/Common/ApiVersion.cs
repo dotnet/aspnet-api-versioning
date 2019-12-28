@@ -222,7 +222,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="text">The text to parse.</param>
         /// <param name="version">The parsed <see cref="ApiVersion">API version</see>, if the operation is successful.</param>
         /// <returns>True if the operation succeeded; otherwise false.</returns>
-#if NETAPPCORE3_0
+#if NETAPPCORE3_1
         public static bool TryParse( string text, [NotNullWhen( true )] out ApiVersion? version )
 #else
         public static bool TryParse( string? text, out ApiVersion? version )

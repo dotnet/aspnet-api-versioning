@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>4.1.0</VersionPrefix>
+  <VersionPrefix>4.1.1</VersionPrefix>
   <AssemblyVersion>4.1.0.0</AssemblyVersion>
-  <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
-  <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
-  <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
+  <TargetFramework>netcoreapp3.1</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
   <Description>ASP.NET Core MVC API explorer functionality for discovering metadata such as the list of API-versioned controllers and actions, and their URLs and allowed HTTP methods.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
@@ -14,10 +12,6 @@
 
  <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNetCore.Mvc.Versioning\Microsoft.AspNetCore.Mvc.Versioning.csproj" />
- </ItemGroup>
-
- <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="[2.2.0,3.0.0)" />
  </ItemGroup>
 
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />

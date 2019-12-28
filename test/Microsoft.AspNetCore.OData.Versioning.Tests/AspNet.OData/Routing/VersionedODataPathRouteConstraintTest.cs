@@ -5,7 +5,6 @@
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNet.OData.Interfaces;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Builder.Internal;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.Mvc;
@@ -168,9 +167,9 @@
             }
 
             services.AddLogging();
-            services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
-            services.Add( Singleton( Options.Create( new MvcOptions() ) ) );
-            services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Add( new TestApplicationPart( typeof( TestsController ) ) ) );
+            services.Add( Singleton( new DiagnosticListener( "test" ) ) );
+            services.AddMvcCore( options => options.EnableEndpointRouting = false )
+                    .ConfigureApplicationPartManager( apm => apm.ApplicationParts.Add( new TestApplicationPart( typeof( TestsController ) ) ) );
             services.AddApiVersioning( configure ?? ( _ => { } ) );
             services.AddOData().EnableApiVersioning();
 

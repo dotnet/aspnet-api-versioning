@@ -6,7 +6,6 @@
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Builder.Internal;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -106,9 +105,9 @@
                     typeof( TestsController3 ) );
 
             services.AddLogging();
-            services.Add( Singleton<DiagnosticSource>( new DiagnosticListener( "test" ) ) );
-            services.Add( Singleton( Options.Create( new MvcOptions() ) ) );
-            services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );
+            services.Add( Singleton( new DiagnosticListener( "test" ) ) );
+            services.AddMvcCore( options => options.EnableEndpointRouting = false )
+                    .ConfigureApplicationPartManager( apm => apm.ApplicationParts.Add( testControllers ) );
             services.AddApiVersioning();
             services.AddOData().EnableApiVersioning();
 

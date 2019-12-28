@@ -29,7 +29,10 @@
 
         public bool Equals( EdmTypeKey other ) => hashCode == other.hashCode;
 
-        static int ComputeHash( string fullName, ApiVersion apiVersion ) =>
-            ( fullName.GetHashCode() * 397 ) ^ apiVersion.GetHashCode();
+#if WEBAPI
+        static int ComputeHash( string fullName, ApiVersion apiVersion ) => ( fullName.GetHashCode() * 397 ) ^ apiVersion.GetHashCode();
+#else
+        static int ComputeHash( string fullName, ApiVersion apiVersion ) => HashCode.Combine( fullName, apiVersion );
+#endif
     }
 }

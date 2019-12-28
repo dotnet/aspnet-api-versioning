@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
-    using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
@@ -24,16 +23,16 @@
         /// Initializes a new instance of the <see cref="ODataApiVersionActionSelector"/> class.
         /// </summary>
         /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider "/> used to select candidate routes.</param>
-        /// <param name="actionConstraintCache">The <see cref="ActionConstraintCache"/> that providers a set of <see cref="IActionConstraint"/> instances.</param>
+        /// <param name="actionConstraintProviders">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IActionConstraintProvider">action constraint providers</see>.</param>
         /// <param name="options">The <see cref="ApiVersioningOptions">options</see> associated with the action selector.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="routePolicy">The <see cref="IApiVersionRoutePolicy">route policy</see> applied to candidate matches.</param>
         public ODataApiVersionActionSelector(
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
-            ActionConstraintCache actionConstraintCache,
+            IEnumerable<IActionConstraintProvider> actionConstraintProviders,
             IOptions<ApiVersioningOptions> options,
             ILoggerFactory loggerFactory,
-            IApiVersionRoutePolicy routePolicy ) : base( actionDescriptorCollectionProvider, actionConstraintCache, options, loggerFactory, routePolicy ) { }
+            IApiVersionRoutePolicy routePolicy ) : base( actionDescriptorCollectionProvider, actionConstraintProviders, options, loggerFactory, routePolicy ) { }
 
         /// <summary>
         /// Selects a list of candidate actions from the specified route context.

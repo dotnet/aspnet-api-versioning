@@ -28,7 +28,7 @@
     {
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
-        readonly ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, TypeInfo>> generatedEdmTypesPerVersion = new ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, TypeInfo>>();
+        readonly ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>> generatedEdmTypesPerVersion = new ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>();
 
         /// <inheritdoc />
         public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel )
@@ -55,7 +55,7 @@
             return CreateTypeInfoFromSignature( moduleBuilder, signature );
         }
 
-        IDictionary<EdmTypeKey, TypeInfo> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )
+        IDictionary<EdmTypeKey, Type> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )
         {
             ModuleBuilder NewModuleBuilder() => modules.GetOrAdd( apiVersion, CreateModuleForApiVersion );
 
@@ -216,7 +216,7 @@
             return Tuple.Create( clrTypeMatchesEdmType, hasUnfinishedTypes );
         }
 
-        static TypeInfo ResolveType(
+        static Type ResolveType(
             EdmTypeKey typeKey,
             Type clrType,
             bool clrTypeMatchesEdmType,
@@ -228,7 +228,7 @@
             var apiVersion = context.ApiVersion;
             var edmTypes = context.EdmTypes;
 
-            TypeInfo type;
+            Type? type;
 
             if ( clrTypeMatchesEdmType )
             {
@@ -272,7 +272,7 @@
             return type;
         }
 
-        static TypeInfo CreateTypeInfoFromSignature( ModuleBuilder moduleBuilder, ClassSignature @class ) => CreateTypeBuilderFromSignature( moduleBuilder, @class ).CreateTypeInfo();
+        static Type CreateTypeInfoFromSignature( ModuleBuilder moduleBuilder, ClassSignature @class ) => CreateTypeBuilderFromSignature( moduleBuilder, @class ).CreateType()!;
 
         static TypeBuilder CreateTypeBuilderFromSignature( ModuleBuilder moduleBuilder, ClassSignature @class )
         {
@@ -297,7 +297,7 @@
             return typeBuilder;
         }
 
-        static IDictionary<EdmTypeKey, TypeInfo> ResolveDependencies( BuilderContext context )
+        static IDictionary<EdmTypeKey, Type> ResolveDependencies( BuilderContext context )
         {
             var edmTypes = context.EdmTypes;
             var dependencies = context.Dependencies;
@@ -323,7 +323,7 @@
 
                 if ( edmTypes[key] is TypeBuilder typeBuilder )
                 {
-                    edmTypes[key] = typeBuilder.CreateTypeInfo();
+                    edmTypes[key] = typeBuilder.CreateTypeInfo()!;
                 }
             }
 
@@ -387,7 +387,7 @@
 
             internal IEdmModel EdmModel { get; }
 
-            internal IDictionary<EdmTypeKey, TypeInfo> EdmTypes { get; } = new Dictionary<EdmTypeKey, TypeInfo>();
+            internal IDictionary<EdmTypeKey, Type> EdmTypes { get; } = new Dictionary<EdmTypeKey, Type>();
 
             internal ISet<EdmTypeKey> VisitedEdmTypes { get; } = new HashSet<EdmTypeKey>();
 

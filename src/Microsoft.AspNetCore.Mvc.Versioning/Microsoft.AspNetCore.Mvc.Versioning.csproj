@@ -1,30 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>4.1.0</VersionPrefix>
+  <VersionPrefix>4.1.1</VersionPrefix>
   <AssemblyVersion>4.1.0.0</AssemblyVersion>
-  <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
-  <NETStandardImplicitPackageVersion>2.0.0-*</NETStandardImplicitPackageVersion>
-  <NETStandardLibraryNETFrameworkVersion>2.0.0-*</NETStandardLibraryNETFrameworkVersion>
+  <TargetFramework>netcoreapp3.1</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
  </PropertyGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-  <FrameworkReference Include="Microsoft.AspNetCore.App" />
- </ItemGroup>
-
- <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="[2.2.0,3.0.0)" />
- </ItemGroup>
-
  <ItemGroup>
-  <Compile Update="Routing\ApiVersionMatcherPolicy.netcoreapp3.1.cs" DependentUpon="Routing\ApiVersionMatcherPolicy.cs" />
-  <Compile Update="Routing\ApiVersionMatcherPolicy.netstandard2.0.cs" DependentUpon="Routing\ApiVersionMatcherPolicy.cs" />
-  <Compile Update="Versioning\ApiVersionActionSelector.netcoreapp3.1.cs" DependentUpon="Versioning\ApiVersionActionSelector.cs" />
-  <Compile Update="Versioning\ApiVersionActionSelector.netstandard2.0.cs" DependentUpon="Versioning\ApiVersionActionSelector.cs" />
+  <FrameworkReference Include="Microsoft.AspNetCore.App" />
  </ItemGroup>
 
  <Import Project="..\Common\Common.projitems" Label="Shared" />
