@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>netcoreapp2.2;net461</TargetFrameworks>
-  <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.2</TargetFrameworks>
+  <TargetFramework>netcoreapp3.1</TargetFramework>
   <RootNamespace>Microsoft</RootNamespace>
  </PropertyGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\src\Microsoft.AspNetCore.OData.Versioning.ApiExplorer\Microsoft.AspNetCore.OData.Versioning.ApiExplorer.csproj" />
- </ItemGroup>
-
- <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
  </ItemGroup>
 
  <Import Project="..\OData.Test.Shared\OData.Test.Shared.projitems" Label="Shared" />

@@ -4,7 +4,6 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
@@ -35,7 +34,7 @@
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure( IApplicationBuilder app, IHostingEnvironment env, VersionedODataModelBuilder modelBuilder )
+        public void Configure( IApplicationBuilder app, VersionedODataModelBuilder modelBuilder )
         {
             app.UseMvc(
                 routeBuilder =>

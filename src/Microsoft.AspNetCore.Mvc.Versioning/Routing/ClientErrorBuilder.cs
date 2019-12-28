@@ -4,9 +4,6 @@
     using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
-#if NETSTANDARD2_0
-    using Microsoft.AspNetCore.Mvc.Internal;
-#endif
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Logging;
     using System;

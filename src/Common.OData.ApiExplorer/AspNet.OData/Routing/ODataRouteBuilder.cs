@@ -659,14 +659,14 @@
 
             public int GetHashCode( Type obj )
             {
-                if ( obj.BaseType.Equals( typeof( ValueType ) ) || obj.BaseType.Equals( typeof( Array ) ) )
+                if ( obj.BaseType == null || obj.BaseType.Equals( typeof( ValueType ) ) || obj.BaseType.Equals( typeof( Array ) ) )
                 {
                     return obj.GetHashCode();
                 }
 
                 var baseType = typeof( object );
 
-                while ( !obj.BaseType.Equals( baseType ) )
+                while ( obj.BaseType != null && !obj.BaseType.Equals( baseType ) )
                 {
                     obj = obj.BaseType;
                 }

@@ -190,7 +190,7 @@
         static IEnumerable<string> GetODataRoutePrefixes( ControllerActionDescriptor controllerAction )
         {
             var prefixAttributes = controllerAction.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>( inherit: false );
-            return GetODataRoutePrefixes( prefixAttributes, controllerAction.ControllerTypeInfo.FullName );
+            return GetODataRoutePrefixes( prefixAttributes, controllerAction.ControllerTypeInfo?.FullName ?? string.Empty );
         }
 
         IEnumerable<ODataPathTemplate> GetODataPathTemplates( string prefix, ControllerActionDescriptor controllerAction )

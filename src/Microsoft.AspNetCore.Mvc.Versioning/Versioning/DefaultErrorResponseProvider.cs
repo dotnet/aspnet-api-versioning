@@ -5,9 +5,6 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using static System.String;
-#if NETSTANDARD2_0
-    using IWebHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
     /// <summary>
     /// Represents the default implementation for creating HTTP error responses related to API versioning.
@@ -55,9 +52,7 @@
 
         static string? NullIfEmpty( string value ) => IsNullOrEmpty( value ) ? null : value;
 
-#if NETCOREAPP3_1
         [return: MaybeNull]
-#endif
         static TError NewInnerError<TError>( ErrorResponseContext context, Func<ErrorResponseContext, TError> create )
         {
             if ( IsNullOrEmpty( context.MessageDetail ) )

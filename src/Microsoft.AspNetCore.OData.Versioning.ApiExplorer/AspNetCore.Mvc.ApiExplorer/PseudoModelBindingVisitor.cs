@@ -3,7 +3,6 @@
     using Microsoft.AspNet.OData;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
-    using Microsoft.DotNet.PlatformAbstractions;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -123,16 +122,7 @@
         {
             public bool Equals( PropertyKey x, PropertyKey y ) => x.ContainerType == y.ContainerType && x.PropertyName == y.PropertyName && x.Source == y.Source;
 
-            public int GetHashCode( PropertyKey obj )
-            {
-                var hashCodeCombiner = HashCodeCombiner.Start();
-
-                hashCodeCombiner.Add( obj.ContainerType );
-                hashCodeCombiner.Add( obj.PropertyName );
-                hashCodeCombiner.Add( obj.Source );
-
-                return hashCodeCombiner.CombinedHash;
-            }
+            public int GetHashCode( PropertyKey obj ) => HashCode.Combine( obj.ContainerType, obj.PropertyName, obj.Source );
         }
     }
 }

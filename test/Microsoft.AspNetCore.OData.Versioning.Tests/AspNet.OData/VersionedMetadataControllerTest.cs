@@ -50,7 +50,7 @@
                     typeof( TestsController2 ),
                     typeof( TestsController3 ) );
 
-                services.AddMvc()
+                services.AddMvc( options => options.EnableEndpointRouting = false )
                         .ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );
 
                 services.AddApiVersioning()

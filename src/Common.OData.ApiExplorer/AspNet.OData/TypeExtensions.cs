@@ -103,12 +103,12 @@
                     if ( argument.IsField )
                     {
                         namedFields.Add( (FieldInfo) argument.MemberInfo );
-                        fieldValues.Add( argument.TypedValue.Value );
+                        fieldValues.Add( argument.TypedValue.Value! );
                     }
                     else
                     {
                         namedProperties.Add( (PropertyInfo) argument.MemberInfo );
-                        propertyValues.Add( argument.TypedValue.Value );
+                        propertyValues.Add( argument.TypedValue.Value! );
                     }
                 }
 
@@ -278,7 +278,7 @@
 
         static bool IsSingleResult( this Type type ) => type.Is( SingleResultOfT );
 
-        static bool IsODataValue( this Type type )
+        static bool IsODataValue( this Type? type )
         {
             while ( type != null )
             {

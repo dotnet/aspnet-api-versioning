@@ -489,7 +489,7 @@
 
         static Func<IRouteBuilder, Action<IContainerBuilder>, Action<IContainerBuilder>> ResolveConfigureDefaultServicesFunc()
         {
-            var method = typeof( ODataRouteBuilderExtensions ).GetMethod( "ConfigureDefaultServices", NonPublic | Static, null, new[] { typeof( IRouteBuilder ), typeof( Action<IContainerBuilder> ) }, null );
+            var method = typeof( ODataRouteBuilderExtensions ).GetMethod( "ConfigureDefaultServices", NonPublic | Static, null, new[] { typeof( IRouteBuilder ), typeof( Action<IContainerBuilder> ) }, null )!;
             return (Func<IRouteBuilder, Action<IContainerBuilder>, Action<IContainerBuilder>>) method.CreateDelegate( typeof( Func<IRouteBuilder, Action<IContainerBuilder>, Action<IContainerBuilder>> ) );
         }
 

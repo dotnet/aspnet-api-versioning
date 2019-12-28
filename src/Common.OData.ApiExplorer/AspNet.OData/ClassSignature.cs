@@ -32,7 +32,7 @@
 
             attributeBuilders.AddRange( originalType.DeclaredAttributes() );
 
-            Name = originalType.FullName;
+            Name = originalType.FullName!;
             Attributes = attributeBuilders.ToArray();
             Properties = properties.ToArray();
             ApiVersion = apiVersion;
@@ -58,7 +58,7 @@
 
         public override int GetHashCode() => hashCode.Value;
 
-        public override bool Equals( object obj ) => obj is ClassSignature s && Equals( s );
+        public override bool Equals( object? obj ) => obj is ClassSignature s && Equals( s );
 
         public bool Equals( ClassSignature other ) => GetHashCode() == other?.GetHashCode();
 

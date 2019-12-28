@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.Mvc
 
     static partial class CollectionExtensions
     {
-#if NETAPPCORE3_0
+#if NETAPPCORE3_1
         internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, [NotNullWhen(true)] out TValue value ) where TKey : notnull
 #else
         internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, out TValue value ) where TKey : notnull

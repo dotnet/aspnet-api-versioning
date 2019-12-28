@@ -13,6 +13,9 @@
 #endif
     using static System.Globalization.CultureInfo;
     using static System.String;
+#if !WEBAPI
+    using static System.StringComparison;
+#endif
 
     static class EdmExtensions
     {
@@ -32,7 +35,7 @@
             }
 
             var element = (IEdmSchemaType) edmType;
-            var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>(element);
+            var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>( element );
 
             if ( annotationValue != null )
             {
@@ -59,17 +62,29 @@
                 case "Edm.DateTime":
                 case "Edm.DateTimeOffset":
                 case "Edm.Guid":
+#if WEBAPI
                     return Type.GetType( edmFullName.Replace( "Edm", "System" ), throwOnError: true );
+#else
+                    return Type.GetType( edmFullName.Replace( "Edm", "System", Ordinal ), throwOnError: true );
+#endif
                 case "Edm.Duration":
                     return typeof( TimeSpan );
                 case "Edm.Binary":
                     return typeof( byte[] );
                 case "Edm.Geography":
                 case "Edm.Geometry":
+#if WEBAPI
                     return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.Spatial" ), throwOnError: true );
+#else
+                    return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.Spatial", Ordinal ), throwOnError: true );
+#endif
                 case "Edm.Date":
                 case "Edm.TimeOfDay":
+#if WEBAPI
                     return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.OData.Edm" ), throwOnError: true );
+#else
+                    return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.OData.Edm", Ordinal ), throwOnError: true );
+#endif
             }
 
             return null;

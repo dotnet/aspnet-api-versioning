@@ -10,13 +10,16 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
+    using static System.Threading.Tasks.Task;
 
     /// <summary>
     /// Represents the <see cref="IEndpointSelectorPolicy">endpoint selector policy</see> for API versions.
     /// </summary>
     [CLSCompliant( false )]
-    public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
+    public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     {
         readonly IOptions<ApiVersioningOptions> options;
 
@@ -66,6 +69,48 @@
             }
 
             return false;
+        }
+
+        /// <inheritdoc />
+        public Task ApplyAsync( HttpContext httpContext, CandidateSet candidates )
+        {
+            if ( httpContext == null )
+            {
+                throw new ArgumentNullException( nameof( httpContext ) );
+            }
+
+            if ( candidates == null )
+            {
+                throw new ArgumentNullException( nameof( candidates ) );
+            }
+
+            if ( IsRequestedApiVersionAmbiguous( httpContext, out var apiVersion ) )
+            {
+                return CompletedTask;
+            }
+
+            if ( apiVersion == null && Options.AssumeDefaultVersionWhenUnspecified )
+            {
+                apiVersion = TrySelectApiVersion( httpContext, candidates );
+                httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
+            }
+
+            var finalMatches = EvaluateApiVersion( candidates, apiVersion );
+
+            if ( finalMatches.Count == 0 )
+            {
+                httpContext.SetEndpoint( ClientError( httpContext, candidates ) );
+            }
+            else
+            {
+                for ( var i = 0; i < finalMatches.Count; i++ )
+                {
+                    var (index, _, valid) = finalMatches[i];
+                    candidates.SetValidity( index, valid );
+                }
+            }
+
+            return CompletedTask;
         }
 
         static IReadOnlyList<(int Index, ActionDescriptor Action, bool Valid)> EvaluateApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
@@ -118,6 +163,30 @@
             }
 
             return bestMatches.ToArray();
+        }
+
+        bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, out ApiVersion? apiVersion )
+        {
+            try
+            {
+                apiVersion = httpContext.GetRequestedApiVersion();
+            }
+            catch ( AmbiguousApiVersionException ex )
+            {
+                Logger.LogInformation( ex.Message );
+                apiVersion = default;
+
+                var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
+                {
+                    Code = AmbiguousApiVersion,
+                    Message = ex.Message,
+                };
+
+                httpContext.SetEndpoint( new BadRequestHandler( handlerContext ) );
+                return true;
+            }
+
+            return false;
         }
 
         ApiVersion TrySelectApiVersion( HttpContext httpContext, CandidateSet candidates )
