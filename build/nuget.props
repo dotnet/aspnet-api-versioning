@@ -15,8 +15,8 @@
  </PropertyGroup>
 
  <ItemGroup Label="NuGet">
-  <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" Visible="false" />
-  <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="\" Visible="false" />
+  <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
+  <None Include="$(MSBuildThisFileDirectory)..\LICENSE.txt" Pack="true" PackagePath="" Visible="false" />
  </ItemGroup>
 
  <!-- allow build-specific, one-time release notes from the command-line without modifying the source project -->
