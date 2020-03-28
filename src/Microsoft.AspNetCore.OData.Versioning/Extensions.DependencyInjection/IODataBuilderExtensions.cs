@@ -59,10 +59,15 @@
 
         static void AddODataServices( IServiceCollection services )
         {
-            // note: if we end up creating a new ApplicationPartManager here we won't fail, but the setup
-            // will not register any model configurations automatically. this is almost certainly because
-            // services.AddMvcCore() hasn't be called yet, which is unexpected
-            var partManager = services.GetService<ApplicationPartManager>() ?? new ApplicationPartManager();
+            var partManager = services.GetService<ApplicationPartManager>();
+
+            if ( partManager == null )
+            {
+                partManager = new ApplicationPartManager();
+                services.TryAddSingleton( partManager );
+            }
+
+            partManager.ApplicationParts.Add( new AssemblyPart( typeof( IODataBuilderExtensions ).Assembly ) );
 
             ConfigureDefaultFeatureProviders( partManager );
             services.Replace( Singleton<IActionSelector, ODataApiVersionActionSelector>() );
