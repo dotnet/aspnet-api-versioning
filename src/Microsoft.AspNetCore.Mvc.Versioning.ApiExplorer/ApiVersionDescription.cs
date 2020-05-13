@@ -39,7 +39,7 @@
         /// <remarks>An API version will only be described as deprecated when all
         /// all corresponding service implementations are also deprecated. It is
         /// possible that some API versions may be partially deprecated, in which
-        /// case this property will return <c>true</c>, but individual actions
+        /// case this property will return <c>false</c>, but individual actions
         /// may report that they are deprecated.</remarks>
         public bool IsDeprecated { get; }
     }
