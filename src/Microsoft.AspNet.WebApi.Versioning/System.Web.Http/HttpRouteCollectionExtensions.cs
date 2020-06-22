@@ -15,7 +15,7 @@
         /// Returns the route collection as a read-only dictionary mapping configured names to routes.
         /// </summary>
         /// <param name="routes">The <see cref="HttpRouteCollection">route collection</see> to convert.</param>
-        /// <returns>A new <see cref="IReadOnlyDictionary{TKey, TValue}">read-only dictonary</see> of
+        /// <returns>A new <see cref="IReadOnlyDictionary{TKey, TValue}">read-only dictionary</see> of
         /// <see cref="IHttpRoute">routes</see> mapped to their name.</returns>
         public static IReadOnlyDictionary<string, IHttpRoute> ToDictionary( this HttpRouteCollection routes )
         {
