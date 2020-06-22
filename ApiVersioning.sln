@@ -143,13 +143,34 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Common.OData.ApiExplorer\Common.OData.ApiExplorer.projitems*{0d6519ae-20d2-4c98-97aa-ed3622043936}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{0d6519ae-20d2-4c98-97aa-ed3622043936}*SharedItemsImports = 5
 		src\Common.OData\Common.OData.projitems*{1599a30d-d37f-443c-b935-290144910be3}*SharedItemsImports = 13
+		src\Common.OData.ApiExplorer\Common.OData.ApiExplorer.projitems*{1b255310-a2b7-437f-804f-6e1d8c940a17}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{1b255310-a2b7-437f-804f-6e1d8c940a17}*SharedItemsImports = 5
+		test\OData.Test.Shared\OData.Test.Shared.projitems*{23bc896b-a4cc-4c82-b98b-ce71239c2eb8}*SharedItemsImports = 5
 		src\Common.ApiExplorer\Common.ApiExplorer.projitems*{26a67334-f6e6-49b8-8c5a-f88f28770966}*SharedItemsImports = 13
+		src\Common\Common.projitems*{3bac97ed-1a8e-4f5a-a716-db5255f51c81}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{3bac97ed-1a8e-4f5a-a716-db5255f51c81}*SharedItemsImports = 5
+		src\Common.OData\Common.OData.projitems*{48a2b488-23ab-4c83-ae30-0b8b735c4562}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{48a2b488-23ab-4c83-ae30-0b8b735c4562}*SharedItemsImports = 5
+		src\Common.OData\Common.OData.projitems*{59d9cec0-f8e5-4a1a-b8dd-5117e6a409d5}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{59d9cec0-f8e5-4a1a-b8dd-5117e6a409d5}*SharedItemsImports = 5
+		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{5c31964d-ea8b-420b-9297-5adfefe54962}*SharedItemsImports = 5
+		test\Test.Common\Test.Common.projitems*{69c59656-53d1-4acb-92b5-8b34c8e62175}*SharedItemsImports = 5
 		test\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems*{6cdfb878-2642-4f98-ae35-621bac581181}*SharedItemsImports = 13
 		src\Common\Common.projitems*{6d0e834b-6422-44cd-9a85-e3be9dead1be}*SharedItemsImports = 13
+		src\Common.ApiExplorer\Common.ApiExplorer.projitems*{91e1f0b5-905d-446c-a2dd-4c1edabfaf6c}*SharedItemsImports = 5
 		test\OData.Test.Shared\OData.Test.Shared.projitems*{9a635d55-7547-4df6-b7bd-840e16ebde28}*SharedItemsImports = 13
+		test\Test.Common\Test.Common.projitems*{aeb074e1-e57a-4dd3-a972-3625b367ce5d}*SharedItemsImports = 5
 		src\Shared\Shared.projitems*{b7897873-6757-4684-83c0-39575821ae14}*SharedItemsImports = 13
+		test\OData.Test.Shared\OData.Test.Shared.projitems*{ba0c8652-fef6-4004-a779-cd6dcf2996f7}*SharedItemsImports = 5
 		src\Common.OData.ApiExplorer\Common.OData.ApiExplorer.projitems*{c0c766f3-a2d6-461e-adff-27496600ea9c}*SharedItemsImports = 13
+		src\Common\Common.projitems*{c39cccbc-6b04-406f-96be-ca796eff34c5}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{c39cccbc-6b04-406f-96be-ca796eff34c5}*SharedItemsImports = 5
+		test\OData.Test.Shared\OData.Test.Shared.projitems*{d87e54cc-c2d6-4ae5-806d-ae825b051c66}*SharedItemsImports = 5
+		src\Common.ApiExplorer\Common.ApiExplorer.projitems*{f7784c3a-5569-4590-ae28-b721c0426045}*SharedItemsImports = 5
+		src\Shared\Shared.projitems*{f7784c3a-5569-4590-ae28-b721c0426045}*SharedItemsImports = 5
 		test\Test.Common\Test.Common.projitems*{f9297626-c37c-402b-afd6-712f3e5e4d7c}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

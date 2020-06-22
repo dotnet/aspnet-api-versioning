@@ -13,7 +13,7 @@
         [InlineData( typeof( NormalODataController ), true )]
         [InlineData( typeof( CustomODataController ), true )]
         [InlineData( typeof( NonODataController ), false )]
-        public void is_satisified_by_should_return_expected_value( Type controllerType, bool expected )
+        public void is_satisfied_by_should_return_expected_value( Type controllerType, bool expected )
         {
             // arrange
             var specification = new ODataControllerSpecification();

@@ -36,7 +36,7 @@
         }
 
         [Fact]
-        public void is_deprecated_should_return_false_without_api_vesioning()
+        public void is_deprecated_should_return_false_without_api_versioning()
         {
             // arrange
             var provider = new DefaultApiVersionDescriptionProvider(

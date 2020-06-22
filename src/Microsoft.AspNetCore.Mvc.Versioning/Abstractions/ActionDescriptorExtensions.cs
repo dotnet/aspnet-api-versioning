@@ -16,14 +16,14 @@
     public static class ActionDescriptorExtensions
     {
         /// <summary>
-        /// Gets the API version information associated with a action.
+        /// Gets the API version information associated with an action.
         /// </summary>
         /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
         /// <returns>The <see cref="ApiVersionModel">API version information</see> for the action.</returns>
         public static ApiVersionModel GetApiVersionModel( this ActionDescriptor action ) => action.GetApiVersionModel( Explicit );
 
         /// <summary>
-        /// Gets the API version information associated with a action.
+        /// Gets the API version information associated with an action.
         /// </summary>
         /// <param name="action">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
         /// <param name="mapping">One or more of the <see cref="ApiVersionMapping"/> values.</param>

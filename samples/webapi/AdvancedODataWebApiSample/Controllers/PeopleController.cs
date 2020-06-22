@@ -7,7 +7,7 @@
     using Microsoft.Web.Http;
     using System.Web.Http;
 
-    // note: since the application is configured with AssumeDefaultVersionWhenUnspecifed, this controller
+    // note: since the application is configured with AssumeDefaultVersionWhenUnspecified, this controller
     // is resolved without or without an API version, even though it is explicitly versioned
     [ApiVersion( "1.0" )]
     [ApiVersion( "2.0" )]

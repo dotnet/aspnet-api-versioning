@@ -101,7 +101,7 @@
         }
 
         [Fact]
-        public void url_helper_should_create_route_link_with_api_version_constriant()
+        public void url_helper_should_create_route_link_with_api_version_constraint()
         {
             // arrange
             var services = CreateServices().AddApiVersioning();

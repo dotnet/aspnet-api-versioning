@@ -9,7 +9,7 @@
     public class ApiVersioningRouteOptionsSetupTest
     {
         [Fact]
-        public void post_configure_should_add_route_contraint_with_default_name()
+        public void post_configure_should_add_route_constraint_with_default_name()
         {
             // arrange
             var versioningOptions = Options.Create( new ApiVersioningOptions() );
@@ -24,7 +24,7 @@
         }
 
         [Fact]
-        public void post_configure_should_add_route_contraint_with_custom_name()
+        public void post_configure_should_add_route_constraint_with_custom_name()
         {
             // arrange
             const string key = "api-version";

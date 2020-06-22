@@ -147,14 +147,14 @@
             var originalType = typeof( Company );
 
             //act
-            var subsitutedType = originalType.SubstituteIfNecessary( context );
+            var substitutedType = originalType.SubstituteIfNecessary( context );
 
             // assert
-            subsitutedType.GetRuntimeProperties().Should().HaveCount( 4 );
-            subsitutedType.Should().HaveProperty<int>( nameof( Company.CompanyId ) );
-            subsitutedType.Should().HaveProperty<string>( nameof( Company.Name ) );
-            subsitutedType.Should().Be( subsitutedType.GetRuntimeProperty( nameof( Company.ParentCompany ) ).PropertyType );
-            subsitutedType.Should().Be( subsitutedType.GetRuntimeProperty( nameof( Company.Subsidiaries ) ).PropertyType.GetGenericArguments()[0] );
+            substitutedType.GetRuntimeProperties().Should().HaveCount( 4 );
+            substitutedType.Should().HaveProperty<int>( nameof( Company.CompanyId ) );
+            substitutedType.Should().HaveProperty<string>( nameof( Company.Name ) );
+            substitutedType.Should().Be( substitutedType.GetRuntimeProperty( nameof( Company.ParentCompany ) ).PropertyType );
+            substitutedType.Should().Be( substitutedType.GetRuntimeProperty( nameof( Company.Subsidiaries ) ).PropertyType.GetGenericArguments()[0] );
         }
 
         [Fact]
