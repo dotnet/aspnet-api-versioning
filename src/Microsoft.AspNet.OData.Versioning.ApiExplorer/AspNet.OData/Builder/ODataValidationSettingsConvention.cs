@@ -24,7 +24,7 @@
                 throw new ArgumentNullException( nameof( apiDescription ) );
             }
 
-            if ( !IsSupported( apiDescription ) )
+            if ( !IsSupported( apiDescription.HttpMethod.Method ) )
             {
                 return;
             }
@@ -141,16 +141,6 @@
             }
 
             return parameter;
-        }
-
-        static bool IsSupported( ApiDescription apiDescription )
-        {
-            return apiDescription.HttpMethod.Method.ToUpperInvariant() switch
-            {
-                "GET" => true,
-                "POST" => apiDescription.Operation()?.IsAction() == true,
-                _ => false,
-            };
         }
     }
 }

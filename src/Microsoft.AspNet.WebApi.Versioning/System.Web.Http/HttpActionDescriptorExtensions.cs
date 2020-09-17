@@ -110,6 +110,7 @@
 
         internal static T? GetProperty<T>( this HttpActionDescriptor action ) where T : class =>
             action.Properties.TryGetValue( typeof( T ), out T value ) ? value : default;
+#pragma warning restore CS8603 // Possible null reference return.
 
         internal static void SetProperty<T>( this HttpActionDescriptor action, T value ) =>
             action.Properties.AddOrUpdate( typeof( T ), value, ( key, oldValue ) => value );
