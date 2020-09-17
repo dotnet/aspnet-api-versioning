@@ -3,7 +3,7 @@
     using Microsoft.Examples.Models;
     using System.Web.Http;
 
-    // note: since the application is configured with AssumeDefaultVersionWhenUnspecifed, this controller
+    // note: since the application is configured with AssumeDefaultVersionWhenUnspecified, this controller
     // is implicitly versioned to the DefaultApiVersion, which has the default value 1.0.
     public class OrdersController : ApiController
     {

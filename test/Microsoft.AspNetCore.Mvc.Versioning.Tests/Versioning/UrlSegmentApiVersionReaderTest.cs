@@ -35,10 +35,10 @@
 
         static HttpRequest RequestAfterApiVersionConstraintHasBeenMatched( string requestedVersion, IApiVersionReader apiVersionReader )
         {
-            const string ParmaterName = "version";
+            const string ParameterName = "version";
 
             var request = new Mock<HttpRequest>();
-            var routeData = new RouteData() { Values = { [ParmaterName] = requestedVersion } };
+            var routeData = new RouteData() { Values = { [ParameterName] = requestedVersion } };
             var featureCollection = new FeatureCollection();
             var requestServices = new Mock<IServiceProvider>();
             var httpContext = new Mock<HttpContext>();

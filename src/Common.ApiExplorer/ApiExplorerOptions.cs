@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer
         /// may be useful for a version-neutral API that its own per-API version logic.
         /// </para>
         /// <para>
-        /// An API version defined using the URLsegment method is unaffected by this setting because path-based route
+        /// An API version defined using the URL segment method is unaffected by this setting because path-based route
         /// parameters are always required.
         /// </para></remarks>
         public bool AddApiVersionParametersWhenVersionNeutral { get; set; }

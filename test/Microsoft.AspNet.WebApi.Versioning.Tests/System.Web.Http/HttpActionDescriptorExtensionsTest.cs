@@ -85,7 +85,7 @@
         }
 
         [Fact]
-        public void get_api_version_model_should_return_exising_instance_for_action_descriptor()
+        public void get_api_version_model_should_return_existing_instance_for_action_descriptor()
         {
             // arrange
             var controller = new Mock<IHttpController>().Object;
