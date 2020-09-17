@@ -24,14 +24,11 @@
 
     public class ODataValidationSettingsConventionTest
     {
-        [Theory]
-        [InlineData( "PUT" )]
-        [InlineData( "PATCH" )]
-        [InlineData( "DELETE" )]
-        public void apply_to_should_ignore_nonquery_and_nonaction_descriptions( string httpMethod )
+        [Fact]
+        public void apply_to_should_ignore_nonquery_and_nonaction_description()
         {
             // arrange
-            var description = NewApiDescription( httpMethod );
+            var description = NewApiDescription( "DELETE" );
             var validationSettings = new ODataValidationSettings();
             var settings = new TestODataQueryOptionSettings( typeof( object ) );
             var convention = new ODataValidationSettingsConvention( validationSettings, settings );

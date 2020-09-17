@@ -3,7 +3,6 @@
     using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Net;
     using System.Net.Http;
 
@@ -12,6 +11,7 @@
     /// </summary>
     public static class HttpRequestMessageExtensions
     {
+        const string RoutingContextKey = "MS_RoutingContext";
         const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
 
         static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, Func<bool, HttpError> errorCreator )
@@ -83,7 +83,14 @@
 
             if ( !request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
             {
+                var forceRouteConstraintEvaluation = !request.Properties.ContainsKey( RoutingContextKey );
+
                 request.Properties[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( request );
+
+                if ( forceRouteConstraintEvaluation )
+                {
+                    request.GetConfiguration()?.Routes.GetRouteData( request );
+                }
             }
 
             return properties;

@@ -115,6 +115,17 @@
             return NewParameterDescription( GetName( Count ), description, typeof( bool ), defaultValue: false );
         }
 
+        // REF: http://docs.oasis-open.org/odata/odata/v4.01/cs01/part2-url-conventions/odata-v4.01-cs01-part2-url-conventions.html#sec_SystemQueryOptions
+        static bool IsSupported( string httpMethod ) =>
+            httpMethod.ToUpperInvariant() switch
+            {
+                "GET" => true,
+                "PUT" => true,
+                "PATCH" => true,
+                "POST" => true,
+                _ => false,
+            };
+
         string GetName( AllowedQueryOptions option )
         {
 #pragma warning disable CA1308 // Normalize strings to uppercase
