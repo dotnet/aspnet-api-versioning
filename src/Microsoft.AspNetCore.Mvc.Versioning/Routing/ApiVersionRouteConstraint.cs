@@ -4,8 +4,8 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using System;
-    using static ApiVersion;
-    using static AspNetCore.Routing.RouteDirection;
+    using static Microsoft.AspNetCore.Mvc.ApiVersion;
+    using static Microsoft.AspNetCore.Routing.RouteDirection;
     using static System.String;
 
     /// <summary>

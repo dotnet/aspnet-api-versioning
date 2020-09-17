@@ -35,6 +35,11 @@
         /// <remarks>This method always replaces the <see cref="IApiExplorer"/> with a new instance of <see cref="ODataApiExplorer"/>.</remarks>
         public static ODataApiExplorer AddODataApiExplorer( this HttpConfiguration configuration, Action<ODataApiExplorerOptions>? setupAction )
         {
+            if ( configuration == null )
+            {
+                throw new ArgumentNullException( nameof( configuration ) );
+            }
+
             var options = new ODataApiExplorerOptions( configuration );
 
             setupAction?.Invoke( options );

@@ -7,7 +7,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using static ApiVersion;
+#if WEBAPI
+    using static Microsoft.Web.Http.ApiVersion;
+#else
+    using static Microsoft.AspNetCore.Mvc.ApiVersion;
+#endif
 
     /// <summary>
     /// Represents the base implementation for the metadata that describes the <see cref="ApiVersion">API versions</see> associated with a service.

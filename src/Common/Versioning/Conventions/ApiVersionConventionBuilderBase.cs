@@ -7,7 +7,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using static ApiVersionProviderOptions;
+#if WEBAPI
+    using static Microsoft.Web.Http.Versioning.ApiVersionProviderOptions;
+#else
+    using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionProviderOptions;
+#endif
 
     /// <summary>
     /// Represents the base implementation of an API version convention builder.

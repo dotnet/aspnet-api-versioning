@@ -25,6 +25,11 @@
         /// <remarks>This method always replaces the <see cref="IApiExplorer"/> with a new instance of <see cref="VersionedApiExplorer"/>.</remarks>
         public static VersionedApiExplorer AddVersionedApiExplorer( this HttpConfiguration configuration, Action<ApiExplorerOptions>? setupAction )
         {
+            if ( configuration == null )
+            {
+                throw new ArgumentNullException( nameof( configuration ) );
+            }
+
             var options = new ApiExplorerOptions( configuration );
 
             setupAction?.Invoke( options );

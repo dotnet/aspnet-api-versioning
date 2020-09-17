@@ -5,7 +5,7 @@
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Routing;
-    using static ApiVersion;
+    using static Microsoft.Web.Http.ApiVersion;
     using static System.String;
     using static System.Web.Http.Routing.HttpRouteDirection;
 

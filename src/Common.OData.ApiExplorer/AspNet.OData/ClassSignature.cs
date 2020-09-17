@@ -60,7 +60,7 @@
 
         public override bool Equals( object? obj ) => obj is ClassSignature s && Equals( s );
 
-        public bool Equals( ClassSignature other ) => GetHashCode() == other?.GetHashCode();
+        public bool Equals( ClassSignature? other ) => other != null && GetHashCode() == other.GetHashCode();
 
         int ComputeHashCode()
         {

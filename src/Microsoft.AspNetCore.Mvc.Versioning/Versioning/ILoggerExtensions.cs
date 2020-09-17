@@ -5,8 +5,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using static Extensions.Logging.LoggerMessage;
-    using static Extensions.Logging.LogLevel;
+    using static Microsoft.Extensions.Logging.LoggerMessage;
+    using static Microsoft.Extensions.Logging.LogLevel;
     using static System.Globalization.CultureInfo;
 
     static class ILoggerExtensions

@@ -259,7 +259,7 @@
 
         sealed class ODataAttributeRouteInfoComparer : IEqualityComparer<ODataAttributeRouteInfo>
         {
-            public bool Equals( ODataAttributeRouteInfo x, ODataAttributeRouteInfo y )
+            public bool Equals( ODataAttributeRouteInfo? x, ODataAttributeRouteInfo? y )
             {
                 if ( x == null )
                 {

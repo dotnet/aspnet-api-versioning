@@ -108,7 +108,7 @@
         internal static bool IsAttributeRouted( this HttpActionDescriptor action ) =>
             action.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value ) && ( value ?? false );
 
-        internal static T GetProperty<T>( this HttpActionDescriptor action ) =>
+        internal static T? GetProperty<T>( this HttpActionDescriptor action ) where T : class =>
             action.Properties.TryGetValue( typeof( T ), out T value ) ? value : default;
 
         internal static void SetProperty<T>( this HttpActionDescriptor action, T value ) =>

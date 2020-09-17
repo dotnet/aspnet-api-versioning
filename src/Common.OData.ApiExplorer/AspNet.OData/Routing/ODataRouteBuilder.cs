@@ -283,9 +283,9 @@
             var typeDef = typeReference.Definition;
             var offset = template.Length;
 
-            template.Append( "{" );
+            template.Append( '{' );
             template.Append( name );
-            template.Append( "}" );
+            template.Append( '}' );
 
             if ( Context.RouteTemplateGeneration == Server || keyAsSegment )
             {
@@ -655,10 +655,15 @@
 
         sealed class TypeComparer : IEqualityComparer<Type>
         {
-            public bool Equals( Type x, Type y ) => x.IsAssignableFrom( y );
+            public bool Equals( Type? x, Type? y ) => x != null && x.IsAssignableFrom( y );
 
             public int GetHashCode( Type obj )
             {
+                if ( obj is null )
+                {
+                    return 0;
+                }
+
                 if ( obj.BaseType == null || obj.BaseType.Equals( typeof( ValueType ) ) || obj.BaseType.Equals( typeof( Array ) ) )
                 {
                     return obj.GetHashCode();

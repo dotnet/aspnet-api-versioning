@@ -12,8 +12,8 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
+    using static Microsoft.Web.Http.Versioning.ErrorCodes;
     using static System.StringComparer;
-    using static Versioning.ErrorCodes;
 
     /// <summary>
     /// Represents the logic for selecting a versioned controller.

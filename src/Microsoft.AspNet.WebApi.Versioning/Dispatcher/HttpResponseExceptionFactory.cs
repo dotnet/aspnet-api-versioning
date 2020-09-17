@@ -8,10 +8,10 @@
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
     using System.Web.Http.Tracing;
-    using static ApiVersion;
+    using static Microsoft.Web.Http.ApiVersion;
+    using static Microsoft.Web.Http.Versioning.ErrorCodes;
     using static System.Net.HttpStatusCode;
     using static System.String;
-    using static Versioning.ErrorCodes;
 
     sealed class HttpResponseExceptionFactory
     {

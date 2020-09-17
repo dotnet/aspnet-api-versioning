@@ -4,6 +4,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Represents an object that manages the collection of registered OData routes.
@@ -45,7 +46,7 @@
 
             public int IndexOf( ODataRouteMapping item ) => items.IndexOf( item );
 
-            public bool TryGetValue( ApiVersion key, out IReadOnlyList<ODataRouteMapping>? value )
+            public bool TryGetValue( ApiVersion key, [NotNullWhen( true )] out IReadOnlyList<ODataRouteMapping>? value )
             {
                 if ( dictionary.TryGetValue( key, out var list ) )
                 {

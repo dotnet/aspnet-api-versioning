@@ -220,6 +220,11 @@
                 throw new ArgumentNullException( nameof( builder ) );
             }
 
+            if ( IsNullOrEmpty( routeName ) )
+            {
+                throw new ArgumentNullException( nameof( routeName ) );
+            }
+
             if ( models == null )
             {
                 throw new ArgumentNullException( nameof( models ) );
@@ -249,8 +254,8 @@
 
                 IEnumerable<IODataRoutingConvention> NewRouteConventions( IServiceProvider services )
                 {
-                    var conventions = new IODataRoutingConvention[routeConventions.Count + 1];
-                    conventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName, serviceProvider, apiVersion );
+                    var conventions = new IODataRoutingConvention[routeConventions!.Count + 1];
+                    conventions[0] = new VersionedAttributeRoutingConvention( versionedRouteName!, serviceProvider!, apiVersion! );
                     routeConventions.CopyTo( conventions, 1 );
                     return conventions;
                 }
