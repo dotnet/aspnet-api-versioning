@@ -61,17 +61,16 @@
         }
 
         [Fact]
-        public async Task then_get_returns_400_or_405_with_invalid_id()
+        public async Task then_get_returns_400_with_invalid_id()
         {
             // arrange
             var requestUrl = "api/values/abc?api-version=2.0";
-            var statusCode = UsingEndpointRouting ? NotFound : BadRequest;
 
             // act
             var response = await GetAsync( requestUrl );
 
             // assert
-            response.StatusCode.Should().Be( statusCode );
+            response.StatusCode.Should().Be( BadRequest );
         }
 
         [Theory]
