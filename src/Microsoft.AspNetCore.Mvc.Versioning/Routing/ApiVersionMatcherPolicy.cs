@@ -95,33 +95,28 @@
                 httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
             }
 
-            var finalMatches = EvaluateApiVersion( candidates, apiVersion );
-
-            if ( finalMatches.Count == 0 )
+            if ( !MatchesApiVersion( candidates, apiVersion ) )
             {
                 httpContext.SetEndpoint( ClientError( httpContext, candidates ) );
-            }
-            else
-            {
-                for ( var i = 0; i < finalMatches.Count; i++ )
-                {
-                    var (index, _, valid) = finalMatches[i];
-                    candidates.SetValidity( index, valid );
-                }
             }
 
             return CompletedTask;
         }
 
-        static IReadOnlyList<(int Index, ActionDescriptor Action, bool Valid)> EvaluateApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
+        static bool MatchesApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
         {
-            var bestMatches = new List<(int Index, ActionDescriptor Action, bool)>();
-            var implicitMatches = new List<(int, ActionDescriptor, bool)>();
+            var bestMatches = new List<int>();
+            var implicitMatches = new List<int>();
 
             for ( var i = 0; i < candidates.Count; i++ )
             {
+                if ( !candidates.IsValidCandidate( i ) )
+                {
+                    continue;
+                }
+
                 ref var candidate = ref candidates[i];
-                var action = candidate.Endpoint.Metadata?.GetMetadata<ActionDescriptor>();
+                var action = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>();
 
                 if ( action == null )
                 {
@@ -134,10 +129,10 @@
                 switch ( action.MappingTo( apiVersion ) )
                 {
                     case Explicit:
-                        bestMatches.Add( (i, action, candidates.IsValidCandidate( i )) );
+                        bestMatches.Add( i );
                         break;
                     case Implicit:
-                        implicitMatches.Add( (i, action, candidates.IsValidCandidate( i )) );
+                        implicitMatches.Add( i );
                         break;
                 }
 
@@ -149,20 +144,39 @@
             switch ( bestMatches.Count )
             {
                 case 0:
-                    bestMatches.AddRange( implicitMatches );
-                    break;
+                    if ( implicitMatches.Count == 0 )
+                    {
+                        return false;
+                    }
+
+                    for ( var i = 0; i < implicitMatches.Count; i++ )
+                    {
+                        candidates.SetValidity( implicitMatches[i], true );
+                    }
+
+                    return true;
                 case 1:
-                    var model = bestMatches[0].Action.GetApiVersionModel();
+                    ref var candidate = ref candidates[bestMatches[0]];
+                    var action = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>();
+                    var model = action.GetApiVersionModel();
 
                     if ( model.IsApiVersionNeutral )
                     {
-                        bestMatches.AddRange( implicitMatches );
+                        for ( var i = 0; i < implicitMatches.Count; i++ )
+                        {
+                            candidates.SetValidity( implicitMatches[i], true );
+                        }
                     }
 
                     break;
             }
 
-            return bestMatches.ToArray();
+            for ( var i = 0; i < bestMatches.Count; i++ )
+            {
+                candidates.SetValidity( bestMatches[i], true );
+            }
+
+            return true;
         }
 
         bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, out ApiVersion? apiVersion )
@@ -195,8 +209,13 @@
 
             for ( var i = 0; i < candidates.Count; i++ )
             {
+                if ( !candidates.IsValidCandidate( i ) )
+                {
+                    continue;
+                }
+
                 ref var candidate = ref candidates[i];
-                var model = candidate.Endpoint.Metadata?.GetMetadata<ActionDescriptor>()?.GetApiVersionModel();
+                var model = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>()?.GetApiVersionModel();
 
                 if ( model != null )
                 {
