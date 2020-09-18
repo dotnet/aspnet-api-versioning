@@ -127,7 +127,13 @@
                 routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             }
 
-            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, unversionedConstraints, inlineConstraintResolver );
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch(
+                routeName,
+                routePrefix,
+                unversionedConstraints,
+                inlineConstraintResolver,
+                builder.ConfigureDefaultServices( container => configureAction?.Invoke( container ) ) );
+
             NotifyRoutesMapped();
 
             return odataRoutes;
@@ -278,7 +284,13 @@
                 routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
             }
 
-            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, unversionedConstraints, inlineConstraintResolver );
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch(
+                routeName,
+                routePrefix,
+                unversionedConstraints,
+                inlineConstraintResolver,
+                builder.ConfigureDefaultServices( _ => { } ) );
+
             NotifyRoutesMapped();
 
             return odataRoutes;
@@ -340,13 +352,13 @@
             var routeCollection = builder.ServiceProvider.GetRequiredService<IODataRouteCollectionProvider>();
             var perRouteContainer = builder.ServiceProvider.GetRequiredService<IPerRouteContainer>();
             var inlineConstraintResolver = builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
-            var preConfigureAction = builder.ConfigureDefaultServices(
+            var perConfigureAction = builder.ConfigureDefaultServices(
                 container =>
                 {
                     container.AddService( Singleton, typeof( IEnumerable<IODataRoutingConvention> ), NewRoutingConventions );
                     configureAction?.Invoke( container );
                 } );
-            var rootContainer = perRouteContainer.CreateODataRootContainer( routeName, preConfigureAction );
+            var rootContainer = perRouteContainer.CreateODataRootContainer( routeName, perConfigureAction );
             var router = rootContainer.GetService<IRouter>() ?? builder.DefaultHandler;
 
             builder.ConfigurePathHandler( rootContainer );
@@ -357,7 +369,7 @@
             builder.ConfigureBatchHandler( rootContainer, route );
             builder.Routes.Add( route );
             routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
-            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver );
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver, perConfigureAction );
             NotifyRoutesMapped();
 
             return route;
@@ -484,7 +496,7 @@
             builder.ConfigureBatchHandler( rootContainer, route );
             builder.Routes.Add( route );
             routeCollection.Add( new ODataRouteMapping( route, apiVersion, rootContainer ) );
-            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver );
+            builder.AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch( routeName, routePrefix, apiVersion, inlineConstraintResolver, configureAction );
             NotifyRoutesMapped();
 
             return route;
@@ -552,7 +564,8 @@
             string routeName,
             string routePrefix,
             IEnumerable<IRouteConstraint> unversionedConstraints,
-            IInlineConstraintResolver inlineConstraintResolver )
+            IInlineConstraintResolver inlineConstraintResolver,
+            Action<IContainerBuilder> configureAction )
         {
             routeName += UnversionedRouteSuffix;
 
@@ -560,6 +573,7 @@
             var route = new ODataRoute( builder.DefaultHandler, routeName, routePrefix, constraint, inlineConstraintResolver );
 
             builder.Routes.Add( route );
+            builder.ServiceProvider.GetRequiredService<IPerRouteContainer>().CreateODataRootContainer( routeName, configureAction );
         }
 
         static void AddRouteToRespondWithBadRequestWhenAtLeastOneRouteCouldMatch(
@@ -567,7 +581,8 @@
             string routeName,
             string routePrefix,
             ApiVersion apiVersion,
-            IInlineConstraintResolver inlineConstraintResolver )
+            IInlineConstraintResolver inlineConstraintResolver,
+            Action<IContainerBuilder> configureAction )
         {
             routeName += UnversionedRouteSuffix;
 
@@ -576,6 +591,7 @@
             var route = new ODataRoute( builder.DefaultHandler, routeName, routePrefix, constraint, inlineConstraintResolver );
 
             builder.Routes.Add( route );
+            builder.ServiceProvider.GetRequiredService<IPerRouteContainer>().CreateODataRootContainer( routeName, configureAction );
         }
 
         static IRouteConstraint MakeVersionedODataRouteConstraint( ApiVersion apiVersion, ref string versionedRouteName )

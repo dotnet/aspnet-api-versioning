@@ -66,6 +66,9 @@
                 return false;
             }
 
+            // delete the request container because ODataPathRouteConstraint will try to create it resulting in an exception
+            // ODataPathRouteConstraint cleans itself up afterward
+            // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNetCore.OData/Routing/ODataPathRouteConstraint.cs#L53
             httpContext.Request.DeleteRequestContainer( true );
 
             // by evaluating the remaining unversioned constraints, this will ultimately determine whether 400 or 404
