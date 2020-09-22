@@ -21,6 +21,8 @@
             // arrange
             var services = new ServiceCollection();
 
+            services.AddMvcCore();
+
             // act
             services.AddApiVersioning();
 
@@ -46,6 +48,8 @@
         {
             // arrange
             var services = new ServiceCollection();
+
+            services.AddMvcCore();
 
             // act
             services.AddApiVersioning(

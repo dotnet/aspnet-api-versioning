@@ -47,6 +47,7 @@
 
             var properties = request.ApiVersionProperties();
 
+            properties.RouteParameter = parameterName;
             properties.RawRequestedApiVersion = value;
 
             if ( TryParse( value, out var requestedVersion ) )

@@ -79,6 +79,7 @@
 
                 if ( conventionRouteResult.Succeeded )
                 {
+                    EnsureUrlHelper( request );
                     return request.ApiVersionProperties().SelectedController = conventionRouteResult.Controller;
                 }
 
@@ -90,6 +91,7 @@
 
             if ( directRouteResult.Succeeded )
             {
+                EnsureUrlHelper( request );
                 return request.ApiVersionProperties().SelectedController = directRouteResult.Controller;
             }
 
@@ -97,6 +99,7 @@
 
             if ( conventionRouteResult.Succeeded )
             {
+                EnsureUrlHelper( request );
                 return request.ApiVersionProperties().SelectedController = conventionRouteResult.Controller;
             }
 
@@ -291,6 +294,23 @@
             {
                 var response = request.GetApiVersioningOptions().ErrorResponses;
                 throw new HttpResponseException( response.BadRequest( request, AmbiguousApiVersion, ex.Message ) );
+            }
+        }
+
+        static void EnsureUrlHelper( HttpRequestMessage request )
+        {
+            var context = request.GetRequestContext();
+
+            if ( context == null || context.Url is ApiVersionUrlHelper )
+            {
+                return;
+            }
+
+            var options = request.GetApiVersioningOptions();
+
+            if ( options.ApiVersionReader.VersionsByUrlSegment() )
+            {
+                context.Url = new ApiVersionUrlHelper( context.Url );
             }
         }
     }

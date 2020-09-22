@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
+    using Microsoft.AspNetCore.Mvc.Routing;
     using System;
 
     /// <summary>
@@ -8,6 +9,14 @@
     [CLSCompliant( false )]
     public interface IApiVersioningFeature
     {
+        /// <summary>
+        /// Gets or sets the name of the route parameter containing the API Version value.
+        /// </summary>
+        /// <value>The name of the API version route parameter or <c>null</c>.</value>
+        /// <remarks>This property will be <c>null</c> unless versioning by URL segment and the incoming request
+        /// matches the <see cref="ApiVersionRouteConstraint">API version route constraint</see>.</remarks>
+        string? RouteParameter { get; set; }
+
         /// <summary>
         /// Gets or sets the raw, unparsed API version for the current request.
         /// </summary>

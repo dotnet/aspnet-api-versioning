@@ -14,10 +14,10 @@
 
         // GET api/v{version}/helloworld/{id}
         [HttpGet( "{id:int}" )]
-        public IActionResult Get( int id, ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Id = id, Version = apiVersion.ToString() } );
+        public IActionResult Get( int id, ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Id = id } );
 
         // POST api/v{version}/helloworld
         [HttpPost]
-        public IActionResult Post( ApiVersion apiVersion ) => CreatedAtAction( nameof( Get ), new { id = 42, version = apiVersion.ToString() }, null );
+        public IActionResult Post( ApiVersion apiVersion ) => CreatedAtAction( nameof( Get ), new { id = 42 }, null );
     }
 }

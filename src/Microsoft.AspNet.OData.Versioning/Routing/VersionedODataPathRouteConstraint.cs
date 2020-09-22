@@ -82,13 +82,7 @@
                 return false;
             }
 
-            if ( ApiVersion == requestedVersion )
-            {
-                DecorateUrlHelperWithApiVersionRouteValueIfNecessary( request, values );
-                return true;
-            }
-
-            return false;
+            return ApiVersion == requestedVersion;
         }
 
         static ApiVersion? GetRequestedApiVersionOrReturnBadRequest( HttpRequestMessage request )
@@ -103,34 +97,6 @@
             {
                 var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
                 throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
-            }
-        }
-
-        static void DecorateUrlHelperWithApiVersionRouteValueIfNecessary( HttpRequestMessage request, IDictionary<string, object> values )
-        {
-            object apiVersion;
-            string routeConstraintName;
-            var configuration = request.GetConfiguration();
-
-            if ( configuration == null )
-            {
-                routeConstraintName = nameof( apiVersion );
-            }
-            else
-            {
-                routeConstraintName = configuration.GetApiVersioningOptions().RouteConstraintName;
-            }
-
-            if ( !values.TryGetValue( routeConstraintName, out apiVersion ) )
-            {
-                return;
-            }
-
-            var requestContext = request.GetRequestContext();
-
-            if ( !( requestContext.Url is VersionedUrlHelperDecorator ) )
-            {
-                requestContext.Url = new VersionedUrlHelperDecorator( requestContext.Url, routeConstraintName, apiVersion );
             }
         }
     }

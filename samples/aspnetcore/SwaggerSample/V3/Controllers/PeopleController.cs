@@ -91,7 +91,7 @@
         public IActionResult Post( [FromBody] Person person, ApiVersion apiVersion )
         {
             person.Id = 42;
-            return CreatedAtAction( nameof( Get ), new { id = person.Id, version = apiVersion.ToString() }, person );
+            return CreatedAtAction( nameof( Get ), new { id = person.Id }, person );
         }
     }
 }
