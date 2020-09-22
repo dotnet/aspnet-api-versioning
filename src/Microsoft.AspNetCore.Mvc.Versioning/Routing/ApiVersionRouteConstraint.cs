@@ -52,6 +52,7 @@
 
             var feature = httpContext.Features.Get<IApiVersioningFeature>();
 
+            feature.RouteParameter = routeKey;
             feature.RawRequestedApiVersion = value;
 
             if ( TryParse( value, out var requestedVersion ) )

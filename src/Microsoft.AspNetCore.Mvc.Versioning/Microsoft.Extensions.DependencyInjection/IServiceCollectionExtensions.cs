@@ -11,6 +11,7 @@
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
     using System;
+    using System.Linq;
     using static ServiceDescriptor;
 
     /// <summary>
@@ -66,6 +67,7 @@
             services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
             services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
             services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
+            services.Replace( WithUrlHelperFactoryDecorator( services ) );
         }
 
         static IReportApiVersions OnRequestIReportApiVersions( IServiceProvider serviceProvider )
@@ -78,6 +80,40 @@
             }
 
             return new DoNotReportApiVersions();
+        }
+
+        static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
+        {
+            if ( descriptor.ImplementationInstance != null )
+            {
+                return descriptor.ImplementationInstance;
+            }
+
+            if ( descriptor.ImplementationFactory != null )
+            {
+                return descriptor.ImplementationFactory( services );
+            }
+
+            return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType );
+        }
+
+        static ServiceDescriptor WithUrlHelperFactoryDecorator( IServiceCollection services )
+        {
+            var descriptor = services.First( sd => sd.ServiceType == typeof( IUrlHelperFactory ) );
+            var factory = ActivatorUtilities.CreateFactory( typeof( ApiVersionUrlHelperFactory ), new[] { typeof( IUrlHelperFactory ) } );
+
+            IUrlHelperFactory NewFactory( IServiceProvider serviceProvider )
+            {
+                var decorated = serviceProvider.CreateInstance( descriptor! );
+                var options = serviceProvider.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+                var instance = options.ApiVersionReader.VersionsByUrlSegment() ?
+                    factory( serviceProvider, new[] { decorated } ) :
+                    decorated;
+
+                return (IUrlHelperFactory) instance;
+            }
+
+            return Describe( typeof( IUrlHelperFactory ), NewFactory, descriptor.Lifetime );
         }
     }
 }

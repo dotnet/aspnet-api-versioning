@@ -11,21 +11,38 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
     internal static class IApiVersionReaderExtensions
     {
+        internal static bool VersionsByUrlSegment( this IApiVersionReader reader )
+        {
+            var context = new UrlSegmentDescriptionContext();
+            reader.AddParameters( context );
+            return context.HasPathApiVersion;
+        }
+
         internal static bool VersionsByMediaType( this IApiVersionReader reader )
         {
-            var context = new DescriptionContext();
+            var context = new MediaTypeDescriptionContext();
             reader.AddParameters( context );
             return context.HasMediaTypeApiVersion;
         }
 
         internal static string GetMediaTypeVersionParameter( this IApiVersionReader reader )
         {
-            var context = new DescriptionContext();
+            var context = new MediaTypeDescriptionContext();
             reader.AddParameters( context );
             return context.ParameterName;
         }
 
-        sealed class DescriptionContext : IApiVersionParameterDescriptionContext
+        sealed class UrlSegmentDescriptionContext : IApiVersionParameterDescriptionContext
+        {
+            internal bool HasPathApiVersion { get; private set; }
+
+            public void AddParameter( string name, ApiVersionParameterLocation location )
+            {
+                HasPathApiVersion |= location == Path;
+            }
+        }
+
+        sealed class MediaTypeDescriptionContext : IApiVersionParameterDescriptionContext
         {
             readonly StringComparer comparer = StringComparer.OrdinalIgnoreCase;
             readonly List<string> parameterNames = new List<string>();

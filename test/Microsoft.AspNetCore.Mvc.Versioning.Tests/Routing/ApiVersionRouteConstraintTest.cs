@@ -3,11 +3,11 @@
     using AspNetCore.Routing;
     using Builder;
     using Extensions.DependencyInjection;
-    using Extensions.ObjectPool;
     using FluentAssertions;
     using Http;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.ObjectPool;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -104,24 +104,39 @@
         public void url_helper_should_create_route_link_with_api_version_constraint()
         {
             // arrange
-            var services = CreateServices().AddApiVersioning();
-            var provider = services.BuildServiceProvider();
-            var httpContext = new DefaultHttpContext() { RequestServices = provider };
-            var routeBuilder = CreateRouteBuilder( provider );
-            var actionContext = new ActionContext() { HttpContext = httpContext };
-
-            httpContext.Features.Set<IApiVersioningFeature>( new ApiVersioningFeature( httpContext ) );
-            routeBuilder.MapRoute( "default", "v{version:apiVersion}/{controller}/{action}" );
-            actionContext.RouteData = new RouteData();
-            actionContext.RouteData.Routers.Add( routeBuilder.Build() );
-
-            var urlHelper = new UrlHelper( actionContext );
+            var urlHelper = NewUrlHelper(controller: "Store", action: "Buy", version: "1" );
 
             // act
-            var url = urlHelper.Link( "default", new { version = "1", controller = "Store", action = "Buy" } );
+            var url = urlHelper.Link( "default", default );
 
             // assert
             url.Should().Be( "/v1/Store/Buy" );
+        }
+
+        [Fact]
+        public void url_helper_should_create_route_url_with_api_version_constraint()
+        {
+            // arrange
+            var urlHelper = NewUrlHelper( controller: "Movie", action: "Rate", version: "2" );
+
+            // act
+            var url = urlHelper.RouteUrl( "default" );
+
+            // assert
+            url.Should().Be( "/v2/Movie/Rate" );
+        }
+
+        [Fact]
+        public void url_helper_should_create_action_with_api_version_constraint()
+        {
+            // arrange
+            var urlHelper = NewUrlHelper( controller: "Order", action: "Place", version: "1.1" );
+
+            // act
+            var url = urlHelper.Action( action: "Place", controller: "Order" );
+
+            // assert
+            url.Should().Be( "/v1.1/Order/Place" );
         }
 
         class PassThroughRouter : IRouter
@@ -147,7 +162,14 @@
             return httpContext.Object;
         }
 
-        static ServiceCollection CreateServices()
+        static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
+        {
+            var app = new Mock<IApplicationBuilder>();
+            app.SetupGet( a => a.ApplicationServices ).Returns( services );
+            return new RouteBuilder( app.Object ) { DefaultHandler = new PassThroughRouter() };
+        }
+
+        static IUrlHelper NewUrlHelper(string controller, string action, string version)
         {
             var services = new ServiceCollection();
 
@@ -156,15 +178,39 @@
             services.AddRouting();
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>()
                     .AddSingleton( UrlEncoder.Default );
+            services.AddMvcCore();
+            services.AddApiVersioning();
 
-            return services;
-        }
+            var provider = services.BuildServiceProvider();
+            var httpContext = new DefaultHttpContext() { RequestServices = provider };
+            var routeBuilder = CreateRouteBuilder( provider );
+            var actionContext = new ActionContext() { HttpContext = httpContext };
+            var constraint = new ApiVersionRouteConstraint();
 
-        static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
-        {
-            var app = new Mock<IApplicationBuilder>();
-            app.SetupGet( a => a.ApplicationServices ).Returns( services );
-            return new RouteBuilder( app.Object ) { DefaultHandler = new PassThroughRouter() };
+            httpContext.Features.Set<IApiVersioningFeature>( new ApiVersioningFeature( httpContext ) );
+            routeBuilder.MapRoute( "default", "v{version:apiVersion}/{controller}/{action}" );
+
+            var router = routeBuilder.Build();
+
+            actionContext.RouteData = new RouteData()
+            {
+                Values =
+                {
+                    [nameof(controller)] = controller,
+                    [nameof(action)] = action,
+                    [nameof(version)] = version,
+                },
+                Routers =
+                {
+                    router,
+                }
+            };
+            actionContext.RouteData.Routers.Add( router );
+            constraint.Match( httpContext, router, nameof( version ), actionContext.RouteData.Values, IncomingRequest );
+
+            var factory = provider.GetRequiredService<IUrlHelperFactory>();
+            
+            return factory.GetUrlHelper( actionContext );
         }
     }
 }
