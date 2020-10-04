@@ -48,7 +48,7 @@
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [ResponseType( typeof( Order ) )]
         [EnableQuery( AllowedQueryOptions = Select )]
         public SingleResult<Order> Get( int key ) => SingleResult.Create( new[] { new Order() { Id = key, Customer = "John Doe" } }.AsQueryable() );
@@ -84,7 +84,7 @@
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpPatch]
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [ResponseType( typeof( Order ) )]
         public IHttpActionResult Patch( int key, Delta<Order> delta )
         {
@@ -120,7 +120,7 @@
         /// <returns>None</returns>
         /// <response code="204">The order was successfully rated.</response>
         [HttpPost]
-        [ODataRoute( "({key})/Rate" )]
+        [ODataRoute( "{key}/Rate" )]
         public IHttpActionResult Rate( int key, ODataActionParameters parameters )
         {
             if ( !ModelState.IsValid )
@@ -140,7 +140,7 @@
         /// <response code="200">The line items were successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({key})/LineItems" )]
+        [ODataRoute( "{key}/LineItems" )]
         [ResponseType( typeof( ODataValue<IEnumerable<LineItem>> ) )]
         [EnableQuery( AllowedQueryOptions = Select )]
         public IHttpActionResult LineItems( int key )

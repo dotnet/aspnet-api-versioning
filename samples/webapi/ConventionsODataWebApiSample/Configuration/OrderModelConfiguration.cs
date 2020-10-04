@@ -17,8 +17,13 @@
             return order;
         }
 
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
         {
+            if ( routePrefix != "api/v{apiVersion}" )
+            {
+                return;
+            }
+
             // note: the EDM for orders is only available in version 1.0
             if ( apiVersion == V1 )
             {

@@ -24,7 +24,7 @@
             return person;
         }
 
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
         {
             switch ( apiVersion.MajorVersion )
             {

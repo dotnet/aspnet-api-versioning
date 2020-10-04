@@ -126,6 +126,25 @@
         public SingleResult<Supplier> GetSupplier( [FromODataUri] int key ) => SingleResult.Create( products.Where( p => p.Id == key ).Select( p => p.Supplier ) );
 
         /// <summary>
+        /// Rates a product.
+        /// </summary>
+        /// <param name="key">The requested product identifier.</param>
+        /// <param name="parameters">The action parameters.</param>
+        /// <returns>None</returns>
+        /// <response code="204">The product was successfully rated.</response>
+        [HttpPost]
+        public IHttpActionResult Rate( int key, ODataActionParameters parameters )
+        {
+            if ( !ModelState.IsValid )
+            {
+                return BadRequest( ModelState );
+            }
+
+            var stars = (int) parameters["stars"];
+            return StatusCode( NoContent );
+        }
+
+        /// <summary>
         /// Gets the link to the associated supplier, if any.
         /// </summary>
         /// <param name="key">The product identifier.</param>

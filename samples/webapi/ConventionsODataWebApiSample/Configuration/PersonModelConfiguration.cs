@@ -24,8 +24,13 @@
             return person;
         }
 
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
         {
+            if ( routePrefix != "api" )
+            {
+                return;
+            }
+
             switch ( apiVersion.MajorVersion )
             {
                 case 1:
