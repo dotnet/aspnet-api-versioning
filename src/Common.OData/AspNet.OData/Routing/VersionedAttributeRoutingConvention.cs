@@ -6,10 +6,12 @@
     using Microsoft.AspNetCore.Mvc.Controllers;
 #endif
     using Microsoft.OData;
+    using Microsoft.OData.UriParser;
 #if WEBAPI
     using Microsoft.Web.Http;
 #endif
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using static System.StringComparison;
 #if WEBAPI
@@ -21,20 +23,20 @@
     /// </summary>
     public partial class VersionedAttributeRoutingConvention
     {
-        readonly string routeName;
-        IDictionary<ODataPathTemplate, ControllerActionDescriptor>? attributeMappings;
+        readonly ConcurrentDictionary<ApiVersion, IReadOnlyDictionary<ODataPathTemplate, ControllerActionDescriptor>> attributeMappingsPerApiVersion =
+            new ConcurrentDictionary<ApiVersion, IReadOnlyDictionary<ODataPathTemplate, ControllerActionDescriptor>>();
+
+        /// <summary>
+        /// Gets the name of the route associated the routing convention.
+        /// </summary>
+        /// <value>The name of the associated route.</value>
+        public string RouteName { get; }
 
         /// <summary>
         /// Gets the <see cref="IODataPathTemplateHandler"/> to be used for parsing the route templates.
         /// </summary>
         /// <value>The <see cref="IODataPathTemplateHandler"/> to be used for parsing the route templates.</value>
         public IODataPathTemplateHandler ODataPathTemplateHandler { get; }
-
-        /// <summary>
-        /// Gets the API version associated with the route convention.
-        /// </summary>
-        /// <value>The associated <see cref="ApiVersion">API version</see>.</value>
-        public ApiVersion ApiVersion { get; }
 
         static IEnumerable<string> GetODataRoutePrefixes( IEnumerable<ODataRoutePrefixAttribute> prefixAttributes, string controllerName )
         {
@@ -79,7 +81,7 @@
             return routeDatum.Key.StartsWith( ParameterValuePrefix, Ordinal ) && routeDatum.Value?.GetType().Name == ODataParameterValue;
         }
 
-        ODataPathTemplate GetODataPathTemplate( string prefix, string pathTemplate, IServiceProvider serviceProvider, string controllerName, string actionName )
+        ODataPathTemplate? GetODataPathTemplate( string prefix, string pathTemplate, IServiceProvider serviceProvider )
         {
             if ( prefix != null && !pathTemplate.StartsWith( "/", Ordinal ) )
             {
@@ -102,14 +104,7 @@
                 pathTemplate = pathTemplate.Substring( 1 );
             }
 
-            try
-            {
-                return ODataPathTemplateHandler.ParseTemplate( pathTemplate, serviceProvider );
-            }
-            catch ( ODataException e )
-            {
-                throw new InvalidOperationException( SR.InvalidODataRouteOnAction.FormatDefault( pathTemplate, actionName, controllerName, e.Message ) );
-            }
+            return ODataPathTemplateHandler.SafeParseTemplate( pathTemplate, serviceProvider );
         }
     }
 }

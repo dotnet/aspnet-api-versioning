@@ -44,8 +44,8 @@
             var modelBuilder = routeBuilder.ServiceProvider.GetRequiredService<VersionedODataModelBuilder>();
             var models = modelBuilder.GetEdmModels();
 
-            routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
-            routeBuilder.MapVersionedODataRoutes( "odata-bypath", "v{version:apiVersion}", models );
+            routeBuilder.MapVersionedODataRoute( "odata", "api", models );
+            routeBuilder.MapVersionedODataRoute( "odata-bypath", "v{version:apiVersion}", models );
         }
     }
 }

@@ -3,9 +3,7 @@
     using Microsoft.AspNet.OData.Basic.Controllers;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Configuration;
-    using Microsoft.OData.UriParser;
     using System.Web.Http;
-    using static Microsoft.OData.ServiceLifetime;
 
     public class BasicFixture : ODataFixture
     {
@@ -29,8 +27,8 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver ) );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver ) );
+            Configuration.MapVersionedODataRoute( "odata", "api", models );
+            Configuration.MapVersionedODataRoute( "odata-bypath", "v{apiVersion}", models );
             Configuration.EnsureInitialized();
         }
     }

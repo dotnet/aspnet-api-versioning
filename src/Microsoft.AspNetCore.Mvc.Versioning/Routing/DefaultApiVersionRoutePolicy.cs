@@ -142,7 +142,7 @@
                 handler = builder.Build();
             }
 
-            context.Handler = handler!;
+            context.SetHandlerOrEndpoint( handler );
         }
 
         /// <summary>

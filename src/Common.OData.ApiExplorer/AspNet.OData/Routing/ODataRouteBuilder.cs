@@ -73,7 +73,7 @@
 
         void AppendRoutePrefix( IList<string> segments )
         {
-            var prefix = Context.Route.RoutePrefix?.Trim( '/' );
+            var prefix = Context.RoutePrefix;
 
             if ( IsNullOrEmpty( prefix ) )
             {

@@ -21,17 +21,15 @@
         {
             // arrange
             var request = new HttpRequestMessage( new HttpMethod( "OPTIONS" ), "http://localhost/$metadata" );
-            var response = default( HttpResponseMessage );
             var hostBuilder = new WebHostBuilder().UseStartup<ODataStartup>();
 
-            using ( var server = new TestServer( hostBuilder ) )
-            using ( var client = server.CreateClient() )
-            {
-                client.BaseAddress = new Uri( "http://localhost" );
+            using var server = new TestServer( hostBuilder );
+            using var client = server.CreateClient();
 
-                // act
-                response = ( await client.SendAsync( request ) ).EnsureSuccessStatusCode();
-            }
+            client.BaseAddress = new Uri( "http://localhost" );
+
+            // act
+            var response = ( await client.SendAsync( request ) ).EnsureSuccessStatusCode();
 
             // assert
             response.Headers.GetValues( "OData-Version" ).Single().Should().Be( "4.0" );
@@ -60,7 +58,7 @@
 
             public void Configure( IApplicationBuilder app, VersionedODataModelBuilder builder )
             {
-                app.UseMvc( r => r.MapVersionedODataRoutes( "odata", null, builder.GetEdmModels() ) );
+                app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, builder ) );
             }
         }
     }

@@ -13,7 +13,7 @@
     {
         [Theory]
         [InlineData( "api/orders?api-version=1.0" )]
-        [InlineData( "api/orders(42)?api-version=1.0" )]
+        [InlineData( "api/orders/42?api-version=1.0" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange

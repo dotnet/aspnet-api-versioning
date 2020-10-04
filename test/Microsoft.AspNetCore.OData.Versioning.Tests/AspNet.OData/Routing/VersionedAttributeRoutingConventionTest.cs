@@ -16,6 +16,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
+    using Microsoft.Extensions.Primitives;
     using Microsoft.Simulators;
     using Moq;
     using System;
@@ -34,9 +35,9 @@
         public void select_action_should_return_true_for_versionX2Dneutral_controller()
         {
             // arrange
-            var routeContext = NewRouteContext( "http://localhost/NeutralTests(1)", typeof( VersionNeutralController ) );
+            var routeContext = NewRouteContext( "http://localhost/NeutralTests/1", typeof( VersionNeutralController ) );
             var serviceProvider = routeContext.HttpContext.RequestServices;
-            var convention = NewRoutingConvention( serviceProvider, new ApiVersion( 1, 0 ) );
+            var convention = new VersionedAttributeRoutingConvention( "odata", serviceProvider );
 
             // act
             var result = convention.SelectAction( routeContext );
@@ -51,9 +52,10 @@
         public void select_action_should_return_expected_result_for_controller_version( int majorVersion, string expected )
         {
             // arrange
-            var routeContext = NewRouteContext( "http://localhost/Tests(1)?api-version=1.0", typeof( TestsController ) );
+            var apiVersion = majorVersion + ".0";
+            var routeContext = NewRouteContext( $"http://localhost/Tests(1)?api-version={apiVersion}", typeof( TestsController ), apiVersion );
             var serviceProvider = routeContext.HttpContext.RequestServices;
-            var convention = NewRoutingConvention( serviceProvider, new ApiVersion( majorVersion, 0 ) );
+            var convention = new VersionedAttributeRoutingConvention( "odata", serviceProvider );
 
             // act
             var actionName = convention.SelectAction( routeContext )?.SingleOrDefault()?.ActionName;
@@ -61,9 +63,6 @@
             // assert
             actionName.Should().Be( expected );
         }
-
-        static VersionedAttributeRoutingConvention NewRoutingConvention( IServiceProvider serviceProvider, ApiVersion apiVersion ) =>
-            new VersionedAttributeRoutingConvention( "odata", serviceProvider, new DefaultODataPathHandler(), apiVersion );
 
         static IActionDescriptorCollectionProvider NewActionDescriptorProvider( MethodInfo method )
         {
@@ -89,15 +88,21 @@
             return provider.Object;
         }
 
-        static RouteContext NewRouteContext( string requestUri, Type controllerType )
+        static RouteContext NewRouteContext( string requestUri, Type controllerType, string apiVersion = default )
         {
             var url = new Uri( requestUri );
+            var store = new Dictionary<string, StringValues>( capacity: 1 );
             var features = new Mock<IFeatureCollection>();
             var odataFeature = Mock.Of<IODataFeature>();
             var entitySet = Test.Model.EntityContainer.FindEntitySet( "Tests" );
             var httpRequest = new Mock<HttpRequest>();
             var httpContext = new Mock<HttpContext>();
             var services = new ServiceCollection();
+
+            if ( !string.IsNullOrEmpty( apiVersion ) )
+            {
+                store["api-version"] = new StringValues( apiVersion );
+            }
 
             services.AddLogging();
             services.Add( Singleton( new DiagnosticListener( "test" ) ) );
@@ -111,18 +116,24 @@
             var modelBuilder = serviceProvider.GetRequiredService<VersionedODataModelBuilder>();
 
             modelBuilder.ModelConfigurations.Add( new TestModelConfiguration() );
-            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, modelBuilder.GetEdmModels().First(), new ApiVersion( 1, 0 ) ) );
+            app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", null, modelBuilder ) );
+
+            var rootContainer = serviceProvider.GetRequiredService<IPerRouteContainer>().GetODataRootContainer( "odata" );
+
             odataFeature.Path = new DefaultODataPathHandler().Parse(
                 url.GetLeftPart( UriPartial.Authority ),
                 url.GetComponents( Path, Unescaped ),
-                serviceProvider.GetRequiredService<IPerRouteContainer>().GetODataRootContainer( "odata" ) );
+                rootContainer );
             odataFeature.RoutingConventionsStore = new Dictionary<string, object>();
+            odataFeature.RequestContainer = rootContainer;
             features.SetupGet( f => f[typeof( IODataFeature )] ).Returns( odataFeature );
             features.Setup( f => f.Get<IODataFeature>() ).Returns( odataFeature );
+            features.Setup( f => f.Get<IApiVersioningFeature>() ).Returns( () => new ApiVersioningFeature( httpContext.Object ) );
             httpContext.SetupGet( c => c.Features ).Returns( features.Object );
             httpContext.SetupProperty( c => c.RequestServices, serviceProvider );
             httpContext.SetupGet( c => c.Request ).Returns( () => httpRequest.Object );
             httpRequest.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
+            httpRequest.SetupProperty( r => r.Query, new QueryCollection( store ) );
             httpRequest.SetupProperty( r => r.Method, "GET" );
             httpRequest.SetupProperty( r => r.Protocol, url.Scheme );
             httpRequest.SetupProperty( r => r.Host, new HostString( url.Host ) );

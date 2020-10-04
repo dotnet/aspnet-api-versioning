@@ -19,8 +19,11 @@
         public async Task options_should_return_expected_headers()
         {
             // arrange
-            var configuration = new HttpConfiguration();
-            var builder = new VersionedODataModelBuilder( configuration );
+            var configuration = new HttpConfiguration() { IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always };
+            var builder = new VersionedODataModelBuilder( configuration )
+            {
+                DefaultModelConfiguration = (b, v, r) => b.EntitySet<TestEntity>( "Tests" ),
+            };
             var metadata = new VersionedMetadataController() { Configuration = configuration };
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
             var controllerTypes = new List<Type>() { typeof( Controller1 ), typeof( Controller2 ), typeof( VersionedMetadataController ) };
@@ -31,18 +34,17 @@
 
             var models = builder.GetEdmModels();
             var request = new HttpRequestMessage( new HttpMethod( "OPTIONS" ), "http://localhost/$metadata" );
-            var response = default( HttpResponseMessage );
 
-            configuration.MapVersionedODataRoutes( "odata", null, models );
+            configuration.MapVersionedODataRoute( "odata", null, models );
 
-            using ( var server = new HttpServer( configuration ) )
-            using ( var client = new HttpClient( server ) )
-            {
-                // act
-                response = ( await client.SendAsync( request ) ).EnsureSuccessStatusCode();
-            }
+            using var server = new HttpServer( configuration );
+            using var client = new HttpClient( server );
+
+            // act
+            var response = await client.SendAsync( request );
 
             // assert
+            response.EnsureSuccessStatusCode();
             response.Headers.GetValues( "OData-Version" ).Single().Should().Be( "4.0" );
             response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
             response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Beta" );

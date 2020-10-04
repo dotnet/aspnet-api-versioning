@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.Mvc
 #if WEBAPI
     [Trait( "Framework", "Web API" )]
 #else
-    [Trait( "Framework", "ASP.NET Core" )]
+    [Trait( "Framework", "Core" )]
 #endif
     public abstract partial class AcceptanceTest
     {

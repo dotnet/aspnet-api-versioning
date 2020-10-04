@@ -9,6 +9,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( AgreementsCollection ) )]
     public class when_using_a_query_string : AcceptanceTest
     {
@@ -63,6 +64,7 @@
         public when_using_a_query_string( AgreementsFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( AgreementsEndpointCollection ) )]
     public class when_using_a_query_string_ : when_using_a_query_string
     {

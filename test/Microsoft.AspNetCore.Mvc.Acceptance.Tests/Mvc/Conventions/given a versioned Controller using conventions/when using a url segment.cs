@@ -10,6 +10,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( ConventionsCollection ) )]
     public class when_using_a_url_segment : AcceptanceTest
     {
@@ -58,7 +59,7 @@
 
 
             // act
-            var response = await GetAsync( "api/v4/helloworld" );
+            var response = await GetAsync( "api/v42/helloworld" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -69,6 +70,7 @@
         public when_using_a_url_segment( ConventionsFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( ConventionsEndpointCollection ) )]
     public class when_using_a_url_segment_ : when_using_a_url_segment
     {

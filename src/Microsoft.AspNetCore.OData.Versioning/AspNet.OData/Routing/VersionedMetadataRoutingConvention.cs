@@ -3,10 +3,15 @@
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -31,7 +36,43 @@
                 throw new ArgumentNullException( nameof( odataPath ) );
             }
 
-            return odataPath.PathTemplate == "~" || odataPath.PathTemplate == "~/$metadata" ? "VersionedMetadata" : null;
+            if ( request == null )
+            {
+                throw new ArgumentNullException( nameof( request ) );
+            }
+
+            if ( odataPath.PathTemplate != "~" && odataPath.PathTemplate != "~/$metadata" )
+            {
+                return null;
+            }
+
+            var context = request.HttpContext;
+            var feature = context.Features.Get<IApiVersioningFeature>();
+            string? apiVersion;
+
+            try
+            {
+                apiVersion = feature.RawRequestedApiVersion;
+            }
+            catch ( AmbiguousApiVersionException )
+            {
+                // the appropriate response will be handled by policy
+                return "VersionedMetadata";
+            }
+
+            // the service document and metadata endpoints are special, but they are not neutral. if the client doesn't
+            // specify a version, they may not know to. assume a default version by policy, but it's always allowed.
+            // a client might also send an OPTIONS request to determine which versions are available (ex: tooling)
+            if ( string.IsNullOrEmpty( apiVersion ) )
+            {
+                var modelSelector = request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();
+                var versionSelector = context.RequestServices.GetRequiredService<IApiVersionSelector>();
+                var model = new ApiVersionModel( modelSelector.ApiVersions, Enumerable.Empty<ApiVersion>() );
+
+                feature.RequestedApiVersion = versionSelector.SelectVersion( request, model );
+            }
+
+            return "VersionedMetadata";
         }
 
         /// <summary>
@@ -50,7 +91,6 @@
 
             const IEnumerable<ControllerActionDescriptor>? NoActions = default;
             var httpContext = routeContext.HttpContext;
-            var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
             var odataPath = httpContext.ODataFeature().Path;
             var request = httpContext.Request;
             var controller = SelectController( odataPath, request );
@@ -60,11 +100,12 @@
                 return NoActions;
             }
 
-            var actionDescriptors = actionCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().Where( c => c.ControllerName == controller );
+            var actionCollectionProvider = httpContext.RequestServices.GetRequiredService<IActionDescriptorCollectionProvider>();
+            var actions = actionCollectionProvider.ActionDescriptors.Items;
 
             if ( odataPath.PathTemplate == "~" )
             {
-                return actionDescriptors.Where( a => a.ActionName == nameof( VersionedMetadataController.GetServiceDocument ) );
+                return SelectActions( actions, controller, nameof( VersionedMetadataController.GetServiceDocument ) );
             }
 
             if ( odataPath.PathTemplate != "~/$metadata" )
@@ -76,14 +117,31 @@
 
             if ( method.Equals( "GET", OrdinalIgnoreCase ) )
             {
-                return actionDescriptors.Where( a => a.ActionName == nameof( VersionedMetadataController.GetMetadata ) );
+                return SelectActions( actions, controller, nameof( VersionedMetadataController.GetMetadata ) );
             }
             else if ( method.Equals( "OPTIONS", OrdinalIgnoreCase ) )
             {
-                return actionDescriptors.Where( a => a.ActionName == nameof( VersionedMetadataController.GetOptions ) );
+                return SelectActions( actions, controller, nameof( VersionedMetadataController.GetOptions ) );
             }
 
             return NoActions;
+        }
+
+        static IEnumerable<ControllerActionDescriptor> SelectActions(
+            IReadOnlyList<ActionDescriptor> actions,
+            string controllerName,
+            string actionName )
+        {
+            for ( var i = 0; i < actions.Count; i++ )
+            {
+                if ( actions[i] is ControllerActionDescriptor action )
+                {
+                    if ( action.ControllerName == controllerName && action.ActionName == actionName )
+                    {
+                        yield return action;
+                    }
+                }
+            }
         }
     }
 }

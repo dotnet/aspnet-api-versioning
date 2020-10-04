@@ -9,6 +9,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( AdvancedODataCollection ) )]
     public class when_people_is_any_version : ODataAcceptanceTest
     {
@@ -19,7 +20,7 @@
             var person = new { lastName = "Me" };
 
             // act
-            var response = await PatchAsync( $"api/people(42)?api-version=4.0", person );
+            var response = await PatchAsync( $"api/people/42?api-version=4.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -28,5 +29,14 @@
         }
 
         public when_people_is_any_version( AdvancedFixture fixture ) : base( fixture ) { }
+
+        protected when_people_is_any_version( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( AdvancedODataEndpointCollection ) )]
+    public class when_people_is_any_version_ : when_people_is_any_version
+    {
+        public when_people_is_any_version_( AdvancedEndpointFixture fixture ) : base( fixture ) { }
     }
 }

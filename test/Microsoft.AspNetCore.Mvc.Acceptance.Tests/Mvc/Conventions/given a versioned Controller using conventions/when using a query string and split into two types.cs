@@ -10,6 +10,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( ConventionsCollection ) )]
     public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
     {
@@ -64,6 +65,7 @@
         public when_using_a_query_string_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( ConventionsEndpointCollection ) )]
     public class when_using_a_query_string_and_split_into_two_types_ : when_using_a_query_string_and_split_into_two_types
     {

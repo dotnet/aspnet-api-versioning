@@ -29,7 +29,7 @@
                     app =>
                     {
                         var modelBuilder = app.ApplicationServices.GetRequiredService<VersionedODataModelBuilder>();
-                        app.UseMvc( routeBuilder => routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() ) );
+                        app.UseMvc( rb => rb.MapVersionedODataRoute( "odata", "api", modelBuilder.GetEdmModels() ) );
                     } );
             var server = new TestServer( builder );
             var serviceProvider = server.Host.Services;
@@ -58,7 +58,7 @@
                 new[]
                 {
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
-                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders({key})" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
                 },
                 options => options.ExcludingMissingMembers() );
@@ -73,7 +73,7 @@
                 new[]
                 {
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
-                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders({key})" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
                     new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/MostExpensive" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
@@ -91,11 +91,11 @@
               {
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders" },
-                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders({key})" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
                     new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
-                    new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Orders({key})" },
+                    new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Orders/{key}" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/MostExpensive" },
-                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders({key})/Rate" },
+                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders/{key}/Rate" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People/NewHires(Since={since})" },
@@ -113,12 +113,12 @@
                 {
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders" },
-                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders({key})" },
+                    new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
                     new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
-                    new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Orders({key})" },
-                    new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Orders({key})?suspendOnly={suspendOnly}" },
+                    new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Orders/{key}" },
+                    new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Orders/{key}?suspendOnly={suspendOnly}" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/MostExpensive" },
-                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders({key})/Rate" },
+                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders/{key}/Rate" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
                     new { HttpMethod = "POST", GroupName, RelativePath = "api/People" },

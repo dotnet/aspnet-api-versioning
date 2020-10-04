@@ -8,6 +8,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( BasicCollection ) )]
     public class when_using_an_action : AcceptanceTest
     {
@@ -77,6 +78,7 @@
         public when_using_an_action( BasicFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( BasicEndpointCollection ) )]
     public class when_using_an_action_ : when_using_an_action
     {

@@ -4,6 +4,7 @@
     using Microsoft.AspNet.OData;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
+    using Microsoft.Web.Http;
     using Moq;
     using System;
     using System.Collections.Generic;
@@ -15,43 +16,6 @@
 
     public class VersionedMetadataRoutingConventionTest
     {
-        readonly IODataPathHandler pathHandler = new DefaultODataPathHandler();
-        readonly IServiceProvider serviceProvider;
-
-        public VersionedMetadataRoutingConventionTest()
-        {
-            var builder = new DefaultContainerBuilder();
-
-            builder.AddDefaultODataServices();
-            builder.AddService( Singleton, typeof( IEdmModel ), sp => Test.Model );
-            serviceProvider = builder.BuildContainer();
-        }
-
-        ODataPath ParseUrl( string odataPath ) => pathHandler.Parse( "http://localhost", odataPath, serviceProvider );
-
-        public static IEnumerable<object[]> SelectControllerData
-        {
-            get
-            {
-                yield return new object[] { "", "VersionedMetadata" };
-                yield return new object[] { "$metadata", "VersionedMetadata" };
-                yield return new object[] { "Tests", null };
-                yield return new object[] { "Tests(42)", null };
-            }
-        }
-
-        public static IEnumerable<object[]> SelectActionData
-        {
-            get
-            {
-                yield return new object[] { "", "GET", "GetServiceDocument" };
-                yield return new object[] { "$metadata", "GET", "GetMetadata" };
-                yield return new object[] { "$metadata", "OPTIONS", "GetOptions" };
-                yield return new object[] { "Tests", "GET", null };
-                yield return new object[] { "Tests(42)", "GET", null };
-            }
-        }
-
         [Theory]
         [MemberData( nameof( SelectControllerData ) )]
         public void select_controller_should_return_expected_name( string requestUrl, string expected )
@@ -60,6 +24,8 @@
             var odataPath = ParseUrl( requestUrl );
             var request = new HttpRequestMessage();
             var routingConvention = new VersionedMetadataRoutingConvention();
+
+            SetRequestContainer( request );
 
             // act
             var controllerName = routingConvention.SelectController( odataPath, request );
@@ -84,6 +50,54 @@
 
             // assert
             actionName.Should().Be( expected );
+        }
+
+        readonly IODataPathHandler pathHandler = new DefaultODataPathHandler();
+        readonly IServiceProvider serviceProvider;
+
+        public VersionedMetadataRoutingConventionTest()
+        {
+            var builder = new DefaultContainerBuilder();
+
+            builder.AddDefaultODataServices();
+            builder.AddService( Singleton, typeof( IEdmModel ), sp => Test.Model );
+            serviceProvider = builder.BuildContainer();
+        }
+
+        ODataPath ParseUrl( string odataPath ) => pathHandler.Parse( "http://localhost", odataPath, serviceProvider );
+
+        static void SetRequestContainer(HttpRequestMessage request)
+        {
+            const string RequestContainerKey = "Microsoft.AspNet.OData.RequestContainer";
+            var selector = new Mock<IEdmModelSelector>();
+            var serviceProvider = new Mock<IServiceProvider>();
+
+            selector.SetupGet( s => s.ApiVersions ).Returns( new[] { ApiVersion.Default } );
+            serviceProvider.Setup( sp => sp.GetService( typeof( IEdmModelSelector ) ) ).Returns( selector.Object );
+            request.Properties[RequestContainerKey] = serviceProvider.Object;
+        }
+
+        public static IEnumerable<object[]> SelectControllerData
+        {
+            get
+            {
+                yield return new object[] { "", "VersionedMetadata" };
+                yield return new object[] { "$metadata", "VersionedMetadata" };
+                yield return new object[] { "Tests", null };
+                yield return new object[] { "Tests/42", null };
+            }
+        }
+
+        public static IEnumerable<object[]> SelectActionData
+        {
+            get
+            {
+                yield return new object[] { "", "GET", "GetServiceDocument" };
+                yield return new object[] { "$metadata", "GET", "GetMetadata" };
+                yield return new object[] { "$metadata", "OPTIONS", "GetOptions" };
+                yield return new object[] { "Tests", "GET", null };
+                yield return new object[] { "Tests/42", "GET", null };
+            }
         }
     }
 }

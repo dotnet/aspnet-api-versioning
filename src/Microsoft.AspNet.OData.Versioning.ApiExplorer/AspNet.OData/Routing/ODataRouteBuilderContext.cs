@@ -15,6 +15,8 @@
 
     partial class ODataRouteBuilderContext
     {
+        readonly ODataRoute route;
+
         internal ODataRouteBuilderContext(
             HttpConfiguration configuration,
             ApiVersion apiVersion,
@@ -24,40 +26,47 @@
             IModelTypeBuilder modelTypeBuilder,
             ODataApiExplorerOptions options )
         {
+            this.route = route;
             ApiVersion = apiVersion;
             Services = configuration.GetODataRootContainer( route );
-            EdmModel = Services.GetRequiredService<IEdmModel>();
             routeAttribute = actionDescriptor.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
-            Route = route;
+            RoutePrefix = route.RoutePrefix?.Trim( '/' );
             ActionDescriptor = actionDescriptor;
             ParameterDescriptions = parameterDescriptions;
             Options = options;
             UrlKeyDelimiter = UrlKeyDelimiterOrDefault( configuration.GetUrlKeyDelimiter() ?? Services.GetService<IODataPathHandler>()?.UrlKeyDelimiter );
 
-            var container = EdmModel.EntityContainer;
+            var selector = Services.GetRequiredService<IEdmModelSelector>();
+            var model = selector.SelectModel( apiVersion );
+            var container = model?.EntityContainer;
 
-            if ( container == null )
+            if ( model == null || container == null )
             {
+                EdmModel = Services.GetRequiredService<IEdmModel>();
                 IsRouteExcluded = true;
                 return;
             }
 
-            EntitySet = container.FindEntitySet( actionDescriptor.ControllerDescriptor.ControllerName );
-            Operation = container.FindOperationImports( actionDescriptor.ActionName ).FirstOrDefault()?.Operation ??
-                        EdmModel.FindDeclaredOperations( container.Namespace + "." + actionDescriptor.ActionName ).FirstOrDefault();
-            ActionType = GetActionType( EntitySet, Operation );
+            var controllerName = actionDescriptor.ControllerDescriptor.ControllerName;
+
+            EdmModel = model;
+            Services = new FixedEdmModelServiceProviderDecorator( Services, model );
+            EntitySet = container.FindEntitySet( controllerName );
+            Operation = ResolveOperation( container, actionDescriptor.ActionName );
+            ActionType = GetActionType( EntitySet, Operation, actionDescriptor );
+            IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
 
             if ( Operation?.IsAction() == true )
             {
-                ConvertODataActionParametersToTypedModel( modelTypeBuilder, (IEdmAction) Operation, actionDescriptor.ControllerDescriptor.ControllerName );
+                ConvertODataActionParametersToTypedModel( modelTypeBuilder, (IEdmAction) Operation, controllerName );
             }
         }
 
+        IEnumerable<string> GetHttpMethods( HttpActionDescriptor action ) => action.GetHttpMethods( route ).Select( m => m.Method );
+
         void ConvertODataActionParametersToTypedModel( IModelTypeBuilder modelTypeBuilder, IEdmAction action, string controllerName )
         {
-            var apiVersion = new Lazy<ApiVersion>( () => EdmModel.GetAnnotationValue<ApiVersionAnnotation>( EdmModel ).ApiVersion );
-
             for ( var i = 0; i < ParameterDescriptions.Count; i++ )
             {
                 var description = ParameterDescriptions[i];
@@ -65,7 +74,8 @@
 
                 if ( parameter != null && parameter.ParameterType.IsODataActionParameters() )
                 {
-                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, modelTypeBuilder.NewActionParameters( Services, action, apiVersion.Value, controllerName ) );
+                    var parameterType = modelTypeBuilder.NewActionParameters( Services, action, ApiVersion, controllerName );
+                    description.ParameterDescriptor = new ODataModelBoundParameterDescriptor( parameter, parameterType );
                     break;
                 }
             }

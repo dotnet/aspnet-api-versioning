@@ -3,7 +3,7 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Mvc.Versioning;
-    using Microsoft.AspNetCore.OData.Basic.Controllers;
+    using Microsoft.AspNetCore.OData.Basic.Controllers.Classic;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using System.Reflection;
@@ -25,8 +25,8 @@
             var modelBuilder = routeBuilder.ServiceProvider.GetRequiredService<VersionedODataModelBuilder>();
             var models = modelBuilder.GetEdmModels();
 
-            routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
-            routeBuilder.MapVersionedODataRoutes( "odata-bypath", "v{version:apiVersion}", models );
+            routeBuilder.MapVersionedODataRoute( "odata", "api", models );
+            routeBuilder.MapVersionedODataRoute( "odata-bypath", "v{version:apiVersion}", models );
         }
     }
 }

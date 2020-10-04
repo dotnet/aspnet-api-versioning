@@ -16,14 +16,13 @@
     // services.AddOData().EnableApiVersioning();
     sealed class MetadataControllerConvention : IApplicationModelConvention
     {
-        readonly TypeInfo metadataControllerType = typeof( MetadataController ).GetTypeInfo();
         readonly ODataApiVersioningOptions options;
 
         internal MetadataControllerConvention( ODataApiVersioningOptions options ) => this.options = options;
 
         public void Apply( ApplicationModel application )
         {
-            var metadataController = default( ControllerModel );
+            var metadataControllers = new List<ControllerModel>();
             var supported = new HashSet<ApiVersion>();
             var deprecated = new HashSet<ApiVersion>();
 
@@ -31,9 +30,9 @@
             {
                 var controller = application.Controllers[i];
 
-                if ( metadataControllerType.IsAssignableFrom( controller.ControllerType ) )
+                if ( controller.ControllerType.IsMetadataController() )
                 {
-                    metadataController = controller;
+                    metadataControllers.Add( controller );
                     continue;
                 }
 
@@ -59,8 +58,11 @@
                 }
             }
 
+            var metadataController = SelectBestMetadataController( metadataControllers );
+
             if ( metadataController == null )
             {
+                // graceful exit; in theory, this should never happen
                 return;
             }
 
@@ -72,6 +74,47 @@
                                      .HasDeprecatedApiVersions( deprecated );
 
             builder.ApplyTo( metadataController );
+        }
+
+        static ControllerModel? SelectBestMetadataController( IReadOnlyList<ControllerModel> controllers )
+        {
+            // note: there should be at least 2 metadata controllers, but there could be 3+
+            // if a developer defines their own custom controller. ultimately, there an be
+            // only one. choose and version the best controller using the following ranking:
+            //
+            // 1. original MetadataController type
+            // 2. VersionedMetadataController type (it's possible this has been removed upstream)
+            // 3. last, custom type of MetadataController from another assembly
+            var bestController = default( ControllerModel );
+            var original = typeof( MetadataController ).GetTypeInfo();
+            var versioned = typeof( VersionedMetadataController ).GetTypeInfo();
+
+            for ( var i = 0; i < controllers.Count; i++ )
+            {
+                var controller = controllers[i];
+
+                if ( bestController == default )
+                {
+                    bestController = controller;
+                }
+                else if ( bestController.ControllerType == original &&
+                          controller.ControllerType == versioned )
+                {
+                    bestController = controller;
+                }
+                else if ( bestController.ControllerType == versioned &&
+                          controller.ControllerType != original )
+                {
+                    bestController = controller;
+                }
+                else if ( bestController.ControllerType != versioned &&
+                          controller.ControllerType != original )
+                {
+                    bestController = controller;
+                }
+            }
+
+            return bestController;
         }
     }
 }

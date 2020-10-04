@@ -24,5 +24,11 @@
         /// </summary>
         /// <value>The <see cref="ODataPathTemplate">OData path template</see> for the action.</value>
         public ODataPathTemplate? ODataTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding route prefix.
+        /// </summary>
+        /// <value>The associated route prefix, if any.</value>
+        public string? RoutePrefix { get; set; }
     }
 }

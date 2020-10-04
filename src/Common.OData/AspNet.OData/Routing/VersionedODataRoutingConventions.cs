@@ -7,10 +7,7 @@
     /// <summary>
     /// Provides utility functions to create OData routing conventions with support for API versioning.
     /// </summary>
-#if !WEBAPI
-    [CLSCompliant( false )]
-#endif
-    public static class VersionedODataRoutingConventions
+    public static partial class VersionedODataRoutingConventions
     {
         /// <summary>
         /// Creates a mutable list of the default OData routing conventions with support for API versioning.
@@ -34,8 +31,11 @@
             return EnsureConventions( routingConventions );
         }
 
-        static IList<IODataRoutingConvention> EnsureConventions( IList<IODataRoutingConvention> conventions )
+        static IList<IODataRoutingConvention> EnsureConventions(
+            IList<IODataRoutingConvention> conventions,
+            VersionedAttributeRoutingConvention? attributeRoutingConvention = default )
         {
+            var hasVersionedAttributeConvention = false;
             var hasVersionedMetadataConvention = false;
 
             for ( var i = conventions.Count - 1; i >= 0; i-- )
@@ -44,7 +44,15 @@
 
                 if ( convention is AttributeRoutingConvention && convention.GetType().Equals( typeof( AttributeRoutingConvention ) ) )
                 {
-                    conventions.RemoveAt( i );
+                    if ( attributeRoutingConvention == default )
+                    {
+                        conventions.RemoveAt( i );
+                    }
+                    else
+                    {
+                        conventions[i] = attributeRoutingConvention;
+                        hasVersionedAttributeConvention = true;
+                    }
                 }
                 else if ( convention is MetadataRoutingConvention )
                 {
@@ -60,6 +68,11 @@
             if ( !hasVersionedMetadataConvention )
             {
                 conventions.Insert( 0, new VersionedMetadataRoutingConvention() );
+            }
+
+            if ( !hasVersionedAttributeConvention && attributeRoutingConvention != default )
+            {
+                conventions.Insert( 0, attributeRoutingConvention );
             }
 
             return conventions;

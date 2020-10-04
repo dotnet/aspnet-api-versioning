@@ -11,6 +11,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( BasicCollection ) )]
     public class when_using_a_url_segment : AcceptanceTest
     {
@@ -70,11 +71,16 @@
             // arrange
             var requestUrl = "api/v2/helloworld/abc";
 
+            // note: the classic routing mechanism cannot disambiguate 400 vs 405
+            // because the route constraint {id:int} completely eliminates the
+            // candidate; however, endpoint routing works as expected
+            var statusCode = UsingEndpointRouting ? BadRequest : MethodNotAllowed;
+
             // act
             var response = await GetAsync( requestUrl );
 
             // asserts
-            response.StatusCode.Should().Be( BadRequest );
+            response.StatusCode.Should().Be( statusCode );
         }
 
         [Theory]
@@ -126,6 +132,7 @@
         public when_using_a_url_segment( BasicFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( BasicEndpointCollection ) )]
     public class when_using_a_url_segment_ : when_using_a_url_segment
     {

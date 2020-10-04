@@ -45,7 +45,7 @@
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         public IActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
 
         /// <summary>
@@ -81,7 +81,7 @@
         [ProducesResponseType( typeof( Order ), Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         public IActionResult Patch( int key, Delta<Order> delta )
         {
             if ( !ModelState.IsValid )
@@ -119,7 +119,7 @@
         [ProducesResponseType( Status200OK )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})/Rate" )]
+        [ODataRoute( "{key}/Rate" )]
         public IActionResult Rate( int key, ODataActionParameters parameters )
         {
             if ( !ModelState.IsValid )

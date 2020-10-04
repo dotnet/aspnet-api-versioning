@@ -5,17 +5,22 @@
 
     sealed class ActionParameterContext
     {
+        readonly ODataPathTemplate? pathTemplate;
+
         internal ActionParameterContext( ODataRouteBuilder routeBuilder, ODataRouteBuilderContext routeContext )
         {
             var odataPathTemplate = routeBuilder.BuildPath( includePrefix: false );
+
             RouteContext = routeContext;
-            PathTemplate = RouteContext.PathTemplateHandler.ParseTemplate( odataPathTemplate, Services );
+            pathTemplate = RouteContext.PathTemplateHandler.SafeParseTemplate( odataPathTemplate, Services );
         }
 
         internal ODataRouteBuilderContext RouteContext { get; }
 
         internal IServiceProvider Services => RouteContext.Services;
 
-        internal ODataPathTemplate PathTemplate { get; }
+        internal ODataPathTemplate PathTemplate => pathTemplate ?? throw new NotSupportedException();
+
+        internal bool IsSupported => pathTemplate != null;
     }
 }

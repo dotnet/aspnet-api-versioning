@@ -1,6 +1,7 @@
 ﻿namespace System.Web.Http
 {
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Controllers;
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Collections.Generic;
@@ -30,38 +31,42 @@
         public static ApiVersionModel GetApiVersionModel( this HttpControllerDescriptor controllerDescriptor ) =>
             controllerDescriptor.GetProperty<ApiVersionModel>() ?? ApiVersionModel.Empty;
 
-        internal static void SetApiVersionModel( this HttpControllerDescriptor controller, ApiVersionModel value ) => controller.SetProperty( value );
+        /// <summary>
+        /// Enumerates a controller descriptor as a sequence of descriptors.
+        /// </summary>
+        /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller descriptor</see> to enumerate.</param>
+        /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="HttpControllerDescriptor">controller descriptors</see>.</returns>
+        /// <remarks>This method will flatten a sequence of composite descriptors such as <see cref="HttpControllerDescriptorGroup"/>.
+        /// If the <paramref name="controllerDescriptor">controller descriptor</paramref> is not a composite, it yields itself.</remarks>
+        public static IEnumerable<HttpControllerDescriptor> AsEnumerable( this HttpControllerDescriptor controllerDescriptor ) =>
+            AsEnumerable( controllerDescriptor, includeCandidates: false );
 
-        internal static bool IsAttributeRouted( this HttpControllerDescriptor controller )
+        internal static IEnumerable<HttpControllerDescriptor> AsEnumerable( this HttpControllerDescriptor controllerDescriptor, bool includeCandidates )
         {
-            controller.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
-            return value ?? false;
-        }
+            if ( controllerDescriptor == null )
+            {
+                throw new ArgumentNullException( nameof( controllerDescriptor ) );
+            }
 
-        internal static void SetPossibleCandidates( this HttpControllerDescriptor controllerDescriptor, IEnumerable<HttpControllerDescriptor> value ) =>
-            controllerDescriptor.Properties.AddOrUpdate( PossibleControllerCandidatesKey, value, ( key, oldValue ) => value );
-
-        internal static IEnumerable<HttpControllerDescriptor> AsEnumerable( this HttpControllerDescriptor controller )
-        {
             var visited = new HashSet<HttpControllerDescriptor>();
 
-            if ( controller is IEnumerable<HttpControllerDescriptor> groupedControllers )
+            if ( controllerDescriptor is IEnumerable<HttpControllerDescriptor> groupedDescriptors )
             {
-                foreach ( var groupedController in groupedControllers )
+                foreach ( var groupedDescriptor in groupedDescriptors )
                 {
-                    if ( visited.Add( groupedController ) )
+                    if ( visited.Add( groupedDescriptor ) )
                     {
-                        yield return groupedController;
+                        yield return groupedDescriptor;
                     }
                 }
             }
             else
             {
-                visited.Add( controller );
-                yield return controller;
+                visited.Add( controllerDescriptor );
+                yield return controllerDescriptor;
             }
 
-            if ( !controller.Properties.TryGetValue( PossibleControllerCandidatesKey, out IEnumerable<HttpControllerDescriptor> candidates ) )
+            if ( !includeCandidates || !controllerDescriptor.Properties.TryGetValue( PossibleControllerCandidatesKey, out IEnumerable<HttpControllerDescriptor> candidates ) )
             {
                 yield break;
             }
@@ -76,6 +81,17 @@
 
             visited.Clear();
         }
+
+        internal static void SetApiVersionModel( this HttpControllerDescriptor controller, ApiVersionModel value ) => controller.SetProperty( value );
+
+        internal static bool IsAttributeRouted( this HttpControllerDescriptor controller )
+        {
+            controller.Properties.TryGetValue( AttributeRoutedPropertyKey, out bool? value );
+            return value ?? false;
+        }
+
+        internal static void SetPossibleCandidates( this HttpControllerDescriptor controllerDescriptor, IEnumerable<HttpControllerDescriptor> value ) =>
+            controllerDescriptor.Properties.AddOrUpdate( PossibleControllerCandidatesKey, value, ( key, oldValue ) => value );
 
         static T GetProperty<T>( this HttpControllerDescriptor controller )
         {

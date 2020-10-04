@@ -8,6 +8,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( BasicCollection ) )]
     public class when_no_version_is_specified : AcceptanceTest
     {
@@ -85,6 +86,7 @@
         public when_no_version_is_specified( BasicFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( BasicEndpointCollection ) )]
     public class when_no_version_is_specified_ : when_no_version_is_specified
     {

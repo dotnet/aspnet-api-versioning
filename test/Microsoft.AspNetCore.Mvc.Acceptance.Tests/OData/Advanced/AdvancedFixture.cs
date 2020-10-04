@@ -4,7 +4,7 @@
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Versioning;
-    using Microsoft.AspNetCore.OData.Advanced.Controllers;
+    using Microsoft.AspNetCore.OData.Advanced.Controllers.Classic;
     using Microsoft.AspNetCore.OData.Configuration;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
@@ -37,10 +37,7 @@
             modelBuilder.ModelConfigurations.Clear();
             modelBuilder.ModelConfigurations.Add( new PersonModelConfiguration() );
             modelBuilder.ModelConfigurations.Add( new OrderModelConfiguration( supportedApiVersion: new ApiVersion( 2, 0 ) ) );
-
-            var models = modelBuilder.GetEdmModels();
-
-            routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
+            routeBuilder.MapVersionedODataRoute( "odata", "api", modelBuilder.GetEdmModels() );
         }
     }
 }

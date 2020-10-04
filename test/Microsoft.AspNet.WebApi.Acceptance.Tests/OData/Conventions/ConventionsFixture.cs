@@ -4,10 +4,8 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Configuration;
     using Microsoft.AspNet.OData.Conventions.Controllers;
-    using Microsoft.OData.UriParser;
     using Microsoft.Web.Http.Versioning.Conventions;
     using System.Web.Http;
-    using static Microsoft.OData.ServiceLifetime;
 
     public class ConventionsFixture : ODataFixture
     {
@@ -50,8 +48,8 @@
             };
             var models = modelBuilder.GetEdmModels();
 
-            Configuration.MapVersionedODataRoutes( "odata", "api", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver ) );
-            Configuration.MapVersionedODataRoutes( "odata-bypath", "v{apiVersion}", models, builder => builder.AddService( Singleton, typeof( ODataUriResolver ), sp => UriResolver ) );
+            Configuration.MapVersionedODataRoute( "odata", "api", models );
+            Configuration.MapVersionedODataRoute( "odata-bypath", "v{apiVersion}", models );
             Configuration.EnsureInitialized();
         }
     }

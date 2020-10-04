@@ -60,9 +60,17 @@
 
             for ( var i = 0; i < endpoints.Count; i++ )
             {
-                var action = endpoints[i].Metadata?.GetMetadata<ActionDescriptor>();
+                var metadata = endpoints[i].Metadata;
+                var action = metadata.GetMetadata<ActionDescriptor>();
 
                 if ( action?.GetProperty<ApiVersionModel>() != null )
+                {
+                    return true;
+                }
+
+                var endpoint = metadata.GetMetadata<IDynamicEndpointMetadata>();
+
+                if ( endpoint?.IsDynamic == true )
                 {
                     return true;
                 }
@@ -233,7 +241,14 @@
             for ( var i = 0; i < candidateSet.Count; i++ )
             {
                 ref var candidate = ref candidateSet[i];
-                var action = candidate.Endpoint.Metadata?.GetMetadata<ActionDescriptor>();
+                var endpoint = candidate.Endpoint;
+
+                if ( endpoint == null )
+                {
+                    continue;
+                }
+
+                var action = endpoint.Metadata.GetMetadata<ActionDescriptor>();
 
                 if ( action != null )
                 {

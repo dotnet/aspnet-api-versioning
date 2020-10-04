@@ -10,6 +10,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( BasicCollection ) )]
     public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
     {
@@ -66,11 +67,16 @@
             // arrange
             var requestUrl = "api/values/abc?api-version=2.0";
 
+            // note: the classic routing mechanism cannot disambiguate 400 vs 405
+            // because the route constraint {id:int} completely eliminates the
+            // candidate; however, endpoint routing works as expected
+            var statusCode = UsingEndpointRouting ? BadRequest : MethodNotAllowed;
+
             // act
             var response = await GetAsync( requestUrl );
 
             // assert
-            response.StatusCode.Should().Be( BadRequest );
+            response.StatusCode.Should().Be( statusCode );
         }
 
         [Theory]
@@ -138,6 +144,7 @@
         public when_using_a_query_string_and_split_into_two_types( BasicFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( BasicEndpointCollection ) )]
     public class when_using_a_query_string_and_split_into_two_types_ : when_using_a_query_string_and_split_into_two_types
     {

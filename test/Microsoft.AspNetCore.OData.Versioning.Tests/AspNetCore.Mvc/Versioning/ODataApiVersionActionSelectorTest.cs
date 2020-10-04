@@ -23,12 +23,11 @@
             // arrange
             using var server = new WebServer();
 
+            // act
             await server.Client.GetAsync( $"api/tests?api-version={version}" );
 
-            // act
-            var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
-
             // assert
+            var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
             action.GetProperty<ApiVersionModel>().SupportedApiVersions.Should().Contain( Parse( version ) );
             action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType.GetTypeInfo() );
         }
@@ -42,12 +41,11 @@
             var controllerType = typeof( VersionNeutralController ).GetTypeInfo();
             using var server = new WebServer();
             
+            // act
             await server.Client.GetAsync( requestUri );
 
-            // act
-            var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
-
             // assert
+            var action = ( (TestODataApiVersionActionSelector) server.Services.GetRequiredService<IActionSelector>() ).SelectedCandidate;
             action.As<ControllerActionDescriptor>().ControllerTypeInfo.Should().Be( controllerType );
         }
     }

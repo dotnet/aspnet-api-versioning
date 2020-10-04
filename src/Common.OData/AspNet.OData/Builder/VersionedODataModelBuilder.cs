@@ -3,6 +3,7 @@
 #if !WEBAPI
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.OData;
 #endif
     using Microsoft.OData.Edm;
 #if WEBAPI
@@ -11,6 +12,7 @@
 #endif
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Represents a versioned variant of the <see cref="ODataModelBuilder"/>.
@@ -27,9 +29,9 @@
         /// <summary>
         /// Gets or sets the default model configuration.
         /// </summary>
-        /// <value>The <see cref="Action{T1, T2}">method</see> for the default model configuration.
+        /// <value>The <see cref="Action{T1, T2, T3}">method</see> for the default model configuration.
         /// The default value is <c>null</c>.</value>
-        public Action<ODataModelBuilder, ApiVersion>? DefaultModelConfiguration { get; set; }
+        public Action<ODataModelBuilder, ApiVersion, string?>? DefaultModelConfiguration { get; set; }
 
         /// <summary>
         /// Gets the list of model configurations associated with the builder.
@@ -48,13 +50,20 @@
         /// Builds and returns the sequence of EDM models based on the define model configurations.
         /// </summary>
         /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
-        public virtual IEnumerable<IEdmModel> GetEdmModels()
+        public IEnumerable<IEdmModel> GetEdmModels() => GetEdmModels( default );
+
+        /// <summary>
+        /// Builds and returns the sequence of EDM models based on the define model configurations.
+        /// </summary>
+        /// <param name="routePrefix">The route prefix associated with the configuration, if any.</param>
+        /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
+        public virtual IEnumerable<IEdmModel> GetEdmModels( string? routePrefix )
         {
             var apiVersions = GetApiVersions();
             var configurations = GetMergedConfigurations();
             var models = new List<IEdmModel>();
 
-            BuildModelPerApiVersion( apiVersions, configurations, models );
+            BuildModelPerApiVersion( apiVersions, configurations, models, routePrefix );
 
             return models;
         }
@@ -76,7 +85,11 @@
             return configurations;
         }
 
-        void BuildModelPerApiVersion( IReadOnlyList<ApiVersion> apiVersions, IList<IModelConfiguration> configurations, ICollection<IEdmModel> models )
+        void BuildModelPerApiVersion(
+            IReadOnlyList<ApiVersion> apiVersions,
+            IList<IModelConfiguration> configurations,
+            ICollection<IEdmModel> models,
+            string? routePrefix )
         {
             for ( var i = 0; i < apiVersions.Count; i++ )
             {
@@ -85,10 +98,19 @@
 
                 for ( var j = 0; j < configurations.Count; j++ )
                 {
-                    configurations[j].Apply( builder, apiVersion );
+                    configurations[j].Apply( builder, apiVersion, routePrefix );
                 }
 
                 var model = builder.GetEdmModel();
+                var container = model.EntityContainer;
+                var empty = !container.EntitySets().Any() &&
+                            !container.Singletons().Any() &&
+                            !container.OperationImports().Any();
+
+                if ( empty )
+                {
+                    continue;
+                }
 
                 model.SetAnnotationValue( model, new ApiVersionAnnotation( apiVersion ) );
                 OnModelCreated?.Invoke( builder, model );

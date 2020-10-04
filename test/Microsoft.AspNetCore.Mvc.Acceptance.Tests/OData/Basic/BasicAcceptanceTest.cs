@@ -7,7 +7,6 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
-    [Collection( nameof( BasicODataCollection ) )]
     public abstract class BasicAcceptanceTest : ODataAcceptanceTest
     {
         [Fact]
@@ -56,6 +55,6 @@
             content.Error.Message.Should().NotContain( "?api-version=1.0" );
         }
 
-        protected BasicAcceptanceTest( BasicFixture fixture ) : base( fixture ) { }
+        protected BasicAcceptanceTest( ODataFixture fixture ) : base( fixture ) { }
     }
 }

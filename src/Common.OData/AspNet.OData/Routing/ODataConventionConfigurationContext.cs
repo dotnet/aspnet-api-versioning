@@ -42,5 +42,20 @@
         [CLSCompliant( false )]
 #endif
         public IList<IODataRoutingConvention> RoutingConventions { get; }
+
+        /// <summary>
+        /// Gets the associate service provider.
+        /// </summary>
+        /// <value>The associated <see cref="IServiceProvider">service provider</see>.</value>
+        public IServiceProvider ServiceProvider { get; }
+
+        sealed class No : IServiceProvider
+        {
+            No() { }
+
+            internal static IServiceProvider ServiceProvider { get; } = new No();
+
+            public object GetService( Type serviceType ) => default!;
+        }
     }
 }

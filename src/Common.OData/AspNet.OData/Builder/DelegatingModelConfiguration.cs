@@ -9,10 +9,10 @@
 
     sealed class DelegatingModelConfiguration : IModelConfiguration
     {
-        readonly Action<ODataModelBuilder, ApiVersion> action;
+        readonly Action<ODataModelBuilder, ApiVersion, string?> action;
 
-        internal DelegatingModelConfiguration( Action<ODataModelBuilder, ApiVersion> action ) => this.action = action;
+        internal DelegatingModelConfiguration( Action<ODataModelBuilder, ApiVersion, string?> action ) => this.action = action;
 
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) => action( builder, apiVersion );
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string? routePrefix ) => action( builder, apiVersion, routePrefix );
     }
 }

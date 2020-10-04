@@ -4,6 +4,7 @@
     using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ActionConstraints;
+    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Logging;
     using System;
@@ -66,7 +67,7 @@
                 requestedVersion = parsedVersion.ToString();
             }
 
-            return Unmatched( handlerContext, url, method, allowedMethods.Value, actionNames.Value, parsedVersion, requestedVersion );
+            return Unmatched( handlerContext, url, method, allowedMethods.Value, actionNames.Value, parsedVersion!, requestedVersion, apiVersions );
         }
 
         static HashSet<string> AllowedMethodsFromCandidates( IEnumerable<ActionDescriptor> candidates, ApiVersion? apiVersion )
@@ -75,18 +76,60 @@
 
             foreach ( var candidate in candidates )
             {
-                if ( candidate.ActionConstraints == null || !candidate.IsMappedTo( apiVersion ) )
+                if ( candidate.IsMappedTo( apiVersion ) )
                 {
-                    continue;
-                }
-
-                foreach ( var constraint in candidate.ActionConstraints.OfType<HttpMethodActionConstraint>() )
-                {
-                    httpMethods.AddRange( constraint.HttpMethods );
+                    httpMethods.AddRange( GetHttpMethods( candidate ) );
                 }
             }
 
             return httpMethods;
+        }
+
+        static IEnumerable<string> GetHttpMethods( ActionDescriptor action )
+        {
+            if ( action.ActionConstraints != null )
+            {
+                foreach ( var constraint in action.ActionConstraints.OfType<HttpMethodActionConstraint>() )
+                {
+                    foreach ( var method in constraint.HttpMethods )
+                    {
+                        yield return method;
+                    }
+                }
+            }
+
+            if ( action is ControllerActionDescriptor controllerAction )
+            {
+                foreach ( var attribute in controllerAction.MethodInfo.GetCustomAttributes( inherit: false ).OfType<IActionHttpMethodProvider>() )
+                {
+                    foreach ( var method in attribute.HttpMethods )
+                    {
+                        yield return method;
+                    }
+                }
+            }
+        }
+
+        bool MethodSupportedInAnyOtherVersion( string method, ApiVersion version )
+        {
+            var comparer = StringComparer.OrdinalIgnoreCase;
+
+            foreach ( var candidate in Candidates! )
+            {
+                if ( candidate.IsMappedTo( version ) )
+                {
+                    continue;
+                }
+
+                var methods = GetHttpMethods( candidate );
+
+                if ( methods.Contains( method, comparer ) )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         RequestHandler VersionNeutralUnmatched(
@@ -135,22 +178,30 @@
             string method,
             IReadOnlyCollection<string> allowedMethods,
             string actionNames,
-            ApiVersion? parsedVersion,
-            string? requestedVersion )
+            ApiVersion version,
+            string? rawVersion,
+            Lazy<ApiVersionModel> aggregateModel )
         {
-            Logger!.ApiVersionUnmatched( parsedVersion, actionNames );
+            Logger!.ApiVersionUnmatched( version, actionNames );
             context.Code = UnsupportedApiVersion;
 
-            if ( allowedMethods.Count == 0 || allowedMethods.Contains( method ) )
+            var methodNotAllowed =
+                ( allowedMethods.Count > 0 &&
+                 !allowedMethods.Contains( method ) ) ||
+                ( allowedMethods.Count == 0 &&
+                  aggregateModel.Value.ImplementedApiVersions.Contains( version ) &&
+                  MethodSupportedInAnyOtherVersion( method, version ) );
+
+            if ( methodNotAllowed )
             {
-                context.Message = SR.VersionedResourceNotSupported.FormatDefault( requestUrl, requestedVersion );
-                return new BadRequestHandler( context );
+                context.Message = SR.VersionedMethodNotSupported.FormatDefault( requestUrl, rawVersion, method );
+                context.AllowedMethods = allowedMethods.Count == 0 ? new[] { method } : allowedMethods.ToArray();
+
+                return new MethodNotAllowedHandler( context );
             }
 
-            context.Message = SR.VersionedMethodNotSupported.FormatDefault( requestUrl, requestedVersion, method );
-            context.AllowedMethods = allowedMethods.ToArray();
-
-            return new MethodNotAllowedHandler( context );
+            context.Message = SR.VersionedResourceNotSupported.FormatDefault( requestUrl, rawVersion );
+            return new BadRequestHandler( context );
         }
     }
 }

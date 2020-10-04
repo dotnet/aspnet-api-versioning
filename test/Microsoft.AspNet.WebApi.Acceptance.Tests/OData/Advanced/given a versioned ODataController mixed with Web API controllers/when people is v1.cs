@@ -31,8 +31,8 @@
         }
 
         [Theory]
-        [InlineData( "api/people(42)" )]
-        [InlineData( "api/people(42)?api-version=1.0" )]
+        [InlineData( "api/people/42" )]
+        [InlineData( "api/people/42?api-version=1.0" )]
         public async Task then_get_with_key_should_return_200( string requestUrl )
         {
             // arrange
@@ -55,7 +55,7 @@
             var person = new { lastName = "Me" };
 
             // act
-            var response = await PatchAsync( $"api/people(42)?api-version=1.0", person );
+            var response = await PatchAsync( $"api/people/42?api-version=1.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

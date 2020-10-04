@@ -23,9 +23,21 @@ namespace Microsoft.AspNetCore.Mvc
     /// </summary>
     public class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion>, IFormattable
     {
+        const int Prime = 397;
         const string ParsePattern = @"^(\d{4}-\d{2}-\d{2})?\.?(\d{0,9})\.?(\d{0,9})\.?-?(.*)$";
         const string GroupVersionFormat = "yyyy-MM-dd";
-        static readonly Lazy<ApiVersion> defaultVersion = new Lazy<ApiVersion>( () => new ApiVersion( 1, 0 ) );
+        int hashCode;
+
+        ApiVersion()
+        {
+            const int MajorVersion = int.MaxValue;
+            const int MinorVersion = int.MaxValue;
+            var groupVersion = MaxValue;
+
+            hashCode = groupVersion.GetHashCode();
+            hashCode = ( hashCode * Prime ) ^ MajorVersion;
+            hashCode = ( hashCode * Prime ) ^ MinorVersion;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersion"/> class.
@@ -112,7 +124,13 @@ namespace Microsoft.AspNetCore.Mvc
         /// Gets the default API version.
         /// </summary>
         /// <value>The default <see cref="ApiVersion">API version</see>, which is always "1.0".</value>
-        public static ApiVersion Default => defaultVersion.Value;
+        public static ApiVersion Default { get; } = new ApiVersion( 1, 0 );
+
+        /// <summary>
+        /// Gets the neutral API version.
+        /// </summary>
+        /// <value>The neutral <see cref="ApiVersion">API version</see>.</value>
+        public static ApiVersion Neutral { get; } = new ApiVersion();
 
         /// <summary>
         /// Gets the group version.
@@ -321,7 +339,14 @@ namespace Microsoft.AspNetCore.Mvc
         /// <see cref="ToString()">text representation</see> of the object.</remarks>
         public override int GetHashCode()
         {
-            var hashes = new List<int>( 4 );
+            // perf: api version is used in a lot sets and as a dictionary keys
+            // since it's immutable, calculate the hash code once and reuse it
+            if ( hashCode != default )
+            {
+                return hashCode;
+            }
+
+            var hashes = new List<int>( capacity: 4 );
 
             if ( GroupVersion != null )
             {
@@ -343,10 +368,10 @@ namespace Microsoft.AspNetCore.Mvc
 
             for ( var i = 1; i < hashes.Count; i++ )
             {
-                hash = ( hash * 397 ) ^ hashes[i];
+                hash = ( hash * Prime ) ^ hashes[i];
             }
 
-            return hash;
+            return hashCode = hash;
         }
 
         /// <summary>
@@ -408,18 +433,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <param name="other">The <see cref="ApiVersion">other</see> to evaluate.</param>
         /// <returns>True if the specified object is equal to the current instance; otherwise, false.</returns>
-        public virtual bool Equals( ApiVersion? other )
-        {
-            if ( other == null )
-            {
-                return false;
-            }
-
-            return Nullable.Equals( GroupVersion, other.GroupVersion ) &&
-                   Nullable.Equals( MajorVersion, other.MajorVersion ) &&
-                   ImpliedMinorVersion.Equals( other.ImpliedMinorVersion ) &&
-                   string.Equals( Status, other.Status, StringComparison.OrdinalIgnoreCase );
-        }
+        public virtual bool Equals( ApiVersion? other ) => other is null ? false : GetHashCode() == other.GetHashCode();
 
         /// <summary>
         /// Performs a comparison of the current object to another object and returns a value
@@ -499,7 +513,7 @@ namespace Microsoft.AspNetCore.Mvc
             var provider = ApiVersionFormatProvider.GetInstance( formatProvider );
 #pragma warning disable CA1062 // Validate arguments of public methods (false positive)
             return provider.Format( format, this, formatProvider );
-#pragma warning restore CA1062 // Validate arguments of public methods
+#pragma warning restore CA1062
         }
     }
 }

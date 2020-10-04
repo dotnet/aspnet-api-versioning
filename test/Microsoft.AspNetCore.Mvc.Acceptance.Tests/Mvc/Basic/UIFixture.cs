@@ -14,9 +14,7 @@
             partManager.ApplicationParts.Add( new AssemblyPart( GetType().Assembly ) );
         }
 
-#if !NET461
         protected override void OnConfigureServices( IServiceCollection services ) =>
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
-#endif
     }
 }

@@ -1,33 +1,26 @@
 ﻿namespace System.Web.Http
 {
+    using Microsoft.OData;
+    using Microsoft.Web.Http;
     using Microsoft.Web.Http.Versioning;
     using System.Net.Http;
+    using static System.Net.HttpStatusCode;
 
-    /// <summary>
-    /// Provides extension methods for the <see cref="HttpRequestMessage"/> class.
-    /// </summary>
-    public static class HttpRequestMessageExtensions
+    static class HttpRequestMessageExtensions
     {
-        const string ODataApiVersionPropertiesKey = "MS_" + nameof( ODataApiVersionRequestProperties );
-
-        /// <summary>
-        /// Gets the current OData API versioning request properties.
-        /// </summary>
-        /// <param name="request">The <see cref="HttpRequestMessage">request</see> to get the OData API versioning properties for.</param>
-        /// <returns>The current <see cref="ODataApiVersionRequestProperties">OData API versioning properties</see>.</returns>
-        public static ODataApiVersionRequestProperties ODataApiVersionProperties( this HttpRequestMessage request )
+        internal static ApiVersion? GetRequestedApiVersionOrReturnBadRequest( this HttpRequestMessage request )
         {
-            if ( request == null )
-            {
-                throw new ArgumentNullException( nameof( request ) );
-            }
+            var properties = request.ApiVersionProperties();
 
-            if ( !request.Properties.TryGetValue( ODataApiVersionPropertiesKey, out var value ) || !( value is ODataApiVersionRequestProperties properties ) )
+            try
             {
-                request.Properties[ODataApiVersionPropertiesKey] = properties = new ODataApiVersionRequestProperties();
+                return properties.RequestedApiVersion;
             }
-
-            return properties;
+            catch ( AmbiguousApiVersionException ex )
+            {
+                var error = new ODataError() { ErrorCode = "AmbiguousApiVersion", Message = ex.Message };
+                throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
+            }
         }
     }
 }
