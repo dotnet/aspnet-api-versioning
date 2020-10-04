@@ -108,7 +108,11 @@
 
                     var groupResult = result.Clone();
 
-                    groupResult.GroupName = groupName;
+                    if ( string.IsNullOrEmpty( groupResult.GroupName ) )
+                    {
+                        groupResult.GroupName = groupName;
+                    }
+
                     groupResult.SetApiVersion( version );
                     PopulateApiVersionParameters( groupResult, version );
                     groupResult.TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
