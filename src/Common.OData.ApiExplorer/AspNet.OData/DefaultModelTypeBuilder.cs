@@ -28,7 +28,10 @@
     {
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
         readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
-        readonly ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>> generatedEdmTypesPerVersion = new ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>();
+        readonly ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>> generatedEdmTypesPerVersion =
+            new ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>();
+        readonly ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>> generatedActionParamsPerVersion =
+            new ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>>();
 
         /// <inheritdoc />
         public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel )
@@ -47,12 +50,19 @@
                 throw new ArgumentNullException( nameof( action ) );
             }
 
-            var name = controllerName + "." + action.FullName() + "Parameters";
-            var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, p, this ) );
-            var signature = new ClassSignature( name, properties, apiVersion );
-            var moduleBuilder = modules.GetOrAdd( apiVersion, CreateModuleForApiVersion );
+            var paramTypes = generatedActionParamsPerVersion.GetOrAdd( apiVersion, _ => new ConcurrentDictionary<EdmTypeKey, Type>() );
+            var fullTypeName = $"{controllerName}.{action.Namespace}.{controllerName}{action.Name}Parameters";
+            var key = new EdmTypeKey( fullTypeName, apiVersion );
+            var type = paramTypes.GetOrAdd( key, _ =>
+            {
+                var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, p, this ) );
+                var signature = new ClassSignature( fullTypeName, properties, apiVersion );
+                var moduleBuilder = modules.GetOrAdd( apiVersion, CreateModuleForApiVersion );
 
-            return CreateTypeInfoFromSignature( moduleBuilder, signature );
+                return CreateTypeInfoFromSignature( moduleBuilder, signature );
+            } );
+
+            return type;
         }
 
         IDictionary<EdmTypeKey, Type> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )

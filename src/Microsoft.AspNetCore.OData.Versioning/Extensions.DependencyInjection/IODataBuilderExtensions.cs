@@ -3,6 +3,7 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Interfaces;
     using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -18,7 +19,7 @@
     /// Provides extension methods for the <see cref="IODataBuilder"/> interface.
     /// </summary>
     [CLSCompliant( false )]
-    public static class IODataBuilderExtensions
+    public static partial class IODataBuilderExtensions
     {
         /// <summary>
         /// Enables service API versioning for the specified OData configuration.
@@ -77,6 +78,7 @@
             services.AddTransient<IActionDescriptorProvider, ODataActionDescriptorProvider>();
             services.AddSingleton<IActionDescriptorChangeProvider>( ODataActionDescriptorChangeProvider.Instance );
             services.TryAddEnumerable( Transient<IApiControllerSpecification, ODataControllerSpecification>() );
+            services.AddTransient<IStartupFilter, RaiseVersionedODataRoutesMapped>();
             services.AddModelConfigurationsAsServices( partManager );
         }
 

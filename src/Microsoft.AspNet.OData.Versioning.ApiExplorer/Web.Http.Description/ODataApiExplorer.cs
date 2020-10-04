@@ -158,10 +158,10 @@
             }
 
             var apiDescriptions = new Collection<VersionedApiDescription>();
-            var edmModel = Configuration.GetODataRootContainer( route ).GetRequiredService<IEdmModel>();
-            var routeApiVersion = edmModel.GetAnnotationValue<ApiVersionAnnotation>( edmModel )?.ApiVersion;
+            var modelSelector = Configuration.GetODataRootContainer( route ).GetRequiredService<IEdmModelSelector>();
+            var edmModel = modelSelector.SelectModel( apiVersion );
 
-            if ( routeApiVersion != apiVersion )
+            if ( edmModel == null )
             {
                 return apiDescriptions;
             }
@@ -355,7 +355,7 @@
 
             foreach ( var entry in route.Constraints )
             {
-                if ( entry.Value is ApiVersionRouteConstraint constraint )
+                if ( entry.Value is ApiVersionRouteConstraint )
                 {
                     list.Add( new ApiParameterDescription() { Name = entry.Key, Source = FromUri } );
                     break;

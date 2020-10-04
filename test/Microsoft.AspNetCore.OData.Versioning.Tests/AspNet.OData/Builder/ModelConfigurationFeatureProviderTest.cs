@@ -37,27 +37,27 @@
     {
         struct ValueTypeModelConfiguration : IModelConfiguration
         {
-            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) { }
+            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
         class PrivateModelConfiguration : IModelConfiguration
         {
-            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) { }
+            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
         public abstract class AbstractModelConfiguration : IModelConfiguration
         {
-            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) { }
+            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
         public class GenericModelConfiguration<T> : IModelConfiguration
         {
-            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) { }
+            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
         public class PublicModelConfiguration : IModelConfiguration
         {
-            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) { }
+            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
     }
 }

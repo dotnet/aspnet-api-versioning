@@ -109,20 +109,7 @@
                 throw new ArgumentNullException( nameof( actionDescriptor ) );
             }
 
-            IList<HttpMethod> supportedMethods;
-            IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
-            var httpMethodConstraint = route.Constraints.Values.OfType<HttpMethodConstraint>().FirstOrDefault();
-
-            if ( httpMethodConstraint == null )
-            {
-                supportedMethods = actionHttpMethods;
-            }
-            else
-            {
-                supportedMethods = httpMethodConstraint.AllowedMethods.Intersect( actionHttpMethods ).ToList();
-            }
-
-            return new Collection<HttpMethod>( supportedMethods );
+            return new Collection<HttpMethod>( actionDescriptor.GetHttpMethods( route ) );
         }
 
         /// <summary>

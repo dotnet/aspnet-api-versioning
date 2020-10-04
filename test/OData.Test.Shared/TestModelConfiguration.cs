@@ -10,7 +10,7 @@
 
     public class TestModelConfiguration : IModelConfiguration
     {
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
         {
             var tests = builder.EntitySet<TestEntity>( "Tests" ).EntityType;
             var neutralTests = builder.EntitySet<TestNeutralEntity>( "NeutralTests" ).EntityType;

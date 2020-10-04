@@ -293,7 +293,7 @@
                     Message = ex.Message,
                 };
 
-                context.Handler = new BadRequestHandler( handlerContext );
+                context.SetHandlerOrEndpoint( new BadRequestHandler( handlerContext ) );
                 return true;
             }
 

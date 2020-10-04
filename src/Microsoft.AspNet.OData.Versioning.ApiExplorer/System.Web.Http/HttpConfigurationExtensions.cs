@@ -4,7 +4,6 @@
     using Microsoft.OData;
     using Microsoft.Web.Http.Description;
     using System.Collections.Concurrent;
-    using System.ComponentModel.DataAnnotations;
     using System.Web.Http.Description;
     using System.Web.Http.Routing;
 

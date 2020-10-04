@@ -13,6 +13,7 @@
     using static System.Net.HttpStatusCode;
     using static System.Text.Encoding;
 
+    [Trait( "Routing", "Classic" )]
     public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<MediaTypeNegotiationFixture>
     {
         [Theory]
@@ -93,6 +94,7 @@
         public when_using_media_type_negotiation( MediaTypeNegotiationFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     public class when_using_media_type_negotiation_ : when_using_media_type_negotiation, IClassFixture<MediaTypeNegotiationEndpointFixture>
     {
         public when_using_media_type_negotiation_( MediaTypeNegotiationEndpointFixture fixture ) : base( fixture ) { }

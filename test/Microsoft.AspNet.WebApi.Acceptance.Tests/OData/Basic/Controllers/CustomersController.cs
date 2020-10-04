@@ -19,7 +19,7 @@
         [ApiVersion( "1.0" )]
         [ApiVersion( "2.0" )]
         [ApiVersion( "3.0" )]
-        public IHttpActionResult Get( [FromODataUri] int key ) => Ok();
+        public IHttpActionResult Get( int key ) => Ok();
 
         [ODataRoute]
         [ApiVersion( "1.0" )]
@@ -31,12 +31,12 @@
             return Created( customer );
         }
 
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [ApiVersion( "3.0" )]
-        public IHttpActionResult Put( [FromODataUri] int key, [FromBody] Customer customer ) => StatusCode( NoContent );
+        public IHttpActionResult Put( int key, [FromBody] Customer customer ) => StatusCode( NoContent );
 
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [ApiVersionNeutral]
-        public IHttpActionResult Delete( [FromODataUri] int key ) => StatusCode( NoContent );
+        public IHttpActionResult Delete( int key ) => StatusCode( NoContent );
     }
 }

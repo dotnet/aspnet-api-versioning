@@ -47,7 +47,7 @@
                 throw new ArgumentNullException( nameof( controllerDescriptor ) );
             }
 
-            var actionMappings = ( from descriptor in controllerDescriptor.AsEnumerable()
+            var actionMappings = ( from descriptor in controllerDescriptor.AsEnumerable( includeCandidates: true )
                                    let selector = GetInternalSelector( descriptor )
                                    select selector.GetActionMapping() ).ToArray();
 

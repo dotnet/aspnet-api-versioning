@@ -19,7 +19,7 @@
             var person = new { lastName = "Me" };
 
             // act
-            var response = await PatchAsync( $"api/people(42)?api-version=4.0", person );
+            var response = await PatchAsync( $"api/people/42?api-version=4.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

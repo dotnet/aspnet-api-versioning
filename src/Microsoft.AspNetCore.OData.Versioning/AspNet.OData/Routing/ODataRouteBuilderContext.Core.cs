@@ -1,11 +1,14 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNet.OData;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
+    using System.Collections.Generic;
     using System.Reflection;
     using static System.Linq.Enumerable;
 
@@ -14,36 +17,40 @@
         private IODataPathTemplateHandler? templateHandler;
 
         internal ODataRouteBuilderContext(
+            ApiVersion apiVersion,
             ODataRouteMapping routeMapping,
             ControllerActionDescriptor actionDescriptor,
             ODataApiVersioningOptions options )
         {
-            ApiVersion = routeMapping.ApiVersion;
+            ApiVersion = apiVersion;
             Services = routeMapping.Services;
-            EdmModel = Services.GetRequiredService<IEdmModel>();
             routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
-            Route = routeMapping.Route;
+            RoutePrefix = routeMapping.RoutePrefix;
             ActionDescriptor = actionDescriptor;
             Options = options;
             UrlKeyDelimiter = UrlKeyDelimiterOrDefault( Services.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
 
-            var container = EdmModel.EntityContainer;
+            var selector = Services.GetRequiredService<IEdmModelSelector>();
+            var model = selector.SelectModel( apiVersion );
+            var container = model?.EntityContainer;
 
-            if ( container == null )
+            if ( model == null || container == null )
             {
+                EdmModel = Services.GetRequiredService<IEdmModel>();
                 IsRouteExcluded = true;
                 return;
             }
 
-            var controllerName = actionDescriptor.ControllerName;
-            var actionName = actionDescriptor.ActionName;
-
-            EntitySet = container.FindEntitySet( controllerName );
-            Operation = container.FindOperationImports( controllerName ).FirstOrDefault()?.Operation ??
-                        EdmModel.FindDeclaredOperations( string.Concat( container.Namespace, ".", actionName ) ).FirstOrDefault();
-            ActionType = GetActionType( EntitySet, Operation );
+            EdmModel = model;
+            Services = new FixedEdmModelServiceProviderDecorator( Services, model );
+            EntitySet = container.FindEntitySet( actionDescriptor.ControllerName );
+            Operation = ResolveOperation( container, actionDescriptor.ActionName );
+            ActionType = GetActionType( EntitySet, Operation, actionDescriptor );
+            IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
         }
+
+        static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action ) => action.GetHttpMethods();
 
         internal IODataPathTemplateHandler PathTemplateHandler =>
             templateHandler ??= Services.GetRequiredService<IODataPathTemplateHandler>();

@@ -34,7 +34,7 @@
             var example = new { id = 0, firstName = "", lastName = "", email = "" };
 
             // act
-            var response = await Client.GetAsync( "api/people(42)?api-version=2.0" );
+            var response = await Client.GetAsync( "api/people/42?api-version=2.0" );
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
@@ -50,7 +50,7 @@
             var person = new { email = "bmei@somewhere.com" };
 
             // act
-            var response = await PatchAsync( "api/people(42)?api-version=2.0", person );
+            var response = await PatchAsync( "api/people/42?api-version=2.0", person );
 
             // assert
             response.StatusCode.Should().Be( NoContent );
@@ -63,7 +63,7 @@
             var person = new { phone = "bmei@somewhere.com" };
 
             // act
-            var response = await PatchAsync( "api/people(42)?api-version=2.0", person );
+            var response = await PatchAsync( "api/people/42?api-version=2.0", person );
 
             // assert
             response.StatusCode.Should().Be( BadRequest );

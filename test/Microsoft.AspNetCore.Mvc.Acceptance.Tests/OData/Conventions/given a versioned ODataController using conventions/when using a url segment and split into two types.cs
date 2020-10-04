@@ -10,16 +10,17 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( ConventionsODataCollection ) )]
     public class when_using_a_url_segment_and_split_into_two_types : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "v1/people" )]
-        [InlineData( "v1/people(42)" )]
+        [InlineData( "v1/people/42" )]
         [InlineData( "v2/people" )]
-        [InlineData( "v2/people(42)" )]
+        [InlineData( "v2/people/42" )]
         [InlineData( "v3/people" )]
-        [InlineData( "v3/people(42)" )]
+        [InlineData( "v3/people/42" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange
@@ -39,15 +40,15 @@
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
 
             // act
-            var response = await PatchAsync( "v2/people(42)", person );
+            var response = await PatchAsync( "v2/people/42", person );
 
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
 
         [Theory]
-        [InlineData( "v1/people(42)" )]
-        [InlineData( "v3/people(42)" )]
+        [InlineData( "v1/people/42" )]
+        [InlineData( "v3/people/42" )]
         public async Task then_patch_should_return_405_if_supported_in_any_version( string requestUrl )
         {
             // arrange
@@ -69,7 +70,7 @@
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
 
             // act
-            var response = await PatchAsync( "v4/people(42)", person );
+            var response = await PatchAsync( "v4/people/42", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -78,5 +79,14 @@
         }
 
         public when_using_a_url_segment_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }
+
+        protected when_using_a_url_segment_and_split_into_two_types( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( ConventionsODataEndpointCollection ) )]
+    public class when_using_a_url_segment_and_split_into_two_types_ : when_using_a_url_segment_and_split_into_two_types
+    {
+        public when_using_a_url_segment_and_split_into_two_types_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
     }
 }

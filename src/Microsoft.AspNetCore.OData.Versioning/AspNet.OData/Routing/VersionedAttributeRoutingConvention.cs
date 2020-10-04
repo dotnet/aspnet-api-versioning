@@ -10,6 +10,8 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
+    using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -21,15 +23,12 @@
     [CLSCompliant( false )]
     public partial class VersionedAttributeRoutingConvention : IODataRoutingConvention
     {
-        readonly IServiceProvider serviceProvider;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
         /// </summary>
         /// <param name="routeName">The name of the route.</param>
         /// <param name="serviceProvider">The current <see cref="IServiceProvider">HTTP configuration</see>.</param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
-        public VersionedAttributeRoutingConvention( string routeName, IServiceProvider serviceProvider, ApiVersion apiVersion )
+        public VersionedAttributeRoutingConvention( string routeName, IServiceProvider serviceProvider )
         {
             if ( serviceProvider == null )
             {
@@ -39,50 +38,19 @@
             var perRouteContainer = serviceProvider.GetRequiredService<IPerRouteContainer>();
             var rootContainer = perRouteContainer.GetODataRootContainer( routeName );
 
-            this.routeName = routeName;
-            this.serviceProvider = serviceProvider;
-            ApiVersion = apiVersion;
+            RouteName = routeName;
             ODataPathTemplateHandler = rootContainer.GetRequiredService<IODataPathTemplateHandler>();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VersionedAttributeRoutingConvention"/> class.
-        /// </summary>
-        /// <param name="routeName">The name of the route.</param>
-        /// <param name="serviceProvider">The current <see cref="IServiceProvider">HTTP configuration</see>.</param>
-        /// <param name="pathTemplateHandler">The <see cref="IODataPathTemplateHandler">OData path template handler</see> associated with the routing convention.</param>
-        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> associated with the convention.</param>
-        public VersionedAttributeRoutingConvention( string routeName, IServiceProvider serviceProvider, IODataPathTemplateHandler pathTemplateHandler, ApiVersion apiVersion )
-        {
-            this.routeName = routeName;
-            this.serviceProvider = serviceProvider;
-            ApiVersion = apiVersion;
-            ODataPathTemplateHandler = pathTemplateHandler;
-        }
-
-        IDictionary<ODataPathTemplate, ControllerActionDescriptor> AttributeMappings
-        {
-            get
-            {
-                if ( attributeMappings == null )
-                {
-                    var provider = serviceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
-                    var actions = provider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>();
-                    attributeMappings = BuildAttributeMappings( actions );
-                }
-
-                return attributeMappings;
-            }
         }
 
         /// <summary>
         /// Returns a value indicating whether the specified action should be mapped using attribute routing conventions.
         /// </summary>
         /// <param name="action">The <see cref="ControllerActionDescriptor">controller action descriptor</see> to evaluate.</param>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to evaluate.</param>
         /// <returns>True if the <paramref name="action"/> should be mapped as an OData action or function; otherwise, false.</returns>
         /// <remarks>This method will match any OData action that explicitly or implicitly matches the API version applied
         /// to the associated <see cref="ApiVersionModel">model</see>.</remarks>
-        public virtual bool ShouldMapAction( ControllerActionDescriptor action ) => action.IsMappedTo( ApiVersion );
+        public virtual bool ShouldMapAction( ControllerActionDescriptor action, ApiVersion? apiVersion ) => action.IsMappedTo( apiVersion );
 
         /// <summary>
         /// Selects the controller for OData requests.
@@ -96,36 +64,38 @@
                 throw new ArgumentNullException( nameof( routeContext ) );
             }
 
-            var items = new Dictionary<string, object>();
+            var version = SelectApiVersion( routeContext );
+            var attributeMappings = attributeMappingsPerApiVersion.GetOrAdd( version, key => BuildAttributeMappings( key, routeContext ) );
+            var values = new Dictionary<string, object>();
             var feature = routeContext.HttpContext.ODataFeature();
             var odataPath = feature.Path;
-            IDictionary<string, object> routeData = routeContext.RouteData.Values;
+            var routeData = routeContext.RouteData.Values;
 
-            foreach ( var attributeMapping in AttributeMappings )
+            foreach ( var attributeMapping in attributeMappings )
             {
                 var template = attributeMapping.Key;
                 var action = attributeMapping.Value;
 
-                if ( !template.TryMatch( odataPath, items ) )
+                if ( !template.TryMatch( odataPath, values ) )
                 {
                     continue;
                 }
 
-                foreach ( var item in items )
+                foreach ( var value in values )
                 {
-                    if ( IsODataRouteParameter( item ) )
+                    if ( IsODataRouteParameter( value ) )
                     {
-                        feature.RoutingConventionsStore[item.Key] = item.Value;
+                        feature.RoutingConventionsStore[value.Key] = value.Value;
                     }
                     else
                     {
-                        routeData[item.Key] = item.Value;
+                        routeData[value.Key] = value.Value;
                     }
                 }
 
-                items[ODataRouteConstants.Action] = action.ActionName;
+                values[ODataRouteConstants.Action] = action.ActionName;
 
-                yield return new SelectControllerResult( action.ControllerName, items );
+                yield return new SelectControllerResult( action.ControllerName, values );
             }
         }
 
@@ -162,20 +132,81 @@
             }
         }
 
-        IDictionary<ODataPathTemplate, ControllerActionDescriptor> BuildAttributeMappings( IEnumerable<ControllerActionDescriptor> actions )
+        /// <summary>
+        /// Selects the API version from the given HTTP request.
+        /// </summary>
+        /// <param name="routeContext">The current <see cref="RouteContext">context</see>.</param>
+        /// <returns>The selected <see cref="ApiVersion">API version</see>.</returns>
+        protected virtual ApiVersion SelectApiVersion( RouteContext routeContext )
         {
+            if ( routeContext == null )
+            {
+                throw new ArgumentNullException( nameof( routeContext ) );
+            }
+
+            var httpContext = routeContext.HttpContext;
+            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            ApiVersion? version;
+
+            try
+            {
+                version = feature.RequestedApiVersion;
+            }
+            catch ( AmbiguousApiVersionException )
+            {
+                version = default;
+            }
+
+            if ( version != null )
+            {
+                return version;
+            }
+
+            var options = httpContext.RequestServices.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+
+            if ( !options.AssumeDefaultVersionWhenUnspecified )
+            {
+                return version ?? ApiVersion.Neutral;
+            }
+
+            var modelSelector = httpContext.Request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();
+            var versionSelector = options.ApiVersionSelector;
+            var model = new ApiVersionModel( modelSelector.ApiVersions, Enumerable.Empty<ApiVersion>() );
+
+            return versionSelector.SelectVersion( httpContext.Request, model );
+        }
+
+        static IEnumerable<string> GetODataRoutePrefixes( ControllerActionDescriptor controllerAction )
+        {
+            var prefixAttributes = controllerAction.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>( inherit: false );
+            return GetODataRoutePrefixes( prefixAttributes, controllerAction.ControllerTypeInfo.FullName! );
+        }
+
+        IReadOnlyDictionary<ODataPathTemplate, ControllerActionDescriptor> BuildAttributeMappings( ApiVersion version, RouteContext routeContext )
+        {
+            var httpContext = routeContext.HttpContext;
+            var services = httpContext.RequestServices;
+            var provider = services.GetRequiredService<IActionDescriptorCollectionProvider>();
+            var actions = provider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>();
             var attributeMappings = new Dictionary<ODataPathTemplate, ControllerActionDescriptor>();
+            var serviceProvider = httpContext.Request.GetRequestContainer();
 
             foreach ( var action in actions )
             {
-                if ( !action.ControllerTypeInfo.IsODataController() || !ShouldMapAction( action ) )
+                if ( !action.ControllerTypeInfo.IsODataController() || !ShouldMapAction( action, version ) )
                 {
+                    continue;
+                }
+
+                if ( action.AttributeRouteInfo is ODataAttributeRouteInfo routeInfo && routeInfo.ODataTemplate != null )
+                {
+                    attributeMappings.Add( routeInfo.ODataTemplate, action );
                     continue;
                 }
 
                 foreach ( var prefix in GetODataRoutePrefixes( action ) )
                 {
-                    var pathTemplates = GetODataPathTemplates( prefix, action );
+                    var pathTemplates = GetODataPathTemplates( prefix, action, serviceProvider );
 
                     foreach ( var pathTemplate in pathTemplates )
                     {
@@ -187,21 +218,19 @@
             return attributeMappings;
         }
 
-        static IEnumerable<string> GetODataRoutePrefixes( ControllerActionDescriptor controllerAction )
-        {
-            var prefixAttributes = controllerAction.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>( inherit: false );
-            return GetODataRoutePrefixes( prefixAttributes, controllerAction.ControllerTypeInfo?.FullName ?? string.Empty );
-        }
-
-        IEnumerable<ODataPathTemplate> GetODataPathTemplates( string prefix, ControllerActionDescriptor controllerAction )
+        IEnumerable<ODataPathTemplate> GetODataPathTemplates( string prefix, ControllerActionDescriptor controllerAction, IServiceProvider serviceProvider )
         {
             var routeAttributes = controllerAction.MethodInfo.GetCustomAttributes<ODataRouteAttribute>( inherit: false );
-            var perRouteContainer = serviceProvider.GetRequiredService<IPerRouteContainer>();
-            var requestContainer = perRouteContainer.GetODataRootContainer( routeName );
-            var controllerName = controllerAction.ControllerName;
-            var actionName = controllerAction.ActionName;
 
-            return routeAttributes.Select( route => GetODataPathTemplate( prefix, route.PathTemplate, requestContainer, controllerName, actionName ) ).Where( template => template != null );
+            foreach ( var route in routeAttributes )
+            {
+                var template = GetODataPathTemplate( prefix, route.PathTemplate, serviceProvider );
+
+                if ( template != null )
+                {
+                    yield return template;
+                }
+            }
         }
     }
 }

@@ -12,7 +12,7 @@
         [ODataRoute]
         public IActionResult Get() => Ok( new [] { new TestEntity() { Id = 1 }, new TestEntity() { Id = 2 }, new TestEntity() { Id = 3 } } );
 
-        [ODataRoute( "({id})" )]
+        [ODataRoute( "{id}" )]
         public IActionResult Get( int id ) => Ok( new TestEntity() { Id = id } );
     }
 }

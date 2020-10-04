@@ -7,13 +7,14 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( ConventionsODataCollection ) )]
     public class when_using_an_action : ODataAcceptanceTest
     {
         [Theory]
-        [InlineData( "api/customers(42)?api-version=1.0" )]
-        [InlineData( "api/customers(42)?api-version=2.0" )]
-        [InlineData( "api/customers(42)?api-version=3.0" )]
+        [InlineData( "api/customers/42?api-version=1.0" )]
+        [InlineData( "api/customers/42?api-version=2.0" )]
+        [InlineData( "api/customers/42?api-version=3.0" )]
         [InlineData( "api/customers?api-version=2.0" )]
         [InlineData( "api/customers?api-version=3.0" )]
         public async Task then_get_should_return_200( string requestUrl )
@@ -47,7 +48,7 @@
         public async Task then_put_should_return_204()
         {
             // arrange
-            var requestUrl = "api/customers(42)?api-version=3.0";
+            var requestUrl = "api/customers/42?api-version=3.0";
             var customer = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
 
             // act
@@ -58,10 +59,10 @@
         }
 
         [Theory]
-        [InlineData( "api/customers(42)" )]
-        [InlineData( "api/customers(42)?api-version=1.0" )]
-        [InlineData( "api/customers(42)?api-version=2.0" )]
-        [InlineData( "api/customers(42)?api-version=3.0" )]
+        [InlineData( "api/customers/42" )]
+        [InlineData( "api/customers/42?api-version=1.0" )]
+        [InlineData( "api/customers/42?api-version=2.0" )]
+        [InlineData( "api/customers/42?api-version=3.0" )]
         public async Task then_delete_should_return_204( string requestUrl )
         {
             // arrange
@@ -74,5 +75,14 @@
         }
 
         public when_using_an_action( ConventionsFixture fixture ) : base( fixture ) { }
+
+        protected when_using_an_action( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( ConventionsODataEndpointCollection ) )]
+    public class when_using_an_action_ : when_using_an_action
+    {
+        public when_using_an_action_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
     }
 }

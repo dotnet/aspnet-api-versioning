@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>4.0.0</VersionPrefix>
-  <AssemblyVersion>4.0.0.0</AssemblyVersion>
+  <VersionPrefix>5.0.0</VersionPrefix>
+  <AssemblyVersion>5.0.0.0</AssemblyVersion>
   <TargetFramework>net45</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Web API Versioning for OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API and OData v4.0.</Description>
-  <RootNamespace>Microsoft.AspNet.OData</RootNamespace>
+  <RootNamespace>Microsoft</RootNamespace>
   <DefineConstants>$(DefineConstants);WEBAPI</DefineConstants>
   <PackageTags>Microsoft;AspNet;AspNetWebAPI;OData;Versioning</PackageTags>
  </PropertyGroup>
@@ -16,7 +16,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.OData" Version="[7.0.1,8.0.0)" />
+  <PackageReference Include="Microsoft.AspNet.OData" Version="[7.5.0,8.0.0)" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -24,7 +24,18 @@
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
 
+ <ItemGroup>
+   <Compile Update="LocalSR.Designer.cs">
+     <DesignTime>True</DesignTime>
+   </Compile>
+ </ItemGroup>
+
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
  <Import Project="..\Common.OData\Common.OData.projitems" Label="Shared" />
+ <ItemGroup>
+   <Compile Update="C:\Dev\Projects\aspnet-api-versioning\src\Common.OData\SR.Designer.cs">
+     <DesignTime>True</DesignTime>
+   </Compile>
+ </ItemGroup>
 
 </Project>

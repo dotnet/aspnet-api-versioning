@@ -47,7 +47,7 @@
             };
             var models = builder.GetEdmModels();
 
-            configuration.MapVersionedODataRoutes( "odata", "api", models );
+            configuration.MapVersionedODataRoute( "odata", "api", models );
 
             return configuration;
         }
@@ -69,7 +69,7 @@
             };
             var models = builder.GetEdmModels();
 
-            configuration.MapVersionedODataRoutes( "odata", "api/v{apiVersion}", models );
+            configuration.MapVersionedODataRoute( "odata", "api/v{apiVersion}", models );
 
             return configuration;
         }
@@ -86,7 +86,7 @@
 
             var builder = new VersionedODataModelBuilder( configuration )
             {
-                DefaultModelConfiguration = ( b, v ) =>
+                DefaultModelConfiguration = ( b, v, r ) =>
                 {
                     b.EntitySet<Product>( "Products" ).EntityType.HasKey( p => p.Id );
                     b.EntitySet<Supplier>( "Suppliers" ).EntityType.HasKey( s => s.Id );
@@ -94,7 +94,7 @@
             };
             var models = builder.GetEdmModels();
 
-            configuration.MapVersionedODataRoutes( "odata", "api", models );
+            configuration.MapVersionedODataRoute( "odata", "api", models );
 
             return configuration;
         }

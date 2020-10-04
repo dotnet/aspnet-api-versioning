@@ -11,6 +11,7 @@
     using System.Threading.Tasks;
     using Xunit;
 
+    [Trait( "Routing", "Classic" )]
     public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<OverlappingRouteTemplateFixture>
     {
         [Fact]
@@ -71,6 +72,7 @@
         public when_two_route_templates_overlap( OverlappingRouteTemplateFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     public class when_two_route_templates_overlap_ : when_two_route_templates_overlap, IClassFixture<OverlappingRouteTemplateEndpointFixture>
     {
         public when_two_route_templates_overlap_( OverlappingRouteTemplateEndpointFixture fixture ) : base( fixture ) { }

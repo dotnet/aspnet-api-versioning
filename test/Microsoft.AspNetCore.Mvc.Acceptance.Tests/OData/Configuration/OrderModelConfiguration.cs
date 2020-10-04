@@ -6,10 +6,9 @@
 
     public class OrderModelConfiguration : IModelConfiguration
     {
-        static readonly ApiVersion V1 = new ApiVersion( 1, 0 );
         readonly ApiVersion supportedApiVersion;
 
-        public OrderModelConfiguration() : this( V1 ) { }
+        public OrderModelConfiguration() { }
 
         public OrderModelConfiguration( ApiVersion supportedApiVersion ) => this.supportedApiVersion = supportedApiVersion;
 
@@ -20,9 +19,9 @@
             return order;
         }
 
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion )
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
         {
-            if ( supportedApiVersion == apiVersion )
+            if ( supportedApiVersion == null || supportedApiVersion == apiVersion )
             {
                 ConfigureCurrent( builder );
             }

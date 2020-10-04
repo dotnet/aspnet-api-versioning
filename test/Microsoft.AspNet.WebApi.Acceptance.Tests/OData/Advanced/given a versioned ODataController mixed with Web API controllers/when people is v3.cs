@@ -35,7 +35,7 @@
             var example = new { id = 0, firstName = "", lastName = "", email = "", phone = "" };
 
             // act
-            var response = await Client.GetAsync( "api/people(42)?api-version=3.0" );
+            var response = await Client.GetAsync( "api/people/42?api-version=3.0" );
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
@@ -51,7 +51,7 @@
             var person = new { lastName = "Me" };
 
             // act
-            var response = await PatchAsync( $"api/people(42)?api-version=3.0", person );
+            var response = await PatchAsync( $"api/people/42?api-version=3.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

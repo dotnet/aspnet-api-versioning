@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNet.OData {
+namespace Microsoft {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Microsoft.AspNet.OData {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.AspNet.OData.LocalSR", typeof(LocalSR).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.LocalSR", typeof(LocalSR).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

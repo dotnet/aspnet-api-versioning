@@ -19,6 +19,9 @@
         internal EdmTypeKey( IEdmTypeReference type, ApiVersion apiVersion ) =>
             hashCode = ComputeHash( type.FullName(), apiVersion );
 
+        internal EdmTypeKey( string fullTypeName, ApiVersion apiVersion ) =>
+            hashCode = ComputeHash( fullTypeName, apiVersion );
+
         public static bool operator ==( EdmTypeKey obj, EdmTypeKey other ) => obj.Equals( other );
 
         public static bool operator !=( EdmTypeKey obj, EdmTypeKey other ) => !obj.Equals( other );

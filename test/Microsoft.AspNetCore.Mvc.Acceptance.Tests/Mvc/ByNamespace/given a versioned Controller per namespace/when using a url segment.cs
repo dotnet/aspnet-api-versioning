@@ -9,6 +9,7 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( AgreementsCollection ) )]
     public class when_using_a_url_segment : AcceptanceTest
     {
@@ -48,6 +49,7 @@
         public when_using_a_url_segment( AgreementsFixture fixture ) : base( fixture ) { }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     [Collection( nameof( AgreementsEndpointCollection ) )]
     public class when_using_a_url_segment_ : when_using_a_url_segment
     {

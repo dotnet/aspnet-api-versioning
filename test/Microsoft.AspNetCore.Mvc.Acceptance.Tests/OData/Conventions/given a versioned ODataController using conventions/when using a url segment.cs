@@ -10,12 +10,13 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( ConventionsODataCollection ) )]
     public class when_using_a_url_segment : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "v1/orders" )]
-        [InlineData( "v1/orders(42)" )]
+        [InlineData( "v1/orders/42" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange
@@ -44,5 +45,14 @@
         }
 
         public when_using_a_url_segment( ConventionsFixture fixture ) : base( fixture ) { }
+
+        protected when_using_a_url_segment( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( ConventionsODataEndpointCollection ) )]
+    public class when_using_a_url_segment_ : when_using_a_url_segment
+    {
+        public when_using_a_url_segment_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
     }
 }

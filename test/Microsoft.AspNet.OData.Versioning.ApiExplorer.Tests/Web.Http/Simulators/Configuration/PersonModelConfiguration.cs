@@ -6,6 +6,6 @@
 
     public class PersonModelConfiguration : IModelConfiguration
     {
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) => builder.EntitySet<Person>( "People" );
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) => builder.EntitySet<Person>( "People" );
     }
 }

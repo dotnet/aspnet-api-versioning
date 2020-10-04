@@ -16,8 +16,8 @@
         public IHttpActionResult Get( ODataQueryOptions<Order> options ) =>
             Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } } );
 
-        [ODataRoute( "({key})" )]
-        public IHttpActionResult Get( [FromODataUri] int key, ODataQueryOptions<Order> options ) =>
+        [ODataRoute( "{key}" )]
+        public IHttpActionResult Get( int key, ODataQueryOptions<Order> options ) =>
             Ok( new Order() { Id = key, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } );
     }
 }

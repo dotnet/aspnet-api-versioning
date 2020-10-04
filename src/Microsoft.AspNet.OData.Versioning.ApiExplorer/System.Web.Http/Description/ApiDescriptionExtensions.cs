@@ -1,5 +1,6 @@
 ﻿namespace System.Web.Http.Description
 {
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.OData.Edm;
     using Microsoft.Web.Http.Description;
 
@@ -77,6 +78,21 @@
             }
 
             return default;
+        }
+
+        /// <summary>
+        /// Gets the route prefix associated with the API description.
+        /// </summary>
+        /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the route prefix for.</param>
+        /// <returns>The associated route prefix or <c>null</c>.</returns>
+        public static string? RoutePrefix( this ApiDescription apiDescription )
+        {
+            if ( apiDescription == null )
+            {
+                throw new ArgumentNullException( nameof( apiDescription ) );
+            }
+
+            return apiDescription.Route is ODataRoute route ? route.RoutePrefix : default;
         }
     }
 }

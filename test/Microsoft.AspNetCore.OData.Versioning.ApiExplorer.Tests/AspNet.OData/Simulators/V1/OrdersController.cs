@@ -24,7 +24,7 @@
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         public IActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = "John Doe" } );
 
         /// <summary>

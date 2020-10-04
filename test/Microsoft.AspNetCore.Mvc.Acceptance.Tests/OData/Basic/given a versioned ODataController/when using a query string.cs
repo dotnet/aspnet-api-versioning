@@ -2,6 +2,7 @@
 {
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData;
     using Microsoft.AspNetCore.OData.Basic;
     using System.Linq;
     using System.Net.Http;
@@ -9,11 +10,13 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
+    [Collection( nameof( BasicODataCollection ) )]
     public class when_using_a_query_string : BasicAcceptanceTest
     {
         [Theory]
         [InlineData( "api/orders?api-version=1.0" )]
-        [InlineData( "api/orders(42)?api-version=1.0" )]
+        [InlineData( "api/orders/42?api-version=1.0" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange
@@ -57,5 +60,14 @@
         }
 
         public when_using_a_query_string( BasicFixture fixture ) : base( fixture ) { }
+
+        protected when_using_a_query_string( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( BasicODataEndpointCollection ) )]
+    public class when_using_a_query_string_ : when_using_a_query_string
+    {
+        public when_using_a_query_string_( BasicEndpointFixture fixture ) : base( fixture ) { }
     }
 }

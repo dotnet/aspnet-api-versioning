@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using Xunit;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( AdvancedODataCollection ) )]
     public class when_orders_is_v1 : ODataAcceptanceTest
     {
@@ -67,5 +68,14 @@
         }
 
         public when_orders_is_v1( AdvancedFixture fixture ) : base( fixture ) { }
+
+        protected when_orders_is_v1( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( AdvancedODataEndpointCollection ) )]
+    public class when_orders_is_v1_ : when_orders_is_v1
+    {
+        public when_orders_is_v1_( AdvancedEndpointFixture fixture ) : base( fixture ) { }
     }
 }

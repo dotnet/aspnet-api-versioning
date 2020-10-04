@@ -9,8 +9,6 @@ namespace Microsoft.AspNetCore.Mvc
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
-    using System.Collections.Generic;
-    using System.Linq;
 
     sealed class ODataActionDescriptorProvider : IActionDescriptorProvider
     {
@@ -37,35 +35,32 @@ namespace Microsoft.AspNetCore.Mvc
                 return;
             }
 
-            var results = context.Results.ToArray();
+            var results = context.Results;
             var conventions = new IODataActionDescriptorConvention[]
             {
                 new ImplicitHttpMethodConvention(),
                 new ODataRouteBindingInfoConvention( routeCollectionProvider, modelMetadataProvider, options ),
             };
 
-            foreach ( var action in ODataActions( results ) )
+            for ( var i = results.Count - 1; i >= 0; i-- )
             {
-                foreach ( var convention in conventions )
+                var result = results[i];
+
+                if ( !( result is ControllerActionDescriptor action ) ||
+                     !action.ControllerTypeInfo.IsODataController() )
                 {
-                    convention.Apply( context, action );
+                    continue;
+                }
+
+                results.RemoveAt( i );
+
+                for ( var j = 0; j < conventions.Length; j++ )
+                {
+                    conventions[j].Apply( context, action );
                 }
             }
         }
 
         public void OnProvidersExecuting( ActionDescriptorProviderContext context ) { }
-
-        static IEnumerable<ControllerActionDescriptor> ODataActions( IEnumerable<ActionDescriptor> results )
-        {
-            foreach ( var result in results )
-            {
-                if ( result is ControllerActionDescriptor action &&
-                     action.ControllerTypeInfo.IsODataController() &&
-                    !action.ControllerTypeInfo.IsMetadataController() )
-                {
-                    yield return action;
-                }
-            }
-        }
     }
 }

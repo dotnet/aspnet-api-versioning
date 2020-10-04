@@ -3,10 +3,10 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using System.Threading.Tasks;
+    using static System.Threading.Tasks.Task;
 
     sealed class CatchAllRouteHandler : IRouter
     {
-        static readonly Task CompletedTask = Task.FromResult( default( object ) );
         readonly IApiVersionRoutePolicy routePolicy;
 
         public CatchAllRouteHandler( IApiVersionRoutePolicy routePolicy ) => this.routePolicy = routePolicy;

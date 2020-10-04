@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.Web
 {
     using System;
+    using System.Diagnostics;
     using System.Net.Http;
     using System.Web.Http;
     using System.Web.Http.Dispatcher;
@@ -13,7 +14,7 @@
         {
             Configuration.IncludeErrorDetailPolicy = Always;
             Configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), FilteredControllerTypes );
-            Configuration.Services.Replace( typeof( ITraceWriter ), new TraceWriter() );
+            Configuration.Services.Replace( typeof( ITraceWriter ), Debugger.IsAttached ? TraceWriter.Debug : TraceWriter.None );
             Server = new HttpServer( Configuration );
             Client = new HttpClient( new HttpSimulatorHandler( Server ) ) { BaseAddress = new Uri( "http://localhost" ) };
         }

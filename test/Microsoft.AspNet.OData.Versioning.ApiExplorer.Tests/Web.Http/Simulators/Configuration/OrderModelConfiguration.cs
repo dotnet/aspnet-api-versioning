@@ -6,6 +6,6 @@
 
     public class OrderModelConfiguration : IModelConfiguration
     {
-        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion ) => builder.EntitySet<Order>( "Orders" );
+        public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) => builder.EntitySet<Order>( "Orders" );
     }
 }

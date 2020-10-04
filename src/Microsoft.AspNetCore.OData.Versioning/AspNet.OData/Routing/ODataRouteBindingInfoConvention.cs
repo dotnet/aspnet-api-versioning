@@ -1,12 +1,15 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNet.OData.Routing.Template;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
+    using Microsoft.OData;
     using Microsoft.OData.Edm;
     using System;
     using System.Collections.Generic;
@@ -40,60 +43,144 @@
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
             var model = action.GetApiVersionModel( Explicit | Implicit );
-            var mappings = RouteCollectionProvider.Items;
-            var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
 
             UpdateControllerName( action );
 
-            if ( model.IsApiVersionNeutral )
+            var routeInfos = model.IsApiVersionNeutral ?
+                             ExpandVersionNeutralActions( action ) :
+                             ExpandVersionedActions( action, model );
+
+            foreach ( var routeInfo in routeInfos )
             {
-                if ( mappings.Count == 0 )
-                {
-                    return;
-                }
-
-                // any mapping will do for a version-neutral action; just take the first one
-                var mapping = mappings[0];
-
-                UpdateBindingInfo( action, mapping, routeInfos );
+                context.Results.Add( Clone( action, routeInfo ) );
             }
-            else
+        }
+
+        IEnumerable<ODataAttributeRouteInfo> ExpandVersionedActions( ControllerActionDescriptor action, ApiVersionModel model )
+        {
+            var mappings = RouteCollectionProvider.Items;
+            var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
+            var declaredVersions = model.DeclaredApiVersions;
+            var metadata = action.ControllerTypeInfo.IsMetadataController();
+
+            for ( var i = 0; i < declaredVersions.Count; i++ )
             {
-                foreach ( var apiVersion in model.DeclaredApiVersions )
+                for ( var j = 0; j < mappings.Count; j++ )
                 {
-                    if ( !mappings.TryGetValue( apiVersion, out var mappingsPerApiVersion ) )
+                    var mapping = mappings[j];
+                    var selector = mapping.ModelSelector;
+
+                    if ( !selector.Contains( declaredVersions[i] ) )
                     {
                         continue;
                     }
 
-                    foreach ( var mapping in mappingsPerApiVersion! )
+                    if ( metadata )
                     {
                         UpdateBindingInfo( action, mapping, routeInfos );
+                    }
+                    else
+                    {
+                        var mappedVersions = selector.ApiVersions;
+
+                        for ( var k = 0; k < mappedVersions.Count; k++ )
+                        {
+                            UpdateBindingInfo( action, mappedVersions[k], mapping, routeInfos );
+                        }
                     }
                 }
             }
 
-            if ( routeInfos.Count == 0 )
+            return routeInfos;
+        }
+
+        IEnumerable<ODataAttributeRouteInfo> ExpandVersionNeutralActions( ControllerActionDescriptor action )
+        {
+            var mappings = RouteCollectionProvider.Items;
+            var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
+            var visited = new HashSet<ApiVersion>();
+
+            for ( var i = 0; i < mappings.Count; i++ )
+            {
+                var mapping = mappings[i];
+                var mappedVersions = mapping.ModelSelector.ApiVersions;
+
+                for ( var j = 0; j < mappedVersions.Count; j++ )
+                {
+                    var apiVersion = mappedVersions[j];
+
+                    if ( visited.Add( apiVersion ) )
+                    {
+                        UpdateBindingInfo( action, apiVersion, mapping, routeInfos );
+                    }
+                }
+            }
+
+            return routeInfos;
+        }
+
+        static void UpdateBindingInfo(
+            ControllerActionDescriptor action,
+            ODataRouteMapping mapping,
+            ICollection<ODataAttributeRouteInfo> routeInfos )
+        {
+            string template;
+            string path;
+
+            switch ( action.ActionName )
+            {
+                case nameof( MetadataController.GetMetadata ):
+                case nameof( VersionedMetadataController.GetOptions ):
+                    path = "$metadata";
+
+                    if ( string.IsNullOrEmpty( mapping.RoutePrefix ) )
+                    {
+                        template = path;
+                    }
+                    else
+                    {
+                        template = mapping.RoutePrefix + '/' + path;
+                    }
+
+                    break;
+                default:
+                    path = "/";
+                    template = string.IsNullOrEmpty( mapping.RoutePrefix ) ? path : mapping.RoutePrefix;
+                    break;
+            }
+
+            var handler = mapping.Services.GetRequiredService<IODataPathTemplateHandler>();
+            var routeInfo = new ODataAttributeRouteInfo()
+            {
+                Name = mapping.RouteName,
+                Template = template,
+                ODataTemplate = handler.ParseTemplate( path, mapping.Services ),
+                RoutePrefix = mapping.RoutePrefix,
+            };
+
+            routeInfos.Add( routeInfo );
+        }
+
+        void UpdateBindingInfo(
+            ControllerActionDescriptor action,
+            ApiVersion apiVersion,
+            ODataRouteMapping mapping,
+            ICollection<ODataAttributeRouteInfo> routeInfos )
+        {
+            var routeContext = new ODataRouteBuilderContext( apiVersion, mapping, action, Options );
+
+            if ( routeContext.IsRouteExcluded )
             {
                 return;
             }
 
-            using var iterator = routeInfos.GetEnumerator();
-
-            iterator.MoveNext();
-            action.AttributeRouteInfo = iterator.Current;
-
-            while ( iterator.MoveNext() )
-            {
-                context.Results.Add( Clone( action, iterator.Current ) );
-            }
-        }
-
-        void UpdateBindingInfo( ControllerActionDescriptor action, ODataRouteMapping mapping, ICollection<ODataAttributeRouteInfo> routeInfos )
-        {
-            var routeContext = new ODataRouteBuilderContext( mapping, action, Options );
             var routeBuilder = new ODataRouteBuilder( routeContext );
             var parameterContext = new ActionParameterContext( routeBuilder, routeContext );
+
+            if ( !parameterContext.IsSupported )
+            {
+                return;
+            }
 
             for ( var i = 0; i < action.Parameters.Count; i++ )
             {
@@ -102,8 +189,10 @@
 
             var routeInfo = new ODataAttributeRouteInfo()
             {
+                Name = mapping.RouteName,
                 Template = routeBuilder.BuildPath( includePrefix: true ),
                 ODataTemplate = parameterContext.PathTemplate,
+                RoutePrefix = mapping.RoutePrefix,
             };
 
             routeInfos.Add( routeInfo );
@@ -270,10 +359,14 @@
                     return false;
                 }
 
-                return StringComparer.OrdinalIgnoreCase.Equals( x.Template, y.Template );
+                var comparer = StringComparer.OrdinalIgnoreCase;
+
+                return comparer.Equals( x.Template, y.Template ) &&
+                       comparer.Equals( x.Name, y.Name );
             }
 
-            public int GetHashCode( ODataAttributeRouteInfo obj ) => obj is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode( obj.Template );
+            public int GetHashCode( ODataAttributeRouteInfo obj ) =>
+                obj is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode( obj.Template );
         }
     }
 }

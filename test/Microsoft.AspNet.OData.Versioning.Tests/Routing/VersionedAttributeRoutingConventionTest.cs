@@ -10,24 +10,18 @@
 
     public class VersionedAttributeRoutingConventionTest
     {
-        [ApiVersionNeutral]
-        sealed class NeutralController : ODataController { }
-
-        [ApiVersion( "1.0" )]
-        sealed class ControllerV1 : ODataController { }
-
         [Fact]
         public void should_map_controller_should_return_true_for_versionX2Dneutral_controller()
         {
             // arrange
             var configuration = new HttpConfiguration();
             var controller = new HttpControllerDescriptor( configuration, string.Empty, typeof( NeutralController ) );
-            var convention = new VersionedAttributeRoutingConvention( "Tests", configuration, new ApiVersion( 1, 0 ) );
+            var convention = new VersionedAttributeRoutingConvention( "Tests", configuration );
 
             controller.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
 
             // act
-            var result = convention.ShouldMapController( controller );
+            var result = convention.ShouldMapController( controller, new ApiVersion( 1, 0 ) );
 
             // assert
             result.Should().BeTrue();
@@ -41,15 +35,21 @@
             // arrange
             var configuration = new HttpConfiguration();
             var controller = new HttpControllerDescriptor( configuration, string.Empty, typeof( ControllerV1 ) );
-            var convention = new VersionedAttributeRoutingConvention( "Tests", configuration, new ApiVersion( majorVersion, 0 ) );
+            var convention = new VersionedAttributeRoutingConvention( "Tests", configuration );
 
-            controller.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+            controller.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( majorVersion, 0 ) );
 
             // act
-            var result = convention.ShouldMapController( controller );
+            var result = convention.ShouldMapController( controller, new ApiVersion( majorVersion, 0 ) );
 
             // assert
             result.Should().BeTrue();
         }
+
+        [ApiVersionNeutral]
+        sealed class NeutralController : ODataController { }
+
+        [ApiVersion( "1.0" )]
+        sealed class ControllerV1 : ODataController { }
     }
 }

@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using Xunit;
 
+    [Trait( "Routing", "Classic" )]
     public class when_accessing_a_view_using_convention_routing : AcceptanceTest, IClassFixture<UIFixture>
     {
         [Theory]
@@ -34,6 +35,7 @@
         }
     }
 
+    [Trait( "Routing", "Endpoint" )]
     public class when_accessing_a_view_using_convention_routing_ : when_accessing_a_view_using_convention_routing, IClassFixture<UIEndpointFixture>
     {
         public when_accessing_a_view_using_convention_routing_( UIEndpointFixture fixture ) : base( fixture ) { }

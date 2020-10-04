@@ -15,7 +15,7 @@
     {
         [Theory]
         [InlineData( "v1/orders" )]
-        [InlineData( "v1/orders(42)" )]
+        [InlineData( "v1/orders/42" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange

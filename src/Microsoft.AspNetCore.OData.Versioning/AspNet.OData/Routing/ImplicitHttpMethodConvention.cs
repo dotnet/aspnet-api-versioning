@@ -42,8 +42,10 @@
         {
             const int Post = 2;
 
-            foreach ( var supportedHttpMethod in SupportedHttpMethodConventions )
+            for ( var i = 0; i < SupportedHttpMethodConventions.Count; i++ )
             {
+                var supportedHttpMethod = SupportedHttpMethodConventions[i];
+
                 if ( action.MethodInfo.Name.StartsWith( supportedHttpMethod, OrdinalIgnoreCase ) )
                 {
                     return supportedHttpMethod;

@@ -10,16 +10,17 @@
     using Xunit;
     using static System.Net.HttpStatusCode;
 
+    [Trait( "Routing", "Classic" )]
     [Collection( nameof( ConventionsODataCollection ) )]
     public class when_using_a_query_string_and_split_into_two_types : ODataAcceptanceTest
     {
         [Theory]
         [InlineData( "api/people?api-version=1.0" )]
-        [InlineData( "api/people(42)?api-version=1.0" )]
+        [InlineData( "api/people/42?api-version=1.0" )]
         [InlineData( "api/people?api-version=2.0" )]
-        [InlineData( "api/people(42)?api-version=2.0" )]
+        [InlineData( "api/people/42?api-version=2.0" )]
         [InlineData( "api/people?api-version=3.0" )]
-        [InlineData( "api/people(42)?api-version=3.0" )]
+        [InlineData( "api/people/42?api-version=3.0" )]
         public async Task then_get_should_return_200( string requestUrl )
         {
             // arrange
@@ -54,15 +55,15 @@
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
 
             // act
-            var response = await PatchAsync( "api/people(42)?api-version=2.0", person );
+            var response = await PatchAsync( "api/people/42?api-version=2.0", person );
 
             // assert
             response.StatusCode.Should().Be( NoContent );
         }
 
         [Theory]
-        [InlineData( "api/people(42)?api-version=1.0" )]
-        [InlineData( "api/people(42)?api-version=3.0" )]
+        [InlineData( "api/people/42?api-version=1.0" )]
+        [InlineData( "api/people/42?api-version=3.0" )]
         public async Task then_patch_should_return_405_if_supported_in_any_version( string requestUrl )
         {
             // arrange
@@ -84,7 +85,7 @@
             var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
 
             // act
-            var response = await PatchAsync( "api/people(42)?api-version=4.0", person );
+            var response = await PatchAsync( "api/people/42?api-version=4.0", person );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -108,5 +109,14 @@
         }
 
         public when_using_a_query_string_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }
+
+        protected when_using_a_query_string_and_split_into_two_types( ODataFixture fixture ) : base( fixture ) { }
+    }
+
+    [Trait( "Routing", "Endpoint" )]
+    [Collection( nameof( ConventionsODataEndpointCollection ) )]
+    public class when_using_a_query_string_and_split_into_two_types_ : when_using_a_query_string_and_split_into_two_types
+    {
+        public when_using_a_query_string_and_split_into_two_types_( ConventionsEndpointFixture fixture ) : base( fixture ) { }
     }
 }
