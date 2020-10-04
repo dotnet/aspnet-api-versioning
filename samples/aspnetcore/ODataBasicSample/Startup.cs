@@ -1,13 +1,10 @@
 ﻿namespace Microsoft.Examples
 {
-    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
 
     public class Startup
     {
@@ -21,9 +18,7 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices( IServiceCollection services )
         {
-            // the sample application always uses the latest version, but you may want an explicit version such as Version_2_2
-            // note: Endpoint Routing is enabled by default; however, it is unsupported by OData and MUST be false
-            services.AddMvc( options => options.EnableEndpointRouting = false ).SetCompatibilityVersion( Latest );
+            services.AddControllers();
             services.AddApiVersioning(
                 options =>
                 {
@@ -36,17 +31,23 @@
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure( IApplicationBuilder app, VersionedODataModelBuilder modelBuilder )
         {
-            app.UseMvc(
-                routeBuilder =>
+            app.UseRouting();
+            app.UseEndpoints(
+                endpoints =>
                 {
-                    var models = modelBuilder.GetEdmModels();
+                    endpoints.MapControllers();
 
-                    // the following will not work as expected
-                    // BUG: https://github.com/OData/WebApi/issues/1837
-                    // routeBuilder.SetDefaultODataOptions( new ODataOptions() { UrlKeyDelimiter = Parentheses } );
-                    routeBuilder.ServiceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter = Parentheses;
-                    routeBuilder.MapVersionedODataRoutes( "odata", "api", models );
-                    routeBuilder.MapVersionedODataRoutes( "odata-bypath", "v{version:apiVersion}", models );
+                    // INFO: you do NOT and should NOT use both the query string and url segment methods together.
+                    // this configuration is merely illustrating that they can coexist and allows you to easily
+                    // experiment with either configuration. one of these would be removed in a real application.
+                    //
+                    // INFO: only pass the route prefix to GetEdmModels if you want to split the models; otherwise, both routes contain all models
+
+                    // WHEN VERSIONING BY: query string, header, or media type
+                    endpoints.MapVersionedODataRoute( "odata", "api", modelBuilder );
+
+                    // WHEN VERSIONING BY: url segment
+                    endpoints.MapVersionedODataRoute( "odata-bypath", "api/v{version:apiVersion}", modelBuilder );
                 } );
         }
     }

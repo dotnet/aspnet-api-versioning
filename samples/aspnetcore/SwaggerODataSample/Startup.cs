@@ -86,7 +86,7 @@
                     // global odata query options
                     routeBuilder.Count();
 
-                    routeBuilder.MapVersionedODataRoutes( "odata", "api", modelBuilder.GetEdmModels() );
+                    routeBuilder.MapVersionedODataRoute( "odata", "api", modelBuilder );
                 } );
             app.UseSwagger();
             app.UseSwaggerUI(

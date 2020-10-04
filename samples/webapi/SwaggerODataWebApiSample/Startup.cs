@@ -3,13 +3,10 @@
 namespace Microsoft.Examples
 {
     using global::Owin;
-    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
-    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Configuration;
     using Microsoft.OData;
-    using Microsoft.OData.UriParser;
     using Newtonsoft.Json.Serialization;
     using Swashbuckle.Application;
     using System;
@@ -18,8 +15,6 @@ namespace Microsoft.Examples
     using System.Web.Http;
     using System.Web.Http.Description;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
-    using static Microsoft.OData.ServiceLifetime;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -57,13 +52,17 @@ namespace Microsoft.Examples
             // global odata query options
             configuration.Count();
 
-            // INFO: while you can use both, you should choose only ONE of the following; comment, uncomment, or remove as necessary
+            // INFO: you do NOT and should NOT use both the query string and url segment methods together.
+            // this configuration is merely illustrating that they can coexist and allows you to easily
+            // experiment with either configuration. one of these would be removed in a real application.
+            //
+            // INFO: only pass the route prefix to GetEdmModels if you want to split the models; otherwise, both routes contain all models
 
             // WHEN VERSIONING BY: query string, header, or media type
-            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureContainer );
+            configuration.MapVersionedODataRoute( "odata", "api", models );
 
             // WHEN VERSIONING BY: url segment
-            // configuration.MapVersionedODataRoutes( "odata-bypath", "api/v{apiVersion}", models, ConfigureContainer );
+            // configuration.MapVersionedODataRoute( "odata-bypath", "api/v{apiVersion}", models );
 
             // add the versioned IApiExplorer and capture the strongly-typed implementation (e.g. ODataApiExplorer vs IApiExplorer)
             // note: the specified format code will format the version as "'v'major[.minor][-status]"
@@ -153,12 +152,6 @@ namespace Microsoft.Examples
                 var fileName = typeof( Startup ).GetTypeInfo().Assembly.GetName().Name + ".xml";
                 return Path.Combine( ContentRootPath, fileName );
             }
-        }
-
-        static void ConfigureContainer( IContainerBuilder builder )
-        {
-            builder.AddService<IODataPathHandler>( Singleton, sp => new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses } );
-            builder.AddService<ODataUriResolver>( Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver() { EnableCaseInsensitive = true } );
         }
     }
 }

@@ -3,18 +3,12 @@
 namespace Microsoft.Examples
 {
     using global::Owin;
-    using Microsoft.AspNet.OData;
-    using Microsoft.AspNet.OData.Batch;
     using Microsoft.AspNet.OData.Builder;
-    using Microsoft.AspNet.OData.Routing;
     using Microsoft.Examples.Configuration;
     using Microsoft.OData;
-    using Microsoft.OData.UriParser;
     using Microsoft.Web.Http.Versioning;
     using System;
     using System.Web.Http;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
-    using static Microsoft.OData.ServiceLifetime;
     using static System.Web.Http.RouteParameter;
 
     public class Startup
@@ -48,24 +42,17 @@ namespace Microsoft.Examples
                     new OrderModelConfiguration()
                 }
             };
-            var models = modelBuilder.GetEdmModels();
-            var batchHandler = new DefaultODataBatchHandler( httpServer );
 
             // NOTE: when you mix OData and non-Data controllers in Web API, it's RECOMMENDED to only use
             // convention-based routing. using attribute routing may not work as expected due to limitations
             // in the underlying routing system. the order of route registration is important as well.
             //
             // DO NOT use configuration.MapHttpAttributeRoutes();
-            configuration.MapVersionedODataRoutes( "odata", "api", models, ConfigureContainer, batchHandler );
+            configuration.MapVersionedODataRoute( "odata", "api", modelBuilder.GetEdmModels() );
             configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{id}", new { id = Optional } );
-            
-            appBuilder.UseWebApi( httpServer );
-        }
 
-        static void ConfigureContainer( IContainerBuilder builder )
-        {
-            builder.AddService<IODataPathHandler>( Singleton, sp => new DefaultODataPathHandler() { UrlKeyDelimiter = Parentheses } );
-            builder.AddService<ODataUriResolver>( Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver() { EnableCaseInsensitive = true } );
+            configuration.Formatters.Remove( configuration.Formatters.XmlFormatter );
+            appBuilder.UseWebApi( httpServer );
         }
 
         public static string ContentRootPath
