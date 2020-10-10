@@ -49,24 +49,81 @@
 
         internal ODataRouteBuilder( ODataRouteBuilderContext context ) => Context = context;
 
+        internal bool IsNavigationPropertyLink { get; private set; }
+
+        ODataRouteBuilderContext Context { get; }
+
         internal string Build()
         {
             var builder = new StringBuilder();
 
+            IsNavigationPropertyLink = false;
             BuildPath( builder );
             BuildQuery( builder );
 
             return builder.ToString();
         }
 
-        ODataRouteBuilderContext Context { get; }
+        internal string GetRoutePrefix() =>
+            IsNullOrEmpty( Context.RoutePrefix ) ? string.Empty : RemoveRouteConstraints( Context.RoutePrefix! );
+
+        internal IReadOnlyList<string> ExpandNavigationPropertyLinkTemplate( string template )
+        {
+            if ( IsNullOrEmpty( template ) )
+            {
+#if WEBAPI
+                return new string[0];
+#else
+                return Array.Empty<string>();
+#endif
+            }
+
+            var token = Concat( "{", NavigationProperty, "}" );
+
+            if ( template.IndexOf( token, OrdinalIgnoreCase ) < 0 )
+            {
+                return new[] { template };
+            }
+
+            IEdmEntityType entity;
+
+            switch ( Context.ActionType )
+            {
+                case EntitySet:
+                    entity = Context.EntitySet.EntityType();
+                    break;
+                case Singleton:
+                    entity = Context.Singleton.EntityType();
+                    break;
+                default:
+#if WEBAPI
+                    return new string[0];
+#else
+                    return Array.Empty<string>();
+#endif
+            }
+
+            var properties = entity.NavigationProperties().ToArray();
+            var refLinks = new string[properties.Length];
+
+            for ( var i = 0; i < properties.Length; i++ )
+            {
+#if WEBAPI
+                refLinks[i] = template.Replace( token, properties[i].Name );
+#else
+                refLinks[i] = template.Replace( token, properties[i].Name, OrdinalIgnoreCase );
+#endif
+            }
+
+            return refLinks;
+        }
 
         void BuildPath( StringBuilder builder )
         {
             var segments = new List<string>();
 
             AppendRoutePrefix( segments );
-            AppendEntitySetOrOperation( segments );
+            AppendPath( segments );
 
             builder.Append( Join( "/", segments ) );
         }
@@ -84,7 +141,7 @@
             segments.Add( prefix );
         }
 
-        void AppendEntitySetOrOperation( IList<string> segments )
+        void AppendPath( IList<string> segments )
         {
 #if WEBAPI
             var controllerDescriptor = Context.ActionDescriptor.ControllerDescriptor;
@@ -95,19 +152,21 @@
             if ( Context.IsAttributeRouted )
             {
 #if WEBAPI
-                var prefix = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>().FirstOrDefault()?.Prefix?.Trim( '/' );
+                var attributes = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>();
 #else
-                var prefix = controllerDescriptor.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>().FirstOrDefault()?.Prefix?.Trim( '/' );
+                var attributes = controllerDescriptor.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>();
 #endif
-                AppendEntitySetOrOperationFromAttributes( segments, prefix );
+                var prefix = attributes.FirstOrDefault()?.Prefix?.Trim( '/' );
+
+                AppendPathFromAttributes( segments, prefix );
             }
             else
             {
-                AppendEntitySetOrOperationFromConvention( segments, controllerDescriptor.ControllerName );
+                AppendPathFromConventions( segments, controllerDescriptor.ControllerName );
             }
         }
 
-        void AppendEntitySetOrOperationFromAttributes( IList<string> segments, string? prefix )
+        void AppendPathFromAttributes( IList<string> segments, string? prefix )
         {
             var template = Context.RouteTemplate;
 
@@ -141,7 +200,7 @@
             }
         }
 
-        void AppendEntitySetOrOperationFromConvention( IList<string> segments, string controllerName )
+        void AppendPathFromConventions( IList<string> segments, string controllerName )
         {
             var builder = new StringBuilder();
 
@@ -150,7 +209,11 @@
                 case EntitySet:
                     builder.Append( controllerName );
                     AppendEntityKeysFromConvention( builder );
-                    AppendNavigationPropertyFromConvention( builder );
+                    AppendNavigationPropertyFromConvention( builder, Context.EntitySet.EntityType() );
+                    break;
+                case Singleton:
+                    builder.Append( controllerName );
+                    AppendNavigationPropertyFromConvention( builder, Context.Singleton.EntityType() );
                     break;
                 case BoundOperation:
                     builder.Append( controllerName );
@@ -175,10 +238,21 @@
         void AppendEntityKeysFromConvention( StringBuilder builder )
         {
             // REF: http://odata.github.io/WebApi/#13-06-KeyValueBinding
-            var entityKeys = ( Context.EntitySet?.EntityType().Key() ?? Empty<IEdmStructuralProperty>() ).ToArray();
+            if ( Context.EntitySet == null )
+            {
+                return;
+            }
+
+            var entityKeys = Context.EntitySet.EntityType().Key().ToArray();
+
+            if ( entityKeys.Length == 0 )
+            {
+                return;
+            }
+
             var parameterKeys = Context.ParameterDescriptions.Where( p => p.Name.StartsWith( Key, OrdinalIgnoreCase ) ).ToArray();
 
-            if ( entityKeys.Length == 0 || entityKeys.Length != parameterKeys.Length )
+            if ( entityKeys.Length != parameterKeys.Length )
             {
                 return;
             }
@@ -219,18 +293,22 @@
             }
         }
 
-        void AppendNavigationPropertyFromConvention( StringBuilder builder )
+        void AppendNavigationPropertyFromConvention( StringBuilder builder, IEdmEntityType entityType )
         {
             var actionName = Context.ActionDescriptor.ActionName;
-            var navigationProperties = new Lazy<IEdmNavigationProperty[]>( Context.EntitySet.EntityType().NavigationProperties().ToArray );
 #if API_EXPLORER
-            var refLink = TryAppendNavigationPropertyLink( builder, actionName, navigationProperties );
+            var navigationProperties = entityType.NavigationProperties().ToArray();
+
+            IsNavigationPropertyLink = TryAppendNavigationPropertyLink( builder, actionName, navigationProperties );
 #else
-            var refLink = TryAppendNavigationPropertyLink( builder, actionName );
+            IsNavigationPropertyLink = TryAppendNavigationPropertyLink( builder, actionName );
 #endif
 
-            if ( !refLink )
+            if ( !IsNavigationPropertyLink )
             {
+#if !API_EXPLORER
+                var navigationProperties = entityType.NavigationProperties().ToArray();
+#endif
                 TryAppendNavigationProperty( builder, actionName, navigationProperties );
             }
         }
@@ -494,12 +572,11 @@
             return queryParameters;
         }
 
-        bool TryAppendNavigationProperty( StringBuilder builder, string name, Lazy<IEdmNavigationProperty[]> navigationProperties )
+        bool TryAppendNavigationProperty( StringBuilder builder, string name, IReadOnlyList<IEdmNavigationProperty> navigationProperties )
         {
             // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/PropertyRoutingConvention.cs
-            const string NavigationPropertyPrefix = @"(?:Get|(?:Post|Put|Delete|Patch)To)(\w+)";
-            const string NavigationProperty = "^" + NavigationPropertyPrefix + "$";
-            const string NavigationPropertyFromDeclaringType = "^" + NavigationPropertyPrefix + @"From(\w+)$";
+            const string NavigationProperty = @"(?:Get|(?:Post|Put|Delete|Patch)To)(\w+)";
+            const string NavigationPropertyFromDeclaringType = NavigationProperty + @"From(\w+)";
             var match = Regex.Match( name, NavigationPropertyFromDeclaringType, RegexOptions.Singleline );
 
             if ( !match.Success )
@@ -519,7 +596,7 @@
 
                 if ( Context.Options.UseQualifiedNames )
                 {
-                    var navigationProperty = navigationProperties.Value.First( p => p.Name.Equals( navigationPropertyName, OrdinalIgnoreCase ) );
+                    var navigationProperty = navigationProperties.First( p => p.Name.Equals( navigationPropertyName, OrdinalIgnoreCase ) );
                     builder.Append( navigationProperty.Type.ShortQualifiedName() );
                 }
                 else
@@ -535,19 +612,22 @@
 
             return true;
         }
+
 #if API_EXPLORER
-        bool TryAppendNavigationPropertyLink( StringBuilder builder, string name, Lazy<IEdmNavigationProperty[]> navigationProperties )
+        bool TryAppendNavigationPropertyLink( StringBuilder builder, string name, IReadOnlyList<IEdmNavigationProperty> navigationProperties )
 #else
-        static bool TryAppendNavigationPropertyLink( StringBuilder builder, string name )
+        bool TryAppendNavigationPropertyLink( StringBuilder builder, string name )
 #endif
         {
             // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/RefRoutingConvention.cs
-            const string NavigationPropertyLinkPrefix = "(?:Create|Delete|Get)Ref";
-            const string NavigationPropertyLink = "^" + NavigationPropertyLinkPrefix + "$";
-            const string NavigationPropertyLinkTo = "^" + NavigationPropertyLinkPrefix + @"To(\w+)$";
-            const string NavigationPropertyLinkFrom = "^" + NavigationPropertyLinkPrefix + @"To(\w+)From(\w+)$";
-            var patterns = new[] { NavigationPropertyLinkFrom, NavigationPropertyLinkTo, NavigationPropertyLink };
+            const int Link = 1;
+            const int LinkTo = 2;
+            const int LinkFrom = 3;
+            const string NavigationPropertyLink = "(?:Create|Delete|Get)Ref";
+            const string NavigationPropertyLinkTo = NavigationPropertyLink + @"To(\w+)";
+            const string NavigationPropertyLinkFrom = NavigationPropertyLinkTo + @"From(\w+)";
             var i = 0;
+            var patterns = new[] { NavigationPropertyLinkFrom, NavigationPropertyLinkTo, NavigationPropertyLink };
             var match = Regex.Match( name, patterns[i], RegexOptions.Singleline );
 
             while ( !match.Success && ++i < patterns.Length )
@@ -560,54 +640,58 @@
                 return false;
             }
 
+            var convention = match.Groups.Count;
             var propertyName = match.Groups[1].Value;
 
             builder.Append( '/' );
 
-            switch ( match.Groups.Count )
+            switch ( convention )
             {
-                case 1:
+                case Link:
                     builder.Append( '{' ).Append( NavigationProperty ).Append( '}' );
 #if API_EXPLORER
-                    AddOrReplaceNavigationPropertyParameter();
+                    RemoveNavigationPropertyParameter();
 #endif
                     break;
-                case 2:
-                case 3:
+                case LinkTo:
+                case LinkFrom:
                     builder.Append( propertyName );
-#if API_EXPLORER
-                    var parameters = Context.ParameterDescriptions;
-
-                    for ( i = 0; i < parameters.Count; i++ )
-                    {
-                        if ( parameters[i].Name.Equals( NavigationProperty, OrdinalIgnoreCase ) )
-                        {
-                            parameters.RemoveAt( i );
-                            break;
-                        }
-                    }
-#endif
+                    RemoveNavigationPropertyParameter();
                     break;
             }
 
             builder.Append( "/$ref" );
 
 #if API_EXPLORER
-            if ( name.StartsWith( "DeleteRef", OrdinalIgnoreCase ) )
+            if ( name.StartsWith( "DeleteRef", Ordinal ) && !IsNullOrEmpty( propertyName ) )
             {
-                var property = navigationProperties.Value.First( p => p.Name.Equals( propertyName, OrdinalIgnoreCase ) );
+                var property = navigationProperties.First( p => p.Name.Equals( propertyName, OrdinalIgnoreCase ) );
 
                 if ( property.TargetMultiplicity() == EdmMultiplicity.Many )
                 {
                     AddOrReplaceRefIdQueryParameter();
                 }
             }
-            else if ( name.StartsWith( "CreateRef", OrdinalIgnoreCase ) )
+            else if ( name.StartsWith( "CreateRef", Ordinal ) )
             {
                 AddOrReplaceIdBodyParameter();
             }
 #endif
             return true;
+        }
+
+        void RemoveNavigationPropertyParameter()
+        {
+            var parameters = Context.ParameterDescriptions;
+
+            for ( var i = 0; i < parameters.Count; i++ )
+            {
+                if ( parameters[i].Name.Equals( NavigationProperty, OrdinalIgnoreCase ) )
+                {
+                    parameters.RemoveAt( i );
+                    break;
+                }
+            }
         }
 
         static string GetRouteParameterName( IReadOnlyDictionary<string, ApiParameterDescription> actionParameters, string name )

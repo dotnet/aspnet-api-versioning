@@ -27,6 +27,7 @@
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
     using static System.Linq.Enumerable;
     using static System.StringComparison;
+    using static Microsoft.AspNet.OData.Routing.ODataRouteConstants;
 
     /// <summary>
     /// Represents an API explorer that provides <see cref="ApiDescription">API descriptions</see> for actions represented by
@@ -301,11 +302,35 @@
         {
             var relativePath = action.AttributeRouteInfo?.Template;
 
-            // note: if path happens to be built ahead of time, it's expected to be qualified; rebuild it as necessary
-            if ( string.IsNullOrEmpty( relativePath ) || !routeContext.Options.UseQualifiedNames )
+            if ( !string.IsNullOrEmpty( relativePath ) && routeContext.Options.UseQualifiedNames )
             {
-                var builder = new ODataRouteBuilder( routeContext );
-                relativePath = builder.Build();
+                return relativePath;
+            }
+
+            var builder = new ODataRouteBuilder( routeContext );
+
+            relativePath = builder.Build();
+
+            if ( builder.IsNavigationPropertyLink && action.AttributeRouteInfo is ODataAttributeRouteInfo info )
+            {
+                var template = info.ODataTemplate?.Segments.OfType<NavigationPropertyLinkSegmentTemplate>().FirstOrDefault();
+
+                if ( template == null )
+                {
+                    return relativePath;
+                }
+
+                var key = string.Concat( "{", NavigationProperty, "}" );
+                var property = template.Segment.NavigationProperty;
+                var value = property.Name;
+
+                relativePath = relativePath.Replace( key, value, OrdinalIgnoreCase );
+
+                if ( action.ActionName.StartsWith( "DeleteRef", Ordinal ) &&
+                     property.TargetMultiplicity() == EdmMultiplicity.Many )
+                {
+                    builder.AddOrReplaceRefIdQueryParameter();
+                }
             }
 
             return relativePath;
@@ -530,40 +555,31 @@
             var parameterType = parameter.ParameterType;
             var bindingInfo = parameter.BindingInfo;
 
-            static bool IsSpecialBindingSource( BindingInfo info, Type type )
+            if ( bindingInfo == null )
             {
-                if ( info == null )
-                {
-                    return false;
-                }
-
-                if ( ( type.IsODataQueryOptions() || type.IsODataPath() ) && info.BindingSource == Custom )
-                {
-                    info.BindingSource = Special;
-                    return true;
-                }
-
-                return false;
+                parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
+            }
+            else if ( bindingInfo.BindingSource == null )
+            {
+                bindingInfo.BindingSource = metadata.BindingSource;
             }
 
-            if ( IsSpecialBindingSource( bindingInfo, parameterType ) )
+            if ( bindingInfo.BindingSource == Custom )
+            {
+                if ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() )
+                {
+                    bindingInfo.BindingSource = Special;
+                }
+            }
+
+            if ( bindingInfo.BindingSource != null )
             {
                 return;
             }
 
-            if ( bindingInfo == null )
-            {
-                parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
-
-                if ( IsSpecialBindingSource( bindingInfo, parameterType ) )
-                {
-                    return;
-                }
-            }
-
             var key = default( IEdmNamedElement );
             var paramName = parameter.Name;
-            var source = bindingInfo.BindingSource;
+            var source = Query;
 
             switch ( context.RouteContext.ActionType )
             {
@@ -616,13 +632,9 @@
                     }
 
                     break;
-                default:
-                    source = Query;
-                    break;
             }
 
-            bindingInfo.BindingSource = source ?? Query;
-            parameter.BindingInfo = bindingInfo;
+            bindingInfo.BindingSource = source;
         }
 
         IReadOnlyList<ApiResponseType> GetApiResponseTypes(
