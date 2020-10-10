@@ -20,7 +20,7 @@
         /// Retrieves all suppliers.
         /// </summary>
         /// <returns>All available suppliers.</returns>
-        /// <response code="200">Products successfully retrieved.</response>
+        /// <response code="200">Suppliers successfully retrieved.</response>
         [EnableQuery]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Supplier>> ), Status200OK )]
