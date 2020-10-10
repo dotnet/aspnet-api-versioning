@@ -15,8 +15,6 @@
 
     partial class ODataRouteBuilderContext
     {
-        private IODataPathTemplateHandler? templateHandler;
-
         internal ODataRouteBuilderContext(
             ODataRouteMapping routeMapping,
             ApiVersion apiVersion,
@@ -48,15 +46,16 @@
             EdmModel = model;
             Services = new FixedEdmModelServiceProviderDecorator( Services, model );
             EntitySet = container.FindEntitySet( actionDescriptor.ControllerName );
+            Singleton = container.FindSingleton( actionDescriptor.ControllerName );
             Operation = ResolveOperation( container, actionDescriptor.ActionName );
-            ActionType = GetActionType( EntitySet, Operation, actionDescriptor );
+            ActionType = GetActionType( actionDescriptor );
             IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
         }
 
-        static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action ) => action.GetHttpMethods();
-
         internal IODataPathTemplateHandler PathTemplateHandler =>
             templateHandler ??= Services.GetRequiredService<IODataPathTemplateHandler>();
+
+        static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action ) => action.GetHttpMethods();
 
         internal IModelMetadataProvider? ModelMetadataProvider { get; set; }
     }

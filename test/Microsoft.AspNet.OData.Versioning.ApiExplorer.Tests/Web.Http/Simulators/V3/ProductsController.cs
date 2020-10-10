@@ -133,7 +133,7 @@
         /// <param name="navigationProperty">The supplier to link.</param>
         /// <returns>The supplier link.</returns>
         [ResponseType( typeof( ODataId ) )]
-        public IHttpActionResult GetRefToSupplier( [FromODataUri] int key, string navigationProperty )
+        public IHttpActionResult GetRef( [FromODataUri] int key, string navigationProperty )
         {
             var routeName = Request.ODataProperties().RouteName;
             var url = Request.RequestUri;
@@ -164,7 +164,7 @@
         /// <param name="link">The supplier identifier.</param>
         /// <returns>None</returns>
         [HttpPut]
-        public IHttpActionResult CreateRefToSupplier( [FromODataUri] int key, string navigationProperty, [FromBody] Uri link ) => StatusCode( NoContent );
+        public IHttpActionResult CreateRef( [FromODataUri] int key, string navigationProperty, [FromBody] Uri link ) => StatusCode( NoContent );
 
         /// <summary>
         /// Unlinks a supplier from a product.
@@ -172,7 +172,7 @@
         /// <param name="key">The product identifier.</param>
         /// <param name="navigationProperty">The supplier to unlink.</param>
         /// <returns>None</returns>
-        public IHttpActionResult DeleteRefToSupplier( [FromODataUri] int key, string navigationProperty ) => StatusCode( NoContent );
+        public IHttpActionResult DeleteRef( [FromODataUri] int key, string navigationProperty ) => StatusCode( NoContent );
 
         static Product NewProduct( int id ) =>
             new Product()

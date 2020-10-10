@@ -6,5 +6,6 @@
         EntitySet,
         BoundOperation,
         UnboundOperation,
+        Singleton,
     }
 }

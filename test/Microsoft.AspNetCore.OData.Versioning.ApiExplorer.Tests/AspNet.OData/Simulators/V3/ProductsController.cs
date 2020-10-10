@@ -149,7 +149,7 @@
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataId ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
-        public IActionResult GetRefToSupplier( [FromODataUri] int key, [FromODataUri] string navigationProperty )
+        public IActionResult GetRef( [FromODataUri] int key, [FromODataUri] string navigationProperty )
         {
             var segments = Request.ODataFeature().Path.Segments.ToArray();
             var entitySet = ( (EntitySetSegment) segments[0] ).EntitySet;
@@ -172,7 +172,7 @@
         [HttpPut]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status404NotFound )]
-        public IActionResult CreateRefToSupplier( [FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link ) => NoContent();
+        public IActionResult CreateRef( [FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link ) => NoContent();
 
         /// <summary>
         /// Unlinks a supplier from a product.
@@ -182,7 +182,7 @@
         /// <returns>None</returns>
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status404NotFound )]
-        public IActionResult DeleteRefToSupplier( [FromODataUri] int key, [FromODataUri] string navigationProperty ) => NoContent();
+        public IActionResult DeleteRef( [FromODataUri] int key, [FromODataUri] string navigationProperty ) => NoContent();
 
         static Product NewProduct( int id ) =>
             new Product()

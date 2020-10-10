@@ -4,6 +4,7 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Formatter;
     using Microsoft.AspNet.OData.Routing;
+    using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using Microsoft.OData.UriParser;
@@ -21,6 +22,7 @@
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
     using System.Web.Http.ValueProviders;
+    using static System.StringComparison;
     using static System.Text.RegularExpressions.RegexOptions;
     using static System.Web.Http.Description.ApiParameterSource;
 
@@ -258,9 +260,59 @@
                         continue;
                     }
 
-                    var relativePath = new ODataRouteBuilder( context ).Build();
+                    var routeBuilder = new ODataRouteBuilder( context );
+                    var relativePath = routeBuilder.Build();
 
-                    PopulateActionDescriptions( action, route, context, relativePath, apiDescriptions, apiVersion );
+                    if ( routeBuilder.IsNavigationPropertyLink )
+                    {
+                        var routeTemplates = routeBuilder.ExpandNavigationPropertyLinkTemplate( relativePath );
+                        var afterPrefix = string.IsNullOrEmpty( context.RoutePrefix ) ? 0 : context.RoutePrefix!.Length + 1;
+
+                        for ( var i = 0; i < routeTemplates.Count; i++ )
+                        {
+                            relativePath = routeTemplates[i];
+
+                            var queryParamAdded = false;
+
+                            if ( action.ActionName.StartsWith( "DeleteRef", Ordinal ) )
+                            {
+                                var handler = context.PathTemplateHandler;
+                                var pathTemplate = handler.ParseTemplate( relativePath.Substring( afterPrefix ), context.Services );
+                                var template = pathTemplate?.Segments.OfType<NavigationPropertyLinkSegmentTemplate>().FirstOrDefault();
+
+                                if ( template != null )
+                                {
+                                    var property = template.Segment.NavigationProperty;
+
+                                    if ( property.TargetMultiplicity() == EdmMultiplicity.Many )
+                                    {
+                                        routeBuilder.AddOrReplaceRefIdQueryParameter();
+                                        queryParamAdded = true;
+                                    }
+                                }
+                            }
+
+                            PopulateActionDescriptions( action, route, context, relativePath, apiDescriptions, apiVersion );
+
+                            if ( queryParamAdded )
+                            {
+                                for ( var j = 0; j < context.ParameterDescriptions.Count; j++ )
+                                {
+                                    var parameter = context.ParameterDescriptions[j];
+
+                                    if ( parameter.Name == "$id" || parameter.Name == "id" )
+                                    {
+                                        context.ParameterDescriptions.RemoveAt( j );
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        PopulateActionDescriptions( action, route, context, relativePath, apiDescriptions, apiVersion );
+                    }
                 }
             }
         }

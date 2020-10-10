@@ -18,8 +18,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
 #if WEBAPI
     using System.Web.Http.Description;
     using System.Web.Http.Dispatcher;
@@ -32,6 +30,7 @@
     sealed partial class ODataRouteBuilderContext
     {
         readonly ODataRouteAttribute? routeAttribute;
+        IODataPathTemplateHandler? templateHandler;
 
         internal IServiceProvider Services { get; }
 
@@ -61,6 +60,8 @@
 
         internal IEdmEntitySet? EntitySet { get; }
 
+        internal IEdmSingleton? Singleton { get; }
+
         internal IEdmOperation? Operation { get; }
 
         internal ODataRouteActionType ActionType { get; }
@@ -73,47 +74,45 @@
 
         internal bool IsOperation => Operation != null;
 
-        internal bool IsBound => IsOperation && EntitySet != null;
+        internal bool IsBound => IsOperation && ( EntitySet != null || Singleton != null );
 
         internal bool AllowUnqualifiedEnum => Services.GetRequiredService<ODataUriResolver>() is StringAsEnumResolver;
 
-        internal
-#if !WEBAPI
-        static
-#endif
-        ODataRouteActionType GetActionType( IEdmEntitySet? entitySet, IEdmOperation? operation, ControllerActionDescriptor action )
+        internal ODataRouteActionType GetActionType( ControllerActionDescriptor action )
         {
-            if ( entitySet == null )
+            if ( EntitySet == null && Singleton == null )
             {
-                if ( operation == null )
+                if ( Operation == null )
                 {
                     return ODataRouteActionType.Unknown;
                 }
-                else if ( !operation.IsBound )
+                else if ( !Operation.IsBound )
                 {
                     return ODataRouteActionType.UnboundOperation;
                 }
             }
-            else
+            else if ( Operation == null )
             {
-                if ( operation == null )
+                if ( IsActionOrFunction( EntitySet, Singleton, action.ActionName, GetHttpMethods( action ) ) )
                 {
-                    if ( IsActionOrFunction( entitySet, action.ActionName, GetHttpMethods( action ) ) )
-                    {
-                        return ODataRouteActionType.Unknown;
-                    }
-                    else
-                    {
-                        return ODataRouteActionType.EntitySet;
-                    }
+                    return ODataRouteActionType.Unknown;
                 }
-                else if ( operation.IsBound )
+                else if ( Singleton == null )
                 {
-                    return ODataRouteActionType.BoundOperation;
+                    return ODataRouteActionType.EntitySet;
+                }
+                else
+                {
+                    return ODataRouteActionType.Singleton;
                 }
             }
 
-            return ODataRouteActionType.Unknown;
+            if ( Operation.IsBound )
+            {
+                return ODataRouteActionType.BoundOperation;
+            }
+
+            return ODataRouteActionType.UnboundOperation;
         }
 
         // Slash became the default 4/18/2018
@@ -124,7 +123,8 @@
         // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/FunctionRoutingConvention.cs
         // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/EntitySetRoutingConvention.cs
         // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/EntityRoutingConvention.cs
-        static bool IsActionOrFunction( IEdmEntitySet? entitySet, string actionName, IEnumerable<string> methods )
+        // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/SingletonRoutingConvention.cs
+        static bool IsActionOrFunction( IEdmEntitySet? entitySet, IEdmSingleton? singleton, string actionName, IEnumerable<string> methods )
         {
             using var iterator = methods.GetEnumerator();
 
@@ -140,50 +140,73 @@
                 return false;
             }
 
+            if ( entitySet == null && singleton == null )
+            {
+                return true;
+            }
+
             const string ActionMethod = "Post";
             const string FunctionMethod = "Get";
 
             if ( ActionMethod.Equals( method, OrdinalIgnoreCase ) && actionName != ActionMethod )
             {
-                if ( entitySet == null )
+                if ( actionName.StartsWith( "CreateRef", Ordinal ) ||
+                   ( entitySet != null && actionName == ( ActionMethod + entitySet.Name ) ) )
                 {
-                    return true;
+                    return false;
                 }
 
-                return actionName != ( ActionMethod + entitySet.Name ) &&
-                       actionName != ( ActionMethod + entitySet.EntityType().Name ) &&
-                      !actionName.StartsWith( "CreateRef", Ordinal );
+                return !IsNavigationPropertyLink( entitySet, singleton, actionName, ActionMethod );
             }
             else if ( FunctionMethod.Equals( method, OrdinalIgnoreCase ) && actionName != FunctionMethod )
             {
-                if ( entitySet == null )
+                if ( actionName.StartsWith( "GetRef", Ordinal ) ||
+                   ( entitySet != null && actionName == ( ActionMethod + entitySet.Name ) ) )
                 {
-                    // TODO: could be a singleton here
+                    return false;
+                }
+
+                return !IsNavigationPropertyLink( entitySet, singleton, actionName, FunctionMethod );
+            }
+
+            return false;
+        }
+
+        static bool IsNavigationPropertyLink( IEdmEntitySet? entitySet, IEdmSingleton? singleton, string actionName, string method )
+        {
+            var entities = new List<IEdmEntityType>( capacity: 2 );
+
+            if ( entitySet != null )
+            {
+                entities.Add( entitySet.EntityType() );
+            }
+
+            if ( singleton != null )
+            {
+                var entity = singleton.EntityType();
+
+                if ( entities.Count == 0 || !entities[0].Equals( entity ) )
+                {
+                    entities.Add( entity );
+                }
+            }
+
+            for ( var i = 0; i < entities.Count; i++ )
+            {
+                var entity = entities[i];
+
+                if ( actionName == ( method + entity.Name ) )
+                {
                     return true;
-                }
-
-                if ( actionName == ( ActionMethod + entitySet.Name ) ||
-                     actionName.StartsWith( "GetRef", Ordinal ) )
-                {
-                    return false;
-                }
-
-                var entity = entitySet.EntityType();
-
-                if ( actionName == ( ActionMethod + entity.Name ) )
-                {
-                    return false;
                 }
 
                 foreach ( var property in entity.NavigationProperties() )
                 {
-                    if ( actionName.StartsWith( FunctionMethod + property.Name, OrdinalIgnoreCase ) )
+                    if ( actionName.StartsWith( method + property.Name, OrdinalIgnoreCase ) )
                     {
-                        return false;
+                        return true;
                     }
                 }
-
-                return true;
             }
 
             return false;
@@ -199,10 +222,26 @@
             }
 
             var qualifiedName = container.Namespace + "." + name;
+            var entities = new List<IEdmType>( capacity: 2 );
+
+            if ( Singleton != null )
+            {
+                entities.Add( Singleton.EntityType() );
+            }
 
             if ( EntitySet != null )
             {
-                var operation = EdmModel.FindBoundOperations( qualifiedName, EntitySet.EntityType() ).SingleOrDefault();
+                var entity = EntitySet.EntityType();
+
+                if ( entities.Count == 0 || !entities[0].Equals( entity ) )
+                {
+                    entities.Add( entity );
+                }
+            }
+
+            for ( var i = 0; i < entities.Count; i++ )
+            {
+                var operation = EdmModel.FindBoundOperations( qualifiedName, entities[i] ).SingleOrDefault();
 
                 if ( operation != null )
                 {

@@ -17,48 +17,11 @@
         internal string BuildPath()
         {
             var segments = new List<string>();
-            AppendEntitySetOrOperation( segments );
+            AppendPath( segments );
             return Join( "/", segments );
         }
 
-        void AddOrReplaceNavigationPropertyParameter()
-        {
-            var parameters = Context.ParameterDescriptions;
-            var parameter = default( ApiParameterDescription );
-
-            for ( var i = 0; i < parameters.Count; i++ )
-            {
-                if ( parameters[i].Name.Equals( NavigationProperty, OrdinalIgnoreCase ) )
-                {
-                    break;
-                }
-            }
-
-            if ( parameter == null )
-            {
-                var type = typeof( string );
-
-                parameter = new ApiParameterDescription()
-                {
-                    DefaultValue = default( string ),
-                    IsRequired = true,
-                    ModelMetadata = new ODataQueryOptionModelMetadata( Context.ModelMetadataProvider!, type, description: Empty ),
-                    Name = NavigationProperty,
-                    ParameterDescriptor = new ParameterDescriptor()
-                    {
-                        Name = NavigationProperty,
-                        ParameterType = type,
-                    },
-                    Type = type,
-                };
-
-                parameters.Add( parameter );
-            }
-
-            parameter.Source = Path;
-        }
-
-        void AddOrReplaceRefIdQueryParameter()
+        internal void AddOrReplaceRefIdQueryParameter()
         {
             var parameters = Context.ParameterDescriptions;
             var parameter = default( ApiParameterDescription );
@@ -101,12 +64,15 @@
 
             for ( var i = parameters.Count - 1; i >= 0; i-- )
             {
-                if ( parameters[i].ParameterDescriptor.ParameterType == type &&
-                     parameters[i].Source == Body )
+                parameter = parameters[i];
+
+                if ( parameter.Source == Body &&
+                     parameter.ParameterDescriptor?.ParameterType == type )
                 {
-                    parameter = parameters[i];
                     break;
                 }
+
+                parameter = default;
             }
 
             type = typeof( ODataId );

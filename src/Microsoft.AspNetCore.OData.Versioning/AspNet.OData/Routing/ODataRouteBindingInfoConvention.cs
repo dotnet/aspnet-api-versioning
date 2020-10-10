@@ -40,6 +40,8 @@
 
         ODataApiVersioningOptions Options => options.Value;
 
+        ODataAttributeRouteInfoComparer Comparer { get; } = new ODataAttributeRouteInfoComparer();
+
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
             var model = action.GetApiVersionModel( Explicit | Implicit );
@@ -56,67 +58,60 @@
             }
         }
 
-        IEnumerable<ODataAttributeRouteInfo> ExpandVersionedActions( ControllerActionDescriptor action, ApiVersionModel model )
+        static ControllerActionDescriptor Clone( ControllerActionDescriptor action, AttributeRouteInfo attributeRouteInfo )
         {
-            var mappings = RouteCollectionProvider.Items;
-            var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
-            var declaredVersions = model.DeclaredApiVersions;
-            var metadata = action.ControllerTypeInfo.IsMetadataController();
-
-            for ( var i = 0; i < declaredVersions.Count; i++ )
+            var clone = new ControllerActionDescriptor()
             {
-                for ( var j = 0; j < mappings.Count; j++ )
-                {
-                    var mapping = mappings[j];
-                    var selector = mapping.ModelSelector;
+                ActionConstraints = action.ActionConstraints,
+                ActionName = action.ActionName,
+                AttributeRouteInfo = attributeRouteInfo,
+                BoundProperties = action.BoundProperties,
+                ControllerName = action.ControllerName,
+                ControllerTypeInfo = action.ControllerTypeInfo,
+                DisplayName = action.DisplayName,
+                FilterDescriptors = action.FilterDescriptors,
+                MethodInfo = action.MethodInfo,
+                Parameters = action.Parameters,
+                Properties = action.Properties,
+                RouteValues = action.RouteValues,
+            };
 
-                    if ( !selector.Contains( declaredVersions[i] ) )
-                    {
-                        continue;
-                    }
-
-                    if ( metadata )
-                    {
-                        UpdateBindingInfo( action, mapping, routeInfos );
-                    }
-                    else
-                    {
-                        var mappedVersions = selector.ApiVersions;
-
-                        for ( var k = 0; k < mappedVersions.Count; k++ )
-                        {
-                            UpdateBindingInfo( action, mappedVersions[k], mapping, routeInfos );
-                        }
-                    }
-                }
-            }
-
-            return routeInfos;
+            return clone;
         }
 
-        IEnumerable<ODataAttributeRouteInfo> ExpandVersionNeutralActions( ControllerActionDescriptor action )
+        static void UpdateControllerName( ControllerActionDescriptor action )
         {
-            var mappings = RouteCollectionProvider.Items;
-            var routeInfos = new HashSet<ODataAttributeRouteInfo>( new ODataAttributeRouteInfoComparer() );
-            var visited = new HashSet<ApiVersion>();
-
-            for ( var i = 0; i < mappings.Count; i++ )
+            if ( !action.RouteValues.TryGetValue( "controller", out var key ) )
             {
-                var mapping = mappings[i];
-                var mappedVersions = mapping.ModelSelector.ApiVersions;
+                key = action.ControllerName;
+            }
 
-                for ( var j = 0; j < mappedVersions.Count; j++ )
+            action.ControllerName = TrimTrailingNumbers( key );
+        }
+
+        static string TrimTrailingNumbers( string name )
+        {
+            if ( string.IsNullOrEmpty( name ) )
+            {
+                return name;
+            }
+
+            var last = name.Length - 1;
+
+            for ( var i = last; i >= 0; i-- )
+            {
+                if ( !char.IsNumber( name[i] ) )
                 {
-                    var apiVersion = mappedVersions[j];
-
-                    if ( visited.Add( apiVersion ) )
+                    if ( i < last )
                     {
-                        UpdateBindingInfo( action, apiVersion, mapping, routeInfos );
+                        return name.Substring( 0, i + 1 );
                     }
+
+                    return name;
                 }
             }
 
-            return routeInfos;
+            return name;
         }
 
         static void UpdateBindingInfo(
@@ -187,15 +182,21 @@
                 UpdateBindingInfo( parameterContext, action.Parameters[i] );
             }
 
-            var routeInfo = new ODataAttributeRouteInfo()
-            {
-                Name = mapping.RouteName,
-                Template = routeBuilder.BuildPath( includePrefix: true ),
-                ODataTemplate = parameterContext.PathTemplate,
-                RoutePrefix = mapping.RoutePrefix,
-            };
+            var templates = parameterContext.Templates;
 
-            routeInfos.Add( routeInfo );
+            for ( var i = 0; i < templates.Count; i++ )
+            {
+                var template = templates[i];
+                var routeInfo = new ODataAttributeRouteInfo()
+                {
+                    Name = mapping.RouteName,
+                    Template = template.RouteTemplate,
+                    ODataTemplate = template.PathTemplate,
+                    RoutePrefix = mapping.RoutePrefix,
+                };
+
+                routeInfos.Add( routeInfo );
+            }
         }
 
         void UpdateBindingInfo( ActionParameterContext context, ParameterDescriptor parameter )
@@ -203,27 +204,30 @@
             var parameterType = parameter.ParameterType;
             var bindingInfo = parameter.BindingInfo;
 
-            if ( bindingInfo != null )
+            if ( bindingInfo == null || bindingInfo.BindingSource == null )
             {
-                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
+                var metadata = ModelMetadataProvider.GetMetadataForType( parameterType );
+
+                if ( bindingInfo == null )
+                {
+                    parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
+                }
+                else
+                {
+                    bindingInfo.BindingSource = metadata.BindingSource;
+                }
+            }
+
+            if ( bindingInfo.BindingSource == Custom )
+            {
+                if ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() )
                 {
                     bindingInfo.BindingSource = Special;
                 }
-
-                return;
             }
-
-            var metadata = ModelMetadataProvider.GetMetadataForType( parameterType );
-
-            parameter.BindingInfo = bindingInfo = new BindingInfo() { BindingSource = metadata.BindingSource };
 
             if ( bindingInfo.BindingSource != null )
             {
-                if ( ( parameterType.IsODataQueryOptions() || parameterType.IsODataPath() ) && bindingInfo.BindingSource == Custom )
-                {
-                    bindingInfo.BindingSource = Special;
-                }
-
                 return;
             }
 
@@ -241,16 +245,12 @@
 
                     if ( key == null )
                     {
-                        var template = context.PathTemplate;
+                        var template = context.Templates[0].PathTemplate;
+                        var segments = template.Segments.OfType<KeySegmentTemplate>();
 
-                        if ( template != null )
+                        if ( segments.SelectMany( s => s.ParameterMappings.Values ).Any( name => name.Equals( paramName, OrdinalIgnoreCase ) ) )
                         {
-                            var segments = template.Segments.OfType<KeySegmentTemplate>();
-
-                            if ( segments.SelectMany( s => s.ParameterMappings.Values ).Any( name => name.Equals( paramName, OrdinalIgnoreCase ) ) )
-                            {
-                                source = Path;
-                            }
+                            source = Path;
                         }
                     }
                     else
@@ -287,63 +287,69 @@
             }
 
             bindingInfo.BindingSource = source;
-            parameter.BindingInfo = bindingInfo;
         }
 
-        static ControllerActionDescriptor Clone( ControllerActionDescriptor action, AttributeRouteInfo attributeRouteInfo )
+        IEnumerable<ODataAttributeRouteInfo> ExpandVersionedActions( ControllerActionDescriptor action, ApiVersionModel model )
         {
-            var clone = new ControllerActionDescriptor()
+            var mappings = RouteCollectionProvider.Items;
+            var routeInfos = new HashSet<ODataAttributeRouteInfo>( Comparer );
+            var declaredVersions = model.DeclaredApiVersions;
+            var metadata = action.ControllerTypeInfo.IsMetadataController();
+
+            for ( var i = 0; i < declaredVersions.Count; i++ )
             {
-                ActionConstraints = action.ActionConstraints,
-                ActionName = action.ActionName,
-                AttributeRouteInfo = attributeRouteInfo,
-                BoundProperties = action.BoundProperties,
-                ControllerName = action.ControllerName,
-                ControllerTypeInfo = action.ControllerTypeInfo,
-                DisplayName = action.DisplayName,
-                FilterDescriptors = action.FilterDescriptors,
-                MethodInfo = action.MethodInfo,
-                Parameters = action.Parameters,
-                Properties = action.Properties,
-                RouteValues = action.RouteValues,
-            };
-
-            return clone;
-        }
-
-        static void UpdateControllerName( ControllerActionDescriptor action )
-        {
-            if ( !action.RouteValues.TryGetValue( "controller", out var key ) )
-            {
-                key = action.ControllerName;
-            }
-
-            action.ControllerName = TrimTrailingNumbers( key );
-        }
-
-        static string TrimTrailingNumbers( string name )
-        {
-            if ( string.IsNullOrEmpty( name ) )
-            {
-                return name;
-            }
-
-            var last = name.Length - 1;
-
-            for ( var i = last; i >= 0; i-- )
-            {
-                if ( !char.IsNumber( name[i] ) )
+                for ( var j = 0; j < mappings.Count; j++ )
                 {
-                    if ( i < last )
+                    var mapping = mappings[j];
+                    var selector = mapping.ModelSelector;
+
+                    if ( !selector.Contains( declaredVersions[i] ) )
                     {
-                        return name.Substring( 0, i + 1 );
+                        continue;
                     }
 
-                    return name;
+                    if ( metadata )
+                    {
+                        UpdateBindingInfo( action, mapping, routeInfos );
+                    }
+                    else
+                    {
+                        var mappedVersions = selector.ApiVersions;
+
+                        for ( var k = 0; k < mappedVersions.Count; k++ )
+                        {
+                            UpdateBindingInfo( action, mappedVersions[k], mapping, routeInfos );
+                        }
+                    }
                 }
             }
 
-            return name;
+            return routeInfos;
+        }
+
+        IEnumerable<ODataAttributeRouteInfo> ExpandVersionNeutralActions( ControllerActionDescriptor action )
+        {
+            var mappings = RouteCollectionProvider.Items;
+            var routeInfos = new HashSet<ODataAttributeRouteInfo>( Comparer );
+            var visited = new HashSet<ApiVersion>();
+
+            for ( var i = 0; i < mappings.Count; i++ )
+            {
+                var mapping = mappings[i];
+                var mappedVersions = mapping.ModelSelector.ApiVersions;
+
+                for ( var j = 0; j < mappedVersions.Count; j++ )
+                {
+                    var apiVersion = mappedVersions[j];
+
+                    if ( visited.Add( apiVersion ) )
+                    {
+                        UpdateBindingInfo( action, apiVersion, mapping, routeInfos );
+                    }
+                }
+            }
+
+            return routeInfos;
         }
 
         sealed class ODataAttributeRouteInfoComparer : IEqualityComparer<ODataAttributeRouteInfo>

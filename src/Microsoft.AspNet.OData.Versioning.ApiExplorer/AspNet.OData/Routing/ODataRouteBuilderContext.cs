@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.AspNet.OData.Routing
 {
     using Microsoft.AspNet.OData;
+    using Microsoft.AspNet.OData.Routing.Conventions;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
@@ -53,13 +54,29 @@
             EdmModel = model;
             Services = new FixedEdmModelServiceProviderDecorator( Services, model );
             EntitySet = container.FindEntitySet( controllerName );
+            Singleton = container.FindSingleton( controllerName );
             Operation = ResolveOperation( container, actionDescriptor.ActionName );
-            ActionType = GetActionType( EntitySet, Operation, actionDescriptor );
+            ActionType = GetActionType( actionDescriptor );
             IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
 
             if ( Operation?.IsAction() == true )
             {
                 ConvertODataActionParametersToTypedModel( modelTypeBuilder, (IEdmAction) Operation, controllerName );
+            }
+        }
+
+        internal IODataPathTemplateHandler PathTemplateHandler
+        {
+            get
+            {
+                if ( templateHandler == null )
+                {
+                    var conventions = Services.GetRequiredService<IEnumerable<IODataRoutingConvention>>();
+                    var attribute = conventions.OfType<AttributeRoutingConvention>().FirstOrDefault();
+                    templateHandler = attribute?.ODataPathTemplateHandler ?? new DefaultODataPathHandler();
+                }
+
+                return templateHandler;
             }
         }
 

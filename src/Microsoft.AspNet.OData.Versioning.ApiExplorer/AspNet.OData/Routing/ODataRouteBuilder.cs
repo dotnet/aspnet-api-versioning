@@ -11,34 +11,7 @@
 
     partial class ODataRouteBuilder
     {
-        void AddOrReplaceNavigationPropertyParameter()
-        {
-            var parameters = Context.ParameterDescriptions;
-
-            for ( var i = 0; i < parameters.Count; i++ )
-            {
-                if ( parameters[i].Name.Equals( NavigationProperty, OrdinalIgnoreCase ) )
-                {
-                    return;
-                }
-            }
-
-            var descriptor = new ODataParameterDescriptor( NavigationProperty, typeof( string ) )
-            {
-                ActionDescriptor = Context.ActionDescriptor,
-                Configuration = Context.ActionDescriptor.Configuration,
-            };
-            var parameter = new ApiParameterDescription()
-            {
-                Name = descriptor.ParameterName,
-                Source = FromUri,
-                ParameterDescriptor = descriptor,
-            };
-
-            parameters.Add( parameter );
-        }
-
-        void AddOrReplaceRefIdQueryParameter()
+        internal void AddOrReplaceRefIdQueryParameter()
         {
             var parameters = Context.ParameterDescriptions;
             var parameter = default( ApiParameterDescription );
@@ -86,14 +59,15 @@
 
             for ( var i = parameters.Count - 1; i >= 0; i-- )
             {
-                var param = parameters[i];
+                parameter = parameters[i];
 
-                if ( param.ParameterDescriptor.ParameterType == type &&
-                     param.Source == FromBody )
+                if ( parameter.Source == FromBody &&
+                     parameter.ParameterDescriptor?.ParameterType == type )
                 {
-                    parameter = param;
                     break;
                 }
+
+                parameter = default;
             }
 
             if ( parameter == null )

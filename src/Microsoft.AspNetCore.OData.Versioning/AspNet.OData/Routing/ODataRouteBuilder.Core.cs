@@ -15,7 +15,7 @@
                 AppendRoutePrefix( segments );
             }
 
-            AppendEntitySetOrOperation( segments );
+            AppendPath( segments );
 
             return Join( "/", segments );
         }
