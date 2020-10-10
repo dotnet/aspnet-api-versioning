@@ -17,7 +17,8 @@
                 return;
             }
 
-            var supplier = builder.EntitySet<Supplier>( "Suppliers" ).EntityType.HasKey( p => p.Id );
+            builder.EntitySet<Supplier>( "Suppliers" ).EntityType.HasKey( p => p.Id );
+            builder.Singleton<Supplier>( "Acme" );
         }
     }
 }
