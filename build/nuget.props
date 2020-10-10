@@ -29,6 +29,9 @@
   <PublishRepositoryUrl>true</PublishRepositoryUrl>
   <EmbedUntrackedSources>true</EmbedUntrackedSources>
   <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
+  <!-- REF: https://github.com/clairernovotny/DeterministicBuilds -->
+  <ContinuousIntegrationBuild Condition=" ('$(TF_BUILD)' == 'true') OR ('$(GITHUB_ACTIONS)' == 'true') ">true</ContinuousIntegrationBuild>
  </PropertyGroup>
 
  <ItemGroup Label="SourceLink">
