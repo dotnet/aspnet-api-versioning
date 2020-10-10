@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>4.1.1</VersionPrefix>
-  <AssemblyVersion>4.1.0.0</AssemblyVersion>
+  <VersionPrefix>4.2.0</VersionPrefix>
+  <AssemblyVersion>4.2.0.0</AssemblyVersion>
   <TargetFramework>netcoreapp3.1</TargetFramework>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
   <Description>ASP.NET Core MVC API explorer functionality for discovering metadata such as the list of API-versioned controllers and actions, and their URLs and allowed HTTP methods.</Description>
