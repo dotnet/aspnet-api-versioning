@@ -14,7 +14,7 @@
     [ApiVersion( "3.0" )]
     public class AcmeController : ODataController
     {
-        // <summary>
+        /// <summary>
         /// Retrieves the ACME supplier.
         /// </summary>
         /// <returns>All available suppliers.</returns>
