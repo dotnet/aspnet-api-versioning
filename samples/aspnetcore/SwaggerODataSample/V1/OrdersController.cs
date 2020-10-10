@@ -24,7 +24,7 @@
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
@@ -78,7 +78,7 @@
         /// <response code="200">The line items were successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({key})/LineItems" )]
+        [ODataRoute( "{key}/LineItems" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]

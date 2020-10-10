@@ -22,7 +22,7 @@
         /// Retrieves all suppliers.
         /// </summary>
         /// <returns>All available suppliers.</returns>
-        /// <response code="200">Products successfully retrieved.</response>
+        /// <response code="200">Suppliers were successfully retrieved.</response>
         [EnableQuery]
         [ResponseType( typeof( ODataValue<IEnumerable<Supplier>> ) )]
         public IQueryable<Supplier> Get() => suppliers;

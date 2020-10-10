@@ -45,7 +45,7 @@
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
@@ -84,7 +84,7 @@
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
-        [ODataRoute( "({key})" )]
+        [ODataRoute( "{key}" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
         [ProducesResponseType( Status204NoContent )]
@@ -128,7 +128,7 @@
         /// <response code="400">The parameters are invalid.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpPost]
-        [ODataRoute( "({key})/Rate" )]
+        [ODataRoute( "{key}/Rate" )]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
@@ -151,7 +151,7 @@
         /// <response code="200">The line items were successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
         [HttpGet]
-        [ODataRoute( "({key})/LineItems" )]
+        [ODataRoute( "{key}/LineItems" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]

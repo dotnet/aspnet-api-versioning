@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Examples
 {
-    using Microsoft.AspNet.OData;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Extensions;
     using Microsoft.AspNetCore.Builder;
@@ -12,8 +11,6 @@
     using System.IO;
     using System.Reflection;
     using static Microsoft.AspNet.OData.Query.AllowedQueryOptions;
-    using static Microsoft.AspNetCore.Mvc.CompatibilityVersion;
-    using static Microsoft.OData.ODataUrlKeyDelimiter;
 
     /// <summary>
     /// Represents the startup process for the application.
@@ -26,9 +23,7 @@
         /// <param name="services">The collection of services to configure the application with.</param>
         public void ConfigureServices( IServiceCollection services )
         {
-            // the sample application always uses the latest version, but you may want an explicit version such as Version_2_2
-            // note: Endpoint Routing is enabled by default; however, it is unsupported by OData and MUST be false
-            services.AddMvc( options => options.EnableEndpointRouting = false ).SetCompatibilityVersion( Latest );
+            services.AddControllers();
             services.AddApiVersioning( options => options.ReportApiVersions = true );
             services.AddOData().EnableApiVersioning();
             services.AddODataApiExplorer(
@@ -75,18 +70,12 @@
         /// <param name="provider">The API version descriptor provider used to enumerate defined API versions.</param>
         public void Configure( IApplicationBuilder app, VersionedODataModelBuilder modelBuilder, IApiVersionDescriptionProvider provider )
         {
-            app.UseMvc(
-                routeBuilder =>
+            app.UseRouting();
+            app.UseEndpoints(
+                endpoints =>
                 {
-                    // the following will not work as expected
-                    // BUG: https://github.com/OData/WebApi/issues/1837
-                    // routeBuilder.SetDefaultODataOptions( new ODataOptions() { UrlKeyDelimiter = Parentheses } );
-                    routeBuilder.ServiceProvider.GetRequiredService<ODataOptions>().UrlKeyDelimiter = Parentheses;
-
-                    // global odata query options
-                    routeBuilder.Count();
-
-                    routeBuilder.MapVersionedODataRoute( "odata", "api", modelBuilder );
+                    endpoints.Count();
+                    endpoints.MapVersionedODataRoute( "odata", "api", modelBuilder );
                 } );
             app.UseSwagger();
             app.UseSwaggerUI(
