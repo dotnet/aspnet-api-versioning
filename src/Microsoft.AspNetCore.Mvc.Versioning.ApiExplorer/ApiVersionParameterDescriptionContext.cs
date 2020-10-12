@@ -173,8 +173,12 @@
             parameter.DefaultValue = ApiVersion.ToString();
             parameter.ModelMetadata = ModelMetadata;
             parameter.Type = ModelMetadata.ModelType;
-            parameter.RouteInfo.IsOptional = false;
-            parameter.RouteInfo.DefaultValue = parameter.DefaultValue;
+
+            if ( parameter.RouteInfo != null )
+            {
+                parameter.RouteInfo.IsOptional = false;
+                parameter.RouteInfo.DefaultValue = parameter.DefaultValue;
+            }
 
             if ( parameter.ParameterDescriptor == null )
             {

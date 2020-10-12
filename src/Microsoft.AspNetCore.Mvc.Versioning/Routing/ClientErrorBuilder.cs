@@ -36,9 +36,9 @@
             var method = request.Method;
             var requestedVersion = feature.RawRequestedApiVersion;
             var parsedVersion = feature.RequestedApiVersion;
-            var actionNames = new Lazy<string>( () => Join( NewLine, Candidates.Select( a => a.DisplayName ) ) );
+            var actionNames = new Lazy<string>( () => Join( NewLine, Candidates!.Select( a => a.DisplayName ) ) );
             var allowedMethods = new Lazy<HashSet<string>>( () => AllowedMethodsFromCandidates( Candidates!, parsedVersion ) );
-            var apiVersions = new Lazy<ApiVersionModel>( Candidates.Select( a => a.GetApiVersionModel() ).Aggregate );
+            var apiVersions = new Lazy<ApiVersionModel>( Candidates!.Select( a => a.GetApiVersionModel() ).Aggregate );
             var handlerContext = new RequestHandlerContext( ErrorResponseProvider, ApiVersionReporter!, apiVersions );
             var url = new Uri( request.GetDisplayUrl() ).SafeFullPath();
 

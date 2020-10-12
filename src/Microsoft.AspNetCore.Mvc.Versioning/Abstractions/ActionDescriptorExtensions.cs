@@ -96,9 +96,9 @@
 
         internal static string ExpandSignature( this ActionDescriptor action )
         {
-            if ( !( action is ControllerActionDescriptor controllerAction ) )
+            if ( action is not ControllerActionDescriptor controllerAction )
             {
-                return action.DisplayName;
+                return action.DisplayName ?? string.Empty;
             }
 
             var signature = new StringBuilder();

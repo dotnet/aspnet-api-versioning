@@ -489,7 +489,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <returns>A <see cref="string">string</see> representing the formatted argument.</returns>
         public virtual string Format( string? format, object? arg, IFormatProvider? formatProvider )
         {
-            if ( !( arg is ApiVersion value ) )
+            if ( arg is not ApiVersion value )
             {
                 return GetDefaultFormat( format, arg, formatProvider );
             }

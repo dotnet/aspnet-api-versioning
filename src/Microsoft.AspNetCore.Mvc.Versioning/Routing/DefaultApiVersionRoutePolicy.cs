@@ -97,7 +97,7 @@
         /// <param name="context">The current <see cref="RouteContext">route context</see>.</param>
         /// <param name="selectionResult">The current <see cref="ActionSelectionResult">action selection result</see>.</param>
         /// <returns>The single, matching <see cref="ActionDescriptor">action</see> conforming to the policy.</returns>
-        protected virtual ActionDescriptor OnSingleMatch( RouteContext context, ActionSelectionResult selectionResult )
+        protected virtual ActionDescriptor? OnSingleMatch( RouteContext context, ActionSelectionResult selectionResult )
         {
             if ( selectionResult == null )
             {

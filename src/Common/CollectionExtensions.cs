@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Mvc
             }
         }
 
-        internal static string EnsureZeroOrOneApiVersions( this ICollection<string> apiVersions )
+        internal static string? EnsureZeroOrOneApiVersions( this ICollection<string> apiVersions )
         {
             if ( apiVersions.Count < 2 )
             {

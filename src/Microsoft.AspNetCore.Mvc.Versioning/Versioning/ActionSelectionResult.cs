@@ -21,7 +21,7 @@
         /// <remarks>This property returns the first occurrence of a single match in the earliest iteration. If
         /// no matches exist in any iteration or multiple matches exist, this property returns <c>null</c>.</remarks>
         [CLSCompliant( false )]
-        public ActionDescriptor BestMatch => MatchingActions.FirstOrDefault();
+        public ActionDescriptor? BestMatch => MatchingActions.FirstOrDefault();
 
         /// <summary>
         /// Gets a read-only collection of candidate actions.

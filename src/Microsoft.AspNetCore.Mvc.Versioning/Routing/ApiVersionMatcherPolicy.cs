@@ -158,7 +158,7 @@
                     return true;
                 case 1:
                     ref var candidate = ref candidates[bestMatches[0]];
-                    var action = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>();
+                    var action = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>()!;
                     var model = action.GetApiVersionModel();
 
                     if ( model.IsApiVersionNeutral )
