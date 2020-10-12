@@ -46,7 +46,7 @@
         public ActionContext ActionContext { get; }
 
         /// <inheritdoc />
-        public virtual string Action( UrlActionContext actionContext )
+        public virtual string? Action( UrlActionContext actionContext )
         {
             if ( actionContext == null )
             {
@@ -58,20 +58,20 @@
         }
 
         /// <inheritdoc />
-        public virtual string Content( string contentPath ) => Url.Content( contentPath );
+        public virtual string? Content( string? contentPath ) => Url.Content( contentPath );
 
         /// <inheritdoc />
 #pragma warning disable CA1054 // URI-like parameters should not be strings
-        public virtual bool IsLocalUrl( string url ) => Url.IsLocalUrl( url );
+        public virtual bool IsLocalUrl( string? url ) => Url.IsLocalUrl( url );
 #pragma warning restore CA1054
 
         /// <inheritdoc />
-        public virtual string Link( string routeName, object values ) =>
+        public virtual string? Link( string? routeName, object? values ) =>
             Url.Link( routeName, AddApiVersionRouteValueIfNecessary( values ) );
 
         /// <inheritdoc />
 #pragma warning disable CA1055 // URI-like return values should not be strings
-        public virtual string RouteUrl( UrlRouteContext routeContext )
+        public virtual string? RouteUrl( UrlRouteContext routeContext )
 #pragma warning restore CA1055
         {
             if ( routeContext == null )
@@ -83,7 +83,7 @@
             return Url.RouteUrl( routeContext );
         }
 
-        object AddApiVersionRouteValueIfNecessary( object current )
+        object? AddApiVersionRouteValueIfNecessary( object? current )
         {
             var key = RouteParameter;
 
@@ -99,7 +99,7 @@
                 return current;
             }
 
-            if ( !( current is RouteValueDictionary values ) )
+            if ( current is not RouteValueDictionary values )
             {
                 values = current == null ? new RouteValueDictionary() : new RouteValueDictionary( current );
             }

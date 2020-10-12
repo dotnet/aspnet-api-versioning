@@ -23,7 +23,7 @@
         /// <param name="values">The current <see cref="RouteValueDictionary">collection</see> of route values.</param>
         /// <param name="routeDirection">The <see cref="RouteDirection">route direction</see> to match.</param>
         /// <returns>True if the route constraint is matched; otherwise, false.</returns>
-        public bool Match( HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
+        public bool Match( HttpContext? httpContext, IRouter? route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
         {
             if ( values == null )
             {

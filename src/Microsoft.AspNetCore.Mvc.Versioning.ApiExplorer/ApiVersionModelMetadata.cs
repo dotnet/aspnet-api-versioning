@@ -68,7 +68,7 @@
         public override string EditFormatString => inner.EditFormatString;
 
         /// <inheritdoc />
-        public override ModelMetadata ElementMetadata => inner.ElementMetadata;
+        public override ModelMetadata? ElementMetadata => inner.ElementMetadata;
 
         /// <inheritdoc />
         public override IEnumerable<KeyValuePair<EnumGroupAndName, string>> EnumGroupedDisplayNamesAndValues => inner.EnumGroupedDisplayNamesAndValues;

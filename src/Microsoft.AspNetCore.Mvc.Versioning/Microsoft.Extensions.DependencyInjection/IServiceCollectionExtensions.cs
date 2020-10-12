@@ -96,7 +96,7 @@
                 return descriptor.ImplementationFactory( services );
             }
 
-            return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType );
+            return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
         }
 
         // REF: https://github.com/dotnet/runtime/blob/master/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L125

@@ -60,7 +60,7 @@
                 return default!;
             }
 
-            var environment = (IWebHostEnvironment) context.Request.HttpContext.RequestServices.GetService( typeof( IWebHostEnvironment ) );
+            var environment = (IWebHostEnvironment?) context.Request.HttpContext.RequestServices.GetService( typeof( IWebHostEnvironment ) );
 
             if ( environment?.IsDevelopment() == true )
             {

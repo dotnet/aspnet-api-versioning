@@ -324,7 +324,7 @@
             for ( var i = 0; i < actions.Count; i++ )
             {
                 var action = actions[i];
-                var constraints = actionConstraintCache.GetActionConstraints( context.HttpContext, action );
+                var constraints = actionConstraintCache.GetActionConstraints( context.HttpContext, action ) ?? Array.Empty<IActionConstraint>();
                 candidates.Add( new ActionSelectorCandidate( action, constraints ) );
             }
 
@@ -399,7 +399,7 @@
                         if ( !constraint.Accept( constraintContext ) )
                         {
                             isMatch = false;
-                            Logger.ConstraintMismatch( candidate.Action.DisplayName, candidate.Action.Id, constraint );
+                            Logger.ConstraintMismatch( candidate.Action.DisplayName!, candidate.Action.Id, constraint );
                             break;
                         }
                     }
@@ -476,10 +476,11 @@
                 return CreateCore(
                     version: 0,
                     items: endpoints.Where( e => e.GetType() == typeof( Endpoint ) ),
-                    getRouteKeys: e => e.Metadata.GetMetadata<ActionDescriptor>().RouteValues.Keys,
+                    getRouteKeys: e => e.Metadata.GetMetadata<ActionDescriptor>()?.RouteValues.Keys ?? Enumerable.Empty<string>(),
                     getRouteValue: ( e, key ) =>
                     {
-                        e.Metadata.GetMetadata<ActionDescriptor>().RouteValues.TryGetValue( key, out var value );
+                        var value = default( string? );
+                        e.Metadata.GetMetadata<ActionDescriptor>()?.RouteValues.TryGetValue( key, out value );
                         return Convert.ToString( value, InvariantCulture ) ?? string.Empty;
                     } );
             }
@@ -595,7 +596,7 @@
 
                     if ( !item.IsReusable )
                     {
-                        item.Constraint = null;
+                        item.Constraint = default!;
                         allActionConstraintsCached = false;
                     }
                 }

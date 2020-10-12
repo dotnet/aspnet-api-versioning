@@ -45,7 +45,7 @@
 
         internal static void ApiVersionInvalid( this ILogger logger, string? apiVersion ) => apiVersionInvalid( logger, apiVersion, null );
 
-        internal static void NoActionsMatched( this ILogger logger, IDictionary<string, object> routeValueDictionary )
+        internal static void NoActionsMatched( this ILogger logger, IDictionary<string, object?> routeValueDictionary )
         {
             if ( !logger.IsEnabled( Debug ) )
             {
