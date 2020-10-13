@@ -324,69 +324,91 @@
 
             foreach ( var parameterDescription in parameterDescriptions )
             {
-                if ( parameterDescription.Source == FromUri )
+                switch ( parameterDescription.Source )
                 {
-                    if ( parameterDescription.ParameterDescriptor == null )
-                    {
-                        // Undeclared route parameter handling generates query string like "?name={name}"
-                        AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
-                    }
-                    else if ( parameterDescription.ParameterDescriptor.ParameterType.CanConvertFromString() )
-                    {
-                        // Simple type generates query string like "?name={name}"
-                        AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
-                    }
-                    else if ( IsBindableCollection( parameterDescription.ParameterDescriptor.ParameterType ) )
-                    {
-                        var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
-                        var innerType = GetCollectionElementType( parameterDescription.ParameterDescriptor.ParameterType );
-                        var innerTypeProperties = innerType.GetBindableProperties().ToArray();
-
-                        if ( innerTypeProperties.Any() )
+                    case FromUri:
+                        if ( parameterDescription.ParameterDescriptor == null )
                         {
-                            // Complex array and collection generate query string like
-                            // "?name[0].foo={name[0].foo}&name[0].bar={name[0].bar}&name[1].foo={name[1].foo}&name[1].bar={name[1].bar}"
-                            AddPlaceholderForProperties( parameterValuesForRoute, innerTypeProperties, parameterName + "[0]." );
-                            AddPlaceholderForProperties( parameterValuesForRoute, innerTypeProperties, parameterName + "[1]." );
-                        }
-                        else
-                        {
-                            // Simple array and collection generate query string like "?name[0]={name[0]}&name[1]={name[1]}".
-                            AddPlaceholder( parameterValuesForRoute, parameterName + "[0]" );
-                            AddPlaceholder( parameterValuesForRoute, parameterName + "[1]" );
-                        }
-                    }
-                    else if ( IsBindableKeyValuePair( parameterDescription.ParameterDescriptor.ParameterType ) )
-                    {
-                        // KeyValuePair generates query string like "?key={key}&value={value}"
-                        AddPlaceholder( parameterValuesForRoute, "key" );
-                        AddPlaceholder( parameterValuesForRoute, "value" );
-                    }
-                    else if ( IsBindableDictionry( parameterDescription.ParameterDescriptor.ParameterType ) )
-                    {
-                        // Dictionary generates query string like
-                        // "?dict[0].key={dict[0].key}&dict[0].value={dict[0].value}&dict[1].key={dict[1].key}&dict[1].value={dict[1].value}"
-                        var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
-                        AddPlaceholder( parameterValuesForRoute, parameterName + "[0].key" );
-                        AddPlaceholder( parameterValuesForRoute, parameterName + "[0].value" );
-                        AddPlaceholder( parameterValuesForRoute, parameterName + "[1].key" );
-                        AddPlaceholder( parameterValuesForRoute, parameterName + "[1].value" );
-                    }
-                    else if ( parameterDescription.CanConvertPropertiesFromString() )
-                    {
-                        if ( emitPrefixes )
-                        {
-                            prefix = parameterDescription.Name + ".";
+                            // Undeclared route parameter handling generates query string like "?name={name}"
+                            AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
+                            continue;
                         }
 
-                        // Inserting the individual properties of the object in the query string as all the complex object can not be converted from string,
-                        // but all its individual properties can.
-                        AddPlaceholderForProperties( parameterValuesForRoute, parameterDescription.GetBindableProperties(), prefix );
-                    }
+                        var parameterType = parameterDescription.ParameterDescriptor.ParameterType;
+
+                        if ( IsApiVersionRouteParameter( parameterType, route.Constraints.Values ) )
+                        {
+                            // model build parameter based on route constraint like "api/v{version:apiVersion}"
+                            AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
+                        }
+                        else if ( parameterType.CanConvertFromString() )
+                        {
+                            // Simple type generates query string like "?name={name}"
+                            AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
+                        }
+                        else if ( IsBindableCollection( parameterType ) )
+                        {
+                            var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
+                            var innerType = GetCollectionElementType( parameterType );
+                            var innerTypeProperties = innerType.GetBindableProperties().ToArray();
+
+                            if ( innerTypeProperties.Any() )
+                            {
+                                // Complex array and collection generate query string like
+                                // "?name[0].foo={name[0].foo}&name[0].bar={name[0].bar}&name[1].foo={name[1].foo}&name[1].bar={name[1].bar}"
+                                AddPlaceholderForProperties( parameterValuesForRoute, innerTypeProperties, parameterName + "[0]." );
+                                AddPlaceholderForProperties( parameterValuesForRoute, innerTypeProperties, parameterName + "[1]." );
+                            }
+                            else
+                            {
+                                // Simple array and collection generate query string like "?name[0]={name[0]}&name[1]={name[1]}".
+                                AddPlaceholder( parameterValuesForRoute, parameterName + "[0]" );
+                                AddPlaceholder( parameterValuesForRoute, parameterName + "[1]" );
+                            }
+                        }
+                        else if ( IsBindableKeyValuePair( parameterType ) )
+                        {
+                            // KeyValuePair generates query string like "?key={key}&value={value}"
+                            AddPlaceholder( parameterValuesForRoute, "key" );
+                            AddPlaceholder( parameterValuesForRoute, "value" );
+                        }
+                        else if ( IsBindableDictionry( parameterType ) )
+                        {
+                            // Dictionary generates query string like
+                            // "?dict[0].key={dict[0].key}&dict[0].value={dict[0].value}&dict[1].key={dict[1].key}&dict[1].value={dict[1].value}"
+                            var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
+                            AddPlaceholder( parameterValuesForRoute, parameterName + "[0].key" );
+                            AddPlaceholder( parameterValuesForRoute, parameterName + "[0].value" );
+                            AddPlaceholder( parameterValuesForRoute, parameterName + "[1].key" );
+                            AddPlaceholder( parameterValuesForRoute, parameterName + "[1].value" );
+                        }
+                        else if ( parameterDescription.CanConvertPropertiesFromString() )
+                        {
+                            if ( emitPrefixes )
+                            {
+                                prefix = parameterDescription.Name + ".";
+                            }
+
+                            // Inserting the individual properties of the object in the query string as all the complex object can not be converted from string,
+                            // but all its individual properties can.
+                            AddPlaceholderForProperties( parameterValuesForRoute, parameterDescription.GetBindableProperties(), prefix );
+                        }
+
+                        break;
+                    case Unknown:
+                        if ( IsApiVersionRouteParameter( parameterDescription, route.Constraints.Values ) )
+                        {
+                            // model build parameter based on route constraint like "api/v{version:apiVersion}"
+                            AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
+                        }
+
+                        break;
                 }
             }
 
-            var boundRouteTemplate = parsedRoute.Bind( null, parameterValuesForRoute, new HttpRouteValueDictionary( route.Defaults ), new HttpRouteValueDictionary( route.Constraints ) );
+            var defaultValues = new HttpRouteValueDictionary( route.Defaults );
+            var constraints = new HttpRouteValueDictionary( route.Constraints );
+            var boundRouteTemplate = parsedRoute.Bind( null, parameterValuesForRoute, defaultValues, constraints );
 
             if ( boundRouteTemplate == null )
             {
@@ -397,6 +419,12 @@
             expandedRouteTemplate = Uri.UnescapeDataString( boundRouteTemplate.BoundTemplate );
             return true;
         }
+
+        static bool IsApiVersionRouteParameter( ApiParameterDescription parameter, IEnumerable<object> constraints ) =>
+            parameter.ParameterDescriptor != null && IsApiVersionRouteParameter( parameter.ParameterDescriptor.ParameterType, constraints );
+
+        static bool IsApiVersionRouteParameter( Type? parameterType, IEnumerable<object> constraints ) =>
+            parameterType != null && typeof( ApiVersion ).IsAssignableFrom( parameterType ) && constraints.OfType<ApiVersionRouteConstraint>().Any();
 
         static IEnumerable<IHttpRoute> FlattenRoutes( IEnumerable<IHttpRoute> routes )
         {
