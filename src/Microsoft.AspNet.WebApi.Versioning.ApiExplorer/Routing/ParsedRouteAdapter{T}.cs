@@ -22,9 +22,15 @@ namespace Microsoft.Web.Http.Routing
             pathSegments = new Lazy<IReadOnlyList<IPathSegment>>( AdaptToPathSegments );
         }
 
-        public IBoundRouteTemplate Bind( IDictionary<string, object>? currentValues, IDictionary<string, object> values, HttpRouteValueDictionary defaultValues, HttpRouteValueDictionary constraints )
+        public IBoundRouteTemplate? Bind( IDictionary<string, object>? currentValues, IDictionary<string, object> values, HttpRouteValueDictionary defaultValues, HttpRouteValueDictionary constraints )
         {
             var boundRouteTemplate = bindFunc.Value( adapted, currentValues, values, defaultValues, constraints );
+
+            if ( boundRouteTemplate == null )
+            {
+                return default;
+            }
+
             var adapterType = typeof( BoundRouteTemplateAdapter<> ).MakeGenericType( boundRouteTemplate.GetType() );
             var adapter = (IBoundRouteTemplate) Activator.CreateInstance( adapterType, boundRouteTemplate );
 
