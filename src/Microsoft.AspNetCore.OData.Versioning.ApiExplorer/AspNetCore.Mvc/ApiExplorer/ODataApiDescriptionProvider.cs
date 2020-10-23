@@ -249,8 +249,8 @@
         }
 
         static bool IsMappedTo( ControllerActionDescriptor action, ODataRouteMapping mapping ) =>
-            action.AttributeRouteInfo != null &&
-            StringComparer.OrdinalIgnoreCase.Equals( action.AttributeRouteInfo.Name, mapping.RouteName );
+            action.AttributeRouteInfo is ODataAttributeRouteInfo routeInfo &&
+            StringComparer.OrdinalIgnoreCase.Equals( routeInfo.RouteName, mapping.RouteName );
 
         static Type? GetDeclaredReturnType( ControllerActionDescriptor action )
         {
@@ -346,7 +346,7 @@
             var responseMetadataAttributes = GetResponseMetadataAttributes( action );
             var declaredReturnType = GetDeclaredReturnType( action );
             var runtimeReturnType = GetRuntimeReturnType( declaredReturnType! );
-            var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes!, runtimeReturnType!, mapping.Services );
+            var apiResponseTypes = GetApiResponseTypes( responseMetadataAttributes!, runtimeReturnType!, mapping.Services, version );
             var routeContext = new ODataRouteBuilderContext( mapping, version, action, Options ) { ModelMetadataProvider = MetadataProvider };
 
             if ( routeContext.IsRouteExcluded )
@@ -640,7 +640,8 @@
         IReadOnlyList<ApiResponseType> GetApiResponseTypes(
             IReadOnlyList<IApiResponseMetadataProvider> responseMetadataAttributes,
             Type responseType,
-            IServiceProvider serviceProvider )
+            IServiceProvider serviceProvider,
+            ApiVersion version )
         {
             var results = new List<ApiResponseType>();
             var objectTypes = new Dictionary<int, Type>();
@@ -682,7 +683,7 @@
 
                 if ( objectType.Value == typeof( void ) )
                 {
-                    type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) );
+                    type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder, version ) );
 
                     results.Add( new ApiResponseType()
                     {
@@ -694,7 +695,7 @@
                     continue;
                 }
 
-                type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder ) );
+                type = objectType.Value.SubstituteIfNecessary( new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder, version ) );
 
                 var apiResponseType = new ApiResponseType()
                 {
