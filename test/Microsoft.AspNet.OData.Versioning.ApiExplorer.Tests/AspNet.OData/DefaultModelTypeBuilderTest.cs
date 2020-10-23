@@ -230,13 +230,18 @@
             action.Parameter<string>( "contactedBy" );
             action.Parameter<bool>( "callbackRequired" );
 
-            var context = NewContext( modelBuilder.GetEdmModel() );
-            var model = context.Model;
+            var model = modelBuilder.GetEdmModel();
+
+            model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
+
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
             var services = new ServiceCollection();
 
-            services.AddSingleton( model );
+            services.AddTransient( sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) );
+            services.AddSingleton( selector );
 
             // act
             var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default, contact.Name );
@@ -263,13 +268,18 @@
             action.Parameter<Contact>( "interviewer" );
             action.Parameter<Contact>( "interviewee" );
 
-            var context = NewContext( modelBuilder.GetEdmModel() );
-            var model = context.Model;
+            var model = modelBuilder.GetEdmModel();
+
+            model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
+
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
             var services = new ServiceCollection();
 
-            services.AddSingleton( model );
+            services.AddTransient( sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) );
+            services.AddSingleton( selector );
 
             // act
             var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default, contact.Name );
@@ -301,13 +311,18 @@
             action.CollectionParameter<Contact>( "attendees" );
             action.CollectionParameter<string>( "topics" );
 
-            var context = NewContext( modelBuilder.GetEdmModel() );
-            var model = context.Model;
+            var model = modelBuilder.GetEdmModel();
+
+            model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
+
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
             var services = new ServiceCollection();
 
-            services.AddSingleton( model );
+            services.AddTransient( sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) );
+            services.AddSingleton( selector );
 
             // act
             var substitutionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operation, ApiVersion.Default, contact.Name );
@@ -338,13 +353,18 @@
             action.CollectionParameter<Employee>( "attendees" );
             action.Parameter<string>( "project" );
 
-            var context = NewContext( modelBuilder.GetEdmModel() );
-            var model = context.Model;
+            var model = modelBuilder.GetEdmModel();
+
+            model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
+
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operations = model.FindDeclaredOperations( qualifiedName ).Select( o => (IEdmAction) o ).ToArray();
             var services = new ServiceCollection();
 
-            services.AddSingleton( model );
+            services.AddTransient( sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) );
+            services.AddSingleton( selector );
 
             // act
             var contactActionType = context.ModelTypeBuilder.NewActionParameters( services.BuildServiceProvider(), operations[0], ApiVersion.Default, contact.Name );

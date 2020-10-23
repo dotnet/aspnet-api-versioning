@@ -210,12 +210,12 @@
             queryOptions.ApplyTo( apiDescriptions, settings );
         }
 
-        ResponseDescription CreateResponseDescriptionWithRoute( HttpActionDescriptor actionDescriptor, IHttpRoute route )
+        ResponseDescription CreateResponseDescriptionWithRoute( HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
         {
             var description = CreateResponseDescription( actionDescriptor );
             var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
             var returnType = description.ResponseType ?? description.DeclaredType;
-            var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder );
+            var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder, apiVersion );
 
             description.ResponseType = returnType.SubstituteIfNecessary( context );
 
@@ -245,7 +245,7 @@
                         continue;
                     }
 
-                    var parameterDescriptions = CreateParameterDescriptions( action, route );
+                    var parameterDescriptions = CreateParameterDescriptions( action, route, apiVersion );
                     var context = new ODataRouteBuilderContext(
                                     Configuration,
                                     apiVersion,
@@ -344,7 +344,7 @@
             return willReadUri;
         }
 
-        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider )
+        ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider, ApiVersion apiVersion )
         {
             var descriptor = parameterBinding.Descriptor;
             var description = CreateParameterDescription( descriptor );
@@ -354,7 +354,7 @@
                 description.Source = FromBody;
 
                 var parameterType = descriptor.ParameterType;
-                var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder );
+                var context = new TypeSubstitutionContext( serviceProvider, ModelTypeBuilder, apiVersion );
                 var substitutedType = parameterType.SubstituteIfNecessary( context );
 
                 if ( parameterType != substitutedType )
@@ -373,7 +373,7 @@
             return description;
         }
 
-        IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route )
+        IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
         {
             var list = new List<ApiParameterDescription>();
             var actionBinding = GetActionBinding( actionDescriptor );
@@ -388,7 +388,7 @@
                 {
                     foreach ( var binding in parameterBindings )
                     {
-                        list.Add( CreateParameterDescriptionFromBinding( binding, serviceProvider ) );
+                        list.Add( CreateParameterDescriptionFromBinding( binding, serviceProvider, apiVersion ) );
                     }
                 }
             }
@@ -461,7 +461,7 @@
             ApiVersion apiVersion )
         {
             var documentation = DocumentationProvider?.GetDocumentation( actionDescriptor );
-            var responseDescription = CreateResponseDescriptionWithRoute( actionDescriptor, route );
+            var responseDescription = CreateResponseDescriptionWithRoute( actionDescriptor, route, apiVersion );
             var responseType = responseDescription.ResponseType ?? responseDescription.DeclaredType;
             var requestFormatters = new List<MediaTypeFormatter>();
             var responseFormatters = new List<MediaTypeFormatter>();

@@ -23,7 +23,6 @@
         {
             ApiVersion = apiVersion;
             Services = routeMapping.Services;
-            EdmModel = Services.GetRequiredService<IEdmModel>();
             routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
             RouteTemplate = routeAttribute?.PathTemplate;
             RoutePrefix = routeMapping.RoutePrefix;

@@ -9,16 +9,15 @@
     using Microsoft.Web.Http;
 #endif
     using System;
-    using System.Collections.Generic;
-    using System.Reflection;
 
     /// <summary>
     /// Represents a type substitution context.
     /// </summary>
     public class TypeSubstitutionContext
     {
-        private readonly Lazy<IEdmModel> model;
-        private readonly Lazy<ApiVersion> apiVersion;
+        readonly IServiceProvider? serviceProvider;
+        IEdmModel? model;
+        ApiVersion? apiVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeSubstitutionContext"/> class.
@@ -27,8 +26,7 @@
         /// <param name="modelTypeBuilder">The associated <see cref="IModelTypeBuilder">model type builder</see>.</param>
         public TypeSubstitutionContext( IEdmModel model, IModelTypeBuilder modelTypeBuilder )
         {
-            this.model = new Lazy<IEdmModel>( () => model );
-            apiVersion = new Lazy<ApiVersion>( () => Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Default );
+            this.model = model;
             ModelTypeBuilder = modelTypeBuilder;
         }
 
@@ -38,10 +36,11 @@
         /// <param name="serviceProvider">The <see cref="IServiceProvider">service provider</see> that the
         /// <see cref="IEdmModel">EDM model</see> can be resolved from.</param>
         /// <param name="modelTypeBuilder">The associated <see cref="IModelTypeBuilder">model type builder</see>.</param>
-        public TypeSubstitutionContext( IServiceProvider serviceProvider, IModelTypeBuilder modelTypeBuilder )
+        /// <param name="apiVersion">The current <see cref="ApiVersion">API version</see>.</param>
+        public TypeSubstitutionContext( IServiceProvider serviceProvider, IModelTypeBuilder modelTypeBuilder, ApiVersion apiVersion )
         {
-            model = new Lazy<IEdmModel>( serviceProvider.GetRequiredService<IEdmModel> );
-            apiVersion = new Lazy<ApiVersion>( () => Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Default );
+            this.apiVersion = apiVersion;
+            this.serviceProvider = serviceProvider;
             ModelTypeBuilder = modelTypeBuilder;
         }
 
@@ -49,13 +48,13 @@
         /// Gets the source Entity Data Model (EDM).
         /// </summary>
         /// <value>The associated <see cref="IEdmModel">EDM model</see> compared against for substitutions.</value>
-        public IEdmModel Model => model.Value;
+        public IEdmModel Model => model ??= serviceProvider!.GetRequiredService<IEdmModelSelector>().SelectModel( apiVersion )!;
 
         /// <summary>
         /// Gets API version associated with the source model.
         /// </summary>
         /// <value>The associated <see cref="ApiVersion">API version</see>.</value>
-        public ApiVersion ApiVersion => apiVersion.Value;
+        public ApiVersion ApiVersion => apiVersion ??= model!.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Neutral;
 
         /// <summary>
         /// Gets the model type builder used to create substitution types.

@@ -23,24 +23,21 @@
             Attributes = clrProperty.DeclaredAttributes().ToArray();
         }
 
-        internal ClassProperty( IServiceProvider services, IEdmOperationParameter parameter, IModelTypeBuilder typeBuilder )
+        internal ClassProperty( IEdmOperationParameter parameter, TypeSubstitutionContext context )
         {
             Name = parameter.Name;
-
-            var context = new TypeSubstitutionContext( services, typeBuilder );
-            var edmModel = services.GetRequiredService<IEdmModel>();
 
             if ( parameter.Type.IsCollection() )
             {
                 var collectionType = parameter.Type.AsCollection();
-                var elementType = collectionType.ElementType().Definition.GetClrType( edmModel )!;
+                var elementType = collectionType.ElementType().Definition.GetClrType( context.Model )!;
                 var substitutedType = elementType.SubstituteIfNecessary( context );
 
                 Type = typeof( IEnumerable<> ).MakeGenericType( substitutedType );
             }
             else
             {
-                var parameterType = parameter.Type.Definition.GetClrType( edmModel )!;
+                var parameterType = parameter.Type.Definition.GetClrType( context.Model )!;
 
                 Type = parameterType.SubstituteIfNecessary( context );
             }
