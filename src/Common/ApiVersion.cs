@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="status">The status to evaluate.</param>
         /// <returns>True if the status is valid; otherwise, false.</returns>
         /// <remarks>The status must be alphabetic or alphanumeric, start with a letter, and contain no spaces.</remarks>
-        public static bool IsValidStatus( string? status ) => IsNullOrEmpty( status ) ? false : IsMatch( status, @"^[a-zA-Z][a-zA-Z0-9]*$", Singleline );
+        public static bool IsValidStatus( string? status ) => !IsNullOrEmpty( status ) && IsMatch( status, @"^[a-zA-Z][a-zA-Z0-9]*$", Singleline );
 
         /// <summary>
         /// Parses the specified text into an API version.
@@ -408,7 +408,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is less than or equal to the second object; otherwise, false.</returns>
         public static bool operator <=( ApiVersion? version1, ApiVersion? version2 ) =>
-            version1 is null ? true : version1.CompareTo( version2 ) <= 0;
+            version1 is null || version1.CompareTo( version2 ) <= 0;
 
         /// <summary>
         /// Overloads the greater than operator.
@@ -417,7 +417,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is greater than the second object; otherwise, false.</returns>
         public static bool operator >( ApiVersion? version1, ApiVersion? version2 ) =>
-            version1 is null ? false : version1.CompareTo( version2 ) > 0;
+            version1 != null && version1.CompareTo( version2 ) > 0;
 
         /// <summary>
         /// Overloads the greater than or equal to operator.
@@ -433,7 +433,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// </summary>
         /// <param name="other">The <see cref="ApiVersion">other</see> to evaluate.</param>
         /// <returns>True if the specified object is equal to the current instance; otherwise, false.</returns>
-        public virtual bool Equals( ApiVersion? other ) => other is null ? false : GetHashCode() == other.GetHashCode();
+        public virtual bool Equals( ApiVersion? other ) => other != null && GetHashCode() == other.GetHashCode();
 
         /// <summary>
         /// Performs a comparison of the current object to another object and returns a value

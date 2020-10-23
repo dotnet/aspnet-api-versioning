@@ -86,12 +86,14 @@
             {
                 var action = (IEdmAction) Context.RouteContext.Operation;
                 var apiVersion = Context.RouteContext.ApiVersion;
+                var controller = Context.RouteContext.ActionDescriptor.ControllerName;
 
-                type = Context.TypeBuilder.NewActionParameters( Context.Services, action, apiVersion, Context.RouteContext.ActionDescriptor.ControllerName );
+                type = Context.TypeBuilder.NewActionParameters( Context.Services, action, apiVersion, controller );
             }
             else
             {
-                type = type.SubstituteIfNecessary( new TypeSubstitutionContext( Context.Services, Context.TypeBuilder ) );
+                var context = new TypeSubstitutionContext( Context.Services, Context.TypeBuilder, Context.RouteContext.ApiVersion );
+                type = type.SubstituteIfNecessary( context );
             }
 
             return new ApiParameterDescription()

@@ -55,7 +55,8 @@
             var key = new EdmTypeKey( fullTypeName, apiVersion );
             var type = paramTypes.GetOrAdd( key, _ =>
             {
-                var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( services, p, this ) );
+                var context = new TypeSubstitutionContext( services, this, apiVersion );
+                var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( p, context ) );
                 var signature = new ClassSignature( fullTypeName, properties, apiVersion );
                 var moduleBuilder = modules.GetOrAdd( apiVersion, CreateModuleForApiVersion );
 
