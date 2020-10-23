@@ -147,9 +147,9 @@
             var handler = mapping.Services.GetRequiredService<IODataPathTemplateHandler>();
             var routeInfo = new ODataAttributeRouteInfo()
             {
-                Name = mapping.RouteName,
                 Template = template,
                 ODataTemplate = handler.ParseTemplate( path, mapping.Services ),
+                RouteName = mapping.RouteName,
                 RoutePrefix = mapping.RoutePrefix,
             };
 
@@ -189,9 +189,9 @@
                 var template = templates[i];
                 var routeInfo = new ODataAttributeRouteInfo()
                 {
-                    Name = mapping.RouteName,
                     Template = template.RouteTemplate,
                     ODataTemplate = template.PathTemplate,
+                    RouteName = mapping.RouteName,
                     RoutePrefix = mapping.RoutePrefix,
                 };
 
@@ -368,7 +368,7 @@
                 var comparer = StringComparer.OrdinalIgnoreCase;
 
                 return comparer.Equals( x.Template, y.Template ) &&
-                       comparer.Equals( x.Name, y.Name );
+                       comparer.Equals( x.RouteName, y.RouteName );
             }
 
             public int GetHashCode( ODataAttributeRouteInfo obj ) =>
