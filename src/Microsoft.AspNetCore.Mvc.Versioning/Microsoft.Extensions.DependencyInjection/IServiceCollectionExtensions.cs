@@ -52,6 +52,7 @@
             }
 
             services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
+            services.Add( Singleton( sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
             services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector ) );
             services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ErrorResponses ) );
             services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
@@ -68,6 +69,7 @@
             services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
             services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
             services.Replace( WithUrlHelperFactoryDecorator( services ) );
+            services.Replace( WithLinkGeneratorDecorator( services ) );
         }
 
         static IReportApiVersions OnRequestIReportApiVersions( IServiceProvider serviceProvider )
@@ -97,6 +99,26 @@
             return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType );
         }
 
+        // REF: https://github.com/dotnet/runtime/blob/master/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L125
+        static Type GetImplementationType( this ServiceDescriptor descriptor )
+        {
+            if ( descriptor.ImplementationType != null )
+            {
+                return descriptor.ImplementationType;
+            }
+            else if ( descriptor.ImplementationInstance != null )
+            {
+                return descriptor.ImplementationInstance.GetType();
+            }
+            else if ( descriptor.ImplementationFactory != null )
+            {
+                var typeArguments = descriptor.ImplementationFactory.GetType().GenericTypeArguments;
+                return typeArguments[1];
+            }
+
+            throw new InvalidOperationException();
+        }
+
         static ServiceDescriptor WithUrlHelperFactoryDecorator( IServiceCollection services )
         {
             var descriptor = services.FirstOrDefault( sd => sd.ServiceType == typeof( IUrlHelperFactory ) );
@@ -112,10 +134,10 @@
             IUrlHelperFactory NewFactory( IServiceProvider serviceProvider )
             {
                 var decorated = instantiate( serviceProvider );
-                var options = serviceProvider.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+                var source = serviceProvider.GetRequiredService<IApiVersionParameterSource>();
                 var instance = decorated;
 
-                if ( options.ApiVersionReader.VersionsByUrlSegment() )
+                if ( source.VersionsByUrlSegment() )
                 {
                     var factory = ActivatorUtilities.CreateFactory( typeof( ApiVersionUrlHelperFactory ), new[] { typeof( IUrlHelperFactory ) } );
                     instance = factory( serviceProvider, new[] { decorated } );
@@ -125,6 +147,25 @@
             }
 
             return Describe( typeof( IUrlHelperFactory ), NewFactory, lifetime );
+        }
+
+        static ServiceDescriptor WithLinkGeneratorDecorator( IServiceCollection services )
+        {
+            var descriptor = services.FirstOrDefault( sd => sd.ServiceType == typeof( LinkGenerator ) );
+
+            if ( descriptor == null )
+            {
+                services.AddRouting();
+                descriptor = services.First( sd => sd.ServiceType == typeof( LinkGenerator ) );
+            }
+
+            var lifetime = descriptor.Lifetime;
+            var decoratedType = descriptor.GetImplementationType();
+            var decoratorType = typeof( ApiVersionLinkGenerator<> ).MakeGenericType( decoratedType );
+
+            services.Replace( Describe( decoratedType, decoratedType, lifetime ) );
+
+            return Describe( typeof( LinkGenerator ), decoratorType, lifetime );
         }
     }
 }

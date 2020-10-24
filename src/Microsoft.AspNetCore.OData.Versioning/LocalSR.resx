@@ -120,4 +120,7 @@
   <data name="MissingAnnotation" xml:space="preserve">
     <value>The entity model (EDM) does not have the required {0} annotation.</value>
   </data>
+  <data name="MissingLinkGenerator" xml:space="preserve">
+    <value>Expected OData to register a custom LinkGenerator using a factory method.</value>
+  </data>
 </root>

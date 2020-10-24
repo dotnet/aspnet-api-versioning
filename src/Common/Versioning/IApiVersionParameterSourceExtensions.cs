@@ -9,26 +9,26 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System.Linq;
     using static ApiVersionParameterLocation;
 
-    internal static class IApiVersionReaderExtensions
+    internal static class IApiVersionParameterSourceExtensions
     {
-        internal static bool VersionsByUrlSegment( this IApiVersionReader reader )
+        internal static bool VersionsByUrlSegment( this IApiVersionParameterSource source )
         {
             var context = new UrlSegmentDescriptionContext();
-            reader.AddParameters( context );
+            source.AddParameters( context );
             return context.HasPathApiVersion;
         }
 
-        internal static bool VersionsByMediaType( this IApiVersionReader reader )
+        internal static bool VersionsByMediaType( this IApiVersionParameterSource source )
         {
             var context = new MediaTypeDescriptionContext();
-            reader.AddParameters( context );
+            source.AddParameters( context );
             return context.HasMediaTypeApiVersion;
         }
 
-        internal static string GetMediaTypeVersionParameter( this IApiVersionReader reader )
+        internal static string GetMediaTypeVersionParameter( this IApiVersionParameterSource source )
         {
             var context = new MediaTypeDescriptionContext();
-            reader.AddParameters( context );
+            source.AddParameters( context );
             return context.ParameterName;
         }
 

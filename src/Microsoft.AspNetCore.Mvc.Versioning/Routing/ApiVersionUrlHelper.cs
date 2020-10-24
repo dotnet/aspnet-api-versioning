@@ -1,6 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Mvc.Versioning
+﻿namespace Microsoft.AspNetCore.Mvc.Routing
 {
-    using Microsoft.AspNetCore.Mvc.Routing;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using System;
 
