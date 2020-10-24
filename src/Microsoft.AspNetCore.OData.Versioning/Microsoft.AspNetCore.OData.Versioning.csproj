@@ -20,7 +20,13 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.OData" Version="[7.5.0,8.0.0)" />
+  <PackageReference Include="Microsoft.AspNetCore.OData" Version="[7.5.1,8.0.0)" />
+ </ItemGroup>
+
+ <ItemGroup>
+   <Compile Update="LocalSR.Designer.cs">
+     <DesignTime>True</DesignTime>
+   </Compile>
  </ItemGroup>
 
  <Import Project="..\Common.OData\Common.OData.projitems" Label="Shared" />

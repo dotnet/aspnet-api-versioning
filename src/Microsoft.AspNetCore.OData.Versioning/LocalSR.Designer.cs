@@ -68,5 +68,14 @@ namespace Microsoft {
                 return ResourceManager.GetString("MissingAnnotation", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected OData to register a custom LinkGenerator using a factory method..
+        /// </summary>
+        internal static string MissingLinkGenerator {
+            get {
+                return ResourceManager.GetString("MissingLinkGenerator", resourceCulture);
+            }
+        }
     }
 }
