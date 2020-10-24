@@ -14,9 +14,9 @@
         public IActionResult Get( ODataQueryOptions<Order> options, ApiVersion version ) =>
             Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{version}" } } );
 
-        // GET ~/api/orders/{id}?api-version=2.0
-        [HttpGet( "{id}" )]
-        public IActionResult Get( int id, ODataQueryOptions<Order> options, ApiVersion version ) =>
-            Ok( new Order() { Id = id, Customer = $"Customer v{version}" } );
+        // GET ~/api/orders/{key}?api-version=2.0
+        [HttpGet( "{key}" )]
+        public IActionResult Get( int key, ODataQueryOptions<Order> options, ApiVersion version ) =>
+            Ok( new Order() { Id = key, Customer = $"Customer v{version}" } );
     }
 }
