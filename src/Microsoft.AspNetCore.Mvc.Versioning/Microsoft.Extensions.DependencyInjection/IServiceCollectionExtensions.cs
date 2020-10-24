@@ -99,21 +99,32 @@
 
         static ServiceDescriptor WithUrlHelperFactoryDecorator( IServiceCollection services )
         {
-            var descriptor = services.First( sd => sd.ServiceType == typeof( IUrlHelperFactory ) );
-            var factory = ActivatorUtilities.CreateFactory( typeof( ApiVersionUrlHelperFactory ), new[] { typeof( IUrlHelperFactory ) } );
+            var descriptor = services.FirstOrDefault( sd => sd.ServiceType == typeof( IUrlHelperFactory ) );
+            var lifetime = ServiceLifetime.Singleton;
+            Func<IServiceProvider, object> instantiate = sp => new UrlHelperFactory();
+
+            if ( descriptor != null )
+            {
+                lifetime = descriptor.Lifetime;
+                instantiate = sp => sp.CreateInstance( descriptor );
+            }
 
             IUrlHelperFactory NewFactory( IServiceProvider serviceProvider )
             {
-                var decorated = serviceProvider.CreateInstance( descriptor! );
+                var decorated = instantiate( serviceProvider );
                 var options = serviceProvider.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
-                var instance = options.ApiVersionReader.VersionsByUrlSegment() ?
-                    factory( serviceProvider, new[] { decorated } ) :
-                    decorated;
+                var instance = decorated;
+
+                if ( options.ApiVersionReader.VersionsByUrlSegment() )
+                {
+                    var factory = ActivatorUtilities.CreateFactory( typeof( ApiVersionUrlHelperFactory ), new[] { typeof( IUrlHelperFactory ) } );
+                    instance = factory( serviceProvider, new[] { decorated } );
+                }
 
                 return (IUrlHelperFactory) instance;
             }
 
-            return Describe( typeof( IUrlHelperFactory ), NewFactory, descriptor.Lifetime );
+            return Describe( typeof( IUrlHelperFactory ), NewFactory, lifetime );
         }
     }
 }
