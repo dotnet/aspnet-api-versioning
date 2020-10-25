@@ -21,8 +21,7 @@
         {
             if ( ActionBuilders.TryGetValue( method, out var actionBuilder ) )
             {
-                convention = actionBuilder;
-                return true;
+                return ( convention = actionBuilder ) != null;
             }
 
             convention = default;

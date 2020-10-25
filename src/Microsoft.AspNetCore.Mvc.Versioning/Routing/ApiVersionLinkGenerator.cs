@@ -24,7 +24,7 @@
         protected LinkGenerator LinkGenerator { get; }
 
         /// <inheritdoc />
-        public override string GetPathByAddress<TAddress>(
+        public override string? GetPathByAddress<TAddress>(
             HttpContext httpContext,
             TAddress address,
             RouteValueDictionary values,
@@ -38,7 +38,7 @@
         }
 
         /// <inheritdoc />
-        public override string GetPathByAddress<TAddress>(
+        public override string? GetPathByAddress<TAddress>(
             TAddress address,
             RouteValueDictionary values,
             PathString pathBase = default,
@@ -46,7 +46,7 @@
             LinkOptions? options = null ) => LinkGenerator.GetPathByAddress( address, values, pathBase, fragment, options );
 
         /// <inheritdoc />
-        public override string GetUriByAddress<TAddress>(
+        public override string? GetUriByAddress<TAddress>(
             HttpContext httpContext,
             TAddress address,
             RouteValueDictionary values,
@@ -62,7 +62,7 @@
         }
 
         /// <inheritdoc />
-        public override string GetUriByAddress<TAddress>(
+        public override string? GetUriByAddress<TAddress>(
             TAddress address,
             RouteValueDictionary values,
             string scheme,

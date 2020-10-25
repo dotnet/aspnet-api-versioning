@@ -112,10 +112,10 @@
                 }
             }
 
-#if NETCOREAPP3_1
-            var genericPartIndex = type.Name.IndexOf( '`', StringComparison.Ordinal );
-#else
+#if WEBAPI
             var genericPartIndex = type.Name.IndexOf( '`' );
+#else
+            var genericPartIndex = type.Name.IndexOf( '`', StringComparison.Ordinal );
 #endif
 
             if ( genericPartIndex <= 0 )
