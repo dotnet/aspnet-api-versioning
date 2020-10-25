@@ -67,13 +67,6 @@
                 {
                     return true;
                 }
-
-                var endpoint = metadata.GetMetadata<IDynamicEndpointMetadata>();
-
-                if ( endpoint?.IsDynamic == true )
-                {
-                    return true;
-                }
             }
 
             return false;
