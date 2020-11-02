@@ -1,3 +1,1 @@
-﻿ApiVersionMatcherPolicy doesn't check candidate validity (#600)
-Fix NuGET Part URI cannot start with two forward slashes (#637)
-Error response provider should return ProblemDetails (#612)
+﻿
