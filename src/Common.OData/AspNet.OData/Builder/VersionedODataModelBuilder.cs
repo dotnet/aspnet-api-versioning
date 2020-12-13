@@ -47,13 +47,13 @@
         public Action<ODataModelBuilder, IEdmModel>? OnModelCreated { get; set; }
 
         /// <summary>
-        /// Builds and returns the sequence of EDM models based on the define model configurations.
+        /// Builds and returns the sequence of EDM models based on the defined model configurations.
         /// </summary>
         /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
         public IEnumerable<IEdmModel> GetEdmModels() => GetEdmModels( default );
 
         /// <summary>
-        /// Builds and returns the sequence of EDM models based on the define model configurations.
+        /// Builds and returns the sequence of EDM models based on the defined model configurations.
         /// </summary>
         /// <param name="routePrefix">The route prefix associated with the configuration, if any.</param>
         /// <returns>A <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>.</returns>
