@@ -24,7 +24,7 @@
                 throw new ArgumentNullException( nameof( request ) );
             }
 
-            var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+            SortedSet<string>? versions = null;
 
             foreach ( var parameterName in ParameterNames )
             {
@@ -34,7 +34,8 @@
                 {
                     if ( !IsNullOrEmpty( value ) )
                     {
-                        versions.Add( value );
+                        ( versions ?? new SortedSet<string>( StringComparer.OrdinalIgnoreCase ) )
+                            .Add( value );
                     }
                 }
             }

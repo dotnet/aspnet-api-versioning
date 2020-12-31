@@ -57,17 +57,23 @@ namespace Microsoft.AspNetCore.Mvc
             }
         }
 
-        internal static string EnsureZeroOrOneApiVersions( this ICollection<string> apiVersions )
+        internal static string? EnsureZeroOrOneApiVersions( this SortedSet<string>? apiVersions )
         {
-            if ( apiVersions.Count < 2 )
+            if ( apiVersions is null || apiVersions.Count == 0 )
             {
-                return apiVersions.SingleOrDefault();
+                return null;
             }
 
-            var requestedVersions = Join( ", ", apiVersions.OrderBy( v => v ) );
+            var requestedVersions = Join( ", ", apiVersions );
+
+            if ( apiVersions.Count == 1 )
+            {
+                return requestedVersions;
+            }
+
             var message = Format( InvariantCulture, SR.MultipleDifferentApiVersionsRequested, requestedVersions );
 
-            throw new AmbiguousApiVersionException( message, apiVersions.OrderBy( v => v ) );
+            throw new AmbiguousApiVersionException( message, apiVersions );
         }
 
         internal static void UnionWith<T>( this ICollection<T> collection, IEnumerable<T> other )

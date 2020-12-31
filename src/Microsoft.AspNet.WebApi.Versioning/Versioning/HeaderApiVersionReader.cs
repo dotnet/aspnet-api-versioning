@@ -25,13 +25,14 @@
             }
 
             var headers = request.Headers;
-            var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+            SortedSet<string>? versions = null;
 
             foreach ( var name in HeaderNames )
             {
                 if ( headers.TryGetValues( name, out var values ) )
                 {
-                    versions.AddRange( values.Where( v => !IsNullOrEmpty( v ) ) );
+                    ( versions ?? new SortedSet<string>( StringComparer.OrdinalIgnoreCase ) )
+                        .AddRange( values.Where( v => !IsNullOrEmpty( v ) ) );
                 }
             }
 

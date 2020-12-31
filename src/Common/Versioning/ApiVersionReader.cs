@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             public string? Read( HttpRequest request )
             {
-                var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+                SortedSet<string>? versions = null;
 
                 foreach ( var apiVersionReader in apiVersionReaders )
                 {
@@ -77,7 +77,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
                     if ( !IsNullOrEmpty( version ) )
                     {
-                        versions.Add( version! );
+                        ( versions ?? new SortedSet<string>( StringComparer.OrdinalIgnoreCase ) )
+                            .Add( version! );
                     }
                 }
 

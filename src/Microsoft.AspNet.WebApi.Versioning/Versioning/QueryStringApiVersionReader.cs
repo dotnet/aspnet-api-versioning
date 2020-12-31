@@ -19,11 +19,19 @@
         /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         public virtual string? Read( HttpRequestMessage request )
         {
-            var values = from pair in request.GetQueryNameValuePairs()
-                         from parameterName in ParameterNames
-                         where parameterName.Equals( pair.Key, OrdinalIgnoreCase ) && pair.Value.Length > 0
-                         select pair.Value;
-            var versions = new HashSet<string>( values, StringComparer.OrdinalIgnoreCase );
+            SortedSet<string>? versions = null;
+
+            foreach ( var pair in request.GetQueryNameValuePairs() )
+            {
+                foreach ( var parameterName in ParameterNames )
+                {
+                    if ( parameterName.Equals( pair.Key, OrdinalIgnoreCase ) && pair.Value.Length > 0 )
+                    {
+                        ( versions ?? new SortedSet<string>( StringComparer.OrdinalIgnoreCase ) )
+                            .Add( pair.Value );
+                    }
+                }
+            }
 
             return versions.EnsureZeroOrOneApiVersions();
         }
