@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Examples
 {
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
-    using Microsoft.OpenApi.Any;
     using Microsoft.OpenApi.Models;
     using Swashbuckle.AspNetCore.SwaggerGen;
     using System.Linq;
@@ -24,6 +23,24 @@
 
             operation.Deprecated |= apiDescription.IsDeprecated();
 
+            // https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1752#issue-663991077
+            foreach ( var responseType in context.ApiDescription.SupportedResponseTypes )
+            {
+                // based on internals of SwaggerGenerator
+                // https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/b7cf75e7905050305b115dd96640ddd6e74c7ac9/src/Swashbuckle.AspNetCore.SwaggerGen/SwaggerGenerator/SwaggerGenerator.cs#L383-L387
+                var responseKey = responseType.IsDefaultResponse ? "default" : responseType.StatusCode.ToString();
+                var response = operation.Responses[responseKey];
+
+                // remove media types not supported by the API
+                foreach ( var contentType in response.Content.Keys )
+                {
+                    if ( !responseType.ApiResponseFormats.Any( x => x.MediaType == contentType ) )
+                    {
+                        response.Content.Remove( contentType );
+                    }
+                }
+            }
+
             if ( operation.Parameters == null )
             {
                 return;
@@ -42,7 +59,8 @@
 
                 if ( parameter.Schema.Default == null && description.DefaultValue != null )
                 {
-                    parameter.Schema.Default = new OpenApiString( description.DefaultValue.ToString() );
+                    // https://github.com/Microsoft/aspnet-api-versioning/issues/429#issuecomment-605402330
+                    parameter.Schema.Default = OpenApiAnyFactory.CreateFor( parameter.Schema, description.DefaultValue );
                 }
 
                 parameter.Required |= description.IsRequired;
