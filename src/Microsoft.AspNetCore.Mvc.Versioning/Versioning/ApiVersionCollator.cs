@@ -82,15 +82,15 @@
                 throw new ArgumentNullException( nameof( action ) );
             }
 
-            if ( !action.RouteValues.TryGetValue( "controller", out var key ) )
+            if ( !action.RouteValues.TryGetValue( "controller", out var name ) )
             {
                 if ( action is ControllerActionDescriptor controllerAction )
                 {
-                    key = controllerAction.ControllerName;
+                    name = controllerAction.ControllerName;
                 }
             }
 
-            return TrimTrailingNumbers( key );
+            return name ?? string.Empty;
         }
 
         IEnumerable<IEnumerable<ActionDescriptor>> GroupActionsByController( IEnumerable<ActionDescriptor> actions )
@@ -118,31 +118,6 @@
             {
                 yield return value;
             }
-        }
-
-        static string TrimTrailingNumbers( string? name )
-        {
-            if ( string.IsNullOrEmpty( name ) )
-            {
-                return string.Empty;
-            }
-
-            var last = name!.Length - 1;
-
-            for ( var i = last; i >= 0; i-- )
-            {
-                if ( !char.IsNumber( name[i] ) )
-                {
-                    if ( i < last )
-                    {
-                        return name.Substring( 0, i + 1 );
-                    }
-
-                    return name;
-                }
-            }
-
-            return name;
         }
 
         static ApiVersionModel CollateModel( IEnumerable<ActionDescriptor> actions ) => actions.Select( a => a.GetApiVersionModel() ).Aggregate();

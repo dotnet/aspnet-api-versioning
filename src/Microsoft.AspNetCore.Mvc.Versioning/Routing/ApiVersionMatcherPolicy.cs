@@ -96,7 +96,9 @@
                 httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
             }
 
-            if ( !MatchesApiVersion( candidates, apiVersion ) )
+            var (matched, hasCandidates) = MatchApiVersion( candidates, apiVersion );
+
+            if ( !matched && hasCandidates )
             {
                 httpContext.SetEndpoint( ClientError( httpContext, candidates ) );
             }
@@ -104,10 +106,11 @@
             return CompletedTask;
         }
 
-        static bool MatchesApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
+        static (bool Matched, bool HasCandidates) MatchApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
         {
             var bestMatches = new List<int>();
             var implicitMatches = new List<int>();
+            var hasCandidates = false;
 
             for ( var i = 0; i < candidates.Count; i++ )
             {
@@ -116,6 +119,7 @@
                     continue;
                 }
 
+                hasCandidates = true;
                 ref var candidate = ref candidates[i];
                 var action = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>();
 
@@ -147,7 +151,7 @@
                 case 0:
                     if ( implicitMatches.Count == 0 )
                     {
-                        return false;
+                        return (false, hasCandidates);
                     }
 
                     for ( var i = 0; i < implicitMatches.Count; i++ )
@@ -155,7 +159,7 @@
                         candidates.SetValidity( implicitMatches[i], true );
                     }
 
-                    return true;
+                    return (true, hasCandidates);
                 case 1:
                     ref var candidate = ref candidates[bestMatches[0]];
                     var action = candidate.Endpoint.Metadata.GetMetadata<ActionDescriptor>()!;
@@ -177,7 +181,7 @@
                 candidates.SetValidity( bestMatches[i], true );
             }
 
-            return true;
+            return (true, hasCandidates);
         }
 
         bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, out ApiVersion? apiVersion )

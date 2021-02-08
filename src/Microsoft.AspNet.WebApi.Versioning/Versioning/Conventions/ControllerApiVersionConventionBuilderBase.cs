@@ -75,7 +75,7 @@
 
             for ( var i = 0; i < actions.Length; i++ )
             {
-                if ( !( actions[i] is ReflectedHttpActionDescriptor action ) )
+                if ( actions[i] is not ReflectedHttpActionDescriptor action )
                 {
                     continue;
                 }

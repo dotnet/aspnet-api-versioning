@@ -62,6 +62,8 @@
             {
                 var controller = controllers[i];
 
+                controller.ControllerName = TrimTrailingNumbers( controller.ControllerName );
+
                 if ( !conventionBuilder.ApplyTo( controller ) )
                 {
                     ApplyAttributeOrImplicitConventions( controller, implicitVersionModel );
@@ -71,6 +73,31 @@
 
         /// <inheritdoc />
         public virtual void OnProvidersExecuting( ApplicationModelProviderContext context ) { }
+
+        static string TrimTrailingNumbers( string name )
+        {
+            if ( string.IsNullOrEmpty( name ) )
+            {
+                return string.Empty;
+            }
+
+            var last = name.Length - 1;
+
+            for ( var i = last; i >= 0; i-- )
+            {
+                if ( !char.IsNumber( name[i] ) )
+                {
+                    if ( i < last )
+                    {
+                        return name.Substring( 0, i + 1 );
+                    }
+
+                    return name;
+                }
+            }
+
+            return name;
+        }
 
         static bool IsDecoratedWithAttributes( ControllerModel controller )
         {

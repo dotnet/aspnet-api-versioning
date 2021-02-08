@@ -19,7 +19,7 @@
         /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
         protected override bool TryGetConvention( MethodInfo method, [NotNullWhen( true )] out IApiVersionConvention<ActionModel>? convention )
         {
-            if ( ActionBuilders.TryGetValue( method, out var actionBuilder ) )
+            if ( ActionBuilders.TryGetValue( method, out var actionBuilder ) && actionBuilder != null )
             {
                 return ( convention = actionBuilder ) != null;
             }

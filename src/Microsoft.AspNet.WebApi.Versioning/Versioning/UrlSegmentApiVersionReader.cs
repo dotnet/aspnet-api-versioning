@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.Web.Http.Versioning
 {
+    using System;
     using System.Net.Http;
     using System.Web.Http;
 
@@ -16,6 +17,11 @@
         /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         public virtual string? Read( HttpRequestMessage request )
         {
+            if ( request == null )
+            {
+                throw new ArgumentNullException( nameof( request ) );
+            }
+
             if ( reentrant )
             {
                 return null;

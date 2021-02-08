@@ -949,7 +949,7 @@
         {
             for ( var i = 0; i < parsedRoute.PathSegments.Count; i++ )
             {
-                if ( !( parsedRoute.PathSegments[i] is IPathContentSegment content ) )
+                if ( parsedRoute.PathSegments[i] is not IPathContentSegment content )
                 {
                     continue;
                 }
@@ -1055,7 +1055,7 @@
             }
 
             // note that we don't support custom constraint (IHttpRouteConstraint) because it might rely on the request and some runtime states
-            if ( !( constraint is string constraintsRule ) )
+            if ( constraint is not string constraintsRule )
             {
                 return true;
             }
