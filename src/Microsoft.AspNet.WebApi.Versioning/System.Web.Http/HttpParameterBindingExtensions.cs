@@ -9,7 +9,7 @@
     {
         internal static bool WillReadUri( this HttpParameterBinding parameterBinding )
         {
-            if ( !( parameterBinding is IValueProviderParameterBinding valueProviderParameterBinding ) )
+            if ( parameterBinding is not IValueProviderParameterBinding valueProviderParameterBinding )
             {
                 return false;
             }

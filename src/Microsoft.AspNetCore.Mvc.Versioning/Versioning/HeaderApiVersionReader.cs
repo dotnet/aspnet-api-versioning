@@ -3,8 +3,8 @@
     using Microsoft.AspNetCore.Http;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using static System.String;
+    using static System.StringComparer;
 
     /// <content>
     /// Provides the implementation for ASP.NET Core.
@@ -25,18 +25,52 @@
                 throw new ArgumentNullException( nameof( request ) );
             }
 
-            var headers = request.Headers;
-            var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+            var count = HeaderNames.Count;
 
-            foreach ( var name in HeaderNames )
+            if ( count == 0 )
             {
-                if ( headers.TryGetValue( name, out var values ) )
+                return default;
+            }
+
+            var version = default( string );
+            var versions = default( SortedSet<string> );
+            var names = new string[count];
+            var headers = request.Headers;
+
+            HeaderNames.CopyTo( names, 0 );
+
+            for ( var i = 0; i < count; i++ )
+            {
+                if ( !headers.TryGetValue( names[i], out var values ) )
                 {
-                    versions.AddRange( values.Where( v => !IsNullOrEmpty( v ) ) );
+                    continue;
+                }
+
+                for ( var j = 0; j < values.Count; j++ )
+                {
+                    var value = values[j];
+
+                    if ( IsNullOrEmpty( value ) )
+                    {
+                        continue;
+                    }
+
+                    if ( version == null )
+                    {
+                        version = value;
+                    }
+                    else if ( versions == null )
+                    {
+                        versions = new SortedSet<string>( OrdinalIgnoreCase ) { version, value };
+                    }
+                    else
+                    {
+                        versions.Add( value );
+                    }
                 }
             }
 
-            return versions.EnsureZeroOrOneApiVersions();
+            return versions == null ? version : versions.EnsureZeroOrOneApiVersions();
         }
     }
 }

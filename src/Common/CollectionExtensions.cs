@@ -18,10 +18,10 @@ namespace Microsoft.AspNetCore.Mvc
 
     static partial class CollectionExtensions
     {
-#if NETAPPCORE3_1
-        internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, [NotNullWhen(true)] out TValue value ) where TKey : notnull
-#else
+#if WEBAPI
         internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, out TValue value ) where TKey : notnull
+#else
+        internal static bool TryGetValue<TKey, TValue>( this IDictionary<TKey, object?> dictionary, TKey key, [NotNullWhen( true )] out TValue value ) where TKey : notnull
 #endif
         {
             if ( dictionary.TryGetValue( key, out var val ) && val is TValue v )
@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.Mvc
             return false;
         }
 
-        internal static List<T> AsList<T>( this IEnumerable<T> sequence ) => ( sequence as List<T> ) ?? new List<T>( sequence );
+        internal static List<T> AsList<T>( this IEnumerable<T> sequence ) => ( sequence as List<T> ) ?? sequence.ToList();
 
         internal static IReadOnlyList<T> ToSortedReadOnlyList<T>( this IEnumerable<T> sequence ) where T : IComparable<T>
         {
@@ -59,15 +59,18 @@ namespace Microsoft.AspNetCore.Mvc
 
         internal static string? EnsureZeroOrOneApiVersions( this ICollection<string> apiVersions )
         {
-            if ( apiVersions.Count < 2 )
+            switch ( apiVersions.Count )
             {
-                return apiVersions.SingleOrDefault();
+                case 0:
+                    return default;
+                case 1:
+                    var values = new string[1];
+                    apiVersions.CopyTo( values, 0 );
+                    return values[0];
+                default:
+                    var message = Format( InvariantCulture, SR.MultipleDifferentApiVersionsRequested, Join( ", ", apiVersions ) );
+                    throw new AmbiguousApiVersionException( message, apiVersions );
             }
-
-            var requestedVersions = Join( ", ", apiVersions.OrderBy( v => v ) );
-            var message = Format( InvariantCulture, SR.MultipleDifferentApiVersionsRequested, requestedVersions );
-
-            throw new AmbiguousApiVersionException( message, apiVersions.OrderBy( v => v ) );
         }
 
         internal static void UnionWith<T>( this ICollection<T> collection, IEnumerable<T> other )

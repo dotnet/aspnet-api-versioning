@@ -2,9 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Http;
-    using static System.StringComparison;
 
     /// <content>
     /// Provides the implementation for ASP.NET Web API.
@@ -19,13 +17,53 @@
         /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
         public virtual string? Read( HttpRequestMessage request )
         {
-            var values = from pair in request.GetQueryNameValuePairs()
-                         from parameterName in ParameterNames
-                         where parameterName.Equals( pair.Key, OrdinalIgnoreCase ) && pair.Value.Length > 0
-                         select pair.Value;
-            var versions = new HashSet<string>( values, StringComparer.OrdinalIgnoreCase );
+            if ( request == null )
+            {
+                throw new ArgumentNullException( nameof( request ) );
+            }
 
-            return versions.EnsureZeroOrOneApiVersions();
+            var count = ParameterNames.Count;
+
+            if ( count == 0 )
+            {
+                return default;
+            }
+
+            var version = default( string );
+            var versions = default( SortedSet<string> );
+            var names = new string[count];
+            var comparer = StringComparer.OrdinalIgnoreCase;
+
+            ParameterNames.CopyTo( names, 0 );
+
+            foreach ( var pair in request.GetQueryNameValuePairs() )
+            {
+                for ( var i = 0; i < count; i++ )
+                {
+                    var parameterName = names[i];
+                    var value = pair.Value;
+
+                    if ( value.Length == 0 || !comparer.Equals( parameterName, pair.Key ) )
+                    {
+                        continue;
+                    }
+
+                    if ( version == null )
+                    {
+                        version = value;
+                    }
+                    else if ( versions == null )
+                    {
+                        versions = new SortedSet<string>( comparer ) { version, value };
+                    }
+                    else
+                    {
+                        versions.Add( value );
+                    }
+                }
+            }
+
+            return versions == null ? version : versions.EnsureZeroOrOneApiVersions();
         }
     }
 }

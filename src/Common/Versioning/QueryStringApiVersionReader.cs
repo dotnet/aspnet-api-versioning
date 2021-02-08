@@ -75,9 +75,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 throw new ArgumentNullException( nameof( context ) );
             }
 
-            foreach ( var name in ParameterNames )
+            var count = ParameterNames.Count;
+            var names = new string[count];
+
+            ParameterNames.CopyTo( names, 0 );
+
+            for ( var i = 0; i < count; i++ )
             {
-                context.AddParameter( name, Query );
+                context.AddParameter( names[i], Query );
             }
         }
     }

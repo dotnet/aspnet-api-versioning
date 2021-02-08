@@ -5,6 +5,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #endif
 {
 #if WEBAPI
+    using Microsoft.Web.Http;
     using Microsoft.Web.Http.Routing;
 #else
     using Microsoft.AspNetCore.Mvc.Routing;
@@ -20,6 +21,7 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using MediaTypeWithQualityHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 #endif
     using static ApiVersionParameterLocation;
+    using static System.StringComparison;
 
     /// <summary>
     /// Represents a service API version reader that reads the value from a media type HTTP header in the request.
@@ -47,34 +49,48 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <summary>
         /// Reads the requested API version from the HTTP Accept header.
         /// </summary>
-        /// <param name="accept">The <see cref="IEnumerable{T}">sequence</see> of Accept
+        /// <param name="accept">The <see cref="ICollection{T}">collection</see> of Accept
         /// <see cref="MediaTypeWithQualityHeaderValue">headers</see> to read from.</param>
         /// <returns>The API version read or <c>null</c>.</returns>
         /// <remarks>The default implementation will return the first defined API version ranked by the media type
         /// quality parameter.</remarks>
-        protected virtual string? ReadAcceptHeader( IEnumerable<MediaTypeWithQualityHeaderValue> accept )
+        protected virtual string? ReadAcceptHeader( ICollection<MediaTypeWithQualityHeaderValue> accept )
         {
-            var comparer = StringComparer.OrdinalIgnoreCase;
-            var contentTypes = from entry in accept
-                               orderby entry.Quality descending
-                               group entry by entry.MediaType;
-
-            foreach ( var contentType in contentTypes )
+            if ( accept == null )
             {
-                foreach ( var entry in contentType )
+                throw new ArgumentNullException( nameof( accept ) );
+            }
+
+            var count = accept.Count;
+
+            if ( count == 0 )
+            {
+                return default;
+            }
+
+            var mediaTypes = accept.ToArray();
+
+            Array.Sort( mediaTypes, ByQualityDescending );
+
+            for ( var i = 0; i < count; i++ )
+            {
+#if WEBAPI
+                var parameters = mediaTypes[i].Parameters.ToArray();
+                var paramCount = parameters.Length;
+#else
+                var parameters = mediaTypes[i].Parameters;
+                var paramCount = parameters.Count;
+#endif
+                for ( var j = 0; j < paramCount; j++ )
                 {
-                    foreach ( var parameter in entry.Parameters )
+                    var parameter = parameters[j];
+
+                    if ( parameter.Name.Equals( ParameterName, OrdinalIgnoreCase ) )
                     {
 #if WEBAPI
-                        if ( comparer.Equals( parameter.Name, ParameterName ) )
-                        {
-                            return parameter.Value;
-                        }
+                        return parameter.Value;
 #else
-                        if ( comparer.Equals( parameter.Name.Value, ParameterName ) )
-                        {
-                            return parameter.Value.Value;
-                        }
+                        return parameter.Value.Value;
 #endif
                     }
                 }
@@ -94,22 +110,25 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             {
                 throw new ArgumentNullException( nameof( contentType ) );
             }
-
-            var comparer = StringComparer.OrdinalIgnoreCase;
-
-            foreach ( var parameter in contentType.Parameters )
-            {
 #if WEBAPI
-                if ( comparer.Equals( parameter.Name, ParameterName ) )
-                {
-                    return parameter.Value;
-                }
+            var parameters = contentType.Parameters.ToArray();
+            var count = parameters.Length;
 #else
-                if ( comparer.Equals( parameter.Name.Value, ParameterName ) )
-                {
-                    return parameter.Value.Value;
-                }
+            var parameters = contentType.Parameters;
+            var count = parameters.Count;
 #endif
+            for ( var i = 0; i < count; i++ )
+            {
+                var parameter = parameters[i];
+
+                if ( parameter.Name.Equals( ParameterName, OrdinalIgnoreCase ) )
+                {
+#if WEBAPI
+                    return parameter.Value;
+#else
+                    return parameter.Value.Value;
+#endif
+                }
             }
 
             return null;
@@ -128,5 +147,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
             context.AddParameter( ParameterName, MediaTypeParameter );
         }
+
+        static int ByQualityDescending( MediaTypeWithQualityHeaderValue? left, MediaTypeWithQualityHeaderValue? right ) =>
+            -Nullable.Compare( left?.Quality, right?.Quality );
     }
 }

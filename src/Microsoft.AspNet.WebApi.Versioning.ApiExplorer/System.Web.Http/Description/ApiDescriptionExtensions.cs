@@ -103,7 +103,7 @@
                 throw new ArgumentNullException( nameof( options ) );
             }
 
-            if ( !options.SubstituteApiVersionInUrl || !( apiDescription is VersionedApiDescription versionedApiDescription ) )
+            if ( !options.SubstituteApiVersionInUrl || apiDescription is not VersionedApiDescription versionedApiDescription )
             {
                 return false;
             }

@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using static System.String;
+    using static System.StringComparer;
 
     /// <content>
     /// Provides the implementation for ASP.NET Core.
@@ -24,22 +25,48 @@
                 throw new ArgumentNullException( nameof( request ) );
             }
 
-            var versions = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+            var count = ParameterNames.Count;
 
-            foreach ( var parameterName in ParameterNames )
+            if ( count == 0 )
             {
-                var values = request.Query[parameterName];
+                return default;
+            }
 
-                foreach ( var value in values )
+            var version = default( string );
+            var versions = default( SortedSet<string> );
+            var names = new string[count];
+
+            ParameterNames.CopyTo( names, 0 );
+
+            for ( var i = 0; i < count; i++ )
+            {
+                var values = request.Query[names[i]];
+
+                for ( var j = 0; j < values.Count; j++ )
                 {
-                    if ( !IsNullOrEmpty( value ) )
+                    var value = values[j];
+
+                    if ( IsNullOrEmpty( value ) )
+                    {
+                        continue;
+                    }
+
+                    if ( version == null )
+                    {
+                        version = value;
+                    }
+                    else if ( versions == null )
+                    {
+                        versions = new SortedSet<string>( OrdinalIgnoreCase ) { version, value };
+                    }
+                    else
                     {
                         versions.Add( value );
                     }
                 }
             }
 
-            return versions.EnsureZeroOrOneApiVersions();
+            return versions == null ? version : versions.EnsureZeroOrOneApiVersions();
         }
     }
 }

@@ -16,10 +16,10 @@
         /// <typeparam name="T">The <see cref="Type">type</see> and key of the property.</typeparam>
         /// <param name="controller">The <see cref="ControllerModel">model</see> to get the property from.</param>
         /// <returns>The property value of <typeparamref name="T"/> or its default value.</returns>
-#if NETCOREAPP3_1
-        [return: MaybeNull]
+#if WEBAPI
         public static T GetProperty<T>( this ControllerModel controller )
 #else
+        [return: MaybeNull]
         public static T GetProperty<T>( this ControllerModel controller )
 #endif
         {
@@ -37,10 +37,10 @@
         /// <typeparam name="T">The <see cref="Type">type</see> and key of the property.</typeparam>
         /// <param name="controller">The <see cref="ControllerModel">model</see> to set the property for.</param>
         /// <param name="value">The property value to set.</param>
-#if NETCOREAPP3_1
-        public static void SetProperty<T>( this ControllerModel controller, [AllowNull] T value )
-#else
+#if WEBAPI
         public static void SetProperty<T>( this ControllerModel controller, T value )
+#else
+        public static void SetProperty<T>( this ControllerModel controller, [AllowNull] T value )
 #endif
         {
             if ( controller == null )
@@ -57,10 +57,10 @@
         /// <typeparam name="T">The <see cref="Type">type</see> and key of the property.</typeparam>
         /// <param name="action">The <see cref="ActionModel">model</see> to get the property from.</param>
         /// <returns>The property value of <typeparamref name="T"/> or its default value.</returns>
-#if NETCOREAPP3_1
-        [return: MaybeNull]
+#if WEBAPI
         public static T GetProperty<T>( this ActionModel action )
 #else
+        [return: MaybeNull]
         public static T GetProperty<T>( this ActionModel action )
 #endif
         {

@@ -30,12 +30,7 @@
 
             var accept = request.Headers.Accept;
 
-            if ( accept == null || accept.Count == 0 )
-            {
-                return null;
-            }
-
-            return ReadAcceptHeader( accept );
+            return accept == null ? default : ReadAcceptHeader( accept );
         }
     }
 }

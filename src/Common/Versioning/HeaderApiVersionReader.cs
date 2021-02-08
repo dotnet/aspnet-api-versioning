@@ -50,9 +50,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 throw new ArgumentNullException( nameof( context ) );
             }
 
-            foreach ( var name in HeaderNames )
+            var count = HeaderNames.Count;
+            var names = new string[count];
+
+            HeaderNames.CopyTo( names, 0 );
+
+            for ( var i = 0; i < count; i++ )
             {
-                context.AddParameter( name, Header );
+                context.AddParameter( names[i], Header );
             }
         }
     }

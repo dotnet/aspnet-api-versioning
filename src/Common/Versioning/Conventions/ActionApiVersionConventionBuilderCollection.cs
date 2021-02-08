@@ -59,10 +59,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
         /// <param name="actionBuilder">The <see cref="ActionApiVersionConventionBuilder">controller action convention builder</see> or <c>null</c>.</param>
         /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-#if NETCOREAPP3_1
-        public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ActionApiVersionConventionBuilder? actionBuilder )
-#else
+#if WEBAPI
         public virtual bool TryGetValue( MethodInfo? actionMethod, out ActionApiVersionConventionBuilder? actionBuilder )
+#else
+        public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ActionApiVersionConventionBuilder? actionBuilder )
 #endif
         {
             if ( actionMethod == null )
