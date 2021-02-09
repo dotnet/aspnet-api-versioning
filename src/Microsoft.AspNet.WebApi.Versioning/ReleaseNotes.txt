@@ -1,2 +1,1 @@
-﻿CORS preflight request results in error (#619)
-HttpControllerDescriptorExtensions.AsEnumerable is now public
+﻿Performance enhancements for IApiVersionReader implementations
