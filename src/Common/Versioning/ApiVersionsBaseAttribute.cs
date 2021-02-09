@@ -41,14 +41,14 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
         /// </summary>
         /// <param name="version">The API version string.</param>
-        public ApiVersionsBaseAttribute( string version ) : this( new[] { version } ) { }
+        protected ApiVersionsBaseAttribute( string version ) : this( new[] { version } ) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
         /// </summary>
         /// <param name="versions">An <see cref="Array">array</see> of API version strings.</param>
         [CLSCompliant( false )]
-        public ApiVersionsBaseAttribute( params string[] versions )
+        protected ApiVersionsBaseAttribute( params string[] versions )
         {
             computedHashCode = new Lazy<int>( () => ComputeHashCode( Versions ) );
             this.versions = new Lazy<IReadOnlyList<ApiVersion>>( () => versions.Select( Parse ).Distinct().ToSortedReadOnlyList() );

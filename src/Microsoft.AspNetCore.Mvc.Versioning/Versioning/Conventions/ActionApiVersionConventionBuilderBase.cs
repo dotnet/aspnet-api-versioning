@@ -15,7 +15,9 @@
         /// Applies the builder conventions to the specified controller action.
         /// </summary>
         /// <param name="actionModel">The <see cref="ActionModel">action model</see> to apply the conventions to.</param>
+#pragma warning disable CA1725
         public virtual void ApplyTo( ActionModel actionModel )
+#pragma warning restore CA1725
         {
             if ( actionModel == null )
             {

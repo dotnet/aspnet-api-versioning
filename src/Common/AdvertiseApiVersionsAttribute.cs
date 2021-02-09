@@ -13,6 +13,9 @@ namespace Microsoft.AspNetCore.Mvc
     using System.Diagnostics.CodeAnalysis;
     using static System.AttributeTargets;
 
+#pragma warning disable CA1019
+#pragma warning disable CA1813
+
     /// <summary>
     /// Represents the metadata that describes the advertised <see cref="ApiVersion">API versions</see> for an ASP.NET controllers.
     /// </summary>
@@ -48,9 +51,9 @@ namespace Microsoft.AspNetCore.Mvc
         [CLSCompliant( false )]
         public AdvertiseApiVersionsAttribute( params string[] versions ) : base( versions ) { }
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types
+#pragma warning disable CA1033
         ApiVersionProviderOptions IApiVersionProvider.Options => options;
-#pragma warning restore CA1033 // Interface methods should be callable by child types
+#pragma warning restore CA1033
 
         /// <summary>
         /// Gets or sets a value indicating whether the specified set of API versions are deprecated.

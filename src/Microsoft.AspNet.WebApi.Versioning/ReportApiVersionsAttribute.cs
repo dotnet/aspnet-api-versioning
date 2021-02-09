@@ -8,7 +8,7 @@
     /// <content>
     /// Provides the implementation for ASP.NET Web API.
     /// </content>
-    public partial class ReportApiVersionsAttribute
+    public sealed partial class ReportApiVersionsAttribute
     {
         /// <summary>
         /// Occurs after the controller action has executed.

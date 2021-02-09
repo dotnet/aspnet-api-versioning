@@ -12,7 +12,7 @@
     /// Provides additional implementation specific to ASP.NET Core.
     /// </content>
     [CLSCompliant( false )]
-    public partial class ReportApiVersionsAttribute
+    public sealed partial class ReportApiVersionsAttribute
     {
         readonly IReportApiVersions reporter;
 
@@ -25,7 +25,9 @@
         /// Initializes a new instance of the <see cref="ReportApiVersionsAttribute"/> class.
         /// </summary>
         /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
+#pragma warning disable CA1019
         public ReportApiVersionsAttribute( IReportApiVersions reportApiVersions ) => reporter = reportApiVersions;
+#pragma warning restore CA1019
 
         /// <summary>
         /// Reports the discovered service API versions for the given context before an action has executed.

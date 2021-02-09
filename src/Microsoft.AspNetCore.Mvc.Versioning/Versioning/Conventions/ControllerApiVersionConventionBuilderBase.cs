@@ -22,7 +22,9 @@
         /// Applies the builder conventions to the specified controller.
         /// </summary>
         /// <param name="controllerModel">The <see cref="ControllerModel">controller model</see> to apply the conventions to.</param>
+#pragma warning disable CA1725
         public virtual void ApplyTo( ControllerModel controllerModel )
+#pragma warning restore CA1725
         {
             if ( controllerModel == null )
             {
