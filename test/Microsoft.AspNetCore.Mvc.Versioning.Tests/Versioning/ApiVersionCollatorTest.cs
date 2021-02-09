@@ -114,7 +114,7 @@
                     },
                     new ControllerActionDescriptor()
                     {
-                        ControllerName = "Values2",
+                        ControllerName = "Values",
                         RouteValues = new Dictionary<string, string>()
                         {
                             ["action"] = "Get",
@@ -126,7 +126,7 @@
                     },
                     new ControllerActionDescriptor()
                     {
-                        ControllerName = "Values3",
+                        ControllerName = "Values",
                         RouteValues = new Dictionary<string, string>()
                         {
                             ["action"] = "Get",
