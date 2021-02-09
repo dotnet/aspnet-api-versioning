@@ -12,10 +12,13 @@ namespace Microsoft.AspNetCore.Mvc
     using System;
     using static System.AttributeTargets;
 
+#pragma warning disable CA1813
+
     /// <summary>
     /// Represents the metadata that describes the <see cref="ApiVersion">API versions</see> associated with a service.
     /// </summary>
     [AttributeUsage( Class | Method, AllowMultiple = true, Inherited = false )]
+
     public class ApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     {
         ApiVersionProviderOptions options = ApiVersionProviderOptions.None;
@@ -30,7 +33,9 @@ namespace Microsoft.AspNetCore.Mvc
         /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
         /// </summary>
         /// <param name="version">The API version string.</param>
+#pragma warning disable CA1019
         public ApiVersionAttribute( string version ) : base( version ) { }
+#pragma warning restore CA1019
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types
         ApiVersionProviderOptions IApiVersionProvider.Options => options;

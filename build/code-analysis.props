@@ -2,9 +2,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup Label="Code Analysis">
-    <Features>IOperation</Features>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)code-analysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup Label="Code Analysis">
@@ -12,8 +11,6 @@
   </ItemGroup>
 
   <ItemGroup Label="NuGet">
-   <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.0" PrivateAssets="All" />
-   <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0" PrivateAssets="All" />
    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-*" PrivateAssets="All" />
   </ItemGroup>
 
