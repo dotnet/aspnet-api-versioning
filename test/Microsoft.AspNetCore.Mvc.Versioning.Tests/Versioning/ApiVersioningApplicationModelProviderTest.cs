@@ -184,5 +184,30 @@
                 } );
             uiController.Actions.Single().GetProperty<ApiVersionModel>().Should().BeNull();
         }
+
+        [Theory]
+        [InlineData( "" )]
+        [InlineData( "1" )]
+        [InlineData( "42" )]
+        public void on_providers_executed_should_trim_trailing_numbers_by_convention( string suffix )
+        {
+            // arrange
+            var controllerType = typeof( object ).GetTypeInfo();
+            var attributes = new object[] { new ApiControllerAttribute() };
+            var controller = new ControllerModel( controllerType, attributes ) { ControllerName = "Values" + suffix };
+            var controllerTypes = new[] { controller.ControllerType };
+            var options = Options.Create( new ApiVersioningOptions() );
+            var filter = new DefaultApiControllerFilter( new IApiControllerSpecification[] { new ApiBehaviorSpecification() } );
+            var context = new ApplicationModelProviderContext( controllerTypes );
+            var provider = new ApiVersioningApplicationModelProvider( options, filter );
+
+            context.Result.Controllers.Add( controller );
+
+            // act
+            provider.OnProvidersExecuted( context );
+
+            // assert
+            controller.ControllerName.Should().Be( "Values" );
+        }
     }
 }
