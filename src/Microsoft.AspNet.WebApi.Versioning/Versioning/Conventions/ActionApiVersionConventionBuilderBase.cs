@@ -17,6 +17,7 @@
         /// </summary>
         /// <param name="actionDescriptor">The <see cref="HttpActionDescriptor">action descriptor</see>
         /// to apply the conventions to.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage( "Naming", "CA1725:Parameter names should match base declaration", Justification = "Derived name is more meaningful." )]
         public virtual void ApplyTo( HttpActionDescriptor actionDescriptor )
         {
             if ( actionDescriptor == null )

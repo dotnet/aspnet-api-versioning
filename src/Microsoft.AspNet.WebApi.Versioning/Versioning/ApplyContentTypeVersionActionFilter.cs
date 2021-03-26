@@ -9,7 +9,7 @@
     {
         readonly string parameterName;
 
-        public ApplyContentTypeVersionActionFilter( IApiVersionReader reader ) =>
+        internal ApplyContentTypeVersionActionFilter( IApiVersionReader reader ) =>
             parameterName = reader.GetMediaTypeVersionParameter();
 
         public override bool AllowMultiple => false;

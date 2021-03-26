@@ -178,7 +178,7 @@
 
             if ( !options.AssumeDefaultVersionWhenUnspecified )
             {
-                return version ?? ApiVersion.Neutral;
+                return ApiVersion.Neutral;
             }
 
             var modelSelector = request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();

@@ -46,7 +46,7 @@
             {
                 if ( IsNullOrEmpty( requestedVersion ) )
                 {
-                    if ( Options!.AssumeDefaultVersionWhenUnspecified || Candidates.Any( c => c.GetApiVersionModel().IsApiVersionNeutral ) )
+                    if ( Options!.AssumeDefaultVersionWhenUnspecified || Candidates!.Any( c => c.GetApiVersionModel().IsApiVersionNeutral ) )
                     {
                         return VersionNeutralUnmatched( handlerContext, url, method, allowedMethods.Value, actionNames.Value );
                     }

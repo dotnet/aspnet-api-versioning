@@ -23,6 +23,7 @@
         /// </summary>
         /// <param name="controllerDescriptor">The <see cref="HttpControllerDescriptor">controller descriptor</see>
         /// to apply the conventions to.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage( "Naming", "CA1725:Parameter names should match base declaration", Justification = "Derived name is more meaningful." )]
         public virtual void ApplyTo( HttpControllerDescriptor controllerDescriptor )
         {
             if ( controllerDescriptor == null )
