@@ -58,7 +58,9 @@
                 }
                 else
                 {
+#pragma warning disable CA1508 // Avoid dead conditional code
                     using ( new PseudoParameterDescriptionScope( RouteContext ) )
+#pragma warning restore CA1508 // Avoid dead conditional code
                     {
                         path = routeBuilder.BuildPath();
                     }

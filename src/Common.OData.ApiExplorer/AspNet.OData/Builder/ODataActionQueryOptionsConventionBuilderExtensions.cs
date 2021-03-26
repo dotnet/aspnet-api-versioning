@@ -166,7 +166,9 @@
                     return builder.Action( methods[0] );
             }
 
+#pragma warning disable CA1508 // Avoid dead conditional code
             argumentTypes ??= Type.EmptyTypes;
+#pragma warning restore CA1508 // Avoid dead conditional code
             methods = methods.Where( m => SignatureMatches( m, argumentTypes ) ).ToArray();
 
             if ( methods.Length == 1 )
