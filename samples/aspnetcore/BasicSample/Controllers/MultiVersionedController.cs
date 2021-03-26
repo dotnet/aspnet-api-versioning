@@ -10,9 +10,9 @@
     public class MultiVersionedController : ControllerBase
     {
         [HttpGet]
-        public string GetMe() => "Version 1";
+        public string Get( ApiVersion version ) => "Version " + version;
 
         [HttpGet, MapToApiVersion( "2.0" )]
-        public string GetMeV2() => "Version 2";
+        public string GetV2( ApiVersion version ) => "Version " + version;
     }
 }
