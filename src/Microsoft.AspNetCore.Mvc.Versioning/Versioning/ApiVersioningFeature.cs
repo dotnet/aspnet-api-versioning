@@ -13,6 +13,7 @@
         readonly HttpContext context;
         string? rawApiVersion;
         ApiVersion? apiVersion;
+        ActionSelectionResult? selectionResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiVersioningFeature"/> class.
@@ -58,6 +59,6 @@
         }
 
         /// <inheritdoc />
-        public ActionSelectionResult SelectionResult { get; } = new ActionSelectionResult();
+        public ActionSelectionResult SelectionResult => selectionResult ??= new();
     }
 }

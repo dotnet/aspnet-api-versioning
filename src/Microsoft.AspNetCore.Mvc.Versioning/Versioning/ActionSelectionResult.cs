@@ -11,8 +11,8 @@
     [CLSCompliant( false )]
     public class ActionSelectionResult
     {
-        readonly HashSet<ActionDescriptor> candidateActions = new HashSet<ActionDescriptor>();
-        readonly HashSet<ActionDescriptor> matchingActions = new HashSet<ActionDescriptor>();
+        HashSet<ActionDescriptor>? candidateActions;
+        HashSet<ActionDescriptor>? matchingActions;
 
         /// <summary>
         /// Gets the best action descriptor match.
@@ -21,21 +21,21 @@
         /// <remarks>This property returns the first occurrence of a single match in the earliest iteration. If
         /// no matches exist in any iteration or multiple matches exist, this property returns <c>null</c>.</remarks>
         [CLSCompliant( false )]
-        public ActionDescriptor? BestMatch => MatchingActions.FirstOrDefault();
+        public ActionDescriptor? BestMatch => matchingActions?.FirstOrDefault();
 
         /// <summary>
         /// Gets a read-only collection of candidate actions.
         /// </summary>
         /// <value>A <see cref="IReadOnlyCollection{T}">read-only collection</see> of candidate <see cref="ActionDescriptor">actions</see>.</value>
         [CLSCompliant( false )]
-        public IReadOnlyCollection<ActionDescriptor> CandidateActions => candidateActions;
+        public IReadOnlyCollection<ActionDescriptor> CandidateActions => candidateActions ??= new();
 
         /// <summary>
         /// Gets a read-only collection of matching actions.
         /// </summary>
         /// <value>A <see cref="IReadOnlyCollection{T}">read-only collection</see> of <see cref="ActionDescriptor">matching actions</see>.</value>
         [CLSCompliant( false )]
-        public IReadOnlyCollection<ActionDescriptor> MatchingActions => matchingActions;
+        public IReadOnlyCollection<ActionDescriptor> MatchingActions => matchingActions ??= new();
 
         /// <summary>
         /// Adds the specified candidate actions to the selection result.
@@ -44,7 +44,7 @@
         /// to add to the selection result.</param>
         [CLSCompliant( false )]
         public void AddCandidates( IEnumerable<ActionDescriptor> actions ) =>
-            candidateActions.AddRange( actions ?? throw new ArgumentNullException( nameof( actions ) ) );
+            ( candidateActions ??= new() ).AddRange( actions ?? throw new ArgumentNullException( nameof( actions ) ) );
 
         /// <summary>
         /// Adds the specified matching actions to the selection result.
@@ -53,6 +53,16 @@
         /// to add to the selection result.</param>
         [CLSCompliant( false )]
         public void AddMatches( IEnumerable<ActionDescriptor> matches ) =>
-            matchingActions.AddRange( matches ?? throw new ArgumentNullException( nameof( matches ) ) );
+            ( matchingActions ??= new() ).AddRange( matches ?? throw new ArgumentNullException( nameof( matches ) ) );
+
+        /// <summary>
+        /// Clears the selection result.
+        /// </summary>
+        /// <remarks>The selection result should only ever be cleared if the routing middleware will be re-executed.</remarks>
+        public void Clear()
+        {
+            candidateActions?.Clear();
+            matchingActions?.Clear();
+        }
     }
 }
