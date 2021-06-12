@@ -14,8 +14,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     using System;
 #if WEBAPI
     using static Microsoft.Web.Http.Versioning.ApiVersionReader;
+    using NamingConvention = Microsoft.Web.Http.Versioning.Conventions.ControllerNameConvention;
 #else
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionReader;
+    using NamingConvention = Microsoft.AspNetCore.Mvc.Versioning.Conventions.ControllerNameConvention;
 #endif
 
     /// <summary>
@@ -24,11 +26,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
     public partial class ApiVersioningOptions
     {
         IApiVersionReader? apiVersionReader;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ApiVersioningOptions"/> class.
-        /// </summary>
-        public ApiVersioningOptions() => ApiVersionSelector = new DefaultApiVersionSelector( this );
+        IApiVersionSelector? apiVersionSelector;
+        IApiVersionConventionBuilder? conventions;
+        IErrorResponseProvider? errorResponses;
+        IControllerNameConvention? controllerNameConvention;
 
         /// <summary>
         /// Gets or sets the name associated with the API version route constraint.
@@ -105,7 +106,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public IApiVersionSelector ApiVersionSelector { get; set; }
+        public IApiVersionSelector ApiVersionSelector
+        {
+            get => apiVersionSelector ??= new DefaultApiVersionSelector( this );
+            set => apiVersionSelector = value;
+        }
 
         /// <summary>
         /// Gets or sets the builder used to define API version conventions.
@@ -114,7 +119,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public IApiVersionConventionBuilder Conventions { get; set; } = new ApiVersionConventionBuilder();
+        public IApiVersionConventionBuilder Conventions
+        {
+            get => conventions ??= new ApiVersionConventionBuilder();
+            set => conventions = value;
+        }
 
         /// <summary>
         /// Gets or sets the object used to generate HTTP error responses related to API versioning.
@@ -124,6 +133,21 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 #if !WEBAPI
         [CLSCompliant( false )]
 #endif
-        public IErrorResponseProvider ErrorResponses { get; set; } = new DefaultErrorResponseProvider();
+        public IErrorResponseProvider ErrorResponses
+        {
+            get => errorResponses ??= new DefaultErrorResponseProvider();
+            set => errorResponses = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the naming convention applied to controllers.
+        /// </summary>
+        /// <value>The <see cref="IControllerNameConvention">naming convention</see> applied to controllers. The default
+        /// value is <see cref="NamingConvention.Default"/>.</value>
+        public IControllerNameConvention ControllerNameConvention
+        {
+            get => controllerNameConvention ??= NamingConvention.Default;
+            set => controllerNameConvention = value;
+        }
     }
 }

@@ -84,7 +84,6 @@
             var controllerType = new TestType( "Contoso.Api.Controllers" );
             var attributes = Array.Empty<object>();
             var controllerModel = new ControllerModel( controllerType.GetTypeInfo(), attributes );
-            var controller = new Mock<IControllerConventionBuilder>();
             var convention = new VersionByNamespaceConvention();
 
             // act

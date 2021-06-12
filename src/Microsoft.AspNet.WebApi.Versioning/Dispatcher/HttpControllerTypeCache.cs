@@ -1,11 +1,11 @@
 ﻿namespace Microsoft.Web.Http.Dispatcher
 {
+    using Microsoft.Web.Http.Versioning.Conventions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Web.Http;
-    using static System.Web.Http.Dispatcher.DefaultHttpControllerSelector;
 
     sealed class HttpControllerTypeCache
     {
@@ -18,51 +18,13 @@
             cache = new Lazy<Dictionary<string, ILookup<string, Type>>>( InitializeCache );
         }
 
-        static string GetControllerName( Type type )
+        static string GetControllerName( Type type, IControllerNameConvention convention )
         {
-            // allow authors to specify a controller name via an attribute. this is required for controllers that
-            // do not use attribute-based routing, but support versioning. in the pure Convention-Over-Configuration
-            // model, this is not otherwise possible because each controller type maps to a different route
-            var attribute = type.GetCustomAttributes<ControllerNameAttribute>( false ).SingleOrDefault();
+            var name = type.GetCustomAttribute<ControllerNameAttribute>( false ) is ControllerNameAttribute attribute ?
+                attribute.Name :
+                type.Name;
 
-            if ( attribute != null )
-            {
-                return attribute.Name;
-            }
-
-            // use standard convention for the controller name (ex: ValuesController -> Values)
-            var name = type.Name;
-            var suffixLength = ControllerSuffix.Length;
-
-            name = name.Substring( 0, name.Length - suffixLength );
-
-            // trim trailing numbers to enable grouping by convention (ex: Values1Controller -> Values, Values2Controller -> Values)
-            return TrimTrailingNumbers( name );
-        }
-
-        static string TrimTrailingNumbers( string name )
-        {
-            if ( string.IsNullOrEmpty( name ) )
-            {
-                return name;
-            }
-
-            var last = name.Length - 1;
-
-            for ( var i = last; i >= 0; i-- )
-            {
-                if ( !char.IsNumber( name[i] ) )
-                {
-                    if ( i < last )
-                    {
-                        return name.Substring( 0, i + 1 );
-                    }
-
-                    return name;
-                }
-            }
-
-            return name;
+            return convention.GroupName( convention.NormalizeName( name ) );
         }
 
         Dictionary<string, ILookup<string, Type>> InitializeCache()
@@ -70,10 +32,11 @@
             var services = configuration.Services;
             var assembliesResolver = services.GetAssembliesResolver();
             var typeResolver = services.GetHttpControllerTypeResolver();
+            var convention = configuration.GetApiVersioningOptions().ControllerNameConvention;
             var comparer = StringComparer.OrdinalIgnoreCase;
 
             return typeResolver.GetControllerTypes( assembliesResolver )
-                               .GroupBy( GetControllerName, comparer )
+                               .GroupBy( type => GetControllerName( type, convention ), comparer )
                                .ToDictionary( g => g.Key, g => g.ToLookup( t => t.Namespace ?? string.Empty, comparer ), comparer );
         }
 

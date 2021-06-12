@@ -26,8 +26,8 @@
     /// </summary>
     public class VersionedApiExplorer : IApiExplorer
     {
-        static readonly Regex actionVariableRegex = new Regex( $"{{{RouteValueKeys.Action}}}", Compiled | IgnoreCase | CultureInvariant );
-        static readonly Regex controllerVariableRegex = new Regex( $"{{{RouteValueKeys.Controller}}}", Compiled | IgnoreCase | CultureInvariant );
+        static readonly Regex actionVariableRegex = new( $"{{{RouteValueKeys.Action}}}", Compiled | IgnoreCase | CultureInvariant );
+        static readonly Regex controllerVariableRegex = new( $"{{{RouteValueKeys.Controller}}}", Compiled | IgnoreCase | CultureInvariant );
         readonly Lazy<ApiDescriptionGroupCollection> apiDescriptions;
         IDocumentationProvider? documentationProvider;
 
