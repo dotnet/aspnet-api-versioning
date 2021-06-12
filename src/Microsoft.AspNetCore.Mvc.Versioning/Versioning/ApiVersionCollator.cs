@@ -42,8 +42,9 @@
             {
                 var collatedModel = CollateModel( actions );
 
-                foreach ( var action in actions )
+                for ( var i = 0; i < actions.Count; i++ )
                 {
+                    var action = actions[i];
                     var model = action.GetProperty<ApiVersionModel>();
 
                     if ( model != null && !model.IsApiVersionNeutral )
@@ -90,15 +91,16 @@
                 }
             }
 
-            return name ?? string.Empty;
+            return Options.ControllerNameConvention.GroupName( name ?? string.Empty );
         }
 
-        IEnumerable<IEnumerable<ActionDescriptor>> GroupActionsByController( IEnumerable<ActionDescriptor> actions )
+        IEnumerable<IReadOnlyList<ActionDescriptor>> GroupActionsByController( IList<ActionDescriptor> actions )
         {
             var groups = new Dictionary<string, List<ActionDescriptor>>( StringComparer.OrdinalIgnoreCase );
 
-            foreach ( var action in actions )
+            for ( var i = 0; i < actions.Count; i++ )
             {
+                var action = actions[i];
                 var key = GetControllerName( action );
 
                 if ( string.IsNullOrEmpty( key ) )
