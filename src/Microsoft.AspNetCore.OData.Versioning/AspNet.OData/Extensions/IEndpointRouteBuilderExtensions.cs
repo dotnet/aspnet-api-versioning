@@ -4,7 +4,6 @@
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNet.OData.Routing.Conventions;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;

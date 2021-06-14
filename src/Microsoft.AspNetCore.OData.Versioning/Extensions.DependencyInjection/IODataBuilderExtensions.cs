@@ -13,7 +13,6 @@
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection.Extensions;
-    using Microsoft.Extensions.Options;
     using System;
     using System.Linq;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionParameterLocation;
@@ -23,7 +22,7 @@
     /// Provides extension methods for the <see cref="IODataBuilder"/> interface.
     /// </summary>
     [CLSCompliant( false )]
-    public static partial class IODataBuilderExtensions
+    public static class IODataBuilderExtensions
     {
         /// <summary>
         /// Enables service API versioning for the specified OData configuration.
@@ -80,7 +79,8 @@
             services.TryAdd( Singleton<IODataRouteCollectionProvider, ODataRouteCollectionProvider>() );
             services.AddTransient<IApplicationModelProvider, ODataApplicationModelProvider>();
             services.AddTransient<IActionDescriptorProvider, ODataActionDescriptorProvider>();
-            services.AddSingleton<IActionDescriptorChangeProvider>( ODataActionDescriptorChangeProvider.Instance );
+            services.AddSingleton<ODataActionDescriptorChangeProvider>();
+            services.AddSingleton<IActionDescriptorChangeProvider>( sp => sp.GetRequiredService<ODataActionDescriptorChangeProvider>() );
             services.TryAddEnumerable( Transient<IApiControllerSpecification, ODataControllerSpecification>() );
             services.AddTransient<IStartupFilter, RaiseVersionedODataRoutesMapped>();
             services.AddModelConfigurationsAsServices( partManager );

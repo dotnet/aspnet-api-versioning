@@ -7,8 +7,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
     sealed class ODataApplicationModelProvider : IApplicationModelProvider
     {
-        const int AfterApiVersioningConventions = -100;
         readonly IOptions<ODataApiVersioningOptions> options;
+        internal const int AfterApiVersioningConventions = -100;
 
         public ODataApplicationModelProvider( IOptions<ODataApiVersioningOptions> options ) => this.options = options;
 

@@ -55,7 +55,7 @@
             services.Add( Singleton( sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
             services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector ) );
             services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ErrorResponses ) );
-            services.Replace( Singleton<IActionSelector, ApiVersionActionSelector>() );
+            services.TryAddOrReplace( Singleton<IActionSelector, ApiVersionActionSelector>() );
             services.TryAddSingleton<IApiVersionRoutePolicy, DefaultApiVersionRoutePolicy>();
             services.TryAddSingleton<IApiControllerFilter, DefaultApiControllerFilter>();
             services.TryAddSingleton<ReportApiVersionsAttribute>();
@@ -70,6 +70,28 @@
             services.AddTransient<IStartupFilter, AutoRegisterMiddleware>();
             services.Replace( WithUrlHelperFactoryDecorator( services ) );
             services.Replace( WithLinkGeneratorDecorator( services ) );
+        }
+
+        static IServiceCollection TryAddOrReplace( this IServiceCollection services, ServiceDescriptor descriptor )
+        {
+            var currentDescriptor = services.FirstOrDefault( sd => sd.ServiceType == descriptor.ServiceType );
+
+            if ( currentDescriptor == null )
+            {
+                services.Add( descriptor );
+            }
+            else if ( !descriptor.GetImplementationType().IsAssignableFrom( currentDescriptor.GetImplementationType() ) )
+            {
+                // the only known case where this can happen is if 'services.AddOData()' is called before
+                // 'services.AddApiVersioning()'. this is because even with endpoint routing in OData 7.x,
+                // it still uses IActionSelector behind the scenes. IActionSelector cannot be decorated or
+                // otherwise composed and MUST replaced with a specific concrete implementation. if services
+                // are registered out of order, this will cause ApiVersionActionSelector to replace
+                // ODataApiVersionActionSelector, will cause all versioned OData routes to fail
+                services.Replace( descriptor );
+            }
+
+            return services;
         }
 
         static IReportApiVersions OnRequestIReportApiVersions( IServiceProvider serviceProvider )
@@ -160,12 +182,34 @@
             }
 
             var lifetime = descriptor.Lifetime;
-            var decoratedType = descriptor.GetImplementationType();
-            var decoratorType = typeof( ApiVersionLinkGenerator<> ).MakeGenericType( decoratedType );
+            var factory = descriptor.ImplementationFactory;
 
-            services.Replace( Describe( decoratedType, decoratedType, lifetime ) );
+            if ( factory == null )
+            {
+                var decoratedType = descriptor.GetImplementationType();
+                var decoratorType = typeof( ApiVersionLinkGenerator<> ).MakeGenericType( decoratedType );
 
-            return Describe( typeof( LinkGenerator ), decoratorType, lifetime );
+                services.Replace( Describe( decoratedType, decoratedType, lifetime ) );
+
+                return Describe( typeof( LinkGenerator ), decoratorType, lifetime );
+            }
+            else
+            {
+                LinkGenerator NewFactory( IServiceProvider serviceProvider )
+                {
+                    var instance = (LinkGenerator) factory( serviceProvider );
+                    var source = serviceProvider.GetRequiredService<IApiVersionParameterSource>();
+
+                    if ( source.VersionsByUrlSegment() )
+                    {
+                        instance = new ApiVersionLinkGenerator( instance );
+                    }
+
+                    return instance;
+                }
+
+                return Describe( typeof( LinkGenerator ), NewFactory, lifetime );
+            }
         }
     }
 }

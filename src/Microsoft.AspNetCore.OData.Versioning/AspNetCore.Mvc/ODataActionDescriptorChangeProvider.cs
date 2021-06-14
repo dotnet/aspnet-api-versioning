@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc
 {
+    using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Primitives;
     using System;
@@ -16,16 +17,21 @@
     /// MapVersionedODataRoute or MapVersionedODataRoutes calls have been made.</remarks>
     public sealed class ODataActionDescriptorChangeProvider : IActionDescriptorChangeProvider
     {
-        readonly List<ChangeToken> changeTokens = new List<ChangeToken>();
-        readonly object syncRoot = new object();
-
-        ODataActionDescriptorChangeProvider() { }
+        readonly object syncRoot = new();
+        readonly IODataRouteCollectionProvider routeCollectionProvider;
+        int version;
+        List<ChangeToken>? changeTokens;
 
         /// <summary>
-        /// Gets the change provider instance.
+        /// Initializes a new instance of the <see cref="ODataActionDescriptorChangeProvider"/> class.
         /// </summary>
-        /// <value>The singleton <see cref="ODataActionDescriptorChangeProvider"/> instance.</value>
-        public static ODataActionDescriptorChangeProvider Instance { get; } = new ODataActionDescriptorChangeProvider();
+        /// <param name="routeCollectionProvider">The corresponding <see cref="IODataRouteCollectionProvider">
+        /// OData route collection provider</see>.</param>
+        [CLSCompliant( false )]
+        public ODataActionDescriptorChangeProvider( IODataRouteCollectionProvider routeCollectionProvider ) =>
+            this.routeCollectionProvider = routeCollectionProvider;
+
+        int CurrentVersion => routeCollectionProvider.Items.Count;
 
         internal bool HasChanged { get; private set; }
 
@@ -40,6 +46,7 @@
 
             lock ( syncRoot )
             {
+                changeTokens ??= new();
                 changeTokens.Add( changeToken );
             }
 
@@ -55,6 +62,19 @@
         {
             lock ( syncRoot )
             {
+                if ( changeTokens == null )
+                {
+                    return;
+                }
+
+                var currentVersion = CurrentVersion;
+
+                if ( version == currentVersion )
+                {
+                    return;
+                }
+
+                version = currentVersion;
                 HasChanged = true;
 
                 var tokens = changeTokens.ToArray();
@@ -65,8 +85,7 @@
                 {
                     for ( var i = 0; i < tokens.Length; i++ )
                     {
-                        var token = tokens[i];
-                        token.Callback();
+                        tokens[i].Callback();
                     }
                 }
                 finally
@@ -79,8 +98,8 @@
         sealed class ChangeToken : IChangeToken
         {
             readonly ODataActionDescriptorChangeProvider provider;
-            readonly HashSet<(Action<object> Callback, object State)> callbacks = new HashSet<(Action<object> Callback, object State)>();
-            readonly object syncRoot = new object();
+            readonly object syncRoot = new();
+            HashSet<(Action<object> Callback, object State)>? callbacks;
 
             internal ChangeToken( ODataActionDescriptorChangeProvider provider ) => this.provider = provider;
 
@@ -94,6 +113,7 @@
 
                 lock ( syncRoot )
                 {
+                    callbacks ??= new();
                     callbacks.Add( item );
                 }
 
@@ -104,7 +124,10 @@
             {
                 lock ( syncRoot )
                 {
-                    callbacks.Remove( item );
+                    if ( callbacks != null )
+                    {
+                        callbacks.Remove( item );
+                    }
                 }
             }
 
@@ -114,14 +137,21 @@
 
                 lock ( syncRoot )
                 {
-                    items = callbacks.ToArray();
-                    callbacks.Clear();
+                    if ( callbacks == null )
+                    {
+                        items = Array.Empty<(Action<object> Callback, object State)>();
+                    }
+                    else
+                    {
+                        items = callbacks.ToArray();
+                        callbacks.Clear();
+                    }
                 }
 
                 for ( var i = 0; i < items.Length; i++ )
                 {
-                    var item = items[i];
-                    item.Callback( item.State );
+                    var (callback, state) = items[i];
+                    callback( state );
                 }
             }
         }
