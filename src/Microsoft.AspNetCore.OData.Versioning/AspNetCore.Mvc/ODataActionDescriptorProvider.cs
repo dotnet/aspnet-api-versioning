@@ -9,6 +9,7 @@ namespace Microsoft.AspNetCore.Mvc
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.Options;
+    using static Microsoft.AspNetCore.Mvc.Versioning.ODataApplicationModelProvider;
 
     sealed class ODataActionDescriptorProvider : IActionDescriptorProvider
     {
@@ -26,7 +27,7 @@ namespace Microsoft.AspNetCore.Mvc
             this.options = options;
         }
 
-        public int Order => 0;
+        public int Order => AfterApiVersioningConventions;
 
         public void OnProvidersExecuted( ActionDescriptorProviderContext context )
         {
@@ -44,9 +45,7 @@ namespace Microsoft.AspNetCore.Mvc
 
             for ( var i = results.Count - 1; i >= 0; i-- )
             {
-                var result = results[i];
-
-                if ( !( result is ControllerActionDescriptor action ) ||
+                if ( results[i] is not ControllerActionDescriptor action ||
                      !action.ControllerTypeInfo.IsODataController() )
                 {
                     continue;

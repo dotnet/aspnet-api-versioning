@@ -10,12 +10,7 @@
     [CLSCompliant( false )]
     public sealed class ODataRouteCollectionProvider : IODataRouteCollectionProvider
     {
-        readonly ODataRouteCollection items = new ODataRouteCollection();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataRouteCollectionProvider"/> class.
-        /// </summary>
-        public ODataRouteCollectionProvider() { }
+        readonly ODataRouteCollection items = new();
 
         /// <inheritdoc />
         public IODataRouteCollection Items => items;
@@ -25,7 +20,7 @@
 
         sealed class ODataRouteCollection : IODataRouteCollection
         {
-            private readonly List<ODataRouteMapping> items = new List<ODataRouteMapping>();
+            readonly List<ODataRouteMapping> items = new();
 
             public ODataRouteMapping this[int index] => items[index];
 

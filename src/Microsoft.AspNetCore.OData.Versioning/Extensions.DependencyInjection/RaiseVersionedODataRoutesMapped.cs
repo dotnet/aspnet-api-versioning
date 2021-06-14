@@ -9,6 +9,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
     sealed class RaiseVersionedODataRoutesMapped : IStartupFilter
     {
+        readonly ODataActionDescriptorChangeProvider changeProvider;
+
+        public RaiseVersionedODataRoutesMapped( ODataActionDescriptorChangeProvider changeProvider ) =>
+            this.changeProvider = changeProvider;
+
         public Action<IApplicationBuilder> Configure( Action<IApplicationBuilder> next )
         {
             return app =>
@@ -21,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 // until one or more routes have been mapped. if anyone has subscribed changes, notify them now.
                 // this might do unnecessary work, but we assume that if you're using api versioning and odata, then
                 // at least one call to MapVersionedODataRoute or some other means added a route to the IODataRouteCollection
-                ODataActionDescriptorChangeProvider.Instance.NotifyChanged();
+                changeProvider.NotifyChanged();
             };
         }
     }
