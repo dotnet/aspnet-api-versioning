@@ -197,7 +197,7 @@
                 }
             }
 
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var feature = httpContext.ApiVersioningFeature();
             var selectionResult = feature.SelectionResult;
 
             feature.RequestedApiVersion = selectionContext.RequestedVersion;

@@ -50,7 +50,7 @@
                 throw new ArgumentNullException( nameof( httpContext ) );
             }
 
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var feature = httpContext.ApiVersioningFeature();
 
             feature.RouteParameter = routeKey;
             feature.RawRequestedApiVersion = value;

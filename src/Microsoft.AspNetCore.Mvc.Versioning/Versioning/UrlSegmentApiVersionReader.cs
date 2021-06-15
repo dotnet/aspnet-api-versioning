@@ -28,7 +28,7 @@
             }
 
             reentrant = true;
-            var feature = request.HttpContext.Features.Get<IApiVersioningFeature>();
+            var feature = request.HttpContext.ApiVersioningFeature();
             var value = feature.RawRequestedApiVersion;
             reentrant = false;
 

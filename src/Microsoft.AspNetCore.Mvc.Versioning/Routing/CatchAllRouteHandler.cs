@@ -17,7 +17,7 @@
         /// <inheritdoc />
         public Task RouteAsync( RouteContext context )
         {
-            var feature = context.HttpContext.Features.Get<IApiVersioningFeature>();
+            var feature = context.HttpContext.ApiVersioningFeature();
             routePolicy.Evaluate( context, feature.SelectionResult );
             return CompletedTask;
         }

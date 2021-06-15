@@ -31,7 +31,7 @@
 
         internal RequestHandler Build()
         {
-            var feature = HttpContext!.Features.Get<IApiVersioningFeature>();
+            var feature = HttpContext!.ApiVersioningFeature();
             var request = HttpContext!.Request;
             var method = request.Method;
             var requestedVersion = feature.RawRequestedApiVersion;

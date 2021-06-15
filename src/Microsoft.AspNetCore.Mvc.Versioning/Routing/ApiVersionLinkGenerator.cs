@@ -83,7 +83,7 @@
                 throw new ArgumentNullException( nameof( values ) );
             }
 
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var feature = httpContext.ApiVersioningFeature();
             var key = feature.RouteParameter;
 
             if ( string.IsNullOrEmpty( key ) )

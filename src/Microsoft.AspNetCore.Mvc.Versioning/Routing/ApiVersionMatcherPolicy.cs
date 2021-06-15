@@ -93,7 +93,7 @@
             if ( apiVersion == null && Options.AssumeDefaultVersionWhenUnspecified )
             {
                 apiVersion = TrySelectApiVersion( httpContext, candidates );
-                httpContext.Features.Get<IApiVersioningFeature>().RequestedApiVersion = apiVersion;
+                httpContext.ApiVersioningFeature().RequestedApiVersion = apiVersion;
             }
 
             var (matched, hasCandidates) = MatchApiVersion( candidates, apiVersion );
