@@ -20,7 +20,7 @@
                 throw new ArgumentNullException( nameof( bindingContext ) );
             }
 
-            var feature = bindingContext.HttpContext.Features.Get<IApiVersioningFeature>();
+            var feature = bindingContext.HttpContext.ApiVersioningFeature();
             var model = feature.RequestedApiVersion;
 
             if ( model != null )

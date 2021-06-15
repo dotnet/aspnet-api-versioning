@@ -21,7 +21,7 @@
         {
             ActionContext = actionContext ?? throw new ArgumentNullException( nameof( actionContext ) );
             Url = url;
-            feature = actionContext.HttpContext.Features.Get<IApiVersioningFeature>();
+            feature = actionContext.HttpContext.ApiVersioningFeature();
         }
 
         /// <summary>

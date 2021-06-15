@@ -47,7 +47,7 @@
             }
 
             var context = request.HttpContext;
-            var feature = context.Features.Get<IApiVersioningFeature>();
+            var feature = context.ApiVersioningFeature();
             string? apiVersion;
 
             try

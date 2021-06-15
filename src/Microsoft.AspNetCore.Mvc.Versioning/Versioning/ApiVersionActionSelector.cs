@@ -158,7 +158,7 @@
 
             var selectionContext = new ActionSelectionContext( httpContext, matches, apiVersion );
             var finalMatches = SelectBestActions( selectionContext );
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var feature = httpContext.ApiVersioningFeature();
             var selectionResult = feature.SelectionResult;
 
             feature.RequestedApiVersion = selectionContext.RequestedVersion;

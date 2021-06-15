@@ -11,14 +11,11 @@
     public static class HttpContextExtensions
     {
         /// <summary>
-        /// Gets the current API version requested.
+        /// Gets the API versioning feature associated with the current HTTP context.
         /// </summary>
-        /// <param name="context">The current <see cref="HttpContext">HTTP context</see> to get the API version for.</param>
-        /// <returns>The requested <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
-        /// <remarks>This method will return <c>null</c> no service API version was requested or the requested
-        /// service API version is in an invalid format.</remarks>
-        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
-        public static ApiVersion? GetRequestedApiVersion( this HttpContext context )
+        /// <param name="context">The current <see cref="HttpContext">HTTP context</see> to get the API feature for.</param>
+        /// <returns>The current <see cref="IApiVersioningFeature">API versioning feature</see>.</returns>
+        public static IApiVersioningFeature ApiVersioningFeature( this HttpContext context )
         {
             if ( context == null )
             {
@@ -26,7 +23,24 @@
             }
 
             var feature = context.Features.Get<IApiVersioningFeature>();
-            return feature?.RequestedApiVersion;
+
+            if ( feature == null )
+            {
+                feature = new ApiVersioningFeature( context );
+                context.Features.Set( feature );
+            }
+
+            return feature;
         }
+
+        /// <summary>
+        /// Gets the current API version requested.
+        /// </summary>
+        /// <param name="context">The current <see cref="HttpContext">HTTP context</see> to get the API version for.</param>
+        /// <returns>The requested <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
+        /// <remarks>This method will return <c>null</c> no service API version was requested or the requested
+        /// service API version is in an invalid format.</remarks>
+        /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
+        public static ApiVersion? GetRequestedApiVersion( this HttpContext context ) => context.ApiVersioningFeature().RequestedApiVersion;
     }
 }

@@ -145,7 +145,7 @@
             }
 
             var httpContext = routeContext.HttpContext;
-            var feature = httpContext.Features.Get<IApiVersioningFeature>();
+            var feature = httpContext.ApiVersioningFeature();
             ApiVersion? version;
 
             try
