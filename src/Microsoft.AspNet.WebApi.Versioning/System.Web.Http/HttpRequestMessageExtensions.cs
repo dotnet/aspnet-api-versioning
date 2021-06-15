@@ -81,15 +81,30 @@
                 throw new ArgumentNullException( nameof( request ) );
             }
 
-            if ( !request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
+            if ( request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
             {
-                var forceRouteConstraintEvaluation = !request.Properties.ContainsKey( RoutingContextKey );
+                return properties;
+            }
 
-                request.Properties[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( request );
+            var forceRouteConstraintEvaluation = !request.Properties.ContainsKey( RoutingContextKey );
 
-                if ( forceRouteConstraintEvaluation )
+            request.Properties[ApiVersionPropertiesKey] = properties = new ApiVersionRequestProperties( request );
+
+            if ( forceRouteConstraintEvaluation && request.GetConfiguration() is HttpConfiguration configuration )
+            {
+                // HACK: do NOT use 'HttpRouteCollection.GetRouteData' because it can result in a LockRecursionException when hosted on IIS
+                // REF: https://github.com/microsoft/referencesource/blob/master/System.Web/Routing/RouteCollection.cs#L159
+                var routes = configuration.Routes;
+                var context = request.GetRequestContext();
+                var virtualPathRoot = context?.VirtualPathRoot ?? routes.VirtualPathRoot ?? string.Empty;
+
+                // HACK: do NOT use a normal 'for' loop here because the IIS implementation does not support indexing
+                foreach ( var route in routes )
                 {
-                    request.GetConfiguration()?.Routes.GetRouteData( request );
+                    if ( route.GetRouteData( virtualPathRoot, request ) is not null )
+                    {
+                        break;
+                    }
                 }
             }
 
