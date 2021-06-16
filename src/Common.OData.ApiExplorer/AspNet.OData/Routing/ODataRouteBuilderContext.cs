@@ -146,6 +146,7 @@
             }
 
             const string ActionMethod = "Post";
+            const string AddNavigationLink = ActionMethod + "To";
             const string FunctionMethod = "Get";
 
             if ( ActionMethod.Equals( method, OrdinalIgnoreCase ) && actionName != ActionMethod )
@@ -156,7 +157,7 @@
                     return false;
                 }
 
-                return !IsNavigationPropertyLink( entitySet, singleton, actionName, ActionMethod );
+                return !IsNavigationPropertyLink( entitySet, singleton, actionName, ActionMethod, AddNavigationLink );
             }
             else if ( FunctionMethod.Equals( method, OrdinalIgnoreCase ) && actionName != FunctionMethod )
             {
@@ -172,7 +173,7 @@
             return false;
         }
 
-        static bool IsNavigationPropertyLink( IEdmEntitySet? entitySet, IEdmSingleton? singleton, string actionName, string method )
+        static bool IsNavigationPropertyLink( IEdmEntitySet? entitySet, IEdmSingleton? singleton, string actionName, params string[] methods )
         {
             var entities = new List<IEdmEntityType>( capacity: 2 );
 
@@ -191,20 +192,51 @@
                 }
             }
 
+            var propertyNames = default( List<string> );
+
             for ( var i = 0; i < entities.Count; i++ )
             {
                 var entity = entities[i];
 
-                if ( actionName == ( method + entity.Name ) )
+                for ( var j = 0; j < methods.Length; j++ )
                 {
-                    return true;
-                }
+                    var method = methods[j];
 
-                foreach ( var property in entity.NavigationProperties() )
-                {
-                    if ( actionName.StartsWith( method + property.Name, OrdinalIgnoreCase ) )
+                    if ( actionName == ( method + entity.Name ) )
                     {
                         return true;
+                    }
+
+                    if ( j == 0 )
+                    {
+                        if ( propertyNames is null )
+                        {
+                            propertyNames = new();
+                        }
+                        else
+                        {
+                            propertyNames.Clear();
+                        }
+
+                        foreach ( var property in entity.NavigationProperties() )
+                        {
+                            if ( actionName.StartsWith( method + property.Name, OrdinalIgnoreCase ) )
+                            {
+                                return true;
+                            }
+
+                            propertyNames.Add( property.Name );
+                        }
+                    }
+                    else if ( propertyNames is not null )
+                    {
+                        for ( var k = 0; k < propertyNames.Count; k++ )
+                        {
+                            if ( actionName.StartsWith( method + propertyNames[k], OrdinalIgnoreCase ) )
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
