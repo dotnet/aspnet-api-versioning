@@ -59,6 +59,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                 deprecated.UnionWith( otherVersion.DeprecatedApiVersions );
             }
 
+            deprecated.ExceptWith( supported );
+
             return new ApiVersionModel( version, implemented.ToSortedReadOnlyList(), supported.ToSortedReadOnlyList(), deprecated.ToSortedReadOnlyList() );
         }
 
@@ -93,6 +95,8 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
                     deprecated.UnionWith( iterator.Current.DeprecatedApiVersions );
                 }
             }
+
+            deprecated.ExceptWith( supported );
 
             return new ApiVersionModel( supported, deprecated );
         }

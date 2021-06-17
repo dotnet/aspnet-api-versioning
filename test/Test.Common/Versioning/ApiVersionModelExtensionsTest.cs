@@ -25,11 +25,11 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             aggregatedModel.Should().BeEquivalentTo(
                 new
                 {
-                    IsApiVersionNeutral = expected.IsApiVersionNeutral,
-                    DeclaredApiVersions = expected.DeclaredApiVersions,
-                    ImplementedApiVersions = expected.ImplementedApiVersions,
-                    SupportedApiVersions = expected.SupportedApiVersions,
-                    DeprecatedApiVersions = expected.DeprecatedApiVersions
+                    expected.IsApiVersionNeutral,
+                    expected.DeclaredApiVersions,
+                    expected.ImplementedApiVersions,
+                    expected.SupportedApiVersions,
+                    expected.DeprecatedApiVersions
                 } );
         }
 
@@ -54,11 +54,34 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             aggregatedModel.Should().BeEquivalentTo(
                 new
                 {
-                    IsApiVersionNeutral = expected.IsApiVersionNeutral,
-                    DeclaredApiVersions = expected.DeclaredApiVersions,
-                    ImplementedApiVersions = expected.ImplementedApiVersions,
-                    SupportedApiVersions = expected.SupportedApiVersions,
-                    DeprecatedApiVersions = expected.DeprecatedApiVersions
+                    expected.IsApiVersionNeutral,
+                    expected.DeclaredApiVersions,
+                    expected.ImplementedApiVersions,
+                    expected.SupportedApiVersions,
+                    expected.DeprecatedApiVersions
+                } );
+        }
+
+        [Fact]
+        public void aggregate_should_not_merge_deprecated_api_version_when_also_supported()
+        {
+            // arrange
+            var model1 = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ) }, Enumerable.Empty<ApiVersion>() );
+            var model2 = new ApiVersionModel( new[] { new ApiVersion( 2, 0 ) }, new[] { new ApiVersion( 1, 0 ) } );
+            var expected = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) }, Enumerable.Empty<ApiVersion>() );
+
+            // act
+            var aggregatedModel = model1.Aggregate( model2 );
+
+            // assert
+            aggregatedModel.Should().BeEquivalentTo(
+                new
+                {
+                    expected.IsApiVersionNeutral,
+                    expected.DeclaredApiVersions,
+                    expected.ImplementedApiVersions,
+                    expected.SupportedApiVersions,
+                    expected.DeprecatedApiVersions
                 } );
         }
     }
