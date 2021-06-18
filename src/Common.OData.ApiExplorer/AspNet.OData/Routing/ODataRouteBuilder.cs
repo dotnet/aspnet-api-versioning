@@ -38,7 +38,7 @@
     {
         static readonly Type ODataQueryOptionsType = typeof( ODataQueryOptions );
         static readonly Type ODataActionParametersType = typeof( ODataActionParameters );
-        static readonly Dictionary<Type, string> quotedTypes = new Dictionary<Type, string>( new TypeComparer() )
+        static readonly Dictionary<Type, string> quotedTypes = new( new TypeComparer() )
         {
             [typeof( string )] = string.Empty,
             [typeof( TimeSpan )] = "duration",
