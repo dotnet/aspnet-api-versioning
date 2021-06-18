@@ -79,7 +79,7 @@
             {
                 var item = items[i];
 
-                if ( !( item is ControllerActionDescriptor action ) || !action.ControllerTypeInfo.IsODataController() )
+                if ( item is not ControllerActionDescriptor action || !action.ControllerTypeInfo.IsODataController() )
                 {
                     continue;
                 }

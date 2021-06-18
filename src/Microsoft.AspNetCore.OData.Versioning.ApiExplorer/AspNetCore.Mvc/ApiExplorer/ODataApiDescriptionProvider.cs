@@ -518,7 +518,7 @@
                 {
                     var formatter = MvcOptions.InputFormatters[j];
 
-                    if ( !( formatter is IApiRequestFormatMetadataProvider requestFormatMetadataProvider ) )
+                    if ( formatter is not IApiRequestFormatMetadataProvider requestFormatMetadataProvider )
                     {
                         continue;
                     }
