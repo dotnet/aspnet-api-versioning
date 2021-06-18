@@ -28,12 +28,23 @@
                 throw new ArgumentNullException( nameof( context ) );
             }
 
-            var urlHelper = new ApiVersionUrlHelper( context, Factory.GetUrlHelper( context ) );
+            var items = context.HttpContext.Items;
 
             // REF: https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/Routing/UrlHelperFactory.cs#L44
-            context.HttpContext.Items[typeof( IUrlHelper )] = urlHelper;
+            if ( !items.TryGetValue( typeof( IUrlHelper ), out var value ) )
+            {
+                var urlHelper = new ApiVersionUrlHelper( context, Factory.GetUrlHelper( context ) );
+                items[typeof( IUrlHelper )] = urlHelper;
+                return urlHelper;
+            }
 
-            return urlHelper;
+            if ( value is not ApiVersionUrlHelper outer )
+            {
+                var inner = value as IUrlHelper ?? Factory.GetUrlHelper( context );
+                items[typeof( IUrlHelper )] = outer = new ApiVersionUrlHelper( context, inner );
+            }
+
+            return outer;
         }
     }
 }

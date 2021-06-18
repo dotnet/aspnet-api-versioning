@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Routing
 {
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.AspNetCore.Routing;
     using System;
 
