@@ -19,9 +19,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         const int DefaultModel = 0;
         const int NeutralModel = 1;
         const int EmptyModel = 2;
-        static readonly Lazy<ApiVersionModel> defaultVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( DefaultModel ) );
-        static readonly Lazy<ApiVersionModel> neutralVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( NeutralModel ) );
-        static readonly Lazy<ApiVersionModel> emptyVersion = new Lazy<ApiVersionModel>( () => new ApiVersionModel( EmptyModel ) );
+        static readonly Lazy<ApiVersionModel> defaultVersion = new( () => new( DefaultModel ) );
+        static readonly Lazy<ApiVersionModel> neutralVersion = new( () => new( NeutralModel ) );
+        static readonly Lazy<ApiVersionModel> emptyVersion = new( () => new( EmptyModel ) );
 #if WEBAPI
         static readonly IReadOnlyList<ApiVersion> emptyVersions = new ApiVersion[0];
 #else
@@ -55,16 +55,16 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
 
         internal ApiVersionModel( ApiVersionModel original, IReadOnlyList<ApiVersion> implemented, IReadOnlyList<ApiVersion> supported, IReadOnlyList<ApiVersion> deprecated )
         {
+            DeclaredApiVersions = original.DeclaredApiVersions;
+
             if ( IsApiVersionNeutral = implemented.Count == 0 )
             {
-                DeclaredApiVersions = emptyVersions;
                 ImplementedApiVersions = emptyVersions;
                 SupportedApiVersions = emptyVersions;
                 DeprecatedApiVersions = emptyVersions;
             }
             else
             {
-                DeclaredApiVersions = original.DeclaredApiVersions;
                 ImplementedApiVersions = implemented;
                 SupportedApiVersions = supported;
                 DeprecatedApiVersions = deprecated;

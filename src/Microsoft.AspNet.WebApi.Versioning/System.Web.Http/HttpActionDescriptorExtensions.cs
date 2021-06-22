@@ -79,15 +79,31 @@
 
             var model = action.GetApiVersionModel();
 
-            if ( model.IsApiVersionNeutral || ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) ) )
+            if ( model.IsApiVersionNeutral )
             {
                 return Explicit;
             }
-            else if ( model.DeclaredApiVersions.Count == 0 )
+
+            if ( apiVersion is null )
+            {
+                return None;
+            }
+
+            var mappedWithImplementation = model.DeclaredApiVersions.Contains( apiVersion ) &&
+                                           model.ImplementedApiVersions.Contains( apiVersion );
+
+            if ( mappedWithImplementation )
+            {
+                return Explicit;
+            }
+
+            var deriveFromParent = model.DeclaredApiVersions.Count == 0;
+
+            if ( deriveFromParent )
             {
                 model = action.ControllerDescriptor.GetApiVersionModel();
 
-                if ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) )
+                if ( model.DeclaredApiVersions.Contains( apiVersion ) )
                 {
                     return Implicit;
                 }

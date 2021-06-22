@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using System;
-    using System.Linq;
     using System.Reflection;
 
     /// <content>
@@ -32,18 +31,18 @@
 
         static bool HasDecoratedActions( ControllerModel controllerModel )
         {
-            foreach ( var action in controllerModel.Actions )
+            for ( var i = 0; i < controllerModel.Actions.Count; i++ )
             {
-                var attributes = action.Attributes;
+                var action = controllerModel.Actions[i];
 
-                if ( attributes.OfType<IApiVersionNeutral>().Any() )
+                for ( var j = 0; j < action.Attributes.Count; j++ )
                 {
-                    return true;
-                }
+                    var attribute = action.Attributes[j];
 
-                if ( attributes.OfType<IApiVersionProvider>().Any() )
-                {
-                    return true;
+                    if ( attribute is IApiVersionProvider || attribute is IApiVersionNeutral )
+                    {
+                        return true;
+                    }
                 }
             }
 
