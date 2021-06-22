@@ -375,7 +375,7 @@
                    !( binder is BodyModelBinder ) &&
                    !( binder is ComplexTypeModelBinder ) &&
                    !( binder is BinderTypeModelBinder ) &&
-                   !( binder is ICollectionModelBinder);
+                   !( binder is ICollectionModelBinder );
         }
 
         [DebuggerDisplay( "{Action.DisplayName,nq}" )]
