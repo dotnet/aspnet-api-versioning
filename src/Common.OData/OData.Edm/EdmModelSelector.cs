@@ -3,60 +3,105 @@
 #if !WEBAPI
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Versioning;
 #endif
     using Microsoft.Extensions.DependencyInjection;
 #if WEBAPI
     using Microsoft.Web.Http;
+    using Microsoft.Web.Http.Versioning;
 #endif
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 #if WEBAPI
     using System.Net.Http;
     using System.Web.Http;
+    using HttpRequest = System.Net.Http.HttpRequestMessage;
 #endif
 
     /// <summary>
     /// Represents an <see cref="IEdmModelSelector">EDM model selector</see>.
     /// </summary>
-#if WEBAPI
+#if !WEBAPI
     [CLSCompliant( false )]
 #endif
     public class EdmModelSelector : IEdmModelSelector
     {
         readonly ApiVersion maxVersion;
+        readonly IApiVersionSelector selector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EdmModelSelector"/> class.
         /// </summary>
         /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">models</see> to select from.</param>
         /// <param name="defaultApiVersion">The default <see cref="ApiVersion">API version</see>.</param>
+        [Obsolete( "This constructor will be removed in the next major version. Use the constructor with IApiVersionSelector instead." )]
         public EdmModelSelector( IEnumerable<IEdmModel> models, ApiVersion defaultApiVersion )
+            : this( models, defaultApiVersion, new ConstantApiVersionSelector( defaultApiVersion ) ) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EdmModelSelector"/> class.
+        /// </summary>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">models</see> to select from.</param>
+        /// <param name="defaultApiVersion">The default <see cref="ApiVersion">API version</see>.</param>
+        /// <param name="apiVersionSelector">The <see cref="IApiVersionSelector">selector</see> used to choose API versions.</param>
+        public EdmModelSelector( IEnumerable<IEdmModel> models, ApiVersion defaultApiVersion, IApiVersionSelector apiVersionSelector )
         {
-            var versions = new List<ApiVersion>();
-            var collection = new Dictionary<ApiVersion, IEdmModel>();
-
-            foreach ( var model in models ?? throw new ArgumentNullException( nameof( models ) ) )
+            if ( models == null )
             {
-                var annotation = model.GetAnnotationValue<ApiVersionAnnotation>( model );
+                throw new ArgumentNullException( nameof( models ) );
+            }
 
-                if ( annotation == null )
-                {
-                    throw new ArgumentException( LocalSR.MissingAnnotation.FormatDefault( typeof( ApiVersionAnnotation ).Name ) );
-                }
+            if ( defaultApiVersion == null )
+            {
+                throw new ArgumentNullException( nameof( defaultApiVersion ) );
+            }
 
-                var version = annotation.ApiVersion;
+            selector = apiVersionSelector ?? throw new ArgumentNullException( nameof( apiVersionSelector ) );
 
-                collection.Add( version, model );
-                versions.Add( version );
+            List<ApiVersion> versions;
+            Dictionary<ApiVersion, IEdmModel> collection;
+
+            switch ( models )
+            {
+                case IList<IEdmModel> list:
+                    versions = new( list.Count );
+                    collection = new( list.Count );
+
+                    for ( var i = 0; i < list.Count; i++ )
+                    {
+                        AddVersionFromModel( list[i], versions, collection );
+                    }
+
+                    break;
+                case IReadOnlyList<IEdmModel> list:
+                    versions = new( list.Count );
+                    collection = new( list.Count );
+
+                    for ( var i = 0; i < list.Count; i++ )
+                    {
+                        AddVersionFromModel( list[i], versions, collection );
+                    }
+
+                    break;
+                default:
+                    versions = new();
+                    collection = new();
+
+                    foreach ( var model in models )
+                    {
+                        AddVersionFromModel( model, versions, collection );
+                    }
+#if !WEBAPI
+                    collection.TrimExcess();
+#endif
+                    break;
             }
 
             versions.Sort();
 #pragma warning disable IDE0056 // Use index operator (cannot be used in web api)
             maxVersion = versions.Count == 0 ? defaultApiVersion : versions[versions.Count - 1];
 #pragma warning restore IDE0056
-#if !WEBAPI
-            collection.TrimExcess();
-#endif
             ApiVersions = versions.ToArray();
             Models = collection;
         }
@@ -85,13 +130,45 @@
                 return default;
             }
 
-#if WEBAPI
-            var version = serviceProvider.GetService<HttpRequestMessage>()?.GetRequestedApiVersion();
-#else
-            var version = serviceProvider.GetService<HttpRequest>()?.HttpContext.GetRequestedApiVersion();
-#endif
+            var request = serviceProvider.GetService<HttpRequest>();
 
-            return version != null && Models.TryGetValue( version, out var model ) ? model : Models[maxVersion];
+            if ( request is null )
+            {
+                return Models[maxVersion];
+            }
+
+            var version = request
+#if !WEBAPI
+                .HttpContext
+#endif
+                .GetRequestedApiVersion();
+
+            if ( version is null )
+            {
+                var model = new ApiVersionModel( ApiVersions, Enumerable.Empty<ApiVersion>() );
+
+                if ( ( version = selector.SelectVersion( request, model ) ) is null )
+                {
+                    return Models[maxVersion];
+                }
+            }
+
+            return Models.TryGetValue( version, out var edm ) ? edm : Models[maxVersion];
+        }
+
+        static void AddVersionFromModel( IEdmModel model, IList<ApiVersion> versions, IDictionary<ApiVersion, IEdmModel> collection )
+        {
+            var annotation = model.GetAnnotationValue<ApiVersionAnnotation>( model );
+
+            if ( annotation == null )
+            {
+                throw new ArgumentException( LocalSR.MissingAnnotation.FormatDefault( typeof( ApiVersionAnnotation ).Name ) );
+            }
+
+            var version = annotation.ApiVersion;
+
+            collection.Add( version, model );
+            versions.Add( version );
         }
     }
 }

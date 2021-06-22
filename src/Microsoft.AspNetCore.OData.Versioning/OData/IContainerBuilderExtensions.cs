@@ -32,9 +32,11 @@
                     Singleton,
                     child => child.WithParent(
                         serviceProvider,
-                        sp => (IEdmModelSelector) new EdmModelSelector(
-                            models,
-                            sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.DefaultApiVersion ) ) )
+                        sp =>
+                        {
+                            var options = sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+                            return (IEdmModelSelector) new EdmModelSelector( models, options.DefaultApiVersion, options.ApiVersionSelector );
+                        } ) )
                 .AddService(
                     Singleton,
                     child => child.WithParent( serviceProvider, sp => CreateDefaultWithAttributeRouting( routeName, sp ).AsEnumerable() ) );
@@ -59,9 +61,11 @@
                     Singleton,
                     child => child.WithParent(
                         serviceProvider,
-                        sp => (IEdmModelSelector) new EdmModelSelector(
-                            models,
-                            sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.DefaultApiVersion ) ) )
+                        sp =>
+                        {
+                            var options = sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
+                            return (IEdmModelSelector) new EdmModelSelector( models, options.DefaultApiVersion, options.ApiVersionSelector );
+                        } ) )
                 .AddService( Singleton, child => child.WithParent( serviceProvider, sp => AddOrUpdate( routingConventions.ToList() ).AsEnumerable() ) );
     }
 }

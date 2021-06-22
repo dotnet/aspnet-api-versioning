@@ -2,9 +2,9 @@
 {
     using FluentAssertions;
     using FluentAssertions.Common;
-    using System.Runtime.Serialization;
     using Microsoft.AspNet.OData.Builder;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData.Edm;
     using System;
@@ -12,6 +12,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
+    using System.Runtime.Serialization;
     using Xunit;
 
     public class DefaultModelTypeBuilderTest
@@ -236,7 +237,7 @@
 
             model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
 
-            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default, new ConstantApiVersionSelector( ApiVersion.Default ) );
             var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
@@ -274,7 +275,7 @@
 
             model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
 
-            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default, new ConstantApiVersionSelector( ApiVersion.Default ) );
             var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
@@ -317,7 +318,7 @@
 
             model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
 
-            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default, new ConstantApiVersionSelector( ApiVersion.Default ) );
             var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operation = (IEdmAction) model.FindDeclaredOperations( qualifiedName ).Single();
@@ -359,7 +360,7 @@
 
             model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
 
-            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default );
+            var selector = (IEdmModelSelector) new EdmModelSelector( new[] { model }, ApiVersion.Default, new ConstantApiVersionSelector( ApiVersion.Default ) );
             var context = NewContext( model );
             var qualifiedName = $"{model.EntityContainer.Namespace}.{action.Name}";
             var operations = model.FindDeclaredOperations( qualifiedName ).Select( o => (IEdmAction) o ).ToArray();
