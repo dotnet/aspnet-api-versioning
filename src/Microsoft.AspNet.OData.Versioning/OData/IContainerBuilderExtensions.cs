@@ -26,9 +26,11 @@
                 .AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
                 .AddService(
                     Singleton,
-                    sp => (IEdmModelSelector) new EdmModelSelector(
-                        models,
-                        sp.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions().DefaultApiVersion ) )
+                    sp =>
+                    {
+                        var options = sp.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions();
+                        return (IEdmModelSelector) new EdmModelSelector( models, options.DefaultApiVersion, options.ApiVersionSelector );
+                    } )
                 .AddService(
                     Singleton,
                     sp => CreateDefaultWithAttributeRouting(
@@ -50,9 +52,11 @@
                 .AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
                 .AddService(
                     Singleton,
-                    sp => (IEdmModelSelector) new EdmModelSelector(
-                        models,
-                        sp.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions().DefaultApiVersion ) )
+                    sp =>
+                    {
+                        var options = sp.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions();
+                        return (IEdmModelSelector) new EdmModelSelector( models, options.DefaultApiVersion, options.ApiVersionSelector );
+                    } )
                 .AddService( Singleton, sp => AddOrUpdate( routingConventions.ToList() ).AsEnumerable() );
     }
 }

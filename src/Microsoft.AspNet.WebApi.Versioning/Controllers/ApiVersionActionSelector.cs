@@ -14,7 +14,7 @@
     /// </summary>
     public partial class ApiVersionActionSelector : IHttpActionSelector
     {
-        readonly object cacheKey = new object();
+        readonly object cacheKey = new();
         ActionSelectorCacheItem? fastCache;
 
         /// <summary>

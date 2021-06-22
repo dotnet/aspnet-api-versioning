@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Mvc
     public abstract partial class AcceptanceTest
     {
         const string JsonMediaType = "application/json";
-        static readonly HttpMethod Patch = new HttpMethod( "PATCH" );
+        static readonly HttpMethod Patch = new( "PATCH" );
         readonly HttpServerFixture fixture;
 
         protected AcceptanceTest( HttpServerFixture fixture ) => this.fixture = fixture;

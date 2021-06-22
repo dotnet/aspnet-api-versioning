@@ -106,7 +106,7 @@
                 {
                     foreach ( var candidate in candidates )
                     {
-                        if ( !( candidate.AttributeRouteInfo is ODataAttributeRouteInfo info ) ||
+                        if ( candidate.AttributeRouteInfo is not ODataAttributeRouteInfo info ||
                              !comparer.Equals( routePrefix, info.RoutePrefix ) )
                         {
                             continue;
@@ -237,16 +237,11 @@
         {
             var method = context.Request.Method.ToUpperInvariant();
 
-            switch ( method )
+            return method switch
             {
-                case "POST":
-                case "PUT":
-                case "PATCH":
-                case "MERGE":
-                    return true;
-            }
-
-            return false;
+                "POST" or "PUT" or "PATCH" or "MERGE" => true,
+                _ => false,
+            };
         }
 
         static bool ActionAcceptsMethod( ActionDescriptor action, string method ) =>
