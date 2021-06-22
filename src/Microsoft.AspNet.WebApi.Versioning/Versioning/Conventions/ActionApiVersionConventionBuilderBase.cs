@@ -37,7 +37,7 @@
                 return;
             }
 
-            var versionModel = default( ApiVersionModel );
+            ApiVersionModel? versionModel;
 
             if ( MappedVersions.Count == 0 )
             {

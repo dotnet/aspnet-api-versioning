@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 #if WEBAPI
     using static Microsoft.Web.Http.Versioning.ApiVersionProviderOptions;
 #else
@@ -30,15 +29,18 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         protected ICollection<ApiVersion> MappedVersions { get; } = new HashSet<ApiVersion>();
 
         /// <inheritdoc />
-        protected override void MergeAttributesWithConventions( IEnumerable<object> attributes )
+        protected override void MergeAttributesWithConventions( IReadOnlyList<object> attributes )
         {
+            if ( attributes == null )
+            {
+                throw new ArgumentNullException( nameof( attributes ) );
+            }
+
             base.MergeAttributesWithConventions( attributes );
 
-            var providers = attributes.OfType<IApiVersionProvider>();
-
-            foreach ( var provider in providers )
+            for ( var i = 0; i < attributes.Count; i++ )
             {
-                if ( provider.Options == Mapped )
+                if ( attributes[i] is IApiVersionProvider provider && provider.Options == Mapped )
                 {
                     MappedVersions.UnionWith( provider.Versions );
                 }

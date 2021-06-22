@@ -15,5 +15,10 @@
 
         [Route]
         public IHttpActionResult Post() => CreatedAtRoute( "GetMessageById", new { id = 42 }, default( object ) );
+
+        [HttpGet]
+        [Route( nameof( Unreachable ) )]
+        [MapToApiVersion( "42.0" )]
+        public IHttpActionResult Unreachable( ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Version = apiVersion.ToString() } );
     }
 }

@@ -20,5 +20,9 @@
 
         [HttpGet( "search" )]
         public IActionResult Search( string query, ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Query = query, Version = apiVersion.ToString() } );
+
+        [HttpGet( "[action]" )]
+        [MapToApiVersion( "42.0" )]
+        public IActionResult Unreachable( ApiVersion apiVersion ) => Ok( new { Controller = GetType().Name, Version = apiVersion.ToString() } );
     }
 }

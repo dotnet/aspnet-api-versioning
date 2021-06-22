@@ -68,15 +68,31 @@
         {
             var model = action.GetApiVersionModel();
 
-            if ( model.IsApiVersionNeutral || ( apiVersion != null && model.DeclaredApiVersions.Contains( apiVersion ) ) )
+            if ( model.IsApiVersionNeutral )
             {
                 return Explicit;
             }
-            else if ( model.DeclaredApiVersions.Count == 0 )
-            {
-                var parentModel = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
 
-                if ( parentModel != null && ( apiVersion != null && parentModel.DeclaredApiVersions.Contains( apiVersion ) ) )
+            if ( apiVersion is null )
+            {
+                return None;
+            }
+
+            var mappedWithImplementation = model.DeclaredApiVersions.Contains( apiVersion ) &&
+                                           model.ImplementedApiVersions.Contains( apiVersion );
+
+            if ( mappedWithImplementation )
+            {
+                return Explicit;
+            }
+
+            var deriveFromParent = model.DeclaredApiVersions.Count == 0;
+
+            if ( deriveFromParent )
+            {
+                model = action.GetProperty<ControllerModel>()?.GetProperty<ApiVersionModel>();
+
+                if ( model is not null && model.DeclaredApiVersions.Contains( apiVersion ) )
                 {
                     return Implicit;
                 }

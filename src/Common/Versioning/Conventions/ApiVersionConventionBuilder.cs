@@ -113,9 +113,9 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
                 builder = new ControllerApiVersionConventionBuilder( model.ControllerType );
             }
 
-            foreach ( var convention in ControllerConventions )
+            for ( var i = 0; i < ControllerConventions.Count; i++ )
             {
-                applied |= convention.Apply( builder!, model );
+                applied |= ControllerConventions[i].Apply( builder!, model );
             }
 
             if ( applied )

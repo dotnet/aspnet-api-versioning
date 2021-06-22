@@ -57,33 +57,91 @@ namespace Microsoft.AspNetCore.Mvc.Versioning.Conventions
         /// Merges API version information from the specified attributes with the current conventions.
         /// </summary>
         /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of attributes to merge.</param>
-        protected virtual void MergeAttributesWithConventions( IEnumerable<object> attributes )
+        protected virtual void MergeAttributesWithConventions( IEnumerable<object> attributes ) =>
+            MergeAttributesWithConventions( ( attributes as IReadOnlyList<object> ) ?? attributes.ToArray() );
+
+        /// <summary>
+        /// Merges API version information from the specified attributes with the current conventions.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IReadOnlyList{T}">read-only list</see> of attributes to merge.</param>
+        protected virtual void MergeAttributesWithConventions( IReadOnlyList<object> attributes )
         {
-            if ( VersionNeutral |= attributes.OfType<IApiVersionNeutral>().Any() )
+            if ( attributes == null )
+            {
+                throw new ArgumentNullException( nameof( attributes ) );
+            }
+
+            if ( VersionNeutral )
             {
                 return;
             }
 
             const ApiVersionProviderOptions DeprecatedAdvertised = Deprecated | Advertised;
-            var providers = attributes.OfType<IApiVersionProvider>();
+            var supported = default( List<ApiVersion> );
+            var deprecated = default( List<ApiVersion> );
+            var advertised = default( List<ApiVersion> );
+            var deprecatedAdvertised = default( List<ApiVersion> );
 
-            foreach ( var provider in providers )
+            for ( var i = 0; i < attributes.Count; i++ )
             {
-                switch ( provider.Options )
+                switch ( attributes[i] )
                 {
-                    case None:
-                        SupportedVersions.UnionWith( provider.Versions );
-                        break;
-                    case Deprecated:
-                        DeprecatedVersions.UnionWith( provider.Versions );
-                        break;
-                    case Advertised:
-                        AdvertisedVersions.UnionWith( provider.Versions );
-                        break;
-                    case DeprecatedAdvertised:
-                        DeprecatedAdvertisedVersions.UnionWith( provider.Versions );
+                    case IApiVersionNeutral:
+                        VersionNeutral = true;
+                        return;
+                    case IApiVersionProvider provider:
+                        List<ApiVersion> target;
+                        IReadOnlyList<ApiVersion> source;
+
+                        switch ( provider.Options )
+                        {
+                            case None:
+                                target = supported ??= new();
+                                source = provider.Versions;
+                                break;
+                            case Deprecated:
+                                target = deprecated ??= new();
+                                source = provider.Versions;
+                                break;
+                            case Advertised:
+                                target = advertised ??= new();
+                                source = provider.Versions;
+                                break;
+                            case DeprecatedAdvertised:
+                                target = deprecatedAdvertised ??= new();
+                                source = provider.Versions;
+                                break;
+                            default:
+                                continue;
+                        }
+
+                        for ( var j = 0; j < source.Count; j++ )
+                        {
+                            target.Add( source[j] );
+                        }
+
                         break;
                 }
+            }
+
+            if ( supported is not null && supported.Count > 0 )
+            {
+                SupportedVersions.UnionWith( supported );
+            }
+
+            if ( deprecated is not null && deprecated.Count > 0 )
+            {
+                DeprecatedVersions.UnionWith( deprecated );
+            }
+
+            if ( advertised is not null && advertised.Count > 0 )
+            {
+                AdvertisedVersions.UnionWith( advertised );
+            }
+
+            if ( deprecatedAdvertised is not null && deprecatedAdvertised.Count > 0 )
+            {
+                DeprecatedAdvertisedVersions.UnionWith( deprecatedAdvertised );
             }
         }
     }
