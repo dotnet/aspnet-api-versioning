@@ -21,7 +21,7 @@
             var example = new { value = new[] { new { id = 0, firstName = "", lastName = "" } } };
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
             var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
@@ -39,7 +39,7 @@
             var example = new { id = 0, firstName = "", lastName = "" };
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert

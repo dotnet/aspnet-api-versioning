@@ -20,7 +20,8 @@
                 new TestApplicationPart(
                     typeof( OrderModelConfiguration ),
                     typeof( PersonModelConfiguration ),
-                    typeof( CustomerModelConfiguration ) ) );
+                    typeof( CustomerModelConfiguration ),
+                    typeof( WeatherForecastModelConfiguration ) ) );
         }
 
         protected override void OnConfigureServices( IServiceCollection services ) => services.AddOData().EnableApiVersioning();

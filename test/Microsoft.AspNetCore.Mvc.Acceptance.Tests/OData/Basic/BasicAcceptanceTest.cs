@@ -16,7 +16,7 @@
             var requestUrl = $"v4";
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -30,7 +30,7 @@
             // arrange
 
             // act
-            var response = await Client.GetAsync( "v4/$metadata" );
+            var response = await GetAsync( "v4/$metadata" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -45,7 +45,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api?api-version=4.0" );
+            var response = await GetAsync( "api?api-version=4.0" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

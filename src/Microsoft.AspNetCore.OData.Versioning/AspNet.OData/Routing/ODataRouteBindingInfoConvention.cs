@@ -3,6 +3,7 @@
     using Microsoft.AspNet.OData.Routing.Template;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
+    using Microsoft.AspNetCore.Mvc.ActionConstraints;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
@@ -45,9 +46,6 @@
         public void Apply( ActionDescriptorProviderContext context, ControllerActionDescriptor action )
         {
             var model = action.GetApiVersionModel( Explicit | Implicit );
-
-            UpdateControllerName( action );
-
             var routeInfos = model.IsApiVersionNeutral ?
                              ExpandVersionNeutralActions( action ) :
                              ExpandVersionedActions( action, model );
@@ -77,41 +75,6 @@
             };
 
             return clone;
-        }
-
-        static void UpdateControllerName( ControllerActionDescriptor action )
-        {
-            if ( !action.RouteValues.TryGetValue( "controller", out var key ) )
-            {
-                key = action.ControllerName;
-            }
-
-            action.ControllerName = TrimTrailingNumbers( key );
-        }
-
-        static string TrimTrailingNumbers( string name )
-        {
-            if ( string.IsNullOrEmpty( name ) )
-            {
-                return name;
-            }
-
-            var last = name.Length - 1;
-
-            for ( var i = last; i >= 0; i-- )
-            {
-                if ( !char.IsNumber( name[i] ) )
-                {
-                    if ( i < last )
-                    {
-                        return name.Substring( 0, i + 1 );
-                    }
-
-                    return name;
-                }
-            }
-
-            return name;
         }
 
         static void UpdateBindingInfo(
@@ -196,6 +159,11 @@
                 };
 
                 routeInfos.Add( routeInfo );
+            }
+
+            if ( routeContext.IsOperation )
+            {
+                EnsureOperationHttpMethod( action, routeContext.Operation! );
             }
         }
 
@@ -350,6 +318,38 @@
             }
 
             return routeInfos;
+        }
+
+        static void EnsureOperationHttpMethod( ControllerActionDescriptor actionDescriptor, IEdmOperation operation )
+        {
+            static void LimitByODataSpec( ControllerActionDescriptor action, string httpMethod )
+            {
+                if ( action.ActionConstraints is null )
+                {
+                    action.ActionConstraints = new List<IActionConstraintMetadata>();
+                }
+                else
+                {
+                    for ( var i = action.ActionConstraints.Count - 1; i >= 0; i-- )
+                    {
+                        if ( action.ActionConstraints[i] is HttpMethodActionConstraint )
+                        {
+                            action.ActionConstraints.RemoveAt( i );
+                        }
+                    }
+                }
+
+                action.ActionConstraints.Add( new HttpMethodActionConstraint( new[] { httpMethod } ) );
+            }
+
+            if ( operation.IsFunction() )
+            {
+                LimitByODataSpec( actionDescriptor, "GET" );
+            }
+            else if ( operation.IsAction() )
+            {
+                LimitByODataSpec( actionDescriptor, "POST" );
+            }
         }
 
         sealed class ODataAttributeRouteInfoComparer : IEqualityComparer<ODataAttributeRouteInfo>

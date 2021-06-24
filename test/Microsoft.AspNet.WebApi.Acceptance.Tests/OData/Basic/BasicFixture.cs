@@ -13,6 +13,7 @@
             FilteredControllerTypes.Add( typeof( PeopleController ) );
             FilteredControllerTypes.Add( typeof( People2Controller ) );
             FilteredControllerTypes.Add( typeof( CustomersController ) );
+            FilteredControllerTypes.Add( typeof( WeatherForecastsController ) );
 
             Configuration.AddApiVersioning( options => options.ReportApiVersions = true );
 
@@ -23,6 +24,7 @@
                     new PersonModelConfiguration(),
                     new OrderModelConfiguration(),
                     new CustomerModelConfiguration(),
+                    new WeatherForecastModelConfiguration(),
                 }
             };
             var models = modelBuilder.GetEdmModels();

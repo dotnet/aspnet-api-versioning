@@ -100,7 +100,7 @@
         /// <param name="since">The date and time since people were hired.</param>
         /// <returns>The matching new hires.</returns>
         /// <response code="200">The people were successfully retrieved.</response>
-        [HttpGet]
+        [HttpGet( "[action](Since={since})" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
         public IActionResult NewHires( DateTime since ) => Get();
@@ -112,7 +112,7 @@
         /// <param name="parameters">The action parameters.</param>
         /// <returns>None</returns>
         /// <response code="204">The person was successfully promoted.</response>
-        [HttpPost]
+        [HttpPost( "{key}/[action]" )]
         [ProducesResponseType( Status200OK )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]

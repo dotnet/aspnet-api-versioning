@@ -16,26 +16,15 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.OData" Version="[7.5.0,8.0.0)" />
+  <PackageReference Include="Microsoft.AspNet.OData" Version="[7.5.8,8.0.0)" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+ <ItemGroup>
   <Reference Include="System" />
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>
 
- <ItemGroup>
-   <Compile Update="LocalSR.Designer.cs">
-     <DesignTime>True</DesignTime>
-   </Compile>
- </ItemGroup>
-
  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
  <Import Project="..\Common.OData\Common.OData.projitems" Label="Shared" />
- <ItemGroup>
-   <Compile Update="C:\Dev\Projects\aspnet-api-versioning\src\Common.OData\SR.Designer.cs">
-     <DesignTime>True</DesignTime>
-   </Compile>
- </ItemGroup>
 
 </Project>

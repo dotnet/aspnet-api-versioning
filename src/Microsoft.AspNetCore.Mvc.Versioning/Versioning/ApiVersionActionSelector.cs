@@ -724,8 +724,8 @@
 
         sealed partial class StringArrayComparer : IEqualityComparer<string[]>
         {
-            public static readonly StringArrayComparer Ordinal = new StringArrayComparer( StringComparer.Ordinal );
-            public static readonly StringArrayComparer OrdinalIgnoreCase = new StringArrayComparer( StringComparer.OrdinalIgnoreCase );
+            public static readonly StringArrayComparer Ordinal = new( StringComparer.Ordinal );
+            public static readonly StringArrayComparer OrdinalIgnoreCase = new( StringComparer.OrdinalIgnoreCase );
             readonly StringComparer valueComparer;
 
             StringArrayComparer( StringComparer valueComparer ) => this.valueComparer = valueComparer;

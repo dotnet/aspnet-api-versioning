@@ -19,7 +19,7 @@
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+ <ItemGroup>
   <Reference Include="System" />
   <Reference Include="Microsoft.CSharp" />
  </ItemGroup>

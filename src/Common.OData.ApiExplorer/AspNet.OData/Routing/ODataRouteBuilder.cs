@@ -13,7 +13,6 @@
     using System.Reflection;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
 #if WEBAPI
     using System.Web.Http.Description;
 #endif
@@ -108,11 +107,7 @@
 
             for ( var i = 0; i < properties.Length; i++ )
             {
-#if WEBAPI
-                refLinks[i] = template.Replace( token, properties[i].Name );
-#else
                 refLinks[i] = template.Replace( token, properties[i].Name, OrdinalIgnoreCase );
-#endif
             }
 
             return refLinks;
@@ -143,21 +138,37 @@
 
         void AppendPath( IList<string> segments )
         {
+            var controllerDescriptor = Context.ActionDescriptor
 #if WEBAPI
-            var controllerDescriptor = Context.ActionDescriptor.ControllerDescriptor;
-#else
-            var controllerDescriptor = Context.ActionDescriptor;
+                .ControllerDescriptor
 #endif
+                ;
 
             if ( Context.IsAttributeRouted )
             {
-#if WEBAPI
-                var attributes = controllerDescriptor.GetCustomAttributes<ODataRoutePrefixAttribute>();
-#else
-                var attributes = controllerDescriptor.ControllerTypeInfo.GetCustomAttributes<ODataRoutePrefixAttribute>();
+                var prefix = default( string );
+                var attribute = controllerDescriptor
+#if !WEBAPI
+                    .ControllerTypeInfo
 #endif
-                var prefix = attributes.FirstOrDefault()?.Prefix?.Trim( '/' );
+                    .GetCustomAttributes<ODataRoutePrefixAttribute>()
+                    .FirstOrDefault();
 
+                if ( attribute is not null )
+                {
+                    prefix = attribute.Prefix?.Trim( '/' );
+                }
+#if !WEBAPI
+                else
+                {
+                    var nativeEndpointRouting = Context.RouteTemplateProvider is not null;
+
+                    if ( nativeEndpointRouting )
+                    {
+                        prefix = controllerDescriptor.ControllerName;
+                    }
+                }
+#endif
                 AppendPathFromAttributes( segments, prefix );
             }
             else
@@ -168,7 +179,7 @@
 
         void AppendPathFromAttributes( IList<string> segments, string? prefix )
         {
-            var template = Context.RouteTemplate;
+            var template = Context.RouteTemplate?.Replace( "[action]", Context.ActionDescriptor.ActionName, OrdinalIgnoreCase );
 
             if ( Context.IsOperation && Context.RouteTemplateGeneration == Client && !IsNullOrEmpty( template ) )
             {
@@ -550,11 +561,11 @@
                     continue;
                 }
 
+                var parameterType = parameter
 #if API_EXPLORER
-                var parameterType = parameter.ParameterDescriptor?.ParameterType;
-#else
-                var parameterType = parameter.ParameterType;
+                    .ParameterDescriptor?
 #endif
+                    .ParameterType;
 
                 if ( parameterType == null || IsBuiltInParameter( parameterType ) )
                 {
@@ -574,43 +585,59 @@
 
         bool TryAppendNavigationProperty( StringBuilder builder, string name, IReadOnlyList<IEdmNavigationProperty> navigationProperties )
         {
+            if ( navigationProperties.Count == 0 )
+            {
+                return false;
+            }
+
             // REF: https://github.com/OData/WebApi/blob/master/src/Microsoft.AspNet.OData.Shared/Routing/Conventions/PropertyRoutingConvention.cs
             const string NavigationProperty = @"(?:Get|(?:Post|Put|Delete|Patch)To)(\w+)";
             const string NavigationPropertyFromDeclaringType = NavigationProperty + @"From(\w+)";
             var match = Regex.Match( name, NavigationPropertyFromDeclaringType, RegexOptions.Singleline );
+            string propertyName;
 
-            if ( !match.Success )
+            if ( match.Success )
+            {
+                propertyName = match.Groups[2].Value;
+            }
+            else
             {
                 match = Regex.Match( name, NavigationProperty, RegexOptions.Singleline );
 
-                if ( !match.Success )
+                if ( match.Success )
+                {
+                    propertyName = match.Groups[1].Value;
+                }
+                else
                 {
                     return false;
                 }
             }
-            else
+
+            for ( var i = 0; i < navigationProperties.Count; i++ )
             {
-                var navigationPropertyName = match.Groups[2].Value;
+                var navigationProperty = navigationProperties[i];
+
+                if ( !navigationProperty.Name.Equals( propertyName, OrdinalIgnoreCase ) )
+                {
+                    continue;
+                }
 
                 builder.Append( '/' );
 
                 if ( Context.Options.UseQualifiedNames )
                 {
-                    var navigationProperty = navigationProperties.First( p => p.Name.Equals( navigationPropertyName, OrdinalIgnoreCase ) );
                     builder.Append( navigationProperty.Type.ShortQualifiedName() );
                 }
                 else
                 {
-                    builder.Append( navigationPropertyName );
+                    builder.Append( propertyName );
                 }
+
+                return true;
             }
 
-            var propertyName = match.Groups[1].Value;
-
-            builder.Append( '/' );
-            builder.Append( propertyName );
-
-            return true;
+            return false;
         }
 
 #if API_EXPLORER
