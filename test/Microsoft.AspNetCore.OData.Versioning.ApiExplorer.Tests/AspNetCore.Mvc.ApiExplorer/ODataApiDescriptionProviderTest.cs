@@ -9,9 +9,14 @@
     using Microsoft.Extensions.DependencyInjection;
     using System.Linq;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class ODataApiDescriptionProviderTest
     {
+        readonly ITestOutputHelper Console;
+
+        public ODataApiDescriptionProviderTest( ITestOutputHelper console ) => Console = console;
+
         [Fact]
         public void odata_api_explorer_should_group_and_order_descriptions_on_providers_executed()
         {
@@ -49,10 +54,11 @@
             AssertVersion3( groups[3] );
         }
 
-        private void AssertVersion0_9( ApiDescriptionGroup group )
+        void AssertVersion0_9( ApiDescriptionGroup group )
         {
             const string GroupName = "v0.9";
 
+            PrintGroup( group );
             group.GroupName.Should().Be( GroupName );
             group.Items.Should().BeEquivalentTo(
                 new[]
@@ -64,10 +70,11 @@
                 options => options.ExcludingMissingMembers() );
         }
 
-        private void AssertVersion1( ApiDescriptionGroup group )
+        void AssertVersion1( ApiDescriptionGroup group )
         {
             const string GroupName = "v1";
 
+            PrintGroup( group );
             group.GroupName.Should().Be( GroupName );
             group.Items.Should().BeEquivalentTo(
                 new[]
@@ -81,10 +88,11 @@
                 options => options.ExcludingMissingMembers() );
         }
 
-        private void AssertVersion2( ApiDescriptionGroup group )
+        void AssertVersion2( ApiDescriptionGroup group )
         {
             const string GroupName = "v2";
 
+            PrintGroup( group );
             group.GroupName.Should().Be( GroupName );
             group.Items.Should().BeEquivalentTo(
               new[]
@@ -103,10 +111,11 @@
               options => options.ExcludingMissingMembers() );
         }
 
-        private void AssertVersion3( ApiDescriptionGroup group )
+        void AssertVersion3( ApiDescriptionGroup group )
         {
             const string GroupName = "v3";
 
+            PrintGroup( group );
             group.GroupName.Should().Be( GroupName );
             group.Items.Should().BeEquivalentTo(
                 new[]
@@ -132,7 +141,7 @@
                     new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/Supplier" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
-                    new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
+                    new { HttpMethod = "POST", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
                     new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers" },
                     new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}" },
@@ -145,6 +154,17 @@
                     new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}/Products/$ref?$id={$id}" },
                 },
                 options => options.ExcludingMissingMembers() );
+        }
+
+        void PrintGroup( ApiDescriptionGroup group )
+        {
+            var items = group.Items;
+
+            for ( var i = items.Count - 1; i >= 0; i-- )
+            {
+                var item = items[i];
+                Console.WriteLine( $"{item.HttpMethod} {item.RelativePath}" );
+            }
         }
     }
 }

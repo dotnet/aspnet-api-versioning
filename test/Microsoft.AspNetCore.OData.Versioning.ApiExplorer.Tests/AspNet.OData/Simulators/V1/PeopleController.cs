@@ -19,7 +19,7 @@
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [HttpGet]
+        [HttpGet( "{key}" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Person ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]

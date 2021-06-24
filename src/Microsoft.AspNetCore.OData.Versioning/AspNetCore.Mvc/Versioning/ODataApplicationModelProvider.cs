@@ -2,6 +2,7 @@
 
 namespace Microsoft.AspNetCore.Mvc.Versioning
 {
+    using Microsoft.AspNet.OData;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
     using Microsoft.Extensions.Options;
 
@@ -19,15 +20,36 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         public void OnProvidersExecuted( ApplicationModelProviderContext context )
         {
             var application = context.Result;
-            var conventions = new IApplicationModelConvention[]
+            var applicationConventions = new IApplicationModelConvention[]
             {
                 new MetadataControllerConvention( Options ),
-                new ApiExplorerModelConvention(),
             };
 
-            for ( var i = 0; i < conventions.Length; i++ )
+            for ( var i = 0; i < applicationConventions.Length; i++ )
             {
-                conventions[i].Apply( application );
+                applicationConventions[i].Apply( application );
+            }
+
+            var controllers = application.Controllers;
+            var controllerConventions = new IControllerModelConvention[]
+            {
+                new ApiExplorerModelConvention(),
+                new ControllerNameOverrideConvention(),
+            };
+
+            for ( var i = 0; i < controllers.Count; i++ )
+            {
+                var controller = controllers[i];
+
+                if ( !controller.ControllerType.IsODataController() )
+                {
+                    continue;
+                }
+
+                for ( var j = 0; j < controllerConventions.Length; j++ )
+                {
+                    controllerConventions[j].Apply( controller );
+                }
             }
         }
 

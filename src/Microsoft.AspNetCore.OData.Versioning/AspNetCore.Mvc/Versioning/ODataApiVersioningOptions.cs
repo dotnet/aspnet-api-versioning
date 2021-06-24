@@ -8,6 +8,8 @@
     /// </summary>
     public class ODataApiVersioningOptions
     {
+        ApiVersionConventionBuilder? conventions;
+
         /// <summary>
         /// Gets or sets the builder used to define API version conventions.
         /// </summary>
@@ -15,7 +17,11 @@
         /// <remarks>These conventions are meant to be applied to OData specific features and built-in
         /// services such as the metadata controller.</remarks>
         [CLSCompliant( false )]
-        public ApiVersionConventionBuilder Conventions { get; set; } = new ApiVersionConventionBuilder();
+        public ApiVersionConventionBuilder Conventions
+        {
+            get => conventions ??= new();
+            set => conventions = value;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether qualified names are used when building URLs.

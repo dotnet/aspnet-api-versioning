@@ -45,8 +45,8 @@
                 var testControllers = new TestApplicationPart(
                     typeof( VersionedMetadataController ),
                     typeof( TestsController ),
-                    typeof( TestsController2 ),
-                    typeof( TestsController3 ) );
+                    typeof( Tests2Controller ),
+                    typeof( Tests3Controller ) );
 
                 services.AddMvc( options => options.EnableEndpointRouting = false )
                         .ConfigureApplicationPartManager( m => m.ApplicationParts.Add( testControllers ) );

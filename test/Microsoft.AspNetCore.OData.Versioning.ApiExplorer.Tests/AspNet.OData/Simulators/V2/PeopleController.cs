@@ -75,7 +75,7 @@
         /// <param name="since">The date and time since people were hired.</param>
         /// <returns>The matching new hires.</returns>
         /// <response code="200">The people were successfully retrieved.</response>
-        [HttpGet]
+        [HttpGet( "NewHires(Since={since})" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
         public IActionResult NewHires( DateTime since ) => Get();

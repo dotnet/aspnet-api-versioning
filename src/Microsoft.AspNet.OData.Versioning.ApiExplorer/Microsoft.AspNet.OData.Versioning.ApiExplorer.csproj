@@ -14,6 +14,7 @@
  <ItemGroup>
   <Compile Include="..\Common.OData\TypeExtensions.cs" Link="AspNet.OData\TypeExtensions.cs" />
   <Compile Include="..\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\System.Web.Http\Controllers\*.cs" Link="System.Web.Http\Controllers\%(Filename)%(Extension)" />
+  <Compile Include="..\Microsoft.AspNet.WebApi.Versioning.ApiExplorer\StringExtensions.cs" Link="%(Filename)%(Extension)" />
  </ItemGroup>
 
  <ItemGroup>

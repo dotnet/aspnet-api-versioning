@@ -17,7 +17,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api" );
+            var response = await GetAsync( "api" );
 
             // assert
             response.StatusCode.Should().Be( OK );
@@ -33,7 +33,7 @@
             var requestUrl = $"api?api-version={apiVersion}";
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
 
             // assert
             response.StatusCode.Should().Be( OK );
@@ -46,7 +46,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api?api-version=4.0" );
+            var response = await GetAsync( "api?api-version=4.0" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -58,7 +58,7 @@
         public async Task then_X24metadata_should_allow_an_unspecified_version()
         {
             // arrange
-
+            Client.DefaultRequestHeaders.Clear();
 
             // act
             var response = await Client.GetAsync( "api/$metadata" );
@@ -76,6 +76,8 @@
             // arrange
             var requestUrl = $"api/$metadata?api-version={apiVersion}";
 
+            Client.DefaultRequestHeaders.Clear();
+
             // act
             var response = await Client.GetAsync( requestUrl );
 
@@ -87,7 +89,7 @@
         public async Task then_X24metadata_should_return_400_for_an_unsupported_version()
         {
             // arrange
-
+            Client.DefaultRequestHeaders.Clear();
 
             // act
             var response = await Client.GetAsync( "api/$metadata?api-version=4.0" );

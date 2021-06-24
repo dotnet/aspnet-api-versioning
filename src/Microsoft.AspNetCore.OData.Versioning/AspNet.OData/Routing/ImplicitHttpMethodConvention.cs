@@ -41,12 +41,13 @@
         static string GetImplicitHttpMethod( ControllerActionDescriptor action )
         {
             const int Post = 2;
+            var name = action.MethodInfo.Name;
 
             for ( var i = 0; i < SupportedHttpMethodConventions.Count; i++ )
             {
                 var supportedHttpMethod = SupportedHttpMethodConventions[i];
 
-                if ( action.MethodInfo.Name.StartsWith( supportedHttpMethod, OrdinalIgnoreCase ) )
+                if ( name.StartsWith( supportedHttpMethod, OrdinalIgnoreCase ) )
                 {
                     return supportedHttpMethod;
                 }

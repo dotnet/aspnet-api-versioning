@@ -102,19 +102,21 @@
             {
                 var candidates = convention.SelectAction( context );
 
-                if ( candidates != null )
+                if ( candidates is null )
                 {
-                    foreach ( var candidate in candidates )
-                    {
-                        if ( candidate.AttributeRouteInfo is not ODataAttributeRouteInfo info ||
-                             !comparer.Equals( routePrefix, info.RoutePrefix ) )
-                        {
-                            continue;
-                        }
+                    continue;
+                }
 
-                        actionNames.Add( candidate.ActionName );
-                        bestCandidates.Add( candidate );
+                foreach ( var candidate in candidates )
+                {
+                    if ( candidate.AttributeRouteInfo is not ODataAttributeRouteInfo info ||
+                         !comparer.Equals( routePrefix, info.RoutePrefix ) )
+                    {
+                        continue;
                     }
+
+                    actionNames.Add( candidate.ActionName );
+                    bestCandidates.Add( candidate );
                 }
             }
 

@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
 #endif
     using Microsoft.Extensions.DependencyInjection;
@@ -53,6 +54,10 @@
         internal IEdmModel EdmModel { get; }
 
         internal string? RouteTemplate { get; }
+
+#if !WEBAPI
+        internal IRouteTemplateProvider? RouteTemplateProvider { get; }
+#endif
 
         internal string? RoutePrefix { get; }
 
@@ -162,7 +167,7 @@
             else if ( FunctionMethod.Equals( method, OrdinalIgnoreCase ) && actionName != FunctionMethod )
             {
                 if ( actionName.StartsWith( "GetRef", Ordinal ) ||
-                   ( entitySet != null && actionName == ( ActionMethod + entitySet.Name ) ) )
+                   ( entitySet != null && actionName == ( FunctionMethod + entitySet.Name ) ) )
                 {
                     return false;
                 }

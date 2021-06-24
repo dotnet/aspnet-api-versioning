@@ -4,13 +4,12 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
     using System.Collections.Generic;
-    using System.Reflection;
-    using static System.Linq.Enumerable;
 
     partial class ODataRouteBuilderContext
     {
@@ -22,8 +21,8 @@
         {
             ApiVersion = apiVersion;
             Services = routeMapping.Services;
-            routeAttribute = actionDescriptor.MethodInfo.GetCustomAttributes<ODataRouteAttribute>().FirstOrDefault();
-            RouteTemplate = routeAttribute?.PathTemplate;
+            (RouteTemplateProvider, routeAttribute) = TryGetRouteAttribute( actionDescriptor );
+            RouteTemplate = routeAttribute?.PathTemplate ?? RouteTemplateProvider?.Template;
             RoutePrefix = routeMapping.RoutePrefix;
             ActionDescriptor = actionDescriptor;
             Options = options;
@@ -49,9 +48,32 @@
             IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
         }
 
-        static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action ) => action.GetHttpMethods();
-
         internal IODataPathTemplateHandler PathTemplateHandler =>
             templateHandler ??= Services.GetRequiredService<IODataPathTemplateHandler>();
+
+        static IEnumerable<string> GetHttpMethods( ControllerActionDescriptor action ) => action.GetHttpMethods();
+
+        static (IRouteTemplateProvider? RouteTemplateProvider, ODataRouteAttribute? RouteAttribute) TryGetRouteAttribute( ControllerActionDescriptor actionDescriptor )
+        {
+            var attributes = actionDescriptor.MethodInfo.GetCustomAttributes( inherit: false );
+            var templateProvider = default( IRouteTemplateProvider );
+
+            for ( var i = 0; i < attributes.Length; i++ )
+            {
+                var attribute = attributes[i];
+
+                if ( attribute is ODataRouteAttribute routeAttribute )
+                {
+                    return (default, routeAttribute);
+                }
+
+                if ( templateProvider is null )
+                {
+                    templateProvider = attribute as IRouteTemplateProvider;
+                }
+            }
+
+            return templateProvider is null ? default : (templateProvider, new ODataRouteAttribute( templateProvider.Template ));
+        }
     }
 }

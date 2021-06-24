@@ -16,6 +16,7 @@
             FilteredControllerTypes.Add( typeof( PeopleController ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( People2Controller ).GetTypeInfo() );
             FilteredControllerTypes.Add( typeof( CustomersController ).GetTypeInfo() );
+            FilteredControllerTypes.Add( typeof( WeatherForecastsController ).GetTypeInfo() );
         }
 
         protected override void OnAddApiVersioning( ApiVersioningOptions options ) => options.ReportApiVersions = true;

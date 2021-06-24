@@ -17,7 +17,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api" );
+            var response = await GetAsync( "api" );
 
             // assert
             response.StatusCode.Should().Be( OK );
@@ -33,7 +33,7 @@
             var requestUrl = $"api?api-version={apiVersion}";
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
 
             // assert
             response.StatusCode.Should().Be( OK );
@@ -46,7 +46,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api?api-version=4.0" );
+            var response = await GetAsync( "api?api-version=4.0" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -61,7 +61,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api/$metadata" );
+            var response = await GetAsync( "api/$metadata" );
 
             // assert
             response.StatusCode.Should().Be( OK );
@@ -77,7 +77,7 @@
             var requestUrl = $"api/$metadata?api-version={apiVersion}";
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
 
             // assert
             response.StatusCode.Should().Be( OK );
@@ -90,7 +90,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api/$metadata?api-version=4.0" );
+            var response = await GetAsync( "api/$metadata?api-version=4.0" );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert

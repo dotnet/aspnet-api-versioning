@@ -16,8 +16,8 @@
     {
         [Theory]
         [InlineData( "1.0", typeof( TestsController ) )]
-        [InlineData( "2.0", typeof( TestsController2 ) )]
-        [InlineData( "3.0", typeof( TestsController3 ) )]
+        [InlineData( "2.0", typeof( Tests2Controller ) )]
+        [InlineData( "3.0", typeof( Tests3Controller ) )]
         public async Task select_best_candidate_should_return_correct_versionedX2C_attributeX2Dbased_controller( string version, Type controllerType )
         {
             // arrange

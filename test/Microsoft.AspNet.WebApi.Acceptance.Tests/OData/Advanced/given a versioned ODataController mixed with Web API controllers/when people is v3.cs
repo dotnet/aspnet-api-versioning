@@ -19,7 +19,7 @@
             var example = new { value = new[] { new { id = 0, firstName = "", lastName = "", email = "", phone = "" } } };
 
             // act
-            var response = await Client.GetAsync( "api/people?api-version=3.0" );
+            var response = await GetAsync( "api/people?api-version=3.0" );
             var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert
@@ -35,7 +35,7 @@
             var example = new { id = 0, firstName = "", lastName = "", email = "", phone = "" };
 
             // act
-            var response = await Client.GetAsync( "api/people/42?api-version=3.0" );
+            var response = await GetAsync( "api/people/42?api-version=3.0" );
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
 
             // assert

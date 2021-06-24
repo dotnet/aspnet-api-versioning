@@ -67,8 +67,8 @@
             var services = new ServiceCollection();
             var testControllers = new TestApplicationPart(
                     typeof( TestsController ),
-                    typeof( TestsController2 ),
-                    typeof( TestsController3 ) );
+                    typeof( Tests2Controller ),
+                    typeof( Tests3Controller ) );
 
             services.AddLogging();
             services.Add( Singleton( new DiagnosticListener( "test" ) ) );

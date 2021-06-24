@@ -4,13 +4,13 @@
     using Microsoft.AspNet.OData.Routing;
     using Microsoft.AspNetCore.Mvc;
 
-    [ApiVersion( "2.0" )]
-    [ControllerName( "Tests" )]
+    [ApiVersion( "3.0" )]
+    [ApiVersion( "3.0-Beta", Deprecated = true )]
     [ODataRoutePrefix( "Tests" )]
-    public class TestsController2 : ODataController
+    public class Tests3Controller : ODataController
     {
         [ODataRoute]
-        public IActionResult Get() => Ok( new [] { new TestEntity() { Id = 1 }, new TestEntity() { Id = 2 }, new TestEntity() { Id = 3 } } );
+        public IActionResult Get() => Ok( new[] { new TestEntity() { Id = 1 }, new TestEntity() { Id = 2 }, new TestEntity() { Id = 3 } } );
 
         [ODataRoute( "{id}" )]
         public IActionResult Get( int id ) => Ok( new TestEntity() { Id = id } );

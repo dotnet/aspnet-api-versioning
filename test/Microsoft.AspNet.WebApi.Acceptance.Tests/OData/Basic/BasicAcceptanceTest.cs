@@ -17,7 +17,7 @@
             var requestUrl = "v4";
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
             // assert
@@ -35,7 +35,7 @@
             var requestUrl = $"v4{additionalUriPart}";
 
             // act
-            var response = await Client.GetAsync( requestUrl );
+            var response = await GetAsync( requestUrl );
             var content = await response.Content.ReadAsAsync<OneApiErrorResponse>();
 
 
@@ -50,6 +50,7 @@
         public async Task then_X24metadata_should_return_400_for_unsupported_url_api_version()
         {
             // arrange
+            Client.DefaultRequestHeaders.Clear();
 
             // act
             var response = await Client.GetAsync( "v4/$metadata" );

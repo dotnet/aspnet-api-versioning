@@ -169,7 +169,6 @@
         /// <param name="navigationProperty">The supplier to link.</param>
         /// <param name="link">The supplier identifier.</param>
         /// <returns>None</returns>
-        [HttpPut]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status404NotFound )]
         public IActionResult CreateRef( [FromODataUri] int key, [FromODataUri] string navigationProperty, [FromBody] Uri link ) => NoContent();
