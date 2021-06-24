@@ -142,7 +142,6 @@
         /// <param name="options">The current OData query options.</param>
         /// <returns>The matching new hires.</returns>
         /// <response code="200">The people were successfully retrieved.</response>
-        [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
         public IActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
@@ -156,7 +155,6 @@
         /// <response code="204">The person was successfully promoted.</response>
         /// <response code="400">The parameters are invalid.</response>
         /// <response code="404">The person does not exist.</response>
-        [HttpPost]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
         [ProducesResponseType( Status404NotFound )]
@@ -178,7 +176,6 @@
         /// <returns>The person's home address.</returns>
         /// <response code="200">The home address was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Address ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
@@ -199,7 +196,6 @@
         /// <returns>The person's work address.</returns>
         /// <response code="200">The work address was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Address ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]

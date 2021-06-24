@@ -192,6 +192,10 @@
                 {
                     bindingInfo.BindingSource = Special;
                 }
+                else if ( bindingInfo.BinderType.IsODataModelBinder() )
+                {
+                    bindingInfo.BindingSource = default;
+                }
             }
 
             if ( bindingInfo.BindingSource != null )
@@ -206,8 +210,7 @@
             switch ( context.RouteContext.ActionType )
             {
                 case EntitySet:
-
-                    var keys = context.RouteContext.EntitySet.EntityType().Key().ToArray();
+                    var keys = context.RouteContext.EntitySet.EntityType().Key();
 
                     key = keys.FirstOrDefault( k => k.Name.Equals( paramName, OrdinalIgnoreCase ) );
 
@@ -229,7 +232,6 @@
                     break;
                 case BoundOperation:
                 case UnboundOperation:
-
                     var operation = context.RouteContext.Operation;
 
                     if ( operation == null )

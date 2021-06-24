@@ -61,7 +61,6 @@
         /// <returns>The most expensive order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The no orders exist.</response>
-        [HttpGet]
         [ODataRoute( "MostExpensive" )]
         [MapToApiVersion( "1.0" )]
         [Produces( "application/json" )]
@@ -77,13 +76,12 @@
         /// <returns>The order line items.</returns>
         /// <response code="200">The line items were successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [HttpGet]
         [ODataRoute( "{key}/LineItems" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
         [EnableQuery( AllowedQueryOptions = Select )]
-        public IActionResult LineItems( int key )
+        public IActionResult GetLineItems( int key )
         {
             var lineItems = new[]
             {

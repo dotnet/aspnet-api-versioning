@@ -38,5 +38,17 @@
            Delta.IsAssignableFrom( type ) ||
            ODataActionParameters.IsAssignableFrom( type ) ||
            ODataParameterHelper.Equals( type );
+
+#if !WEBAPI
+        static readonly Type ODataModelBinder = ResolveType( "Microsoft.AspNet.OData.Formatter.ODataModelBinder" );
+
+        internal static bool IsODataModelBinder( this Type type ) => ODataModelBinder.IsAssignableFrom( type );
+
+        static Type ResolveType( string name )
+        {
+            var assembly = ODataRoutingAttributeType.Assembly;
+            return assembly.GetType( name, throwOnError: true )!;
+        }
+#endif
     }
 }

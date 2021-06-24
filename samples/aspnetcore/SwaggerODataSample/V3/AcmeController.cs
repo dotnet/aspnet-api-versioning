@@ -37,7 +37,6 @@
         /// <param name="navigationProperty">The product to link.</param>
         /// <param name="link">The product identifier.</param>
         /// <returns>None</returns>
-        [HttpPost]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status404NotFound )]
         public IActionResult CreateRef( [FromODataUri] string navigationProperty, [FromBody] Uri link ) => NoContent();
