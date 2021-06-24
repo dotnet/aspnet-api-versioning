@@ -116,7 +116,6 @@
         /// <param name="options">The current OData query options.</param>
         /// <returns>The matching new hires.</returns>
         /// <response code="200">The people were successfully retrieved.</response>
-        [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
         public IActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
@@ -128,7 +127,6 @@
         /// <returns>The person's home address.</returns>
         /// <response code="200">The home address was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        [HttpGet]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Address ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]

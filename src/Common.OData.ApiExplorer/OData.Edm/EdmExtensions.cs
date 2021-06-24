@@ -21,7 +21,7 @@
     {
         internal static Type? GetClrType( this IEdmType edmType, IEdmModel edmModel )
         {
-            if ( !( edmType is IEdmSchemaType schemaType ) )
+            if ( edmType is not IEdmSchemaType schemaType )
             {
                 return null;
             }

@@ -110,7 +110,6 @@
         /// <returns>The most expensive order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The no orders exist.</response>
-        [HttpGet]
         [ODataRoute( nameof( MostExpensive ) )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( Order ), Status200OK )]
@@ -127,7 +126,6 @@
         /// <response code="204">The order was successfully rated.</response>
         /// <response code="400">The parameters are invalid.</response>
         /// <response code="404">The order does not exist.</response>
-        [HttpPost]
         [ODataRoute( "{key}/Rate" )]
         [ProducesResponseType( Status204NoContent )]
         [ProducesResponseType( Status400BadRequest )]
@@ -150,13 +148,12 @@
         /// <returns>The order line items.</returns>
         /// <response code="200">The line items were successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        [HttpGet]
         [ODataRoute( "{key}/LineItems" )]
         [Produces( "application/json" )]
         [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
         [ProducesResponseType( Status404NotFound )]
         [EnableQuery( AllowedQueryOptions = Select )]
-        public IActionResult LineItems( int key )
+        public IActionResult GetLineItems( int key )
         {
             var lineItems = new[]
             {

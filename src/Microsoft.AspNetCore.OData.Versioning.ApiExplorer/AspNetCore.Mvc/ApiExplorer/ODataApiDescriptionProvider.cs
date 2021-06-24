@@ -23,11 +23,11 @@
     using System.Linq;
     using System.Threading.Tasks;
     using static Microsoft.AspNet.OData.Routing.ODataRouteActionType;
+    using static Microsoft.AspNet.OData.Routing.ODataRouteConstants;
     using static Microsoft.AspNetCore.Http.StatusCodes;
     using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
     using static System.Linq.Enumerable;
     using static System.StringComparison;
-    using static Microsoft.AspNet.OData.Routing.ODataRouteConstants;
 
     /// <summary>
     /// Represents an API explorer that provides <see cref="ApiDescription">API descriptions</see> for actions represented by
@@ -570,6 +570,10 @@
                 {
                     bindingInfo.BindingSource = Special;
                 }
+                else if ( bindingInfo.BinderType.IsODataModelBinder() )
+                {
+                    bindingInfo.BindingSource = default;
+                }
             }
 
             if ( bindingInfo.BindingSource != null )
@@ -584,7 +588,7 @@
             switch ( context.RouteContext.ActionType )
             {
                 case EntitySet:
-                    var keys = context.RouteContext.EntitySet.EntityType().Key().ToArray();
+                    var keys = context.RouteContext.EntitySet.EntityType().Key();
 
                     key = keys.FirstOrDefault( k => k.Name.Equals( paramName, OrdinalIgnoreCase ) );
 

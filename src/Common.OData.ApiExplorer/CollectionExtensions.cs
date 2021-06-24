@@ -10,9 +10,29 @@ namespace Microsoft.AspNetCore.Mvc
     {
         internal static void AddRange<T>( this ICollection<T> collection, IEnumerable<T> items )
         {
-            foreach ( var item in items )
+            switch ( items )
             {
-                collection.Add( item );
+                case IList<T> list:
+                    for ( var i = 0; i < list.Count; i++ )
+                    {
+                        collection.Add( list[i] );
+                    }
+
+                    break;
+                case IReadOnlyList<T> list:
+                    for ( var i = 0; i < list.Count; i++ )
+                    {
+                        collection.Add( list[i] );
+                    }
+
+                    break;
+                default:
+                    foreach ( var item in items )
+                    {
+                        collection.Add( item );
+                    }
+
+                    break;
             }
         }
     }

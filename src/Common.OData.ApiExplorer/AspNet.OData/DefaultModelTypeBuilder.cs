@@ -27,11 +27,9 @@
     public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     {
         static readonly Type IEnumerableOfT = typeof( IEnumerable<> );
-        readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new ConcurrentDictionary<ApiVersion, ModuleBuilder>();
-        readonly ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>> generatedEdmTypesPerVersion =
-            new ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>();
-        readonly ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>> generatedActionParamsPerVersion =
-            new ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>>();
+        readonly ConcurrentDictionary<ApiVersion, ModuleBuilder> modules = new();
+        readonly ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>> generatedEdmTypesPerVersion = new();
+        readonly ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>> generatedActionParamsPerVersion = new();
 
         /// <inheritdoc />
         public Type NewStructuredType( IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion, IEdmModel edmModel )
@@ -152,9 +150,12 @@
             var visitedEdmTypes = context.VisitedEdmTypes;
             var clrTypeMatchesEdmType = true;
             var hasUnfinishedTypes = false;
+            var clrProperties = clrType.GetProperties( Public | Instance );
 
-            foreach ( var property in clrType.GetProperties( Public | Instance ) )
+            for ( var i = 0; i < clrProperties.Length; i++ )
             {
+                var property = clrProperties[i];
+
                 if ( !structuralProperties.TryGetValue( property.Name, out var structuralProperty ) &&
                      !mappedClrProperties.TryGetValue( property, out structuralProperty ) )
                 {
