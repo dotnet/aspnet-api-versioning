@@ -283,6 +283,16 @@
         static bool HasNoEntityKeysRemaining( IEdmOperation operation, IList<ParameterDescriptor> parameters )
         {
             var actionParamCount = parameters.Count;
+
+            if ( operation.IsAction() )
+            {
+                return actionParamCount == 0;
+            }
+            else if ( !operation.IsFunction() )
+            {
+                return false;
+            }
+
             var operationParamCount = 0;
             var matches = 0;
 
