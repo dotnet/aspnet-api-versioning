@@ -8,6 +8,7 @@
   <Description>ASP.NET Core MVC API explorer functionality for discovering metadata such as the list of API-versioned controllers and actions, and their URLs and allowed HTTP methods.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning;ApiExplorer</PackageTags>
+  <LangVersion>default</LangVersion>
  </PropertyGroup>
 
  <ItemGroup>

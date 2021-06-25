@@ -8,6 +8,7 @@
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc</RootNamespace>
   <PackageTags>Microsoft;AspNet;AspNetCore;Versioning</PackageTags>
+  <LangVersion>default</LangVersion>
  </PropertyGroup>
 
  <ItemGroup>

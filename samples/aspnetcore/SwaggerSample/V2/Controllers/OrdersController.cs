@@ -63,5 +63,25 @@
             order.Id = 42;
             return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
         }
+
+        /// <summary>
+        /// Updates an existing order.
+        /// </summary>
+        /// <param name="order">The order to update.</param>
+        /// <returns>The created order.</returns>
+        /// <response code="204">The order was successfully updated.</response>
+        /// <response code="400">The order is invalid.</response>
+        /// <response code="404">The order does not exist.</response>
+        [HttpPatch( "{id:int}" )]
+        [Produces( "application/json" )]
+        [Consumes( "application/merge-patch+json" )]
+        [ProducesResponseType( 204 )]
+        [ProducesResponseType( 400 )]
+        [ProducesResponseType( 404 )]
+        public IActionResult Patch( int id, [FromBody] Order order )
+        {
+            order.Id = 2; // if id=2 then it is returned from V2 OrdersController.cs
+            return CreatedAtAction( nameof( Get ), new { id = order.Id }, order );
+        }
     }
 }
