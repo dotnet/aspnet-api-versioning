@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Mvc.Versioning;
 #endif
@@ -23,6 +24,7 @@
     using System.Web.Http.Description;
     using System.Web.Http.Dispatcher;
     using ControllerActionDescriptor = System.Web.Http.Controllers.HttpActionDescriptor;
+    using ParameterDescriptor = System.Web.Http.Controllers.HttpParameterDescriptor;
 #endif
     using static Microsoft.OData.ODataUrlKeyDelimiter;
     using static ODataRouteTemplateGenerationKind;
@@ -249,44 +251,68 @@
             return false;
         }
 
-        IEdmOperation? ResolveOperation( IEdmEntityContainer container, string name )
+        IEdmOperation? ResolveOperation( IEdmEntityContainer container, ControllerActionDescriptor action )
         {
-            var import = container.FindOperationImports( name ).SingleOrDefault();
-
-            if ( import != null )
+            if ( container.FindOperationImports( action.ActionName ).SingleOrDefault() is IEdmOperationImport import )
             {
                 return import.Operation;
             }
 
-            var qualifiedName = container.Namespace + "." + name;
-            var entities = new List<IEdmType>( capacity: 2 );
+            var qualifiedName = container.Namespace + "." + action.ActionName;
 
-            if ( Singleton != null )
+            if ( Singleton is not null )
             {
-                entities.Add( Singleton.EntityType() );
+                return EdmModel.FindBoundOperations( qualifiedName, Singleton.EntityType() ).SingleOrDefault();
             }
 
-            if ( EntitySet != null )
+            if ( EntitySet is null )
             {
-                var entity = EntitySet.EntityType();
+                return default;
+            }
 
-                if ( entities.Count == 0 || !entities[0].Equals( entity ) )
+            var operation = EdmModel.FindBoundOperations( qualifiedName, EntitySet.Type ).SingleOrDefault();
+
+            if ( operation is not null && HasNoEntityKeysRemaining( operation, FilterParameters( action ) ) )
+            {
+                return operation;
+            }
+
+            return EdmModel.FindBoundOperations( qualifiedName, EntitySet.EntityType() ).SingleOrDefault();
+        }
+
+        static bool HasNoEntityKeysRemaining( IEdmOperation operation, IList<ParameterDescriptor> parameters )
+        {
+            var actionParamCount = parameters.Count;
+            var operationParamCount = 0;
+            var matches = 0;
+
+            foreach ( var parameter in operation.Parameters )
+            {
+                if ( parameter.Name == "bindingParameter" )
                 {
-                    entities.Add( entity );
+                    continue;
+                }
+
+                ++operationParamCount;
+
+                for ( var i = 0; i < parameters.Count; i++ )
+                {
+#if WEBAPI
+                    var name = parameters[i].ParameterName;
+#else
+                    var name = parameters[i].Name;
+#endif
+                    if ( name.Equals( parameter.Name, OrdinalIgnoreCase ) )
+                    {
+                        ++matches;
+                        parameters.RemoveAt( i );
+                        break;
+                    }
                 }
             }
 
-            for ( var i = 0; i < entities.Count; i++ )
-            {
-                var operation = EdmModel.FindBoundOperations( qualifiedName, entities[i] ).SingleOrDefault();
-
-                if ( operation != null )
-                {
-                    return operation;
-                }
-            }
-
-            return EdmModel.FindDeclaredOperations( qualifiedName ).SingleOrDefault();
+            return operationParamCount == matches &&
+                   operationParamCount == actionParamCount;
         }
 
         sealed class FixedEdmModelServiceProviderDecorator : IServiceProvider

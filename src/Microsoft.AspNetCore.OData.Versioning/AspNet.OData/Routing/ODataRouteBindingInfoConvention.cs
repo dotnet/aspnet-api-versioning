@@ -125,7 +125,7 @@
             ODataRouteMapping mapping,
             ICollection<ODataAttributeRouteInfo> routeInfos )
         {
-            var routeContext = new ODataRouteBuilderContext( apiVersion, mapping, action, Options );
+            var routeContext = new ODataRouteBuilderContext( mapping, apiVersion, action, Options );
 
             if ( routeContext.IsRouteExcluded )
             {

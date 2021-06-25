@@ -9,6 +9,7 @@
     using Microsoft.Web.Http.Description;
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Description;
@@ -55,7 +56,7 @@
             Services = new FixedEdmModelServiceProviderDecorator( Services, model );
             EntitySet = container.FindEntitySet( controllerName );
             Singleton = container.FindSingleton( controllerName );
-            Operation = ResolveOperation( container, actionDescriptor.ActionName );
+            Operation = ResolveOperation( container, actionDescriptor );
             ActionType = GetActionType( actionDescriptor );
             IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
 
@@ -96,6 +97,27 @@
                     break;
                 }
             }
+        }
+
+        static IList<HttpParameterDescriptor> FilterParameters( HttpActionDescriptor action )
+        {
+            var parameters = action.GetParameters().ToList();
+            var cancellationToken = typeof( CancellationToken );
+
+            for ( var i = parameters.Count - 1; i >= 0; i-- )
+            {
+                var type = parameters[i].ParameterType;
+
+                if ( type.IsODataQueryOptions() ||
+                     type.IsODataActionParameters() ||
+                     type.IsODataPath() ||
+                     type.Equals( cancellationToken ) )
+                {
+                    parameters.RemoveAt( i );
+                }
+            }
+
+            return parameters;
         }
     }
 }
