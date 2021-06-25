@@ -3,14 +3,21 @@
     using Microsoft.AspNet.OData;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
+#if API_EXPLORER
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
+#endif
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Routing;
+#if !API_EXPLORER
+    using Microsoft.AspNetCore.Mvc.Versioning;
+#endif
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.OData;
     using Microsoft.OData.Edm;
     using System.Collections.Generic;
+    using System.Linq;
+    using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 
     partial class ODataRouteBuilderContext
     {
@@ -18,7 +25,11 @@
             ODataRouteMapping routeMapping,
             ApiVersion apiVersion,
             ControllerActionDescriptor actionDescriptor,
+#if API_EXPLORER
             ODataApiExplorerOptions options )
+#else
+            ODataApiVersioningOptions options )
+#endif
         {
             ApiVersion = apiVersion;
             Services = routeMapping.Services;
@@ -26,7 +37,9 @@
             RouteTemplate = routeAttribute?.PathTemplate ?? RouteTemplateProvider?.Template;
             RoutePrefix = routeMapping.RoutePrefix;
             ActionDescriptor = actionDescriptor;
+#if API_EXPLORER
             ParameterDescriptions = new List<ApiParameterDescription>();
+#endif
             Options = options;
             UrlKeyDelimiter = UrlKeyDelimiterOrDefault( Services.GetRequiredService<ODataOptions>().UrlKeyDelimiter );
 
@@ -45,7 +58,7 @@
             Services = new FixedEdmModelServiceProviderDecorator( Services, model );
             EntitySet = container.FindEntitySet( actionDescriptor.ControllerName );
             Singleton = container.FindSingleton( actionDescriptor.ControllerName );
-            Operation = ResolveOperation( container, actionDescriptor.ActionName );
+            Operation = ResolveOperation( container, actionDescriptor );
             ActionType = GetActionType( actionDescriptor );
             IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
         }
@@ -78,6 +91,35 @@
             }
 
             return templateProvider is null ? default : (templateProvider, new ODataRouteAttribute( templateProvider.Template ));
+        }
+
+        static IList<ParameterDescriptor> FilterParameters( ControllerActionDescriptor action )
+        {
+            var parameters = action.Parameters.ToList();
+
+            for ( var i = parameters.Count - 1; i >= 0; i-- )
+            {
+                if ( parameters[i].BindingInfo is not BindingInfo info )
+                {
+                    continue;
+                }
+
+                if ( info.BindingSource == Special )
+                {
+                    parameters.RemoveAt( i );
+                }
+                else if ( info.BindingSource == Custom )
+                {
+                    var type = parameters[i].ParameterType;
+
+                    if ( type.IsODataQueryOptions() || type.IsODataActionParameters() || type.IsODataPath() )
+                    {
+                        parameters.RemoveAt( i );
+                    }
+                }
+            }
+
+            return parameters;
         }
     }
 }

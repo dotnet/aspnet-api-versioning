@@ -741,15 +741,17 @@
 
         static bool IsKey( IReadOnlyList<IEdmStructuralProperty> keys, ApiParameterDescription parameter )
         {
-            foreach ( var key in keys )
+            var name = parameter.Name;
+
+            for ( var i = 0; i < keys.Count; i++ )
             {
-                if ( key.Name.Equals( parameter.Name, OrdinalIgnoreCase ) )
+                if ( keys[i].Name.Equals( name, OrdinalIgnoreCase ) )
                 {
                     return true;
                 }
             }
 
-            return parameter.Name.StartsWith( Key, OrdinalIgnoreCase );
+            return name.StartsWith( Key, OrdinalIgnoreCase );
         }
 
         static bool IsFunctionParameter( IEdmOperation? operation, ApiParameterDescription parameter )
