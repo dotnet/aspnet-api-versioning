@@ -242,7 +242,8 @@
             }
 
             if ( context.AllowedFunctions != AllowedFunctions.None &&
-                 context.AllowedFunctions != AllowedFunctions.All )
+                 context.AllowedFunctions != AllowedFunctions.All &&
+                 context.AllowedFunctions != AllowedFunctions.AllFunctions )
             {
 #pragma warning disable CA1308 // Normalize strings to uppercase
                 var functions = context.AllowedFunctions.ToString().ToLowerInvariant();
