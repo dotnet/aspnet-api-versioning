@@ -17,7 +17,7 @@
 #endif
     public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescriptionProvider
     {
-        const char Space = ' ';
+        private const char Space = ' ';
 
         /// <inheritdoc />
         public virtual string Describe( AllowedQueryOptions queryOption, ODataQueryOptionDescriptionContext context )
@@ -223,7 +223,7 @@
         /// <returns>The query option description.</returns>
         protected virtual string DescribeCount( ODataQueryOptionDescriptionContext context ) => SR.CountQueryOptionDesc;
 
-        static void AppendAllowedOptions( StringBuilder description, ODataQueryOptionDescriptionContext context )
+        private static void AppendAllowedOptions( StringBuilder description, ODataQueryOptionDescriptionContext context )
         {
             if ( context.AllowedLogicalOperators != AllowedLogicalOperators.None &&
                  context.AllowedLogicalOperators != AllowedLogicalOperators.All )
@@ -242,7 +242,6 @@
             }
 
             if ( context.AllowedFunctions != AllowedFunctions.None &&
-                 context.AllowedFunctions != AllowedFunctions.All &&
                  context.AllowedFunctions != AllowedFunctions.AllFunctions )
             {
 #pragma warning disable CA1308 // Normalize strings to uppercase
@@ -254,7 +253,7 @@
             }
         }
 
-        static IEnumerable<string> EnumerateLogicalOperators( AllowedLogicalOperators logicalOperators )
+        private static IEnumerable<string> EnumerateLogicalOperators( AllowedLogicalOperators logicalOperators )
         {
             if ( logicalOperators.HasFlag( Equal ) )
             {
@@ -307,7 +306,7 @@
             }
         }
 
-        static IEnumerable<string> EnumerateArithmeticOperators( AllowedArithmeticOperators arithmeticOperators )
+        private static IEnumerable<string> EnumerateArithmeticOperators( AllowedArithmeticOperators arithmeticOperators )
         {
             if ( arithmeticOperators.HasFlag( Add ) )
             {
@@ -335,7 +334,7 @@
             }
         }
 
-        static string ToCommaSeparatedValues( IEnumerable<string> values )
+        private static string ToCommaSeparatedValues( IEnumerable<string> values )
         {
             using var iterator = values.GetEnumerator();
 
