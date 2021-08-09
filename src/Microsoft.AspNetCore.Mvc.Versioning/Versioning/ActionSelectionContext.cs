@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.AspNetCore.Mvc.Versioning
 {
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc.Abstractions;
 
     /// <summary>
     /// Represents the context for selecting a controller action from a list of matching candidates.
