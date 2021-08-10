@@ -30,8 +30,6 @@ jobs:
           $buildConfiguration = "Release"
           $useSharedCompilation = "false"
 
-          dotnet nuget locals all --clear
-
           Get-ChildItem src -Include *.csproj -Recurse | ForEach-Object { 
             dotnet build $_.FullName `
             -property:UseSharedCompilation=$useSharedCompilation `
