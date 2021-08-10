@@ -13,7 +13,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -27,27 +27,17 @@ jobs:
       - name: Build solution
         shell: pwsh
         run: |
-          $pathToSolution = "ApiVersioning.sln"
           $buildConfiguration = "Release"
           $useSharedCompilation = "false"
-          $testProjects = @( Get-ChildItem -Path test/ -Recurse | Where-Object { $_.Extension -match 'shproj' -or $_.Extension -match 'csproj' } | ForEach-Object { $_.FullName } )
 
           dotnet nuget locals all --clear
 
-          # remove one or more test projects, 
-          # so that CodeQL only analyzes the source code
-          dotnet sln $pathToSolution remove $testProjects
-
-          dotnet clean $pathToSolution `
-          --configuration $buildConfiguration
-
-          dotnet restore $pathToSolution
-
-          dotnet build $pathToSolution `
-          -property:UseSharedCompilation=$useSharedCompilation `
-          --configuration $buildConfiguration `
-          --no-incremental `
-          --no-restore
+          Get-ChildItem src -Include *.csproj -Recurse | ForEach-Object { 
+            dotnet build $_.FullName `
+            -property:UseSharedCompilation=$useSharedCompilation `
+            --configuration $buildConfiguration `
+            --no-incremental
+          }
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
