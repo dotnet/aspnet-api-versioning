@@ -74,3 +74,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ----
 > If you are an existing user, please makes sure you review the [release notes](../../releases) between all major and minor package releases.
+
+## License
+[MIT](./LICENSE.txt) © dotnet
