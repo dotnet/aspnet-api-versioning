@@ -1,4 +1,4 @@
-[![Build status](https://microsoft.visualstudio.com/OS/_apis/build/status/aspnet.api.versioning/Release)](https://microsoft.visualstudio.com/OS/_build/latest?definitionId=25025 "Build status")
+[![Build status](https://microsoft.visualstudio.com/OS/_apis/build/status/aspnet.api.versioning/Release)](https://microsoft.visualstudio.com/OS/_build/latest?definitionId=25012 "Build status")
 
 # ASP.NET API Versioning
 
