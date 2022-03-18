@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning.ApiExplorer</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
+ </ItemGroup>
+
+</Project>

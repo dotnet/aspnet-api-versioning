@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFrameworks>net6.0;net452;net472</TargetFrameworks>
+  <RootNamespace>Asp.Versioning.Http</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <Compile Remove="net6.0\**\*.cs" />
+  <None Include="net6.0\**\*.cs" />
+ </ItemGroup>
+
+ <ItemGroup Condition="'$(TargetFramework)' != 'net452'">
+   <PackageReference Include="MELT" Version="0.8.0" />
+ </ItemGroup>
+ 
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Asp.Versioning.Http.Client\Asp.Versioning.Http.Client.csproj" />
+ </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.2" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\OData\src\Asp.Versioning.OData\Asp.Versioning.OData.csproj" />
+  <ProjectReference Include="..\..\WebApi\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\Common\test\Common.Acceptance.Tests\Common.Acceptance.Tests.projitems" Label="Shared" />
+
+</Project>

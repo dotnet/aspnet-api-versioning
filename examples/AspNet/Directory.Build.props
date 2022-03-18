@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../'))" />
+ 
+ <PropertyGroup>
+  <OutputType>Exe</OutputType>
+ </PropertyGroup>
+ 
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" Version="5.2.7" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <AssemblyAttribute Include="Microsoft.Owin.OwinStartupAttribute">
+   <_Parameter1>ApiVersioning.Examples.Startup</_Parameter1>
+   <_Parameter1_TypeName>System.Type</_Parameter1_TypeName>
+  </AssemblyAttribute>
+ </ItemGroup>
+
+</Project>

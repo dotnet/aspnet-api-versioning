@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup>
+  <IsPackable>true</IsPackable>
+  <RepositoryType>git</RepositoryType>
+  <RepositoryUrl>https://github.com/dotnet/aspnet-api-versioning</RepositoryUrl>
+  <PackageIconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
+  <PackageIcon>icon.png</PackageIcon>
+  <PackageProjectUrl>https://github.com/dotnet/aspnet-api-versioning/wiki</PackageProjectUrl>
+  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
+  <PackageReadmeFile>README.md</PackageReadmeFile>
+  <NoWarn>NU5118;$(NoWarn)</NoWarn>
+ </PropertyGroup>
+
+ <ItemGroup Label="Packages Files">
+  <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
+  <None Include="$(MSBuildThisFileDirectory)..\LICENSE.txt" Pack="true" PackagePath="" Visible="false" />
+ </ItemGroup>
+
+ <!-- allow build-specific, one-time release notes from the command-line without modifying the source project -->
+ <ItemGroup>
+  <ReleaseNotes Include="$(BuildReleaseNotes.Split('|'))" />
+ </ItemGroup>
+
+ <!-- REF: https://github.com/dotnet/sourcelink/blob/master/README.md -->
+ <PropertyGroup Label="SourceLink">
+  <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
+  <!-- REF: https://github.com/clairernovotny/DeterministicBuilds -->
+  <ContinuousIntegrationBuild Condition=" ('$(TF_BUILD)' == 'true') OR ('$(GITHUB_ACTIONS)' == 'true') ">true</ContinuousIntegrationBuild>
+ </PropertyGroup>
+
+ <ItemGroup Label="SourceLink">
+  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1-*" PrivateAssets="All"/>
+ </ItemGroup>
+
+</Project>

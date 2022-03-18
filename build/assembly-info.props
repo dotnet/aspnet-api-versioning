@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <ItemGroup>
+  <AssemblyAttribute Include="System.Reflection.AssemblyTrademarkAttribute">
+   <_Parameter1>$(Company)</_Parameter1>
+  </AssemblyAttribute>
+  <AssemblyAttribute Include="System.Runtime.InteropServices.ComVisibleAttribute">
+   <_Parameter1>false</_Parameter1>
+  </AssemblyAttribute>
+  <AssemblyAttribute Include="System.CLSCompliantAttribute" Condition=" '$(IsClsCompliant)' == 'true' ">
+   <_Parameter1>true</_Parameter1>
+  </AssemblyAttribute>
+ </ItemGroup>
+
+</Project>

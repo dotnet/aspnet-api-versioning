@@ -1,0 +1,7 @@
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+
+[*.{cs,vb}]
+
+# ide code suppressions
+dotnet_diagnostic.IDE0059.severity = none
+dotnet_diagnostic.IDE0060.severity = none

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\..\Common\test\Common.Mvc.Tests\Common.Mvc.Tests.projitems" Label="Shared" />
+
+</Project>

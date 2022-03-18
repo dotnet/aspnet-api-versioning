@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net48</TargetFramework>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <Reference Include="System.ComponentModel.DataAnnotations" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\..\..\src\AspNet\OData\src\Asp.Versioning.WebApi.OData\Asp.Versioning.WebApi.OData.csproj" />
+ </ItemGroup>
+
+</Project>

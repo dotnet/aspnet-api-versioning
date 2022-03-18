@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup>
+  <Company>.NET Foundation</Company>
+  <Authors>.NET Foundation and Contributors</Authors>
+  <Copyright>© $(Company). All rights reserved.</Copyright>
+  <NeutralLanguage>en</NeutralLanguage>
+  <DefaultLanguage>en-US</DefaultLanguage>
+ </PropertyGroup>
+
+ <PropertyGroup Label="C#">
+  <LangVersion>latest</LangVersion>
+  <ImplicitUsings>enable</ImplicitUsings>
+  <IsClsCompliant>true</IsClsCompliant>
+ </PropertyGroup>
+
+</Project>

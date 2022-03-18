@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup>
+  <IsPackable>false</IsPackable>
+  <Nullable>disable</Nullable>
+  <IsClsCompliant>false</IsClsCompliant>
+  <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
+ </PropertyGroup>
+
+ <ItemGroup Condition=" '$(IsSharedProject)' == 'false' ">
+  <None Include="$(MSBuildThisFileDirectory)\$(AcceptanceTestPrefix)xunit.runner.json"
+        Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(IsSharedProject)' == 'false' ">
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+  <PackageReference Include="Moq" Version="4.16.1" />
+  <PackageReference Include="xunit" Version="2.4.1" />
+  <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.2-*" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Using Include="Moq" />
+  <Using Include="Xunit" />
+  <Using Include="Xunit.Abstractions" />
+ </ItemGroup>
+
+</Project>

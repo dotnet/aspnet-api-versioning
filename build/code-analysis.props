@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup Label="Code Analysis">
+  <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+ </PropertyGroup>
+
+ <ItemGroup Label="StyleCop">
+  <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" Visible="false" />
+  <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-*" PrivateAssets="All" />
+ </ItemGroup>
+
+</Project>

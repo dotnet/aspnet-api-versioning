@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <TargetFrameworks>net6.0;net472;net452</TargetFrameworks>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+ </PropertyGroup>
+ <ItemGroup Condition=" ('$(TargetFramework)' == 'net452') OR ('$(TargetFramework)' == 'net472') ">
+  <Compile Remove="net6.0\**\*.cs" />
+  <None Include="net6.0\**\*.cs" />
+  <Using Remove="System.Net.Http" />
+ </ItemGroup>
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+  <Compile Remove="net452\**\*.cs" />
+  <None Include="net452\**\*.cs" />
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="..\..\src\Asp.Versioning.Abstractions\Asp.Versioning.Abstractions.csproj" />
+ </ItemGroup>
+</Project>

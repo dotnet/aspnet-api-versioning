@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net48</TargetFramework>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\..\..\src\AspNet\WebApi\src\Asp.Versioning.WebApi\Asp.Versioning.WebApi.csproj" />
+ </ItemGroup>
+
+</Project>

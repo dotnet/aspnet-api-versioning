@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+   <ProjectReference Include="..\..\src\Asp.Versioning.OData.ApiExplorer\Asp.Versioning.OData.ApiExplorer.csproj" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\..\Common\test\Common.OData.ApiExplorer.Tests\Common.OData.ApiExplorer.Tests.projitems" Label="Shared" />
+
+</Project>

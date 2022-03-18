@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFrameworks>net452;net472</TargetFrameworks>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <Compile Include="$(BackportDir)Array.cs" Visible="false" />
+ </ItemGroup>
+ 
+ <ItemGroup>
+   <ProjectReference Include="..\..\src\Asp.Versioning.WebApi\Asp.Versioning.WebApi.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+   <Reference Include="System.Web" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\..\Common\test\Common.Mvc.Tests\Common.Mvc.Tests.projitems" Label="Shared" />
+ <Import Project="..\..\..\..\Common\test\Common.Tests\Common.Tests.projitems" Label="Shared" />
+
+</Project>

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>6.0.0</VersionPrefix>
+  <AssemblyVersion>6.0.0.0</AssemblyVersion>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+  <AssemblyTitle>ASP.NET Core API Versioning API Explorer for OData v4.0</AssemblyTitle>
+  <Description>The API Explorer extensions for ASP.NET Core API Versioning and OData v4.0.</Description>
+  <PackageTags>Asp;AspNet;AspNetCore;Versioning;ApiExplorer;OData</PackageTags>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <Compile Include="..\..\..\..\Common\src\Common.OData\TypeExtensions.cs" Link="TypeExtensions.cs" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\..\WebApi\src\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
+  <ProjectReference Include="..\Asp.Versioning.OData\Asp.Versioning.OData.csproj" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\..\Common\src\Common.OData.ApiExplorer\Common.OData.ApiExplorer.projitems" Label="Shared" />
+
+</Project>

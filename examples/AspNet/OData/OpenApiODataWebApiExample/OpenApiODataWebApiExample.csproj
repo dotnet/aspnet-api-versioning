@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>net48</TargetFramework>
+  <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildThisFileName).xml</DocumentationFile>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <Reference Include="System.ComponentModel.DataAnnotations" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Swashbuckle.Core" Version="5.6.0" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\..\..\src\AspNet\OData\src\Asp.Versioning.WebApi.OData.ApiExplorer\Asp.Versioning.WebApi.OData.ApiExplorer.csproj" />
+ </ItemGroup>
+
+</Project>

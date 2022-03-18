@@ -1,0 +1,25 @@
+﻿{
+  // https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/EnableConfiguration.md
+
+  "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+  "settings": {
+    "documentationRules": {
+      "companyName": ".NET Foundation",
+      "copyrightText": "Copyright (c) {companyName} and contributors. All rights reserved.",
+      "documentInterfaces": true,
+      "documentExposedElements": true,
+      "documentInternalElements": false,
+      "documentPrivateElements": false,
+      "documentPrivateFields": false,
+      "variables": {
+      },
+      "xmlHeader": false
+    },
+    "layoutRules": {
+      "newlineAtEndOfFile": "omit"
+    },
+    "orderingRules": {
+      "blankLinesBetweenUsingGroups": "omit"
+    }
+  }
+}

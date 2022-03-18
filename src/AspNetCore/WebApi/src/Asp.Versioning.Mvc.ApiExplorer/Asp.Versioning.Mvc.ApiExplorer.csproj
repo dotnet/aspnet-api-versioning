@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>6.0.0</VersionPrefix>
+  <AssemblyVersion>6.0.0.0</AssemblyVersion>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning.ApiExplorer</RootNamespace>
+  <AssemblyTitle>ASP.NET Core API Versioning API Explorer</AssemblyTitle>
+  <Description>The API Explorer extensions for ASP.NET Core API Versioning.</Description>
+  <PackageTags>Asp;AspNet;AspNetCore;Versioning;ApiExplorer</PackageTags>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\..\Common\src\Common.ApiExplorer\Common.ApiExplorer.projitems" Label="Shared" />
+
+</Project>

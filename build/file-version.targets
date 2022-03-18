@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <!-- replicates the behavior of 1.0.* -->
+ <PropertyGroup>
+  <AssemblyVersion Condition=" '$(AssemblyVersion)' == '' ">1.0.0.0</AssemblyVersion>
+  <MajorAndMinorVersion>$(AssemblyVersion.Split(`.`)[0]).$(AssemblyVersion.Split(`.`)[1])</MajorAndMinorVersion>
+  <DaylightSavingTime>$([System.DateTime]::Now.IsDaylightSavingTime())</DaylightSavingTime>
+  <FileBuildNumber>$([System.DateTime]::Today.Subtract($([System.DateTime]::Parse("1/1/2000"))).ToString("%d"))</FileBuildNumber>
+  <FileBuildRevision Condition=" '$(DaylightSavingTime)'=='True' " >$([System.Convert]::ToInt32($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.TimeSpan]::FromHours(1.0))).TimeOfDay.TotalSeconds),2))))</FileBuildRevision>
+  <FileBuildRevision Condition=" '$(DaylightSavingTime)'=='False' " >$([System.Convert]::ToInt32($([MSBuild]::Divide($([System.DateTime]::Now.TimeOfDay.TotalSeconds),2))))</FileBuildRevision>
+  <FileVersion>$(MajorAndMinorVersion).$(FileBuildNumber).$(FileBuildRevision)</FileVersion>
+ </PropertyGroup>
+
+</Project>

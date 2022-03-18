@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup>
+  <FluentAssertionsVersion>6.5.1</FluentAssertionsVersion>
+  <FluentAssertionsVersion Condition=" '$(TargetFramework)' != 'net6.0' ">5.10.3</FluentAssertionsVersion>
+ </PropertyGroup>
+
+ <ItemGroup Condition=" '$(IsSharedProject)' == 'false' ">
+  <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Using Include="FluentAssertions" />
+ </ItemGroup>
+
+</Project>

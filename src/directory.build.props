@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <PropertyGroup>
+  <RootDir>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), .gitignore))))</RootDir>
+  <BuildDir>$([MSBuild]::EnsureTrailingSlash($(RootDir)build))</BuildDir>
+  <BackportDir>$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::Combine('$(RootDir)','src','Common','src','Common.Backport'))))</BackportDir>
+ </PropertyGroup>
+
+ <PropertyGroup>
+  <IsPackable>true</IsPackable>
+  <Nullable>enable</Nullable>
+  <IsSharedProject>false</IsSharedProject>
+  <IsSharedProject Condition=" ('$(MSBuildProjectExtension)' == '.shproj') OR ('$(MSBuildProjectExtension)' == '.msbuildproj') ">true</IsSharedProject>
+  <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
+  <IsAspNetCore>$(MSBuildProjectDirectory.Contains('AspNetCore'))</IsAspNetCore>
+ </PropertyGroup>
+
+ <ImportGroup Condition=" '$(IsSharedProject)' == 'false' ">
+  <Import Project="$(BuildDir)common.props" />
+  <Import Project="$(BuildDir)assembly-info.props" />
+  <Import Project="$(BuildDir)code-analysis.props" />
+ </ImportGroup>
+
+ <ImportGroup Condition=" '$(IsSharedProject)' == 'false' AND '$(IsTestProject)' == 'false' ">
+  <Import Project="$(BuildDir)signing.props" />
+  <Import Project="$(BuildDir)nuget.props" />
+ </ImportGroup>
+
+ <ImportGroup Condition=" '$(IsSharedProject)' == 'false' AND '$(IsTestProject)' == 'true' ">
+  <Import Project="$(BuildDir)test.props" />
+ </ImportGroup>
+
+ <ItemGroup Condition=" '$(IsTestProject)' == 'false' ">
+  <Using Include="System.Diagnostics.CodeAnalysis" />
+ </ItemGroup>
+
+</Project>

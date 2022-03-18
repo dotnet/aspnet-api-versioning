@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>6.0.0</VersionPrefix>
+  <AssemblyVersion>6.0.0.0</AssemblyVersion>
+  <TargetFramework>net6.0</TargetFramework>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+  <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>
+  <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
+  <PackageTags>Asp;AspNet;AspNetCore;Versioning</PackageTags>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <ProjectReference Include="..\..\..\..\Abstractions\src\Asp.Versioning.Abstractions\Asp.Versioning.Abstractions.csproj" />
+ </ItemGroup>
+
+ <Import Project="..\..\..\..\Common\src\Common\Common.projitems" Label="Shared" />
+ <Import Project="..\..\..\..\Common\src\Common.ProblemDetails\Common.ProblemDetails.projitems" Label="Shared" />
+
+</Project>

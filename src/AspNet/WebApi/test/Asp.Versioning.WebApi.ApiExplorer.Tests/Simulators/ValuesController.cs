@@ -1,0 +1,10 @@
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+
+namespace Asp.Versioning.Simulators;
+
+using System.Web.Http;
+
+public class ValuesController : ApiController
+{
+    public IHttpActionResult Get() => Ok();
+}
