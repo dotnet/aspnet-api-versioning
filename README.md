@@ -1,5 +1,8 @@
 [![Build status](https://microsoft.visualstudio.com/OS/_apis/build/status/aspnet.api.versioning/Release)](https://microsoft.visualstudio.com/OS/_build/latest?definitionId=25012 "Build status")
 
+| :mega: Check out the [announcement](../../discussions/807) regarding upcoming changes |
+|-|
+
 # ASP.NET API Versioning
 
 ASP.NET API versioning gives you a powerful, but easy-to-use method for adding API versioning semantics to your new and existing REST services built with ASP.NET. The API versioning extensions define simple metadata attributes and conventions that you use to describe which API versions are implemented by your services. You don't need to learn any new routing concepts or change the way you implement your services in ASP.NET today.
