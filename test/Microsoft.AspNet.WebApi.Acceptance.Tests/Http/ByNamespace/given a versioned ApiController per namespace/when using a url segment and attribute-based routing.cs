@@ -6,7 +6,9 @@
     using System.Threading.Tasks;
     using Xunit;
 
+#pragma warning disable IDE1006 // Naming Styles
     public class when_using_a_url_segment_and_attributeX2Dbased_routing : AcceptanceTest, IClassFixture<HelloWorldFixture>
+#pragma warning restore IDE1006 // Naming Styles
     {
         [Fact]
         public async Task then_get_should_should_return_200_for_an_unspecified_version()

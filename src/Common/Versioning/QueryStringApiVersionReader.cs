@@ -49,7 +49,10 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// <remarks>This constructor adds the "api-version" query string parameter if no other query parameter names are specified.</remarks>
         public QueryStringApiVersionReader( params string[] parameterNames )
         {
-            ParameterNames.AddRange( parameterNames );
+            if ( parameterNames != null )
+            {
+                ParameterNames.AddRange( parameterNames );
+            }
 
             if ( ParameterNames.Count == 0 )
             {

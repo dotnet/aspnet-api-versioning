@@ -34,7 +34,16 @@ namespace Microsoft.AspNetCore.Mvc
 
             var request = new HttpRequestMessage( method, requestUri );
 
-            if ( !Equals( entity, default( TEntity ) ) )
+            if ( Equals( entity, default( TEntity ) ) )
+            {
+                return request;
+            }
+
+            if ( entity is HttpContent content )
+            {
+                request.Content = content;
+            }
+            else
             {
                 var formatter = new JsonMediaTypeFormatter();
                 request.Content = new ObjectContent<TEntity>( entity, formatter, JsonMediaType );

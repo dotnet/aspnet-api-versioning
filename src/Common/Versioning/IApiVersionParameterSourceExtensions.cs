@@ -18,6 +18,13 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
             return context.HasPathApiVersion;
         }
 
+        internal static bool VersionsOnlyByUrlSegment( this IApiVersionParameterSource source )
+        {
+            var context = new UrlSegmentDescriptionContext();
+            source.AddParameters( context );
+            return context.HasPathApiVersion && context.Locations == 1;
+        }
+
         internal static bool VersionsByMediaType( this IApiVersionParameterSource source )
         {
             var context = new MediaTypeDescriptionContext();
@@ -36,16 +43,19 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         {
             internal bool HasPathApiVersion { get; private set; }
 
+            internal int Locations { get; private set; }
+
             public void AddParameter( string name, ApiVersionParameterLocation location )
             {
                 HasPathApiVersion |= location == Path;
+                ++Locations;
             }
         }
 
         sealed class MediaTypeDescriptionContext : IApiVersionParameterDescriptionContext
         {
             readonly StringComparer comparer = StringComparer.OrdinalIgnoreCase;
-            readonly List<string> parameterNames = new List<string>();
+            readonly List<string> parameterNames = new();
 
             internal string ParameterName => parameterNames.Count == 0 ? string.Empty : parameterNames[0];
 

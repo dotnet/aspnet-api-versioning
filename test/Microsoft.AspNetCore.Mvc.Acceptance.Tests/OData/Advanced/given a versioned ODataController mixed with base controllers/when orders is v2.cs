@@ -18,7 +18,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api/orders?api-version=2.0" );
+            var response = await GetAsync( "api/orders?api-version=2.0" );
             var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { value = new[] { new { id = 0, customer = "" } } } );
 
             // assert
@@ -32,7 +32,7 @@
 
 
             // act
-            var response = await Client.GetAsync( "api/orders/42?api-version=2.0" );
+            var response = await GetAsync( "api/orders/42?api-version=2.0" );
             var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( new { id = 0, customer = "" } );
 
             // assert

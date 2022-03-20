@@ -11,6 +11,9 @@ namespace Microsoft.AspNetCore.Mvc
 #endif
     using System;
     using System.Collections.Generic;
+#if !WEBAPI
+    using System.Diagnostics.CodeAnalysis;
+#endif
     using System.Globalization;
     using static System.DateTime;
     using static System.Globalization.CultureInfo;
@@ -240,10 +243,10 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="text">The text to parse.</param>
         /// <param name="version">The parsed <see cref="ApiVersion">API version</see>, if the operation is successful.</param>
         /// <returns>True if the operation succeeded; otherwise false.</returns>
-#if NETAPPCORE3_1
-        public static bool TryParse( string text, [NotNullWhen( true )] out ApiVersion? version )
-#else
+#if WEBAPI
         public static bool TryParse( string? text, out ApiVersion? version )
+#else
+        public static bool TryParse( string? text, [NotNullWhen( true )] out ApiVersion? version )
 #endif
         {
             version = null;
