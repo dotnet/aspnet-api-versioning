@@ -29,7 +29,7 @@
 
 #pragma warning disable CA2225 // Operator overloads have named alternates; implicit cast only intended
         public static implicit operator RequestDelegate?( RequestHandler handler ) =>
-            handler == null ? default( RequestDelegate ) : handler.ExecuteAsync;
+            handler == null ? default : handler.ExecuteAsync;
 #pragma warning restore CA2225
 
         public static implicit operator Endpoint?( RequestHandler? handler ) => handler?.ToEndpoint();
@@ -37,7 +37,7 @@
         internal Endpoint ToEndpoint()
         {
             var metadata = Context.Metadata == null ?
-                           new EndpointMetadataCollection() :
+                           EndpointMetadataCollection.Empty :
                            new EndpointMetadataCollection( Context.Metadata );
 
             return new Endpoint( ExecuteAsync, metadata, default );

@@ -30,7 +30,13 @@ namespace Microsoft.AspNetCore.Mvc.Versioning
         /// Initializes a new instance of the <see cref="HeaderApiVersionReader"/> class.
         /// </summary>
         /// <param name="headerNames">An array of HTTP header names to read the service API version from.</param>
-        public HeaderApiVersionReader( params string[] headerNames ) => HeaderNames.AddRange( headerNames );
+        public HeaderApiVersionReader( params string[] headerNames )
+        {
+            if ( headerNames is not null )
+            {
+                HeaderNames.AddRange( headerNames );
+            }
+        }
 
         /// <summary>
         /// Gets a collection of HTTP header names that the service API version can be read from.

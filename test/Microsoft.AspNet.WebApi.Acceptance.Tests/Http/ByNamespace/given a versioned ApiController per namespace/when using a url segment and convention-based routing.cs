@@ -10,7 +10,9 @@
     using static System.Net.HttpStatusCode;
 
     [Collection( nameof( AgreementsCollection ) )]
+#pragma warning disable IDE1006 // Naming Styles
     public class when_using_a_url_segment_and_conventionX2Dbased_routing : AcceptanceTest
+#pragma warning restore IDE1006 // Naming Styles
     {
         [Theory]
         [InlineData( "Microsoft.Web.Http.ByNamespace.Controllers.V1.AgreementsController", "1" )]

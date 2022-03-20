@@ -7,6 +7,7 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using static System.Environment;
     using static System.Linq.Enumerable;
@@ -135,7 +136,7 @@
                     Options = Options,
                     ApiVersionReporter = ApiVersionReporter,
                     HttpContext = context.HttpContext,
-                    Candidates = candidates,
+                    Candidates = candidates.ToArray(),
                     Logger = Logger,
                 };
 

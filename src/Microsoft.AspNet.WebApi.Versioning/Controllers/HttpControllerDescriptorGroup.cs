@@ -34,7 +34,8 @@
         /// <param name="controllerDescriptors">An <see cref="Array">array</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
         public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, params HttpControllerDescriptor[] controllerDescriptors )
-            : base( configuration, controllerName, controllerDescriptors[0].ControllerType ) => descriptors = controllerDescriptors;
+            : base( configuration, controllerName, controllerDescriptors?[0].ControllerType ) =>
+            descriptors = controllerDescriptors ?? throw new ArgumentNullException( nameof( controllerDescriptors ) );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
@@ -51,7 +52,8 @@
         /// <param name="controllerDescriptors">A <see cref="IReadOnlyList{T}">read-only list</see> of
         /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
         public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, IReadOnlyList<HttpControllerDescriptor> controllerDescriptors )
-            : base( configuration, controllerName, controllerDescriptors?[0].ControllerType ) => descriptors = controllerDescriptors ?? throw new ArgumentNullException( nameof( controllerDescriptors ) );
+            : base( configuration, controllerName, controllerDescriptors?[0].ControllerType ) =>
+            descriptors = controllerDescriptors ?? throw new ArgumentNullException( nameof( controllerDescriptors ) );
 
         /// <summary>
         /// Creates and returns a controller for the specified request.
