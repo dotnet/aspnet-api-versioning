@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.AspNetCore.Routing;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
@@ -284,10 +285,11 @@
             }
             catch ( AmbiguousApiVersionException ex )
             {
-                Logger.LogInformation( ex.Message );
+                Logger.ApiVersionAmbiguous( ex );
                 apiVersion = default;
 
-                var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
+                var reporter = httpContext.RequestServices.GetRequiredService<IReportApiVersions>();
+                var handlerContext = new RequestHandlerContext( Options.ErrorResponses, reporter )
                 {
                     Code = AmbiguousApiVersion,
                     Message = ex.Message,

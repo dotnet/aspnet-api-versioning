@@ -6,16 +6,23 @@
 
     sealed class RequestHandlerContext
     {
-        readonly IReportApiVersions? reporter;
-        readonly Lazy<ApiVersionModel>? apiVersions;
-
-        internal RequestHandlerContext( IErrorResponseProvider errorResponseProvider )
-            : this( errorResponseProvider, null, null ) { }
+        readonly IReportApiVersions reporter;
+        readonly Lazy<ApiVersionModel> apiVersions;
+        string[]? allowedMethods;
+        IList<object>? metadata;
 
         internal RequestHandlerContext(
             IErrorResponseProvider errorResponseProvider,
-            IReportApiVersions? reportApiVersions,
-            Lazy<ApiVersionModel>? apiVersions )
+            IReportApiVersions reportApiVersions )
+            : this(
+                  errorResponseProvider,
+                  reportApiVersions,
+                  new Lazy<ApiVersionModel>( () => ApiVersionModel.Empty ) ) { }
+
+        internal RequestHandlerContext(
+            IErrorResponseProvider errorResponseProvider,
+            IReportApiVersions reportApiVersions,
+            Lazy<ApiVersionModel> apiVersions )
         {
             ErrorResponses = errorResponseProvider;
             reporter = reportApiVersions;
@@ -28,16 +35,19 @@
 
         internal string Code { get; set; } = string.Empty;
 
-        internal string[] AllowedMethods { get; set; } = Array.Empty<string>();
-
-        internal IList<object> Metadata { get; set; } = Array.Empty<object>();
-
-        internal void ReportApiVersions( HttpResponse response )
+        internal string[] AllowedMethods
         {
-            if ( reporter != null && apiVersions != null )
-            {
-                reporter.Report( response.Headers, apiVersions );
-            }
+            get => allowedMethods ?? Array.Empty<string>();
+            set => allowedMethods = value;
         }
+
+        internal IList<object> Metadata
+        {
+            get => metadata ??= new List<object>();
+            set => metadata = value;
+        }
+
+        internal void ReportApiVersions( HttpResponse response ) =>
+            reporter.Report( response.Headers, apiVersions );
     }
 }

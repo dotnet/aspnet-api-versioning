@@ -30,7 +30,10 @@
             Define<string?>( Information, 6, "Request contained the service API version '{ApiVersion}', which is not valid" );
 
         static readonly Action<ILogger, string[]?, Exception?> noActionsMatched =
-            Define<string[]?>( Debug, 3, "No actions matched the current request. Route values: {RouteValues}" );
+            Define<string[]?>( Debug, 7, "No actions matched the current request. Route values: {RouteValues}" );
+
+        static readonly Action<ILogger, string[]?, Exception?> apiVersionAmbiguous =
+            Define<string[]?>( Information, 8, "The requested API version is ambiguous. Requested API Versions: {ApiVersions}" );
 
         internal static void AmbiguousActions( this ILogger logger, string actionNames ) => ambiguousActions( logger, actionNames, null );
 
@@ -45,6 +48,11 @@
 
         internal static void ApiVersionInvalid( this ILogger logger, string? apiVersion ) => apiVersionInvalid( logger, apiVersion, null );
 
+        internal static void ApiVersionAmbiguous( this ILogger logger, string[]? apiVersions ) => apiVersionAmbiguous( logger, apiVersions, null );
+
+        internal static void ApiVersionAmbiguous( this ILogger logger, AmbiguousApiVersionException exception ) =>
+            logger.ApiVersionAmbiguous( exception.ApiVersions.Select( v => v.ToString() ).ToArray() );
+
         internal static void NoActionsMatched( this ILogger logger, IDictionary<string, object?> routeValueDictionary )
         {
             if ( !logger.IsEnabled( Debug ) )
@@ -52,13 +60,7 @@
                 return;
             }
 
-            var routeValues = default( string[] );
-
-            if ( routeValueDictionary != null )
-            {
-                routeValues = routeValueDictionary.Select( pair => pair.Key + "=" + Convert.ToString( pair.Value, InvariantCulture ) ).ToArray();
-            }
-
+            var routeValues = routeValueDictionary?.Select( pair => $"{pair.Key}={Convert.ToString( pair.Value, InvariantCulture )}" ).ToArray();
             noActionsMatched( logger, routeValues, null );
         }
     }
