@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc.Routing;
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Defines the behavior of the API versioning feature.
@@ -16,6 +17,12 @@
         /// <remarks>This property will be <c>null</c> unless versioning by URL segment and the incoming request
         /// matches the <see cref="ApiVersionRouteConstraint">API version route constraint</see>.</remarks>
         string? RouteParameter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the raw, unparsed API versions for the current request.
+        /// </summary>
+        /// <value>The unparsed API version values for the current request.</value>
+        IReadOnlyList<string> RawRequestedApiVersions { get; set; }
 
         /// <summary>
         /// Gets or sets the raw, unparsed API version for the current request.
