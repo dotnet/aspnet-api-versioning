@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Conventions;
 
-using Asp.Versioning.OData;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,11 +29,9 @@ public partial class ODataValidationSettingsConvention
             return;
         }
 
-        var context = new ODataQueryOptionDescriptionContext( ValidationSettings );
-        var model = apiDescription.EdmModel();
+        var context = new ODataQueryOptionDescriptionContext( apiDescription, ValidationSettings );
         var queryOptions = GetQueryOptions( apiDescription.ActionDescriptor.Configuration.GetDefaultQuerySettings(), context );
-        var singleResult = IsSingleResult( apiDescription, out var resultType );
-        var visitor = new ODataAttributeVisitor( context, model, queryOptions, resultType, singleResult );
+        var visitor = new ODataAttributeVisitor( context, queryOptions );
 
         visitor.Visit( apiDescription );
 
@@ -51,7 +48,7 @@ public partial class ODataValidationSettingsConvention
             parameterDescriptions.Add( SetAction( NewExpandParameter( context ), apiDescription ) );
         }
 
-        if ( singleResult )
+        if ( context.IsSingleResult )
         {
             return;
         }
@@ -101,27 +98,6 @@ public partial class ODataValidationSettingsConvention
             ParameterDescriptor = new ODataQueryOptionParameterDescriptor( name, type, defaultValue ),
             Source = FromUri,
         };
-
-    private static bool IsSingleResult( ApiDescription description, out Type? resultType )
-    {
-        var responseType = description.ResponseDescription.ResponseType;
-
-        if ( responseType == null )
-        {
-            resultType = default;
-            return true;
-        }
-
-        responseType = responseType.ExtractInnerType();
-
-        if ( responseType.IsEnumerable( out resultType ) )
-        {
-            return false;
-        }
-
-        resultType = responseType;
-        return true;
-    }
 
     private static ApiParameterDescription SetAction( ApiParameterDescription parameter, ApiDescription apiDescription )
     {

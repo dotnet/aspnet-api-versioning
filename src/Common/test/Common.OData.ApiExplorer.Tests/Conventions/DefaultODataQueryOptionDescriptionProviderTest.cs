@@ -26,7 +26,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         var message = FormatMessage( "Only a single, valid query option may be specified.", "queryOption" );
 
         // act
-        Action describe = () => provider.Describe( AllowedQueryOptions.None, new() );
+        Action describe = () => provider.Describe( AllowedQueryOptions.None, new( new() ) );
 
         // assert
         describe.Should().Throw<ArgumentException>().And.Message.Should().Be( message );
@@ -40,7 +40,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         var message = FormatMessage( "Only a single, valid query option may be specified.", "queryOption" );
 
         // act
-        Action describe = () => provider.Describe( Supported, new() );
+        Action describe = () => provider.Describe( Supported, new( new() ) );
 
         // assert
         describe.Should().Throw<ArgumentException>().And.Message.Should().Be( message );
@@ -54,7 +54,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         var message = FormatMessage( "The query option $skiptoken is not supported.", "queryOption" );
 
         // act
-        Action describe = () => provider.Describe( SkipToken, new() );
+        Action describe = () => provider.Describe( SkipToken, new( new() ) );
 
         // assert
         describe.Should().Throw<ArgumentException>().And.Message.Should().Be( message );
@@ -67,7 +67,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         var provider = new DefaultODataQueryOptionDescriptionProvider();
 
         // act
-        var description = provider.Describe( Count, new() );
+        var description = provider.Describe( Count, new( new() ) );
 
         // assert
         description.Should().Be( "Indicates whether the total count of items within a collection are returned in the result." );
@@ -82,7 +82,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         var provider = new DefaultODataQueryOptionDescriptionProvider();
 
         // act
-        var description = provider.Describe( Skip, new() { MaxSkip = maxSkip } );
+        var description = provider.Describe( Skip, new( new() ) { MaxSkip = maxSkip } );
 
         // assert
         description.Should().Be( expected );
@@ -97,7 +97,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         var provider = new DefaultODataQueryOptionDescriptionProvider();
 
         // act
-        var description = provider.Describe( Top, new() { MaxTop = maxTop } );
+        var description = provider.Describe( Top, new( new() ) { MaxTop = maxTop } );
 
         // assert
         description.Should().Be( expected );
@@ -111,7 +111,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
     {
         // arrange
         var provider = new DefaultODataQueryOptionDescriptionProvider();
-        var context = new ODataQueryOptionDescriptionContext() { MaxOrderByNodeCount = maxNodeCount };
+        var context = new ODataQueryOptionDescriptionContext( new() ) { MaxOrderByNodeCount = maxNodeCount };
 
         for ( var i = 0; i < properties.Length; i++ )
         {
@@ -132,7 +132,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
     {
         // arrange
         var provider = new DefaultODataQueryOptionDescriptionProvider();
-        var context = new ODataQueryOptionDescriptionContext();
+        var context = new ODataQueryOptionDescriptionContext( new() );
 
         for ( var i = 0; i < properties.Length; i++ )
         {
@@ -154,7 +154,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
     {
         // arrange
         var provider = new DefaultODataQueryOptionDescriptionProvider();
-        var context = new ODataQueryOptionDescriptionContext() { MaxExpansionDepth = maxDepth };
+        var context = new ODataQueryOptionDescriptionContext( new() ) { MaxExpansionDepth = maxDepth };
 
         for ( var i = 0; i < properties.Length; i++ )
         {
@@ -180,7 +180,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
     {
         // arrange
         var provider = new DefaultODataQueryOptionDescriptionProvider();
-        var context = new ODataQueryOptionDescriptionContext()
+        var context = new ODataQueryOptionDescriptionContext( new() )
         {
             MaxNodeCount = maxNodeCount,
             AllowedArithmeticOperators = arithmeticOperators,

@@ -2,9 +2,13 @@
 
 namespace Asp.Versioning.Conventions;
 
+using Asp.Versioning.OData;
+using Microsoft.OData.Edm;
 #if NETFRAMEWORK
 using Microsoft.AspNet.OData.Query;
+using System.Web.Http.Description;
 #else
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 #endif
@@ -15,8 +19,11 @@ using Microsoft.AspNetCore.OData.Query.Validator;
 #if !NETFRAMEWORK
 [CLSCompliant( false )]
 #endif
-public class ODataQueryOptionDescriptionContext
+public partial class ODataQueryOptionDescriptionContext
 {
+    private bool? scalar;
+    private IEdmModel? model;
+    private IEdmStructuredType? returnType;
     private List<string>? allowedSelectProperties;
     private List<string>? allowedExpandProperties;
     private List<string>? allowedFilterProperties;
@@ -25,19 +32,25 @@ public class ODataQueryOptionDescriptionContext
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQueryOptionDescriptionContext"/> class.
     /// </summary>
-    public ODataQueryOptionDescriptionContext() { }
+    /// <param name="apiDescription">The associated <see cref="ApiDescription">API description</see>.</param>
+    public ODataQueryOptionDescriptionContext( ApiDescription apiDescription ) =>
+        ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQueryOptionDescriptionContext"/> class.
     /// </summary>
+    /// <param name="apiDescription">The associated <see cref="ApiDescription">API description</see>.</param>
     /// <param name="validationSettings">The <see cref="ODataValidationSettings">validation settings</see> to derive the description context from.</param>
-    protected internal ODataQueryOptionDescriptionContext( ODataValidationSettings validationSettings )
+    protected internal ODataQueryOptionDescriptionContext(
+        ApiDescription apiDescription,
+        ODataValidationSettings validationSettings )
     {
         if ( validationSettings == null )
         {
             throw new ArgumentNullException( nameof( validationSettings ) );
         }
 
+        ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
         AllowedArithmeticOperators = validationSettings.AllowedArithmeticOperators;
         AllowedFunctions = validationSettings.AllowedFunctions;
         AllowedLogicalOperators = validationSettings.AllowedLogicalOperators;
@@ -49,6 +62,12 @@ public class ODataQueryOptionDescriptionContext
         MaxTop = validationSettings.MaxTop;
         MaxExpansionDepth = validationSettings.MaxExpansionDepth;
     }
+
+    /// <summary>
+    /// Gets the associated API description.
+    /// </summary>
+    /// <value>The associated <see cref="ApiDescription">API description</see>.</value>
+    public ApiDescription ApiDescription { get; }
 
     /// <summary>
     /// Gets or sets the allowed arithmetic operators.
@@ -127,4 +146,60 @@ public class ODataQueryOptionDescriptionContext
     /// </summary>
     /// <value>The max expansion depth for the $expand query option.</value>
     public int MaxExpansionDepth { get; set; }
+
+    /// <summary>
+    /// Gets the Entity Data Model (EDM) associated with the context.
+    /// </summary>
+    /// <value>The associated <see cref="IEdmModel">EDM</see> or <c>null</c>.</value>
+    public IEdmModel? Model => model ??= ResolveModel( ApiDescription );
+
+    /// <summary>
+    /// Gets the API return type.
+    /// </summary>
+    /// <value>The API <see cref="IEdmStructuredType">return type</see>, if any.</value>
+    public IEdmStructuredType? ReturnType
+    {
+        get
+        {
+            if ( scalar.HasValue )
+            {
+                return returnType;
+            }
+
+            scalar = HasSingleResult( ApiDescription, out var type );
+
+            if ( type != null )
+            {
+                var resolver = new StructuredTypeResolver( Model );
+                returnType = resolver.GetStructuredType( type );
+            }
+
+            return returnType;
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the API return type is scalar.
+    /// </summary>
+    /// <value>True if the API return type is scalar; otherwise, false.</value>
+    public bool IsSingleResult
+    {
+        get
+        {
+            if ( scalar.HasValue )
+            {
+                return scalar.Value;
+            }
+
+            scalar = HasSingleResult( ApiDescription, out var type );
+
+            if ( type != null )
+            {
+                var resolver = new StructuredTypeResolver( Model );
+                returnType = resolver.GetStructuredType( type );
+            }
+
+            return scalar.Value;
+        }
+    }
 }

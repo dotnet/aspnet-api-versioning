@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Conventions;
 
-using Asp.Versioning.OData;
 #if NETFRAMEWORK
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Query;
@@ -26,39 +25,22 @@ using static System.StringSplitOptions;
 internal sealed partial class ODataAttributeVisitor
 {
     private readonly ODataQueryOptionDescriptionContext context;
-    private readonly Type? resultType;
-    private readonly IEdmModel? model;
-    private readonly StructuredTypeResolver typeResolver;
 
     internal ODataAttributeVisitor(
         ODataQueryOptionDescriptionContext context,
-        IEdmModel? model,
-        AllowedQueryOptions allowedQueryOptions,
-        Type? resultType,
-        bool singleResult )
+        AllowedQueryOptions allowedQueryOptions )
     {
         this.context = context;
         AllowedQueryOptions = allowedQueryOptions;
-        this.resultType = resultType;
-        IsSingleResult = singleResult;
-        this.model = model;
-        typeResolver = new( model );
     }
 
     internal AllowedQueryOptions AllowedQueryOptions { get; private set; }
-
-    private bool IsSingleResult { get; }
 
     internal void Visit( ApiDescription apiDescription )
     {
         VisitAction( apiDescription.ActionDescriptor );
 
-        if ( resultType == null )
-        {
-            return;
-        }
-
-        var modelType = typeResolver.GetStructuredType( resultType );
+        var modelType = context.ReturnType;
 
         if ( modelType != null )
         {
@@ -68,7 +50,7 @@ internal sealed partial class ODataAttributeVisitor
 
     private void VisitModel( IEdmStructuredType modelType )
     {
-        var querySettings = model.GetAnnotationValue<ModelBoundQuerySettings>( modelType );
+        var querySettings = context.Model.GetAnnotationValue<ModelBoundQuerySettings>( modelType );
 
         if ( querySettings == null )
         {
@@ -82,7 +64,7 @@ internal sealed partial class ODataAttributeVisitor
         VisitSelect( querySettings, properties );
         VisitExpand( querySettings, properties );
 
-        if ( IsSingleResult )
+        if ( context.IsSingleResult )
         {
             return;
         }
