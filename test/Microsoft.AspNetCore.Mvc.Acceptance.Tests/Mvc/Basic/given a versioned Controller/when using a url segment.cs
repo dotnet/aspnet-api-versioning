@@ -66,7 +66,7 @@
         }
 
         [Fact]
-        public async Task then_get_returns_400_with_invalid_id()
+        public async Task then_get_returns_404_with_invalid_id()
         {
             // arrange
             var requestUrl = "api/v2/helloworld/abc";
@@ -74,7 +74,7 @@
             // note: the classic routing mechanism cannot disambiguate 400 vs 405
             // because the route constraint {id:int} completely eliminates the
             // candidate; however, endpoint routing works as expected
-            var statusCode = UsingEndpointRouting ? BadRequest : MethodNotAllowed;
+            var statusCode = UsingEndpointRouting ? NotFound : MethodNotAllowed;
 
             // act
             var response = await GetAsync( requestUrl );
