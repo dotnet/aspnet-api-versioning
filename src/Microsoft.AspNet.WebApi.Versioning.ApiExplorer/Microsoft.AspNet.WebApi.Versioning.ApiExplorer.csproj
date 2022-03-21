@@ -12,11 +12,15 @@
  </PropertyGroup>
 
  <ItemGroup>
-   <Compile Include="..\Shared\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+  <Compile Include="..\Shared\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
  </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="microsoft.netframework.referenceassemblies.net45" Version="1.0.2" PrivateAssets="All" />
  </ItemGroup>
 
  <ItemGroup>
