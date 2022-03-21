@@ -28,7 +28,7 @@
             // arrange
             var odataPath = ParseUrl( requestUrl );
             var feature = new Mock<IODataFeature>();
-            var features = new Mock<IFeatureCollection>();
+            var features = new FeatureCollection();
             var actionDescriptorCollectionProvider = new Mock<IActionDescriptorCollectionProvider>();
             var serviceProvider = new Mock<IServiceProvider>();
             var request = new Mock<HttpRequest>();
@@ -52,9 +52,10 @@
 
                 return sp.Object;
             } );
-            features.Setup( f => f.Get<IApiVersioningFeature>() ).Returns( () => new ApiVersioningFeature( httpContext.Object ) );
-            features.Setup( f => f.Get<IODataFeature>() ).Returns( feature.Object );
+            features.Set<IApiVersioningFeature>( new ApiVersioningFeature( httpContext.Object ) );
+            features.Set( feature.Object );
             actionDescriptorCollectionProvider.SetupGet( p => p.ActionDescriptors ).Returns( new ActionDescriptorCollection( items, 0 ) );
+            serviceProvider.Setup( sp => sp.GetService( typeof( IApiVersionReader ) ) ).Returns( new QueryStringApiVersionReader() );
             serviceProvider.Setup( sp => sp.GetService( typeof( IActionDescriptorCollectionProvider ) ) ).Returns( actionDescriptorCollectionProvider.Object );
             serviceProvider.Setup( sp => sp.GetService( typeof( IApiVersionSelector ) ) ).Returns( Mock.Of<IApiVersionSelector> );
             serviceProvider.Setup( sp => sp.GetService( typeof( IODataRouteCollectionProvider ) ) )
@@ -67,7 +68,8 @@
             request.SetupProperty( r => r.Method, verb );
             request.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
             request.SetupProperty( r => r.Query, Mock.Of<IQueryCollection>() );
-            httpContext.SetupGet( c => c.Features ).Returns( features.Object );
+            request.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
+            httpContext.SetupGet( c => c.Features ).Returns( features );
             httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
             httpContext.SetupGet( c => c.Request ).Returns( request.Object );
 
