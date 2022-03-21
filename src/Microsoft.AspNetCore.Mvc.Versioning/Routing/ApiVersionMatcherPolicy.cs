@@ -10,6 +10,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using static Microsoft.AspNetCore.Mvc.Versioning.ApiVersionMapping;
     using static Microsoft.AspNetCore.Mvc.Versioning.ErrorCodes;
@@ -98,7 +99,7 @@
 
             var (matched, hasCandidates) = MatchApiVersion( candidates, apiVersion );
 
-            if ( !matched && hasCandidates )
+            if ( !matched && hasCandidates && !DifferByRouteConstraintsOnly( candidates ) )
             {
                 httpContext.SetEndpoint( ClientError( httpContext, candidates ) );
             }
@@ -182,6 +183,66 @@
             }
 
             return (true, hasCandidates);
+        }
+
+        static bool DifferByRouteConstraintsOnly( CandidateSet candidates )
+        {
+            if ( candidates.Count < 2 )
+            {
+                return false;
+            }
+
+            // HACK: edge case where the only differences are route template semantics.
+            // the established behavior is 400 when an endpoint 'could' match, but doesn't.
+            // this will not work for the scenario:
+            //
+            // * 1.0 = values/{id}
+            // * 2.0 = values/{id:int}
+            //
+            // Where the requested version is 2.0 and {id} is 'abc'. Users expect 404 in this
+            // scenario. Both candidates have been eliminated, but the policy doesn't know why.
+            // the only differences are route constraints; otherwise, the templates are equivalent.
+            //
+            // for the scenario:
+            //
+            // * 1.0 = values/{id}
+            // * 2.0 = values/{id}
+            //
+            // but 3.0 is requested, 400 should be returned if we made it this far
+            const string ReplacementPattern = "{$1}";
+            var pattern = new Regex( "{([^:]+):[^}]+}", RegexOptions.Singleline | RegexOptions.IgnoreCase );
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            string? template = default;
+            string? normalizedTemplate = default;
+
+            for ( var i = 0; i < candidates.Count; i++ )
+            {
+                ref var candidate = ref candidates[i];
+
+                if ( candidate.Endpoint is not RouteEndpoint endpoint )
+                {
+                    return false;
+                }
+
+                var otherTemplate = endpoint.RoutePattern.RawText ?? string.Empty;
+
+                if ( template is null )
+                {
+                    template = otherTemplate;
+                    normalizedTemplate = pattern.Replace( otherTemplate, ReplacementPattern );
+                }
+                else if ( !comparer.Equals( template, otherTemplate ) )
+                {
+                    var normalizedOtherTemplate = pattern.Replace( otherTemplate, ReplacementPattern );
+
+                    if ( comparer.Equals( normalizedTemplate, normalizedOtherTemplate ) )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         bool IsRequestedApiVersionAmbiguous( HttpContext httpContext, out ApiVersion? apiVersion )
