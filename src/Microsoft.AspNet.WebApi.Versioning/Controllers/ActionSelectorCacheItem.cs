@@ -13,6 +13,7 @@
     using System.Web.Http.Controllers;
     using System.Web.Http.Routing;
     using System.Web.Http.Services;
+    using static Microsoft.Web.Http.Versioning.ApiVersionMapping;
     using static System.Net.HttpStatusCode;
     using static System.StringComparer;
 
@@ -34,30 +35,27 @@
             readonly CandidateAction[] combinedCandidateActions;
             readonly IDictionary<HttpActionDescriptor, string[]> actionParameterNames = new Dictionary<HttpActionDescriptor, string[]>();
             readonly ILookup<string, HttpActionDescriptor> combinedActionNameMapping;
-            readonly HashSet<HttpMethod> allowedMethods = new HashSet<HttpMethod>();
             StandardActionSelectionCache? standardActions;
 
             internal ActionSelectorCacheItem( HttpControllerDescriptor controllerDescriptor )
             {
                 this.controllerDescriptor = controllerDescriptor;
 
-                var allMethods = this.controllerDescriptor.ControllerType.GetMethods( BindingFlags.Instance | BindingFlags.Public );
-                var validMethods = Array.FindAll( allMethods, IsValidActionMethod );
+                var validMethods = this.controllerDescriptor.ControllerType
+                                                          .GetMethods( BindingFlags.Instance | BindingFlags.Public )
+                                                          .Where( IsValidActionMethod )
+                                                          .ToArray();
 
                 combinedCandidateActions = new CandidateAction[validMethods.Length];
 
                 for ( var i = 0; i < validMethods.Length; i++ )
                 {
-                    var method = validMethods[i];
-                    var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, method );
-                    var actionBinding = actionDescriptor.ActionBinding;
+                    var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, validMethods[i] );
 
-                    allowedMethods.AddRange( actionDescriptor.SupportedHttpMethods );
                     combinedCandidateActions[i] = new CandidateAction( actionDescriptor );
-
                     actionParameterNames.Add(
                         actionDescriptor,
-                        actionBinding.ParameterBindings
+                        actionDescriptor.ActionBinding.ParameterBindings
                             .Where( binding => !binding.Descriptor.IsOptional && binding.Descriptor.ParameterType.CanConvertFromString() && binding.WillReadUri() )
                             .Select( binding => binding.Descriptor.Prefix ?? binding.Descriptor.ParameterName ).ToArray() );
                 }
@@ -193,6 +191,27 @@
                 return selectedCandidates.Select( c => new CandidateHttpActionDescriptor( c ) ).ToArray();
             }
 
+            IEnumerable<HttpMethod> GetAllowedMethods( HttpControllerContext controllerContext )
+            {
+                var request = controllerContext.Request;
+                var apiModel = controllerContext.ControllerDescriptor.GetApiVersionModel();
+                var version = apiModel.IsApiVersionNeutral ? ApiVersion.Neutral : request.ApiVersionProperties().RequestedApiVersion!;
+                var httpMethods = new HashSet<HttpMethod>();
+
+                for ( var i = 0; i < combinedCandidateActions.Length; i++ )
+                {
+                    var actionDescriptor = combinedCandidateActions[i].ActionDescriptor;
+                    var endpointModel = actionDescriptor.GetApiVersionModel( Explicit );
+
+                    if ( endpointModel.IsApiVersionNeutral || endpointModel.ImplementedApiVersions.Contains( version ) )
+                    {
+                        httpMethods.AddRange( actionDescriptor.SupportedHttpMethods );
+                    }
+                }
+
+                return httpMethods;
+            }
+
             HttpResponseMessage CreateSelectionError( HttpControllerContext controllerContext )
             {
                 var actionsFoundByParams = FindMatchingActions( controllerContext, ignoreVerbs: true );
@@ -204,9 +223,10 @@
 
                 var request = controllerContext.Request;
                 var model = controllerContext.ControllerDescriptor.GetApiVersionModel();
+                var httpMethods = GetAllowedMethods( controllerContext );
                 var exceptionFactory = new HttpResponseExceptionFactory( request, new Lazy<ApiVersionModel>( () => model ) );
 
-                return exceptionFactory.CreateMethodNotAllowedResponse( model.IsApiVersionNeutral, allowedMethods );
+                return exceptionFactory.CreateMethodNotAllowedResponse( model.IsApiVersionNeutral, httpMethods );
             }
 
             HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext )
@@ -276,9 +296,10 @@
                     {
                         var request = controllerContext.Request;
                         var model = controllerContext.ControllerDescriptor.GetApiVersionModel();
+                        var httpMethods = GetAllowedMethods( controllerContext );
                         var exceptionFactory = new HttpResponseExceptionFactory( request, new Lazy<ApiVersionModel>( () => model ) );
 
-                        throw exceptionFactory.NewMethodNotAllowedException( model.IsApiVersionNeutral, allowedMethods );
+                        throw exceptionFactory.NewMethodNotAllowedException( model.IsApiVersionNeutral, httpMethods );
                     }
 
                     var candidatesFoundByName = new CandidateAction[actionsFoundByName.Length];
