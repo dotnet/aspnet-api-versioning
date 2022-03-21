@@ -51,7 +51,7 @@
         internal static void ApiVersionAmbiguous( this ILogger logger, string[]? apiVersions ) => apiVersionAmbiguous( logger, apiVersions, null );
 
         internal static void ApiVersionAmbiguous( this ILogger logger, AmbiguousApiVersionException exception ) =>
-            logger.ApiVersionAmbiguous( exception.ApiVersions.Select( v => v.ToString() ).ToArray() );
+            logger.ApiVersionAmbiguous( exception.ApiVersions.ToArray() );
 
         internal static void NoActionsMatched( this ILogger logger, IDictionary<string, object?> routeValueDictionary )
         {

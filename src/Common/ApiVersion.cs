@@ -393,7 +393,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True if the objects are not equal; otherwise, false.</returns>
         public static bool operator !=( ApiVersion? version1, ApiVersion? version2 ) =>
-             version1 is null ? version2 is object : !version1.Equals( version2 );
+             version1 is null ? version2 is not null : !version1.Equals( version2 );
 
         /// <summary>
         /// Overloads the less than operator.
@@ -402,7 +402,7 @@ namespace Microsoft.AspNetCore.Mvc
         /// <param name="version2">The <see cref="ApiVersion"/> to compare against.</param>
         /// <returns>True the first object is less than the second object; otherwise, false.</returns>
         public static bool operator <( ApiVersion? version1, ApiVersion? version2 ) =>
-            version1 is null ? version2 is object : version1.CompareTo( version2 ) < 0;
+            version1 is null ? version2 is not null : version1.CompareTo( version2 ) < 0;
 
         /// <summary>
         /// Overloads the less than or equal to operator.
