@@ -67,6 +67,7 @@
                 ControllerName = action.ControllerName,
                 ControllerTypeInfo = action.ControllerTypeInfo,
                 DisplayName = action.DisplayName,
+                EndpointMetadata = action.EndpointMetadata,
                 FilterDescriptors = action.FilterDescriptors,
                 MethodInfo = action.MethodInfo,
                 Parameters = action.Parameters,
