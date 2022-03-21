@@ -23,6 +23,10 @@
  </ItemGroup>
 
  <ItemGroup>
+  <PackageReference Include="microsoft.netframework.referenceassemblies.net45" Version="1.0.2" PrivateAssets="All" />
+ </ItemGroup>
+
+ <ItemGroup>
   <Reference Include="Microsoft.CSharp" />
   <Reference Include="System" />
   <Reference Include="System.ComponentModel.DataAnnotations" />
