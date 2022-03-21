@@ -106,6 +106,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         }
 
         var groupResults = new List<ApiDescription>( capacity: results.Count );
+        var unversioned = default( List<ApiDescription> );
 
         foreach ( var version in FlattenApiVersions( results ) )
         {
@@ -118,6 +119,12 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
                 if ( !ShouldExploreAction( action, version ) )
                 {
+                    if ( IsUnversioned( action ) )
+                    {
+                        unversioned ??= new();
+                        unversioned.Add( result );
+                    }
+
                     continue;
                 }
 
@@ -147,6 +154,16 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         {
             results.Add( groupResults[i] );
         }
+
+        if ( unversioned == null )
+        {
+            return;
+        }
+
+        for ( var i = 0; i < unversioned.Count; i++ )
+        {
+            results.Add( unversioned[i] );
+        }
     }
 
     /// <summary>
@@ -155,6 +172,21 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// <param name="context">The current <see cref="ApiDescriptionProviderContext">execution context</see>.</param>
     /// <remarks>The default implementation performs no operation.</remarks>
     public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context ) { }
+
+    private static bool IsUnversioned( ActionDescriptor action )
+    {
+        var endpointMetadata = action.EndpointMetadata;
+
+        for ( var i = 0; i < endpointMetadata.Count; i++ )
+        {
+            if ( endpointMetadata[i] is ApiVersionMetadata metadata )
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private IEnumerable<ApiVersion> FlattenApiVersions( IList<ApiDescription> descriptions )
     {
