@@ -192,10 +192,10 @@
             }
             catch ( AmbiguousApiVersionException ex )
             {
-                Logger.LogInformation( ex.Message );
+                Logger.ApiVersionAmbiguous( ex );
                 apiVersion = default;
 
-                var handlerContext = new RequestHandlerContext( Options.ErrorResponses )
+                var handlerContext = new RequestHandlerContext( Options.ErrorResponses, ApiVersionReporter )
                 {
                     Code = AmbiguousApiVersion,
                     Message = ex.Message,
