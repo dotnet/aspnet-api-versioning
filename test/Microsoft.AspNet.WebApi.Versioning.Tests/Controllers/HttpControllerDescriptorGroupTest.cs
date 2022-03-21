@@ -56,19 +56,11 @@
 
             descriptor1.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "1.0" ) } );
-            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
-                       .Returns( () => new Collection<IApiVersionProvider>() );
-            descriptor1.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
-                       .Returns( () => new Collection<IApiVersionNeutral>() );
             descriptor1.Object.Configuration = configuration;
             descriptor1.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
 
             descriptor2.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
                        .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "2.0" ) } );
-            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
-                       .Returns( () => new Collection<IApiVersionProvider>() );
-            descriptor2.Setup( d => d.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) )
-                       .Returns( () => new Collection<IApiVersionNeutral>() );
             descriptor2.Object.Configuration = configuration;
             descriptor2.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 2, 0 ) );
 
