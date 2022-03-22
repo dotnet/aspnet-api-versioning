@@ -1,0 +1,17 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Issue with ASP.NET Core
+    url:  https://github.com/dotnet/aspnetcore/issues/new/choose
+    about: Please open issues relating to ASP.NET Core in dotnet/aspnetcore.
+  - name: Issue with OData
+    url:  https://github.com/OData/AspNetCoreOData/issues/new/choose
+    about: Please open issues relating to OData for ASP.NET Core in OData/AspNetCoreOData.
+  - name: Issue with .NET runtime or core .NET libraries
+    url:  https://github.com/dotnet/runtime/issues/new/choose
+    about: Please open issues relating to the .NET runtime or core .NET libraries in dotnet/runtime.
+  - name: Issue with ASP.NET Web API
+    url:  https://github.com/aspnet/AspNetWebStack/issues/new/choose
+    about: Please open issues relating to ASP.NET Web API in aspnet/AspNetWebStack.
+  - name: Issue with OData (Web API)
+    url:  https://github.com/OData/WebApi/issues/new/choose
+    about: Please open issues relating to OData for ASP.NET Web API in OData/WebApi.
