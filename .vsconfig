@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "components": [
+    "Microsoft.Net.Component.4.7.2.TargetingPack",
+    "Microsoft.Net.Component.4.8.SDK",
+    "Microsoft.Net.Component.4.8.TargetingPack",
+    "Microsoft.VisualStudio.Workload.NetCoreTools",
+    "Microsoft.VisualStudio.Workload.NetWeb"
+  ]
+}
