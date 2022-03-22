@@ -11,7 +11,8 @@
 		"hbenl.vscode-test-explorer-liveshare",
 		"EditorConfig.EditorConfig",
 		"k--kato.docomment",
-		"dbaeumer.vscode-eslint"
+		"dbaeumer.vscode-eslint",
+		"VisualStudioExptTeam.vscodeintellicode"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": []

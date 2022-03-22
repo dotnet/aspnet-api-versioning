@@ -21,13 +21,15 @@
     "cref",
     "xunit"
   ],
-  "omnisharp.enableRoslynAnalyzers": true,
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "dotnet-test-explorer.runInParallel": true,
   "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj",
   "editor.formatOnType": true,
   "omnisharp.enableImportCompletion": true,
+  "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.organizeImportsOnFormat": true,
-  "omnisharp.useModernNet": true
+  "omnisharp.useModernNet": true,
+  "omnisharp.enableMsBuildLoadProjectsOnDemand": true,
+  "omnisharp.enableEditorConfigSupport": true
 }
