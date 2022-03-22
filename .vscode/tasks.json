@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "type": "pickString",
+            "default": "Debug",
+            "options": [
+                "Debug",
+                "Release"
+            ],
+            "id": "configurationType",
+            "description": "Select configuration type",
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Restore projects",
+            "type": "shell",
+            "command": "dotnet restore",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Build entire repository (Debug/Release)",
+            "type": "shell",
+            "command": "dotnet build --configuration ${input:configurationType}",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run all test projects",
+            "type": "shell",
+            "command": "dotnet test",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Pack assets",
+            "type": "shell",
+            "command": "dotnet pack --configuration Release",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Clean artifacts",
+            "type": "shell",
+            "command": "dotnet clean",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

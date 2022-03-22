@@ -1,6 +1,4 @@
 ﻿{
-  // https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/EnableConfiguration.md
-
   "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
   "settings": {
     "documentationRules": {
@@ -11,8 +9,7 @@
       "documentInternalElements": false,
       "documentPrivateElements": false,
       "documentPrivateFields": false,
-      "variables": {
-      },
+      "variables": {},
       "xmlHeader": false
     },
     "layoutRules": {

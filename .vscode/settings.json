@@ -1,0 +1,33 @@
+{
+  "files.trimTrailingWhitespace": true,
+  "files.associations": {
+    "*.*proj": "xml",
+    "*.*projitems": "xml",
+    "*.props": "xml",
+    "*.targets": "xml",
+    "*.tasks": "xml",
+    "*.resx": "xml",
+  },
+  "files.exclude": {
+    ".vs": true,
+    "**/*.sln": true,
+    "**/*.slnf": true,
+    "**/*.msbuildproj": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/node_modules": true
+  },
+  "cSpell.words": [
+    "cref",
+    "xunit"
+  ],
+  "omnisharp.enableRoslynAnalyzers": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "dotnet-test-explorer.runInParallel": true,
+  "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj",
+  "editor.formatOnType": true,
+  "omnisharp.enableImportCompletion": true,
+  "omnisharp.organizeImportsOnFormat": true,
+  "omnisharp.useModernNet": true
+}
