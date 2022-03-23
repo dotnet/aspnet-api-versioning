@@ -1,0 +1,50 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ main ]
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 8 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        queries: security-and-quality
+        languages: csharp
+
+    # build a temporary *.slnf file that only contains source projects and put it in ~/obj
+    # so that it is not tracked by git. then run 'dotnet build' using the *.slnf, which
+    # will preserve the dependency order and configuration of the *.sln
+    - name: Build Source
+      shell: pwsh
+      run: |
+        $start = (Get-Location).Path.Length + 1
+        $sln = Join-Path '..' 'asp.sln'
+        $projects = Get-ChildItem src -Include src -Recurse | `
+                    ForEach-Object { Get-ChildItem $_.FullName -Filter *.csproj -Recurse } | `
+                    ForEach-Object { $_.FullName.Substring($start) }
+        $json = ConvertTo-Json(New-Object PSObject -Property @{solution=@{path=$sln;projects=$projects}})
+        $obj = New-Item -Path 'obj' -ItemType Directory -Force
+        $slnf = New-Item -Path (Join-Path $obj 'codeql.slnf') -ItemType File -Value $json -Force
+
+        dotnet build $slnf.FullName --configuration Release
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
