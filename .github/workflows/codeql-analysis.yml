@@ -7,37 +7,42 @@ on:
       - 'dependabot/**'
   pull_request:
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 8 * * 1'
   workflow_dispatch:
 
 jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-        with:
-          queries: security-and-quality
-          languages: csharp
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        queries: security-and-quality
+        languages: csharp
 
-      - name: Build solution
-        shell: pwsh
-        run: |
-          $buildConfiguration = "Release"
-          $useSharedCompilation = "false"
+    - name: Build solution
+      shell: pwsh
+      run: |
+        $start = (Get-Location).Path.Length + 1
+        $sln = Join-Path '..' 'ApiVersioning.sln'
+        $projects = Get-ChildItem src -Include *.csproj -Recurse | `
+                    ForEach-Object { $_.FullName.Substring($start) }
+        $json = ConvertTo-Json(New-Object PSObject -Property @{solution=@{path=$sln;projects=$projects}})
+        $obj = New-Item -Path 'obj' -ItemType Directory -Force
+        $slnf = New-Item -Path (Join-Path $obj 'codeql.slnf') -ItemType File -Value $json -Force
 
-          Get-ChildItem src -Include *.csproj -Recurse | ForEach-Object { 
-            dotnet build $_.FullName `
-            -property:UseSharedCompilation=$useSharedCompilation `
-            --configuration $buildConfiguration `
-            --no-incremental
-          }
+        dotnet build $slnf.FullName --configuration Release
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
 
 # Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)
