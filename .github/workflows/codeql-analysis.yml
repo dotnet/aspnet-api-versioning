@@ -2,11 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main ]
     branches-ignore:
       - 'dependabot/**'
   pull_request:
-    branches: [ main ]
   schedule:
     - cron: '0 8 * * 1'
 
