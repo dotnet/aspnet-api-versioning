@@ -3,7 +3,7 @@
  <PropertyGroup>
   <VersionPrefix>5.1.0</VersionPrefix>
   <AssemblyVersion>5.1.0.0</AssemblyVersion>
-  <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+  <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
   <AssemblyTitle>Microsoft ASP.NET Core API Versioning</AssemblyTitle>
   <Description>ASP.NET Core MVC API explorer functionality for discovering metadata such as the list of API-versioned controllers and actions, and their URLs and allowed HTTP methods.</Description>
   <RootNamespace>Microsoft.AspNetCore.Mvc.ApiExplorer</RootNamespace>
