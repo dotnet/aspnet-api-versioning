@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.Build.NoTargets/3.3.0">
  <PropertyGroup>
   <TargetFramework>netstandard1.0</TargetFramework>
+  <IsPackable>false</IsPackable>
  </PropertyGroup>
  <ItemGroup>
   <None Include="**\*.*" Exclude="*.msbuildproj;obj\**\*.*" />

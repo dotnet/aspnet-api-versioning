@@ -8,10 +8,11 @@
  </PropertyGroup>
 
  <PropertyGroup>
-  <IsPackable>true</IsPackable>
   <Nullable>enable</Nullable>
   <IsSharedProject>false</IsSharedProject>
   <IsSharedProject Condition=" ('$(MSBuildProjectExtension)' == '.shproj') OR ('$(MSBuildProjectExtension)' == '.msbuildproj') ">true</IsSharedProject>
+  <IsPackable>true</IsPackable>
+  <IsPackable Condition=" '$(IsSharedProject)' == 'true' ">false</IsPackable>
   <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
   <IsAspNetCore>$(MSBuildProjectDirectory.Contains('AspNetCore'))</IsAspNetCore>
  </PropertyGroup>

@@ -5,7 +5,6 @@
   <IsPackable>true</IsPackable>
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/dotnet/aspnet-api-versioning</RepositoryUrl>
-  <PackageIconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
   <PackageIcon>icon.png</PackageIcon>
   <PackageProjectUrl>https://github.com/dotnet/aspnet-api-versioning/wiki</PackageProjectUrl>
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
