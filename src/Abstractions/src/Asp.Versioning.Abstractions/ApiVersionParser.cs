@@ -21,7 +21,7 @@ using Text = System.ReadOnlySpan<char>;
 /// <summary>
 /// Represents the default API version parser.
 /// </summary>
-public partial class ApiVersionParser : IApiVersionParser
+public class ApiVersionParser : IApiVersionParser
 {
     private static ApiVersionParser? @default;
 
