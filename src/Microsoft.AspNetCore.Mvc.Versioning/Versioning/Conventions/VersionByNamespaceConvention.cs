@@ -29,9 +29,7 @@
                 throw new ArgumentNullException( nameof( controllerModel ) );
             }
 
-            var text = GetRawApiVersion( controllerModel.ControllerType.Namespace! );
-
-            if ( !ApiVersion.TryParse( text, out var apiVersion ) )
+            if ( GetApiVersion( controllerModel.ControllerType.Namespace! ) is not ApiVersion apiVersion )
             {
                 return false;
             }
@@ -40,11 +38,11 @@
 
             if ( deprecated )
             {
-                controller.HasDeprecatedApiVersion( apiVersion! );
+                controller.HasDeprecatedApiVersion( apiVersion );
             }
             else
             {
-                controller.HasApiVersion( apiVersion! );
+                controller.HasApiVersion( apiVersion );
             }
 
             return true;

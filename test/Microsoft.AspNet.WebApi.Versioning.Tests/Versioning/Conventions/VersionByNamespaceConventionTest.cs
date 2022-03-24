@@ -115,6 +115,7 @@
                 yield return new object[] { "Contoso.Api.v2018_04_01_1_0_Beta.Controllers", "2018-04-01.1.0-Beta" };
                 yield return new object[] { "MyRestaurant.Vegetarian.Food.v1_1.Controllers", "1.1" };
                 yield return new object[] { "VersioningSample.V5.Controllers", "5.0" };
+                yield return new object[] { "VersioningSample.V10_0.Controllers", "10.0" };
             }
         }
 
