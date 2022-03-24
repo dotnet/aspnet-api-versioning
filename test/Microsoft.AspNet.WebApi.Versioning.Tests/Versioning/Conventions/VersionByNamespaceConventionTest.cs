@@ -86,7 +86,6 @@
             var controllerType = new TestType( "Contoso.Api.Controllers" );
             var attributes = new Attribute[0];
             var controllerModel = new TestHttpControllerDescriptor( controllerType.GetTypeInfo(), attributes );
-            var controller = new Mock<IControllerConventionBuilder>();
             var convention = new VersionByNamespaceConvention();
 
             // act
@@ -136,7 +135,7 @@
                 this.attributes = attributes;
             }
 
-            public override Collection<T> GetCustomAttributes<T>( bool inherit ) => new Collection<T>( attributes.OfType<T>().ToArray() );
+            public override Collection<T> GetCustomAttributes<T>( bool inherit ) => new( attributes.OfType<T>().ToArray() );
         }
     }
 }

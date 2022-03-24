@@ -31,7 +31,7 @@
     /// </summary>
     public class ODataApiExplorer : VersionedApiExplorer
     {
-        static readonly Regex odataVariableRegex = new Regex( $"{{\\*{ODataRouteConstants.ODataPath}}}", CultureInvariant | Compiled | IgnoreCase );
+        static readonly Regex odataVariableRegex = new( $"{{\\*{ODataRouteConstants.ODataPath}}}", CultureInvariant | Compiled | IgnoreCase );
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataApiExplorer"/> class.
@@ -77,7 +77,7 @@
                 throw new ArgumentNullException( nameof( actionDescriptor ) );
             }
 
-            if ( !( route is ODataRoute ) )
+            if ( route is not ODataRoute )
             {
                 return base.ShouldExploreAction( actionRouteParameterValue, actionDescriptor, route, apiVersion );
             }
@@ -154,7 +154,7 @@
                 throw new ArgumentNullException( nameof( controllerMappings ) );
             }
 
-            if ( !( route is ODataRoute ) )
+            if ( route is not ODataRoute )
             {
                 return base.ExploreRouteControllers( controllerMappings, route, apiVersion );
             }
@@ -333,7 +333,7 @@
 
         static bool WillReadUri( HttpParameterBinding parameterBinding )
         {
-            if ( !( parameterBinding is IValueProviderParameterBinding binding ) )
+            if ( parameterBinding is not IValueProviderParameterBinding binding )
             {
                 return false;
             }

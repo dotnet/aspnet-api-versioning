@@ -23,8 +23,7 @@
     /// </summary>
     public partial class VersionedAttributeRoutingConvention
     {
-        readonly ConcurrentDictionary<ApiVersion, IReadOnlyDictionary<ODataPathTemplate, ControllerActionDescriptor>> attributeMappingsPerApiVersion =
-            new ConcurrentDictionary<ApiVersion, IReadOnlyDictionary<ODataPathTemplate, ControllerActionDescriptor>>();
+        readonly ConcurrentDictionary<ApiVersion, IReadOnlyDictionary<ODataPathTemplate, ControllerActionDescriptor>> attributeMappingsPerApiVersion = new();
 
         /// <summary>
         /// Gets the name of the route associated the routing convention.
@@ -101,7 +100,11 @@
 
             if ( pathTemplate.StartsWith( "/", Ordinal ) )
             {
+#if NETFRAMEWORK
                 pathTemplate = pathTemplate.Substring( 1 );
+#else
+                pathTemplate = pathTemplate[1..];
+#endif
             }
 
             return ODataPathTemplateHandler.SafeParseTemplate( pathTemplate, serviceProvider );

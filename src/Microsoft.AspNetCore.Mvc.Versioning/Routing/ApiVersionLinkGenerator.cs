@@ -64,7 +64,11 @@
         public override string? GetUriByAddress<TAddress>(
             TAddress address,
             RouteValueDictionary values,
+#if NET6_0_OR_GREATER
+            string? scheme,
+#else
             string scheme,
+#endif
             HostString host,
             PathString pathBase = default,
             FragmentString fragment = default,
