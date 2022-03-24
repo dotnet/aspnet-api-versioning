@@ -1,1 +1,1 @@
-﻿https://github.com/microsoft/aspnet-api-versioning/releases/tag/v4.2.0
+﻿
