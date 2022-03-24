@@ -1,25 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
- <Target Name="GenerateReleaseNotes" BeforeTargets="GenerateNuspec" Label="NuGet">
+ <PropertyGroup>
+  <SourcePackageReadmeFile>$(MSBuildProjectDirectory)\README.md</SourcePackageReadmeFile>
+  <TargetPackageReadmeFile>$(BaseIntermediateOutputPath)\README.md</TargetPackageReadmeFile>
+ </PropertyGroup>
+
+ <PropertyGroup>
+  <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeNuGetReadme</TargetsForTfmSpecificContentInPackage>
+ </PropertyGroup>
+
+ <Target Name="IncludeNuGetReadme">
+  <ItemGroup>
+   <TfmSpecificPackageFile Include="$(TargetPackageReadmeFile)" PackagePath="" />
+  </ItemGroup>
+ </Target>
+
+ <!--
+ reads the lines from the 'ReleaseNotes.txt' file, if any, and transforms them into a bulleted list.
+ if there are no specific release notes, then the corresponding release link is used. minor and
+ patch versions will typically have release notes. major releases often  have too many items to list
+ and are better served by the official release page. the original read me file is copied to the
+ intermediate output, the releases notes appended, and the final file is packed in the package
+ -->
+ <Target Name="GenerateReadme"
+         BeforeTargets="GenerateNuspec"
+         Condition="Exists('$(SourcePackageReadmeFile)')"
+         Label="NuGet">
 
   <PropertyGroup>
    <ReleaseNotesFile>$(MSBuildProjectDirectory)\ReleaseNotes.txt</ReleaseNotesFile>
+   <PackageReleaseNotes>https://github.com/dotnet/aspnet-api-versioning/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
   </PropertyGroup>
-  
+
+  <!-- if there is banner text, merge as one big string
+       note: ReadLinesFromFile as items won't work here because empty lines are discarded -->
+  <PropertyGroup Condition=" '$(ReadmeBanner)' != '' ">
+   <ReadmeContent>| :mega: $(ReadmeBanner) |
+|-|
+
+$([System.IO.File]::ReadAllText('$(SourcePackageReadmeFile)'))
+   </ReadmeContent>
+  </PropertyGroup>
+
+  <!-- write all text with the banner -->
+  <WriteLinesToFile File="$(TargetPackageReadmeFile)"
+                    Lines="$(ReadmeContent)"
+                    Overwrite="true"
+                    Condition=" '$(ReadmeBanner)' != '' "/>
+
+  <!-- just copy the file without a banner -->
+  <Copy SourceFiles="$(SourcePackageReadmeFile)"
+        DestinationFiles="$(TargetPackageReadmeFile)"
+        OverwriteReadOnlyFiles="true"
+        Condition=" '$(ReadmeBanner)' == '' " />
+
   <ReadLinesFromFile File="$(ReleaseNotesFile)" Condition="Exists('$(ReleaseNotesFile)')" >
    <Output TaskParameter="Lines" ItemName="ReleaseNotes"/>
   </ReadLinesFromFile>
 
-  <ItemGroup Condition=" @(ReleaseNotes->Count()) == 0 ">
-   <ReleaseNotes Include="https://github.com/Microsoft/aspnet-api-versioning/releases/tag/v$(PackageVersion)" />
-  </ItemGroup>
+  <!-- append link to release -->
+  <WriteLinesToFile File="$(TargetPackageReadmeFile)"
+                    Lines="$(PackageReleaseNotes)"
+                    Condition="@(ReleaseNotes->Count()) == 0" />
 
-  <PropertyGroup>
-   <ReleaseNoteCount>@(ReleaseNotes->Count())</ReleaseNoteCount>
-   <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &lt; 2 " >@(ReleaseNotes->'%(Identity)')</PackageReleaseNotes>
-   <PackageReleaseNotes Condition=" $(ReleaseNoteCount) &gt; 1 " >@(ReleaseNotes->'• %(Identity)','%0D%0A')</PackageReleaseNotes>
-  </PropertyGroup>
+  <!-- append specific release notes -->
+  <WriteLinesToFile File="$(TargetPackageReadmeFile)"
+                    Lines="@(ReleaseNotes->'- %(Identity)')"
+                    Condition="@(ReleaseNotes->Count()) > 0" />
 
  </Target>
 
