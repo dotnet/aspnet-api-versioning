@@ -21,7 +21,8 @@
         /// </summary>
         /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the API version for.</param>
         /// <returns>The associated <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
-        public static ApiVersion GetApiVersion( this ApiDescription apiDescription ) => apiDescription.GetProperty<ApiVersion>();
+        public static ApiVersion GetApiVersion( this ApiDescription apiDescription ) =>
+            apiDescription.GetProperty<ApiVersion>() ?? ApiVersion.Neutral;
 
         /// <summary>
         /// Gets a value indicating whether the associated API description is deprecated.
@@ -73,13 +74,13 @@
             }
 
             var parameter = apiDescription.ParameterDescriptions.FirstOrDefault( pd => pd.Source == Path && pd.ModelMetadata?.DataTypeName == nameof( ApiVersion ) );
+            var relativePath = apiDescription.RelativePath;
 
-            if ( parameter == null )
+            if ( parameter == null || string.IsNullOrEmpty( relativePath ) )
             {
                 return false;
             }
 
-            var relativePath = apiDescription.RelativePath;
             var token = '{' + parameter.Name + '}';
             var value = apiDescription.GetApiVersion().ToString( options.SubstitutionFormat, InvariantCulture );
             var newRelativePath = relativePath.Replace( token, value, StringComparison.Ordinal );

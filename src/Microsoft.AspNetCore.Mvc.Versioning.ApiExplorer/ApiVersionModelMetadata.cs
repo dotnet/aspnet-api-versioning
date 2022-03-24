@@ -39,13 +39,25 @@
         public override ModelPropertyCollection Properties => inner.Properties;
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? BinderModelName => inner.BinderModelName;
+#else
         public override string BinderModelName => inner.BinderModelName;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override Type? BinderType => inner.BinderType;
+#else
         public override Type BinderType => inner.BinderType;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override BindingSource? BindingSource => inner.BindingSource;
+#else
         public override BindingSource BindingSource => inner.BindingSource;
+#endif
 
         /// <inheritdoc />
         public override bool ConvertEmptyStringToNull => inner.ConvertEmptyStringToNull;
@@ -57,7 +69,11 @@
         public override string Description => description;
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? DisplayFormatString => inner.DisplayFormatString;
+#else
         public override string DisplayFormatString => inner.DisplayFormatString;
+#endif
 
         /// <inheritdoc />
 #pragma warning disable CA1721 // Property names should not match get methods; inherited member
@@ -65,16 +81,28 @@
 #pragma warning restore CA1721
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? EditFormatString => inner.EditFormatString;
+#else
         public override string EditFormatString => inner.EditFormatString;
+#endif
 
         /// <inheritdoc />
         public override ModelMetadata? ElementMetadata => inner.ElementMetadata;
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override IEnumerable<KeyValuePair<EnumGroupAndName, string>>? EnumGroupedDisplayNamesAndValues => inner.EnumGroupedDisplayNamesAndValues;
+#else
         public override IEnumerable<KeyValuePair<EnumGroupAndName, string>> EnumGroupedDisplayNamesAndValues => inner.EnumGroupedDisplayNamesAndValues;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override IReadOnlyDictionary<string, string>? EnumNamesAndValues => inner.EnumNamesAndValues;
+#else
         public override IReadOnlyDictionary<string, string> EnumNamesAndValues => inner.EnumNamesAndValues;
+#endif
 
         /// <inheritdoc />
         public override bool HasNonDefaultEditFormat => inner.HasNonDefaultEditFormat;
@@ -110,13 +138,25 @@
         public override int Order => inner.Order;
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? Placeholder => inner.Placeholder;
+#else
         public override string Placeholder => inner.Placeholder;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? NullDisplayText => inner.NullDisplayText;
+#else
         public override string NullDisplayText => inner.NullDisplayText;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override IPropertyFilterProvider? PropertyFilterProvider => inner.PropertyFilterProvider;
+#else
         public override IPropertyFilterProvider PropertyFilterProvider => inner.PropertyFilterProvider;
+#endif
 
         /// <inheritdoc />
         public override bool ShowForDisplay => inner.ShowForDisplay;
@@ -125,10 +165,18 @@
         public override bool ShowForEdit => inner.ShowForEdit;
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? SimpleDisplayProperty => inner.SimpleDisplayProperty;
+#else
         public override string SimpleDisplayProperty => inner.SimpleDisplayProperty;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override string? TemplateHint => inner.TemplateHint;
+#else
         public override string TemplateHint => inner.TemplateHint;
+#endif
 
         /// <inheritdoc />
         public override bool ValidateChildren => inner.ValidateChildren;
@@ -137,9 +185,17 @@
         public override IReadOnlyList<object> ValidatorMetadata => inner.ValidatorMetadata;
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override Func<object, object?>? PropertyGetter => inner.PropertyGetter;
+#else
         public override Func<object, object> PropertyGetter => inner.PropertyGetter;
+#endif
 
         /// <inheritdoc />
+#if NET6_0_OR_GREATER
+        public override Action<object, object?>? PropertySetter => inner.PropertySetter;
+#else
         public override Action<object, object> PropertySetter => inner.PropertySetter;
+#endif
     }
 }
