@@ -2,11 +2,14 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
+  <RootNamespace>ApiVersioning.Examples</RootNamespace>
   <LangVersion>latest</LangVersion>
   <ImplicitUsings>enable</ImplicitUsings>
   <IsTestProject>false</IsTestProject>
   <IsPackable>false</IsPackable>
-  <RootNamespace>ApiVersioning.Examples</RootNamespace>
+
+  <!-- REF: https://github.com/NuGet/Home/issues/9357 -->
+  <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
  </PropertyGroup>
 
 </Project>
