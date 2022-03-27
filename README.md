@@ -88,7 +88,7 @@ You can find additional examples, documentation, and getting started instruction
 
 ## Discussion
 
-Have a general question, suggestion, or other feedback? Check out how you can [contribute](CONTRIBUTING.md).
+Have a general question, suggestion, or other feedback? Check out how you can [contribute](docs/CONTRIBUTING.md).
 
 ## Code of Conduct
 
