@@ -91,8 +91,8 @@ jobs:
       dotnet signclient sign
       --config build/signing.json
       --input $(Build.ArtifactStagingDirectory)/packages.zip
-      --user ${{ secrets.SIGNING_USER }}
-      --secret ${{ secrets.SIGNING_SECRET }}
+      --user $(codesign_user)
+      --secret $(codesign_secret)
       --name "ASP.NET API Versioning"
       --description "Adds versioning semantics to APIs build with ASP.NET"
       --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
