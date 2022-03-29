@@ -1,0 +1,112 @@
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+    - .config
+    - .devcontainer
+    - .github
+    - .vscode
+    - docs
+    - .vsconfig
+    - LICENSE.txt
+    - logo.svg
+    - README.md
+
+pr:
+- main
+
+# build at least once a month so the build badge is up-to-date
+schedules:
+- cron: '0 0 1 * *'
+  displayName: Monthly build
+  branches:
+    include:
+    - main
+  always: true
+
+variables:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  BuildConfiguration: Release
+  VersionSuffix: ''
+
+jobs:
+- job: CI
+  pool:
+    vmImage: windows-latest
+  steps:
+  - task: UseDotNet@2
+    displayName: Install .NET SDK
+    inputs:
+      packageType: sdk
+      version: 6.0.x
+
+  - task: DotNetCoreCLI@2
+    displayName: Build and test
+    inputs:
+      command: test
+      arguments: '--logger trx --results-directory $(Build.ArtifactStagingDirectory)/test-results'
+      configuration: $(BuildConfiguration)
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '*.trx'
+      testRunTitle: Unit Tests
+      searchFolder: $(Build.ArtifactStagingDirectory)/test-results
+      buildConfiguration: $(BuildConfiguration)
+      mergeTestResults: true
+      publishRunAttachments: false
+    condition: always()
+
+# packing, signing, and publishing is intentionally manual to
+# double-check for mistakes. publishing doesn't happen often
+- job: Pack
+  condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: Pack packages
+    inputs:
+      command: pack
+      configuration: $(BuildConfiguration)
+      buildProperties: 'VersionSuffix="$(VersionSuffix)"'
+      outputDir: $(Build.ArtifactStagingDirectory)/packages
+      noBuild: true
+
+  - task: DotNetCoreCLI@2
+    displayName: Restore tools
+    inputs:
+      command: custom
+      custom: 'tool restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: Package artifacts for signing
+    inputs:
+      command: custom
+      custom: 'z -c $(Build.ArtifactStagingDirectory)/packages $(Build.ArtifactStagingDirectory)/packages.zip'
+
+  - script: >
+      dotnet signclient sign
+      --config build/signing.json
+      --input $(Build.ArtifactStagingDirectory)/packages.zip
+      --user ${{ secrets.SIGNING_USER }}
+      --secret ${{ secrets.SIGNING_SECRET }}
+      --name "ASP.NET API Versioning"
+      --description "Adds versioning semantics to APIs build with ASP.NET"
+      --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
+    displayName: 'Sign artifacts'
+
+  - task: DotNetCoreCLI@2
+    displayName: Extract signed artifacts
+    inputs:
+      command: custom
+      custom: 'z -e $(Build.ArtifactStagingDirectory)/packages.zip $(Build.ArtifactStagingDirectory)/signed-packages'
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish package artifacts
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)/signed-packages
+      artifactName: NuGet Packages
+      publishLocation: Container
