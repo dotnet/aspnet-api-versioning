@@ -44,31 +44,21 @@ jobs:
       version: 6.0.x
 
   - task: DotNetCoreCLI@2
-    displayName: Build and test
+    displayName: Build and Test
     inputs:
       command: test
-      arguments: '--logger trx --results-directory $(Build.ArtifactStagingDirectory)/test-results'
       configuration: $(BuildConfiguration)
-
-  - task: PublishTestResults@2
-    displayName: Publish test results
-    inputs:
-      testResultsFormat: VSTest
-      testResultsFiles: '*.trx'
       testRunTitle: Unit Tests
-      searchFolder: $(Build.ArtifactStagingDirectory)/test-results
-      buildConfiguration: $(BuildConfiguration)
-      mergeTestResults: true
-      publishRunAttachments: false
-    condition: always()
+      publishTestResults: true
 
 # packing, signing, and publishing is intentionally manual to
 # double-check for mistakes. publishing doesn't happen often
 - job: Pack
   condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
+  dependsOn: CI
   steps:
   - task: DotNetCoreCLI@2
-    displayName: Pack packages
+    displayName: Pack Packages
     inputs:
       command: pack
       configuration: $(BuildConfiguration)
@@ -77,10 +67,10 @@ jobs:
       noBuild: true
 
   - task: DotNetCoreCLI@2
-    displayName: Restore tools
+    displayName: Restore Tools
     inputs:
       command: custom
-      custom: 'tool restore'
+      custom: tool restore
 
   - task: DotNetCoreCLI@2
     displayName: Package artifacts for signing
@@ -97,11 +87,11 @@ jobs:
       --name "ASP.NET API Versioning"
       --description "Adds versioning semantics to APIs build with ASP.NET"
       --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
-    displayName: 'Sign artifacts'
+    displayName: Sign Artifacts
     condition: not($(SkipSigning))
 
   - task: DotNetCoreCLI@2
-    displayName: Extract signed artifacts
+    displayName: Extract Signed Artifacts
     inputs:
       command: custom
       custom: 'z -e $(Build.ArtifactStagingDirectory)/packages.zip $(Build.ArtifactStagingDirectory)/signed-packages'
