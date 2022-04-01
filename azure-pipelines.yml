@@ -88,7 +88,7 @@ jobs:
       --description "Adds versioning semantics to APIs build with ASP.NET"
       --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
     displayName: Sign Artifacts
-    condition: not($(SkipSigning))
+    condition: ${{ not(variables.SkipSigning) }}
 
   - task: DotNetCoreCLI@2
     displayName: Extract Signed Artifacts
