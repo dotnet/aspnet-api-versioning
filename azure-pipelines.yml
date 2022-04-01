@@ -30,6 +30,7 @@ variables:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   BuildConfiguration: Release
   VersionSuffix: ''
+  SkipSigning: false
 
 jobs:
 - job: CI
@@ -97,6 +98,7 @@ jobs:
       --description "Adds versioning semantics to APIs build with ASP.NET"
       --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
     displayName: 'Sign artifacts'
+    condition: not($(SkipSigning))
 
   - task: DotNetCoreCLI@2
     displayName: Extract signed artifacts
