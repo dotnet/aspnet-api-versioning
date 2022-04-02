@@ -1,3 +1,11 @@
+parameters:
+- name: solution
+  type: string
+  default: ''
+- name: configuration
+  type: string
+  default: Release
+
 steps:
 - task: UseDotNet@2
   displayName: Install .NET SDK
@@ -9,6 +17,7 @@ steps:
   displayName: Build and Test
   inputs:
     command: test
-    configuration: $(BuildConfiguration)
+    projects: ${{ parameters.solution }}
+    configuration: ${{ parameters.configuration }}
     testRunTitle: Unit Tests
     publishTestResults: true

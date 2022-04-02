@@ -1,10 +1,25 @@
+parameters:
+- name: solution
+  type: string
+  default: ''
+- name: configuration
+  type: string
+  default: Release
+- name: versionSuffix
+  type: string
+  default: ''
+- name: skipSigning
+  type: boolean
+  default: false
+
 steps:
 - task: DotNetCoreCLI@2
   displayName: Pack Packages
   inputs:
     command: pack
-    configuration: $(BuildConfiguration)
-    buildProperties: 'VersionSuffix="$(VersionSuffix)"'
+    projects: ${{ parameters.solution }}
+    configuration: ${{ parameters.configuration }}
+    buildProperties: VersionSuffix=${{ parameters.versionSuffix }}
     outputDir: $(Build.ArtifactStagingDirectory)/packages
     noBuild: true
 
@@ -30,7 +45,7 @@ steps:
     --description "Adds versioning semantics to APIs build with ASP.NET"
     --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
   displayName: Sign Artifacts
-  condition: ${{ not(variables.SkipSigning) }}
+  condition: ${{ not(parameters.skipSigning) }}
 
 - task: DotNetCoreCLI@2
   displayName: Extract Signed Artifacts

@@ -26,16 +26,27 @@ schedules:
     - main
   always: true
 
+pool:
+  vmImage: windows-latest
+
 variables:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  Solution: asp.sln
   BuildConfiguration: Release
   VersionSuffix: ''
   SkipSigning: false
 
-pool:
-  vmImage: windows-latest
-
 steps:
 - template: build/steps-ci.yml
+  parameters:
+    solution: ${{ variables.Solution }}
+    configuration: ${{ variables.BuildConfiguration }}
+
 - ${{ if eq(variables['Build.Reason'], 'Manual') }}:
   - template: build/steps-release.yml
+    parameters:
+      solution: ${{ variables.Solution }}
+      configuration: ${{ variables.BuildConfiguration }}
+      versionSuffix: ${{ variables.VersionSuffix }}
+      skipSigning: ${{ variables.SkipSigning }}
