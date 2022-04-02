@@ -18,7 +18,7 @@ steps:
   inputs:
     command: pack
     projects: ${{ parameters.solution }}
-    configuration: ${{ parameters.configuration }}
+    arguments: --configuration ${{ parameters.configuration }}
     buildProperties: VersionSuffix=${{ parameters.versionSuffix }}
     outputDir: $(Build.ArtifactStagingDirectory)/packages
     noBuild: true

@@ -18,6 +18,6 @@ steps:
   inputs:
     command: test
     projects: ${{ parameters.solution }}
-    configuration: ${{ parameters.configuration }}
+    arguments: --configuration ${{ parameters.configuration }}
     testRunTitle: Unit Tests
     publishTestResults: true
