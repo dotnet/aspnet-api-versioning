@@ -36,7 +36,6 @@ pool:
   vmImage: windows-latest
 
 steps:
+- template: build/steps-ci.yml
 - ${{ if eq(variables['Build.Reason'], 'Manual') }}:
   - template: build/steps-release.yml
-- ${{ else }}:
-  - template: build/steps-ci.yml
