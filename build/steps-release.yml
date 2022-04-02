@@ -1,0 +1,48 @@
+extends:
+  template: ci.yml
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: Pack Packages
+    inputs:
+      command: pack
+      configuration: $(BuildConfiguration)
+      buildProperties: 'VersionSuffix="$(VersionSuffix)"'
+      outputDir: $(Build.ArtifactStagingDirectory)/packages
+      noBuild: true
+
+  - task: DotNetCoreCLI@2
+    displayName: Restore Tools
+    inputs:
+      command: custom
+      custom: tool restore
+
+  - task: DotNetCoreCLI@2
+    displayName: Package artifacts for signing
+    inputs:
+      command: custom
+      custom: 'z -c $(Build.ArtifactStagingDirectory)/packages $(Build.ArtifactStagingDirectory)/packages.zip'
+
+  - script: >
+      dotnet signclient sign
+      --config build/signing.json
+      --input $(Build.ArtifactStagingDirectory)/packages.zip
+      --user $(codesign_user)
+      --secret $(codesign_secret)
+      --name "ASP.NET API Versioning"
+      --description "Adds versioning semantics to APIs build with ASP.NET"
+      --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
+    displayName: Sign Artifacts
+    condition: ${{ not(variables.SkipSigning) }}
+
+  - task: DotNetCoreCLI@2
+    displayName: Extract Signed Artifacts
+    inputs:
+      command: custom
+      custom: 'z -e $(Build.ArtifactStagingDirectory)/packages.zip $(Build.ArtifactStagingDirectory)/signed-packages'
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish package artifacts
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)/signed-packages
+      artifactName: NuGet Packages
+      publishLocation: Container
