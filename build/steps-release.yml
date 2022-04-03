@@ -8,9 +8,6 @@ parameters:
 - name: versionSuffix
   type: string
   default: ''
-- name: skipSigning
-  type: boolean
-  default: false
 
 steps:
 - task: DotNetCoreCLI@2
@@ -23,17 +20,14 @@ steps:
     outputDir: $(Build.ArtifactStagingDirectory)/packages
     noBuild: true
 
-- task: DotNetCoreCLI@2
+- script: dotnet tool restore
   displayName: Restore Tools
-  inputs:
-    command: custom
-    custom: tool restore
 
-- task: DotNetCoreCLI@2
+- script: >
+    dotnet z -c
+    $(Build.ArtifactStagingDirectory)/packages
+    $(Build.ArtifactStagingDirectory)/packages.zip
   displayName: Package artifacts for signing
-  inputs:
-    command: custom
-    custom: 'z -c $(Build.ArtifactStagingDirectory)/packages $(Build.ArtifactStagingDirectory)/packages.zip'
 
 - script: >
     dotnet signclient sign
@@ -45,13 +39,13 @@ steps:
     --description "Adds versioning semantics to APIs build with ASP.NET"
     --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
   displayName: Sign Artifacts
-  condition: ${{ not(parameters.skipSigning) }}
+  condition: false
 
-- task: DotNetCoreCLI@2
+- script: >
+    dotnet z -e
+    $(Build.ArtifactStagingDirectory)/packages.zip
+    $(Build.ArtifactStagingDirectory)/signed-packages
   displayName: Extract Signed Artifacts
-  inputs:
-    command: custom
-    custom: 'z -e $(Build.ArtifactStagingDirectory)/packages.zip $(Build.ArtifactStagingDirectory)/signed-packages'
 
 - task: PublishBuildArtifacts@1
   displayName: Publish package artifacts

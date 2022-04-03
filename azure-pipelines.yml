@@ -35,7 +35,6 @@ variables:
   Solution: asp.sln
   BuildConfiguration: Release
   VersionSuffix: ''
-  SkipSigning: false
 
 steps:
 - template: build/steps-ci.yml
@@ -49,4 +48,3 @@ steps:
       solution: ${{ variables.Solution }}
       configuration: ${{ variables.BuildConfiguration }}
       versionSuffix: ${{ variables.VersionSuffix }}
-      skipSigning: ${{ variables.SkipSigning }}
