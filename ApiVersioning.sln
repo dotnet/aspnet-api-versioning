@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2957BAF3-9
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
 		CONTRIBUTING.md = CONTRIBUTING.md
 		LICENSE = LICENSE
 		nuget.config = nuget.config
@@ -119,6 +120,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{2BB57808
 		build\resource.targets = build\resource.targets
 		build\signing.props = build\signing.props
 		build\signing.targets = build\signing.targets
+		build\steps-ci.yml = build\steps-ci.yml
+		build\steps-release.yml = build\steps-release.yml
 		build\stylecop.json = build\stylecop.json
 	EndProjectSection
 EndProject
