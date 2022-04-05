@@ -34,9 +34,9 @@ steps:
     --config build/signing.json
     --input $(Build.ArtifactStagingDirectory)/packages.zip
     --user $(codesign_user)
-    --secre $(codesign_secret)
+    --secret $(codesign_secret)
     --name "ASP.NET API Versioning"
-    --description "Adds versioning semantics to APIs build with ASP.NET"
+    --description "Adds versioning semantics to APIs built with ASP.NET"
     --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
   displayName: Sign Artifacts
   condition: false
