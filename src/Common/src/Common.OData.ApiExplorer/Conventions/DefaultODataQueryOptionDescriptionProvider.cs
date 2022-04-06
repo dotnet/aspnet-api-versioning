@@ -284,7 +284,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         }
 
         if ( context.AllowedFunctions != AllowedFunctions.None &&
-             context.AllowedFunctions != AllowedFunctions.All )
+             context.AllowedFunctions != AllowedFunctions.AllFunctions )
         {
             description.Append( Space )
                        .AppendFormat(

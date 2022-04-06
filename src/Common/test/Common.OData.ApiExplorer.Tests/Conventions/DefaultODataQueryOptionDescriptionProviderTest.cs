@@ -250,7 +250,7 @@ public class DefaultODataQueryOptionDescriptionProviderTest
                 new[] { "category", "price", "quantity" },
                 AllowedLogicalOperators.All,
                 AllowedArithmeticOperators.All,
-                AllowedFunctions.All,
+                AllFunctions,
                 "Restricts the set of items returned. The allowed properties are: category, price, quantity.",
             };
         }
