@@ -17,7 +17,7 @@ steps:
     projects: ${{ parameters.solution }}
     arguments: --configuration ${{ parameters.configuration }}
     buildProperties: VersionSuffix=${{ parameters.versionSuffix }}
-    outputDir: $(Build.ArtifactStagingDirectory)\packages
+    outputDir: $(Build.ArtifactStagingDirectory)/packages
     noBuild: true
 
 - script: dotnet tool restore
