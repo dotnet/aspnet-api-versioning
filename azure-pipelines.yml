@@ -36,12 +36,12 @@ variables:
 steps:
 - template: build/steps-ci.yml
   parameters:
-    solution: ${{ variables.Solution }}
-    configuration: ${{ variables.BuildConfiguration }}
+    solution: $(Solution)
+    configuration: $(BuildConfiguration)
 
 - ${{ if eq(variables['Build.Reason'], 'Manual') }}:
   - template: build/steps-release.yml
     parameters:
-      solution: ${{ variables.Solution }}
-      configuration: ${{ variables.BuildConfiguration }}
-      versionSuffix: ${{ variables.VersionSuffix }}
+      solution: $(Solution)
+      configuration: $(BuildConfiguration)
+      versionSuffix: $(VersionSuffix)
