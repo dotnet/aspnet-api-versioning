@@ -1,6 +1,6 @@
 [![.NET Foundation](https://img.shields.io/badge/.NET%20Foundation-blueviolet.svg)](https://dotnetfoundation.org/projects/aspnet-api-versioning)
 [![MIT License](https://img.shields.io/github/license/dotnet/aspnet-api-versioning?color=%230b0&style=flat-square)](https://github.com/dotnet/aspnet-api-versioning/blob/main/LICENSE.txt)
-[![Build Status](https://dev.azure.com/aspnet-api-versioning/build/_apis/build/status/dotnet.aspnet-api-versioning?branchName=main)](https://dev.azure.com/aspnet-api-versioning/build/_build?definitionId=1)
+[![Build Status](https://dev.azure.com/aspnet-api-versioning/build/_apis/build/status/dotnet.aspnet-api-versioning?branchName=main)](https://dev.azure.com/aspnet-api-versioning/build/_build/latest?definitionId=1&branchName=main)
 
 # ASP.NET API Versioning
 
@@ -59,7 +59,7 @@ The supported flavors of ASP.NET are:
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Mvc.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Mvc)
   [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-core)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi)
-  
+
 * **ASP.NET Core and OData**
   <div class="bullet">Adds API versioning to your ASP.NET Core applications using OData v4.0</div>
 
