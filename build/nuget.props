@@ -4,13 +4,13 @@
  <PropertyGroup Label="NuGet">
   <IsPackable>true</IsPackable>
   <RepositoryType>git</RepositoryType>
-  <RepositoryUrl>https://github.com/Microsoft/aspnet-api-versioning</RepositoryUrl>
-  <PackageIconUrl>https://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
+  <RepositoryUrl>https://github.com/dotnet/aspnet-api-versioning</RepositoryUrl>
   <PackageIcon>icon.png</PackageIcon>
-  <PackageProjectUrl>https://github.com/Microsoft/aspnet-api-versioning/wiki</PackageProjectUrl>
+  <PackageProjectUrl>https://github.com/dotnet/aspnet-api-versioning/wiki</PackageProjectUrl>
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   <PackageLicenseExpression>MIT</PackageLicenseExpression>
   <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
+  <PackageReadmeFile>README.md</PackageReadmeFile>
   <NoWarn>NU5118;$(NoWarn)</NoWarn>
  </PropertyGroup>
 
