@@ -42,8 +42,8 @@ The supported flavors of ASP.NET are:
 * **ASP.NET Core**
   <div>Adds API versioning to your ASP.NET Core <i>Minimal API</i> applications</div>
 
-  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Http.Versioning.svg)](https://www.nuget.org/packages/Asp.Versioning.Http.Versioning)
-  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Http.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Http.Versioning)
+  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Http.svg)](https://www.nuget.org/packages/Asp.Versioning.Http)
+  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Http.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Http)
   [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-core)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi)
 
