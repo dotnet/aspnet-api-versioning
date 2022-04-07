@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning;
+namespace Asp.Versioning.Routing;
 
 using System.Web.Http.Routing;
 
@@ -33,8 +33,16 @@ public class ApiVersionUrlHelper : UrlHelper
     public override string Content( string path ) => Url.Content( path );
 
     /// <inheritdoc />
+    public override string Link( string routeName, object routeValues ) =>
+        Url.Link( routeName, AddApiVersionRouteValueIfNecessary( new HttpRouteValueDictionary( routeValues ) ) );
+
+    /// <inheritdoc />
     public override string Link( string routeName, IDictionary<string, object> routeValues ) =>
         Url.Link( routeName, AddApiVersionRouteValueIfNecessary( routeValues ) );
+
+    /// <inheritdoc />
+    public override string Route( string routeName, object routeValues ) =>
+        Url.Route( routeName, AddApiVersionRouteValueIfNecessary( new HttpRouteValueDictionary( routeValues ) ) );
 
     /// <inheritdoc />
     public override string Route( string routeName, IDictionary<string, object> routeValues ) =>
