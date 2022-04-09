@@ -34,8 +34,8 @@ public class OrdersController : ControllerBase
     /// <response code="400">The order is invalid.</response>
     [HttpPost]
     [MapToApiVersion( "1.0" )]
-    [Produces( "application/json" )]
     [Consumes( "application/json" )]
+    [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), 201 )]
     [ProducesResponseType( 400 )]
     public IActionResult Post( [FromBody] Order order )
@@ -49,13 +49,12 @@ public class OrdersController : ControllerBase
     /// </summary>
     /// <param name="id">The requested order identifier.</param>
     /// <param name="order">The order to update.</param>
-    /// <returns>The created order.</returns>
+    /// <returns>None.</returns>
     /// <response code="204">The order was successfully updated.</response>
     /// <response code="400">The order is invalid.</response>
     /// <response code="404">The order does not exist.</response>
     [MapToApiVersion( "1.0" )]
     [HttpPatch( "{id:int}" )]
-    [Produces( "application/json" )]
     [Consumes( "application/json" )]
     [ProducesResponseType( 204 )]
     [ProducesResponseType( 400 )]

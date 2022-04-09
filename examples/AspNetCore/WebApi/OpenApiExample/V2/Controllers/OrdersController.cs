@@ -42,7 +42,6 @@ public class OrdersController : ControllerBase
     [HttpGet( "{id:int}" )]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), 200 )]
-    [ProducesResponseType( 400 )]
     [ProducesResponseType( 404 )]
     public IActionResult Get( int id ) => Ok( new Order() { Id = id, Customer = "John Doe" } );
 
@@ -54,6 +53,7 @@ public class OrdersController : ControllerBase
     /// <response code="201">The order was successfully placed.</response>
     /// <response code="400">The order is invalid.</response>
     [HttpPost]
+    [Consumes( "application/json" )]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), 201 )]
     [ProducesResponseType( 400 )]
@@ -68,12 +68,11 @@ public class OrdersController : ControllerBase
     /// </summary>
     /// <param name="id">The requested order identifier.</param>
     /// <param name="order">The order to update.</param>
-    /// <returns>The created order.</returns>
+    /// <returns>None.</returns>
     /// <response code="204">The order was successfully updated.</response>
     /// <response code="400">The order is invalid.</response>
     /// <response code="404">The order does not exist.</response>
     [HttpPatch( "{id:int}" )]
-    [Produces( "application/json" )]
     [Consumes( "application/json" )]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status400BadRequest )]

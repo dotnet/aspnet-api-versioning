@@ -16,17 +16,15 @@ public class OrdersController : ControllerBase
     /// </summary>
     /// <returns>All available orders.</returns>
     /// <response code="200">Orders successfully retrieved.</response>
-    /// <response code="400">The order is invalid.</response>
     [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( IEnumerable<Order> ), 200 )]
-    [ProducesResponseType( 400 )]
     public IActionResult Get()
     {
         var orders = new Order[]
         {
             new(){ Id = 1, Customer = "John Doe" },
-            new(){ Id = 2, Customer = "John Doe" },
+            new(){ Id = 2, Customer = "Bob Smith" },
             new(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTimeOffset.UtcNow.AddDays( 7d ) },
         };
 
@@ -43,7 +41,6 @@ public class OrdersController : ControllerBase
     [HttpGet( "{id:int}" )]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), 200 )]
-    [ProducesResponseType( 400 )]
     [ProducesResponseType( 404 )]
     public IActionResult Get( int id ) => Ok( new Order() { Id = id, Customer = "John Doe" } );
 
@@ -55,6 +52,7 @@ public class OrdersController : ControllerBase
     /// <response code="201">The order was successfully placed.</response>
     /// <response code="400">The order is invalid.</response>
     [HttpPost]
+    [Consumes( "application/json" )]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), 201 )]
     [ProducesResponseType( 400 )]

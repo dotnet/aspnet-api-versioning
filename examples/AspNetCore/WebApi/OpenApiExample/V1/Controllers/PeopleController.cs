@@ -28,6 +28,6 @@ public class PeopleController : ControllerBase
         {
             Id = id,
             FirstName = "John",
-            LastName = "Doe"
+            LastName = "Doe",
         } );
 }
