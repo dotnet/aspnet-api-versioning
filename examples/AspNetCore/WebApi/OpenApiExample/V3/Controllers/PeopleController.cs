@@ -82,6 +82,7 @@ public class PeopleController : ControllerBase
     /// <response code="201">The person was successfully created.</response>
     /// <response code="400">The person was invalid.</response>
     [HttpPost]
+    [Consumes( "application/json" )]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Person ), 201 )]
     [ProducesResponseType( 400 )]

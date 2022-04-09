@@ -90,7 +90,9 @@ public class Startup
                 // build a swagger endpoint for each discovered API version
                 foreach ( var description in provider.ApiVersionDescriptions )
                 {
-                    options.SwaggerEndpoint( $"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant() );
+                    var url = $"/swagger/{description.GroupName}/swagger.json";
+                    var name = description.GroupName.ToUpperInvariant();
+                    options.SwaggerEndpoint( url, name );
                 }
             } );
     }

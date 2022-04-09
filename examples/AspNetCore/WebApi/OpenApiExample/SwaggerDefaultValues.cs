@@ -1,22 +1,19 @@
 ﻿namespace ApiVersioning.Examples;
 
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json;
 
 /// <summary>
-/// Represents the OpenAPI/Swashbuckle operation filter used to document the implicit API version parameter.
+/// Represents the OpenAPI/Swashbuckle operation filter used to document information provided, but not used.
 /// </summary>
 /// <remarks>This <see cref="IOperationFilter"/> is only required due to bugs in the <see cref="SwaggerGenerator"/>.
 /// Once they are fixed and published, this class can be removed.</remarks>
 public class SwaggerDefaultValues : IOperationFilter
 {
-    /// <summary>
-    /// Applies the filter to the specified operation using the given context.
-    /// </summary>
-    /// <param name="operation">The operation to apply the filter to.</param>
-    /// <param name="context">The current operation filter context.</param>
+    /// <inheritdoc />
     public void Apply( OpenApiOperation operation, OperationFilterContext context )
     {
         var apiDescription = context.ApiDescription;
@@ -55,10 +52,13 @@ public class SwaggerDefaultValues : IOperationFilter
                 parameter.Description = description.ModelMetadata?.Description;
             }
 
-            if ( parameter.Schema.Default == null && description.DefaultValue != null )
+            if ( parameter.Schema.Default == null &&
+                 description.DefaultValue != null &&
+                 description.DefaultValue is not DBNull &&
+                 description.ModelMetadata is ModelMetadata modelMetadata )
             {
                 // REF: https://github.com/Microsoft/aspnet-api-versioning/issues/429#issuecomment-605402330
-                var json = JsonSerializer.Serialize( description.DefaultValue, description.ModelMetadata.ModelType );
+                var json = JsonSerializer.Serialize( description.DefaultValue, modelMetadata.ModelType );
                 parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson( json );
             }
 
