@@ -8,6 +8,14 @@ on:
 jobs:
   cla-assistant:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      checks: read|write
+      contents: read|write
+      issues: read|write
+      pull-requests: read|write
+      security-events: write
+      
     steps:
     - name: 'CLA Signature Check'
       if: (github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') || github.event_name == 'pull_request_target'
