@@ -2,150 +2,171 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Primitives;
 
-internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptorCollectionProvider
+internal class TestEndpointDataSource : EndpointDataSource
 {
-    private readonly Lazy<ActionDescriptorCollection> collection = new( CreateActionDescriptors );
+    public override IReadOnlyList<Endpoint> Endpoints { get; } = CreateEndpoints();
 
-    public ActionDescriptorCollection ActionDescriptors => collection.Value;
+    public override IChangeToken GetChangeToken() => NullChangeToken.Singleton;
 
-    private static ActionDescriptorCollection CreateActionDescriptors()
+    private static IReadOnlyList<Endpoint> CreateEndpoints()
     {
-        var actions = new List<ActionDescriptor>();
+        var endpoints = new List<Endpoint>();
 
-        AddOrderActionDescriptors( actions );
-        AddPeopleActionDescriptors( actions );
+        AddOrderEndpoints( endpoints );
+        AddPeopleEndpoints( endpoints );
 
-        return new( actions.ToArray(), 0 );
+        return endpoints;
     }
 
-    private static void AddOrderActionDescriptors( ICollection<ActionDescriptor> actions )
+    private static void AddOrderEndpoints( ICollection<Endpoint> endpoints )
     {
         // api version 0.9 and 1.0
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-orders/{id}",
+                "orders/{id}",
                 declared: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
                 supported: new ApiVersion[] { new( 1, 0 ) },
                 deprecated: new ApiVersion[] { new( 0, 9 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "POST-orders",
+                "orders",
                 declared: new ApiVersion[] { new( 1, 0 ) },
                 supported: new ApiVersion[] { new( 1, 0 ) } ) );
 
         // api version 2.0
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-orders",
+                "orders",
                 declared: new ApiVersion[] { new( 2, 0 ) },
                 supported: new ApiVersion[] { new( 2, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-orders/{id}",
+                "orders/{id}",
                 declared: new ApiVersion[] { new( 2, 0 ) },
                 supported: new ApiVersion[] { new( 2, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "POST-orders",
+                "orders",
                 declared: new ApiVersion[] { new( 2, 0 ) },
                 supported: new ApiVersion[] { new( 2, 0 ) } ) );
 
         // api version 3.0
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-orders",
+                "orders",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-orders/{id}",
+                "orders/{id}",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "POST-orders",
+                "orders",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "DELETE-orders/{id}",
+                "orders/{id}",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
     }
 
-    private static void AddPeopleActionDescriptors( ICollection<ActionDescriptor> actions )
+    private static void AddPeopleEndpoints( ICollection<Endpoint> endpoints )
     {
         // api version 0.9 and 1.0
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-people/{id}",
+                "people/{id}",
                 declared: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
                 supported: new ApiVersion[] { new( 1, 0 ) },
                 deprecated: new ApiVersion[] { new( 0, 9 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "POST-people",
+                "people",
                 declared: new ApiVersion[] { new( 1, 0 ) },
                 supported: new ApiVersion[] { new( 1, 0 ) } ) );
 
         // api version 2.0
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-people",
+                "people",
                 declared: new ApiVersion[] { new( 2, 0 ) },
                 supported: new ApiVersion[] { new( 2, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-people/{id}",
+                "people/{id}",
                 declared: new ApiVersion[] { new( 2, 0 ) },
                 supported: new ApiVersion[] { new( 2, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "POST-people",
+                "people",
                 declared: new ApiVersion[] { new( 2, 0 ) },
                 supported: new ApiVersion[] { new( 2, 0 ) } ) );
 
         // api version 3.0
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-people",
+                "people",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "GET-people/{id}",
+                "people/{id}",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
 
-        actions.Add(
-            NewActionDescriptor(
+        endpoints.Add(
+            NewEndpoint(
                 "POST-people",
+                "people",
                 declared: new ApiVersion[] { new( 3, 0 ) },
                 supported: new ApiVersion[] { new( 3, 0 ) },
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
     }
 
-    private static ActionDescriptor NewActionDescriptor(
+    private static Endpoint NewEndpoint(
         string displayName,
+        string pattern,
         IEnumerable<ApiVersion> declared,
         IEnumerable<ApiVersion> supported,
         IEnumerable<ApiVersion> deprecated = null,
@@ -160,11 +181,17 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
                 deprecated ?? Enumerable.Empty<ApiVersion>(),
                 advertised ?? Enumerable.Empty<ApiVersion>(),
                 advertisedDeprecated ?? Enumerable.Empty<ApiVersion>() ) );
-
-        return new()
+        var builder = new RouteEndpointBuilder(
+            Route404,
+            RoutePatternFactory.Parse( pattern ),
+            default )
         {
             DisplayName = displayName,
-            EndpointMetadata = new[] { metadata },
+            Metadata = { metadata },
         };
+
+        return builder.Build();
     }
+
+    private static Task Route404( HttpContext context ) => Task.CompletedTask;
 }
