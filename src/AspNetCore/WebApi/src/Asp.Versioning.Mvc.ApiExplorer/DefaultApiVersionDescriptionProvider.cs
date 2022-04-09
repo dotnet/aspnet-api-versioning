@@ -2,9 +2,10 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using static Asp.Versioning.ApiVersionMapping;
 using static System.Globalization.CultureInfo;
 
@@ -14,23 +15,22 @@ using static System.Globalization.CultureInfo;
 [CLSCompliant( false )]
 public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvider
 {
-    private readonly Lazy<IReadOnlyList<ApiVersionDescription>> apiVersionDescriptions;
+    private readonly ApiVersionDescriptionCollection collection;
     private readonly IOptions<ApiExplorerOptions> options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultApiVersionDescriptionProvider"/> class.
     /// </summary>
-    /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider">provider</see>
-    /// used to enumerate the actions within an application.</param>
+    /// <param name="endpointDataSource">The <see cref="EndpointDataSource">data source</see> for <see cref="Endpoint">endpoints</see>.</param>
     /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
     /// <param name="apiExplorerOptions">The <see cref="IOptions{TOptions}">container</see> of configured
     /// <see cref="ApiExplorerOptions">API explorer options</see>.</param>
     public DefaultApiVersionDescriptionProvider(
-        IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+        EndpointDataSource endpointDataSource,
         ISunsetPolicyManager sunsetPolicyManager,
         IOptions<ApiExplorerOptions> apiExplorerOptions )
     {
-        apiVersionDescriptions = LazyApiVersionDescriptions.Create( this, actionDescriptorCollectionProvider );
+        collection = new( this, endpointDataSource );
         SunsetPolicyManager = sunsetPolicyManager;
         options = apiExplorerOptions;
     }
@@ -48,41 +48,46 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     protected ApiExplorerOptions Options => options.Value;
 
     /// <inheritdoc />
-    public IReadOnlyList<ApiVersionDescription> ApiVersionDescriptions => apiVersionDescriptions.Value;
+    public IReadOnlyList<ApiVersionDescription> ApiVersionDescriptions => collection.Items;
 
     /// <summary>
     /// Enumerates all API versions within an application.
     /// </summary>
-    /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider">provider</see> used to enumerate the actions within an application.</param>
+    /// <param name="endpointDataSource">The <see cref="EndpointDataSource">data source</see> used to enumerate the endpoints within an application.</param>
     /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersionDescription">API version descriptions</see>.</returns>
-    protected virtual IReadOnlyList<ApiVersionDescription> EnumerateApiVersions( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
+    protected virtual IReadOnlyList<ApiVersionDescription> EnumerateApiVersions( EndpointDataSource endpointDataSource )
     {
-        if ( actionDescriptorCollectionProvider == null )
+        if ( endpointDataSource == null )
         {
-            throw new ArgumentNullException( nameof( actionDescriptorCollectionProvider ) );
+            throw new ArgumentNullException( nameof( endpointDataSource ) );
         }
 
-        var actions = actionDescriptorCollectionProvider.ActionDescriptors.Items;
-        var descriptions = new List<ApiVersionDescription>( capacity: actions.Count );
+        var endpoints = endpointDataSource.Endpoints;
+        var descriptions = new List<ApiVersionDescription>( capacity: endpoints.Count );
         var supported = new HashSet<ApiVersion>();
         var deprecated = new HashSet<ApiVersion>();
 
-        BucketizeApiVersions( actions, supported, deprecated );
+        BucketizeApiVersions( endpoints, supported, deprecated );
         AppendDescriptions( descriptions, supported, deprecated: false );
         AppendDescriptions( descriptions, deprecated, deprecated: true );
 
         return descriptions.OrderBy( d => d.ApiVersion ).ToArray();
     }
 
-    private void BucketizeApiVersions( IReadOnlyList<ActionDescriptor> actions, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )
+    private void BucketizeApiVersions( IReadOnlyList<Endpoint> endpoints, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )
     {
         var declared = new HashSet<ApiVersion>();
         var advertisedSupported = new HashSet<ApiVersion>();
         var advertisedDeprecated = new HashSet<ApiVersion>();
 
-        for ( var i = 0; i < actions.Count; i++ )
+        for ( var i = 0; i < endpoints.Count; i++ )
         {
-            var model = actions[i].GetApiVersionMetadata().Map( Explicit | Implicit );
+            if ( endpoints[i].Metadata.GetMetadata<ApiVersionMetadata>() is not ApiVersionMetadata metadata )
+            {
+                continue;
+            }
+
+            var model = metadata.Map( Explicit | Implicit );
             var versions = model.DeclaredApiVersions;
 
             for ( var j = 0; j < versions.Count; j++ )
@@ -130,28 +135,51 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         }
     }
 
-    private sealed class LazyApiVersionDescriptions : Lazy<IReadOnlyList<ApiVersionDescription>>
+    private sealed class ApiVersionDescriptionCollection
     {
+        private readonly object syncRoot = new();
+        private readonly EndpointDataSource endpointDataSource;
         private readonly DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider;
-        private readonly IActionDescriptorCollectionProvider actionDescriptorCollectionProvider;
+        private IReadOnlyList<ApiVersionDescription>? items;
 
-        private LazyApiVersionDescriptions(
+        public ApiVersionDescriptionCollection(
             DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
+            EndpointDataSource endpointDataSource )
         {
             this.apiVersionDescriptionProvider = apiVersionDescriptionProvider;
-            this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
+            this.endpointDataSource = endpointDataSource ?? throw new ArgumentNullException( nameof( endpointDataSource ) );
+            ChangeToken.OnChange( endpointDataSource.GetChangeToken, UpdateItems );
         }
 
-        internal static Lazy<IReadOnlyList<ApiVersionDescription>> Create(
-            DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
+        public IReadOnlyList<ApiVersionDescription> Items
         {
-            var descriptions = new LazyApiVersionDescriptions( apiVersionDescriptionProvider, actionDescriptorCollectionProvider );
-            return new( descriptions.EnumerateApiVersions );
+            get
+            {
+                Initialize();
+                return items!;
+            }
         }
 
-        private IReadOnlyList<ApiVersionDescription> EnumerateApiVersions() =>
-            apiVersionDescriptionProvider.EnumerateApiVersions( actionDescriptorCollectionProvider );
+        private void Initialize()
+        {
+            if ( items == null )
+            {
+                lock ( syncRoot )
+                {
+                    if ( items == null )
+                    {
+                        UpdateItems();
+                    }
+                }
+            }
+        }
+
+        private void UpdateItems()
+        {
+            lock ( syncRoot )
+            {
+                items = apiVersionDescriptionProvider.EnumerateApiVersions( endpointDataSource );
+            }
+        }
     }
 }

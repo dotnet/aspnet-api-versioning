@@ -11,7 +11,7 @@ public class DefaultApiVersionDescriptionProviderTest
     {
         // arrange
         var descriptionProvider = new DefaultApiVersionDescriptionProvider(
-            new TestActionDescriptorCollectionProvider(),
+            new TestEndpointDataSource(),
             Mock.Of<ISunsetPolicyManager>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
@@ -40,7 +40,7 @@ public class DefaultApiVersionDescriptionProviderTest
         policyManager.Setup( pm => pm.TryGetPolicy( default, apiVersion, out expected ) ).Returns( true );
 
         var descriptionProvider = new DefaultApiVersionDescriptionProvider(
-            new TestActionDescriptorCollectionProvider(),
+            new TestEndpointDataSource(),
             policyManager.Object,
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
