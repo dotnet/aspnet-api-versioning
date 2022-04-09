@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Patterns;
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.Linq.Enumerable;
 using static System.StringComparison;
@@ -36,9 +37,9 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         ApiExplorerOptions options )
     {
         Options = options ?? throw new ArgumentNullException( nameof( options ) );
-        ApiDescription = apiDescription;
-        ApiVersion = apiVersion;
-        ModelMetadata = modelMetadata;
+        ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
+        ApiVersion = apiVersion ?? throw new ArgumentNullException( nameof( apiVersion ) );
+        ModelMetadata = modelMetadata ?? throw new ArgumentNullException( nameof( modelMetadata ) );
         optional = options.AssumeDefaultVersionWhenUnspecified && apiVersion == options.DefaultApiVersion;
     }
 
@@ -158,13 +159,8 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     /// </summary>
     protected virtual void UpdateUrlSegment()
     {
-        var query = from description in ApiDescription.ParameterDescriptions
-                    let routeInfo = description.RouteInfo
-                    where routeInfo != null
-                    let constraints = routeInfo.Constraints ?? Empty<IRouteConstraint>()
-                    where constraints.OfType<ApiVersionRouteConstraint>().Any()
-                    select description;
-        var parameter = query.FirstOrDefault();
+        var parameter = FindByRouteConstraintType( ApiDescription ) ??
+                        FindByRouteConstraintName( ApiDescription, Options.RouteConstraintName );
 
         if ( parameter == null )
         {
@@ -184,7 +180,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
 
         if ( parameter.ParameterDescriptor == null )
         {
-            parameter.ParameterDescriptor = new ParameterDescriptor()
+            parameter.ParameterDescriptor = new()
             {
                 Name = parameter.Name,
                 ParameterType = typeof( ApiVersion ),
@@ -243,6 +239,74 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
 
             ApiDescription.SupportedResponseTypes.Add( responseType );
         }
+    }
+
+    private static ApiParameterDescription? FindByRouteConstraintType( ApiDescription description )
+    {
+        var parameters = description.ParameterDescriptions;
+
+        for ( var i = 0; i < parameters.Count; i++ )
+        {
+            var parameter = parameters[i];
+
+            if ( parameter.RouteInfo is ApiParameterRouteInfo routeInfo &&
+                 routeInfo.Constraints is IEnumerable<IRouteConstraint> constraints &&
+                 constraints.OfType<ApiVersionRouteConstraint>().Any() )
+            {
+                return parameter;
+            }
+        }
+
+        return default;
+    }
+
+    private static ApiParameterDescription? FindByRouteConstraintName( ApiDescription description, string constraintName )
+    {
+        var relativePath = description.RelativePath;
+
+        if ( string.IsNullOrEmpty( relativePath ) )
+        {
+            return default;
+        }
+
+        var routePattern = RoutePatternFactory.Parse( relativePath );
+        var parameters = routePattern.Parameters;
+        var parameterDescriptions = description.ParameterDescriptions;
+
+        for ( var i = 0; i < parameters.Count; i++ )
+        {
+            var parameter = parameters[i];
+            var policies = parameter.ParameterPolicies;
+
+            for ( var j = 0; j < policies.Count; j++ )
+            {
+                if ( !constraintName.Equals( policies[j].Content, Ordinal ) )
+                {
+                    continue;
+                }
+
+                for ( var k = 0; k < parameterDescriptions.Count; k++ )
+                {
+                    var parameterDescription = parameterDescriptions[k];
+
+                    if ( parameterDescription.Name != parameter.Name &&
+                         parameterDescription.ParameterDescriptor?.ParameterType != typeof( ApiVersion ) )
+                    {
+                        continue;
+                    }
+
+                    var token = $"{parameter.Name}:{constraintName}";
+
+                    parameterDescription.Name = parameter.Name;
+                    description.RelativePath = relativePath.Replace( token, parameter.Name, Ordinal );
+                    parameterDescription.Source = BindingSource.Path;
+
+                    return parameterDescription;
+                }
+            }
+        }
+
+        return default;
     }
 
     private ApiParameterDescription NewApiVersionParameter( string name, BindingSource source )
