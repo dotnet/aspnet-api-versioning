@@ -79,6 +79,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The request type was not configured..
+        /// </summary>
+        internal static string RequestTypeUnconfigured {
+            get {
+                return ResourceManager.GetString("RequestTypeUnconfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be specified to construct a {1}..
         /// </summary>
         internal static string UnsetRequestDelegate {

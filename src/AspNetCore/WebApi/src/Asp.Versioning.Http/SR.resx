@@ -123,6 +123,9 @@
   <data name="ConventionAddedAfterEndpointBuilt" xml:space="preserve">
     <value>Conventions cannot be added after building the endpoint.</value>
   </data>
+  <data name="RequestTypeUnconfigured" xml:space="preserve">
+    <value>The request type was not configured.</value>
+  </data>
   <data name="UnsetRequestDelegate" xml:space="preserve">
     <value>{0} must be specified to construct a {1}.</value>
   </data>
