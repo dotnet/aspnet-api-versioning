@@ -2,6 +2,8 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+using Asp.Versioning.Routing;
+
 /// <content>
 /// Provides additional implementation specific to ASP.NET Core.
 /// </content>
@@ -38,4 +40,10 @@ public partial class ApiExplorerOptions
         get => parameterSource ??= ApiVersionReader.Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
         set => parameterSource = value;
     }
+
+    /// <summary>
+    /// Gets or sets the name associated with the API version route constraint.
+    /// </summary>
+    /// <value>The name associated with the <see cref="ApiVersionRouteConstraint">API version route constraint</see>.</value>
+    public string RouteConstraintName { get; set; } = string.Empty;
 }

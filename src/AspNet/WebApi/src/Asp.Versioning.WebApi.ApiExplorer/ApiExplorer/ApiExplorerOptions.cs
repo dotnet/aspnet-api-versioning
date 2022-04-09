@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+using Asp.Versioning.Routing;
 using System.Web.Http;
 
 /// <content>
@@ -37,4 +38,10 @@ public partial class ApiExplorerOptions
     /// </summary>
     /// <value>The <see cref="IApiVersionParameterSource">API version parameter source</see> used to describe API version parameters.</value>
     public IApiVersionParameterSource ApiVersionParameterSource => options.Value.ApiVersionReader;
+
+    /// <summary>
+    /// Gets the name associated with the API version route constraint.
+    /// </summary>
+    /// <value>The name associated with the <see cref="ApiVersionRouteConstraint">API version route constraint</see>.</value>
+    public string RouteConstraintName => options.Value.RouteConstraintName;
 }

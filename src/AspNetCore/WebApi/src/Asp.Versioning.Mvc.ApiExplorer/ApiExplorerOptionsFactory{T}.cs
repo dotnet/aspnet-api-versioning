@@ -59,9 +59,10 @@ public class ApiExplorerOptionsFactory<T> : IOptionsFactory<T> where T : ApiExpl
         var apiVersioningOptions = Options;
         var options = new T()
         {
-            DefaultApiVersion = apiVersioningOptions.DefaultApiVersion,
-            ApiVersionParameterSource = apiVersioningOptions.ApiVersionReader,
             AssumeDefaultVersionWhenUnspecified = apiVersioningOptions.AssumeDefaultVersionWhenUnspecified,
+            ApiVersionParameterSource = apiVersioningOptions.ApiVersionReader,
+            DefaultApiVersion = apiVersioningOptions.DefaultApiVersion,
+            RouteConstraintName = apiVersioningOptions.RouteConstraintName,
         };
 
         foreach ( var setup in Setups )
