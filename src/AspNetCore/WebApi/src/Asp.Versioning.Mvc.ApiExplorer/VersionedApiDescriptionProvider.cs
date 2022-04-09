@@ -32,9 +32,9 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         IModelMetadataProvider modelMetadataProvider,
         IOptions<ApiExplorerOptions> options )
     {
-        SunsetPolicyManager = sunsetPolicyManager ?? throw new ArgumentNullException( nameof( sunsetPolicyManager ) );
-        ModelMetadataProvider = modelMetadataProvider ?? throw new ArgumentNullException( nameof( modelMetadataProvider ) );
-        this.options = options ?? throw new ArgumentNullException( nameof( options ) );
+        SunsetPolicyManager = sunsetPolicyManager;
+        ModelMetadataProvider = modelMetadataProvider;
+        this.options = options;
     }
 
     /// <summary>
@@ -128,6 +128,8 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                     continue;
                 }
 
+                TryUpdateControllerRouteValueForMinimalApi( result );
+
                 var groupResult = result.Clone();
                 var metadata = action.GetApiVersionMetadata();
 
@@ -179,13 +181,37 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
         for ( var i = 0; i < endpointMetadata.Count; i++ )
         {
-            if ( endpointMetadata[i] is ApiVersionMetadata metadata )
+            if ( endpointMetadata[i] is ApiVersionMetadata )
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private static void TryUpdateControllerRouteValueForMinimalApi( ApiDescription description )
+    {
+        var action = description.ActionDescriptor;
+
+        if ( action is ControllerActionDescriptor )
+        {
+            return;
+        }
+
+        var routeValues = action.RouteValues;
+
+        if ( !routeValues.ContainsKey( "controller" ) )
+        {
+            return;
+        }
+
+        var metadata = action.GetApiVersionMetadata();
+
+        if ( !string.IsNullOrEmpty( metadata.Name ) )
+        {
+            routeValues["controller"] = metadata.Name;
+        }
     }
 
     private IEnumerable<ApiVersion> FlattenApiVersions( IList<ApiDescription> descriptions )
