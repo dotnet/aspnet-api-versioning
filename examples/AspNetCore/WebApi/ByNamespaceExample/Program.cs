@@ -1,15 +1,32 @@
-﻿
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+﻿using Asp.Versioning.Conventions;
 
-namespace ApiVersioning.Examples;
-public static class Program
-{
-    public static void Main( string[] args ) =>
-        CreateWebHostBuilder( args ).Build().Run();
+[assembly: Microsoft.AspNetCore.Mvc.ApiController]
 
-    public static IWebHostBuilder CreateWebHostBuilder( string[] args ) =>
-        WebHost.CreateDefaultBuilder( args )
-               .UseStartup<Startup>();
-}
+var builder = WebApplication.CreateBuilder( args );
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+builder.Services.AddApiVersioning(
+                    options =>
+                    {
+                        // reporting api versions will return the headers
+                        // "api-supported-versions" and "api-deprecated-versions"
+                        options.ReportApiVersions = true;
+                    } )
+                .AddMvc(
+                    options =>
+                    {
+                        // automatically applies an api version based on the name of
+                        // the defining controller's namespace
+                        options.Conventions.Add( new VersionByNamespaceConvention() );
+                    } );
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();

@@ -1,15 +1,24 @@
-﻿namespace ApiVersioning.Examples;
+﻿[assembly: Microsoft.AspNetCore.Mvc.ApiController]
 
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+var builder = WebApplication.CreateBuilder( args );
 
-public static class Program
-{
-    public static void Main( string[] args ) =>
-        CreateWebHostBuilder( args ).Build().Run();
+// Add services to the container.
 
-    public static IWebHostBuilder CreateWebHostBuilder( string[] args ) =>
-        WebHost.CreateDefaultBuilder( args )
-               .UseStartup<Startup>();
-}
+builder.Services.AddControllers();
+builder.Services.AddApiVersioning(
+                    options =>
+                    {
+                        // reporting api versions will return the headers
+                        // "api-supported-versions" and "api-deprecated-versions"
+                        options.ReportApiVersions = true;
+                    } )
+                .AddMvc();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
