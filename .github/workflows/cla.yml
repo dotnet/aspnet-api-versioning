@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      checks: read|write
-      contents: read|write
-      issues: read|write
-      pull-requests: read|write
+      checks: write
+      contents: write
+      issues: write
+      pull-requests: write
       security-events: write
       
     steps:
