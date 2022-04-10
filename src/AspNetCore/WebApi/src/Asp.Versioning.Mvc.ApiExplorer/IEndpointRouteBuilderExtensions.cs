@@ -4,6 +4,7 @@ namespace Microsoft.AspNetCore.Builder;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -34,10 +35,12 @@ public static class IEndpointRouteBuilderExtensions
         // setup. unfortunately, the behavior cannot simply be changed by replacing IApiVersionDescriptionProvider
         // in the container for minimal apis, but that is not a common scenario. all the types and pieces
         // necessary to change this behavior is still possible outside of this method, but it's on the developer
+        var services = endpoints.ServiceProvider;
         var source = new CompositeEndpointDataSource( endpoints.DataSources );
-        var policyManager = endpoints.ServiceProvider.GetRequiredService<ISunsetPolicyManager>();
-        var options = endpoints.ServiceProvider.GetRequiredService<IOptions<ApiExplorerOptions>>();
-        var provider = new DefaultApiVersionDescriptionProvider( source, policyManager, options );
+        var actions = services.GetRequiredService<IActionDescriptorCollectionProvider>();
+        var policyManager = services.GetRequiredService<ISunsetPolicyManager>();
+        var options = services.GetRequiredService<IOptions<ApiExplorerOptions>>();
+        var provider = new DefaultApiVersionDescriptionProvider( source, actions, policyManager, options );
 
         return provider.ApiVersionDescriptions;
     }
