@@ -20,10 +20,6 @@
   <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.2-*" />
- </ItemGroup>
-
  <ItemGroup>
   <Using Include="Moq" />
   <Using Include="Xunit" />

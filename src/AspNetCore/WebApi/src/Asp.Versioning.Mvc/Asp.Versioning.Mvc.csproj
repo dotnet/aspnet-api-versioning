@@ -3,12 +3,22 @@
  <PropertyGroup>
   <VersionPrefix>6.0.0</VersionPrefix>
   <AssemblyVersion>6.0.0.0</AssemblyVersion>
-  <TargetFramework>net6.0</TargetFramework>
+  <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
   <RootNamespace>Asp.Versioning</RootNamespace>
   <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core MVC.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;MVC;Versioning</PackageTags>
  </PropertyGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+  <Compile Remove="net6.0\**\*.cs" />
+  <None Include="net6.0\**\*.cs" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+  <Compile Remove="netcoreapp3.1\**\*.cs" />
+  <None Include="netcoreapp3.1\**\*.cs" />
+ </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />

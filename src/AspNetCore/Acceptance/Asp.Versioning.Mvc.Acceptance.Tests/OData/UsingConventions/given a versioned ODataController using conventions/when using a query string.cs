@@ -17,7 +17,7 @@ public class when_using_a_query_string : ConventionsAcceptanceTest
 
 
         // act
-        var response = (await GetAsync( requestUrl )).EnsureSuccessStatusCode();
+        var response = ( await GetAsync( requestUrl ) ).EnsureSuccessStatusCode();
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0" );
@@ -47,8 +47,15 @@ public class when_using_a_query_string : ConventionsAcceptanceTest
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
+
+        // change from 3.1 to 6.0; DELETE is version-neutral
+        // and the only candidate, so GET returns 405
+#if NETCOREAPP3_1
+        response.StatusCode.Should().Be( MethodNotAllowed );
+#else
         response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unspecified.Type );
+#endif
     }
 
     public when_using_a_query_string( ConventionsFixture fixture ) : base( fixture ) { }
