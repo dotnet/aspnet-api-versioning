@@ -37,7 +37,7 @@ public class VersionedApiExplorerTest
         var descriptions = apiExplorer.ApiDescriptions;
 
         // assert
-        descriptions.Single().Should().Should().BeEquivalentTo(
+        descriptions.Single().Should().BeEquivalentTo(
             new { HttpMethod = Get, RelativePath = routeTemplate, ActionDescriptor = action },
             options => options.ExcludingMissingMembers() );
     }
@@ -70,7 +70,7 @@ public class VersionedApiExplorerTest
         var descriptions = apiExplorer.ApiDescriptions;
 
         // assert
-        descriptions.Single().Should().Should().BeEquivalentTo(
+        descriptions.Single().Should().BeEquivalentTo(
             new { HttpMethod = Get, RelativePath = routeTemplate },
             options => options.ExcludingMissingMembers() );
     }
@@ -124,7 +124,7 @@ public class VersionedApiExplorerTest
         var descriptions = apiExplorer.ApiDescriptions;
 
         // assert
-        descriptions.Single().Should().Should().BeEquivalentTo(
+        descriptions.Single().Should().BeEquivalentTo(
             new { HttpMethod = Get, RelativePath = routeTemplate, ActionDescriptor = action },
             options => options.ExcludingMissingMembers() );
     }
@@ -208,7 +208,7 @@ public class VersionedApiExplorerTest
     {
         // arrange
         var configuration = new HttpConfiguration();
-        var routeTemplate = "api/values/{id}";
+        var routeTemplate = "api/values/{Id}";
         var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( new ApiVersion( 1, 0 ) ) );
         var controllerDescriptor = new HttpControllerDescriptor( configuration, "ApiExplorerValues", typeof( DuplicatedIdController ) );
         var action = new ReflectedHttpActionDescriptor( controllerDescriptor, typeof( DuplicatedIdController ).GetMethod( "Get" ) )
@@ -225,7 +225,7 @@ public class VersionedApiExplorerTest
         var descriptions = apiExplorer.ApiDescriptions;
 
         // assert
-        descriptions.Single().Should().Should().BeEquivalentTo(
+        descriptions.Single().Should().BeEquivalentTo(
            new { HttpMethod = Get, RelativePath = routeTemplate, ActionDescriptor = action },
            options => options.ExcludingMissingMembers() );
     }
