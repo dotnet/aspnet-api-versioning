@@ -18,7 +18,8 @@ If you would like to contribute to the repository, first identify the scale of w
 
 ### Submitting a pull request
 
-You will need to sign a [Contributor License Agreement](CLA.md) when submitting your pull request. To complete the Contributor License Agreement (CLA), you will need to follow the instructions provided by the CLA bot when you send the pull request. This needs to only be done once for any .NET Foundation OSS project.
+You will need to sign a [Contributor License Agreement](https://cla.dotnetfoundation.org/dotnet/aspnet-api-versioning) when submitting your pull request. To complete the Contributor License Agreement (CLA), you
+will need to follow the instructions provided by the CLA bot when you send the pull request. This needs to only be done once for any .NET Foundation OSS project.
 
 If you don't know what a pull request is read this article: https://help.github.com/articles/using-pull-requests. Make sure that the repository can build and that all tests pass. Familiarize yourself with the project workflow and our coding conventions. The coding and style guidelines are described and enforced by `.editorconfig` as well as .NET Compiler Platform analyzers. These tools will automatically override your default settings without changing your environment. Violations will cause the build to fail.
 
