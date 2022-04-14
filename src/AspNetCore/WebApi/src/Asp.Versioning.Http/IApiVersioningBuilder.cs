@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// Defines the behavior for configuring API versioning.
 /// </summary>
-public interface IApiVersioningBuilder
+public partial interface IApiVersioningBuilder
 {
     /// <summary>
     /// Gets the services used when configuring API versioning.

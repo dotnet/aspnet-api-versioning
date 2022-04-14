@@ -1,9 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFramework>net6.0</TargetFramework>
+  <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
   <RootNamespace>Asp.Versioning</RootNamespace>
  </PropertyGroup>
+
+ <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+  <Compile Remove="Builder\**\*.cs" />
+  <None Include="Builder\**\*.cs" />
+ </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\src\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />

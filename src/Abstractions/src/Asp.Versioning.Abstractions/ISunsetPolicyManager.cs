@@ -22,7 +22,7 @@ public interface ISunsetPolicyManager
         string? name,
         ApiVersion? apiVersion,
 #if !NETSTANDARD
-        [MaybeNullWhen(false)]
+        [MaybeNullWhen( false )]
 #endif
         out SunsetPolicy sunsetPolicy );
 }

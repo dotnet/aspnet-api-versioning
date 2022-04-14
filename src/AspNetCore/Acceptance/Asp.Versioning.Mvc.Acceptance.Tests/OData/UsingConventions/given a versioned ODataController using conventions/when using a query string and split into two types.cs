@@ -88,14 +88,20 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
     {
         // arrange
 
-
         // act
         var response = await GetAsync( "api/people" );
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
+
+        // change from 3.1 to 6.0; DELETE is version-neutral
+        // and the only candidate, so GET returns 405
+#if NETCOREAPP3_1
+        response.StatusCode.Should().Be( MethodNotAllowed );
+#else
         response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unspecified.Type );
+#endif
     }
 
     public when_using_a_query_string_and_split_into_two_types( ConventionsFixture fixture ) : base( fixture ) { }

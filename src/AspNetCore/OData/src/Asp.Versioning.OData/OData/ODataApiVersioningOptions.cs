@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// Represents the possible API versioning options for OData services.
 /// </summary>
 [CLSCompliant( false )]
-public class ODataApiVersioningOptions
+public partial class ODataApiVersioningOptions
 {
     private Dictionary<string, Action<IServiceCollection>>? configurations;
 

@@ -5,6 +5,9 @@ namespace Asp.Versioning.Conventions;
 #if NETFRAMEWORK
 using ControllerBase = System.Web.Http.Controllers.IHttpController;
 using DateOnly = System.DateTime;
+#elif NETCOREAPP3_1
+using Microsoft.AspNetCore.Mvc;
+using DateOnly = System.DateTime;
 #else
 using Microsoft.AspNetCore.Mvc;
 #endif

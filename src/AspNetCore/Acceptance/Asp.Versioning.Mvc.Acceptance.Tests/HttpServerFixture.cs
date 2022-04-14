@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 public abstract partial class HttpServerFixture
@@ -35,14 +36,34 @@ public abstract partial class HttpServerFixture
 
     private static string GenerateEndpointDirectedGraph( IServiceProvider services )
     {
+        const int MaxUriLength = 65519;
         var dfa = services.GetRequiredService<DfaGraphWriter>();
         var dataSource = services.GetRequiredService<EndpointDataSource>();
-        using var writer = new StringWriter();
+        string graph;
 
-        dfa.Write( dataSource, writer );
-        writer.Flush();
+        using ( var writer = new StringWriter() )
+        {
+            dfa.Write( dataSource, writer );
+            writer.Flush();
+            graph = writer.ToString();
+        }
 
-        return "https://edotor.net/?engine=dot#" + Uri.EscapeDataString( writer.ToString() );
+        var count = graph.Length / MaxUriLength;
+        var fragment = new StringBuilder();
+
+        for ( var i = 0; i <= count; i++ )
+        {
+            if ( i < count )
+            {
+                fragment.Append( Uri.EscapeDataString( graph.Substring( MaxUriLength * i, MaxUriLength ) ) );
+            }
+            else
+            {
+                fragment.Append( Uri.EscapeDataString( graph[( MaxUriLength * i )..] ) );
+            }
+        }
+
+        return "https://edotor.net/?engine=dot#" + fragment.ToString();
     }
 
     private TestServer CreateServer()

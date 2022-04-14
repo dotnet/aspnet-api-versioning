@@ -15,5 +15,8 @@ public partial class SunsetPolicyManager
     /// Initializes a new instance of the <see cref="SunsetPolicyManager"/> class.
     /// </summary>
     /// <param name="options">The associated <see cref="ApiVersioningOptions">API versioning options</see>.</param>
+#if NETCOREAPP3_1
+    [CLSCompliant( false )]
+#endif
     public SunsetPolicyManager( IOptions<ApiVersioningOptions> options ) => this.options = options;
 }
