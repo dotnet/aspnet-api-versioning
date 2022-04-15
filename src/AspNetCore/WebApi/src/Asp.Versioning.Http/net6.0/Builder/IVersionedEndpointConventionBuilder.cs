@@ -3,18 +3,14 @@
 namespace Asp.Versioning.Builder;
 
 using Asp.Versioning.Conventions;
+using Microsoft.AspNetCore.Builder;
 
 /// <summary>
-/// Defines the behavior of an endpoint metadata builder.
+/// Defines the behavior of a versioned <see cref="IEndpointConventionBuilder"/>.
 /// </summary>
-public interface IEndpointMetadataBuilder : IMapToApiVersionConventionBuilder
+[CLSCompliant( false )]
+public interface IVersionedEndpointConventionBuilder : IEndpointConventionBuilder, IMapToApiVersionConventionBuilder
 {
-    /// <summary>
-    /// Gets the provider used to resolve services.
-    /// </summary>
-    /// <value>The <see cref="IServiceProvider"/> used to resolve services.</value>
-    IServiceProvider ServiceProvider { get; }
-
     /// <summary>
     /// Gets or sets a value indicating whether requests report the API version compatibility information in responses.
     /// </summary>

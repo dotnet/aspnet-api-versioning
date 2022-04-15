@@ -3,6 +3,9 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
+#if !NETCOREAPP3_1
+using Asp.Versioning.Builder;
+#endif
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -47,6 +50,9 @@ public static class IServiceCollectionExtensions
             throw new ArgumentNullException( nameof( services ) );
         }
 
+#if !NETCOREAPP3_1
+        services.TryAddSingleton<IApiVersionSetBuilderFactory, DefaultApiVersionSetBuilderFactory>();
+#endif
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
         services.TryAddSingleton<IProblemDetailsFactory, DefaultProblemDetailsFactory>();
         services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );

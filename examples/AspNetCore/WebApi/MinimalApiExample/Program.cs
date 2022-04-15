@@ -6,6 +6,11 @@ var builder = WebApplication.CreateBuilder( args );
 builder.Services.AddApiVersioning();
 
 var app = builder.Build();
+var versionSet = app.NewApiVersionSet()
+                    .HasApiVersion( 1.0 )
+                    .HasApiVersion( 2.0 )
+                    .ReportApiVersions()
+                    .Build();
 
 // Configure the HTTP request pipeline.
 
@@ -14,46 +19,43 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.DefineApi()
-   .HasApiVersion( 1.0 )
-   .HasApiVersion( 2.0 )
-   .ReportApiVersions()
-   .HasMapping( api =>
+// GET /weatherforecast?api-version=1.0
+app.MapGet( "/weatherforecast", () =>
     {
-        // GET /weatherforecast?api-version=1.0
-        api.MapGet( "/weatherforecast", () =>
-            {
-                return Enumerable.Range( 1, 5 ).Select( index =>
-                    new WeatherForecast
-                    (
-                        DateTime.Now.AddDays( index ),
-                        Random.Shared.Next( -20, 55 ),
-                        summaries[Random.Shared.Next( summaries.Length )]
-                    ) );
-            } )
-           .MapToApiVersion( 1.0 );
+        return Enumerable.Range( 1, 5 ).Select( index =>
+            new WeatherForecast
+            (
+                DateTime.Now.AddDays( index ),
+                Random.Shared.Next( -20, 55 ),
+                summaries[Random.Shared.Next( summaries.Length )]
+            ) );
+    } )
+   .UseApiVersioning( versionSet )
+   .MapToApiVersion( 1.0 );
 
-        // GET /weatherforecast?api-version=2.0
-        api.MapGet( "/weatherforecast", () =>
-            {
-                return Enumerable.Range( 0, summaries.Length ).Select( index =>
-                    new WeatherForecast
-                    (
-                        DateTime.Now.AddDays( index ),
-                        Random.Shared.Next( -20, 55 ),
-                        summaries[Random.Shared.Next( summaries.Length )]
-                    ) );
-            } )
-           .MapToApiVersion( 2.0 );
+// GET /weatherforecast?api-version=2.0
+app.MapGet( "/weatherforecast", () =>
+    {
+        return Enumerable.Range( 0, summaries.Length ).Select( index =>
+            new WeatherForecast
+            (
+                DateTime.Now.AddDays( index ),
+                Random.Shared.Next( -20, 55 ),
+                summaries[Random.Shared.Next( summaries.Length )]
+            ) );
+    } )
+   .UseApiVersioning( versionSet )
+   .MapToApiVersion( 2.0 );
 
-        // POST /weatherforecast?api-version=2.0
-        api.MapPost( "/weatherforecast", ( WeatherForecast forecast ) => { } )
-           .MapToApiVersion( 2.0 );
+// POST /weatherforecast?api-version=2.0
+app.MapPost( "/weatherforecast", ( WeatherForecast forecast ) => { } )
+   .UseApiVersioning( versionSet )
+   .MapToApiVersion( 2.0 );
 
-        // DELETE /weatherforecast
-        api.MapDelete( "/weatherforecast", () => { } )
-           .IsApiVersionNeutral();
-    } );
+// DELETE /weatherforecast
+app.MapDelete( "/weatherforecast", () => { } )
+   .UseApiVersioning( versionSet )
+   .IsApiVersionNeutral();
 
 app.Run();
 

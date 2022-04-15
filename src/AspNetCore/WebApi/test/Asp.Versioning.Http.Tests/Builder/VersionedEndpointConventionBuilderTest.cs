@@ -4,21 +4,24 @@ namespace Asp.Versioning.Builder;
 
 using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Options;
 
-public class EndpointMetadataBuilderTest
+public class VersionedEndpointConventionBuilderTest
 {
     [Fact]
     public void build_should_return_version_neutral_api_version_model()
     {
         // arrange
-        var apiBuilder = Mock.Of<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder, conventionBuilder );
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( null, source, options ).Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
 
-        metadataBuilder.IsApiVersionNeutral();
+        builder.IsApiVersionNeutral();
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeSameAs( ApiVersionMetadata.Neutral );
@@ -28,15 +31,16 @@ public class EndpointMetadataBuilderTest
     public void build_should_return_version_neutral_api_version_model_for_entire_api()
     {
         // arrange
-        var apiBuilder = new Mock<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
-
-        apiBuilder.Setup( b => b.Build() ).Returns( ApiVersionModel.Neutral );
-
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder.Object, conventionBuilder );
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( null, source, options )
+            .IsApiVersionNeutral()
+            .Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeSameAs( ApiVersionMetadata.Neutral );
@@ -46,17 +50,17 @@ public class EndpointMetadataBuilderTest
     public void build_should_return_version_neutral_api_version_model_for_entire_api_with_name()
     {
         // arrange
-        var apiBuilder = new Mock<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
-
-        apiBuilder.Setup( b => b.Build() ).Returns( ApiVersionModel.Neutral );
-        apiBuilder.SetupGet( b => b.Name ).Returns( "Test" );
-
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder.Object, conventionBuilder );
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( "Test", source, options )
+            .IsApiVersionNeutral()
+            .Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
         var expected = new ApiVersionMetadata( ApiVersionModel.Neutral, ApiVersionModel.Neutral, "Test" );
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeEquivalentTo( expected );
@@ -66,17 +70,15 @@ public class EndpointMetadataBuilderTest
     public void build_should_return_empty_api_version_model()
     {
         // arrange
-        var apiBuilder = new Mock<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
-
-        apiBuilder.Setup( b => b.Build() ).Returns( ApiVersionModel.Empty );
-        apiBuilder.SetupGet( b => b.Name ).Returns( "Test" );
-
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder.Object, conventionBuilder );
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( "Test", source, options ).Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
         var expected = new ApiVersionMetadata( ApiVersionModel.Empty, ApiVersionModel.Empty, "Test" );
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeEquivalentTo( expected );
@@ -86,18 +88,18 @@ public class EndpointMetadataBuilderTest
     public void build_should_return_inherited_api_version_model()
     {
         // arrange
-        var apiBuilder = new Mock<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( "Test", source, options )
+            .HasApiVersion( 2.0 )
+            .Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
         var apiModel = new ApiVersionModel( new ApiVersion( 2.0 ) );
-
-        apiBuilder.Setup( b => b.Build() ).Returns( apiModel );
-        apiBuilder.SetupGet( b => b.Name ).Returns( "Test" );
-
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder.Object, conventionBuilder );
         var expected = new ApiVersionMetadata( apiModel, apiModel, "Test" );
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeEquivalentTo( expected );
@@ -107,13 +109,11 @@ public class EndpointMetadataBuilderTest
     public void build_should_return_explicit_api_version_model()
     {
         // arrange
-        var apiBuilder = new Mock<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
-
-        apiBuilder.Setup( b => b.Build() ).Returns( ApiVersionModel.Empty );
-        apiBuilder.SetupGet( b => b.Name ).Returns( "Test" );
-
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder.Object, conventionBuilder );
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( "Test", source, options ).Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
         var expected = new ApiVersionMetadata(
             ApiVersionModel.Empty,
             new ApiVersionModel(
@@ -124,13 +124,13 @@ public class EndpointMetadataBuilderTest
                 deprecatedAdvertisedVersions: new ApiVersion[] { new( 2.0, "Beta" ) } ),
             "Test" );
 
-        metadataBuilder.HasApiVersion( 1.0 )
-                       .HasDeprecatedApiVersion( 0.9 )
-                       .AdvertisesApiVersion( 2.0 )
-                       .AdvertisesDeprecatedApiVersion( 2.0, "Beta" );
+        builder.HasApiVersion( 1.0 )
+               .HasDeprecatedApiVersion( 0.9 )
+               .AdvertisesApiVersion( 2.0 )
+               .AdvertisesDeprecatedApiVersion( 2.0, "Beta" );
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeEquivalentTo( expected );
@@ -140,19 +140,20 @@ public class EndpointMetadataBuilderTest
     public void build_should_return_mapped_api_version_model()
     {
         // arrange
-        var apiBuilder = new Mock<IVersionedApiBuilder>();
-        var conventionBuilder = Mock.Of<IEndpointConventionBuilder>();
+        var endpoints = Mock.Of<IEndpointConventionBuilder>();
+        var source = Mock.Of<IApiVersionParameterSource>();
+        var options = Options.Create( new ApiVersioningOptions() );
+        var versionSet = new ApiVersionSetBuilder( "Test", source, options )
+            .HasApiVersion( 1.0 )
+            .HasApiVersion( 2.0 )
+            .Build();
+        var builder = endpoints.UseApiVersioning( versionSet );
         var apiModel = new ApiVersionModel(
                 declaredVersions: new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
                 supportedVersions: new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
                 deprecatedVersions: Array.Empty<ApiVersion>(),
                 advertisedVersions: Array.Empty<ApiVersion>(),
                 deprecatedAdvertisedVersions: Array.Empty<ApiVersion>() );
-
-        apiBuilder.Setup( b => b.Build() ).Returns( ApiVersionModel.Empty );
-        apiBuilder.SetupGet( b => b.Name ).Returns( "Test" );
-
-        var metadataBuilder = new EndpointMetadataBuilder( apiBuilder.Object, conventionBuilder );
         var expected = new ApiVersionMetadata(
             apiModel,
             new ApiVersionModel(
@@ -163,10 +164,10 @@ public class EndpointMetadataBuilderTest
                 deprecatedAdvertisedVersions: Array.Empty<ApiVersion>() ),
             "Test" );
 
-        metadataBuilder.MapToApiVersion( 2.0 );
+        builder.MapToApiVersion( 2.0 );
 
         // act
-        var metadata = metadataBuilder.Build();
+        var metadata = builder.Build();
 
         // assert
         metadata.Should().BeEquivalentTo( expected );

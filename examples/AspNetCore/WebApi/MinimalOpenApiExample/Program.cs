@@ -44,224 +44,235 @@ services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>
 
 // Configure the HTTP request pipeline.
 var app = builder.Build();
+var orders = app.NewApiVersionSet( "Orders" ).Build();
+var people = app.NewApiVersionSet( "People" ).Build();
 
-app.DefineApi( "Orders" )
-   .HasMapping( api =>
+// 1.0
+app.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV1() { Id = id, Customer = "John Doe" } )
+   .Produces<OrderV1>()
+   .Produces( 404 )
+   .UseApiVersioning( orders )
+   .HasDeprecatedApiVersion( 0.9 )
+   .HasApiVersion( 1.0 );
+
+app.MapPost( "/api/orders", ( HttpRequest request, OrderV1 order ) =>
     {
-        // 1.0
-        api.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV1() { Id = id, Customer = "John Doe" } )
-           .Produces( response => response.Body<OrderV1>() )
-           .Produces( 404 )
-           .HasDeprecatedApiVersion( 0.9 )
-           .HasApiVersion( 1.0 );
+        order.Id = 42;
+        var scheme = request.Scheme;
+        var host = request.Host;
+        var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
+        return Results.Created( location, order );
+    } )
+   .Accepts<OrderV1>( "application/json" )
+   .Produces<OrderV1>( 201 )
+   .Produces( 400 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 1.0 );
 
-        api.MapPost( "/api/orders", ( HttpRequest request, OrderV1 order ) =>
-            {
-                order.Id = 42;
-                var scheme = request.Scheme;
-                var host = request.Host;
-                var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
-                return Results.Created( location, order );
-            } )
-           .Accepts( request => request.Body<OrderV1>() )
-           .Produces( response => response.Body<OrderV1>(), 201 )
-           .Produces( 400 )
-           .HasApiVersion( 1.0 );
+app.MapMethods( "/api/orders/{id:int}", new[] { HttpMethod.Patch.Method }, ( int id, OrderV1 order ) => Results.NoContent() )
+   .Accepts<OrderV1>( "application/json" )
+   .Produces( 204 )
+   .Produces( 400 )
+   .Produces( 404 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 1.0 );
 
-        api.MapPatch( "/api/orders/{id:int}", ( int id, OrderV1 order ) => Results.NoContent() )
-           .Accepts( request => request.Body<OrderV1>() )
-           .Produces( 204 )
-           .Produces( 400 )
-           .Produces( 404 )
-           .HasApiVersion( 1.0 );
-
-        // 2.0
-        api.MapGet( "/api/orders", () =>
-            new OrderV2[]
-            {
+// 2.0
+app.MapGet( "/api/orders", () =>
+    new OrderV2[]
+    {
                 new(){ Id = 1, Customer = "John Doe" },
                 new(){ Id = 2, Customer = "Bob Smith" },
                 new(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTimeOffset.UtcNow.AddDays( 7d ) },
-            } )
-           .Produces( response => response.Body<IEnumerable<OrderV2>>() )
-           .Produces( 404 )
-           .HasApiVersion( 2.0 );
+    } )
+   .Produces<IEnumerable<OrderV2>>()
+   .Produces( 404 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 2.0 );
 
-        api.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV2() { Id = id, Customer = "John Doe" } )
-           .Produces( response => response.Body<OrderV2>() )
-           .Produces( 404 )
-           .HasApiVersion( 2.0 );
+app.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV2() { Id = id, Customer = "John Doe" } )
+   .Produces<OrderV2>()
+   .Produces( 404 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 2.0 );
 
-        api.MapPost( "/api/orders", ( HttpRequest request, OrderV2 order ) =>
-            {
-                order.Id = 42;
-                var scheme = request.Scheme;
-                var host = request.Host;
-                var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
-                return Results.Created( location, order );
-            } )
-           .Accepts( request => request.Body<OrderV2>() )
-           .Produces( response => response.Body<OrderV2>(), 201 )
-           .Produces( 400 )
-           .HasApiVersion( 2.0 );
+app.MapPost( "/api/orders", ( HttpRequest request, OrderV2 order ) =>
+    {
+        order.Id = 42;
+        var scheme = request.Scheme;
+        var host = request.Host;
+        var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
+        return Results.Created( location, order );
+    } )
+   .Accepts<OrderV2>( "application/json" )
+   .Produces<OrderV2>( 201 )
+   .Produces( 400 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 2.0 );
 
-        api.MapPatch( "/api/orders/{id:int}", ( int id, OrderV2 order ) => Results.NoContent() )
-           .Accepts( request => request.Body<OrderV2>() )
-           .Produces( 204 )
-           .Produces( 400 )
-           .Produces( 404 )
-           .HasApiVersion( 2.0 );
+app.MapMethods( "/api/orders/{id:int}", new[] { HttpMethod.Patch.Method }, ( int id, OrderV2 order ) => Results.NoContent() )
+   .Accepts<OrderV2>( "application/json" )
+   .Produces( 204 )
+   .Produces( 400 )
+   .Produces( 404 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 2.0 );
 
-        // 3.0
-        api.MapGet( "/api/orders", () =>
-            new OrderV3[]
-            {
+// 3.0
+app.MapGet( "/api/orders", () =>
+    new OrderV3[]
+    {
                 new(){ Id = 1, Customer = "John Doe" },
                 new(){ Id = 2, Customer = "Bob Smith" },
                 new(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTimeOffset.UtcNow.AddDays( 7d ) },
-            } )
-           .Produces( response => response.Body<IEnumerable<OrderV3>>() )
-           .HasApiVersion( 3.0 );
+    } )
+   .Produces<IEnumerable<OrderV3>>()
+   .UseApiVersioning( orders )
+   .HasApiVersion( 3.0 );
 
-        api.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV3() { Id = id, Customer = "John Doe" } )
-           .Produces( response => response.Body<OrderV3>() )
-           .Produces( 404 )
-           .HasApiVersion( 3.0 );
+app.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV3() { Id = id, Customer = "John Doe" } )
+   .Produces<OrderV3>()
+   .Produces( 404 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 3.0 );
 
-        api.MapPost( "/api/orders", ( HttpRequest request, OrderV3 order ) =>
-            {
-                order.Id = 42;
-                var scheme = request.Scheme;
-                var host = request.Host;
-                var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
-                return Results.Created( location, order );
-            } )
-           .Accepts( request => request.Body<OrderV3>() )
-           .Produces( response => response.Body<OrderV3>(), 201 )
-           .Produces( 400 )
-           .HasApiVersion( 3.0 );
+app.MapPost( "/api/orders", ( HttpRequest request, OrderV3 order ) =>
+    {
+        order.Id = 42;
+        var scheme = request.Scheme;
+        var host = request.Host;
+        var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
+        return Results.Created( location, order );
+    } )
+   .Accepts<OrderV3>( "application/json" )
+   .Produces<OrderV3>( 201 )
+   .Produces( 400 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 3.0 );
 
-        api.MapDelete( "/api/orders/{id:int}", ( int id ) => Results.NoContent() )
-           .Produces( 204 )
-           .HasApiVersion( 3.0 );
-    } );
+app.MapDelete( "/api/orders/{id:int}", ( int id ) => Results.NoContent() )
+   .Produces( 204 )
+   .UseApiVersioning( orders )
+   .HasApiVersion( 3.0 );
 
-app.DefineApi( "People" )
-   .HasMapping( api =>
-   {
-       // 1.0
-       api.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
-           new PersonV1()
-           {
-               Id = id,
-               FirstName = "John",
-               LastName = "Doe",
-           } )
-          .Produces( response => response.Body<PersonV1>() )
-          .Produces( 404 )
-          .HasDeprecatedApiVersion( 0.9 )
-          .HasApiVersion( 1.0 );
+// 1.0
+app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
+    new PersonV1()
+    {
+        Id = id,
+        FirstName = "John",
+        LastName = "Doe",
+    } )
+   .Produces<PersonV1>()
+   .Produces( 404 )
+   .UseApiVersioning( people )
+   .HasDeprecatedApiVersion( 0.9 )
+   .HasApiVersion( 1.0 );
 
-       // 2.0
-       api.MapGet( "/api/v{version:apiVersion}/people", () =>
-           new PersonV2[]
-           {
-               new()
-               {
-                   Id = 1,
-                   FirstName = "John",
-                   LastName = "Doe",
-                   Email = "john.doe@somewhere.com",
-               },
-               new()
-               {
-                   Id = 2,
-                   FirstName = "Bob",
-                   LastName = "Smith",
-                   Email = "bob.smith@somewhere.com",
-               },
-               new()
-               {
-                   Id = 3,
-                   FirstName = "Jane",
-                   LastName = "Doe",
-                   Email = "jane.doe@somewhere.com",
-               },
-           } )
-          .Produces( response => response.Body<IEnumerable<PersonV2>>() )
-          .HasApiVersion( 2.0 );
+// 2.0
+app.MapGet( "/api/v{version:apiVersion}/people", () =>
+    new PersonV2[]
+    {
+        new()
+        {
+            Id = 1,
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@somewhere.com",
+        },
+        new()
+        {
+            Id = 2,
+            FirstName = "Bob",
+            LastName = "Smith",
+            Email = "bob.smith@somewhere.com",
+        },
+        new()
+        {
+            Id = 3,
+            FirstName = "Jane",
+            LastName = "Doe",
+            Email = "jane.doe@somewhere.com",
+        },
+    } )
+   .Produces<IEnumerable<PersonV2>>()
+   .UseApiVersioning( people )
+   .HasApiVersion( 2.0 );
 
-       api.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
-           new PersonV2()
-           {
-               Id = id,
-               FirstName = "John",
-               LastName = "Doe",
-               Email = "john.doe@somewhere.com",
-           } )
-          .Produces( response => response.Body<PersonV2>() )
-          .Produces( 404 )
-          .HasApiVersion( 2.0 );
+app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
+    new PersonV2()
+    {
+        Id = id,
+        FirstName = "John",
+        LastName = "Doe",
+        Email = "john.doe@somewhere.com",
+    } )
+   .Produces<PersonV2>()
+   .Produces( 404 )
+   .UseApiVersioning( people )
+   .HasApiVersion( 2.0 );
 
-       // 3.0
-       api.MapGet( "/api/v{version:apiVersion}/people", () =>
-           new PersonV3[]
-           {
-               new()
-               {
-                   Id = 1,
-                   FirstName = "John",
-                   LastName = "Doe",
-                   Email = "john.doe@somewhere.com",
-                   Phone = "555-987-1234",
-               },
-               new()
-               {
-                   Id = 2,
-                   FirstName = "Bob",
-                   LastName = "Smith",
-                   Email = "bob.smith@somewhere.com",
-                   Phone = "555-654-4321",
-               },
-               new()
-               {
-                   Id = 3,
-                   FirstName = "Jane",
-                   LastName = "Doe",
-                   Email = "jane.doe@somewhere.com",
-                   Phone = "555-789-3456",
-               },
-           } )
-          .Produces( response => response.Body<IEnumerable<PersonV3>>() )
-          .HasApiVersion( 3.0 );
+// 3.0
+app.MapGet( "/api/v{version:apiVersion}/people", () =>
+    new PersonV3[]
+    {
+        new()
+        {
+            Id = 1,
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@somewhere.com",
+            Phone = "555-987-1234",
+        },
+        new()
+        {
+            Id = 2,
+            FirstName = "Bob",
+            LastName = "Smith",
+            Email = "bob.smith@somewhere.com",
+            Phone = "555-654-4321",
+        },
+        new()
+        {
+            Id = 3,
+            FirstName = "Jane",
+            LastName = "Doe",
+            Email = "jane.doe@somewhere.com",
+            Phone = "555-789-3456",
+        },
+    } )
+   .Produces<IEnumerable<PersonV3>>()
+   .UseApiVersioning( people )
+   .HasApiVersion( 3.0 );
 
-       api.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
-           new PersonV3()
-           {
-               Id = id,
-               FirstName = "John",
-               LastName = "Doe",
-               Email = "john.doe@somewhere.com",
-               Phone = "555-987-1234",
-           } )
-          .Produces( response => response.Body<PersonV3>() )
-          .Produces( 404 )
-          .HasApiVersion( 3.0 );
+app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
+    new PersonV3()
+    {
+        Id = id,
+        FirstName = "John",
+        LastName = "Doe",
+        Email = "john.doe@somewhere.com",
+        Phone = "555-987-1234",
+    } )
+   .Produces<PersonV3>()
+   .Produces( 404 )
+   .UseApiVersioning( people )
+   .HasApiVersion( 3.0 );
 
-       api.MapPost( "/api/v{version:apiVersion}/people", ( HttpRequest request, PersonV3 person ) =>
-           {
-               person.Id = 42;
-               var scheme = request.Scheme;
-               var host = request.Host;
-               var version = request.HttpContext.GetRequestedApiVersion();
-               var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/people/{person.Id}" );
-               return Results.Created( location, person );
-           } )
-          .Accepts( request => request.Body<PersonV3>() )
-          .Produces( response => response.Body<PersonV3>(), 201 )
-          .Produces( 400 )
-          .HasApiVersion( 3.0 );
-   } );
+app.MapPost( "/api/v{version:apiVersion}/people", ( HttpRequest request, PersonV3 person ) =>
+    {
+        person.Id = 42;
+        var scheme = request.Scheme;
+        var host = request.Host;
+        var version = request.HttpContext.GetRequestedApiVersion();
+        var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/people/{person.Id}" );
+        return Results.Created( location, person );
+    } )
+   .Accepts<PersonV3>( "application/json" )
+   .Produces<PersonV3>( 201 )
+   .Produces( 400 )
+   .UseApiVersioning( people )
+   .HasApiVersion( 3.0 );
 
 app.UseSwagger();
 app.UseSwaggerUI(
