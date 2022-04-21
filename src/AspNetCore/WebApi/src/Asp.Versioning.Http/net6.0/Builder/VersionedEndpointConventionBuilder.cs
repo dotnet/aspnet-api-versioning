@@ -19,13 +19,9 @@ public class VersionedEndpointConventionBuilder :
     /// <summary>
     /// Initializes a new instance of the <see cref="VersionedEndpointConventionBuilder"/> class.
     /// </summary>
-    /// <param name="inner">The inner <see cref="IEndpointConventionBuilder"/> the new
-    /// instance decorates.</param>
-    /// <param name="apiVersionSet">The associated <see cref="ApiVersionSet">API version
-    /// set</see>.</param>
-    public VersionedEndpointConventionBuilder(
-        IEndpointConventionBuilder inner,
-        ApiVersionSet apiVersionSet )
+    /// <param name="inner">The inner <see cref="IEndpointConventionBuilder"/> the new instance decorates.</param>
+    /// <param name="apiVersionSet">The associated <see cref="ApiVersionSet">API version set</see>.</param>
+    public VersionedEndpointConventionBuilder( IEndpointConventionBuilder inner, ApiVersionSet apiVersionSet )
     {
         this.inner = inner ?? throw new ArgumentNullException( nameof( inner ) );
         VersionSet = apiVersionSet ?? throw new ArgumentNullException( nameof( apiVersionSet ) );
@@ -124,13 +120,14 @@ public class VersionedEndpointConventionBuilder :
     /// <summary>
     /// Builds and returns a new API version metadata.
     /// </summary>
+    /// <param name="options">The configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
     /// <returns>A new <see cref="ApiVersionMetadata">API version metadata</see>.</returns>
-    protected virtual ApiVersionMetadata Build()
+    protected virtual ApiVersionMetadata Build( ApiVersioningOptions options )
     {
         var name = VersionSet.Name;
         ApiVersionModel? apiModel;
 
-        if ( VersionNeutral || ( apiModel = VersionSet.Build() ).IsApiVersionNeutral )
+        if ( VersionNeutral || ( apiModel = VersionSet.Build( options ) ).IsApiVersionNeutral )
         {
             if ( string.IsNullOrEmpty( name ) )
             {
@@ -194,7 +191,7 @@ public class VersionedEndpointConventionBuilder :
             name );
     }
 
-    ApiVersionMetadata IVersionedEndpointConventionBuilder.Build() => Build();
+    ApiVersionMetadata IVersionedEndpointConventionBuilder.Build( ApiVersioningOptions options ) => Build( options );
 
     void IDeclareApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
 

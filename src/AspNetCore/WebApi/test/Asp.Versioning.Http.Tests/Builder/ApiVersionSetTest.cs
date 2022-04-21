@@ -2,17 +2,13 @@
 
 namespace Asp.Versioning.Builder;
 
-using Microsoft.Extensions.Options;
-
 public class ApiVersionSetTest
 {
     [Fact]
     public void report_api_versions_should_derive_from_builder()
     {
         // arrange
-        var source = Mock.Of<IApiVersionParameterSource>();
-        var options = Options.Create( new ApiVersioningOptions() );
-        var builder = new ApiVersionSetBuilder( null, source, options ).ReportApiVersions();
+        var builder = new ApiVersionSetBuilder( default ).ReportApiVersions();
 
         // act
         var versionSet = builder.Build();
@@ -25,14 +21,10 @@ public class ApiVersionSetTest
     public void build_should_construct_model_from_builder()
     {
         // arrange
-        var source = Mock.Of<IApiVersionParameterSource>();
-        var options = Options.Create( new ApiVersioningOptions() );
-        var versionSet = new ApiVersionSetBuilder( null, source, options )
-            .IsApiVersionNeutral()
-            .Build();
+        var versionSet = new ApiVersionSetBuilder( null ).IsApiVersionNeutral().Build();
 
         // act
-        var model = versionSet.Build();
+        var model = versionSet.Build( new() );
 
         // assert
         model.Should().BeSameAs( ApiVersionModel.Neutral );
@@ -42,9 +34,7 @@ public class ApiVersionSetTest
     public void advertises_api_version_should_propagate_to_builder()
     {
         // arrange
-        var source = Mock.Of<IApiVersionParameterSource>();
-        var options = Options.Create( new ApiVersioningOptions() );
-        var builder = new Mock<ApiVersionSetBuilder>( null, source, options ) { CallBase = true };
+        var builder = new Mock<ApiVersionSetBuilder>( null ) { CallBase = true };
 
         builder.Setup( b => b.AdvertisesApiVersion( It.IsAny<ApiVersion>() ) );
 
@@ -62,9 +52,7 @@ public class ApiVersionSetTest
     public void advertises_deprecated_api_version_should_propagate_to_builder()
     {
         // arrange
-        var source = Mock.Of<IApiVersionParameterSource>();
-        var options = Options.Create( new ApiVersioningOptions() );
-        var builder = new Mock<ApiVersionSetBuilder>( null, source, options ) { CallBase = true };
+        var builder = new Mock<ApiVersionSetBuilder>( null ) { CallBase = true };
 
         builder.Setup( b => b.AdvertisesDeprecatedApiVersion( It.IsAny<ApiVersion>() ) );
 

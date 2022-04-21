@@ -3,7 +3,6 @@
 namespace Asp.Versioning.Builder;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Options;
 
 public class IEndpointConventionBuilderExtensionsTest
 {
@@ -12,9 +11,7 @@ public class IEndpointConventionBuilderExtensionsTest
     {
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
-        var source = Mock.Of<IApiVersionParameterSource>();
-        var options = Options.Create( new ApiVersioningOptions() );
-        var versionSet = new ApiVersionSetBuilder( null, source, options ).Build();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
         var builder1 = endpoints.UseApiVersioning( versionSet );
 
         // act

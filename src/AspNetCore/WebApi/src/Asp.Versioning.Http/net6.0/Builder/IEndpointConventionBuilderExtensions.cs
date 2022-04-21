@@ -7,6 +7,8 @@ using Asp.Versioning.Builder;
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Globalization;
 using static Asp.Versioning.ApiVersionParameterLocation;
 
@@ -72,12 +74,21 @@ public static class IEndpointConventionBuilderExtensions
         IVersionedEndpointConventionBuilder conventions,
         ApiVersionSet versionSet )
     {
+        // this will change to EndpointBuilder.ServiceProvider in 7.0
+        // REF: https://github.com/dotnet/aspnetcore/pull/41238/files#diff-f8807c470bcc3a077fb176668a46df57b4bb99c992b6b7b375665f8bf3903c94R510
+        if ( versionSet.ServiceProvider is not IServiceProvider services )
+        {
+            throw new InvalidOperationException( SR.NoEndpointBuilderServices );
+        }
+
+        var parameterSource = services.GetRequiredService<IApiVersionParameterSource>();
+        var options = services.GetRequiredService<IOptions<ApiVersioningOptions>>().Value;
         var requestDelegate = default( RequestDelegate );
-        var metadata = conventions.Build();
+        var metadata = conventions.Build( options );
 
         endpointBuilder.Metadata.Add( metadata );
 
-        if ( versionSet.Options.ReportApiVersions ||
+        if ( options.ReportApiVersions ||
              versionSet.ReportApiVersions ||
              conventions.ReportApiVersions )
         {
@@ -86,9 +97,9 @@ public static class IEndpointConventionBuilderExtensions
             endpointBuilder.RequestDelegate = requestDelegate;
         }
 
-        if ( versionSet.ParameterSource.VersionsByMediaType() )
+        if ( parameterSource.VersionsByMediaType() )
         {
-            var parameterName = versionSet.ParameterSource.GetParameterName( MediaTypeParameter );
+            var parameterName = parameterSource.GetParameterName( MediaTypeParameter );
             requestDelegate = EnsureRequestDelegate( requestDelegate, endpointBuilder.RequestDelegate );
             requestDelegate = new ContentTypeApiVersionDecorator( requestDelegate, parameterName );
             endpointBuilder.RequestDelegate = requestDelegate;

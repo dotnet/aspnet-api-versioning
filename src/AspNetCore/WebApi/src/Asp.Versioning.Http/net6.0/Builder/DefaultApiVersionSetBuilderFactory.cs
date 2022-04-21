@@ -1,32 +1,33 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable
-
 namespace Asp.Versioning.Builder;
 
-using Asp.Versioning.Conventions;
-using Asp.Versioning.Routing;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
-using System.Globalization;
-using static Asp.Versioning.ApiVersionParameterLocation;
-
-internal sealed class DefaultApiVersionSetBuilderFactory :
-    IApiVersionSetBuilderFactory
+/// <summary>
+/// Represents the default API version set builder factory.
+/// </summary>
+public class DefaultApiVersionSetBuilderFactory : IApiVersionSetBuilderFactory
 {
-    private readonly IApiVersionParameterSource parameterSource;
-    private readonly IOptions<ApiVersioningOptions> options;
+    private readonly IServiceProvider serviceProvider;
 
-    public DefaultApiVersionSetBuilderFactory(
-        IApiVersionParameterSource parameterSource,
-        IOptions<ApiVersioningOptions> options )
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultApiVersionSetBuilderFactory"/> class.
+    /// </summary>
+    /// <param name="serviceProvider">The underlying <see cref="IServiceProvider">service provider</see>.</param>
+    public DefaultApiVersionSetBuilderFactory( IServiceProvider serviceProvider ) =>
+        this.serviceProvider = serviceProvider;
+
+    /// <inheritdoc />
+    public ApiVersionSetBuilder Create( string? name = default )
     {
-        this.parameterSource = parameterSource;
-        this.options = options;
+        var instance = CreateInstance( name );
+        instance.ServiceProvider = serviceProvider;
+        return instance;
     }
 
-    public ApiVersionSetBuilder Create( string? name = default ) =>
-        new( name, parameterSource, options );
+    /// <summary>
+    /// Creates and returns a new builder instance.
+    /// </summary>
+    /// <param name="name">The optional name associated with the builder.</param>
+    /// <returns>A new <see cref="ApiVersionSetBuilder">API version set builder</see>.</returns>
+    protected virtual ApiVersionSetBuilder CreateInstance( string? name ) => new( name );
 }

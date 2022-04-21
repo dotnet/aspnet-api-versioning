@@ -3,7 +3,6 @@
 namespace Asp.Versioning.Builder;
 
 using Asp.Versioning.Conventions;
-using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Represents the builder for an API version set.
@@ -11,25 +10,16 @@ using Microsoft.Extensions.Options;
 public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApiVersionConventionBuilder
 {
     private readonly string? name;
-    private readonly IApiVersionParameterSource parameterSource;
-    private readonly IOptions<ApiVersioningOptions> options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionSetBuilder"/> class.
     /// </summary>
     /// <param name="name">The name of the API, if any.</param>
-    /// <param name="parameterSource">The <see cref="IApiVersionParameterSource">API version
-    /// parameter source</see>.</param>
-    /// <param name="options">The configured API versioning options.</param>
-    public ApiVersionSetBuilder(
-        string? name,
-        IApiVersionParameterSource parameterSource,
-        IOptions<ApiVersioningOptions> options )
-    {
-        this.name = name;
-        this.parameterSource = parameterSource;
-        this.options = options;
-    }
+    public ApiVersionSetBuilder( string? name ) => this.name = name;
+
+    // intentionally internal for 6.0, until EndpointBuilder.ServiceProvider is exposed in 7.0
+    // REF: https://github.com/dotnet/aspnetcore/pull/41238/files#diff-f8807c470bcc3a077fb176668a46df57b4bb99c992b6b7b375665f8bf3903c94R510
+    internal IServiceProvider? ServiceProvider { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether requests report the API version compatibility information in responses.
@@ -41,7 +31,7 @@ public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApi
     /// Builds and returns a new API versioning configuration.
     /// </summary>
     /// <returns>A new <see cref="ApiVersionSet">API versioning configuration</see>.</returns>
-    public virtual ApiVersionSet Build() => new( this, name, parameterSource, options );
+    public virtual ApiVersionSet Build() => new( this, name ) { ServiceProvider = ServiceProvider };
 
     /// <summary>
     /// Indicates that all APIs in the version set will report their versions.
@@ -120,9 +110,15 @@ public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApi
     /// <summary>
     /// Builds and returns an API version model.
     /// </summary>
+    /// <param name="options">The configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
     /// <returns>A new <see cref="ApiVersionModel">API version model</see>.</returns>
-    protected internal virtual ApiVersionModel BuildApiVersionModel()
+    protected internal virtual ApiVersionModel BuildApiVersionModel( ApiVersioningOptions options )
     {
+        if ( options == null )
+        {
+            throw new ArgumentNullException( nameof( options ) );
+        }
+
         if ( VersionNeutral )
         {
             return ApiVersionModel.Neutral;
@@ -130,7 +126,7 @@ public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApi
 
         if ( IsEmpty )
         {
-            return new( options.Value.DefaultApiVersion );
+            return new( options.DefaultApiVersion );
         }
 
         return new(
