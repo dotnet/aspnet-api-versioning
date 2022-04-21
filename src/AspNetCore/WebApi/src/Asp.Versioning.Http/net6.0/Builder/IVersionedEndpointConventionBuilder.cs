@@ -20,6 +20,7 @@ public interface IVersionedEndpointConventionBuilder : IEndpointConventionBuilde
     /// <summary>
     /// Builds and returns a new API version metadata.
     /// </summary>
+    /// <param name="options">The configured <see cref="ApiVersioningOptions">API versioning options</see>.</param>
     /// <returns>A new <see cref="ApiVersionMetadata">API version metadata</see>.</returns>
-    ApiVersionMetadata Build();
+    ApiVersionMetadata Build( ApiVersioningOptions options );
 }
