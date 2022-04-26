@@ -19,14 +19,14 @@ using static Asp.Versioning.ApiVersionParameterLocation;
 public static class IEndpointConventionBuilderExtensions
 {
     /// <summary>
-    /// Indicates that the endpoint will use API versioning.
+    /// Applies the specified API version set to the endpoint.
     /// </summary>
     /// <param name="builder">The extended <see cref="IEndpointConventionBuilder">builder</see>.</param>
     /// <param name="apiVersionSet">The <see cref="ApiVersionSet">API version set</see> the endpoint will use.</param>
     /// <returns>A new <see cref="IVersionedEndpointConventionBuilder"/> instance.</returns>
     /// <remarks>If the specified <paramref name="builder"/> already implements <see cref="IVersionedEndpointConventionBuilder"/>,
     /// then that instance will be returned instead.</remarks>
-    public static IVersionedEndpointConventionBuilder UseApiVersioning(
+    public static IVersionedEndpointConventionBuilder WithApiVersionSet(
         this IEndpointConventionBuilder builder,
         ApiVersionSet apiVersionSet )
     {

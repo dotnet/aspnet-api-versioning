@@ -30,7 +30,7 @@ app.MapGet( "/weatherforecast", () =>
                 summaries[Random.Shared.Next( summaries.Length )]
             ) );
     } )
-   .UseApiVersioning( versionSet )
+   .WithApiVersionSet( versionSet )
    .MapToApiVersion( 1.0 );
 
 // GET /weatherforecast?api-version=2.0
@@ -44,17 +44,17 @@ app.MapGet( "/weatherforecast", () =>
                 summaries[Random.Shared.Next( summaries.Length )]
             ) );
     } )
-   .UseApiVersioning( versionSet )
+   .WithApiVersionSet( versionSet )
    .MapToApiVersion( 2.0 );
 
 // POST /weatherforecast?api-version=2.0
 app.MapPost( "/weatherforecast", ( WeatherForecast forecast ) => { } )
-   .UseApiVersioning( versionSet )
+   .WithApiVersionSet( versionSet )
    .MapToApiVersion( 2.0 );
 
 // DELETE /weatherforecast
 app.MapDelete( "/weatherforecast", () => { } )
-   .UseApiVersioning( versionSet )
+   .WithApiVersionSet( versionSet )
    .IsApiVersionNeutral();
 
 app.Run();
