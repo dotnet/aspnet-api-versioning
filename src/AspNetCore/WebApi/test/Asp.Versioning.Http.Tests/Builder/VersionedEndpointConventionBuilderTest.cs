@@ -13,7 +13,7 @@ public class VersionedEndpointConventionBuilderTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( default ).Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
 
         builder.IsApiVersionNeutral();
 
@@ -30,7 +30,7 @@ public class VersionedEndpointConventionBuilderTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( default ).IsApiVersionNeutral().Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
 
         // act
         var metadata = builder.Build( new() );
@@ -45,7 +45,7 @@ public class VersionedEndpointConventionBuilderTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( "Test" ).IsApiVersionNeutral().Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
         var expected = new ApiVersionMetadata( ApiVersionModel.Neutral, ApiVersionModel.Neutral, "Test" );
 
         // act
@@ -61,7 +61,7 @@ public class VersionedEndpointConventionBuilderTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( "Test" ).Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
         var expected = new ApiVersionMetadata( ApiVersionModel.Empty, ApiVersionModel.Empty, "Test" );
 
         // act
@@ -77,7 +77,7 @@ public class VersionedEndpointConventionBuilderTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( "Test" ).HasApiVersion( 2.0 ).Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
         var apiModel = new ApiVersionModel( new ApiVersion( 2.0 ) );
         var expected = new ApiVersionMetadata( apiModel, apiModel, "Test" );
 
@@ -94,7 +94,7 @@ public class VersionedEndpointConventionBuilderTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( "Test" ).Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
         var expected = new ApiVersionMetadata(
             ApiVersionModel.Empty,
             new ApiVersionModel(
@@ -126,7 +126,7 @@ public class VersionedEndpointConventionBuilderTest
             .HasApiVersion( 1.0 )
             .HasApiVersion( 2.0 )
             .Build();
-        var builder = endpoints.UseApiVersioning( versionSet );
+        var builder = endpoints.WithApiVersionSet( versionSet );
         var apiModel = new ApiVersionModel(
                 declaredVersions: new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
                 supportedVersions: new ApiVersion[] { new( 1.0 ), new( 2.0 ) },

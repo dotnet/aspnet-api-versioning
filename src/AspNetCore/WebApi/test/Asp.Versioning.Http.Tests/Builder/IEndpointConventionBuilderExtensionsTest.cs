@@ -12,10 +12,10 @@ public class IEndpointConventionBuilderExtensionsTest
         // arrange
         var endpoints = Mock.Of<IEndpointConventionBuilder>();
         var versionSet = new ApiVersionSetBuilder( default ).Build();
-        var builder1 = endpoints.UseApiVersioning( versionSet );
+        var builder1 = endpoints.WithApiVersionSet( versionSet );
 
         // act
-        var builder2 = builder1.UseApiVersioning( versionSet );
+        var builder2 = builder1.WithApiVersionSet( versionSet );
 
         // assert
         builder1.Should().BeSameAs( builder2 );

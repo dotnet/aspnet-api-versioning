@@ -51,7 +51,7 @@ var people = app.NewApiVersionSet( "People" ).Build();
 app.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV1() { Id = id, Customer = "John Doe" } )
    .Produces<OrderV1>()
    .Produces( 404 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasDeprecatedApiVersion( 0.9 )
    .HasApiVersion( 1.0 );
 
@@ -66,7 +66,7 @@ app.MapPost( "/api/orders", ( HttpRequest request, OrderV1 order ) =>
    .Accepts<OrderV1>( "application/json" )
    .Produces<OrderV1>( 201 )
    .Produces( 400 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 1.0 );
 
 app.MapMethods( "/api/orders/{id:int}", new[] { HttpMethod.Patch.Method }, ( int id, OrderV1 order ) => Results.NoContent() )
@@ -74,7 +74,7 @@ app.MapMethods( "/api/orders/{id:int}", new[] { HttpMethod.Patch.Method }, ( int
    .Produces( 204 )
    .Produces( 400 )
    .Produces( 404 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 1.0 );
 
 // 2.0
@@ -87,13 +87,13 @@ app.MapGet( "/api/orders", () =>
     } )
    .Produces<IEnumerable<OrderV2>>()
    .Produces( 404 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 2.0 );
 
 app.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV2() { Id = id, Customer = "John Doe" } )
    .Produces<OrderV2>()
    .Produces( 404 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 2.0 );
 
 app.MapPost( "/api/orders", ( HttpRequest request, OrderV2 order ) =>
@@ -107,7 +107,7 @@ app.MapPost( "/api/orders", ( HttpRequest request, OrderV2 order ) =>
    .Accepts<OrderV2>( "application/json" )
    .Produces<OrderV2>( 201 )
    .Produces( 400 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 2.0 );
 
 app.MapMethods( "/api/orders/{id:int}", new[] { HttpMethod.Patch.Method }, ( int id, OrderV2 order ) => Results.NoContent() )
@@ -115,7 +115,7 @@ app.MapMethods( "/api/orders/{id:int}", new[] { HttpMethod.Patch.Method }, ( int
    .Produces( 204 )
    .Produces( 400 )
    .Produces( 404 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 2.0 );
 
 // 3.0
@@ -127,13 +127,13 @@ app.MapGet( "/api/orders", () =>
                 new(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTimeOffset.UtcNow.AddDays( 7d ) },
     } )
    .Produces<IEnumerable<OrderV3>>()
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 3.0 );
 
 app.MapGet( "/api/orders/{id:int}", ( int id ) => new OrderV3() { Id = id, Customer = "John Doe" } )
    .Produces<OrderV3>()
    .Produces( 404 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 3.0 );
 
 app.MapPost( "/api/orders", ( HttpRequest request, OrderV3 order ) =>
@@ -147,12 +147,12 @@ app.MapPost( "/api/orders", ( HttpRequest request, OrderV3 order ) =>
    .Accepts<OrderV3>( "application/json" )
    .Produces<OrderV3>( 201 )
    .Produces( 400 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 3.0 );
 
 app.MapDelete( "/api/orders/{id:int}", ( int id ) => Results.NoContent() )
    .Produces( 204 )
-   .UseApiVersioning( orders )
+   .WithApiVersionSet( orders )
    .HasApiVersion( 3.0 );
 
 // 1.0
@@ -165,7 +165,7 @@ app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
     } )
    .Produces<PersonV1>()
    .Produces( 404 )
-   .UseApiVersioning( people )
+   .WithApiVersionSet( people )
    .HasDeprecatedApiVersion( 0.9 )
    .HasApiVersion( 1.0 );
 
@@ -196,7 +196,7 @@ app.MapGet( "/api/v{version:apiVersion}/people", () =>
         },
     } )
    .Produces<IEnumerable<PersonV2>>()
-   .UseApiVersioning( people )
+   .WithApiVersionSet( people )
    .HasApiVersion( 2.0 );
 
 app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
@@ -209,7 +209,7 @@ app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
     } )
    .Produces<PersonV2>()
    .Produces( 404 )
-   .UseApiVersioning( people )
+   .WithApiVersionSet( people )
    .HasApiVersion( 2.0 );
 
 // 3.0
@@ -242,7 +242,7 @@ app.MapGet( "/api/v{version:apiVersion}/people", () =>
         },
     } )
    .Produces<IEnumerable<PersonV3>>()
-   .UseApiVersioning( people )
+   .WithApiVersionSet( people )
    .HasApiVersion( 3.0 );
 
 app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
@@ -256,7 +256,7 @@ app.MapGet( "/api/v{version:apiVersion}/people/{id:int}", ( int id ) =>
     } )
    .Produces<PersonV3>()
    .Produces( 404 )
-   .UseApiVersioning( people )
+   .WithApiVersionSet( people )
    .HasApiVersion( 3.0 );
 
 app.MapPost( "/api/v{version:apiVersion}/people", ( HttpRequest request, PersonV3 person ) =>
@@ -271,7 +271,7 @@ app.MapPost( "/api/v{version:apiVersion}/people", ( HttpRequest request, PersonV
    .Accepts<PersonV3>( "application/json" )
    .Produces<PersonV3>( 201 )
    .Produces( 400 )
-   .UseApiVersioning( people )
+   .WithApiVersionSet( people )
    .HasApiVersion( 3.0 );
 
 app.UseSwagger();
