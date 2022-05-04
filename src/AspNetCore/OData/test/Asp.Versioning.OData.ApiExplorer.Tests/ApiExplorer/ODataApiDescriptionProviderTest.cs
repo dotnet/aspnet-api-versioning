@@ -87,6 +87,8 @@ public class ODataApiDescriptionProviderTest
         items.Should().BeEquivalentTo(
             new[]
             {
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/Books" },
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/Books/{id}" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
                 new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },

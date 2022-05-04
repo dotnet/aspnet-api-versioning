@@ -37,7 +37,8 @@ public class VersionedApiExplorer : IApiExplorer
     /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
     /// </summary>
     /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
-    public VersionedApiExplorer( HttpConfiguration configuration ) : this( configuration, new ApiExplorerOptions( configuration ) ) { }
+    public VersionedApiExplorer( HttpConfiguration configuration )
+        : this( configuration, new ApiExplorerOptions( configuration ) ) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
@@ -109,7 +110,9 @@ public class VersionedApiExplorer : IApiExplorer
     /// <param name="route">The associated <see cref="IHttpRoute">route</see>.</param>
     /// <param name="actionDescriptor">The <see cref="HttpActionDescriptor">action descriptor</see> to get the HTTP methods for.</param>
     /// <returns>A <see cref="Collection{T}">collection</see> of <see cref="HttpMethod">HTTP method</see>.</returns>
-    protected virtual Collection<HttpMethod> GetHttpMethodsSupportedByAction( IHttpRoute route, HttpActionDescriptor actionDescriptor )
+    protected virtual Collection<HttpMethod> GetHttpMethodsSupportedByAction(
+        IHttpRoute route,
+        HttpActionDescriptor actionDescriptor )
     {
         if ( route == null )
         {
@@ -132,7 +135,11 @@ public class VersionedApiExplorer : IApiExplorer
     /// <param name="route">The associated <see cref="IHttpRoute">route</see>.</param>
     /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to consider the controller for.</param>
     /// <returns>True if the action should be explored; otherwise, false.</returns>
-    protected virtual bool ShouldExploreAction( string actionRouteParameterValue, HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
+    protected virtual bool ShouldExploreAction(
+        string actionRouteParameterValue,
+        HttpActionDescriptor actionDescriptor,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         if ( actionDescriptor == null )
         {
@@ -162,7 +169,11 @@ public class VersionedApiExplorer : IApiExplorer
     /// <param name="route">The associated <see cref="IHttpRoute">route</see>.</param>
     /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to consider the controller for.</param>
     /// <returns>True if the controller should be explored; otherwise, false.</returns>
-    protected virtual bool ShouldExploreController( string controllerRouteParameterValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route, ApiVersion apiVersion )
+    protected virtual bool ShouldExploreController(
+        string controllerRouteParameterValue,
+        HttpControllerDescriptor controllerDescriptor,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         if ( controllerDescriptor == null )
         {
@@ -546,7 +557,9 @@ public class VersionedApiExplorer : IApiExplorer
         return supported;
     }
 
-    private static HttpControllerDescriptor? FindControllerDescriptor( IEnumerable<HttpControllerDescriptor> controllerDescriptors, Type controllerType )
+    private static HttpControllerDescriptor? FindControllerDescriptor(
+        IEnumerable<HttpControllerDescriptor> controllerDescriptors,
+        Type controllerType )
     {
         foreach ( var controllerDescriptor in controllerDescriptors )
         {
@@ -680,7 +693,10 @@ public class VersionedApiExplorer : IApiExplorer
     /// <param name="route">The <see cref="IHttpRoute">route</see> to explore.</param>
     /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to explore.</param>
     /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
-    protected virtual Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
+    protected virtual Collection<VersionedApiDescription> ExploreRouteControllers(
+        IDictionary<string, HttpControllerDescriptor> controllerMappings,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         if ( controllerMappings == null )
         {
@@ -930,7 +946,10 @@ public class VersionedApiExplorer : IApiExplorer
         return elementType;
     }
 
-    private static void AddPlaceholderForProperties( Dictionary<string, object> parameterValuesForRoute, IEnumerable<PropertyInfo> properties, string prefix )
+    private static void AddPlaceholderForProperties(
+        Dictionary<string, object> parameterValuesForRoute,
+        IEnumerable<PropertyInfo> properties,
+        string prefix )
     {
         foreach ( var property in properties )
         {
@@ -953,7 +972,10 @@ public class VersionedApiExplorer : IApiExplorer
         }
     }
 
-    private IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IParsedRoute parsedRoute, IDictionary<string, object> routeDefaults )
+    private IList<ApiParameterDescription> CreateParameterDescriptions(
+        HttpActionDescriptor actionDescriptor,
+        IParsedRoute parsedRoute,
+        IDictionary<string, object> routeDefaults )
     {
         IList<ApiParameterDescription> parameterDescriptions = new List<ApiParameterDescription>();
         var actionBinding = GetActionBinding( actionDescriptor );
@@ -991,7 +1013,10 @@ public class VersionedApiExplorer : IApiExplorer
         return parameterDescriptions;
     }
 
-    private static void AddUndeclaredRouteParameters( IParsedRoute parsedRoute, IDictionary<string, object> routeDefaults, IList<ApiParameterDescription> parameterDescriptions )
+    private static void AddUndeclaredRouteParameters(
+        IParsedRoute parsedRoute,
+        IDictionary<string, object> routeDefaults,
+        IList<ApiParameterDescription> parameterDescriptions )
     {
         for ( var i = 0; i < parsedRoute.PathSegments.Count; i++ )
         {
@@ -1061,7 +1086,9 @@ public class VersionedApiExplorer : IApiExplorer
         return parameterDescription;
     }
 
-    private static Collection<VersionedApiDescription> RemoveInvalidApiDescriptions( Collection<VersionedApiDescription> apiDescriptions, ApiVersion apiVersion )
+    private static Collection<VersionedApiDescription> RemoveInvalidApiDescriptions(
+        Collection<VersionedApiDescription> apiDescriptions,
+        ApiVersion apiVersion )
     {
         var filteredDescriptions = new Dictionary<string, VersionedApiDescription>( StringComparer.OrdinalIgnoreCase );
 

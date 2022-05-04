@@ -40,7 +40,8 @@ public partial class ODataQueryOptionDescriptionContext
     /// Initializes a new instance of the <see cref="ODataQueryOptionDescriptionContext"/> class.
     /// </summary>
     /// <param name="apiDescription">The associated <see cref="ApiDescription">API description</see>.</param>
-    /// <param name="validationSettings">The <see cref="ODataValidationSettings">validation settings</see> to derive the description context from.</param>
+    /// <param name="validationSettings">The <see cref="ODataValidationSettings">validation settings</see> to
+    /// derive the description context from.</param>
     protected internal ODataQueryOptionDescriptionContext(
         ApiDescription apiDescription,
         ODataValidationSettings validationSettings )

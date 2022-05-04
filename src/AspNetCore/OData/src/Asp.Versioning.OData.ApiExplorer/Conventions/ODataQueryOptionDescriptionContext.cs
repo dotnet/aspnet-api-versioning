@@ -22,7 +22,14 @@ public partial class ODataQueryOptionDescriptionContext
             return default;
         }
 
-        var items = description.ActionDescriptor.EndpointMetadata.OfType<IODataRoutingMetadata>();
+        var metadata = description.ActionDescriptor.EndpointMetadata;
+
+        if ( metadata == null )
+        {
+            return default;
+        }
+
+        var items = metadata.OfType<IODataRoutingMetadata>();
 
         foreach ( var item in items )
         {

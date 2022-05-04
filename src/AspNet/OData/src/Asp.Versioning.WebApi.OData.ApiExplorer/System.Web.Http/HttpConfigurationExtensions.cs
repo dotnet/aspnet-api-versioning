@@ -4,6 +4,7 @@ namespace System.Web.Http;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNet.OData.Routing;
 using Microsoft.OData;
 using System.Collections.Concurrent;
 using System.Web.Http.Description;
@@ -15,6 +16,7 @@ using System.Web.Http.Routing;
 public static class HttpConfigurationExtensions
 {
     private const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
+    private const string NonODataRootContainerKey = "Microsoft.AspNet.OData.NonODataRootContainerKey";
     private const string UrlKeyDelimiterKey = "Microsoft.AspNet.OData.UrlKeyDelimiterKey";
 
     /// <summary>
@@ -69,10 +71,18 @@ public static class HttpConfigurationExtensions
 
     internal static IServiceProvider GetODataRootContainer( this HttpConfiguration configuration, IHttpRoute route )
     {
-        var containers = (ConcurrentDictionary<string, IServiceProvider>) configuration.Properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
+        var properties = configuration.Properties;
+        var containers = (ConcurrentDictionary<string, IServiceProvider>) properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
         var routeName = configuration.Routes.GetRouteName( route );
 
         if ( !string.IsNullOrEmpty( routeName ) && containers.TryGetValue( routeName!, out var serviceProvider ) )
+        {
+            return serviceProvider;
+        }
+
+        if ( route is not ODataRoute &&
+             properties.TryGetValue( NonODataRootContainerKey, out var value ) &&
+             ( serviceProvider = value as IServiceProvider ) is not null )
         {
             return serviceProvider;
         }

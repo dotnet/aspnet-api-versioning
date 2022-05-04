@@ -7,6 +7,7 @@ using Asp.Versioning.Description;
 using Asp.Versioning.OData;
 using Asp.Versioning.Routing;
 using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Formatter;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNet.OData.Routing.Template;
@@ -63,15 +64,12 @@ public class ODataApiExplorer : VersionedApiExplorer
     protected virtual IModelTypeBuilder ModelTypeBuilder =>
         modelTypeBuilder ??= Configuration.DependencyResolver.GetModelTypeBuilder();
 
-    /// <summary>
-    /// Determines whether the action should be considered.
-    /// </summary>
-    /// <param name="actionRouteParameterValue">The action route parameter value.</param>
-    /// <param name="actionDescriptor">The associated <see cref="HttpActionDescriptor">action descriptor</see>.</param>
-    /// <param name="route">The associated <see cref="IHttpRoute">route</see>.</param>
-    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to consider the controller for.</param>
-    /// <returns>True if the action should be explored; otherwise, false.</returns>
-    protected override bool ShouldExploreAction( string actionRouteParameterValue, HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
+    /// <inheritdoc />
+    protected override bool ShouldExploreAction(
+        string actionRouteParameterValue,
+        HttpActionDescriptor actionDescriptor,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         if ( actionDescriptor == null )
         {
@@ -96,15 +94,12 @@ public class ODataApiExplorer : VersionedApiExplorer
         return actionDescriptor.GetApiVersionMetadata().IsMappedTo( apiVersion );
     }
 
-    /// <summary>
-    /// Determines whether the controller should be considered.
-    /// </summary>
-    /// <param name="controllerRouteParameterValue">The controller route parameter value.</param>
-    /// <param name="controllerDescriptor">The associated <see cref="HttpControllerDescriptor">controller descriptor</see>.</param>
-    /// <param name="route">The associated <see cref="IHttpRoute">route</see>.</param>
-    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to consider the controller for.</param>
-    /// <returns>True if the controller should be explored; otherwise, false.</returns>
-    protected override bool ShouldExploreController( string controllerRouteParameterValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route, ApiVersion apiVersion )
+    /// <inheritdoc />
+    protected override bool ShouldExploreController(
+        string controllerRouteParameterValue,
+        HttpControllerDescriptor controllerDescriptor,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         if ( controllerDescriptor == null )
         {
@@ -141,26 +136,26 @@ public class ODataApiExplorer : VersionedApiExplorer
         return true;
     }
 
-    /// <summary>
-    /// Explores controllers that do not use direct routes (aka "attribute" routing).
-    /// </summary>
-    /// <param name="controllerMappings">The <see cref="IDictionary{TKey, TValue}">collection</see> of controller mappings.</param>
-    /// <param name="route">The <see cref="IHttpRoute">route</see> to explore.</param>
-    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to explore.</param>
-    /// <returns>The <see cref="Collection{T}">collection</see> of discovered <see cref="VersionedApiDescription">API descriptions</see>.</returns>
-    protected override Collection<VersionedApiDescription> ExploreRouteControllers( IDictionary<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, ApiVersion apiVersion )
+    /// <inheritdoc />
+    protected override Collection<VersionedApiDescription> ExploreRouteControllers(
+        IDictionary<string, HttpControllerDescriptor> controllerMappings,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         if ( controllerMappings == null )
         {
             throw new ArgumentNullException( nameof( controllerMappings ) );
         }
 
+        Collection<VersionedApiDescription> apiDescriptions;
+
         if ( route is not ODataRoute )
         {
-            return base.ExploreRouteControllers( controllerMappings, route, apiVersion );
+            apiDescriptions = base.ExploreRouteControllers( controllerMappings, route, apiVersion );
+            return ExploreQueryOptions( route, apiDescriptions );
         }
 
-        var apiDescriptions = new Collection<VersionedApiDescription>();
+        apiDescriptions = new();
         var modelSelector = Configuration.GetODataRootContainer( route ).GetRequiredService<IEdmModelSelector>();
         var edmModel = modelSelector.SelectModel( apiVersion );
 
@@ -184,9 +179,18 @@ public class ODataApiExplorer : VersionedApiExplorer
             }
         }
 
-        ExploreQueryOptions( apiDescriptions, Configuration.GetODataRootContainer( route ).GetRequiredService<ODataUriResolver>() );
+        return ExploreQueryOptions( route, apiDescriptions );
+    }
 
-        return apiDescriptions;
+    /// <inheritdoc />
+    protected override Collection<VersionedApiDescription> ExploreDirectRouteControllers(
+        HttpControllerDescriptor controllerDescriptor,
+        IReadOnlyList<HttpActionDescriptor> candidateActionDescriptors,
+        IHttpRoute route,
+        ApiVersion apiVersion )
+    {
+        var apiDescriptions = base.ExploreDirectRouteControllers( controllerDescriptor, candidateActionDescriptors, route, apiVersion );
+        return ExploreQueryOptions( route, apiDescriptions );
     }
 
     /// <summary>
@@ -194,7 +198,9 @@ public class ODataApiExplorer : VersionedApiExplorer
     /// </summary>
     /// <param name="apiDescriptions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="VersionedApiDescription">API descriptions</see> to explore.</param>
     /// <param name="uriResolver">The associated <see cref="ODataUriResolver">OData URI resolver</see>.</param>
-    protected virtual void ExploreQueryOptions( IEnumerable<VersionedApiDescription> apiDescriptions, ODataUriResolver uriResolver )
+    protected virtual void ExploreQueryOptions(
+        IEnumerable<VersionedApiDescription> apiDescriptions,
+        ODataUriResolver uriResolver )
     {
         if ( uriResolver == null )
         {
@@ -206,12 +212,32 @@ public class ODataApiExplorer : VersionedApiExplorer
         {
             NoDollarPrefix = uriResolver.EnableNoDollarQueryOptions,
             DescriptionProvider = queryOptions.DescriptionProvider,
+            DefaultQuerySettings = Configuration.GetDefaultQuerySettings(),
         };
 
         queryOptions.ApplyTo( apiDescriptions, settings );
     }
 
-    private ResponseDescription CreateResponseDescriptionWithRoute( HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
+    private Collection<VersionedApiDescription> ExploreQueryOptions(
+        IHttpRoute route,
+        Collection<VersionedApiDescription> apiDescriptions )
+    {
+        if ( apiDescriptions.Count == 0 )
+        {
+            return apiDescriptions;
+        }
+
+        var uriResolver = Configuration.GetODataRootContainer( route ).GetRequiredService<ODataUriResolver>();
+
+        ExploreQueryOptions( apiDescriptions, uriResolver );
+
+        return apiDescriptions;
+    }
+
+    private ResponseDescription CreateResponseDescriptionWithRoute(
+        HttpActionDescriptor actionDescriptor,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         var description = CreateResponseDescription( actionDescriptor );
         var serviceProvider = actionDescriptor.Configuration.GetODataRootContainer( route );
@@ -347,7 +373,10 @@ public class ODataApiExplorer : VersionedApiExplorer
         return willReadUri;
     }
 
-    private ApiParameterDescription CreateParameterDescriptionFromBinding( HttpParameterBinding parameterBinding, IServiceProvider serviceProvider, ApiVersion apiVersion )
+    private ApiParameterDescription CreateParameterDescriptionFromBinding(
+        HttpParameterBinding parameterBinding,
+        IServiceProvider serviceProvider,
+        ApiVersion apiVersion )
     {
         var descriptor = parameterBinding.Descriptor;
         var description = CreateParameterDescription( descriptor );
@@ -378,7 +407,10 @@ public class ODataApiExplorer : VersionedApiExplorer
         return description;
     }
 
-    private IList<ApiParameterDescription> CreateParameterDescriptions( HttpActionDescriptor actionDescriptor, IHttpRoute route, ApiVersion apiVersion )
+    private IList<ApiParameterDescription> CreateParameterDescriptions(
+        HttpActionDescriptor actionDescriptor,
+        IHttpRoute route,
+        ApiVersion apiVersion )
     {
         var list = new List<ApiParameterDescription>();
         var actionBinding = GetActionBinding( actionDescriptor );
@@ -422,7 +454,8 @@ public class ODataApiExplorer : VersionedApiExplorer
         return list;
     }
 
-    private static IEnumerable<MediaTypeFormatter> GetInnerFormatters( IEnumerable<MediaTypeFormatter> mediaTypeFormatters ) => mediaTypeFormatters.Select( Decorator.GetInner );
+    private static IEnumerable<MediaTypeFormatter> GetInnerFormatters( IEnumerable<MediaTypeFormatter> mediaTypeFormatters ) =>
+        mediaTypeFormatters.Select( Decorator.GetInner );
 
     private static void PopulateMediaTypeFormatters(
        HttpActionDescriptor actionDescriptor,
