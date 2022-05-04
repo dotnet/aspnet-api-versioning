@@ -132,10 +132,7 @@ public partial class ODataValidationSettingsConvention : IODataQueryOptionsConve
 
         return httpMethod!.ToUpperInvariant() switch
         {
-            "GET" => true,
-            "PUT" => true,
-            "PATCH" => true,
-            "POST" => true,
+            "GET" or "PUT" or "PATCH" or "POST" => true,
             _ => false,
         };
     }

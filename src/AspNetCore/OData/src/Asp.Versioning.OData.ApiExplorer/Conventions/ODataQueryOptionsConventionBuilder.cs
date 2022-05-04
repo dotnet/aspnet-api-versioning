@@ -4,7 +4,6 @@ namespace Asp.Versioning.Conventions;
 
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.OData.Query;
 
 /// <content>
 /// Provides additional implementation specific to Microsoft ASP.NET Core.
@@ -24,12 +23,14 @@ public partial class ODataQueryOptionsConventionBuilder
 
     private static bool IsODataLike( ApiDescription description )
     {
-        if ( description.ActionDescriptor is ControllerActionDescriptor action )
+        var parameters = description.ActionDescriptor.Parameters;
+
+        for ( var i = 0; i < parameters.Count; i++ )
         {
-            return Attribute.IsDefined(
-                action.ControllerTypeInfo,
-                typeof( EnableQueryAttribute ),
-                inherit: true );
+            if ( parameters[i].ParameterType.IsODataQueryOptions() )
+            {
+                return true;
+            }
         }
 
         return false;

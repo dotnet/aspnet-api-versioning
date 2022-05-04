@@ -16,6 +16,18 @@ public partial class ODataQueryOptionsConventionBuilder
         apiDescription.ActionDescriptor.ControllerDescriptor.ControllerType;
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool IsODataLike( ApiDescription description ) =>
-        description.ActionDescriptor.GetCustomAttributes<EnableQueryAttribute>( inherit: true ).Count > 0;
+    private static bool IsODataLike( ApiDescription description )
+    {
+        var parameters = description.ParameterDescriptions;
+
+        for ( var i = 0; i < parameters.Count; i++ )
+        {
+            if ( parameters[i].ParameterDescriptor.ParameterType.IsODataQueryOptions() )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

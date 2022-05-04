@@ -102,7 +102,14 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = results.Count - 1; i >= 0; i-- )
         {
             var result = results[i];
-            var metadata = result.ActionDescriptor.EndpointMetadata.OfType<IODataRoutingMetadata>();
+            var metadata = result.ActionDescriptor.EndpointMetadata.OfType<IODataRoutingMetadata>().ToArray();
+            var notOData = metadata.Length == 0;
+
+            if ( notOData )
+            {
+                RemoveODataOptions( result );
+                continue;
+            }
 
             if ( !TryMatchModelVersion( result, metadata, out var matched ) ||
                  IsServiceDocumentOrMetadata( matched.Template ) ||
@@ -172,13 +179,14 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
 
     private static bool TryMatchModelVersion(
         ApiDescription description,
-        IEnumerable<IODataRoutingMetadata> items,
+        IReadOnlyList<IODataRoutingMetadata> items,
         [NotNullWhen( true )] out IODataRoutingMetadata? metadata )
     {
         var apiVersion = description.GetApiVersion()!;
 
-        foreach ( var item in items )
+        for ( var i = 0; i < items.Count; i++ )
         {
+            var item = items[i];
             var otherApiVersion = item.Model.GetAnnotationValue<ApiVersionAnnotation>( item.Model ).ApiVersion;
 
             if ( apiVersion.Equals( otherApiVersion ) )
@@ -232,6 +240,20 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
                     parameters.RemoveAt( i );
                     break;
                 }
+            }
+        }
+    }
+
+    private static void RemoveODataOptions( ApiDescription description )
+    {
+        var parameters = description.ParameterDescriptions;
+
+        for ( var i = 0; i < parameters.Count; i++ )
+        {
+            if ( parameters[i].Type.IsODataQueryOptions() )
+            {
+                parameters.RemoveAt( i );
+                break;
             }
         }
     }

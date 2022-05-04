@@ -3,6 +3,8 @@
 namespace Asp.Versioning.Conventions;
 
 using Asp.Versioning.Description;
+using Asp.Versioning.Simulators.Models;
+using Asp.Versioning.Simulators.V1;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
@@ -10,6 +12,7 @@ using Microsoft.AspNet.OData.Query;
 using Microsoft.OData.Edm;
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
@@ -457,6 +460,97 @@ public class ODataValidationSettingsConventionTest
             options => options.ExcludingMissingMembers() );
     }
 
+    [Fact]
+    public void apply_to_should_process_odataX2Dlike_api_description()
+    {
+        // arrange
+        var controllerType = typeof( BooksController );
+        var controllerName = controllerType.Name.Substring( 0, controllerType.Name.Length - 10 );
+        var action = controllerType.GetRuntimeMethods()
+                                   .First( m => m.Name == "Get" && m.GetParameters().Length == 1 );
+        var configuration = new HttpConfiguration();
+        var controllerDescriptor = new HttpControllerDescriptor( configuration, controllerName, controllerType );
+        var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, action ) { Configuration = configuration };
+        var parameter = actionDescriptor.GetParameters()[0];
+        var description = new VersionedApiDescription()
+        {
+            ActionDescriptor = actionDescriptor,
+            HttpMethod = HttpMethod.Get,
+            ParameterDescriptions =
+            {
+                new()
+                {
+                    Name = parameter.ParameterName,
+                    ParameterDescriptor = parameter,
+                    Source = Unknown,
+                },
+            },
+            ResponseDescription = new() { ResponseType = typeof( IEnumerable<Book> ) },
+        };
+        var builder = new ODataQueryOptionsConventionBuilder();
+        var settings = new ODataQueryOptionSettings()
+        {
+            DescriptionProvider = builder.DescriptionProvider,
+            DefaultQuerySettings = new(),
+        };
+
+        configuration.EnableDependencyInjection();
+        builder.Controller<BooksController>()
+               .Action( c => c.Get( default ) )
+               .Allow( Select | Count )
+               .AllowOrderBy( "title", "published" );
+
+        // act
+        builder.ApplyTo( new[] { description }, settings );
+
+        // assert
+        description.ParameterDescriptions.RemoveAt( 0 );
+        description.ParameterDescriptions.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    Name = "$select",
+                    Source = FromUri,
+                    ParameterDescriptor = new
+                    {
+                        ParameterName = "$select",
+                        ParameterType = typeof( string ),
+                        Prefix = "$",
+                        IsOptional = true,
+                        DefaultValue = default( object ),
+                    },
+                },
+                new
+                {
+                    Name = "$orderby",
+                    Source = FromUri,
+                    ParameterDescriptor = new
+                    {
+                        ParameterName = "$orderby",
+                        ParameterType = typeof( string ),
+                        Prefix = "$",
+                        IsOptional = true,
+                        DefaultValue = default( object ),
+                    },
+                },
+                new
+                {
+                    Name = "$count",
+                    Source = FromUri,
+                    ParameterDescriptor = new
+                    {
+                        ParameterName = "$count",
+                        ParameterType = typeof( bool ),
+                        Prefix = "$",
+                        IsOptional = true,
+                        DefaultValue = (object) false,
+                    },
+                },
+            },
+            options => options.ExcludingMissingMembers() );
+    }
+
     public static IEnumerable<object[]> EnableQueryAttributeData
     {
         get
@@ -495,7 +589,8 @@ public class ODataValidationSettingsConventionTest
     private static ApiDescription NewApiDescription( Type controllerType, Type responseType, IEdmModel model )
     {
         var configuration = new HttpConfiguration();
-        var controllerDescriptor = new HttpControllerDescriptor( configuration, "Orders", controllerType );
+        var controllerName = controllerType.Name.Substring( 0, controllerType.Name.Length - 10 );
+        var controllerDescriptor = new HttpControllerDescriptor( configuration, controllerName, controllerType );
         var method = controllerType.GetMethod( "Get" );
         var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, method ) { Configuration = configuration };
 

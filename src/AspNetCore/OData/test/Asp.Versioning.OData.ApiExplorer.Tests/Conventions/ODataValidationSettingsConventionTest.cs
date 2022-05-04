@@ -3,7 +3,10 @@
 namespace Asp.Versioning.Conventions;
 
 using Asp.Versioning.OData;
+using Asp.Versioning.Simulators.Models;
+using Asp.Versioning.Simulators.V1;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -466,6 +469,103 @@ public class ODataValidationSettingsConventionTest
             options => options.ExcludingMissingMembers() );
     }
 
+    [Fact]
+    public void apply_to_should_process_odataX2Dlike_api_description()
+    {
+        // arrange
+        var controllerType = typeof( BooksController );
+        var action = controllerType.GetRuntimeMethods()
+                                   .First( m => m.Name == "Get" && m.GetParameters().Length == 1 );
+        var parameter = action.GetParameters()[0];
+        var description = new ApiDescription()
+        {
+            ActionDescriptor = new ControllerActionDescriptor()
+            {
+                ControllerTypeInfo = controllerType.GetTypeInfo(),
+                MethodInfo = action,
+                Parameters = new ParameterDescriptor[]
+                {
+                    new()
+                    {
+                        Name = parameter.Name,
+                        ParameterType = parameter.ParameterType,
+                    },
+                },
+            },
+            HttpMethod = "GET",
+            SupportedResponseTypes =
+            {
+                new()
+                {
+                    Type = typeof( IEnumerable<Book> ),
+                    StatusCode = Status200OK,
+                },
+            },
+            Properties = { [typeof( ApiVersion )] = ApiVersion.Default },
+        };
+        var builder = new ODataQueryOptionsConventionBuilder();
+        var settings = new ODataQueryOptionSettings()
+        {
+            DescriptionProvider = builder.DescriptionProvider,
+            DefaultQuerySettings = new(),
+            ModelMetadataProvider = Mock.Of<IModelMetadataProvider>(),
+        };
+
+        builder.Controller<BooksController>()
+               .Action( c => c.Get( default ) )
+               .Allow( Select | Count )
+               .AllowOrderBy( "title", "published" );
+
+        // act
+        builder.ApplyTo( new[] { description }, settings );
+
+        // assert
+        description.ParameterDescriptions.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    Name = "$select",
+                    Source = Query,
+                    Type = typeof( string ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
+                    ParameterDescriptor = new
+                    {
+                        Name = "$select",
+                        ParameterType = typeof( string ),
+                    },
+                },
+                new
+                {
+                    Name = "$orderby",
+                    Source = Query,
+                    Type = typeof( string ),
+                    DefaultValue = default( object ),
+                    IsRequired = false,
+                    ParameterDescriptor = new
+                    {
+                        Name = "$orderby",
+                        ParameterType = typeof( string ),
+                    },
+                },
+                new
+                {
+                    Name = "$count",
+                    Source = Query,
+                    Type = typeof( bool ),
+                    DefaultValue = (object) false,
+                    IsRequired = false,
+                    ParameterDescriptor = new
+                    {
+                        Name = "$count",
+                        ParameterType = typeof( bool ),
+                    },
+                },
+            },
+            options => options.ExcludingMissingMembers() );
+    }
+
     public static IEnumerable<object[]> EnableQueryAttributeData
     {
         get
@@ -519,9 +619,9 @@ public class ODataValidationSettingsConventionTest
                 ControllerTypeInfo = controllerType.GetTypeInfo(),
                 MethodInfo = controllerType.GetRuntimeMethods().Single( m => m.Name == "Get" ),
                 EndpointMetadata = new object[]
-{
+                {
                     new ODataRoutingMetadata( string.Empty, model, new() ),
-},
+                },
             },
             HttpMethod = "GET",
             SupportedResponseTypes =

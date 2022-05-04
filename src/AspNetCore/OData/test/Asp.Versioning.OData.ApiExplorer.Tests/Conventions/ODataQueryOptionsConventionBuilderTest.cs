@@ -19,7 +19,10 @@ public partial class ODataQueryOptionsConventionBuilderTest
             ActionDescriptor = new ControllerActionDescriptor()
             {
                 ControllerTypeInfo = typeof( StubController ).GetTypeInfo(),
-                MethodInfo = typeof( StubController ).GetTypeInfo().GetRuntimeMethod( nameof( StubController.Get ), Type.EmptyTypes ),
+                MethodInfo = typeof( StubController ).GetTypeInfo()
+                                                     .GetRuntimeMethod(
+                                                         nameof( StubController.Get ),
+                                                         Type.EmptyTypes ),
             },
             HttpMethod = "GET",
         };
