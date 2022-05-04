@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "SomeODataOpenApiExample": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:64762;http://localhost:64763"
+    }
+  }
+}
