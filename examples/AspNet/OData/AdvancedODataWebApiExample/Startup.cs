@@ -46,7 +46,7 @@ public class Startup
         // in the underlying routing system. the order of route registration is important as well.
         //
         // DO NOT use configuration.MapHttpAttributeRoutes();
-        configuration.MapVersionedODataRoute( "odata", "api", modelBuilder.GetEdmModels() );
+        configuration.MapVersionedODataRoute( "odata", "api", modelBuilder );
         configuration.Routes.MapHttpRoute( "orders", "api/{controller}/{id}", new { id = Optional } );
 
         configuration.Formatters.Remove( configuration.Formatters.XmlFormatter );

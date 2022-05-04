@@ -59,7 +59,6 @@ public class Startup
                 new SupplierConfiguration(),
             },
         };
-        var models = modelBuilder.GetEdmModels();
 
         // global odata query options
         configuration.Count();
@@ -71,7 +70,7 @@ public class Startup
         // INFO: only pass the route prefix to GetEdmModels if you want to split the models; otherwise, both routes contain all models
 
         // WHEN VERSIONING BY: query string, header, or media type
-        configuration.MapVersionedODataRoute( "odata", "api", models );
+        configuration.MapVersionedODataRoute( "odata", "api", modelBuilder );
 
         // WHEN VERSIONING BY: url segment
         // configuration.MapVersionedODataRoute( "odata-bypath", "api/v{apiVersion}", models );
