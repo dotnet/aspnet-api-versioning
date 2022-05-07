@@ -57,13 +57,24 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
     /// <param name="version">The version number.</param>
     /// <param name="status">The optional version status.</param>
     public ApiVersion( double version, string? status = default )
+        : this( version, status, IsValidStatus ) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersion"/> class.
+    /// </summary>
+    /// <param name="version">The version number.</param>
+    /// <param name="status">The optional version status.</param>
+    /// <param name="isValidStatus">The function used to valid status.</param>
+    protected ApiVersion( double version, string? status, Func<string?, bool> isValidStatus )
     {
         if ( version < 0d || double.IsNaN( version ) || double.IsInfinity( version ) )
         {
             throw new ArgumentOutOfRangeException( nameof( version ) );
         }
 
-        Status = ValidateStatus( status );
+        Status = ValidateStatus(
+            status,
+            isValidStatus ?? throw new ArgumentNullException( nameof( isValidStatus ) ) );
 
         var number = new decimal( version );
         var bits = decimal.GetBits( number );
@@ -75,7 +86,21 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
         MinorVersion = minor;
     }
 
-    internal ApiVersion( DateOnly? groupVersion, int? majorVersion, int? minorVersion, string? status )
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersion"/> class.
+    /// </summary>
+    /// <param name="groupVersion">The optional group version.</param>
+    /// <param name="majorVersion">The optional major version.</param>
+    /// <param name="minorVersion">The optional minor version.</param>
+    /// <param name="status">The optional version status.</param>
+    /// <param name="isValidStatus">The optional function used to valid status.
+    /// The default value is <see cref="IsValidStatus(string?)"/>.</param>
+    protected internal ApiVersion(
+        DateOnly? groupVersion,
+        int? majorVersion,
+        int? minorVersion,
+        string? status,
+        Func<string?, bool>? isValidStatus = default )
     {
         if ( majorVersion.HasValue && majorVersion.Value < 0 )
         {
@@ -87,7 +112,7 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
             throw new ArgumentOutOfRangeException( nameof( minorVersion ) );
         }
 
-        Status = ValidateStatus( status );
+        Status = ValidateStatus( status, isValidStatus ?? IsValidStatus );
         GroupVersion = groupVersion;
         MajorVersion = majorVersion;
         MinorVersion = minorVersion;
@@ -303,14 +328,9 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
 #pragma warning restore CA1062 // Validate arguments of public methods
     }
 
-    private static string? ValidateStatus( string? status )
+    private static string? ValidateStatus( string? status, Func<string?, bool> isValid )
     {
-        if ( status is not null && status.Length == 0 )
-        {
-            return default;
-        }
-
-        if ( IsValidStatus( status ) )
+        if ( isValid( status ) )
         {
             return status;
         }
