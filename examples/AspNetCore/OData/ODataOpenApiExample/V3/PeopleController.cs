@@ -24,6 +24,7 @@ public class PeopleController : ODataController
     /// <param name="options">The current OData query options.</param>
     /// <returns>All available people.</returns>
     /// <response code="200">The successfully retrieved people.</response>
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<Person>> ), Status200OK )]
     public IActionResult Get( ODataQueryOptions<Person> options )
@@ -87,6 +88,7 @@ public class PeopleController : ODataController
     /// <returns>The requested person.</returns>
     /// <response code="200">The person was successfully retrieved.</response>
     /// <response code="404">The person does not exist.</response>
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Person ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
@@ -121,6 +123,7 @@ public class PeopleController : ODataController
     /// <returns>The created person.</returns>
     /// <response code="201">The person was successfully created.</response>
     /// <response code="400">The person was invalid.</response>
+    [HttpPost]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Person ), Status201Created )]
     [ProducesResponseType( Status400BadRequest )]
@@ -179,7 +182,7 @@ public class PeopleController : ODataController
     /// <returns>The person's home address.</returns>
     /// <response code="200">The home address was successfully retrieved.</response>
     /// <response code="404">The person does not exist.</response>
-    [HttpGet( "api/People/{key}/HomeAddress" )]
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Address ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
@@ -200,7 +203,7 @@ public class PeopleController : ODataController
     /// <returns>The person's work address.</returns>
     /// <response code="200">The work address was successfully retrieved.</response>
     /// <response code="404">The person does not exist.</response>
-    [HttpGet( "api/People/{key}/WorkAddress" )]
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Address ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]

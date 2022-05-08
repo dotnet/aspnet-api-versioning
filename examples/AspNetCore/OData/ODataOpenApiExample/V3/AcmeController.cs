@@ -19,6 +19,7 @@ public class AcmeController : ODataController
     /// </summary>
     /// <returns>All available suppliers.</returns>
     /// <response code="200">The supplier successfully retrieved.</response>
+    [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<Supplier> ), Status200OK )]
@@ -28,7 +29,7 @@ public class AcmeController : ODataController
     /// Gets the products associated with the supplier.
     /// </summary>
     /// <returns>The associated supplier products.</returns>
-    [HttpGet( "api/Acme/Products" )]
+    [HttpGet]
     [EnableQuery]
     public IQueryable<Product> GetProducts() => NewSupplier().Products.AsQueryable();
 
@@ -38,6 +39,7 @@ public class AcmeController : ODataController
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="link">The related entity identifier.</param>
     /// <returns>None</returns>
+    [HttpPut]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult CreateRef(
@@ -50,6 +52,7 @@ public class AcmeController : ODataController
     /// <param name="relatedKey">The related entity identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <returns>None</returns>
+    [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult DeleteRef(
