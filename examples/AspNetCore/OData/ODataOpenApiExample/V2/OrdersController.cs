@@ -23,6 +23,7 @@ public class OrdersController : ODataController
     /// </summary>
     /// <returns>All available orders.</returns>
     /// <response code="200">The successfully retrieved orders.</response>
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<Order>> ), Status200OK )]
     [EnableQuery( MaxTop = 100, AllowedQueryOptions = Select | Top | Skip | Count )]
@@ -45,7 +46,7 @@ public class OrdersController : ODataController
     /// <returns>The requested order.</returns>
     /// <response code="200">The order was successfully retrieved.</response>
     /// <response code="404">The order does not exist.</response>
-    [HttpGet( "api/Orders/{key}" )]
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
@@ -60,6 +61,7 @@ public class OrdersController : ODataController
     /// <returns>The created order.</returns>
     /// <response code="201">The order was successfully placed.</response>
     /// <response code="400">The order is invalid.</response>
+    [HttpPost]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), Status201Created )]
     [ProducesResponseType( Status400BadRequest )]
@@ -84,6 +86,7 @@ public class OrdersController : ODataController
     /// <response code="204">The order was successfully updated.</response>
     /// <response code="400">The order is invalid.</response>
     /// <response code="404">The order does not exist.</response>
+    [HttpPatch]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), Status200OK )]
     [ProducesResponseType( Status204NoContent )]
@@ -148,7 +151,7 @@ public class OrdersController : ODataController
     /// <returns>The order line items.</returns>
     /// <response code="200">The line items were successfully retrieved.</response>
     /// <response code="404">The order does not exist.</response>
-    [HttpGet( "api/Orders/{key}/LineItems" )]
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]

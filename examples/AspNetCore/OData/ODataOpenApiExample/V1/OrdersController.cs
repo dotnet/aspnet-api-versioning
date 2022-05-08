@@ -4,7 +4,6 @@ using ApiVersioning.Examples.Models;
 using Asp.Versioning;
 using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -25,6 +24,7 @@ public class OrdersController : ODataController
     /// <returns>The requested order.</returns>
     /// <response code="200">The order was successfully retrieved.</response>
     /// <response code="404">The order does not exist.</response>
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
@@ -39,6 +39,7 @@ public class OrdersController : ODataController
     /// <returns>The created order.</returns>
     /// <response code="201">The order was successfully placed.</response>
     /// <response code="400">The order is invalid.</response>
+    [HttpPost]
     [MapToApiVersion( 1.0 )]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Order ), Status201Created )]
@@ -93,7 +94,7 @@ public class OrdersController : ODataController
     /// <returns>The order line items.</returns>
     /// <response code="200">The line items were successfully retrieved.</response>
     /// <response code="404">The order does not exist.</response>
-    [HttpGet( "api/Orders/{key}/LineItems" )]
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<LineItem>> ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]

@@ -5,7 +5,6 @@ using Asp.Versioning;
 using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -29,6 +28,7 @@ public class SuppliersController : ODataController
     /// </summary>
     /// <returns>All available suppliers.</returns>
     /// <response code="200">Suppliers successfully retrieved.</response>
+    [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<Supplier>> ), Status200OK )]
@@ -41,6 +41,7 @@ public class SuppliersController : ODataController
     /// <returns>The requested supplier.</returns>
     /// <response code="200">The supplier was successfully retrieved.</response>
     /// <response code="404">The supplier does not exist.</response>
+    [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Supplier ), Status200OK )]
@@ -56,6 +57,7 @@ public class SuppliersController : ODataController
     /// <response code="201">The supplier was successfully created.</response>
     /// <response code="204">The supplier was successfully created.</response>
     /// <response code="400">The supplier is invalid.</response>
+    [HttpPost]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Supplier ), Status201Created )]
     [ProducesResponseType( Status204NoContent )]
@@ -82,6 +84,7 @@ public class SuppliersController : ODataController
     /// <response code="204">The supplier was successfully updated.</response>
     /// <response code="400">The supplier is invalid.</response>
     /// <response code="404">The supplier does not exist.</response>
+    [HttpPatch]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Supplier ), Status200OK )]
     [ProducesResponseType( Status204NoContent )]
@@ -111,6 +114,7 @@ public class SuppliersController : ODataController
     /// <response code="204">The supplier was successfully updated.</response>
     /// <response code="400">The supplier is invalid.</response>
     /// <response code="404">The supplier does not exist.</response>
+    [HttpPut]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Supplier ), Status200OK )]
     [ProducesResponseType( Status204NoContent )]
@@ -132,6 +136,7 @@ public class SuppliersController : ODataController
     /// <param name="key">The supplier to delete.</param>
     /// <returns>None</returns>
     /// <response code="204">The supplier was successfully deleted.</response>
+    [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult Delete( int key ) => NoContent();
@@ -141,7 +146,7 @@ public class SuppliersController : ODataController
     /// </summary>
     /// <param name="key">The supplier identifier.</param>
     /// <returns>The associated supplier products.</returns>
-    [HttpGet( "api/Suppliers/{key}/Products" )]
+    [HttpGet]
     [EnableQuery]
     public IQueryable<Product> GetProducts( int key ) =>
         suppliers.Where( s => s.Id == key ).SelectMany( s => s.Products );
@@ -153,6 +158,7 @@ public class SuppliersController : ODataController
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="link">The related entity identifier.</param>
     /// <returns>None</returns>
+    [HttpPut]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult CreateRef(
@@ -167,6 +173,7 @@ public class SuppliersController : ODataController
     /// <param name="relatedKey">The related entity identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <returns>None</returns>
+    [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult DeleteRef(

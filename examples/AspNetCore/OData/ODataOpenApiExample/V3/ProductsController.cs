@@ -6,7 +6,6 @@ using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -31,6 +30,7 @@ public class ProductsController : ODataController
     /// </summary>
     /// <returns>All available products.</returns>
     /// <response code="200">Products successfully retrieved.</response>
+    [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<Product>> ), Status200OK )]
@@ -43,6 +43,7 @@ public class ProductsController : ODataController
     /// <returns>The requested product.</returns>
     /// <response code="200">The product was successfully retrieved.</response>
     /// <response code="404">The product does not exist.</response>
+    [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Product ), Status200OK )]
@@ -58,6 +59,7 @@ public class ProductsController : ODataController
     /// <response code="201">The product was successfully created.</response>
     /// <response code="204">The product was successfully created.</response>
     /// <response code="400">The product is invalid.</response>
+    [HttpPost]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Product ), Status201Created )]
     [ProducesResponseType( Status204NoContent )]
@@ -84,6 +86,7 @@ public class ProductsController : ODataController
     /// <response code="204">The product was successfully updated.</response>
     /// <response code="400">The product is invalid.</response>
     /// <response code="404">The product does not exist.</response>
+    [HttpPatch]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Product ), Status200OK )]
     [ProducesResponseType( Status204NoContent )]
@@ -113,6 +116,7 @@ public class ProductsController : ODataController
     /// <response code="204">The product was successfully updated.</response>
     /// <response code="400">The product is invalid.</response>
     /// <response code="404">The product does not exist.</response>
+    [HttpPut]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Product ), Status200OK )]
     [ProducesResponseType( Status204NoContent )]
@@ -134,6 +138,7 @@ public class ProductsController : ODataController
     /// <param name="key">The product to delete.</param>
     /// <returns>None</returns>
     /// <response code="204">The product was successfully deleted.</response>
+    [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult Delete( int key ) => NoContent();
@@ -144,7 +149,7 @@ public class ProductsController : ODataController
     /// <param name="key">The product identifier.</param>
     /// <returns>The supplier</returns>
     /// <returns>The requested supplier.</returns>
-    [HttpGet( "api/Products/{key}/Supplier" )]
+    [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Supplier ), Status200OK )]
@@ -158,6 +163,7 @@ public class ProductsController : ODataController
     /// <param name="key">The product identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <returns>The supplier link.</returns>
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataId ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
@@ -181,6 +187,7 @@ public class ProductsController : ODataController
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="link">The related entity identifier.</param>
     /// <returns>None</returns>
+    [HttpPut]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult CreateRef(
@@ -195,6 +202,7 @@ public class ProductsController : ODataController
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="relatedKey">The related entity identifier.</param>
     /// <returns>None</returns>
+    [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult DeleteRef(

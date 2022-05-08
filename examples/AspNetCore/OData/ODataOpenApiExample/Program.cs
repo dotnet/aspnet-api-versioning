@@ -19,6 +19,7 @@ builder.Services.AddControllers()
                         options.Count().Select().OrderBy();
                         options.RouteOptions.EnableKeyInParenthesis = false;
                         options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
+                        options.RouteOptions.EnablePropertyNameCaseInsensitive = true;
                         options.RouteOptions.EnableQualifiedOperationCall = false;
                         options.RouteOptions.EnableUnqualifiedOperationCall = true;
                     } );
@@ -79,6 +80,12 @@ builder.Services.AddSwaggerGen(
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+if ( app.Environment.IsDevelopment() )
+{
+    // navigate to ~/$odata to determine whether any endpoints did not match an odata route template
+    app.UseODataRouteDebug();
+}
 
 app.UseSwagger();
 app.UseSwaggerUI(

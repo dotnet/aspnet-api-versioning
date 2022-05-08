@@ -24,6 +24,7 @@ public class PeopleController : ODataController
     /// <returns>The requested person.</returns>
     /// <response code="200">The person was successfully retrieved.</response>
     /// <response code="404">The person does not exist.</response>
+    [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Person ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
@@ -62,16 +63,16 @@ public class PeopleController : ODataController
     [ProducesResponseType( Status404NotFound )]
     [EnableQuery( AllowedQueryOptions = Select )]
     public SingleResult<Person> MostExpensive( ODataQueryOptions<Person> options, CancellationToken ct ) =>
-        SingleResult.Create(
-            new Person[]
-            { 
+            SingleResult.Create(
+                new Person[]
+                {
                 new()
                 {
-                    Id = 42, 
-                    FirstName = "Elon", 
+                    Id = 42,
+                    FirstName = "Elon",
                     LastName = "Musk",
                 },
-            }.AsQueryable() );
+                }.AsQueryable() );
 
     /// <summary>
     /// Gets the most expensive person.
@@ -91,11 +92,11 @@ public class PeopleController : ODataController
         CancellationToken ct ) =>
         SingleResult.Create(
             new Person[]
-            { 
+            {
                 new()
-                { 
-                    Id = key, 
-                    FirstName = "John", 
+                {
+                    Id = key,
+                    FirstName = "John",
                     LastName = "Doe",
                 },
             }.AsQueryable() );
