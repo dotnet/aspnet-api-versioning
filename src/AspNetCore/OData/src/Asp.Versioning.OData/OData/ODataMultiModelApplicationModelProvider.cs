@@ -110,6 +110,22 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
             provider.OnProvidersExecuted( context );
         }
 
+        // HACK: there are intrinsically a couple of issues here:
+        //
+        // 1. ASP.NET Core creates an ActionDescriptor per SelectorModel in an ActionModel
+        // 2. OData adds a SelectorModel per EDM
+        // 3. ApiVersionMetadata has already be computed and added to EndpointMetadata
+        //
+        // this only becomes a problem when there are multiple EDMs and a single action implementation
+        // maps to more than one EDM.
+        //
+        // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs
+        // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Extensions/ActionModelExtensions.cs#L148
+        if ( mapping.Count > 1 )
+        {
+            CopyApiVersionEndpointMetadata( context.Result.Controllers );
+        }
+
         versionedODataOptions.Mapping = mapping;
     }
 
@@ -164,5 +180,53 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         }
 
         return -1;
+    }
+
+    private static void CopyApiVersionEndpointMetadata( IList<ControllerModel> controllers )
+    {
+        for ( var i = 0; i < controllers.Count; i++ )
+        {
+            var actions = controllers[i].Actions;
+
+            for ( var j = 0; j < actions.Count; j++ )
+            {
+                var selectors = actions[j].Selectors;
+
+                if ( selectors.Count < 2 )
+                {
+                    continue;
+                }
+
+                var metadata = selectors[0].EndpointMetadata.OfType<ApiVersionMetadata>().FirstOrDefault();
+
+                if ( metadata is null )
+                {
+                    continue;
+                }
+
+                for ( var k = 1; k < selectors.Count; k++ )
+                {
+                    var endpointMetadata = selectors[k].EndpointMetadata;
+                    var found = false;
+
+                    for ( var l = 0; l < endpointMetadata.Count; l++ )
+                    {
+                        if ( endpointMetadata[l] is not ApiVersionMetadata )
+                        {
+                            continue;
+                        }
+
+                        endpointMetadata[l] = metadata;
+                        found = true;
+                        break;
+                    }
+
+                    if ( !found )
+                    {
+                        endpointMetadata.Add( metadata );
+                    }
+                }
+            }
+        }
     }
 }

@@ -57,15 +57,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
     private static int BeforeOData { get; } = ODataMultiModelApplicationModelProvider.DefaultODataOrder - 50;
 
     /// <inheritdoc />
-    public virtual void OnProvidersExecuted( ApplicationModelProviderContext context )
-    {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
-
-        EnsureEndpointMetadata( context.Result );
-    }
+    public virtual void OnProvidersExecuted( ApplicationModelProviderContext context ) { }
 
     /// <inheritdoc />
     public virtual void OnProvidersExecuting( ApplicationModelProviderContext context )
@@ -191,46 +183,6 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         }
 
         return bestController;
-    }
-
-    private static void EnsureEndpointMetadata( ApplicationModel application )
-    {
-        var controllers = application.Controllers;
-
-        for ( var i = 0; i < controllers.Count; i++ )
-        {
-            var controller = controllers[i];
-
-            if ( !controller.ControllerType.IsMetadataController() &&
-                 !ODataControllerSpecification.IsSatisfiedBy( controller ) )
-            {
-                continue;
-            }
-
-            var actions = controller.Actions;
-
-            for ( var j = 0; j < actions.Count; j++ )
-            {
-                var selectors = actions[j].Selectors;
-                var metadata = default( ApiVersionMetadata );
-                var endpointMetadata = selectors[0].EndpointMetadata;
-
-                for ( var k = 0; metadata == null && k < selectors.Count; k++ )
-                {
-                    metadata = endpointMetadata[k] as ApiVersionMetadata;
-                }
-
-                if ( metadata == null )
-                {
-                    continue;
-                }
-
-                for ( var k = 1; k < selectors.Count; k++ )
-                {
-                    selectors[k].EndpointMetadata.Add( metadata );
-                }
-            }
-        }
     }
 
     private void ApplyMetadataControllerConventions(
