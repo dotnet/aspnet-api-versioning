@@ -128,48 +128,49 @@ public class ODataApiDescriptionProviderTest
     {
         const string GroupName = "v3";
         var items = group.Items.OrderBy( i => i.RelativePath ).ThenBy( i => i.HttpMethod ).ToArray();
+        var expected = new[]
+        {
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders" },
+            new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
+            new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Orders/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
+            new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Orders/{key}" },
+            new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders/{key}/Rate" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/$count" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/MostExpensive" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/People" },
+            new { HttpMethod = "POST", GroupName, RelativePath = "api/People" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
+            new { HttpMethod = "POST", GroupName, RelativePath = "api/People/{key}/Promote" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/People/$count" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/People/NewHires(Since={since})" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Products" },
+            new { HttpMethod = "POST", GroupName, RelativePath = "api/Products" },
+            new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/$count" },
+            new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Products/{key}" },
+            new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/Supplier" },
+            new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}/supplier/{relatedKey}/$ref" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
+            new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers" },
+            new { HttpMethod = "POST", GroupName, RelativePath = "api/Suppliers" },
+            new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/$count" },
+            new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Suppliers/{key}" },
+            new { HttpMethod = "PUT", GroupName, RelativePath = "api/Suppliers/{key}" },
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}/Products" },
+            new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}/products/{relatedKey}/$ref" },
+            new { HttpMethod = "PUT", GroupName, RelativePath = "api/Suppliers/{key}/products/$ref" },
+        };
 
         PrintGroup( items );
         group.GroupName.Should().Be( GroupName );
-        items.Should().BeEquivalentTo(
-            new[]
-            {
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders" },
-                new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
-                new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Orders/{key}" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
-                new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Orders/{key}" },
-                new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders/{key}/Rate" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/$count" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/MostExpensive" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/People" },
-                new { HttpMethod = "POST", GroupName, RelativePath = "api/People" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
-                new { HttpMethod = "POST", GroupName, RelativePath = "api/People/{key}/Promote" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/People/$count" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/People/NewHires(Since={since})" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Products" },
-                new { HttpMethod = "POST", GroupName, RelativePath = "api/Products" },
-                new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}" },
-                new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Products/{key}" },
-                new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/Supplier" },
-                new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Products/{key}/supplier/{relatedKey}/$ref" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
-                new { HttpMethod = "PUT", GroupName, RelativePath = "api/Products/{key}/supplier/$ref" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers" },
-                new { HttpMethod = "POST", GroupName, RelativePath = "api/Suppliers" },
-                new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}" },
-                new { HttpMethod = "PATCH", GroupName, RelativePath = "api/Suppliers/{key}" },
-                new { HttpMethod = "PUT", GroupName, RelativePath = "api/Suppliers/{key}" },
-                new { HttpMethod = "GET", GroupName, RelativePath = "api/Suppliers/{key}/Products" },
-                new { HttpMethod = "DELETE", GroupName, RelativePath = "api/Suppliers/{key}/products/{relatedKey}/$ref" },
-                new { HttpMethod = "PUT", GroupName, RelativePath = "api/Suppliers/{key}/products/$ref" },
-            },
-            options => options.ExcludingMissingMembers() );
+        items.Should().BeEquivalentTo( expected, options => options.ExcludingMissingMembers() );
     }
 
     private void PrintGroup( IReadOnlyList<ApiDescription> items )
