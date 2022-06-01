@@ -162,9 +162,13 @@ public class SuppliersController : ODataController
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult CreateRef(
-        int key, 
-        string navigationProperty, 
-        [FromBody] Uri link ) => NoContent();
+        int key,
+        string navigationProperty,
+        [FromBody] Uri link )
+    {
+        var relatedKey = this.GetRelatedKey( link );
+        return NoContent();
+    }
 
     /// <summary>
     /// Unlinks a product from a supplier.

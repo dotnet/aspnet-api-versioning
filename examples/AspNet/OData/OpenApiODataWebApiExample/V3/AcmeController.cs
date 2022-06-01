@@ -37,7 +37,11 @@ public class AcmeController : ODataController
     /// <param name="link">The product identifier.</param>
     /// <returns>None</returns>
     [HttpPost]
-    public IHttpActionResult CreateRef( string navigationProperty, [FromBody] Uri link ) => StatusCode( NoContent );
+    public IHttpActionResult CreateRef( string navigationProperty, [FromBody] Uri link )
+    {
+        var relatedKey = this.GetRelatedKey( link );
+        return StatusCode( NoContent );
+    }
 
     /// <summary>
     /// Unlinks a product from a supplier.
