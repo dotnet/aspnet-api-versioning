@@ -21,7 +21,6 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="[5.2.7,6.0.0)" />
-  <PackageReference Include="microsoft.netframework.referenceassemblies.net45" Version="1.0.2" PrivateAssets="All" />
  </ItemGroup>
 
  <ItemGroup>
