@@ -34,6 +34,7 @@ using static System.Web.Http.Description.ApiParameterSource;
 public class ODataApiExplorer : VersionedApiExplorer
 {
     private static readonly Regex odataVariableRegex = new( $"{{\\*{ODataRouteConstants.ODataPath}}}", CultureInvariant | Compiled | IgnoreCase );
+    private readonly ODataApiExplorerOptions options;
     private IModelTypeBuilder? modelTypeBuilder;
 
     /// <summary>
@@ -49,13 +50,13 @@ public class ODataApiExplorer : VersionedApiExplorer
     /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
     /// <param name="options">The associated <see cref="ODataApiExplorerOptions">API explorer options</see>.</param>
     public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options )
-        : base( configuration, options ) => Options = options;
+        : base( configuration, options ) => this.options = options;
 
     /// <summary>
     /// Gets the options associated with the API explorer.
     /// </summary>
     /// <value>The <see cref="ODataApiExplorerOptions">API explorer options</see>.</value>
-    protected new virtual ODataApiExplorerOptions Options { get; }
+    protected new virtual ODataApiExplorerOptions Options => options;
 
     /// <summary>
     /// Gets the model type builder used by the API explorer.

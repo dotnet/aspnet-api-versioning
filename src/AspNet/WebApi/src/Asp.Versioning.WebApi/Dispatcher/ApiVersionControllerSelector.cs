@@ -251,8 +251,6 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         List<HttpControllerDescriptor> controllers,
         IHttpActionSelector actionSelector )
     {
-        var supported = new HashSet<ApiVersion>();
-        var deprecated = new HashSet<ApiVersion>();
         var controllerModels = new List<ApiVersionModel>( controllers.Count );
         var actionModels = new List<ApiVersionModel>( controllers.Count );
         var visitedControllers = new List<Tuple<HttpControllerDescriptor, ApiVersionModel>>( controllers.Count );

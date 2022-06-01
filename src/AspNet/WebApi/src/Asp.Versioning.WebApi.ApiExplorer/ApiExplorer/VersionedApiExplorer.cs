@@ -29,6 +29,7 @@ public class VersionedApiExplorer : IApiExplorer
 {
     private static readonly Regex actionVariableRegex = new( $"{{{RouteValueKeys.Action}}}", Compiled | IgnoreCase | CultureInvariant );
     private static readonly Regex controllerVariableRegex = new( $"{{{RouteValueKeys.Controller}}}", Compiled | IgnoreCase | CultureInvariant );
+    private readonly ApiExplorerOptions options;
     private readonly Lazy<ApiDescriptionGroupCollection> apiDescriptions;
     private IDocumentationProvider? documentationProvider;
     private ISunsetPolicyManager? sunsetPolicyManager;
@@ -48,8 +49,8 @@ public class VersionedApiExplorer : IApiExplorer
     public VersionedApiExplorer( HttpConfiguration configuration, ApiExplorerOptions options )
     {
         Configuration = configuration;
-        Options = options;
-        apiDescriptions = new( InitializeApiDescriptions );
+        this.options = options;
+        apiDescriptions = new( Initialize );
     }
 
     /// <summary>
@@ -80,7 +81,7 @@ public class VersionedApiExplorer : IApiExplorer
     /// Gets the options associated with the API explorer.
     /// </summary>
     /// <value>The <see cref="ApiExplorerOptions">API explorer options</see>.</value>
-    protected virtual ApiExplorerOptions Options { get; }
+    protected virtual ApiExplorerOptions Options => options;
 
     /// <summary>
     /// Gets the comparer used to compare API descriptions.
@@ -204,6 +205,8 @@ public class VersionedApiExplorer : IApiExplorer
 
         return apiVersion.ToString( Options.GroupNameFormat, InvariantCulture );
     }
+
+    private ApiDescriptionGroupCollection Initialize() => InitializeApiDescriptions();
 
     /// <summary>
     /// Initializes the API descriptions to explore.
