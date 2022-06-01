@@ -189,7 +189,11 @@ public class ProductsController : ODataController
     public IHttpActionResult CreateRefToSupplier(
         [FromODataUri] int key,
         string navigationProperty,
-        [FromBody] Uri link ) => StatusCode( NoContent );
+        [FromBody] Uri link )
+    {
+        var relatedKey = this.GetRelatedKey( link );
+        return StatusCode( NoContent );
+    }
 
     /// <summary>
     /// Unlinks a supplier from a product.

@@ -20,8 +20,8 @@ public class ProductsController : ODataController
 {
     private readonly IQueryable<Product> products = new[]
     {
-        NewProduct( 1 ), 
-        NewProduct( 2 ), 
+        NewProduct( 1 ),
+        NewProduct( 2 ),
         NewProduct( 3 ),
     }.AsQueryable();
 
@@ -191,9 +191,13 @@ public class ProductsController : ODataController
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult CreateRef(
-        int key, 
-        string navigationProperty, 
-        [FromBody] Uri link ) => NoContent();
+        int key,
+        string navigationProperty,
+        [FromBody] Uri link )
+    {
+        var relatedKey = this.GetRelatedKey( link );
+        return NoContent();
+    }
 
     /// <summary>
     /// Unlinks a supplier from a product.
@@ -206,7 +210,7 @@ public class ProductsController : ODataController
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult DeleteRef(
-        int key, 
+        int key,
         string navigationProperty,
         int relatedKey ) => NoContent();
 
