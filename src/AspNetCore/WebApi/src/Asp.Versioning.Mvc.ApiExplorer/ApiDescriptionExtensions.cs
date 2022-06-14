@@ -175,6 +175,7 @@ public static class ApiDescriptionExtensions
     {
         var clone = new ApiResponseType()
         {
+            IsDefaultResponse = responseType.IsDefaultResponse,
             ModelMetadata = responseType.ModelMetadata,
             StatusCode = responseType.StatusCode,
             Type = responseType.Type,
