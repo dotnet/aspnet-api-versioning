@@ -5,6 +5,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using static ServiceDescriptor;
@@ -60,6 +62,15 @@ public static class IApiVersioningBuilderExtensions
         services.AddMvcCore().AddApiExplorer();
         services.TryAddSingleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>();
         services.TryAddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
-        services.TryAddEnumerable( Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>() );
+
+        // use internal constructor until ASP.NET Core fixes their bug
+        // BUG: https://github.com/dotnet/aspnetcore/issues/41773
+        services.TryAddEnumerable(
+            Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>(
+                sp => new(
+                    sp.GetRequiredService<ISunsetPolicyManager>(),
+                    sp.GetRequiredService<IModelMetadataProvider>(),
+                    sp.GetRequiredService<IInlineConstraintResolver>(),
+                    sp.GetRequiredService<IOptions<ApiExplorerOptions>>() ) ) );
     }
 }

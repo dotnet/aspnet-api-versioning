@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.AspNetCore.Routing.Template;
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.Linq.Enumerable;
 using static System.StringComparison;
@@ -42,6 +43,11 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         ModelMetadata = modelMetadata ?? throw new ArgumentNullException( nameof( modelMetadata ) );
         optional = options.AssumeDefaultVersionWhenUnspecified && apiVersion == options.DefaultApiVersion;
     }
+
+    // intentionally an internal property so the public contract doesn't change. this will be removed
+    // once the ASP.NET Core team fixes the bug
+    // BUG: https://github.com/dotnet/aspnetcore/issues/41773
+    internal IInlineConstraintResolver? ConstraintResolver { get; set; }
 
     /// <summary>
     /// Gets the associated API description.
@@ -160,7 +166,8 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     protected virtual void UpdateUrlSegment()
     {
         var parameter = FindByRouteConstraintType( ApiDescription ) ??
-                        FindByRouteConstraintName( ApiDescription, Options.RouteConstraintName );
+                        FindByRouteConstraintName( ApiDescription, Options.RouteConstraintName ) ??
+                        TryCreateFromRouteTemplate( ApiDescription, ConstraintResolver );
 
         if ( parameter == null )
         {
@@ -304,6 +311,73 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
                     return parameterDescription;
                 }
             }
+        }
+
+        return default;
+    }
+
+    private static ApiParameterDescription? TryCreateFromRouteTemplate( ApiDescription description, IInlineConstraintResolver? constraintResolver )
+    {
+        if ( constraintResolver == null )
+        {
+            return default;
+        }
+
+        var relativePath = description.RelativePath;
+
+        if ( string.IsNullOrEmpty( relativePath ) )
+        {
+            return default;
+        }
+
+        var constraints = new List<IRouteConstraint>();
+        var template = TemplateParser.Parse( relativePath );
+        var constraintName = default( string );
+
+        for ( var i = 0; i < template.Parameters.Count; i++ )
+        {
+            var match = false;
+            var parameter = template.Parameters[i];
+
+            foreach ( var inlineConstraint in parameter.InlineConstraints )
+            {
+                var constraint = constraintResolver.ResolveConstraint( inlineConstraint.Constraint )!;
+
+                constraints.Add( constraint );
+
+                if ( constraint is ApiVersionRouteConstraint )
+                {
+                    match = true;
+                    constraintName = inlineConstraint.Constraint;
+                }
+            }
+
+            if ( !match )
+            {
+                continue;
+            }
+
+            constraints.TrimExcess();
+
+            // ASP.NET Core does not discover route parameters without using Reflection in 6.0. unclear if it will be fixed before 7.0
+            // BUG: https://github.com/dotnet/aspnetcore/issues/41773
+            // REF: https://github.com/dotnet/aspnetcore/blob/release/6.0/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs#L323
+            var result = new ApiParameterDescription()
+            {
+                Name = parameter.Name!,
+                RouteInfo = new()
+                {
+                    Constraints = constraints,
+                    DefaultValue = parameter.DefaultValue,
+                    IsOptional = parameter.IsOptional || parameter.DefaultValue != null,
+                },
+                Source = BindingSource.Path,
+            };
+            var token = $"{parameter.Name}:{constraintName}";
+
+            description.RelativePath = relativePath.Replace( token, parameter.Name, Ordinal );
+            description.ParameterDescriptions.Insert( 0, result );
+            return result;
         }
 
         return default;
