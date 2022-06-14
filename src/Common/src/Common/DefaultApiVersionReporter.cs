@@ -62,7 +62,6 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         AddApiVersionHeader( headers, ApiDeprecatedVersions, apiVersionModel.DeprecatedApiVersions );
 
 #if NETFRAMEWORK
-        var request = response.RequestMessage;
         var statusCode = (int) response.StatusCode;
 #else
         var context = response.HttpContext;
@@ -75,13 +74,23 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         }
 
 #if NETFRAMEWORK
-        var dependencyResolver = request.GetConfiguration().DependencyResolver;
-        var policyManager = dependencyResolver.GetSunsetPolicyManager();
-        var name = request.GetActionDescriptor().GetApiVersionMetadata().Name;
+        if ( response.RequestMessage is not HttpRequestMessage request ||
+             request.GetActionDescriptor()?.GetApiVersionMetadata() is not ApiVersionMetadata metadata )
+        {
+            return;
+        }
+
+        var name = metadata.Name;
+        var policyManager = request.GetConfiguration().DependencyResolver.GetSunsetPolicyManager();
         var version = request.GetRequestedApiVersion();
 #else
+        if ( context.GetEndpoint()?.Metadata.GetMetadata<ApiVersionMetadata>() is not ApiVersionMetadata metadata )
+        {
+            return;
+        }
+
+        var name = metadata.Name;
         var policyManager = context.RequestServices.GetRequiredService<ISunsetPolicyManager>();
-        var name = context.GetEndpoint()!.Metadata.GetMetadata<ApiVersionMetadata>()?.Name;
         var version = context.GetRequestedApiVersion();
 #endif
 
