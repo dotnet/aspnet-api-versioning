@@ -2,10 +2,12 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using static Asp.Versioning.ApiVersionMapping;
 using static System.Globalization.CultureInfo;
@@ -18,6 +20,7 @@ using static System.Globalization.CultureInfo;
 public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 {
     private readonly IOptions<ApiExplorerOptions> options;
+    private readonly IInlineConstraintResolver constraintResolver;
     private ApiVersionModelMetadata? modelMetadata;
 
     /// <summary>
@@ -31,9 +34,19 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         ISunsetPolicyManager sunsetPolicyManager,
         IModelMetadataProvider modelMetadataProvider,
         IOptions<ApiExplorerOptions> options )
+        : this( sunsetPolicyManager, modelMetadataProvider, new SimpleConstraintResolver( options ), options ) { }
+
+    // intentionally hiding IInlineConstraintResolver from public signature until ASP.NET Core fixes their bug
+    // BUG: https://github.com/dotnet/aspnetcore/issues/41773
+    internal VersionedApiDescriptionProvider(
+        ISunsetPolicyManager sunsetPolicyManager,
+        IModelMetadataProvider modelMetadataProvider,
+        IInlineConstraintResolver constraintResolver,
+        IOptions<ApiExplorerOptions> options )
     {
         SunsetPolicyManager = sunsetPolicyManager;
         ModelMetadataProvider = modelMetadataProvider;
+        this.constraintResolver = constraintResolver;
         this.options = options;
     }
 
@@ -83,6 +96,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         var parameterSource = Options.ApiVersionParameterSource;
         var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, ModelMetadata, Options );
 
+        context.ConstraintResolver = constraintResolver;
         parameterSource.AddParameters( context );
     }
 
@@ -246,5 +260,22 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         }
 
         return versions;
+    }
+
+    private sealed class SimpleConstraintResolver : IInlineConstraintResolver
+    {
+        private readonly IOptions<ApiExplorerOptions> options;
+
+        internal SimpleConstraintResolver( IOptions<ApiExplorerOptions> options ) => this.options = options;
+
+        public IRouteConstraint? ResolveConstraint( string inlineConstraint )
+        {
+            if ( options.Value.RouteConstraintName == inlineConstraint )
+            {
+                return new ApiVersionRouteConstraint();
+            }
+
+            return default;
+        }
     }
 }
