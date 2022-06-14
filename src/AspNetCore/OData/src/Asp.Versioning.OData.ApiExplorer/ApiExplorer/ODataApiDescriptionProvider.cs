@@ -102,7 +102,13 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = results.Count - 1; i >= 0; i-- )
         {
             var result = results[i];
-            var metadata = result.ActionDescriptor.EndpointMetadata.OfType<IODataRoutingMetadata>().ToArray();
+
+            if ( result.ActionDescriptor.EndpointMetadata is not IList<object> endpointMetadata )
+            {
+                continue;
+            }
+
+            var metadata = endpointMetadata.OfType<IODataRoutingMetadata>().ToArray();
             var notOData = metadata.Length == 0;
 
             if ( notOData )

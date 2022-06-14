@@ -24,6 +24,11 @@ public static class ActionDescriptorExtensions
 
         var endpointMetadata = action.EndpointMetadata;
 
+        if ( endpointMetadata == null )
+        {
+            return ApiVersionMetadata.Empty;
+        }
+
         for ( var i = 0; i < endpointMetadata.Count; i++ )
         {
             if ( endpointMetadata[i] is ApiVersionMetadata metadata )
@@ -38,6 +43,12 @@ public static class ActionDescriptorExtensions
     internal static void AddOrReplaceApiVersionMetadata( this ActionDescriptor action, ApiVersionMetadata value )
     {
         var endpointMetadata = action.EndpointMetadata;
+
+        if ( endpointMetadata == null )
+        {
+            action.EndpointMetadata = new List<object>() { value };
+            return;
+        }
 
         for ( var i = 0; i < endpointMetadata.Count; i++ )
         {

@@ -179,6 +179,11 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     {
         var endpointMetadata = action.EndpointMetadata;
 
+        if ( endpointMetadata == null )
+        {
+            return true;
+        }
+
         for ( var i = 0; i < endpointMetadata.Count; i++ )
         {
             if ( endpointMetadata[i] is ApiVersionMetadata )
