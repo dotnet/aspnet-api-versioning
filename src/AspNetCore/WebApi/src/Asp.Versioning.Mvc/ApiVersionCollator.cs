@@ -2,8 +2,10 @@
 
 namespace Asp.Versioning;
 
+using Asp.Versioning.ApplicationModels;
 using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using System.Runtime.CompilerServices;
 using static Asp.Versioning.ApiVersionMapping;
@@ -102,6 +104,9 @@ public class ApiVersionCollator : IActionDescriptorProvider
         return NamingConvention.GroupName( name );
     }
 
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static bool IsUnversioned( ActionDescriptor action ) => action.GetApiVersionMetadata() == ApiVersionMetadata.Empty;
+
     private IEnumerable<IReadOnlyList<ActionDescriptor>> GroupActionsByController( IList<ActionDescriptor> actions )
     {
         var groups = new Dictionary<string, List<ActionDescriptor>>( StringComparer.OrdinalIgnoreCase );
@@ -109,6 +114,12 @@ public class ApiVersionCollator : IActionDescriptorProvider
         for ( var i = 0; i < actions.Count; i++ )
         {
             var action = actions[i];
+
+            if ( IsUnversioned( action ) )
+            {
+                continue;
+            }
+
             var key = GetControllerName( action );
 
             if ( string.IsNullOrEmpty( key ) )
