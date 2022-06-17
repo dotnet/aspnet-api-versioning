@@ -296,7 +296,7 @@ public class VersionedApiExplorer : IApiExplorer
 
             for ( var j = 0; j < apiDescriptions.Count; j++ )
             {
-                apiDescriptions[i].TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
+                apiDescriptions[j].TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
             }
         }
 
