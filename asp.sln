@@ -130,6 +130,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{E0E64F6F-FB0C-4534-B815-2217700B50BA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OData", "OData", "{49EA6476-901C-4D4F-8E45-98BC8A2780EB}"
+	ProjectSection(SolutionItems) = preProject
+		examples\AspNetCore\OData\Directory.Build.props = examples\AspNetCore\OData\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicWebApiExample", "examples\AspNet\WebApi\BasicWebApiExample\BasicWebApiExample.csproj", "{B0457E07-161A-4ED0-949A-8CF7EFA765F5}"
 EndProject
