@@ -100,7 +100,13 @@
             }
             else if ( Operation == null )
             {
-                if ( IsActionOrFunction( EntitySet, Singleton, action.ActionName, GetHttpMethods( action ) ) )
+                var httpMethods = GetHttpMethods( action );
+
+                if ( IsCast( EdmModel, EntitySet, action.ActionName, httpMethods ) )
+                {
+                    return ODataRouteActionType.EntitySet;
+                }
+                else if ( IsActionOrFunction( EntitySet, Singleton, action.ActionName, httpMethods ) )
                 {
                     return ODataRouteActionType.Unknown;
                 }
@@ -120,6 +126,52 @@
             }
 
             return ODataRouteActionType.UnboundOperation;
+        }
+
+        static bool IsCast( IEdmModel model, IEdmEntitySet? entitySet, string actionName, IEnumerable<string> methods )
+        {
+            using var iterator = methods.GetEnumerator();
+
+            if ( !iterator.MoveNext() )
+            {
+                return false;
+            }
+
+            var method = iterator.Current;
+
+            if ( iterator.MoveNext() )
+            {
+                return false;
+            }
+
+            if ( entitySet == null )
+            {
+                return false;
+            }
+
+            var entity = entitySet.EntityType();
+
+            const string ActionMethod = "Post";
+            const string FunctionMethod = "Get";
+
+            if ( ( FunctionMethod.Equals( method, OrdinalIgnoreCase ) ||
+                    ActionMethod.Equals( method, OrdinalIgnoreCase ) ) &&
+                    actionName != ActionMethod )
+            {
+                foreach ( var derivedType in model.FindAllDerivedTypes( entity ).OfType<EdmEntityType>() )
+                {
+                    var fromTypeName = "From" + derivedType.Name;
+
+                    if ( actionName.StartsWith( method + fromTypeName, OrdinalIgnoreCase ) ||
+                         actionName.StartsWith( method + entitySet.Name + fromTypeName, OrdinalIgnoreCase ) ||
+                         actionName.StartsWith( method + derivedType.Name, OrdinalIgnoreCase ) )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         // Slash became the default 4/18/2018
