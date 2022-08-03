@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\AspNetCore\OData\src\Asp.Versioning.OData.ApiExplorer\Asp.Versioning.OData.ApiExplorer.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AspNetCore\OData\src\Asp.Versioning.OData\Asp.Versioning.OData.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
+  </ItemGroup>
+
+
+</Project>
