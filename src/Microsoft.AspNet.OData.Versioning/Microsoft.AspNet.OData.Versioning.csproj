@@ -17,7 +17,7 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.OData" Version="[7.5.14,8.0.0)" />
-  <PackageReference Include="microsoft.netframework.referenceassemblies.net45" Version="1.0.2" PrivateAssets="All" />
+  <PackageReference Include="microsoft.netframework.referenceassemblies.net45" Version="1.0.3" PrivateAssets="All" />
  </ItemGroup>
 
  <ItemGroup>
