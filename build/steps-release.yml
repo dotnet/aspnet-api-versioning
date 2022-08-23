@@ -39,7 +39,6 @@ steps:
     --description "Adds versioning semantics to APIs built with ASP.NET"
     --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
   displayName: Sign Artifacts
-  condition: false
 
 - pwsh: >
     Expand-Archive
