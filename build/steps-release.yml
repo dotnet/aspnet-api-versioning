@@ -35,8 +35,8 @@ steps:
     dotnet signclient sign
     --config build/signing.json
     --input $(Build.ArtifactStagingDirectory)/packages.zip
-    --user $(codesign_user)
-    --secret $(codesign_secret)
+    --user "$(codesign_user)"
+    --secret "$(codesign_secret)"
     --name "ASP.NET API Versioning"
     --description "Adds versioning semantics to APIs built with ASP.NET"
     --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
