@@ -8,7 +8,7 @@ using Microsoft.OData;
 using Owin;
 using System.Web.Http;
 
-public class Startup
+public partial class Startup
 {
     public void Configuration( IAppBuilder appBuilder )
     {
