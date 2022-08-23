@@ -7,18 +7,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-#if WEBAPI
-    using System.Web.Http.Dispatcher;
-#endif
-    using static System.Globalization.CultureInfo;
-    using static System.String;
-#if !WEBAPI
-    using static System.StringComparison;
-#endif
+    using System.Runtime.CompilerServices;
 
     static class EdmExtensions
     {
+        const bool ThrowOnError = true;
+
         internal static Type? GetClrType( this IEdmType edmType, IEdmModel edmModel )
         {
             if ( edmType is not IEdmSchemaType schemaType )
@@ -27,15 +21,13 @@
             }
 
             var typeName = schemaType.FullName();
-            var type = DeriveFromWellKnowPrimitive( typeName );
 
-            if ( type != null )
+            if ( DeriveFromWellKnowPrimitive( typeName ) is Type type )
             {
                 return type;
             }
 
-            var element = (IEdmSchemaType) edmType;
-            var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>( element );
+            var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>( schemaType );
 
             if ( annotationValue != null )
             {
@@ -45,49 +37,29 @@
             return null;
         }
 
-        static Type? DeriveFromWellKnowPrimitive( string edmFullName )
+        static Type? DeriveFromWellKnowPrimitive( string edmFullName ) => edmFullName switch
         {
-            switch ( edmFullName )
-            {
-                case "Edm.String":
-                case "Edm.Byte":
-                case "Edm.SByte":
-                case "Edm.Int16":
-                case "Edm.Int32":
-                case "Edm.Int64":
-                case "Edm.Double":
-                case "Edm.Single":
-                case "Edm.Boolean":
-                case "Edm.Decimal":
-                case "Edm.DateTime":
-                case "Edm.DateTimeOffset":
-                case "Edm.Guid":
-#if WEBAPI
-                    return Type.GetType( edmFullName.Replace( "Edm", "System" ), throwOnError: true );
-#else
-                    return Type.GetType( edmFullName.Replace( "Edm", "System", Ordinal ), throwOnError: true );
-#endif
-                case "Edm.Duration":
-                    return typeof( TimeSpan );
-                case "Edm.Binary":
-                    return typeof( byte[] );
-                case "Edm.Geography":
-                case "Edm.Geometry":
-#if WEBAPI
-                    return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.Spatial" ), throwOnError: true );
-#else
-                    return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.Spatial", Ordinal ), throwOnError: true );
-#endif
-                case "Edm.Date":
-                case "Edm.TimeOfDay":
-#if WEBAPI
-                    return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.OData.Edm" ), throwOnError: true );
-#else
-                    return Type.GetType( edmFullName.Replace( "Edm", "Microsoft.OData.Edm", Ordinal ), throwOnError: true );
-#endif
-            }
+            "Edm.String" or "Edm.Byte" or "Edm.SByte" or "Edm.Int16" or "Edm.Int32" or "Edm.Int64" or
+            "Edm.Double" or "Edm.Single" or "Edm.Boolean" or "Edm.Decimal" or "Edm.DateTime" or "Edm.DateTimeOffset" or
+            "Edm.Guid" => Type.GetType( Requalify( edmFullName, "System" ), ThrowOnError ),
+            "Edm.Duration" => typeof( TimeSpan ),
+            "Edm.Binary" => typeof( byte[] ),
+            "Edm.Geography" or "Edm.Geometry" => GetTypeFromAssembly( edmFullName, "Microsoft.Spatial" ),
+            "Edm.Date" or "Edm.TimeOfDay" => GetTypeFromAssembly( edmFullName, "Microsoft.OData.Edm" ),
+            _ => null,
+        };
 
-            return null;
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+#if WEBAPI
+        static string Requalify( string edmFullName, string @namespace ) => @namespace + edmFullName.Substring( 3 );
+#else
+        static string Requalify( string edmFullName, string @namespace ) => string.Concat( @namespace.AsSpan(), edmFullName.AsSpan().Slice( 3 ) );
+#endif
+
+        static Type? GetTypeFromAssembly( string edmFullName, string assemblyName )
+        {
+            var typeName = Requalify( edmFullName, assemblyName ) + "," + assemblyName;
+            return Type.GetType( typeName, ThrowOnError );
         }
     }
 }
