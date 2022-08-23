@@ -1,19 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <OutputType>Exe</OutputType>
   <TargetFramework>net472</TargetFramework>
   <RootNamespace>Microsoft.Examples</RootNamespace>
  </PropertyGroup>
-
- <ItemGroup>
-  <Reference Include="Microsoft.CSharp" />
-  <Reference Include="System" />
- </ItemGroup>
-
- <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" Version="5.2.7" />
- </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\..\src\Microsoft.AspNet.WebApi.Versioning\Microsoft.AspNet.WebApi.Versioning.csproj" />
