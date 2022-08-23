@@ -54,18 +54,18 @@
             var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
 
             // act
-            Func<Task> act = async () => await GetAsync( "api/v1/values/42/ambiguous" );
+            Func<Task> act = () => GetAsync( "api/v1/values/42/ambiguous" );
 
             // assert
             result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
 
             if ( UsingEndpointRouting )
             {
-                act.Should().Throw<Exception>().And.GetType().Name.Should().Be( "AmbiguousMatchException" );
+                ( await act.Should().ThrowAsync<Exception>() ).And.GetType().Name.Should().Be( "AmbiguousMatchException" );
             }
             else
             {
-                act.Should().Throw<AmbiguousActionException>();
+                await act.Should().ThrowAsync<AmbiguousActionException>();
             }
         }
 
