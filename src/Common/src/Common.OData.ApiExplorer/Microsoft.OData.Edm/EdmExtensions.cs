@@ -7,7 +7,7 @@ using Microsoft.AspNet.OData;
 #else
 using Microsoft.OData.ModelBuilder;
 #endif
-using static System.StringComparison;
+using System.Runtime.CompilerServices;
 
 internal static class EdmExtensions
 {
@@ -41,11 +41,24 @@ internal static class EdmExtensions
     {
         "Edm.String" or "Edm.Byte" or "Edm.SByte" or "Edm.Int16" or "Edm.Int32" or "Edm.Int64" or
         "Edm.Double" or "Edm.Single" or "Edm.Boolean" or "Edm.Decimal" or "Edm.DateTime" or "Edm.DateTimeOffset" or
-        "Edm.Guid" => Type.GetType( edmFullName.Replace( "Edm", "System", Ordinal ), ThrowOnError ),
+        "Edm.Guid" => Type.GetType( Requalify( edmFullName, "System" ), ThrowOnError ),
         "Edm.Duration" => typeof( TimeSpan ),
         "Edm.Binary" => typeof( byte[] ),
-        "Edm.Geography" or "Edm.Geometry" => Type.GetType( edmFullName.Replace( "Edm", "Microsoft.Spatial", Ordinal ), ThrowOnError ),
-        "Edm.Date" or "Edm.TimeOfDay" => Type.GetType( edmFullName.Replace( "Edm", "Microsoft.OData.Edm", Ordinal ), ThrowOnError ),
+        "Edm.Geography" or "Edm.Geometry" => GetTypeFromAssembly( edmFullName, "Microsoft.Spatial" ),
+        "Edm.Date" or "Edm.TimeOfDay" => GetTypeFromAssembly( edmFullName, "Microsoft.OData.Edm" ),
         _ => null,
     };
+
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+#if NETFRAMEWORK
+    private static string Requalify( string edmFullName, string @namespace ) => @namespace + edmFullName.Substring( 3 );
+#else
+    private static string Requalify( string edmFullName, string @namespace ) => string.Concat( @namespace.AsSpan(), edmFullName.AsSpan().Slice( 3 ) );
+#endif
+
+    private static Type? GetTypeFromAssembly( string edmFullName, string assemblyName )
+    {
+        var typeName = Requalify( edmFullName, assemblyName ) + "," + assemblyName;
+        return Type.GetType( typeName, ThrowOnError );
+    }
 }
