@@ -15,8 +15,10 @@ steps:
   inputs:
     command: pack
     projects: ${{ parameters.solution }}
-    arguments: --configuration ${{ parameters.configuration }}
-    buildProperties: VersionSuffix=${{ parameters.versionSuffix }}
+    ${{ if eq(parameters.versionSuffix, '') }}:
+        arguments: --configuration ${{ parameters.configuration }}
+    ${{ else }}:
+        arguments: --configuration ${{ parameters.configuration }} --version-suffix ${{ parameters.versionSuffix }}
     outputDir: $(Build.ArtifactStagingDirectory)/packages
     noBuild: true
 
