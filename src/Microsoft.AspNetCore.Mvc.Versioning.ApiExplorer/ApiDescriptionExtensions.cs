@@ -39,7 +39,7 @@
             var apiVersion = apiDescription.GetApiVersion();
             var model = apiDescription.ActionDescriptor.GetApiVersionModel( Explicit | Implicit );
 
-            return model.DeprecatedApiVersions.Contains( apiVersion );
+            return !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
         }
 
         /// <summary>
