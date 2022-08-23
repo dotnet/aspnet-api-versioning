@@ -119,6 +119,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNet", "AspNet", "{20CEA68A-6E76-4285-99B0-52EDC8F9A03C}"
 	ProjectSection(SolutionItems) = preProject
 		examples\AspNet\Directory.Build.props = examples\AspNet\Directory.Build.props
+		examples\AspNet\Startup.Newtonsoft.cs = examples\AspNet\Startup.Newtonsoft.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", "{4AA0D9F1-F837-430B-9CE2-AAC988E339E4}"

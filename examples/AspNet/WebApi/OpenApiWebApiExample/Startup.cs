@@ -14,7 +14,7 @@ using System.Web.Http.Routing;
 /// <summary>
 /// Represents the startup process for the application.
 /// </summary>
-public class Startup
+public partial class Startup
 {
     /// <summary>
     /// Configures the application using the provided builder.

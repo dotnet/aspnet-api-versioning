@@ -5,7 +5,7 @@ using Owin;
 using System.Web.Http;
 using System.Web.Http.Routing;
 
-public class Startup
+public partial class Startup
 {
     public void Configuration( IAppBuilder builder )
     {

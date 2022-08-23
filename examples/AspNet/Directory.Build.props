@@ -18,4 +18,8 @@
   </AssemblyAttribute>
  </ItemGroup>
 
+ <ItemGroup>
+  <Compile Include="$(MSBuildThisFileDirectory)Startup.Newtonsoft.cs" DependentUpon="Startup.cs" />
+ </ItemGroup>
+
 </Project>
