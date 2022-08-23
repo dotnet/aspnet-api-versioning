@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0987757E-4
 		test\.editorconfig = test\.editorconfig
 		test\acceptance.xunit.runner.json = test\acceptance.xunit.runner.json
 		test\Directory.Build.props = test\Directory.Build.props
+		test\Directory.Build.targets = test\Directory.Build.targets
 		test\xunit.runner.json = test\xunit.runner.json
 	EndProjectSection
 EndProject
