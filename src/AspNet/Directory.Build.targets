@@ -4,7 +4,7 @@
  <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../'))" />
  
 <ItemGroup>
-  <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="1.0.2" PrivateAssets="All" />
+  <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="1.0.3" PrivateAssets="All" />
  </ItemGroup>
 
 </Project>
