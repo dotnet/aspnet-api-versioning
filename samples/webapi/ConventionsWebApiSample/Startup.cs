@@ -1,6 +1,4 @@
-﻿[assembly: Microsoft.Owin.OwinStartup( typeof( Microsoft.Examples.Startup ) )]
-
-namespace Microsoft.Examples
+﻿namespace Microsoft.Examples
 {
     using Controllers;
     using global::Owin;
@@ -10,7 +8,7 @@ namespace Microsoft.Examples
     using System.Web.Http;
     using System.Web.Http.Routing;
 
-    public class Startup
+    public partial class Startup
     {
         public void Configuration( IAppBuilder builder )
         {

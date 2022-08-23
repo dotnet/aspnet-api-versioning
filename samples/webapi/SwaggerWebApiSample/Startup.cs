@@ -1,6 +1,4 @@
-﻿[assembly: Microsoft.Owin.OwinStartup( typeof( Microsoft.Examples.Startup ) )]
-
-namespace Microsoft.Examples
+﻿namespace Microsoft.Examples
 {
     using global::Owin;
     using Microsoft.Web.Http.Routing;
@@ -15,7 +13,7 @@ namespace Microsoft.Examples
     /// <summary>
     /// Represents the startup process for the application.
     /// </summary>
-    public class Startup
+    public partial class Startup
     {
         /// <summary>
         /// Configures the application using the provided builder.

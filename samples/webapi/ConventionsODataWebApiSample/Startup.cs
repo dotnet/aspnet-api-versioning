@@ -1,6 +1,4 @@
-﻿[assembly: Microsoft.Owin.OwinStartup( typeof( Microsoft.Examples.Startup ) )]
-
-namespace Microsoft.Examples
+﻿namespace Microsoft.Examples
 {
     using global::Owin;
     using Microsoft.AspNet.OData.Builder;
@@ -11,7 +9,7 @@ namespace Microsoft.Examples
     using System;
     using System.Web.Http;
 
-    public class Startup
+    public partial class Startup
     {
         public void Configuration( IAppBuilder appBuilder )
         {
