@@ -116,15 +116,12 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         // 2. OData adds a SelectorModel per EDM
         // 3. ApiVersionMetadata has already be computed and added to EndpointMetadata
         //
-        // this only becomes a problem when there are multiple EDMs and a single action implementation
-        // maps to more than one EDM.
+        // this becomes a problem when there are multiple EDMs and a single action implementation
+        // maps to more than one EDM or a dynamically added OData endpoint is added without ApiVersionMetadata.
         //
         // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs
         // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Extensions/ActionModelExtensions.cs#L148
-        if ( mapping.Count > 1 )
-        {
-            CopyApiVersionEndpointMetadata( context.Result.Controllers );
-        }
+        CopyApiVersionEndpointMetadata( context.Result.Controllers );
 
         versionedODataOptions.Mapping = mapping;
     }
