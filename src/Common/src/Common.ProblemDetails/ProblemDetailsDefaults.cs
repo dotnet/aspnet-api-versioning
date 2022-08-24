@@ -19,7 +19,7 @@ public static class ProblemDetailsDefaults
     /// </summary>
     public static ProblemDetailsInfo Unsupported =>
         unsupported ??= new(
-            "https//:docs.api-versioning.org#unsupported",
+            "https://docs.api-versioning.org/problems#unsupported",
             "Unsupported API version",
             "UnsupportedApiVersion" );
 
@@ -28,7 +28,7 @@ public static class ProblemDetailsDefaults
     /// </summary>
     public static ProblemDetailsInfo Unspecified =>
         unspecified ??= new(
-            "https//:docs.api-versioning.org#unspecified",
+            "https://docs.api-versioning.org/problems#unspecified",
             "Unspecified API version",
             "ApiVersionUnspecified" );
 
@@ -37,7 +37,7 @@ public static class ProblemDetailsDefaults
     /// </summary>
     public static ProblemDetailsInfo Invalid =>
         invalid ??= new(
-            "https//:docs.api-versioning.org#invalid",
+            "https://docs.api-versioning.org/problems#invalid",
             "Invalid API version",
             "InvalidApiVersion" );
 
@@ -46,7 +46,7 @@ public static class ProblemDetailsDefaults
     /// </summary>
     public static ProblemDetailsInfo Ambiguous =>
         ambiguous ??= new(
-            "https//:docs.api-versioning.org#ambiguous",
+            "https://docs.api-versioning.org/problems#ambiguous",
             "Ambiguous API version",
             "AmbiguousApiVersion" );
 
