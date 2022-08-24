@@ -67,14 +67,7 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
         }
         set
         {
-            if ( string.IsNullOrEmpty( value ) )
-            {
-                rawApiVersions = default;
-            }
-            else
-            {
-                rawApiVersions = new[] { value };
-            }
+            rawApiVersions = string.IsNullOrEmpty( value ) ? default : new[] { value };
         }
     }
 

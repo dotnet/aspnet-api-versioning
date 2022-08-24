@@ -133,10 +133,8 @@ public class VersionedEndpointConventionBuilder :
             {
                 return ApiVersionMetadata.Neutral;
             }
-            else
-            {
-                return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
-            }
+
+            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
         }
 
         ApiVersion[] emptyVersions;

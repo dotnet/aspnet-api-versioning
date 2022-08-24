@@ -256,9 +256,23 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         var visitedControllers = new List<Tuple<HttpControllerDescriptor, ApiVersionModel>>( controllers.Count );
         var visitedActions = new List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>>( controllers.Count );
 
+        CollateControllerVersions( controllers, actionSelector, controllerModels, actionModels, visitedControllers, visitedActions );
+        CollateControllerModels( controllerModels, visitedControllers, CollateActionModels( actionModels, visitedActions ) );
+        ApplyCollatedModelsToActions( configuration, visitedActions );
+
+        return controllers.ToArray();
+    }
+
+    private static void CollateControllerVersions(
+        List<HttpControllerDescriptor> controllers,
+        IHttpActionSelector actionSelector,
+        List<ApiVersionModel> controllerModels,
+        List<ApiVersionModel> actionModels,
+        List<Tuple<HttpControllerDescriptor, ApiVersionModel>> visitedControllers,
+        List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>> visitedActions )
+    {
         for ( var i = 0; i < controllers.Count; i++ )
         {
-            // 1 - collate controller versions
             var controller = controllers[i];
             var model = controller.GetApiVersionModel();
 
@@ -270,25 +284,37 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             controllerModels.Add( model );
             visitedControllers.Add( Tuple.Create( controller, model ) );
 
-            // 2 - collate action versions
-            var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
-
-            foreach ( var action in actions )
-            {
-                var metadata = action.GetApiVersionMetadata();
-
-                if ( metadata.IsApiVersionNeutral )
-                {
-                    continue;
-                }
-
-                model = metadata.Map( Explicit );
-                actionModels.Add( model );
-                visitedActions.Add( Tuple.Create( controller, action, model ) );
-            }
+            CollateActionVersions( actionSelector, actionModels, visitedActions, controller );
         }
+    }
 
-        // 3 - collate action models
+    private static void CollateActionVersions(
+        IHttpActionSelector actionSelector,
+        List<ApiVersionModel> actionModels,
+        List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>> visitedActions,
+        HttpControllerDescriptor controller )
+    {
+        var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
+
+        foreach ( var action in actions )
+        {
+            var metadata = action.GetApiVersionMetadata();
+
+            if ( metadata.IsApiVersionNeutral )
+            {
+                continue;
+            }
+
+            var model = metadata.Map( Explicit );
+            actionModels.Add( model );
+            visitedActions.Add( Tuple.Create( controller, action, model ) );
+        }
+    }
+
+    private static ApiVersionModel CollateActionModels(
+        List<ApiVersionModel> actionModels,
+        List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>> visitedActions )
+    {
         var collatedModel = actionModels.Aggregate();
 
         for ( var i = 0; i < visitedActions.Count; i++ )
@@ -297,7 +323,14 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             visitedActions[i] = Tuple.Create( controller, action, model.Aggregate( collatedModel ) );
         }
 
-        // 4 - collate controller models
+        return collatedModel;
+    }
+
+    private static void CollateControllerModels(
+        List<ApiVersionModel> controllerModels,
+        List<Tuple<HttpControllerDescriptor, ApiVersionModel>> visitedControllers,
+        ApiVersionModel collatedModel )
+    {
         // note: allows controllers to report versions in 400s even when an action is unmatched
         controllerModels.Add( collatedModel );
         collatedModel = controllerModels.Aggregate();
@@ -307,10 +340,14 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             var (controller, model) = visitedControllers[i];
             controller.SetApiVersionModel( model.Aggregate( collatedModel ) );
         }
+    }
 
+    private static void ApplyCollatedModelsToActions(
+        HttpConfiguration configuration,
+        List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>> visitedActions )
+    {
         var namingConvention = configuration.DependencyResolver.GetControllerNameConvention();
 
-        // 5 - apply collated models into action metadata
         for ( var i = 0; i < visitedActions.Count; i++ )
         {
             var (controller, action, endpointModel) = visitedActions[i];
@@ -318,8 +355,6 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             var name = namingConvention.GroupName( controller.ControllerName );
             action.SetApiVersionMetadata( new ApiVersionMetadata( apiModel, endpointModel, name ) );
         }
-
-        return controllers.ToArray();
     }
 
     private static void EnsureUrlHelper( HttpRequestMessage request )

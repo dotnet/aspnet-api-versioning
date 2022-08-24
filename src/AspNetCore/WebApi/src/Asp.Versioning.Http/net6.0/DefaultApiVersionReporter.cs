@@ -37,7 +37,7 @@ public partial class DefaultApiVersionReporter
         }
         else
         {
-            headerValue.Append( versions[0].ToString() );
+            headerValue.Append( versions[0] );
         }
 
         buffer[0] = ',';
@@ -51,7 +51,7 @@ public partial class DefaultApiVersionReporter
             }
             else
             {
-                headerValue.Append( ", " ).Append( versions[i].ToString() );
+                headerValue.Append( ", " ).Append( versions[i] );
             }
         }
 

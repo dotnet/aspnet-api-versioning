@@ -75,15 +75,9 @@ internal sealed class HttpResponseExceptionFactory
             if ( couldMatch )
             {
                 properties ??= request.ApiVersionProperties();
-
-                if ( properties.RequestedApiVersion is ApiVersion apiVersion )
-                {
-                    response = CreateResponseForUnsupportedApiVersion( apiVersion, NotFound );
-                }
-                else
-                {
-                    response = CreateNotFound( conventionRouteResult );
-                }
+                response = properties.RequestedApiVersion is ApiVersion apiVersion
+                    ? CreateResponseForUnsupportedApiVersion( apiVersion, NotFound )
+                    : CreateNotFound( conventionRouteResult );
             }
             else
             {
@@ -205,16 +199,9 @@ internal sealed class HttpResponseExceptionFactory
         var culture = CultureInfo.CurrentCulture;
         var message = string.Format( culture, SR.ResourceNotFound, safeUrl );
         var controllerName = conventionRouteResult.ControllerName;
-        string messageDetail;
-
-        if ( string.IsNullOrEmpty( controllerName ) )
-        {
-            messageDetail = string.Format( culture, SR.ControllerNameNotFound, safeUrl );
-        }
-        else
-        {
-            messageDetail = string.Format( culture, SR.DefaultControllerFactory_ControllerNameNotFound, controllerName );
-        }
+        var messageDetail = string.IsNullOrEmpty( controllerName )
+            ? string.Format( culture, SR.ControllerNameNotFound, safeUrl )
+            : string.Format( culture, SR.DefaultControllerFactory_ControllerNameNotFound, controllerName );
 
         TraceWriter.Info( request, ControllerSelectorCategory, message );
 

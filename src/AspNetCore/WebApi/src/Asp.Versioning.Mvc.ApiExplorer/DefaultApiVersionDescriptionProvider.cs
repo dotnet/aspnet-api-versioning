@@ -213,7 +213,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     {
         private readonly object syncRoot = new();
         private readonly EndpointDataSource endpointDataSource;
-        private List<ApiVersionMetadata>? items;
+        private List<ApiVersionMetadata>? list;
         private int version;
         private int currentVersion;
 
@@ -229,42 +229,42 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         {
             get
             {
-                if ( items is not null && version == currentVersion )
+                if ( list is not null && version == currentVersion )
                 {
-                    return items;
+                    return list;
                 }
 
                 lock ( syncRoot )
                 {
-                    if ( items is not null && version == currentVersion )
+                    if ( list is not null && version == currentVersion )
                     {
-                        return items;
+                        return list;
                     }
 
                     var endpoints = endpointDataSource.Endpoints;
 
-                    if ( items == null )
+                    if ( list == null )
                     {
-                        items = new( capacity: endpoints.Count );
+                        list = new( capacity: endpoints.Count );
                     }
                     else
                     {
-                        items.Clear();
-                        items.Capacity = endpoints.Count;
+                        list.Clear();
+                        list.Capacity = endpoints.Count;
                     }
 
                     for ( var i = 0; i < endpoints.Count; i++ )
                     {
                         if ( endpoints[i].Metadata.GetMetadata<ApiVersionMetadata>() is ApiVersionMetadata item )
                         {
-                            items.Add( item );
+                            list.Add( item );
                         }
                     }
 
                     version = currentVersion;
                 }
 
-                return items;
+                return list;
             }
         }
 
@@ -290,7 +290,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     {
         private readonly object syncRoot = new();
         private readonly IActionDescriptorCollectionProvider provider;
-        private List<ApiVersionMetadata>? items;
+        private List<ApiVersionMetadata>? list;
         private int version;
 
         public ActionApiVersionMetadataCollection( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider ) =>
@@ -304,39 +304,39 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
             {
                 var collection = provider.ActionDescriptors;
 
-                if ( items is not null && collection.Version == version )
+                if ( list is not null && collection.Version == version )
                 {
-                    return items;
+                    return list;
                 }
 
                 lock ( syncRoot )
                 {
-                    if ( items is not null && collection.Version == version )
+                    if ( list is not null && collection.Version == version )
                     {
-                        return items;
+                        return list;
                     }
 
                     var actions = collection.Items;
 
-                    if ( items == null )
+                    if ( list == null )
                     {
-                        items = new( capacity: actions.Count );
+                        list = new( capacity: actions.Count );
                     }
                     else
                     {
-                        items.Clear();
-                        items.Capacity = actions.Count;
+                        list.Clear();
+                        list.Capacity = actions.Count;
                     }
 
                     for ( var i = 0; i < actions.Count; i++ )
                     {
-                        items.Add( actions[i].GetApiVersionMetadata() );
+                        list.Add( actions[i].GetApiVersionMetadata() );
                     }
 
                     version = collection.Version;
                 }
 
-                return items;
+                return list;
             }
         }
 

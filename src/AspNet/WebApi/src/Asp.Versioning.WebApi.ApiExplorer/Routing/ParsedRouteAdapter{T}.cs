@@ -13,12 +13,12 @@ internal sealed class ParsedRouteAdapter<T> : IParsedRoute where T : notnull
     private static readonly Lazy<Func<T, IEnumerable<object>>> pathSegmentsAccessor = new( NewPathSegmentsAccessor );
     private static readonly Lazy<Func<T, IDictionary<string, object>?, IDictionary<string, object>, HttpRouteValueDictionary, HttpRouteValueDictionary, object>> bindFunc = new( NewBindFunc );
     private readonly T adapted;
-    private readonly Lazy<IReadOnlyList<IPathSegment>> pathSegments;
+    private readonly Lazy<IReadOnlyList<IPathSegment>> pathSegmentsHolder;
 
     public ParsedRouteAdapter( T adapted )
     {
         this.adapted = adapted;
-        pathSegments = new Lazy<IReadOnlyList<IPathSegment>>( AdaptToPathSegments );
+        pathSegmentsHolder = new Lazy<IReadOnlyList<IPathSegment>>( AdaptToPathSegments );
     }
 
     public IBoundRouteTemplate? Bind( IDictionary<string, object>? currentValues, IDictionary<string, object> values, HttpRouteValueDictionary defaultValues, HttpRouteValueDictionary constraints )
@@ -36,7 +36,7 @@ internal sealed class ParsedRouteAdapter<T> : IParsedRoute where T : notnull
         return adapter;
     }
 
-    public IReadOnlyList<IPathSegment> PathSegments => pathSegments.Value;
+    public IReadOnlyList<IPathSegment> PathSegments => pathSegmentsHolder.Value;
 
     private IReadOnlyList<IPathSegment> AdaptToPathSegments()
     {

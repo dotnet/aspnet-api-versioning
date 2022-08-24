@@ -412,12 +412,9 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
             return format ?? string.Empty;
         }
 
-        if ( !string.IsNullOrEmpty( format ) )
+        if ( !string.IsNullOrEmpty( format ) && arg is IFormattable formattable )
         {
-            if ( arg is IFormattable formattable )
-            {
-                return formattable.ToString( format, formatProvider );
-            }
+            return formattable.ToString( format, formatProvider );
         }
 
         return arg.ToString() ?? string.Empty;
@@ -488,17 +485,12 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
             }
         }
 
-        if ( end > start )
-        {
-            count = int.Parse(
+        count = end > start
+            ? int.Parse(
                 Str.StringOrSpan( Str.Slice( format, start, end ) ),
                 default,
-                formatProvider );
-        }
-        else
-        {
-            count = 2;
-        }
+                formatProvider )
+            : 2;
     }
 
     private static void AppendStatus( StringBuilder text, string? status )

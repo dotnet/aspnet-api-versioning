@@ -29,11 +29,11 @@ public partial class DefaultApiVersionReporter
 
         var headerValue = new StringBuilder();
 
-        headerValue.Append( versions[0].ToString() );
+        headerValue.Append( versions[0] );
 
         for ( var i = 1; i < versions.Count; i++ )
         {
-            headerValue.Append( ", " ).Append( versions[i].ToString() );
+            headerValue.Append( ", " ).Append( versions[i] );
         }
 
         headers.Add( headerName, headerValue.ToString() );

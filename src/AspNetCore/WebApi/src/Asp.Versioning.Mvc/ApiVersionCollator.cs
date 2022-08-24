@@ -91,14 +91,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
 
         if ( !action.RouteValues.TryGetValue( "controller", out var name ) || name is null )
         {
-            if ( action is ControllerActionDescriptor controllerAction )
-            {
-                name = controllerAction.ControllerName;
-            }
-            else
-            {
-                name = string.Empty;
-            }
+            name = action is ControllerActionDescriptor controllerAction ? controllerAction.ControllerName : string.Empty;
         }
 
         return NamingConvention.GroupName( name );

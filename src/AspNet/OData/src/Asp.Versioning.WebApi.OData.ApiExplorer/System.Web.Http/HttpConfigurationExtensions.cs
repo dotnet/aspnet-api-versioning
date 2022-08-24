@@ -15,10 +15,6 @@ using System.Web.Http.Routing;
 /// </summary>
 public static class HttpConfigurationExtensions
 {
-    private const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
-    private const string NonODataRootContainerKey = "Microsoft.AspNet.OData.NonODataRootContainerKey";
-    private const string UrlKeyDelimiterKey = "Microsoft.AspNet.OData.UrlKeyDelimiterKey";
-
     /// <summary>
     /// Adds or replaces the configured <see cref="IApiExplorer">API explorer</see> with an implementation that supports OData and API versioning.
     /// </summary>
@@ -71,6 +67,8 @@ public static class HttpConfigurationExtensions
 
     internal static IServiceProvider GetODataRootContainer( this HttpConfiguration configuration, IHttpRoute route )
     {
+        const string RootContainerMappingsKey = "Microsoft.AspNet.OData.RootContainerMappingsKey";
+        const string NonODataRootContainerKey = "Microsoft.AspNet.OData.NonODataRootContainerKey";
         var properties = configuration.Properties;
         var containers = (ConcurrentDictionary<string, IServiceProvider>) properties.GetOrAdd( RootContainerMappingsKey, key => new ConcurrentDictionary<string, IServiceProvider>() );
         var routeName = configuration.Routes.GetRouteName( route );
@@ -92,6 +90,8 @@ public static class HttpConfigurationExtensions
 
     internal static ODataUrlKeyDelimiter? GetUrlKeyDelimiter( this HttpConfiguration configuration )
     {
+        const string UrlKeyDelimiterKey = "Microsoft.AspNet.OData.UrlKeyDelimiterKey";
+
         if ( configuration.Properties.TryGetValue( UrlKeyDelimiterKey, out var value ) )
         {
             return value as ODataUrlKeyDelimiter;

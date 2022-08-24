@@ -20,12 +20,11 @@ internal static class HttpRouteExtensions
 
         var directRouteActions = default( HttpActionDescriptor[] );
 
-        if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out HttpActionDescriptor[] possibleDirectRouteActions ) )
+        if ( dataTokens.TryGetValue( RouteDataTokenKeys.Actions, out HttpActionDescriptor[] possibleDirectRouteActions ) &&
+            possibleDirectRouteActions != null &&
+            possibleDirectRouteActions.Length > 0 )
         {
-            if ( possibleDirectRouteActions != null && possibleDirectRouteActions.Length > 0 )
-            {
-                directRouteActions = possibleDirectRouteActions;
-            }
+            directRouteActions = possibleDirectRouteActions;
         }
 
         if ( directRouteActions == null )

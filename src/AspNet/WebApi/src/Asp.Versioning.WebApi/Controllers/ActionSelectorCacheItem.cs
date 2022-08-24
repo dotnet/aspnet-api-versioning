@@ -313,12 +313,10 @@ internal sealed class ActionSelectorCacheItem
             {
                 var candidate = candidates[i];
 
-                if ( actionName == null || candidate.MatchName( actionName ) )
+                if ( ( actionName == null || candidate.MatchName( actionName ) ) &&
+                     ( ignoreMethods || candidate.MatchVerb( incomingMethod ) ) )
                 {
-                    if ( ignoreMethods || candidate.MatchVerb( incomingMethod ) )
-                    {
-                        candidateActionWithParams.Add( new( candidate, combinedParameterNames, subRouteData ) );
-                    }
+                    candidateActionWithParams.Add( new( candidate, combinedParameterNames, subRouteData ) );
                 }
             }
         }
@@ -360,25 +358,13 @@ internal sealed class ActionSelectorCacheItem
                 candidatesFoundByName[i] = new( actionsFoundByName[i] );
             }
 
-            if ( ignoreMethods )
-            {
-                candidates = candidatesFoundByName;
-            }
-            else
-            {
-                candidates = FilterIncompatibleMethods( incomingMethod, candidatesFoundByName );
-            }
+            candidates = ignoreMethods ? candidatesFoundByName : FilterIncompatibleMethods( incomingMethod, candidatesFoundByName );
         }
         else
         {
-            if ( ignoreMethods )
-            {
-                candidates = standardActions!.StandardCandidateActions!;
-            }
-            else
-            {
-                candidates = FindActionsForMethod( incomingMethod, standardActions!.CacheListMethods!, standardActions!.StandardCandidateActions! );
-            }
+            candidates = ignoreMethods
+                ? standardActions!.StandardCandidateActions!
+                : FindActionsForMethod( incomingMethod, standardActions!.CacheListMethods!, standardActions!.StandardCandidateActions! );
         }
 
         return candidates;
@@ -526,16 +512,9 @@ internal sealed class ActionSelectorCacheItem
         foreach ( var descriptor in ambiguousCandidates )
         {
             var controllerDescriptor = descriptor.ControllerDescriptor;
-            string controllerTypeName;
-
-            if ( controllerDescriptor != null && controllerDescriptor.ControllerType != null )
-            {
-                controllerTypeName = controllerDescriptor.ControllerType.FullName;
-            }
-            else
-            {
-                controllerTypeName = string.Empty;
-            }
+            var controllerTypeName = controllerDescriptor != null && controllerDescriptor.ControllerType != null
+                ? controllerDescriptor.ControllerType.FullName
+                : string.Empty;
 
             exceptionMessageBuilder.AppendLine();
             exceptionMessageBuilder.AppendFormat(

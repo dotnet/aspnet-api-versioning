@@ -153,17 +153,17 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
     /// <param name="apiDescriptions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiDescription">API descriptions</see> to explore.</param>
     protected virtual void ExploreQueryOptions( IEnumerable<ApiDescription> apiDescriptions )
     {
-        var odataOptions = ODataOptions;
-        var queryOptions = Options.QueryOptions;
+        var localODataOptions = ODataOptions;
+        var localQueryOptions = Options.QueryOptions;
         var settings = new ODataQueryOptionSettings()
         {
-            NoDollarPrefix = odataOptions.EnableNoDollarQueryOptions,
-            DescriptionProvider = queryOptions.DescriptionProvider,
-            DefaultQuerySettings = odataOptions.QuerySettings,
+            NoDollarPrefix = localODataOptions.EnableNoDollarQueryOptions,
+            DescriptionProvider = localQueryOptions.DescriptionProvider,
+            DefaultQuerySettings = localODataOptions.QuerySettings,
             ModelMetadataProvider = ModelMetadataProvider,
         };
 
-        queryOptions.ApplyTo( apiDescriptions, settings );
+        localQueryOptions.ApplyTo( apiDescriptions, settings );
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
