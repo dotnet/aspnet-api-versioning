@@ -18,10 +18,10 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
 
     private ApiVersion()
     {
-        const int MajorVersion = int.MaxValue;
-        const int MinorVersion = int.MaxValue;
-        var groupVersion = DateOnly.MaxValue;
-        hashCode = HashCode.Combine( groupVersion, MajorVersion, MinorVersion );
+        const int Major = int.MaxValue;
+        const int Minor = int.MaxValue;
+        var group = DateOnly.MaxValue;
+        hashCode = HashCode.Combine( group, Major, Minor );
     }
 
     /// <summary>

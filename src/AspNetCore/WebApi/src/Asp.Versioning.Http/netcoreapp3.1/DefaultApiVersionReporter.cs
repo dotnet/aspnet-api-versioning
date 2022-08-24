@@ -27,7 +27,7 @@ public partial class DefaultApiVersionReporter
 
         for ( var i = 1; i < versions.Count; i++ )
         {
-            headerValue.Append( ", " ).Append( versions[i].ToString() );
+            headerValue.Append( ", " ).Append( versions[i] );
         }
 
         headers.Add( headerName, headerValue.ToString() );

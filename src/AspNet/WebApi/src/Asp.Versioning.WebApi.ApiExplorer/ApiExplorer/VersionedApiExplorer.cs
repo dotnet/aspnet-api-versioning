@@ -30,7 +30,7 @@ public class VersionedApiExplorer : IApiExplorer
     private static readonly Regex actionVariableRegex = new( $"{{{RouteValueKeys.Action}}}", Compiled | IgnoreCase | CultureInvariant );
     private static readonly Regex controllerVariableRegex = new( $"{{{RouteValueKeys.Controller}}}", Compiled | IgnoreCase | CultureInvariant );
     private readonly ApiExplorerOptions options;
-    private readonly Lazy<ApiDescriptionGroupCollection> apiDescriptions;
+    private readonly Lazy<ApiDescriptionGroupCollection> apiDescriptionsHolder;
     private IDocumentationProvider? documentationProvider;
     private ISunsetPolicyManager? sunsetPolicyManager;
 
@@ -50,14 +50,14 @@ public class VersionedApiExplorer : IApiExplorer
     {
         Configuration = configuration;
         this.options = options;
-        apiDescriptions = new( Initialize );
+        apiDescriptionsHolder = new( Initialize );
     }
 
     /// <summary>
     /// Gets a collection of descriptions grouped by API version.
     /// </summary>
     /// <value>An <see cref="ApiDescriptionGroupCollection">API description group collection</see>.</value>
-    public virtual ApiDescriptionGroupCollection ApiDescriptions => apiDescriptions.Value;
+    public virtual ApiDescriptionGroupCollection ApiDescriptions => apiDescriptionsHolder.Value;
 
     /// <summary>
     /// Gets or sets the documentation provider. The provider will be responsible for documenting the API.
@@ -733,17 +733,15 @@ public class VersionedApiExplorer : IApiExplorer
                 }
             }
         }
-        else if ( route.Defaults.TryGetValue( RouteValueKeys.Controller, out controllerVariableValue ) )
+        else if ( route.Defaults.TryGetValue( RouteValueKeys.Controller, out controllerVariableValue ) &&
+                  controllerMappings.TryGetValue( controllerVariableValue, out var controllerDescriptor ) )
         {
             // bound controller variable {controller = "controllerName"}
-            if ( controllerMappings.TryGetValue( controllerVariableValue, out var controllerDescriptor ) )
+            foreach ( var nestedControllerDescriptor in controllerDescriptor.AsEnumerable() )
             {
-                foreach ( var nestedControllerDescriptor in controllerDescriptor.AsEnumerable() )
+                if ( ShouldExploreController( controllerVariableValue, nestedControllerDescriptor, route, apiVersion ) )
                 {
-                    if ( ShouldExploreController( controllerVariableValue, nestedControllerDescriptor, route, apiVersion ) )
-                    {
-                        ExploreRouteActions( route, routeTemplate, nestedControllerDescriptor, apiDescriptions, apiVersion );
-                    }
+                    ExploreRouteActions( route, routeTemplate, nestedControllerDescriptor, apiDescriptions, apiVersion );
                 }
             }
         }

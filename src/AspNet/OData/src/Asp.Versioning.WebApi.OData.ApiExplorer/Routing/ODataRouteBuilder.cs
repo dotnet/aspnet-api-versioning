@@ -479,7 +479,7 @@ internal sealed class ODataRouteBuilder
 
                 var matched = true;
 
-                for ( var j = 0; j < token.Length; i++, j++ )
+                for ( var j = 0; i < builder.Length && j < token.Length; i++, j++ )
                 {
                     if ( builder[i] != token[j] )
                     {
@@ -493,7 +493,7 @@ internal sealed class ODataRouteBuilder
                     break;
                 }
 
-                while ( builder[i] != '}' )
+                while ( i < builder.Length && builder[i] != '}' )
                 {
                     ++i;
                 }

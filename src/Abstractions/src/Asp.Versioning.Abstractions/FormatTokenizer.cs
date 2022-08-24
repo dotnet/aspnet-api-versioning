@@ -170,7 +170,7 @@ internal static class FormatTokenizer
 
         var start = i;
 #if NETSTANDARD1_0
-        var ch = format[i];
+        char ch;
         var previous = format[i];
 #else
         ref readonly var ch = ref format[i];

@@ -190,13 +190,12 @@ public class NamespaceParser
                 return false;
             }
 
-            if ( group is null && identifier.Length >= 10 )
+            if ( group is null &&
+                 identifier.Length >= 10 &&
+                 !TryConsumeGroup( ref identifier, ReadableDateFormat, length: 10, out group ) )
             {
-                if ( !TryConsumeGroup( ref identifier, ReadableDateFormat, length: 10, out group ) )
-                {
-                    apiVersion = default;
-                    return false;
-                }
+                apiVersion = default;
+                return false;
             }
         }
 
@@ -255,11 +254,6 @@ public class NamespaceParser
         {
             for ( var i = 0; i < 8; i++ )
             {
-#if NETSTANDARD
-                var ch = value[i];
-#else
-                ref readonly var ch = ref value[i];
-#endif
                 if ( !char.IsDigit( value[i] ) )
                 {
                     return false;

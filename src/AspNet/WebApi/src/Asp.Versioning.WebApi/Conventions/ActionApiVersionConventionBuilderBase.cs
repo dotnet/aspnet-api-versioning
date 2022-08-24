@@ -30,14 +30,9 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
 
         if ( VersionNeutral || ( apiModel = item.ControllerDescriptor.GetApiVersionModel() ).IsApiVersionNeutral )
         {
-            if ( string.IsNullOrEmpty( name ) )
-            {
-                metadata = ApiVersionMetadata.Neutral;
-            }
-            else
-            {
-                metadata = new ApiVersionMetadata( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
-            }
+            metadata = string.IsNullOrEmpty( name )
+                ? ApiVersionMetadata.Neutral
+                : new ApiVersionMetadata( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
         }
         else
         {

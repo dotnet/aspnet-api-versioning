@@ -26,12 +26,12 @@ internal sealed class ApplyContentTypeVersionActionFilter : IActionFilter
 
         var httpContext = context.HttpContext;
 
-        httpContext.Response.OnStarting( AddContentTypeApiVersion, (httpContext, parameterName) );
+        httpContext.Response.OnStarting( AddContentTypeApiVersion, httpContext );
     }
 
     private Task AddContentTypeApiVersion( object state )
     {
-        var (context, parameterName) = ((HttpContext, string)) state;
+        var context = (HttpContext) state;
         context.Response.AddApiVersionToContentType( parameterName );
         return Task.CompletedTask;
     }

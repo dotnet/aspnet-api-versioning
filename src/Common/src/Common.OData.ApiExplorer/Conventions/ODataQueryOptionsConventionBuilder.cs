@@ -129,7 +129,7 @@ public partial class ODataQueryOptionsConventionBuilder
             throw new ArgumentNullException( nameof( apiDescriptions ) );
         }
 
-        var conventions = default( Dictionary<Type, IODataQueryOptionsConvention> );
+        var controllerConventions = default( Dictionary<Type, IODataQueryOptionsConvention> );
 
         foreach ( var description in apiDescriptions )
         {
@@ -140,7 +140,7 @@ public partial class ODataQueryOptionsConventionBuilder
                 continue;
             }
 
-            if ( conventions == null || !conventions.TryGetValue( controller, out var convention ) )
+            if ( controllerConventions == null || !controllerConventions.TryGetValue( controller, out var convention ) )
             {
                 if ( conventionBuilders == null ||
                      conventionBuilders.Count == 0 ||
@@ -150,8 +150,8 @@ public partial class ODataQueryOptionsConventionBuilder
                 }
 
                 convention = builder.Build( queryOptionSettings );
-                conventions ??= new();
-                conventions.Add( controller, convention );
+                controllerConventions ??= new();
+                controllerConventions.Add( controller, convention );
             }
 
             convention.ApplyTo( description );

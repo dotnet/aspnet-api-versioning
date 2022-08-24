@@ -11,17 +11,17 @@ internal sealed class PathContentSegmentAdapter<T> : IPathContentSegment where T
     private static readonly Lazy<Func<T, bool>> catchAllAccessor = new( NewCatchAllAccessor );
     private static readonly Lazy<Func<T, IEnumerable<object>>> subsegmentsAccessor = new( NewSubsegmentsAccessor );
     private readonly T adapted;
-    private readonly Lazy<IReadOnlyList<IPathSubsegment>> subsegments;
+    private readonly Lazy<IReadOnlyList<IPathSubsegment>> subsegmentsHolder;
 
     public PathContentSegmentAdapter( T adapted )
     {
         this.adapted = adapted;
-        subsegments = new Lazy<IReadOnlyList<IPathSubsegment>>( AdaptToPathSubsegments );
+        subsegmentsHolder = new Lazy<IReadOnlyList<IPathSubsegment>>( AdaptToPathSubsegments );
     }
 
     public bool IsCatchAll => catchAllAccessor.Value( adapted );
 
-    public IReadOnlyList<IPathSubsegment> Subsegments => subsegments.Value;
+    public IReadOnlyList<IPathSubsegment> Subsegments => subsegmentsHolder.Value;
 
     public override string ToString() => adapted.ToString();
 

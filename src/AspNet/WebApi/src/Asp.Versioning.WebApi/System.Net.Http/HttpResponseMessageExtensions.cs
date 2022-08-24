@@ -48,14 +48,7 @@ public static class HttpResponseMessageExtensions
 
         if ( headers.TryGetValues( Link, out var existing ) )
         {
-            if ( existing is ICollection<string> collection && !collection.IsReadOnly )
-            {
-                values = collection;
-            }
-            else
-            {
-                values = new List<string>( existing );
-            }
+            values = existing is ICollection<string> collection && !collection.IsReadOnly ? collection : new List<string>( existing );
         }
         else
         {
