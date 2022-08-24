@@ -44,16 +44,9 @@ public static class HttpResponseMessageExtensions
 
     private static void AddLinkHeaders( HttpResponseHeaders headers, IList<LinkHeaderValue> links )
     {
-        ICollection<string> values;
-
-        if ( headers.TryGetValues( Link, out var existing ) )
-        {
-            values = existing is ICollection<string> collection && !collection.IsReadOnly ? collection : new List<string>( existing );
-        }
-        else
-        {
-            values = new List<string>( capacity: links.Count );
-        }
+        var values = headers.TryGetValues( Link, out var existing )
+            ? existing is ICollection<string> collection && !collection.IsReadOnly ? collection : new List<string>( existing )
+            : new List<string>( capacity: links.Count );
 
         for ( var i = 0; i < links.Count; i++ )
         {
