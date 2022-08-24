@@ -64,14 +64,7 @@ public class ApiVersionRequestProperties
         }
         set
         {
-            if ( string.IsNullOrEmpty( value ) )
-            {
-                rawApiVersions = default;
-            }
-            else
-            {
-                rawApiVersions = new[] { value! };
-            }
+            rawApiVersions = string.IsNullOrEmpty( value ) ? default : new[] { value! };
         }
     }
 

@@ -128,7 +128,6 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             return controller;
         }
 
-        var configuration = request.GetConfiguration();
         var routes = configuration.Routes;
         var context = request.GetRequestContext();
         var virtualPathRoot = routes.VirtualPathRoot;
@@ -156,7 +155,6 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
 
     private IDictionary<string, HttpControllerDescriptor> InitializeControllerInfoCache()
     {
-        var options = configuration.GetApiVersioningOptions();
         var implicitVersionModel = new ApiVersionModel( options.DefaultApiVersion );
         var conventions = options.Conventions;
         var actionSelector = configuration.Services.GetActionSelector();
