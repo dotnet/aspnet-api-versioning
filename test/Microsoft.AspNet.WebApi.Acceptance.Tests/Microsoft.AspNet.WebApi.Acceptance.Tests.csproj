@@ -21,7 +21,7 @@
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.3" />
   <PackageReference Include="System.Runtime" Version="4.1.0" />
-  <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
+  <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
  </ItemGroup>
 
  <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" Label="Shared" />
