@@ -14,7 +14,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" Version="5.2.7" />
+  <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" Version="5.2.9" />
   <PackageReference Include="Swashbuckle.Core" Version="5.6.0" />
  </ItemGroup>
 
