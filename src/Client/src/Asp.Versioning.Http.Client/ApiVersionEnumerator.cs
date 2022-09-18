@@ -2,21 +2,48 @@
 
 namespace Asp.Versioning.Http;
 
+#pragma warning disable CA1815 // Override equals and operator equals on value types
+
 using System.Collections;
 
-internal readonly struct ApiVersionEnumerator : IEnumerable<ApiVersion>
+/// <summary>
+/// Represents an enumerator of API versions from a HTTP header.
+/// </summary>
+public readonly struct ApiVersionEnumerator : IEnumerable<ApiVersion>
 {
-    private const string ApiSupportedVersions = "api-supported-versions";
-    private const string ApiDeprecatedVersions = "api-deprecated-versions";
     private readonly IEnumerable<string> values;
-    private readonly IApiVersionParser? parser;
+    private readonly IApiVersionParser parser;
 
-    private ApiVersionEnumerator( IEnumerable<string> values, IApiVersionParser? parser = default )
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersionEnumerator"/> struct.
+    /// </summary>
+    /// <param name="response">The HTTP response to create the enumerator from.</param>
+    /// <param name="headerName">The HTTP header name to enumerate.</param>
+    /// <param name="parser">The optional <see cref="IApiVersionParser">API version parser</see>.</param>
+    public ApiVersionEnumerator(
+        HttpResponseMessage response,
+        string headerName,
+        IApiVersionParser? parser = default )
     {
-        this.values = values;
-        this.parser = parser;
+        if ( response == null )
+        {
+            throw new ArgumentNullException( nameof( response ) );
+        }
+
+        if ( string.IsNullOrEmpty( headerName ) )
+        {
+            throw new ArgumentNullException( nameof( headerName ) );
+        }
+
+        this.values =
+            response.Headers.TryGetValues( headerName, out var values )
+            ? values
+            : Enumerable.Empty<string>();
+
+        this.parser = parser ?? ApiVersionParser.Default;
     }
 
+    /// <inheritdoc />
     public IEnumerator<ApiVersion> GetEnumerator()
     {
         using var iterator = values.GetEnumerator();
@@ -25,8 +52,6 @@ internal readonly struct ApiVersionEnumerator : IEnumerable<ApiVersion>
         {
             yield break;
         }
-
-        var parser = this.parser ?? ApiVersionParser.Default;
 
         if ( parser.TryParse( iterator.Current, out var value ) )
         {
@@ -43,28 +68,4 @@ internal readonly struct ApiVersionEnumerator : IEnumerable<ApiVersion>
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    internal static ApiVersionEnumerator Supported(
-        HttpResponseMessage response,
-        IApiVersionParser? parser = default )
-    {
-        if ( response.Headers.TryGetValues( ApiSupportedVersions, out var values ) )
-        {
-            return new( values, parser );
-        }
-
-        return new( Enumerable.Empty<string>() );
-    }
-
-    internal static ApiVersionEnumerator Deprecated(
-        HttpResponseMessage response,
-        IApiVersionParser? parser = default )
-    {
-        if ( response.Headers.TryGetValues( ApiDeprecatedVersions, out var values ) )
-        {
-            return new( values, parser );
-        }
-
-        return new( Enumerable.Empty<string>() );
-    }
 }

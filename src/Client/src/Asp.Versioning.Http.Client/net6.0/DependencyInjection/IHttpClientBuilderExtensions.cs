@@ -112,6 +112,7 @@ public static class IHttpClientBuilderExtensions
 
         services.TryAddSingleton<IApiVersionWriter, QueryStringApiVersionWriter>();
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
+        services.TryAddTransient<ApiVersionHeaderEnumerable>();
         builder.AddHttpMessageHandler( sp => NewApiVersionHandler( sp, apiVersion, apiVersionWriter ) );
 
         return builder;
@@ -142,8 +143,11 @@ public static class IHttpClientBuilderExtensions
             return default;
         }
 
+        var enumerable = serviceProvider.GetService<ApiVersionHeaderEnumerable>();
+
         return new ApiVersionHandlerLogger<ApiVersionHandler>(
             logger,
-            parser ?? ApiVersionParser.Default );
+            parser ?? ApiVersionParser.Default,
+            enumerable ?? new() );
     }
 }

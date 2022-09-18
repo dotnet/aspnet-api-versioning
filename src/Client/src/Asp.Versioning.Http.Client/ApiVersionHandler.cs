@@ -9,6 +9,7 @@ public class ApiVersionHandler : DelegatingHandler
 {
     private readonly IApiVersionWriter apiVersionWriter;
     private readonly ApiVersion apiVersion;
+    private readonly ApiVersionHeaderEnumerable enumerable;
     private readonly IApiNotification notification;
     private readonly IApiVersionParser parser;
 
@@ -22,16 +23,20 @@ public class ApiVersionHandler : DelegatingHandler
     /// that is signaled when changes to an API are detected.</param>
     /// <param name="parser">The optional <see cref="IApiVersionParser">parser</see> used to process
     /// API versions from HTTP responses.</param>
+    /// <param name="enumerable">The optional <see cref="ApiVersionHeaderEnumerable">enumerable</see>
+    /// used to enumerate retrieved API versions from HTTP responses.</param>
     public ApiVersionHandler(
         IApiVersionWriter apiVersionWriter,
         ApiVersion apiVersion,
         IApiNotification? notification = default,
-        IApiVersionParser? parser = default )
+        IApiVersionParser? parser = default,
+        ApiVersionHeaderEnumerable? enumerable = default)
     {
         this.apiVersionWriter = apiVersionWriter ?? throw new ArgumentNullException( nameof( apiVersionWriter ) );
         this.apiVersion = apiVersion ?? throw new ArgumentNullException( nameof( apiVersion ) );
         this.notification = notification ?? ApiNotification.None;
         this.parser = parser ?? ApiVersionParser.Default;
+        this.enumerable = enumerable ?? new();
     }
 
     /// <inheritdoc />
@@ -67,7 +72,7 @@ public class ApiVersionHandler : DelegatingHandler
             throw new ArgumentNullException( nameof( response ) );
         }
 
-        foreach ( var reportedApiVersion in ApiVersionEnumerator.Deprecated( response, parser ) )
+        foreach ( var reportedApiVersion in enumerable.Deprecated( response, parser ) )
         {
             // don't use '==' operator because a derived type may not overload it
             if ( apiVersion.CompareTo( reportedApiVersion ) == 0 )
@@ -91,7 +96,7 @@ public class ApiVersionHandler : DelegatingHandler
             throw new ArgumentNullException( nameof( response ) );
         }
 
-        foreach ( var reportedApiVersion in ApiVersionEnumerator.Supported( response, parser ) )
+        foreach ( var reportedApiVersion in enumerable.Supported( response, parser ) )
         {
             // don't use '<' operator because a derived type may not overload it
             if ( apiVersion.CompareTo( reportedApiVersion ) < 0 )

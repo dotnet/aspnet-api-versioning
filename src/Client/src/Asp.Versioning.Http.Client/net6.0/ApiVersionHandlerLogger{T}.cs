@@ -13,16 +13,19 @@ public class ApiVersionHandlerLogger<T> : ApiNotification
 {
     private readonly ILogger logger;
     private readonly IApiVersionParser parser;
+    private readonly ApiVersionHeaderEnumerable enumerable;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionHandlerLogger{T}"/> class.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{TCategoryName}">logger</see> used to log API notifications.</param>
     /// <param name="parser">The <see cref="IApiVersionParser">parser</see> used to process API versions.</param>
-    public ApiVersionHandlerLogger( ILogger<T> logger, IApiVersionParser parser )
+    /// <param name="enumerable">The <see cref="ApiVersionHeaderEnumerable">enumerable</see> used to enumerate API versions.</param>
+    public ApiVersionHandlerLogger( ILogger<T> logger, IApiVersionParser parser, ApiVersionHeaderEnumerable enumerable )
     {
         this.logger = logger ?? throw new ArgumentNullException( nameof( logger ) );
         this.parser = parser ?? throw new ArgumentNullException( nameof( parser ) );
+        this.enumerable = enumerable ?? throw new ArgumentNullException( nameof( enumerable ) );
     }
 
     /// <inheritdoc />
@@ -51,7 +54,7 @@ public class ApiVersionHandlerLogger<T> : ApiNotification
         var requestUrl = context.Response.RequestMessage!.RequestUri!;
         var currentApiVersion = context.ApiVersion;
         var sunsetPolicy = context.SunsetPolicy;
-        var newApiVersion = ApiVersionEnumerator.Supported( context.Response, parser ).Max() ?? currentApiVersion;
+        var newApiVersion = enumerable.Supported( context.Response, parser ).Max() ?? currentApiVersion;
 
         logger.NewApiVersionAvailable( requestUrl, currentApiVersion, newApiVersion, sunsetPolicy );
     }
