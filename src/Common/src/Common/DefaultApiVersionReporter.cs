@@ -23,17 +23,35 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     private const string ApiDeprecatedVersions = "api-deprecated-versions";
     private const string Sunset = nameof( Sunset );
     private const string Link = nameof( Link );
+    private readonly string apiSupportedVersionsName;
+    private readonly string apiDeprecatedVersionsName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultApiVersionReporter"/> class.
     /// </summary>
-    public DefaultApiVersionReporter() => Mapping = Explicit | Implicit;
+    /// <param name="supportedHeaderName">The HTTP header name used for supported API versions.
+    /// The default value is "api-supported-versions".</param>
+    /// <param name="deprecatedHeaderName">THe HTTP header name used for deprecated API versions.
+    /// The default value is "api-deprecated-versions".</param>
+    /// <param name="mapping">One or more of API versioning mappings. The default value is
+    /// <see cref="ApiVersionMapping.Explicit"/> and <see cref="ApiVersionMapping.Implicit"/>.</param>
+    public DefaultApiVersionReporter(
+        string supportedHeaderName = ApiSupportedVersions,
+        string deprecatedHeaderName = ApiDeprecatedVersions,
+        ApiVersionMapping mapping = Explicit | Implicit )
+    {
+        Mapping = mapping;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultApiVersionReporter"/> class.
-    /// </summary>
-    /// <param name="mapping">One or more of API versioning mappings.</param>
-    public DefaultApiVersionReporter( ApiVersionMapping mapping ) => Mapping = mapping;
+        if ( string.IsNullOrEmpty( apiSupportedVersionsName = supportedHeaderName ) )
+        {
+            throw new ArgumentNullException( nameof( supportedHeaderName ) );
+        }
+
+        if ( string.IsNullOrEmpty( apiDeprecatedVersionsName = deprecatedHeaderName ) )
+        {
+            throw new ArgumentNullException( nameof( deprecatedHeaderName ) );
+        }
+    }
 
     /// <inheritdoc />
     public ApiVersionMapping Mapping { get; }
@@ -58,8 +76,8 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 
         var headers = response.Headers;
 
-        AddApiVersionHeader( headers, ApiSupportedVersions, apiVersionModel.SupportedApiVersions );
-        AddApiVersionHeader( headers, ApiDeprecatedVersions, apiVersionModel.DeprecatedApiVersions );
+        AddApiVersionHeader( headers, apiSupportedVersionsName, apiVersionModel.SupportedApiVersions );
+        AddApiVersionHeader( headers, apiDeprecatedVersionsName, apiVersionModel.DeprecatedApiVersions );
 
 #if NETFRAMEWORK
         var statusCode = (int) response.StatusCode;

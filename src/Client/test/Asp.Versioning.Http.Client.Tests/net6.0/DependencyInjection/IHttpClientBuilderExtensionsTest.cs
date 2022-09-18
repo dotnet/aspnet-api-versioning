@@ -72,6 +72,24 @@ public class IHttpClientBuilderExtensionsTest
         response.RequestMessage.RequestUri.Should().Be( new Uri( "http://tempuri.org?ver=2022-02-01" ) );
     }
 
+    [Fact]
+    public void add_api_version_should_register_transient_header_enumerable()
+    {
+        // arrange
+        var services = new ServiceCollection();
+
+        services.AddHttpClient( "Test" ).AddApiVersion( 1.0 );
+
+        var provider = services.BuildServiceProvider();
+
+        // act
+        var result1 = provider.GetRequiredService<ApiVersionHeaderEnumerable>();
+        var result2 = provider.GetRequiredService<ApiVersionHeaderEnumerable>();
+
+        // assert
+        result1.Should().NotBeSameAs( result2 );
+    }
+
 #pragma warning disable CA1812
 
     private sealed class LastHandler : DelegatingHandler

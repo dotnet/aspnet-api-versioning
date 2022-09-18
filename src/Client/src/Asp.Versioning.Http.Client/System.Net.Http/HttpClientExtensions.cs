@@ -18,6 +18,8 @@ public static class HttpClientExtensions
     /// <param name="requestUrl">The URL to get the API information from.</param>
     /// <param name="parser">The optional <see cref="IApiVersionParser">parser</see> used
     /// to process retrieved API versions.</param>
+    /// <param name="enumerable">The optional <see cref="ApiVersionHeaderEnumerable">enumerable</see>
+    /// used to enumerate retrieved API versions.</param>
     /// <param name="cancellationToken">The token that can be used to cancel the operation.</param>
     /// <returns>A task containing the retrieved <see cref="ApiInformation">API information</see>.</returns>
     /// <remarks>API information is retrieved by sending an OPTIONS request to the specified URL.
@@ -27,10 +29,12 @@ public static class HttpClientExtensions
         this HttpClient client,
         string requestUrl,
         IApiVersionParser? parser = default,
+        ApiVersionHeaderEnumerable? enumerable = default,
         CancellationToken cancellationToken = default ) =>
         client.GetApiInformationAsync(
             new Uri( requestUrl, UriKind.RelativeOrAbsolute ),
             parser,
+            enumerable,
             cancellationToken );
 
     /// <summary>
@@ -40,6 +44,8 @@ public static class HttpClientExtensions
     /// <param name="requestUrl">The URL to get the API information from.</param>
     /// <param name="parser">The optional <see cref="IApiVersionParser">parser</see> used
     /// to process retrieved API versions.</param>
+    /// <param name="enumerable">The optional <see cref="ApiVersionHeaderEnumerable">enumerable</see>
+    /// used to enumerate retrieved API versions.</param>
     /// <param name="cancellationToken">The token that can be used to cancel the operation.</param>
     /// <returns>A task containing the retrieved <see cref="ApiInformation">API information</see>.</returns>
     /// <remarks>API information is retrieved by sending an OPTIONS request to the specified URL.
@@ -49,6 +55,7 @@ public static class HttpClientExtensions
         this HttpClient client,
         Uri requestUrl,
         IApiVersionParser? parser = default,
+        ApiVersionHeaderEnumerable? enumerable = default,
         CancellationToken cancellationToken = default )
     {
         if ( client == null )
@@ -69,12 +76,13 @@ public static class HttpClientExtensions
         }
 
         parser ??= ApiVersionParser.Default;
-        var versions = new SortedSet<ApiVersion>( ApiVersionEnumerator.Supported( response, parser ) );
+        enumerable ??= new();
+        var versions = new SortedSet<ApiVersion>( enumerable.Supported( response, parser ) );
         var supported = versions.ToArray();
 
         versions.Clear();
 
-        foreach ( var version in ApiVersionEnumerator.Deprecated( response, parser ) )
+        foreach ( var version in enumerable.Deprecated( response, parser ) )
         {
             versions.Add( version );
         }

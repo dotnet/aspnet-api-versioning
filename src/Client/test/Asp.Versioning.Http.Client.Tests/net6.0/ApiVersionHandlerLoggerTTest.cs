@@ -14,7 +14,7 @@ public class ApiVersionHandlerLoggerTTest
         using var factory = TestLoggerFactory.Create();
         var logger = factory.CreateLogger<ApiVersionHandler>();
         var parser = ApiVersionParser.Default;
-        var notification = new ApiVersionHandlerLogger<ApiVersionHandler>( logger, parser );
+        var notification = new ApiVersionHandlerLogger<ApiVersionHandler>( logger, parser, new() );
         var response = new HttpResponseMessage()
         {
             RequestMessage = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" ),
@@ -50,7 +50,7 @@ public class ApiVersionHandlerLoggerTTest
         using var factory = TestLoggerFactory.Create();
         var logger = factory.CreateLogger<ApiVersionHandler>();
         var parser = ApiVersionParser.Default;
-        var notification = new ApiVersionHandlerLogger<ApiVersionHandler>( logger, parser );
+        var notification = new ApiVersionHandlerLogger<ApiVersionHandler>( logger, parser, new() );
         var response = new HttpResponseMessage()
         {
             RequestMessage = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" ),
