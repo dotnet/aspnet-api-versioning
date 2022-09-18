@@ -119,6 +119,24 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersion"/> class.
+    /// </summary>
+    /// <param name="other">The instance to derive from.</param>
+    protected ApiVersion( ApiVersion other )
+    {
+        if ( other == null )
+        {
+            throw new ArgumentNullException( nameof( other ) );
+        }
+
+        hashCode = other.hashCode;
+        GroupVersion = other.GroupVersion;
+        MajorVersion = other.MajorVersion;
+        MinorVersion = other.MinorVersion;
+        Status = other.Status;
+    }
+
+    /// <summary>
     /// Gets the default API version.
     /// </summary>
     /// <value>The default <see cref="ApiVersion">API version</see>, which is always "1.0".</value>
