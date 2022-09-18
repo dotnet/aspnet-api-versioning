@@ -17,7 +17,7 @@ using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 /// Provides extension methods for the <see cref="IServiceCollection"/> interface.
 /// </summary>
 [CLSCompliant( false )]
-public static class IServiceCollectionExtensions
+public static partial class IServiceCollectionExtensions
 {
     /// <summary>
     /// Adds service API versioning to the specified services collection.
