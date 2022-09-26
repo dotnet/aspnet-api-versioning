@@ -10,14 +10,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <Reference Include="Microsoft.CSharp" />
-  <Reference Include="System" />
   <Reference Include="System.ComponentModel.DataAnnotations" />
- </ItemGroup>
- 
- <ItemGroup>
-  <PackageReference Include="System.Runtime" Version="4.1.0" />
-  <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
  </ItemGroup>
 
 </Project>
