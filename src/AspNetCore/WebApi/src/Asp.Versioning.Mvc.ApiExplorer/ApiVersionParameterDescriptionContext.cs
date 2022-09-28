@@ -185,14 +185,11 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
             parameter.RouteInfo.DefaultValue = parameter.DefaultValue;
         }
 
-        if ( parameter.ParameterDescriptor == null )
+        parameter.ParameterDescriptor ??= new()
         {
-            parameter.ParameterDescriptor = new()
-            {
-                Name = parameter.Name,
-                ParameterType = typeof( ApiVersion ),
-            };
-        }
+            Name = parameter.Name,
+            ParameterType = typeof( ApiVersion ),
+        };
 
         RemoveAllParametersExcept( parameter );
     }
