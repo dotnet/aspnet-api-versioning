@@ -11,20 +11,24 @@ using Microsoft.AspNetCore.TestHost;
 public abstract partial class HttpServerFixture : IDisposable
 {
     private readonly Lazy<TestServer> server;
-    private readonly Lazy<HttpClient> client;
     private bool disposed;
 
-    protected HttpServerFixture()
-    {
-        server = new( CreateServer );
-        client = new( CreateClient );
-    }
+    protected HttpServerFixture() => server = new( CreateServer );
 
     public TestServer Server => server.Value;
 
-    public HttpClient Client => client.Value;
-
     public ICollection<Type> FilteredControllerTypes { get; } = new FilteredControllerTypes();
+
+    public HttpClient CreateClient()
+    {
+#if NETFRAMEWORK
+        var newClient = Server.HttpClient;
+#else
+        var newClient = Server.CreateClient();
+#endif
+        newClient.BaseAddress = new Uri( "http://localhost" );
+        return newClient;
+    }
 
     public void Dispose()
     {
@@ -46,11 +50,6 @@ public abstract partial class HttpServerFixture : IDisposable
             return;
         }
 
-        if ( client.IsValueCreated )
-        {
-            client.Value.Dispose();
-        }
-
         if ( server.IsValueCreated )
         {
             server.Value.Dispose();
@@ -58,15 +57,4 @@ public abstract partial class HttpServerFixture : IDisposable
     }
 
     protected virtual void OnAddApiVersioning( ApiVersioningOptions options ) { }
-
-    private HttpClient CreateClient()
-    {
-#if NETFRAMEWORK
-        var newClient = Server.HttpClient;
-#else
-        var newClient = Server.CreateClient();
-#endif
-        newClient.BaseAddress = new Uri( "http://localhost" );
-        return newClient;
-    }
 }
