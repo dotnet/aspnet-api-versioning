@@ -1,1 +1,1 @@
-﻿
+﻿Added ApiVersion copy constructor

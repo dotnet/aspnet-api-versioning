@@ -1,1 +1,2 @@
-﻿
+﻿Enable binding ApiVersion in Minimal APIs
+Support custom reporting HTTP headers (#875)
