@@ -13,14 +13,36 @@ using static System.Net.Http.HttpMethod;
 #else
 [Trait( "ASP.NET", "Core" )]
 #endif
-public abstract partial class AcceptanceTest
+public abstract partial class AcceptanceTest : IDisposable
 {
     private static readonly HttpMethod Patch = new( "PATCH" );
-    private readonly HttpServerFixture fixture;
+    private readonly Lazy<HttpClient> client;
+    private bool disposed;
 
-    protected AcceptanceTest( HttpServerFixture fixture ) => this.fixture = fixture;
+    protected AcceptanceTest( HttpServerFixture fixture ) => client = new( fixture.CreateClient );
 
-    protected HttpClient Client => fixture.Client;
+    protected HttpClient Client => client.Value;
+
+    public void Dispose()
+    {
+        Dispose( true );
+        GC.SuppressFinalize( this );
+    }
+
+    protected virtual void Dispose( bool disposing )
+    {
+        if ( disposed )
+        {
+            return;
+        }
+
+        disposed = true;
+
+        if ( disposing && client.IsValueCreated )
+        {
+            client.Value.Dispose();
+        }
+    }
 
     private HttpRequestMessage CreateRequest<TEntity>( string requestUri, TEntity entity, HttpMethod method )
     {
