@@ -32,6 +32,9 @@ public abstract partial class HttpServerFixture
 
     protected virtual void OnAddApiVersioning( IApiVersioningBuilder builder ) { }
 
+    protected virtual void OnBuildApplication( IApplicationBuilder app ) =>
+        app.UseRouting().UseEndpoints( OnConfigureEndpoints );
+
     protected virtual void OnConfigureEndpoints( IEndpointRouteBuilder endpoints ) => endpoints.MapControllers();
 
     private static string GenerateEndpointDirectedGraph( IServiceProvider services )
@@ -70,7 +73,7 @@ public abstract partial class HttpServerFixture
     {
         var builder = new WebHostBuilder()
             .ConfigureServices( OnDefaultConfigureServices )
-            .Configure( app => app.UseRouting().UseEndpoints( OnConfigureEndpoints ) )
+            .Configure( OnBuildApplication )
             .UseContentRoot( GetContentRoot() );
 
         return new TestServer( builder );

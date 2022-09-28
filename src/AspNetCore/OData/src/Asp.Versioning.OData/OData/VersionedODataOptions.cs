@@ -2,8 +2,11 @@
 
 namespace Asp.Versioning.OData;
 
+using Asp.Versioning.OData.Batch;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 /// <summary>
@@ -15,6 +18,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     private readonly IHttpContextAccessor httpContextAccessor;
     private ODataOptions? defaultOptions;
     private IReadOnlyDictionary<ApiVersion, ODataOptions>? mapping;
+    private ODataBatchPathMapping? batchMapping;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VersionedODataOptions"/> class.
@@ -39,12 +43,12 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     {
         get
         {
-            if ( !TryResolveOptions( out var options ) )
+            if ( TryResolveOptions( out var value ) )
             {
-                options = defaultOptions ??= new();
+                return value;
             }
 
-            return options;
+            return defaultOptions ??= new();
         }
     }
 
@@ -56,7 +60,11 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     public IReadOnlyDictionary<ApiVersion, ODataOptions> Mapping
     {
         get => mapping ?? new Dictionary<ApiVersion, ODataOptions>( capacity: 0 );
-        set => mapping = value;
+        set
+        {
+            mapping = value;
+            batchMapping = MapBatchPaths( mapping );
+        }
     }
 
     /// <summary>
@@ -72,15 +80,36 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     protected IApiVersionSelector ApiVersionSelector { get; }
 
     /// <summary>
-    /// Attempts to resolve the current OData options.
+    /// Attempts to retrieve the configured batch handler for the current context.
     /// </summary>
+    /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
+    /// <param name="handler">The retrieved <see cref="ODataBatchHandler">OData batch handler</see> or <c>null</c>.</param>
+    /// <returns>True if the <paramref name="handler"/> was successfully retrieved; otherwise, false.</returns>
+    public virtual bool TryGetBatchHandler( HttpContext context, [NotNullWhen( true )] out ODataBatchHandler? handler )
+    {
+        if ( context == null )
+        {
+            throw new ArgumentNullException( nameof( context ) );
+        }
+
+        if ( batchMapping is null )
+        {
+            handler = default;
+            return false;
+        }
+
+        return batchMapping.TryGetHandler( context, out handler );
+    }
+
+    /// <summary>
+    /// Attempts to get the current OData options.
+    /// </summary>
+    /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
     /// <param name="options">The resolved <see cref="ODataOptions">OData options</see> or <c>null</c>.</param>
     /// <returns>True if the current OData were successfully resolved; otherwise, false.</returns>
-    protected virtual bool TryResolveOptions( [NotNullWhen( true )] out ODataOptions? options )
+    public virtual bool TryGetValue( HttpContext? context, [NotNullWhen( true )] out ODataOptions? options )
     {
-        if ( mapping == null ||
-             mapping.Count == 0 ||
-             httpContextAccessor.HttpContext is not HttpContext context )
+        if ( context == null || mapping == null || mapping.Count == 0 )
         {
             options = default;
             return false;
@@ -101,5 +130,46 @@ public class VersionedODataOptions : IOptions<ODataOptions>
         }
 
         return mapping.TryGetValue( apiVersion, out options );
+    }
+
+    /// <summary>
+    /// Attempts to resolve the current OData options.
+    /// </summary>
+    /// <param name="options">The resolved <see cref="ODataOptions">OData options</see> or <c>null</c>.</param>
+    /// <returns>True if the current OData were successfully resolved; otherwise, false.</returns>
+    protected virtual bool TryResolveOptions( [NotNullWhen( true )] out ODataOptions? options ) =>
+        TryGetValue( httpContextAccessor.HttpContext, out options );
+
+    private ODataBatchPathMapping MapBatchPaths( IReadOnlyDictionary<ApiVersion, ODataOptions> mapping )
+    {
+        if ( mapping.Count == 0 )
+        {
+            return new( capacity: 0, ApiVersionSelector );
+        }
+
+        var count = mapping.Values.Sum( value => value.RouteComponents.Count );
+        var batchMapping = new ODataBatchPathMapping( count, ApiVersionSelector );
+
+        foreach ( var (version, options) in mapping )
+        {
+            foreach ( var (prefix, (_, serviceProvider)) in options.RouteComponents )
+            {
+                if ( serviceProvider.GetService<ODataBatchHandler>() is not ODataBatchHandler handler )
+                {
+                    continue;
+                }
+
+                var template = "/$batch";
+
+                if ( !string.IsNullOrEmpty( prefix ) )
+                {
+                    template = '/' + prefix.Trim( '/' ) + template;
+                }
+
+                batchMapping.Add( prefix, template, handler, version );
+            }
+        }
+
+        return batchMapping;
     }
 }

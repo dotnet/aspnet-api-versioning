@@ -4,6 +4,7 @@ namespace Asp.Versioning.OData.Basic;
 
 using Asp.Versioning.OData;
 using Asp.Versioning.OData.Basic.Controllers;
+using Microsoft.AspNetCore.Builder;
 
 public class BasicFixture : ODataFixture
 {
@@ -20,5 +21,11 @@ public class BasicFixture : ODataFixture
         options.ReportApiVersions = true;
 
     protected override void OnEnableOData( ODataApiVersioningOptions options ) =>
-        options.AddRouteComponents( "api" ).AddRouteComponents( "v{version:apiVersion}" );
+        options.AddRouteComponents( "api" )
+               .AddRouteComponents( "v{version:apiVersion}" );
+
+    protected override void OnBuildApplication( IApplicationBuilder app ) =>
+        app.UseVersionedODataBatching()
+           .UseRouting()
+           .UseEndpoints( OnConfigureEndpoints );
 }

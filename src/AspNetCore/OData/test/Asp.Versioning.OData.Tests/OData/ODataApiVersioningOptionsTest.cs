@@ -61,13 +61,15 @@ public class ODataApiVersioningOptionsTest
             Mock.Of<IODataApiVersionCollectionProvider>(),
             Enumerable.Empty<IModelConfiguration>() );
         var options = new ODataApiVersioningOptions( builder );
-        var configureAction = ( IServiceCollection s ) => { };
+        var configureAction = Mock.Of<Action<IServiceCollection>>();
+        var services = new ServiceCollection();
 
         // act
         options.AddRouteComponents( configureAction );
+        options.Configurations[string.Empty]( services );
 
         // assert
-        options.Configurations[string.Empty].Should().BeSameAs( configureAction );
+        Mock.Get( configureAction ).Verify( f => f( services ), Times.Once() );
     }
 
     [Fact]

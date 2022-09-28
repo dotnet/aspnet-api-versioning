@@ -6,6 +6,8 @@ using Asp.Versioning;
 using Asp.Versioning.ApplicationModels;
 using Asp.Versioning.OData;
 using Asp.Versioning.Routing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.OData;
@@ -76,6 +78,7 @@ public static class IApiVersioningBuilderExtensions
             Singleton<IODataTemplateTranslator, VersionedODataTemplateTranslator>(),
             "Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator" );
         services.Replace( Singleton<IOptions<ODataOptions>>( sp => sp.GetRequiredService<VersionedODataOptions>() ) );
+        services.Replace( WithHttpContextFactoryDecorator( services ) );
         services.TryAddTransient<VersionedODataModelBuilder>();
         services.TryAddSingleton<IOptionsFactory<ODataApiVersioningOptions>, ODataApiVersioningOptionsFactory>();
         services.TryAddSingleton<IODataApiVersionCollectionProvider, ODataApiVersionCollectionProvider>();
@@ -167,5 +170,64 @@ public static class IApiVersioningBuilderExtensions
         {
             partManager.FeatureProviders.Add( new ModelConfigurationFeatureProvider() );
         }
+    }
+
+    private static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
+    {
+        if ( descriptor.ImplementationInstance != null )
+        {
+            return descriptor.ImplementationInstance;
+        }
+
+        if ( descriptor.ImplementationFactory != null )
+        {
+            return descriptor.ImplementationFactory( services );
+        }
+
+        return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
+    }
+
+    private static ServiceDescriptor WithHttpContextFactoryDecorator( IServiceCollection services )
+    {
+        var descriptor = services.First( sd => sd.ServiceType == typeof( IHttpContextFactory ) );
+        var lifetime = descriptor.Lifetime;
+
+        IHttpContextFactory NewFactory( IServiceProvider serviceProvider )
+        {
+            var decorated = (IHttpContextFactory) serviceProvider.CreateInstance( descriptor );
+            return new HttpContextFactoryDecorator( decorated );
+        }
+
+        return Describe( typeof( IHttpContextFactory ), NewFactory, lifetime );
+    }
+
+    private sealed class HttpContextFactoryDecorator : IHttpContextFactory
+    {
+        private readonly IHttpContextFactory decorated;
+
+        public HttpContextFactoryDecorator( IHttpContextFactory decorated ) => this.decorated = decorated;
+
+        public HttpContext Create( IFeatureCollection featureCollection )
+        {
+            // features do not support cloning or DI, which is precisely why ASP.NET Core no longer supports
+            // batching natively. The team states that HTTP/2+ improvements supplants the gains of using
+            // batching over HTTP/1.x. The OData team continues to try to shoehorn it in anyway by making a
+            // best-effort guess as to which features can or can't be preserved.
+            //
+            // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Batch/ODataBatchReaderExtensions.cs#L193
+            //
+            // since OData knows nothing about api versioning, it just assumes that it can preserve IApiVersioningFeature,
+            // which it can't. by explicitly setting the feature to null, it will clear it from the feature collection
+            // each time a HttpContext is created in a batch request.
+            featureCollection.Set( default( IApiVersioningFeature ) );
+
+            // backport of bug that was fixed in 8.0.10 so consumers aren't forced to update - yet
+            // REF: https://github.com/OData/AspNetCoreOData/issues/349
+            featureCollection.Set( default( IQueryFeature ) );
+
+            return decorated.Create( featureCollection );
+        }
+
+        public void Dispose( HttpContext httpContext ) => decorated.Dispose( httpContext );
     }
 }
