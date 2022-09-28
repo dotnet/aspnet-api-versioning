@@ -2,8 +2,10 @@
 
 namespace Asp.Versioning.OData;
 
+using Asp.Versioning.OData.Batch;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 /// <summary>
 /// Represents the possible API versioning options for OData services.
@@ -91,7 +93,10 @@ public partial class ODataApiVersioningOptions
         Action<IServiceCollection> configureAction )
     {
         configurations ??= new( StringComparer.OrdinalIgnoreCase );
-        configurations.Add( prefix, configureAction );
+        configurations.Add( prefix, configureAction + AddDefaultServices );
         return this;
     }
+
+    private static void AddDefaultServices( IServiceCollection services ) =>
+        services.TryAddSingleton<ODataBatchHandler, VersionedODataBatchHandler>();
 }
