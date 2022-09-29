@@ -63,7 +63,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
         set
         {
             mapping = value;
-            batchMapping = MapBatchPaths( mapping );
+            batchMapping = MapBatchPaths( mapping, ApiVersionSelector );
         }
     }
 
@@ -140,15 +140,17 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     protected virtual bool TryResolveOptions( [NotNullWhen( true )] out ODataOptions? options ) =>
         TryGetValue( httpContextAccessor.HttpContext, out options );
 
-    private ODataBatchPathMapping MapBatchPaths( IReadOnlyDictionary<ApiVersion, ODataOptions> mapping )
+    private static ODataBatchPathMapping MapBatchPaths(
+        IReadOnlyDictionary<ApiVersion, ODataOptions> mapping,
+        IApiVersionSelector selector )
     {
         if ( mapping.Count == 0 )
         {
-            return new( capacity: 0, ApiVersionSelector );
+            return new( capacity: 0, selector );
         }
 
         var count = mapping.Values.Sum( value => value.RouteComponents.Count );
-        var batchMapping = new ODataBatchPathMapping( count, ApiVersionSelector );
+        var batchMapping = new ODataBatchPathMapping( count, selector );
 
         foreach ( var (version, options) in mapping )
         {
