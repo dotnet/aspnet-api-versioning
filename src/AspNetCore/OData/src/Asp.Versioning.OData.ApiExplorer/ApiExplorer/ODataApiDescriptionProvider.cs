@@ -380,7 +380,11 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = parameters.Count - 1; i >= 0; i-- )
         {
             var parameter = parameters[i];
-            var type = parameter.Type;
+
+            if ( parameter.Type is not Type type )
+            {
+                continue;
+            }
 
             if ( type.IsODataQueryOptions() || type.IsODataPath() )
             {
@@ -414,16 +418,9 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = 0; i < responseTypes.Count; i++ )
         {
             var responseType = responseTypes[i];
-            var type = responseType.Type;
 
-            if ( type == null )
-            {
-                continue;
-            }
-
-            var modelMetadata = responseType.ModelMetadata;
-
-            if ( modelMetadata == null )
+            if ( responseType.Type is not Type type ||
+                 responseType.ModelMetadata is not ModelMetadata modelMetadata )
             {
                 continue;
             }
