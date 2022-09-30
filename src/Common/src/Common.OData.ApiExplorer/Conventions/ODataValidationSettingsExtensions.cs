@@ -21,12 +21,12 @@ internal static class ODataValidationSettingsExtensions
         original.MaxNodeCount = source.MaxNodeCount;
         original.MaxOrderByNodeCount = source.MaxOrderByNodeCount;
 
-        if ( source.MaxSkip != null )
+        if ( source.MaxSkip.NoLimitOrNone() )
         {
             original.MaxSkip = source.MaxSkip;
         }
 
-        if ( source.MaxTop != null )
+        if ( source.MaxTop.NoLimitOrSome() )
         {
             original.MaxTop = source.MaxTop;
         }

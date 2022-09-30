@@ -174,7 +174,7 @@ public partial class ODataValidationSettingsConvention : IODataQueryOptionsConve
             queryOptions |= Select;
         }
 
-        if ( settings.MaxTop != null && settings.MaxTop.Value > 0 )
+        if ( settings.MaxTop.NoLimitOrSome() )
         {
             context.MaxTop = settings.MaxTop;
         }
