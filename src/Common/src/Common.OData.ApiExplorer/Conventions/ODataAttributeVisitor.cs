@@ -83,42 +83,14 @@ internal sealed partial class ODataAttributeVisitor
         {
             var attribute = attributes[i];
 
-            if ( attribute.AllowedArithmeticOperators == AllowedArithmeticOperators.None )
-            {
-                context.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
-            }
-            else
-            {
-                context.AllowedArithmeticOperators |= attribute.AllowedArithmeticOperators;
-            }
+            context.AllowedArithmeticOperators = attribute.AllowedArithmeticOperators;
+            context.AllowedFunctions = attribute.AllowedFunctions;
+            context.AllowedLogicalOperators = attribute.AllowedLogicalOperators;
 
-            if ( attribute.AllowedFunctions == AllowedFunctions.None )
-            {
-                context.AllowedFunctions = AllowedFunctions.None;
-            }
-            else
-            {
-                context.AllowedFunctions |= attribute.AllowedFunctions;
-            }
+            AllowedQueryOptions = attribute.AllowedQueryOptions;
 
-            if ( attribute.AllowedLogicalOperators == AllowedLogicalOperators.None )
+            if ( attribute.MaxAnyAllExpressionDepth != @default.MaxAnyAllExpressionDepth )
             {
-                context.AllowedLogicalOperators = AllowedLogicalOperators.None;
-            }
-            else
-            {
-                context.AllowedLogicalOperators |= attribute.AllowedLogicalOperators;
-            }
-
-            if ( attribute.AllowedQueryOptions == AllowedQueryOptions.None )
-            {
-                AllowedQueryOptions = AllowedQueryOptions.None;
-            }
-            else
-            {
-                AllowedQueryOptions |= attribute.AllowedQueryOptions;
-            }
-
             if ( context.MaxAnyAllExpressionDepth == @default.MaxAnyAllExpressionDepth )
             {
                 context.MaxAnyAllExpressionDepth = attribute.MaxAnyAllExpressionDepth;
