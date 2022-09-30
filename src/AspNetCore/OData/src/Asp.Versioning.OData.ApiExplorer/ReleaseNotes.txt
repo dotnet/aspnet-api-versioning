@@ -1,1 +1,1 @@
-﻿Minor version bump
+﻿Update OData query option exploration (#702, #853)
