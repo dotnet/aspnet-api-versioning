@@ -91,50 +91,51 @@ internal sealed partial class ODataAttributeVisitor
 
             if ( attribute.MaxAnyAllExpressionDepth != @default.MaxAnyAllExpressionDepth )
             {
-            if ( context.MaxAnyAllExpressionDepth == @default.MaxAnyAllExpressionDepth )
-            {
                 context.MaxAnyAllExpressionDepth = attribute.MaxAnyAllExpressionDepth;
             }
 
-            if ( context.MaxExpansionDepth == @default.MaxExpansionDepth )
+            if ( attribute.MaxExpansionDepth != @default.MaxExpansionDepth )
             {
                 context.MaxExpansionDepth = attribute.MaxExpansionDepth;
             }
 
-            if ( context.MaxNodeCount == @default.MaxNodeCount )
+            if ( attribute.MaxNodeCount != @default.MaxNodeCount )
             {
                 context.MaxNodeCount = attribute.MaxNodeCount;
             }
 
-            if ( context.MaxOrderByNodeCount == @default.MaxOrderByNodeCount )
+            if ( attribute.MaxOrderByNodeCount != @default.MaxOrderByNodeCount )
             {
                 context.MaxOrderByNodeCount = attribute.MaxOrderByNodeCount;
             }
 
-            if ( context.MaxSkip != @default.MaxSkip )
+            if ( attribute.MaxSkip != @default.MaxSkip )
             {
                 context.MaxSkip = attribute.MaxSkip;
             }
 
-            if ( context.MaxTop != @default.MaxTop )
+            if ( attribute.MaxTop != @default.MaxTop )
             {
                 context.MaxTop = attribute.MaxTop;
             }
 
-            if ( !string.IsNullOrEmpty( attribute.AllowedOrderByProperties ) )
+            if ( string.IsNullOrEmpty( attribute.AllowedOrderByProperties ) )
             {
-                var properties = attribute.AllowedOrderByProperties.Split( new[] { ',' }, RemoveEmptyEntries );
-                var allowedOrderByProperties = context.AllowedOrderByProperties;
-                var comparer = StringComparer.OrdinalIgnoreCase;
+                continue;
+            }
 
-                for ( var j = 0; j < properties.Length; j++ )
+            var properties = attribute.AllowedOrderByProperties.Split( new[] { ',' }, RemoveEmptyEntries );
+            var allowedOrderByProperties = context.AllowedOrderByProperties;
+            var comparer = StringComparer.OrdinalIgnoreCase;
+
+            for ( var j = 0; j < properties.Length; j++ )
+            {
+                var property = properties[j].Trim();
+
+                if ( !string.IsNullOrEmpty( property ) &&
+                     !allowedOrderByProperties.Contains( property, comparer ) )
                 {
-                    var property = properties[j].Trim();
-
-                    if ( !string.IsNullOrEmpty( property ) && !allowedOrderByProperties.Contains( property, comparer ) )
-                    {
-                        allowedOrderByProperties.Add( property );
-                    }
+                    allowedOrderByProperties.Add( property );
                 }
             }
         }
@@ -218,10 +219,16 @@ internal sealed partial class ODataAttributeVisitor
 
     private void VisitMaxTop( ModelBoundQuerySettings querySettings )
     {
-        if ( querySettings.MaxTop != null && querySettings.MaxTop.Value > 0 )
+        if ( querySettings.MaxTop.Unset() )
         {
-            context.MaxTop = querySettings.MaxTop;
+            return;
         }
+
+        context.MaxTop = querySettings.MaxTop;
+
+        // calling the Page() configuration sets MaxTop and PageSize,
+        // which is implied to enable $top and $skip
+        AllowedQueryOptions |= Skip | Top;
     }
 
     private void Visit<TSetting>(

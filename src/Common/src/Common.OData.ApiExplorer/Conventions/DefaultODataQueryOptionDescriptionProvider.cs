@@ -214,7 +214,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             throw new ArgumentNullException( nameof( context ) );
         }
 
-        if ( !context.MaxTop.HasValue || context.MaxTop.Value <= 0 )
+        if ( context.MaxTop.NoLimitOrNone() )
         {
             return ODataExpSR.TopQueryOptionDesc;
         }
@@ -222,7 +222,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         return GetOrCreateBuilder()
                 .Append( ODataExpSR.TopQueryOptionDesc )
                 .Append( Space )
-                .AppendFormat( CurrentCulture, ODataExpSR.MaxValueDesc, context.MaxTop.Value )
+                .AppendFormat( CurrentCulture, ODataExpSR.MaxValueDesc, context.MaxTop )
                 .ToString();
     }
 
@@ -238,7 +238,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             throw new ArgumentNullException( nameof( context ) );
         }
 
-        if ( !context.MaxSkip.HasValue || context.MaxSkip.Value <= 0 )
+        if ( context.MaxSkip.NoLimitOrNone() )
         {
             return ODataExpSR.SkipQueryOptionDesc;
         }
@@ -246,7 +246,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         return GetOrCreateBuilder()
                 .Append( ODataExpSR.SkipQueryOptionDesc )
                 .Append( Space )
-                .AppendFormat( CurrentCulture, ODataExpSR.MaxValueDesc, context.MaxSkip.Value )
+                .AppendFormat( CurrentCulture, ODataExpSR.MaxValueDesc, context.MaxSkip )
                 .ToString();
     }
 
