@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static Asp.Versioning.ApiVersionMapping;
@@ -261,7 +262,7 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
 
         for ( var i = 0; i < candidates.Count; i++ )
         {
-            ref var candidate = ref candidates[i];
+            ref readonly var candidate = ref candidates[i];
 
             if ( candidate.Endpoint is not RouteEndpoint endpoint )
             {
@@ -291,11 +292,17 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
 
     private static (bool Matched, bool HasCandidates) MatchApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
     {
-        List<int>? bestMatches = default;
-        List<int>? implicitMatches = default;
+        var total = candidates.Count;
+        var count = 0;
+        var array = default( Match[] );
+        var bestMatch = default( Match? );
         var hasCandidates = false;
+        Span<Match> matches =
+            total <= 16
+            ? stackalloc Match[total]
+            : ( array = ArrayPool<Match>.Shared.Rent( total ) ).AsSpan();
 
-        for ( var i = 0; i < candidates.Count; i++ )
+        for ( var i = 0; i < total; i++ )
         {
             if ( !candidates.IsValidCandidate( i ) )
             {
@@ -303,7 +310,7 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
             }
 
             hasCandidates = true;
-            ref var candidate = ref candidates[i];
+            ref readonly var candidate = ref candidates[i];
             var metadata = candidate.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>();
 
             if ( metadata == null )
@@ -311,61 +318,59 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
                 continue;
             }
 
-            // remember whether the candidate is currently valid. a matching api version will not
-            // make the candidate valid; however, we want to short-circuit with 400 if no candidates
-            // match the api version at all.
-            switch ( metadata.MappingTo( apiVersion ) )
-            {
-                case Explicit:
-                    bestMatches ??= new();
-                    bestMatches.Add( i );
-                    break;
-                case Implicit:
-                    implicitMatches ??= new();
-                    implicitMatches.Add( i );
-                    break;
-            }
+            var score = candidate.Score;
+            bool isExplicit;
 
             // perf: always make the candidate invalid so we only need to loop through the
             // final, best matches for any remaining candidates
             candidates.SetValidity( i, false );
-        }
 
-        if ( bestMatches is null )
-        {
-            if ( implicitMatches is null )
+            switch ( metadata.MappingTo( apiVersion ) )
             {
-                return (false, hasCandidates);
+                case Explicit:
+                    isExplicit = true;
+                    break;
+                case Implicit:
+                    isExplicit = metadata.IsApiVersionNeutral;
+                    break;
+                default:
+                    continue;
             }
 
-            for ( var i = 0; i < implicitMatches.Count; i++ )
-            {
-                candidates.SetValidity( implicitMatches[i], true );
-            }
+            var match = new Match( i, score, isExplicit );
 
-            return (true, hasCandidates);
+            matches[count++] = match;
+
+            if ( !bestMatch.HasValue || match.CompareTo( bestMatch.Value ) > 0 )
+            {
+                bestMatch = match;
+            }
         }
 
-        if ( bestMatches.Count == 1 && implicitMatches is not null )
-        {
-            ref var candidate = ref candidates[bestMatches[0]];
-            var metadata = candidate.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>()!;
+        var matched = false;
 
-            if ( metadata.IsApiVersionNeutral )
+        if ( bestMatch.HasValue )
+        {
+            matched = true;
+            var match = bestMatch.Value;
+
+            for ( var i = 0; i < count; i++ )
             {
-                for ( var i = 0; i < implicitMatches.Count; i++ )
+                ref readonly var otherMatch = ref matches[i];
+
+                if ( match.CompareTo( otherMatch ) == 0 )
                 {
-                    candidates.SetValidity( implicitMatches[i], true );
+                    candidates.SetValidity( otherMatch.Index, true );
                 }
             }
         }
 
-        for ( var i = 0; i < bestMatches.Count; i++ )
+        if ( array is not null )
         {
-            candidates.SetValidity( bestMatches[i], true );
+            ArrayPool<Match>.Shared.Return( array );
         }
 
-        return (true, hasCandidates);
+        return (matched, hasCandidates);
     }
 
     private ApiVersion TrySelectApiVersion( HttpContext httpContext, CandidateSet candidates )
@@ -393,4 +398,24 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
 
     bool INodeBuilderPolicy.AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints ) =>
         !ContainsDynamicEndpoints( endpoints ) && AppliesToEndpoints( endpoints );
+
+    private readonly struct Match
+    {
+        internal readonly int Index;
+        internal readonly int Score;
+        internal readonly bool IsExplicit;
+
+        internal Match( int index, int score, bool isExplicit )
+        {
+            Index = index;
+            Score = score;
+            IsExplicit = isExplicit;
+        }
+
+        internal int CompareTo( in Match other )
+        {
+            var result = -Score.CompareTo( other.Score );
+            return result == 0 ? IsExplicit.CompareTo( other.IsExplicit ) : result;
+        }
+    }
 }

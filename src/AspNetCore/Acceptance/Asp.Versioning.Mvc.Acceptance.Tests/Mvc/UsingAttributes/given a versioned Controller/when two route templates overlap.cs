@@ -4,6 +4,8 @@ namespace given_a_versioned_Controller;
 
 using Asp.Versioning;
 using Asp.Versioning.Mvc.UsingAttributes;
+using System.Net;
+using static System.Net.HttpStatusCode;
 
 public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<OverlappingRouteTemplateFixture>
 {
@@ -52,6 +54,40 @@ public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<Ov
         // assert
         result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
         ( await act.Should().ThrowAsync<Exception>() ).And.GetType().Name.Should().Be( "AmbiguousMatchException" );
+    }
+
+    [Theory]
+    [InlineData( "api/v1/values/echo" )]
+    [InlineData( "api/v2/values/echo" )]
+    public async Task then_route_with_same_score_and_version_should_return_200( string requestUri )
+    {
+        // arrange
+
+
+        // act
+        var response = await GetAsync( requestUri );
+
+        // assert
+        response.StatusCode.Should().Be( OK );
+    }
+
+    [Theory]
+    [InlineData( "api/v1/values/echo/42", OK )]
+#if NETCOREAPP3_1
+    [InlineData( "api/v2/values/echo/42", BadRequest )]
+#else
+    [InlineData( "api/v2/values/echo/42", NotFound )]
+#endif
+    public async Task then_route_with_same_score_and_different_versions_should_return_expected_status( string requestUri, HttpStatusCode statusCode )
+    {
+        // arrange
+
+
+        // act
+        var response = await GetAsync( requestUri );
+
+        // assert
+        response.StatusCode.Should().Be( statusCode );
     }
 
     public when_two_route_templates_overlap( OverlappingRouteTemplateFixture fixture, ITestOutputHelper console )
