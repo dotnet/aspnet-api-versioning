@@ -1,1 +1,1 @@
-﻿
+﻿Support reading custom HTTP headers (#875)

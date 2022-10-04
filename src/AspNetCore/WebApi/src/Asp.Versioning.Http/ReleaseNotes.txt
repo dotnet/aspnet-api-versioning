@@ -1,2 +1,3 @@
 ﻿Enable binding ApiVersion in Minimal APIs
 Support custom reporting HTTP headers (#875)
+Fix matching precedence of overlapping endpoint templates (#884)
