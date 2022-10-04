@@ -30,7 +30,8 @@
 
   <PropertyGroup>
    <ReleaseNotesFile>$(MSBuildProjectDirectory)\ReleaseNotes.txt</ReleaseNotesFile>
-   <PackageReleaseNotes>https://github.com/dotnet/aspnet-api-versioning/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' ">$(PackageVersion.Substring(0,$(PackageVersion.LastIndexOf('.')))).0</GitHubReleaseTag>
+   <PackageReleaseNotes>https://github.com/dotnet/aspnet-api-versioning/releases/tag/v$(GitHubReleaseTag)</PackageReleaseNotes>
   </PropertyGroup>
 
   <!-- if there is banner text, merge as one big string
