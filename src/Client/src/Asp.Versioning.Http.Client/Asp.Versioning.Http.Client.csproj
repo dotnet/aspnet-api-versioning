@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>6.0.0</VersionPrefix>
-  <AssemblyVersion>6.0.0.0</AssemblyVersion>
+  <VersionPrefix>6.1.0</VersionPrefix>
+  <AssemblyVersion>6.1.0.0</AssemblyVersion>
   <TargetFrameworks>net6.0;netstandard2.0;netstandard1.1</TargetFrameworks>
   <RootNamespace>Asp.Versioning.Http</RootNamespace>
   <AssemblyTitle>API Versioning Client Extensions</AssemblyTitle>
