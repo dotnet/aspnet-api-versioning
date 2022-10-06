@@ -194,7 +194,22 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
                     continue;
                 }
 
-                var metadata = selectors[0].EndpointMetadata.OfType<ApiVersionMetadata>().FirstOrDefault();
+                ApiVersionMetadata? metadata = null;
+                for ( var m = 0; m < selectors.Count; m++ )
+                {
+                    metadata = selectors[m].EndpointMetadata.OfType<ApiVersionMetadata>().FirstOrDefault();
+                    if ( metadata != null )
+                    {
+                        if ( m != 0 )
+                        {
+                            var tmpSelector = selectors[m];
+                            selectors[m] = selectors[0];
+                            selectors[0] = tmpSelector;
+                        }
+
+                        break;
+                    }
+                }
 
                 if ( metadata is null )
                 {
