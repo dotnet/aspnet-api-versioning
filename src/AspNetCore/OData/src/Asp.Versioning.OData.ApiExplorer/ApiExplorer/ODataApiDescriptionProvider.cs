@@ -188,12 +188,24 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         IReadOnlyList<IODataRoutingMetadata> items,
         [NotNullWhen( true )] out IODataRoutingMetadata? metadata )
     {
-        var apiVersion = description.GetApiVersion()!;
+        if ( description.GetApiVersion() is not ApiVersion apiVersion )
+        {
+            // this should only happen if an odata endpoint is registered outside of api versioning:
+            //
+            // builder.Services.AddControllers().AddOData(options => options.AddRouteComponents(new EdmModel()));
+            //
+            // instead of:
+            //
+            // builder.Services.AddControllers().AddOData();
+            // builder.Services.AddApiVersioning().AddOData(options => options.AddRouteComponents());
+            metadata = default;
+            return false;
+        }
 
         for ( var i = 0; i < items.Count; i++ )
         {
             var item = items[i];
-            var otherApiVersion = item.Model.GetAnnotationValue<ApiVersionAnnotation>( item.Model ).ApiVersion;
+            var otherApiVersion = item.Model.GetAnnotationValue<ApiVersionAnnotation>( item.Model )?.ApiVersion;
 
             if ( apiVersion.Equals( otherApiVersion ) )
             {
