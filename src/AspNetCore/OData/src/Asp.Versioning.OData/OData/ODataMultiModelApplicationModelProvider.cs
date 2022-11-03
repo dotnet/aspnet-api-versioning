@@ -4,6 +4,7 @@
 
 namespace Asp.Versioning.OData;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
@@ -189,41 +190,47 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
             {
                 var selectors = actions[j].Selectors;
 
-                if ( selectors.Count < 2 )
+                if ( selectors.Count > 1 && FindMetadata( selectors ) is ApiVersionMetadata metadata )
                 {
-                    continue;
-                }
-
-                var metadata = selectors[0].EndpointMetadata.OfType<ApiVersionMetadata>().FirstOrDefault();
-
-                if ( metadata is null )
-                {
-                    continue;
-                }
-
-                for ( var k = 1; k < selectors.Count; k++ )
-                {
-                    var endpointMetadata = selectors[k].EndpointMetadata;
-                    var found = false;
-
-                    for ( var l = 0; l < endpointMetadata.Count; l++ )
-                    {
-                        if ( endpointMetadata[l] is not ApiVersionMetadata )
-                        {
-                            continue;
-                        }
-
-                        endpointMetadata[l] = metadata;
-                        found = true;
-                        break;
-                    }
-
-                    if ( !found )
-                    {
-                        endpointMetadata.Add( metadata );
-                    }
+                    NormalizeMetadata( selectors, metadata );
                 }
             }
+        }
+    }
+
+    private static ApiVersionMetadata? FindMetadata( IList<SelectorModel> selectors )
+    {
+        for ( var i = 0; i < selectors.Count; i++ )
+        {
+            var endpointMetadata = selectors[i].EndpointMetadata;
+
+            for ( var j = 0; j < endpointMetadata.Count; j++ )
+            {
+                if ( endpointMetadata[j] is ApiVersionMetadata metadata )
+                {
+                    return metadata;
+                }
+            }
+        }
+
+        return default;
+    }
+
+    private static void NormalizeMetadata( IList<SelectorModel> selectors, ApiVersionMetadata metadata )
+    {
+        for ( var i = 0; i < selectors.Count; i++ )
+        {
+            var endpointMetadata = selectors[i].EndpointMetadata;
+
+            for ( var j = endpointMetadata.Count - 1; j >= 0; j-- )
+            {
+                if ( endpointMetadata[j] is ApiVersionMetadata )
+                {
+                    endpointMetadata.RemoveAt( j );
+                }
+            }
+
+            endpointMetadata.Insert( 0, metadata );
         }
     }
 }
