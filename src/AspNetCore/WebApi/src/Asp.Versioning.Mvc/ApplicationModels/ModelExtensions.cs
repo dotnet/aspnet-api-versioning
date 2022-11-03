@@ -37,17 +37,16 @@ public static class ModelExtensions
 
     internal static void AddEndpointMetadata( this ActionModel action, object metadata )
     {
-        SelectorModel selector;
+        var selectors = action.Selectors;
 
-        if ( action.Selectors.Count == 0 )
+        if ( selectors.Count == 0 )
         {
-            action.Selectors.Add( selector = new() );
-        }
-        else
-        {
-            selector = action.Selectors[0];
+            selectors.Add( new() );
         }
 
-        selector.EndpointMetadata.Add( metadata );
+        for ( var i = 0; i < selectors.Count; i++ )
+        {
+            selectors[i].EndpointMetadata.Add( metadata );
+        }
     }
 }

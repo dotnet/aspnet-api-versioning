@@ -94,10 +94,13 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     protected virtual void PopulateApiVersionParameters( ApiDescription apiDescription, ApiVersion apiVersion )
     {
         var parameterSource = Options.ApiVersionParameterSource;
-        var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, ModelMetadata, Options );
+        var context = new ApiVersionParameterDescriptionContext( apiDescription, apiVersion, ModelMetadata, Options )
+        {
+            ConstraintResolver = constraintResolver,
+        };
 
-        context.ConstraintResolver = constraintResolver;
         parameterSource.AddParameters( context );
+        apiDescription.TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
     }
 
     /// <summary>
@@ -159,7 +162,6 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
                 groupResult.SetApiVersion( version );
                 PopulateApiVersionParameters( groupResult, version );
-                groupResult.TryUpdateRelativePathAndRemoveApiVersionParameter( Options );
                 groupResults.Add( groupResult );
             }
         }
