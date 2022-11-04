@@ -210,15 +210,17 @@ internal sealed class HttpResponseExceptionFactory
 
     private HttpResponseMessage CreateUnsupportedMediaType()
     {
+        var content = request.Content;
+        var statusCode = content != null && content.Headers.ContentType != null ? UnsupportedMediaType : NotAcceptable;
         var version = request.GetRequestedApiVersion()?.ToString() ?? "(null)";
         var detail = string.Format( CultureInfo.CurrentCulture, SR.VersionedMediaTypeNotSupported, version );
 
         TraceWriter.Info( request, ControllerSelectorCategory, detail );
 
         var (type, title) = ProblemDetailsDefaults.Unsupported;
-        var problem = ProblemDetails.CreateProblemDetails( request, (int) UnsupportedMediaType, title, type, detail );
+        var problem = ProblemDetails.CreateProblemDetails( request, (int) statusCode, title, type, detail );
         var (mediaType, formatter) = request.GetProblemDetailsResponseType();
 
-        return request.CreateResponse( UnsupportedMediaType, problem, formatter, mediaType );
+        return request.CreateResponse( statusCode, problem, formatter, mediaType );
     }
 }

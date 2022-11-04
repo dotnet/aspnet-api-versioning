@@ -10,6 +10,7 @@ internal struct RouteDestination
     public int Unspecified;
     public int UnsupportedMediaType;
     public int AssumeDefault;
+    public int NotAcceptable;
 
     public RouteDestination( int exit )
     {
@@ -19,5 +20,6 @@ internal struct RouteDestination
         Unspecified = exit;
         UnsupportedMediaType = exit;
         AssumeDefault = exit;
+        NotAcceptable = exit;
     }
 }

@@ -5,6 +5,7 @@ namespace Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 
 internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
@@ -36,13 +37,14 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
 
     public override int GetDestination( HttpContext httpContext )
     {
+        var request = httpContext.Request;
         var feature = httpContext.ApiVersioningFeature();
         var apiVersions = new List<string>( capacity: feature.RawRequestedApiVersions.Count + 1 );
 
         apiVersions.AddRange( feature.RawRequestedApiVersions );
 
         if ( versionsByUrl &&
-             TryGetApiVersionFromPath( httpContext.Request, out var rawApiVersion ) &&
+             TryGetApiVersionFromPath( request, out var rawApiVersion ) &&
              DoesNotContainApiVersion( apiVersions, rawApiVersion ) )
         {
             apiVersions.Add( rawApiVersion );
@@ -86,9 +88,17 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                     return destination;
                 }
 
-                return versionsByMediaTypeOnly
-                       ? rejection.UnsupportedMediaType // 415
-                       : rejection.Exit;                // 404
+                if ( versionsByMediaTypeOnly )
+                {
+                    if ( request.Headers.ContainsKey( HeaderNames.ContentType ) )
+                    {
+                        return rejection.UnsupportedMediaType; // 415
+                    }
+
+                    return rejection.NotAcceptable; // 406
+                }
+
+                return rejection.Exit; // 404
         }
 
         var addedFromUrl = apiVersions.Count == apiVersions.Capacity;

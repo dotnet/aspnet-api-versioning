@@ -37,7 +37,7 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
     }
 
     [Fact]
-    public async Task then_get_should_return_415_for_an_unsupported_version()
+    public async Task then_get_should_return_406_for_an_unsupported_version()
     {
         // arrange
         using var request = new HttpRequestMessage( Get, "api/values" )
@@ -47,6 +47,23 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
 
         // act
         var response = await Client.SendAsync( request );
+        var problem = await response.Content.ReadAsProblemDetailsAsync();
+
+        // assert
+        response.StatusCode.Should().Be( NotAcceptable );
+        problem.Type.Should().Be( ProblemDetailsDefaults.Unsupported.Type );
+    }
+
+    [Fact]
+    public async Task then_post_should_return_415_for_an_unsupported_version()
+    {
+        // arrange
+        var entity = new { text = "Test" };
+        var mediaType = Parse( "application/json;v=3.0" );
+        using var content = new ObjectContent( entity.GetType(), entity, new JsonMediaTypeFormatter(), mediaType );
+
+        // act
+        var response = await Client.PostAsync( "api/values", content );
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert

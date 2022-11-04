@@ -34,6 +34,8 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
 
     internal static EdgeKey UnsupportedMediaType => new( EndpointType.UnsupportedMediaType, new( capacity: 0 ) );
 
+    internal static EdgeKey NotAcceptable => new( EndpointType.NotAcceptable, new( capacity: 0 ) );
+
     internal static EdgeKey AssumeDefault => new( EndpointType.AssumeDefault, new() );
 
     public bool Equals( [AllowNull] EdgeKey other ) => GetHashCode() == other.GetHashCode();

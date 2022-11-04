@@ -13,9 +13,17 @@ using System.Text.Json;
 public class Values2Controller : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get( ApiVersion version ) => Ok( new { Controller = nameof( Values2Controller ), Version = version.ToString() } );
+    public IActionResult Get( ApiVersion version ) =>
+        Ok( new { Controller = nameof( Values2Controller ), Version = version.ToString() } );
+
+    [HttpGet( "{id}" )]
+    public IActionResult Get( string id, ApiVersion version ) =>
+        Ok( new { Controller = nameof( Values2Controller ), Id = id, Version = version.ToString() } );
+
+    [HttpPost]
+    public IActionResult Post( JsonElement json ) => CreatedAtAction( nameof( Get ), new { id = "42" }, json );
 
     [HttpPatch( "{id}" )]
     [Consumes( "application/merge-patch+json" )]
-    public IActionResult MergePatch( JsonElement json ) => NoContent();
+    public IActionResult MergePatch( string id, JsonElement json ) => NoContent();
 }
