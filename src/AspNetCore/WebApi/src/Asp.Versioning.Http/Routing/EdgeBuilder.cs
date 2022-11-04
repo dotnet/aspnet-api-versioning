@@ -28,12 +28,13 @@ internal sealed class EdgeBuilder
         unspecifiedNotAllowed = !options.AssumeDefaultVersionWhenUnspecified;
         constraintName = options.RouteConstraintName;
         keys = new( capacity + 1 );
-        edges = new( capacity + 5 )
+        edges = new( capacity + 6 )
         {
             [EdgeKey.Malformed] = new( capacity: 1 ) { new MalformedApiVersionEndpoint( logger ) },
             [EdgeKey.Ambiguous] = new( capacity: 1 ) { new AmbiguousApiVersionEndpoint( logger ) },
             [EdgeKey.Unspecified] = new( capacity: 1 ) { new UnspecifiedApiVersionEndpoint( logger ) },
             [EdgeKey.UnsupportedMediaType] = new( capacity: 1 ) { new UnsupportedMediaTypeEndpoint() },
+            [EdgeKey.NotAcceptable] = new( capacity: 1 ) { new NotAcceptableEndpoint() },
         };
     }
 

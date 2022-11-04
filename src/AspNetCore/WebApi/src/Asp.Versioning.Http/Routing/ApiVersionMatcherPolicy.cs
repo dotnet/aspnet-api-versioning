@@ -139,6 +139,9 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
                 case EndpointType.AssumeDefault:
                     rejection.AssumeDefault = edge.Destination;
                     break;
+                case EndpointType.NotAcceptable:
+                    rejection.NotAcceptable = edge.Destination;
+                    break;
                 default:
                     if ( versionsByUrl && state.RoutePatterns.Count > 0 )
                     {

@@ -11,5 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 public class ValuesController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok( new { Controller = nameof( ValuesController ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get() =>
+        Ok( new { Controller = nameof( ValuesController ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+
+    [HttpGet( "{id}" )]
+    public IActionResult Get( string id ) =>
+        Ok( new { Controller = nameof( ValuesController ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
 }

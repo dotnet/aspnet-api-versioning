@@ -11,9 +11,6 @@ internal sealed class UnsupportedMediaTypeEndpoint : Endpoint
 
     internal UnsupportedMediaTypeEndpoint() : base( OnExecute, Empty, Name ) { }
 
-    private static Task OnExecute( HttpContext context )
-    {
-        context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
-        return Task.CompletedTask;
-    }
+    private static Task OnExecute( HttpContext context ) =>
+        EndpointProblem.UnsupportedApiVersion( context, StatusCodes.Status415UnsupportedMediaType );
 }

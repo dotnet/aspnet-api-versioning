@@ -10,4 +10,5 @@ internal enum EndpointType
     Unspecified,
     UnsupportedMediaType,
     AssumeDefault,
+    NotAcceptable,
 }
