@@ -4,6 +4,7 @@ namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using static ApiVersionParameterLocation;
 using static System.IO.Stream;
 
 public class MediaTypeApiVersionReaderTest
@@ -162,5 +163,21 @@ public class MediaTypeApiVersionReaderTest
 
         // assert
         versions.Single().Should().Be( "3.0" );
+    }
+
+    [Fact]
+    public void add_parameters_should_add_parameter_for_media_type()
+    {
+        // arrange
+        var reader = new MediaTypeApiVersionReader();
+        var context = new Mock<IApiVersionParameterDescriptionContext>();
+
+        context.Setup( c => c.AddParameter( It.IsAny<string>(), It.IsAny<ApiVersionParameterLocation>() ) );
+
+        // act
+        reader.AddParameters( context.Object );
+
+        // assert
+        context.Verify( c => c.AddParameter( "v", MediaTypeParameter ), Times.Once() );
     }
 }

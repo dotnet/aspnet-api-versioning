@@ -126,4 +126,7 @@
   <data name="ZeroApiVersionReaders" xml:space="preserve">
     <value>At least one IApiVersionReader must be specified.</value>
   </data>
+  <data name="InvalidMediaTypeTemplate" xml:space="preserve">
+    <value>The template '{0}' has more than one parameter and no parameter name was specified.</value>
+  </data>
 </root>
