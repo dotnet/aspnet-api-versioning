@@ -427,7 +427,7 @@ public partial class MediaTypeApiVersionReaderBuilder
                         versions.Add( result[j] );
                     }
                 }
-            }
         }
+    }
     }
 }
