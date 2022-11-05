@@ -90,5 +90,16 @@ namespace Asp.Versioning {
                 return ResourceManager.GetString( "ZeroApiVersionReaders", resourceCulture );
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The template '{0}' has more than one parameter and no parameter name was specified..
+        /// </summary>
+        internal static string InvalidMediaTypeTemplate
+        {
+            get
+            {
+                return ResourceManager.GetString( "InvalidMediaTypeTemplate", resourceCulture );
+            }
+        }
     }
 }
