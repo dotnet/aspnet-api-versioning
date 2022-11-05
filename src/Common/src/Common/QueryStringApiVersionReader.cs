@@ -2,6 +2,9 @@
 
 namespace Asp.Versioning;
 
+#if !NETFRAMEWORK
+using System.Buffers;
+#endif
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.StringComparer;
 
@@ -80,7 +83,12 @@ public partial class QueryStringApiVersionReader : IApiVersionReader
         }
 
         var count = ParameterNames.Count;
+#if NETFRAMEWORK
         var names = new string[count];
+#else
+        var pool = ArrayPool<string>.Shared;
+        var names = pool.Rent( count );
+#endif
 
         ParameterNames.CopyTo( names, 0 );
 
@@ -88,5 +96,9 @@ public partial class QueryStringApiVersionReader : IApiVersionReader
         {
             context.AddParameter( names[i], Query );
         }
+
+#if !NETFRAMEWORK
+        pool.Return( names );
+#endif
     }
 }
