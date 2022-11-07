@@ -16,6 +16,7 @@ using Microsoft.OData.Edm;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using static System.StringComparison;
+using static ODataMetadataOptions;
 using Opts = Microsoft.Extensions.Options.Options;
 
 /// <summary>
@@ -118,10 +119,23 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
             }
 
             if ( !TryMatchModelVersion( result, metadata, out var matched ) ||
-                 IsServiceDocumentOrMetadata( matched.Template ) ||
                  !visited.Add( result ) )
             {
                 results.RemoveAt( i );
+            }
+            else if ( IsServiceDocument( matched.Template ) )
+            {
+                if ( !Options.MetadataOptions.HasFlag( ServiceDocument ) )
+                {
+                    results.RemoveAt( i );
+                }
+            }
+            else if ( IsMetadata( matched.Template ) )
+            {
+                if ( !Options.MetadataOptions.HasFlag( Metadata ) )
+                {
+                    results.RemoveAt( i );
+                }
             }
             else if ( IsNavigationPropertyLink( matched.Template ) )
             {
@@ -176,8 +190,10 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool IsServiceDocumentOrMetadata( ODataPathTemplate template ) =>
-        template.Count == 0 || ( template.Count == 1 && template[0] is MetadataSegmentTemplate );
+    private static bool IsServiceDocument( ODataPathTemplate template ) => template.Count == 0;
+
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static bool IsMetadata( ODataPathTemplate template ) => template.Count == 1 && template[0] is MetadataSegmentTemplate;
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static bool IsNavigationPropertyLink( ODataPathTemplate template ) =>

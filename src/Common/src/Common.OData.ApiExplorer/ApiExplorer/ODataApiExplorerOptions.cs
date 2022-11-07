@@ -38,4 +38,10 @@ public partial class ODataApiExplorerOptions : ApiExplorerOptions
         get => queryOptions ??= new();
         set => queryOptions = value;
     }
+
+    /// <summary>
+    /// Gets or sets the OData metadata options used during API exploration.
+    /// </summary>
+    /// <value>One or more <see cref="ODataMetadataOptions"/> values.</value>
+    public ODataMetadataOptions MetadataOptions { get; set; } = ODataMetadataOptions.None;
 }
