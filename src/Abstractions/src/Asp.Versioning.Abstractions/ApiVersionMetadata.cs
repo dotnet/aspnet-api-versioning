@@ -29,6 +29,23 @@ public class ApiVersionMetadata
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersionMetadata"/> class.
+    /// </summary>
+    /// <param name="other">The other <see cref="ApiVersionMetadata">instance</see> to initialize from.</param>
+    protected ApiVersionMetadata( ApiVersionMetadata other )
+    {
+        if ( other == null )
+        {
+            throw new ArgumentNullException( nameof( other ) );
+        }
+
+        apiModel = other.apiModel;
+        endpointModel = other.endpointModel;
+        mergedModel = other.mergedModel;
+        Name = other.Name;
+    }
+
+    /// <summary>
     /// Gets an empty API version information.
     /// </summary>
     /// <value>New, empty <see cref="ApiVersionMetadata"/>.</value>
