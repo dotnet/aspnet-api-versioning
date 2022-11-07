@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.Description;
 
+using Asp.Versioning.Controllers;
 using Asp.Versioning.Conventions;
 using Asp.Versioning.OData;
 using Asp.Versioning.Simulators.Configuration;
@@ -24,6 +25,7 @@ public class TestConfigurations : IEnumerable<object[]>
     {
         var configuration = new HttpConfiguration();
         var controllerTypeResolver = new ControllerTypeCollection(
+            typeof( VersionedMetadataController ),
             typeof( Simulators.V1.OrdersController ),
             typeof( Simulators.V2.OrdersController ),
             typeof( Simulators.V3.OrdersController ) );
@@ -57,9 +59,10 @@ public class TestConfigurations : IEnumerable<object[]>
     {
         var configuration = new HttpConfiguration();
         var controllerTypeResolver = new ControllerTypeCollection(
-           typeof( Simulators.V1.PeopleController ),
-           typeof( Simulators.V2.PeopleController ),
-           typeof( Simulators.V3.PeopleController ) );
+            typeof( VersionedMetadataController ),
+            typeof( Simulators.V1.PeopleController ),
+            typeof( Simulators.V2.PeopleController ),
+            typeof( Simulators.V3.PeopleController ) );
 
         configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
         configuration.AddApiVersioning();
@@ -79,8 +82,9 @@ public class TestConfigurations : IEnumerable<object[]>
     {
         var configuration = new HttpConfiguration();
         var controllerTypeResolver = new ControllerTypeCollection(
-           typeof( Simulators.V3.ProductsController ),
-           typeof( Simulators.V3.SuppliersController ) );
+            typeof( VersionedMetadataController ),
+            typeof( Simulators.V3.ProductsController ),
+            typeof( Simulators.V3.SuppliersController ) );
 
         configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
         configuration.AddApiVersioning();

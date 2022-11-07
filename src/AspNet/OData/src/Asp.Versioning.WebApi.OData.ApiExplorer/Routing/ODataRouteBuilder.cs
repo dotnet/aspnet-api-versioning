@@ -286,6 +286,25 @@ internal sealed class ODataRouteBuilder
                 builder.Append( Context.Operation!.Name );
                 AppendParametersFromConvention( builder, Context.Operation );
                 break;
+            default:
+                var action = Context.ActionDescriptor;
+
+                if ( action.ControllerDescriptor.ControllerType.IsMetadataController() )
+                {
+                    if ( action.ActionName == nameof( MetadataController.GetServiceDocument ) )
+                    {
+                        if ( segments.Count == 0 )
+                        {
+                            segments.Add( "/" );
+                        }
+                    }
+                    else
+                    {
+                        segments.Add( "$metadata" );
+                    }
+                }
+
+                break;
         }
 
         if ( builder.Length > 0 )

@@ -82,6 +82,24 @@ public class ODataApiExplorer : VersionedApiExplorer
             return base.ShouldExploreAction( actionRouteParameterValue, actionDescriptor, route, apiVersion );
         }
 
+        if ( actionDescriptor.ControllerDescriptor.ControllerType.IsMetadataController() )
+        {
+            if ( actionDescriptor.ActionName == nameof( MetadataController.GetServiceDocument ) )
+            {
+                if ( !Options.MetadataOptions.HasFlag( ODataMetadataOptions.ServiceDocument ) )
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if ( !Options.MetadataOptions.HasFlag( ODataMetadataOptions.Metadata ) )
+                {
+                    return false;
+                }
+            }
+        }
+
         if ( Options.UseApiExplorerSettings )
         {
             var setting = actionDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
@@ -112,9 +130,10 @@ public class ODataApiExplorer : VersionedApiExplorer
             throw new ArgumentNullException( nameof( route ) );
         }
 
-        if ( typeof( MetadataController ).IsAssignableFrom( controllerDescriptor.ControllerType ) )
+        if ( controllerDescriptor.ControllerType.IsMetadataController() )
         {
-            return false;
+            controllerDescriptor.ControllerName = "OData";
+            return Options.MetadataOptions > ODataMetadataOptions.None;
         }
 
         var routeTemplate = route.RouteTemplate;

@@ -14,6 +14,7 @@ using static Microsoft.OData.ODataVersion;
 /// </summary>
 [CLSCompliant( false )]
 [ReportApiVersions]
+[ControllerName( "OData" )]
 public class VersionedMetadataController : MetadataController
 {
     /// <summary>

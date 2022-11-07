@@ -43,7 +43,9 @@ internal sealed class ODataRouteBuilderContext
         ActionDescriptor = actionDescriptor;
         ParameterDescriptions = parameterDescriptions;
         Options = options;
-        UrlKeyDelimiter = UrlKeyDelimiterOrDefault( configuration.GetUrlKeyDelimiter() ?? Services.GetService<IODataPathHandler>()?.UrlKeyDelimiter );
+        UrlKeyDelimiter = UrlKeyDelimiterOrDefault(
+            configuration.GetUrlKeyDelimiter() ??
+            Services.GetService<IODataPathHandler>()?.UrlKeyDelimiter );
 
         var selector = Services.GetRequiredService<IEdmModelSelector>();
         var model = selector.SelectModel( apiVersion );
@@ -64,7 +66,8 @@ internal sealed class ODataRouteBuilderContext
         Singleton = container.FindSingleton( controllerName );
         Operation = ResolveOperation( container, actionDescriptor );
         ActionType = GetActionType( actionDescriptor );
-        IsRouteExcluded = ActionType == ODataRouteActionType.Unknown;
+        IsRouteExcluded = ActionType == ODataRouteActionType.Unknown &&
+                         !actionDescriptor.ControllerDescriptor.ControllerType.IsMetadataController();
 
         if ( Operation?.IsAction() == true )
         {

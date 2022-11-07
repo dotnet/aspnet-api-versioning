@@ -28,7 +28,7 @@ internal static partial class TypeExtensions
 
     internal static bool IsODataController( this Type controllerType ) => controllerType.UsingOData();
 
-    internal static bool IsMetadataController( this TypeInfo controllerType )
+    internal static bool IsMetadataController( this Type controllerType )
     {
         metadataController ??= typeof( MetadataController );
         return metadataController.IsAssignableFrom( controllerType );

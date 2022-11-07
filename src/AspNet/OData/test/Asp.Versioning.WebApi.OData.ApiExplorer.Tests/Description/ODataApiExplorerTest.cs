@@ -34,7 +34,10 @@ public class ODataApiExplorerTest
     {
         // arrange
         var assembliesResolver = configuration.Services.GetAssembliesResolver();
-        var controllerTypes = configuration.Services.GetHttpControllerTypeResolver().GetControllerTypes( assembliesResolver );
+        var controllerTypes = configuration.Services
+                                           .GetHttpControllerTypeResolver()
+                                           .GetControllerTypes( assembliesResolver )
+                                           .Where( t => !typeof( MetadataController ).IsAssignableFrom( t ) );
         var apiExplorer = new ODataApiExplorer( configuration );
 
         // act
@@ -54,7 +57,10 @@ public class ODataApiExplorerTest
     {
         // arrange
         var assembliesResolver = configuration.Services.GetAssembliesResolver();
-        var controllerTypes = configuration.Services.GetHttpControllerTypeResolver().GetControllerTypes( assembliesResolver );
+        var controllerTypes = configuration.Services
+                                            .GetHttpControllerTypeResolver()
+                                            .GetControllerTypes( assembliesResolver )
+                                            .Where( t => !typeof( MetadataController ).IsAssignableFrom( t ) );
         var apiExplorer = new ODataApiExplorer( configuration );
 
         // act
@@ -84,6 +90,37 @@ public class ODataApiExplorerTest
                     .Distinct()
                     .Should()
                     .NotContain( type => typeof( MetadataController ).IsAssignableFrom( type ) );
+    }
+
+    [Theory]
+    [InlineData( ODataMetadataOptions.ServiceDocument )]
+    [InlineData( ODataMetadataOptions.Metadata )]
+    [InlineData( ODataMetadataOptions.All )]
+    public void api_descriptions_should_contain_metadata_controllers( ODataMetadataOptions metadataOptions )
+    {
+        // arrange
+        var configuration = TestConfigurations.NewOrdersConfiguration();
+        var options = new ODataApiExplorerOptions( configuration ) { MetadataOptions = metadataOptions };
+        var apiExplorer = new ODataApiExplorer( configuration, options );
+
+        // act
+        var groups = apiExplorer.ApiDescriptions;
+
+        // assert
+        for ( var i = 0; i < groups.Count; i++ )
+        {
+            var group = groups[i];
+
+            if ( metadataOptions.HasFlag( ODataMetadataOptions.ServiceDocument ) )
+            {
+                group.ApiDescriptions.Should().Contain( item => item.RelativePath == "api" );
+            }
+
+            if ( metadataOptions.HasFlag( ODataMetadataOptions.Metadata ) )
+            {
+                group.ApiDescriptions.Should().Contain( item => item.RelativePath == "api/$metadata" );
+            }
+        }
     }
 
     [Theory]

@@ -56,6 +56,62 @@ public class ODataApiDescriptionProviderTest
         AssertVersion3( groups[3] );
     }
 
+    [Theory]
+    [InlineData( ODataMetadataOptions.ServiceDocument )]
+    [InlineData( ODataMetadataOptions.Metadata )]
+    [InlineData( ODataMetadataOptions.All )]
+    public void odata_api_explorer_should_explore_metadata_routes( ODataMetadataOptions metadataOptions )
+    {
+        // arrange
+        var builder = new WebHostBuilder()
+            .ConfigureServices(
+                services =>
+                {
+                    services.AddControllers()
+                            .AddOData(
+                                options =>
+                                {
+                                    options.Count().Select().OrderBy();
+                                    options.RouteOptions.EnableKeyInParenthesis = false;
+                                    options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
+                                    options.RouteOptions.EnableQualifiedOperationCall = false;
+                                    options.RouteOptions.EnableUnqualifiedOperationCall = true;
+                                } );
+
+                    services.AddApiVersioning()
+                            .AddOData( options => options.AddRouteComponents( "api" ) )
+                            .AddODataApiExplorer( options => options.MetadataOptions = metadataOptions );
+
+                    services.TryAddEnumerable( ServiceDescriptor.Transient<IApplicationModelProvider, TestApiExplorerApplicationModelProvider>() );
+                } )
+            .Configure( app => app.UseRouting().UseEndpoints( endpoints => endpoints.MapControllers() ) );
+        var host = builder.Build();
+        var serviceProvider = host.Services;
+
+        // act
+        var groups = serviceProvider.GetRequiredService<IApiDescriptionGroupCollectionProvider>()
+                                    .ApiDescriptionGroups
+                                    .Items
+                                    .OrderBy( i => i.GroupName )
+                                    .ToArray();
+
+        // assert
+        for ( var i = 0; i < groups.Length; i++ )
+        {
+            var group = groups[i];
+
+            if ( metadataOptions.HasFlag( ODataMetadataOptions.ServiceDocument ) )
+            {
+                group.Items.Should().Contain( item => item.RelativePath == "api" );
+            }
+
+            if ( metadataOptions.HasFlag( ODataMetadataOptions.Metadata ) )
+            {
+                group.Items.Should().Contain( item => item.RelativePath == "api/$metadata" );
+            }
+        }
+    }
+
     private readonly ITestOutputHelper console;
 
     public ODataApiDescriptionProviderTest( ITestOutputHelper console ) => this.console = console;
