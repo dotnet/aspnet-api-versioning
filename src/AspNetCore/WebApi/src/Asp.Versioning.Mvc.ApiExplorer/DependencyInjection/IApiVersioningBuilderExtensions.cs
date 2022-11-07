@@ -4,7 +4,9 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -61,7 +63,8 @@ public static class IApiVersioningBuilderExtensions
 
         services.AddMvcCore().AddApiExplorer();
         services.TryAddSingleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>();
-        services.TryAddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
+        services.TryAddTransient( ResolveApiVersionDescriptionProviderFactory );
+        services.TryAddSingleton( ResolveApiVersionDescriptionProvider );
 
         // use internal constructor until ASP.NET Core fixes their bug
         // BUG: https://github.com/dotnet/aspnetcore/issues/41773
@@ -72,5 +75,51 @@ public static class IApiVersioningBuilderExtensions
                     sp.GetRequiredService<IModelMetadataProvider>(),
                     sp.GetRequiredService<IInlineConstraintResolver>(),
                     sp.GetRequiredService<IOptions<ApiExplorerOptions>>() ) ) );
+    }
+
+    private static IApiVersionDescriptionProviderFactory ResolveApiVersionDescriptionProviderFactory( IServiceProvider serviceProvider )
+    {
+        var options = serviceProvider.GetRequiredService<IOptions<ApiExplorerOptions>>();
+        var mightUseCustomGroups = options.Value.FormatGroupName is not null;
+
+        return new ApiVersionDescriptionProviderFactory( serviceProvider, mightUseCustomGroups ? NewGroupedProvider : NewDefaultProvider );
+
+        static IApiVersionDescriptionProvider NewDefaultProvider(
+            EndpointDataSource endpointDataSource,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+            ISunsetPolicyManager sunsetPolicyManager,
+            IOptions<ApiExplorerOptions> apiExplorerOptions ) =>
+            new DefaultApiVersionDescriptionProvider( endpointDataSource, actionDescriptorCollectionProvider, sunsetPolicyManager, apiExplorerOptions );
+
+        static IApiVersionDescriptionProvider NewGroupedProvider(
+            EndpointDataSource endpointDataSource,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+            ISunsetPolicyManager sunsetPolicyManager,
+            IOptions<ApiExplorerOptions> apiExplorerOptions ) =>
+            new GroupedApiVersionDescriptionProvider( endpointDataSource, actionDescriptorCollectionProvider, sunsetPolicyManager, apiExplorerOptions );
+    }
+
+    private static IApiVersionDescriptionProvider ResolveApiVersionDescriptionProvider( IServiceProvider serviceProvider )
+    {
+        var endpointDataSource = serviceProvider.GetRequiredService<EndpointDataSource>();
+        var actionDescriptorCollectionProvider = serviceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
+        var sunsetPolicyManager = serviceProvider.GetRequiredService<ISunsetPolicyManager>();
+        var options = serviceProvider.GetRequiredService<IOptions<ApiExplorerOptions>>();
+        var mightUseCustomGroups = options.Value.FormatGroupName is not null;
+
+        if ( mightUseCustomGroups )
+        {
+            return new GroupedApiVersionDescriptionProvider(
+                endpointDataSource,
+                actionDescriptorCollectionProvider,
+                sunsetPolicyManager,
+                options );
+        }
+
+        return new DefaultApiVersionDescriptionProvider(
+            endpointDataSource,
+            actionDescriptorCollectionProvider,
+            sunsetPolicyManager,
+            options );
     }
 }

@@ -124,10 +124,11 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
         var groupResults = new List<ApiDescription>( capacity: results.Count );
         var unversioned = default( List<ApiDescription> );
+        var formatGroupName = Options.FormatGroupName;
 
         foreach ( var version in FlattenApiVersions( results ) )
         {
-            var groupName = version.ToString( Options.GroupNameFormat, CurrentCulture );
+            var formattedVersion = version.ToString( Options.GroupNameFormat, CurrentCulture );
 
             for ( var i = 0; i < results.Count; i++ )
             {
@@ -150,9 +151,13 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                 var groupResult = result.Clone();
                 var metadata = action.GetApiVersionMetadata();
 
-                if ( string.IsNullOrEmpty( groupResult.GroupName ) )
+                if ( string.IsNullOrEmpty( groupResult.GroupName ) || formatGroupName is null )
                 {
-                    groupResult.GroupName = groupName;
+                    groupResult.GroupName = formattedVersion;
+                }
+                else
+                {
+                    groupResult.GroupName = formatGroupName( groupResult.GroupName, formattedVersion );
                 }
 
                 if ( SunsetPolicyManager.TryResolvePolicy( metadata.Name, version, out var policy ) )

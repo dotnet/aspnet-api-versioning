@@ -46,4 +46,13 @@ public partial class ApiExplorerOptions
     /// </summary>
     /// <value>The name associated with the <see cref="ApiVersionRouteConstraint">API version route constraint</see>.</value>
     public string RouteConstraintName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the function used to format the combination of a group name and API version.
+    /// </summary>
+    /// <value>The <see cref="FormatGroupNameCallback">callback</see> used to format the combination of
+    /// a group name and API version. The default value is <c>null</c>.</value>
+    /// <remarks>The specified callback will only be invoked if a group name has been configured. The API
+    /// version will be provided formatted according to the <see cref="GroupNameFormat">group name format</see>.</remarks>
+    public FormatGroupNameCallback? FormatGroupName { get; set; }
 }
