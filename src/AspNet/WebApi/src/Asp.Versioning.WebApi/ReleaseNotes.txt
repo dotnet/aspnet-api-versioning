@@ -1,1 +1,1 @@
-﻿Support custom reporting HTTP headers (#875)
+﻿

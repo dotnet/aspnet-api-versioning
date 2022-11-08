@@ -1,1 +1,1 @@
-﻿Support batching (#720, #847)
+﻿
