@@ -31,10 +31,6 @@ public class ApiVersionSet
     /// <value>True if all APIs in the version set will report their API versions; otherwise, false.</value>
     public bool ReportApiVersions { get; }
 
-    // intentionally internal for 6.0, until EndpointBuilder.ServiceProvider is exposed in 7.0
-    // REF: https://github.com/dotnet/aspnetcore/pull/41238/files#diff-f8807c470bcc3a077fb176668a46df57b4bb99c992b6b7b375665f8bf3903c94R510
-    internal IServiceProvider? ServiceProvider { get; set; }
-
     /// <summary>
     /// Gets the associated builder.
     /// </summary>

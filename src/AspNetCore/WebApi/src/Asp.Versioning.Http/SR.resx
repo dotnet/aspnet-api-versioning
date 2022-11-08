@@ -123,9 +123,6 @@
   <data name="ConventionAddedAfterEndpointBuilt" xml:space="preserve">
     <value>Conventions cannot be added after building the endpoint.</value>
   </data>
-  <data name="NoEndpointBuilderServices" xml:space="preserve">
-    <value>The required services have not been provided to the EndointBuilder.</value>
-  </data>
   <data name="RequestTypeUnconfigured" xml:space="preserve">
     <value>The request type was not configured.</value>
   </data>

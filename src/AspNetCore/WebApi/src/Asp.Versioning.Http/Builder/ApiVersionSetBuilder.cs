@@ -17,10 +17,6 @@ public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApi
     /// <param name="name">The name of the API, if any.</param>
     public ApiVersionSetBuilder( string? name ) => this.name = name;
 
-    // intentionally internal for 6.0, until EndpointBuilder.ServiceProvider is exposed in 7.0
-    // REF: https://github.com/dotnet/aspnetcore/pull/41238/files#diff-f8807c470bcc3a077fb176668a46df57b4bb99c992b6b7b375665f8bf3903c94R510
-    internal IServiceProvider? ServiceProvider { get; set; }
-
     /// <summary>
     /// Gets or sets a value indicating whether requests report the API version compatibility information in responses.
     /// </summary>
@@ -31,7 +27,7 @@ public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApi
     /// Builds and returns a new API versioning configuration.
     /// </summary>
     /// <returns>A new <see cref="ApiVersionSet">API versioning configuration</see>.</returns>
-    public virtual ApiVersionSet Build() => new( this, name ) { ServiceProvider = ServiceProvider };
+    public virtual ApiVersionSet Build() => new( this, name );
 
     /// <summary>
     /// Indicates that all APIs in the version set will report their versions.
