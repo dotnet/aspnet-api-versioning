@@ -79,15 +79,6 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The required services have not been provided to the EndointBuilder..
-        /// </summary>
-        internal static string NoEndpointBuilderServices {
-            get {
-                return ResourceManager.GetString("NoEndpointBuilderServices", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The request type was not configured..
         /// </summary>
         internal static string RequestTypeUnconfigured {
