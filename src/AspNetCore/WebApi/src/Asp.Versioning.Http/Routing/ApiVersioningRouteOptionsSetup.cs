@@ -20,7 +20,7 @@ public class ApiVersioningRouteOptionsSetup : IPostConfigureOptions<RouteOptions
     public ApiVersioningRouteOptionsSetup( IOptions<ApiVersioningOptions> options ) => versioningOptions = options;
 
     /// <inheritdoc />
-    public virtual void PostConfigure( string name, RouteOptions options )
+    public virtual void PostConfigure( string? name, RouteOptions options )
     {
         if ( options == null )
         {

@@ -190,9 +190,7 @@ public static class ApiDescriptionExtensions
     {
         return new()
         {
-#if !NETCOREAPP3_1
             BindingInfo = parameterDescription.BindingInfo,
-#endif
             IsRequired = parameterDescription.IsRequired,
             DefaultValue = parameterDescription.DefaultValue,
             ModelMetadata = parameterDescription.ModelMetadata,

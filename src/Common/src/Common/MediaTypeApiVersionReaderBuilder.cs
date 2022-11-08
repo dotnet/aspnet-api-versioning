@@ -90,9 +90,12 @@ public partial class MediaTypeApiVersionReaderBuilder
     /// </summary>
     /// <param name="pattern">The regular expression used to match the API version in the media type.</param>
     /// <returns>The current <see cref="MediaTypeApiVersionReaderBuilder"/>.</returns>
+#if NETFRAMEWORK
     public virtual MediaTypeApiVersionReaderBuilder Match( string pattern )
+#else
+    public virtual MediaTypeApiVersionReaderBuilder Match( [StringSyntax( StringSyntaxAttribute.Regex )] string pattern )
+#endif
     {
-        // TODO: in .NET 7 add [StringSyntax( StringSyntaxAttribute.Regex )]
         if ( !string.IsNullOrEmpty( pattern ) )
         {
             AddReader( mediaTypes => ReadMediaType( mediaTypes, pattern ) );
@@ -183,7 +186,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 #if NETFRAMEWORK
             var input = mediaType;
 #else
-            var input = mediaType.Value;
+            var input = mediaType.Value!;
 #endif
             var match = regex.Match( input );
 
@@ -243,7 +246,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 #if NETFRAMEWORK
                 var value = parameter.Value;
 #else
-                var value = parameter.Value.Value;
+                var value = parameter.Value.Value!;
 #endif
                 if ( version == null )
                 {

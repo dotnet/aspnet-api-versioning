@@ -278,14 +278,8 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
 
                         if ( metadata.GetMetadata<ApiVersionMetadata>() is ApiVersionMetadata item )
                         {
-#if NETCOREAPP3_1
-                            // this code path doesn't appear to exist for netcoreapp3.1
-                            // REF: https://github.com/dotnet/aspnetcore/blob/release/3.1/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs#L74
-                            list.Add( new( default, item ) );
-#else
                             var groupName = metadata.OfType<IEndpointGroupNameMetadata>().LastOrDefault()?.EndpointGroupName;
                             list.Add( new( groupName, item ) );
-#endif
                         }
                     }
 
@@ -372,9 +366,6 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs
         private static string? GetGroupName( ActionDescriptor action )
         {
-#if NETCOREAPP3_1
-            return action.GetProperty<ApiDescriptionActionData>()?.GroupName;
-#else
             var endpointGroupName = action.EndpointMetadata.OfType<IEndpointGroupNameMetadata>().LastOrDefault();
 
             if ( endpointGroupName is null )
@@ -383,7 +374,6 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
             }
 
             return endpointGroupName.EndpointGroupName;
-#endif
         }
 
         public void Deconstruct( out IReadOnlyList<GroupedApiVersionMetadata> items, out int version )

@@ -13,7 +13,7 @@ public partial class SunsetPolicyManager : ISunsetPolicyManager
     public virtual bool TryGetPolicy(
         string? name,
         ApiVersion? apiVersion,
-#if !NETFRAMEWORK && !NETCOREAPP3_1
+#if !NETFRAMEWORK
         [MaybeNullWhen( false )]
 #endif
         out SunsetPolicy sunsetPolicy )
@@ -31,12 +31,7 @@ public partial class SunsetPolicyManager : ISunsetPolicyManager
 #endif
         var key = new PolicyKey( name, apiVersion );
 
-        // NETCOREAPP3_1 only; remove when target is dropped
-#pragma warning disable IDE0079
-#pragma warning disable CS8601 // Possible null reference assignment
         return policies.TryGetValue( key, out sunsetPolicy );
-#pragma warning restore CS8601
-#pragma warning restore IDE0079
     }
 
     private static Dictionary<PolicyKey, SunsetPolicy> BuildPolicies( ApiVersioningOptions options )

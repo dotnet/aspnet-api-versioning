@@ -17,9 +17,6 @@ using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 /// <summary>
 /// Provides ASP.NET Core MVC specific extension methods for <see cref="IApiVersioningBuilder"/>.
 /// </summary>
-#if NETCOREAPP3_1
-[CLSCompliant( false )]
-#endif
 public static class IApiVersioningBuilderExtensions
 {
     /// <summary>

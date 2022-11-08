@@ -3,8 +3,6 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
 
 internal sealed class ContentTypeApiVersionDecorator
 {

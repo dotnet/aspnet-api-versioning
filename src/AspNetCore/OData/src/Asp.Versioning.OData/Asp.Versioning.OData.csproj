@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>6.2.1</VersionPrefix>
-  <AssemblyVersion>6.2.0.0</AssemblyVersion>
-  <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
+  <VersionPrefix>7.0.0</VersionPrefix>
+  <AssemblyVersion>7.0.0.0</AssemblyVersion>
+  <TargetFramework>net7.0</TargetFramework>
   <RootNamespace>Asp.Versioning</RootNamespace>
   <AssemblyTitle>ASP.NET Core API Versioning with OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core with OData v4.0.</Description>
@@ -14,22 +14,12 @@
   <FrameworkReference Include="Microsoft.AspNetCore.App" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-  <Compile Remove="net6.0\**\*.cs" />
-  <None Include="net6.0\**\*.cs" />
- </ItemGroup>
-
- <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-  <Compile Remove="netcoreapp3.1\**\*.cs" />
-  <None Include="netcoreapp3.1\**\*.cs" />
- </ItemGroup>
-
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNetCore.OData" Version="[8.0.2,9.0.0)" />
  </ItemGroup>
 
  <ItemGroup>
-   <ProjectReference Include="..\..\..\WebApi\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
+  <ProjectReference Include="..\..\..\WebApi\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
  </ItemGroup>
 
  <Import Project="..\..\..\..\Common\src\Common.OData\Common.OData.projitems" Label="Shared" />

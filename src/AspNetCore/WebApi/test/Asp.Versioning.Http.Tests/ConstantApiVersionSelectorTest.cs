@@ -3,9 +3,6 @@
 namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Http;
-#if NETCOREAPP3_1
-using DateOnly = System.DateTime;
-#endif
 
 public class ConstantApiVersionSelectorTest
 {
