@@ -444,7 +444,7 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         public bool Equals( GroupedApiVersionMetadata? other ) => other is not null && other.GetHashCode() == GetHashCode();
 
         /// <inheritdoc />
-        public override bool Equals( object? obj ) => obj is GroupedApiVersionMetadata other && Equals( other );
+        public override bool Equals( object? obj ) => Equals( obj as GroupedApiVersionMetadata );
 
         /// <inheritdoc />
         public override int GetHashCode()
