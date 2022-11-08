@@ -47,7 +47,7 @@ internal ref struct FormatWriter
 
     public int Written => totalWritten;
 
-    public void Write( ref FormatToken token )
+    public void Write( in FormatToken token )
     {
         if ( builder is null )
         {
@@ -97,7 +97,7 @@ internal ref struct FormatWriter
         }
     }
 
-    public void Write( in char ch )
+    public void Write( char ch )
     {
         if ( builder is null )
         {

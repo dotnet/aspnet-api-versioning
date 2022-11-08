@@ -73,11 +73,7 @@ public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<Ov
 
     [Theory]
     [InlineData( "api/v1/values/echo/42", OK )]
-#if NETCOREAPP3_1
-    [InlineData( "api/v2/values/echo/42", BadRequest )]
-#else
     [InlineData( "api/v2/values/echo/42", NotFound )]
-#endif
     public async Task then_route_with_same_score_and_different_versions_should_return_expected_status( string requestUri, HttpStatusCode statusCode )
     {
         // arrange

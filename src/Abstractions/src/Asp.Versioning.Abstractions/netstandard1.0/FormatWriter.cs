@@ -4,7 +4,7 @@ namespace Asp.Versioning;
 
 using System.Text;
 
-internal ref struct FormatWriter
+internal readonly ref struct FormatWriter
 {
     private readonly ApiVersionFormatProvider formatter;
     private readonly ApiVersion apiVersion;
@@ -23,7 +23,7 @@ internal ref struct FormatWriter
         this.provider = provider;
     }
 
-    public void Write( ref FormatToken token )
+    public void Write( in FormatToken token )
     {
         if ( token.IsLiteral )
         {
@@ -35,5 +35,5 @@ internal ref struct FormatWriter
         }
     }
 
-    public void Write( in char ch ) => builder.Append( ch );
+    public void Write( char ch ) => builder.Append( ch );
 }

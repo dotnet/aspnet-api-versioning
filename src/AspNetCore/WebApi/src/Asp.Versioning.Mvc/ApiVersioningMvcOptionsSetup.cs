@@ -23,7 +23,7 @@ public class ApiVersioningMvcOptionsSetup : IPostConfigureOptions<MvcOptions>
     public ApiVersioningMvcOptionsSetup( IOptions<ApiVersioningOptions> options ) => versioningOptions = options;
 
     /// <inheritdoc />
-    public virtual void PostConfigure( string name, MvcOptions options )
+    public virtual void PostConfigure( string? name, MvcOptions options )
     {
         if ( options == null )
         {

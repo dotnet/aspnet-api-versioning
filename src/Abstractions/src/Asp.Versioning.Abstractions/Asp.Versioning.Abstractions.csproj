@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
  
  <PropertyGroup>
-  <VersionPrefix>6.2.0</VersionPrefix>
-  <AssemblyVersion>6.2.0.0</AssemblyVersion>
-  <TargetFrameworks>netstandard1.0;netstandard2.0;net6.0</TargetFrameworks>
+  <VersionPrefix>7.0.0</VersionPrefix>
+  <AssemblyVersion>7.0.0.0</AssemblyVersion>
+  <TargetFrameworks>netstandard1.0;netstandard2.0;net7.0</TargetFrameworks>
   <AssemblyTitle>API Versioning Abstractions</AssemblyTitle>
   <Description>The abstractions library for API versioning.</Description>
   <RootNamespace>Asp.Versioning</RootNamespace>
@@ -11,8 +11,8 @@
  </PropertyGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-  <Compile Remove="netstandard2.0\**\*.cs;net6.0\**\*.cs" />
-  <None Include="netstandard2.0\**\*.cs;net6.0\**\*.cs" />
+  <Compile Remove="netstandard2.0\**\*.cs;net7.0\**\*.cs" />
+  <None Include="netstandard2.0\**\*.cs;net7.0\**\*.cs" />
   <Using Remove="System.Net.Http" />
  </ItemGroup>
 
@@ -22,15 +22,15 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-  <Compile Remove="net6.0\**\*.cs" />
-  <None Include="net6.0\**\*.cs" />
+  <Compile Remove="net7.0\**\*.cs" />
+  <None Include="net7.0\**\*.cs" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
   <Compile Include="$(BackportDir)Array.cs" Visible="false" />
  </ItemGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' ">
+ <ItemGroup Condition=" '$(TargetFramework)' != 'net7.0' ">
   <Compile Include="$(BackportDir)BitOperations.cs" Visible="false" />
   <Compile Include="$(BackportDir)HashCode.cs" Visible="false" />
  </ItemGroup>

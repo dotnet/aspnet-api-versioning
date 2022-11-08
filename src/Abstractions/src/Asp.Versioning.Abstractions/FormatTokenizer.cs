@@ -62,8 +62,7 @@ internal static class FormatTokenizer
             return;
         }
 
-        var token = new FormatToken( Str.Substring( format, start, length ), literal: true );
-        writer.Write( ref token );
+        writer.Write( new FormatToken( Str.Substring( format, start, length ), literal: true ) );
         length = 0;
     }
 
@@ -79,7 +78,7 @@ internal static class FormatTokenizer
         ref readonly var delimiter = ref format[i];
 #endif
 
-        EnsureCurrentLiteralSequenceTerminated( in format, ref writer, in i, ref length );
+        EnsureCurrentLiteralSequenceTerminated( format, ref writer, in i, ref length );
 
         if ( ++i >= format.Length )
         {
@@ -116,8 +115,7 @@ internal static class FormatTokenizer
             throw new FormatException( SR.InvalidFormatString );
         }
 
-        var token = new FormatToken( Str.Substring( format, start, length ), literal: true );
-        writer.Write( ref token );
+        writer.Write( new FormatToken( Str.Substring( format, start, length ), literal: true ) );
         length = 0;
     }
 
@@ -127,9 +125,8 @@ internal static class FormatTokenizer
         ref int i,
         ref int length )
     {
-        EnsureCurrentLiteralSequenceTerminated( in format, ref writer, in i, ref length );
-        var token = new FormatToken( Str.Substring( format, ++i, 1 ), literal: true );
-        writer.Write( ref token );
+        EnsureCurrentLiteralSequenceTerminated( format, ref writer, in i, ref length );
+        writer.Write( new FormatToken( Str.Substring( format, ++i, 1 ), literal: true ) );
         length = 0;
     }
 
@@ -139,7 +136,7 @@ internal static class FormatTokenizer
         ref int i,
         ref int length )
     {
-        EnsureCurrentLiteralSequenceTerminated( in format, ref writer, in i, ref length );
+        EnsureCurrentLiteralSequenceTerminated( format, ref writer, in i, ref length );
 
         var start = ++i;
         var end = start + 1;
@@ -153,10 +150,7 @@ internal static class FormatTokenizer
         }
 
         length = end - start;
-
-        var token = new FormatToken( Str.Substring( format, start, length ) );
-
-        writer.Write( ref token );
+        writer.Write( new FormatToken( Str.Substring( format, start, length ) ) );
         length = 0;
     }
 
@@ -166,7 +160,7 @@ internal static class FormatTokenizer
         ref int i,
         ref int length )
     {
-        EnsureCurrentLiteralSequenceTerminated( in format, ref writer, in i, ref length );
+        EnsureCurrentLiteralSequenceTerminated( format, ref writer, in i, ref length );
 
         var start = i;
 #if NETSTANDARD1_0
@@ -211,8 +205,7 @@ internal static class FormatTokenizer
             }
         }
 
-        var token = new FormatToken( Str.Substring( format, start, length ) );
-        writer.Write( ref token );
+        writer.Write( new FormatToken( Str.Substring( format, start, length ) ) );
         length = 0;
 
         if ( i != format.Length )
@@ -221,7 +214,7 @@ internal static class FormatTokenizer
         }
     }
 
-    internal static void Tokenize( Text format, ref FormatWriter writer )
+    internal static void Tokenize( in Text format, scoped ref FormatWriter writer )
     {
         var count = format.Length;
         var last = count - 1;
@@ -237,23 +230,23 @@ internal static class FormatTokenizer
 
             if ( IsLiteralDelimiter( ch ) )
             {
-                ConsumeLiteral( in format, ref writer, ref i, ref length );
+                ConsumeLiteral( format, ref writer, ref i, ref length );
             }
             else if ( ( ch == '\\' ) &&
                       ( i < last ) &&
                       IsEscapeSequence( Str.Substring( format, i, 2 ) ) )
             {
-                ConsumeEscapeSequence( in format, ref writer, ref i, ref length );
+                ConsumeEscapeSequence( format, ref writer, ref i, ref length );
             }
             else if ( ( ch == '%' ) &&
                       ( i < last ) &&
                       IsSingleCustomFormatSpecifier( Str.Substring( format, i, 2 ) ) )
             {
-                ConsumeSingleCustomFormat( in format, ref writer, ref i, ref length );
+                ConsumeSingleCustomFormat( format, ref writer, ref i, ref length );
             }
             else if ( IsFormatSpecifier( ch ) )
             {
-                ConsumeCustomFormat( in format, ref writer, ref i, ref length );
+                ConsumeCustomFormat( format, ref writer, ref i, ref length );
             }
             else
             {

@@ -5,7 +5,7 @@
          Condition="Exists($([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../')))"/>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.10" />
+  <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.11" />
  </ItemGroup>
 
 </Project>
