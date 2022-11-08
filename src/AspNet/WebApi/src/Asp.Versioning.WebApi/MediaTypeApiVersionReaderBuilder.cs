@@ -33,11 +33,11 @@ public partial class MediaTypeApiVersionReaderBuilder
         {
             var parser = new RouteParser();
             var parsedRoute = parser.Parse( template );
-            var parameters = from content in parsedRoute.PathSegments.OfType<IPathContentSegment>()
-                             from parameter in content.Subsegments.OfType<IPathParameterSubsegment>()
-                             select parameter;
+            var segments = from content in parsedRoute.PathSegments.OfType<IPathContentSegment>()
+                             from segment in content.Subsegments.OfType<IPathParameterSubsegment>()
+                             select segment;
 
-            if ( parameters.Count() > 1 )
+            if ( segments.Count() > 1 )
             {
                 var message = string.Format( CultureInfo.CurrentCulture, CommonSR.InvalidMediaTypeTemplate, template );
                 throw new ArgumentException( message, nameof( template ) );
