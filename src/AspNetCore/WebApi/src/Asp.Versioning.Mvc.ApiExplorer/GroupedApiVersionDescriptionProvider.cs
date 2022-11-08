@@ -441,10 +441,14 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         public string? GroupName { get; }
 
         /// <inheritdoc />
-        public bool Equals( GroupedApiVersionMetadata? other ) => other is not null && other.GetHashCode() == GetHashCode();
+        public bool Equals( GroupedApiVersionMetadata? other ) =>
+            other is not null && other.GetHashCode() == GetHashCode();
 
         /// <inheritdoc />
-        public override bool Equals( object? obj ) => Equals( obj as GroupedApiVersionMetadata );
+        public override bool Equals( object? obj ) =>
+            obj is not null &&
+            GetType().Equals( obj.GetType() ) &&
+            GetHashCode() == obj.GetHashCode();
 
         /// <inheritdoc />
         public override int GetHashCode()
