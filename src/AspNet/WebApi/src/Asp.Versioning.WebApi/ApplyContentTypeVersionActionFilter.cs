@@ -3,7 +3,6 @@
 namespace Asp.Versioning;
 
 using System.Net.Http.Headers;
-using System.Web.Http;
 using System.Web.Http.Filters;
 using static Asp.Versioning.ApiVersionParameterLocation;
 

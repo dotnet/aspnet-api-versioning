@@ -7,6 +7,7 @@ using Asp.Versioning.Controllers;
 using Asp.Versioning.Dispatcher;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
+using static Asp.Versioning.ApiVersionParameterLocation;
 
 /// <summary>
 /// Provides extension methods for the <see cref="HttpConfiguration"/> class.
@@ -79,9 +80,16 @@ public static class HttpConfigurationExtensions
             configuration.Filters.Add( new ReportApiVersionsAttribute() );
         }
 
-        if ( options.ApiVersionReader.VersionsByMediaType() )
+        var reader = options.ApiVersionReader;
+
+        if ( reader.VersionsByMediaType() )
         {
-            configuration.Filters.Add( new ApplyContentTypeVersionActionFilter( options.ApiVersionReader ) );
+            var parameterName = reader.GetParameterName( MediaTypeParameter );
+
+            if ( !string.IsNullOrEmpty( parameterName ) )
+            {
+                configuration.Filters.Add( new ApplyContentTypeVersionActionFilter( reader ) );
+            }
         }
 
         configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
