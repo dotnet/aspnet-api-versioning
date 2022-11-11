@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Options;
+using static Asp.Versioning.ApiVersionParameterLocation;
 
 /// <summary>
 /// Represents the API versioning configuration for ASP.NET Core <see cref="MvcOptions">MVC options</see>.
@@ -36,9 +37,16 @@ public class ApiVersioningMvcOptionsSetup : IPostConfigureOptions<MvcOptions>
             options.Filters.AddService<ReportApiVersionsAttribute>();
         }
 
-        if ( value.ApiVersionReader.VersionsByMediaType() )
+        var reader = value.ApiVersionReader;
+
+        if ( reader.VersionsByMediaType() )
         {
-            options.Filters.AddService<ApplyContentTypeVersionActionFilter>();
+            var parameterName = reader.GetParameterName( MediaTypeParameter );
+
+            if ( !string.IsNullOrEmpty( parameterName ) )
+            {
+                options.Filters.AddService<ApplyContentTypeVersionActionFilter>();
+            }
         }
 
         var modelMetadataDetailsProviders = options.ModelMetadataDetailsProviders;

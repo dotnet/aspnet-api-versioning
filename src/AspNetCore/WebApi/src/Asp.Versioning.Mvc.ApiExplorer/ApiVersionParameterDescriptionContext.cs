@@ -200,6 +200,11 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     /// <param name="name">The name of the media type parameter.</param>
     protected virtual void AddMediaTypeParameter( string name )
     {
+        if ( string.IsNullOrEmpty( name ) )
+        {
+            return;
+        }
+
         var requestFormats = ApiDescription.SupportedRequestFormats.ToArray();
         var responseTypes = ApiDescription.SupportedResponseTypes.ToArray();
         var parameter = $"{name}={ApiVersion}";
