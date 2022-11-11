@@ -1,1 +1,1 @@
-﻿
+﻿Fix MediaTypeApiVersionReaderBuilder.AddParameters (#904)
