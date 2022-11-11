@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using static Asp.Versioning.ApiVersionParameterLocation;
 
 /// <summary>
@@ -100,12 +101,17 @@ public static class IEndpointConventionBuilderExtensions
         if ( parameterSource.VersionsByMediaType() )
         {
             var parameterName = parameterSource.GetParameterName( MediaTypeParameter );
-            requestDelegate = EnsureRequestDelegate( requestDelegate, endpointBuilder.RequestDelegate );
-            requestDelegate = new ContentTypeApiVersionDecorator( requestDelegate, parameterName );
-            endpointBuilder.RequestDelegate = requestDelegate;
+
+            if ( !string.IsNullOrEmpty( parameterName ) )
+            {
+                requestDelegate = EnsureRequestDelegate( requestDelegate, endpointBuilder.RequestDelegate );
+                requestDelegate = new ContentTypeApiVersionDecorator( requestDelegate, parameterName );
+                endpointBuilder.RequestDelegate = requestDelegate;
+            }
         }
     }
 
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static RequestDelegate EnsureRequestDelegate( RequestDelegate? current, RequestDelegate? original ) =>
         ( current ?? original ) ??
         throw new InvalidOperationException(

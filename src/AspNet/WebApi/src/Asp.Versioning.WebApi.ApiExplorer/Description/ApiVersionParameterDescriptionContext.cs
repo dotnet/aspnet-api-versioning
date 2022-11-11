@@ -157,6 +157,11 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     /// <param name="name">The name of the media type parameter.</param>
     protected virtual void AddMediaTypeParameter( string name )
     {
+        if ( string.IsNullOrEmpty( name ) )
+        {
+            return;
+        }
+
         var parameter = new NameValueHeaderValue( name, ApiVersion.ToString() );
 
         CloneFormattersAndAddMediaTypeParameter( parameter, ApiDescription.SupportedRequestBodyFormatters );

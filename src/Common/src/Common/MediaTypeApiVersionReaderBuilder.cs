@@ -301,9 +301,16 @@ public partial class MediaTypeApiVersionReaderBuilder
                 throw new ArgumentNullException( nameof( context ) );
             }
 
-            for ( var i = 0; i < parameters.Count; i++ )
+            if ( parameters.Count == 0 )
             {
-                context.AddParameter( parameters[i], MediaTypeParameter );
+                context.AddParameter( name: string.Empty, MediaTypeParameter );
+            }
+            else
+            {
+                for ( var i = 0; i < parameters.Count; i++ )
+                {
+                    context.AddParameter( parameters[i], MediaTypeParameter );
+                }
             }
         }
 
@@ -427,7 +434,7 @@ public partial class MediaTypeApiVersionReaderBuilder
                         versions.Add( result[j] );
                     }
                 }
+            }
         }
-    }
     }
 }
