@@ -140,7 +140,7 @@ internal sealed class ODataRouteBuilderContext
 
     internal IList<ApiParameterDescription> ParameterDescriptions { get; }
 
-    internal ODataRouteTemplateGenerationKind RouteTemplateGeneration { get; } = Client;
+    internal ODataRouteTemplateGenerationKind RouteTemplateGeneration => Client;
 
     internal IEdmModel EdmModel { get; }
 

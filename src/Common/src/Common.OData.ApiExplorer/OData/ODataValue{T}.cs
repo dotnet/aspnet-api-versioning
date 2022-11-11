@@ -20,5 +20,9 @@ public class ODataValue<T>
     /// </summary>
     /// <value>The response content within "value".</value>
     [JsonProperty( "value" )]
+#if NETFRAMEWORK
     public T Value { get; set; } = default!;
+#else
+    required public T Value { get; set; }
+#endif
 }

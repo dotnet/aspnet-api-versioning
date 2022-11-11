@@ -18,5 +18,9 @@ public class ODataId
     /// </summary>
     /// <value>The <see cref="Uri">URL</see> representing the related entity identifier.</value>
     [JsonProperty( "@odata.id" )]
+#if NETFRAMEWORK
     public Uri Value { get; set; } = default!;
+#else
+    required public Uri Value { get; set; }
+#endif
 }

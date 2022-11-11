@@ -12,7 +12,7 @@ internal sealed class DoNotReportApiVersions : IReportApiVersions
 
     internal static IReportApiVersions Instance => instance ??= new();
 
-    public ApiVersionMapping Mapping { get; } = Explicit | Implicit;
+    public ApiVersionMapping Mapping => Explicit | Implicit;
 
     public void Report( HttpResponseMessage response, ApiVersionModel apiVersionModel ) { }
 }
