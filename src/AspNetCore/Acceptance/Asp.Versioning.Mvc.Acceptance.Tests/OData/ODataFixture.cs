@@ -25,7 +25,7 @@ public abstract class ODataFixture : HttpServerFixture
     }
 
     protected override void OnConfigureServices( IServiceCollection services ) =>
-        services.AddControllers().AddOData();
+        services.AddProblemDetails().AddControllers().AddOData();
 
     protected override void OnAddApiVersioning( IApiVersioningBuilder builder ) =>
         builder.AddOData( OnEnableOData );

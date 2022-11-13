@@ -86,7 +86,6 @@ public static partial class IServiceCollectionExtensions
 
         services.TryAddSingleton<IApiVersionSetBuilderFactory, DefaultApiVersionSetBuilderFactory>();
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
-        services.TryAddSingleton<IProblemDetailsFactory, DefaultProblemDetailsFactory>();
         services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
         services.Add( Singleton( sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
         services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector ) );
@@ -95,6 +94,7 @@ public static partial class IServiceCollectionExtensions
         services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
         services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
         services.Replace( WithLinkGeneratorDecorator( services ) );
+        TryAddProblemDetailsRfc7231Compliance( services );
     }
 
     // REF: https://github.com/dotnet/runtime/blob/master/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L125
@@ -156,5 +156,28 @@ public static partial class IServiceCollectionExtensions
 
             return Describe( typeof( LinkGenerator ), NewFactory, lifetime );
         }
+    }
+
+    private static void TryAddProblemDetailsRfc7231Compliance( IServiceCollection services )
+    {
+        var descriptor = services.FirstOrDefault( IsDefaultProblemDetailsWriter );
+
+        if ( descriptor == null )
+        {
+            return;
+        }
+
+        var decoratedType = descriptor.ImplementationType!;
+        var lifetime = descriptor.Lifetime;
+
+        services.Add( Describe( decoratedType, decoratedType, lifetime ) );
+        services.Replace( Describe( typeof( IProblemDetailsWriter ), sp => NewProblemDetailsWriter( sp, decoratedType ), lifetime ) );
+
+        static bool IsDefaultProblemDetailsWriter( ServiceDescriptor serviceDescriptor ) =>
+            serviceDescriptor.ServiceType == typeof( IProblemDetailsWriter ) &&
+            serviceDescriptor.ImplementationType?.FullName == "Microsoft.AspNetCore.Http.DefaultProblemDetailsWriter";
+
+        static Rfc7231ProblemDetailsWriter NewProblemDetailsWriter( IServiceProvider serviceProvider, Type decoratedType ) =>
+            new( (IProblemDetailsWriter) serviceProvider.GetRequiredService( decoratedType ) );
     }
 }

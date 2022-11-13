@@ -3,6 +3,7 @@
 namespace Microsoft.AspNetCore.Http;
 
 using Asp.Versioning;
+using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Provides extension methods for the <see cref="HttpContext"/> class.
@@ -42,4 +43,10 @@ public static class HttpContextExtensions
     /// API version is in an invalid format.</remarks>
     /// <exception cref="AmbiguousApiVersionException">Multiple, different API versions were requested.</exception>
     public static ApiVersion? GetRequestedApiVersion( this HttpContext context ) => context.ApiVersioningFeature().RequestedApiVersion;
+
+    internal static bool TryGetProblemDetailsService( this HttpContext context, [NotNullWhen( true )] out IProblemDetailsService? problemDetailsService )
+    {
+        problemDetailsService = context.RequestServices.GetService<IProblemDetailsService>();
+        return problemDetailsService is not null;
+    }
 }
