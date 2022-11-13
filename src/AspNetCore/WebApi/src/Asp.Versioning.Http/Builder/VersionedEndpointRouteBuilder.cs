@@ -60,7 +60,7 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
     private sealed class ServiceProviderDecorator : IServiceProvider
     {
         private readonly IServiceProvider decorated;
-        private ApiVersionSetBuilder versionSetBuilder;
+        private readonly ApiVersionSetBuilder versionSetBuilder;
         private ApiVersionSet? versionSet;
 
         internal ServiceProviderDecorator( IServiceProvider decorated, ApiVersionSetBuilder versionSetBuilder )
