@@ -1,7 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1034 // Nested types should not be visible
-
 namespace Asp.Versioning;
 
 /// <summary>

@@ -70,7 +70,6 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable( Transient<IActionDescriptorProvider, ApiVersionCollator>() );
         services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
         services.Replace( WithUrlHelperFactoryDecorator( services ) );
-        services.TryReplace( typeof( DefaultProblemDetailsFactory ), Singleton<IProblemDetailsFactory, MvcProblemDetailsFactory>() );
     }
 
     private static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
@@ -122,20 +121,6 @@ public static class IApiVersioningBuilderExtensions
         }
 
         return new DecoratedServiceDescriptor( typeof( IUrlHelperFactory ), NewFactory, lifetime );
-    }
-
-    private static void TryReplace( this IServiceCollection services, Type implementationType, ServiceDescriptor descriptor )
-    {
-        for ( var i = 0; i < services.Count; i++ )
-        {
-            var service = services[i];
-
-            if ( service.ServiceType == descriptor.ServiceType && descriptor.ImplementationType == implementationType )
-            {
-                services[i] = descriptor;
-                return;
-            }
-        }
     }
 
     private sealed class DecoratedServiceDescriptor : ServiceDescriptor

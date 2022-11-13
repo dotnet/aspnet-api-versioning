@@ -43,7 +43,14 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
         // arrange
         using var request = new HttpRequestMessage( Get, "api/values" )
         {
-            Headers = { Accept = { Parse( "application/json;v=3.0" ) } },
+            Headers =
+            {
+                Accept =
+                {
+                    Parse( "application/json;v=3.0" ),
+                    Parse( ProblemDetailsDefaults.MediaType.Json ),
+                },
+            },
         };
 
         // act

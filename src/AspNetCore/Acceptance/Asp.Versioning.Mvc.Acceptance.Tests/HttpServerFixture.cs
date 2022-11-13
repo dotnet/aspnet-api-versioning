@@ -1,7 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1056 // URI-like properties should not be strings
-
 namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Builder;
@@ -26,7 +24,7 @@ public abstract partial class HttpServerFixture
     protected virtual void OnConfigurePartManager( ApplicationPartManager partManager ) =>
         partManager.ApplicationParts.Add( new TestApplicationPart( FilteredControllerTypes ) );
 
-    protected virtual void OnConfigureServices( IServiceCollection services ) => services.AddControllers();
+    protected virtual void OnConfigureServices( IServiceCollection services ) => services.AddProblemDetails().AddControllers();
 
     protected virtual void OnAddMvcApiVersioning( MvcApiVersioningOptions options ) { }
 
