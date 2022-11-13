@@ -27,6 +27,11 @@ jobs:
         queries: security-and-quality
         languages: csharp
 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+
     # build a temporary *.slnf file that only contains source projects and put it in ~/obj
     # so that it is not tracked by git. then run 'dotnet build' using the *.slnf, which
     # will preserve the dependency order and configuration of the *.sln
