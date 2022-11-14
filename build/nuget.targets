@@ -30,7 +30,8 @@
 
   <PropertyGroup>
    <ReleaseNotesFile>$(MSBuildProjectDirectory)\ReleaseNotes.txt</ReleaseNotesFile>
-   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' ">$(PackageVersion.Substring(0,$(PackageVersion.LastIndexOf('.')))).0</GitHubReleaseTag>
+   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' AND '$(PackageVersion.IndexOf(`-`))' == '-1' ">$(PackageVersion.Substring(0,$(PackageVersion.LastIndexOf('.')))).0</GitHubReleaseTag>
+   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' ">$(PackageVersion)</GitHubReleaseTag>
    <PackageReleaseNotes>https://github.com/dotnet/aspnet-api-versioning/releases/tag/v$(GitHubReleaseTag)</PackageReleaseNotes>
   </PropertyGroup>
 
