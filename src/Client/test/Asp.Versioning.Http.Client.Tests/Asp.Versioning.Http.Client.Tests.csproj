@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>net6.0;net452;net472</TargetFrameworks>
+  <TargetFrameworks>net7.0;net452;net472</TargetFrameworks>
   <RootNamespace>Asp.Versioning.Http</RootNamespace>
  </PropertyGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-  <Compile Remove="net6.0\**\*.cs" />
-  <None Include="net6.0\**\*.cs" />
+  <Compile Remove="net7.0\**\*.cs" />
+  <None Include="net7.0\**\*.cs" />
  </ItemGroup>
 
  <ItemGroup Condition="'$(TargetFramework)' != 'net452'">
