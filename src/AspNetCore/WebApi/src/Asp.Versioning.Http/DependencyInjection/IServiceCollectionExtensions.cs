@@ -84,7 +84,6 @@ public static partial class IServiceCollectionExtensions
             throw new ArgumentNullException( nameof( services ) );
         }
 
-        services.TryAddSingleton<IApiVersionSetBuilderFactory, DefaultApiVersionSetBuilderFactory>();
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
         services.Add( Singleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );
         services.Add( Singleton( sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader ) );

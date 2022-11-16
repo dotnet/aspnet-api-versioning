@@ -27,9 +27,9 @@ public static class IEndpointRouteBuilderExtensions
             throw new ArgumentNullException( nameof( endpoints ) );
         }
 
-        var factory = endpoints.ServiceProvider.GetRequiredService<IApiVersionSetBuilderFactory>();
+        var create = endpoints.ServiceProvider.GetService<ApiVersionSetBuilderFactory>();
 
-        return factory.Create( name );
+        return create is null ? new ApiVersionSetBuilder( name ) : create( name );
     }
 
     /// <summary>
@@ -52,11 +52,9 @@ public static class IEndpointRouteBuilderExtensions
             throw new InvalidOperationException( SR.CannotNestVersionSet );
         }
 
-        var factory = builder.ServiceProvider.GetRequiredService<IApiVersionSetBuilderFactory>();
-
         builder.Finally( EndpointBuilderFinalizer.FinalizeRoutes );
 
-        return new VersionedEndpointRouteBuilder( builder, builder, factory.Create( name ) );
+        return builder.NewVersionedEndpointRouteBuilder( builder, builder, name );
     }
 
     /// <summary>
@@ -79,11 +77,25 @@ public static class IEndpointRouteBuilderExtensions
 
         var group = builder.MapGroup( string.Empty );
         IEndpointConventionBuilder convention = group;
-        var factory = builder.ServiceProvider.GetRequiredService<IApiVersionSetBuilderFactory>();
 
         convention.Finally( EndpointBuilderFinalizer.FinalizeRoutes );
 
-        return new VersionedEndpointRouteBuilder( group, group, factory.Create( name ) );
+        return builder.NewVersionedEndpointRouteBuilder( group, group, name );
+    }
+
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static IVersionedEndpointRouteBuilder NewVersionedEndpointRouteBuilder(
+        this IEndpointRouteBuilder builder,
+        IEndpointRouteBuilder routeBuilder,
+        IEndpointConventionBuilder conventionBuilder,
+        string? name )
+    {
+        var create = builder.ServiceProvider.GetService<VersionedEndpointRouteBuilderFactory>();
+        var versionSet = builder.NewApiVersionSet( name );
+
+        return create is null ?
+               new VersionedEndpointRouteBuilder( routeBuilder, conventionBuilder, versionSet ) :
+               create( routeBuilder, conventionBuilder, versionSet );
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
