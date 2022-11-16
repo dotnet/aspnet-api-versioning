@@ -32,7 +32,7 @@ public static class IEndpointConventionBuilderExtensions
             throw new ArgumentNullException( nameof( apiVersionSet ) );
         }
 
-        builder.Add( endpoint => AddWithValidation( endpoint, apiVersionSet ) );
+        builder.Add( endpoint => AddMetadata( endpoint, apiVersionSet ) );
         builder.Finally( EndpointBuilderFinalizer.FinalizeEndpoints );
 
         return builder;
@@ -393,7 +393,7 @@ public static class IEndpointConventionBuilderExtensions
         return builder;
     }
 
-    private static void AddWithValidation( EndpointBuilder builder, ApiVersionSet versionSet )
+    private static void AddMetadata( EndpointBuilder builder, ApiVersionSet versionSet )
     {
         var metadata = builder.Metadata;
         var grouped = builder.ApplicationServices.GetService( typeof( ApiVersionSetBuilder ) ) is not null;
@@ -412,30 +412,6 @@ public static class IEndpointConventionBuilderExtensions
         }
 
         metadata.Add( versionSet );
-    }
-
-    private static void AdvertiseInApiVersionSet( IList<object> metadata, ApiVersion apiVersion )
-    {
-        for ( var i = metadata.Count - 1; i >= 0; i-- )
-        {
-            if ( metadata[i] is ApiVersionSet versionSet )
-            {
-                versionSet.AdvertisesApiVersion( apiVersion );
-                break;
-            }
-        }
-    }
-
-    private static void AdvertiseDeprecatedInApiVersionSet( IList<object> metadata, ApiVersion apiVersion )
-    {
-        for ( var i = metadata.Count - 1; i >= 0; i-- )
-        {
-            if ( metadata[i] is ApiVersionSet versionSet )
-            {
-                versionSet.AdvertisesDeprecatedApiVersion( apiVersion );
-                break;
-            }
-        }
     }
 
     private static void AddMetadata( EndpointBuilder builder, object item )
@@ -465,6 +441,30 @@ public static class IEndpointConventionBuilderExtensions
                 builder.DisplayName,
                 nameof( IEndpointRouteBuilderExtensions.MapApiGroup ),
                 nameof( IEndpointRouteBuilderExtensions.WithApiVersionSet ) ) );
+    }
+
+    private static void AdvertiseInApiVersionSet( IList<object> metadata, ApiVersion apiVersion )
+    {
+        for ( var i = metadata.Count - 1; i >= 0; i-- )
+        {
+            if ( metadata[i] is ApiVersionSet versionSet )
+            {
+                versionSet.AdvertisesApiVersion( apiVersion );
+                break;
+            }
+        }
+    }
+
+    private static void AdvertiseDeprecatedInApiVersionSet( IList<object> metadata, ApiVersion apiVersion )
+    {
+        for ( var i = metadata.Count - 1; i >= 0; i-- )
+        {
+            if ( metadata[i] is ApiVersionSet versionSet )
+            {
+                versionSet.AdvertisesDeprecatedApiVersion( apiVersion );
+                break;
+            }
+        }
     }
 
     private sealed class SingleItemReadOnlyList : IReadOnlyList<ApiVersion>

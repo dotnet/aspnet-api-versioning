@@ -32,7 +32,7 @@ internal static class EndpointBuilderFinalizer
     {
         if ( versionSet is null )
         {
-            // this should be impossible because WithApiVersionSet had to be called to get here
+            // this could only happen if the ApiVersionSet was removed elsewhere from the metadata
             endpointBuilder.Metadata.Add( ApiVersionMetadata.Empty );
             return;
         }
@@ -56,7 +56,7 @@ internal static class EndpointBuilderFinalizer
             endpointBuilder.RequestDelegate = requestDelegate;
         }
 
-        var parameterSource = endpointBuilder.ApplicationServices.GetRequiredService<IApiVersionParameterSource>();
+        var parameterSource = services.GetRequiredService<IApiVersionParameterSource>();
 
         if ( parameterSource.VersionsByMediaType() )
         {
@@ -122,10 +122,10 @@ internal static class EndpointBuilderFinalizer
     {
         for ( var i = metadata.Count - 1; i >= 0; i-- )
         {
-            if ( metadata[i] is ApiVersionSet set )
+            if ( metadata[i] is ApiVersionSet versionSet )
             {
                 metadata.RemoveAt( i );
-                return set;
+                return versionSet;
             }
         }
 
