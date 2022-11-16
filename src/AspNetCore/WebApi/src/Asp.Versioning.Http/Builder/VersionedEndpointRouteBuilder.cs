@@ -46,7 +46,8 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
     protected ApiVersionSetBuilder VersionSetBuilder { get; }
 
     /// <inheritdoc />
-    public virtual IApplicationBuilder CreateApplicationBuilder() => routeBuilder.CreateApplicationBuilder();
+    public virtual IApplicationBuilder CreateApplicationBuilder() =>
+        routeBuilder.CreateApplicationBuilder();
 
     /// <inheritdoc />
     public virtual IServiceProvider ServiceProvider => serviceProvider;
@@ -55,7 +56,8 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
     public virtual ICollection<EndpointDataSource> DataSources => dataSources;
 
     /// <inheritdoc />
-    public virtual void Add( Action<EndpointBuilder> convention ) => conventionBuilder.Add( convention );
+    public virtual void Add( Action<EndpointBuilder> convention ) =>
+        conventionBuilder.Add( convention );
 
     private sealed class ServiceProviderDecorator : IServiceProvider
     {
@@ -63,7 +65,9 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
         private readonly ApiVersionSetBuilder versionSetBuilder;
         private ApiVersionSet? versionSet;
 
-        internal ServiceProviderDecorator( IServiceProvider decorated, ApiVersionSetBuilder versionSetBuilder )
+        internal ServiceProviderDecorator(
+            IServiceProvider decorated,
+            ApiVersionSetBuilder versionSetBuilder )
         {
             this.decorated = decorated;
             this.versionSetBuilder = versionSetBuilder;
@@ -71,14 +75,14 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
 
         public object? GetService( Type serviceType )
         {
-            if ( typeof( ApiVersionSet ).Equals( serviceType ) )
-            {
-                return versionSet ??= versionSetBuilder.Build();
-            }
-
             if ( typeof( ApiVersionSetBuilder ).Equals( serviceType ) )
             {
                 return versionSetBuilder;
+            }
+
+            if ( typeof( ApiVersionSet ).Equals( serviceType ) )
+            {
+                return versionSet ??= versionSetBuilder.Build();
             }
 
             return decorated.GetService( serviceType );
@@ -90,7 +94,9 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
         private readonly EndpointDataSource decorated;
         private readonly ApiVersionSetBuilder versionSetBuilder;
 
-        internal EndpointDataSourceDecorator( EndpointDataSource decorated, ApiVersionSetBuilder versionSetBuilder )
+        internal EndpointDataSourceDecorator(
+            EndpointDataSource decorated,
+            ApiVersionSetBuilder versionSetBuilder )
         {
             this.decorated = decorated;
             this.versionSetBuilder = versionSetBuilder;
@@ -104,14 +110,16 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
         {
             CollateGroupApiVersions();
 
-            // HACK: we don't have a way to pass the version set for the group down to each convention so
-            // decorate the service provider to allow it to be resolved. this requires rebuilding the
-            // current context as well.
+            // HACK: we don't have a way to pass the version set for the group down
+            // to each convention so decorate the service provider to allow it to
+            // be resolved. this requires rebuilding the current context as well.
             if ( context.ApplicationServices is not ServiceProviderDecorator )
             {
                 context = new()
                 {
-                    ApplicationServices = new ServiceProviderDecorator( context.ApplicationServices, versionSetBuilder ),
+                    ApplicationServices = new ServiceProviderDecorator(
+                        context.ApplicationServices,
+                        versionSetBuilder ),
                     Conventions = context.Conventions,
                     FinallyConventions = context.FinallyConventions,
                     Prefix = context.Prefix,
@@ -121,7 +129,8 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
             return decorated.GetGroupedEndpoints( context );
         }
 
-        public override bool Equals( object? obj ) => ReferenceEquals( this, obj ) || ReferenceEquals( decorated, obj );
+        public override bool Equals( object? obj ) =>
+            ReferenceEquals( this, obj ) || ReferenceEquals( decorated, obj );
 
         public override int GetHashCode() => decorated.GetHashCode();
 
@@ -190,7 +199,8 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
 
         public bool Contains( EndpointDataSource item ) => adapted.Contains( item );
 
-        public void CopyTo( EndpointDataSource[] array, int arrayIndex ) => adapted.CopyTo( array, arrayIndex );
+        public void CopyTo( EndpointDataSource[] array, int arrayIndex ) =>
+            adapted.CopyTo( array, arrayIndex );
 
         public IEnumerator<EndpointDataSource> GetEnumerator() => adapted.GetEnumerator();
 
