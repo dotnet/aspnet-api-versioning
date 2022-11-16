@@ -120,18 +120,16 @@ internal static class EndpointBuilderFinalizer
 
     private static ApiVersionSet? GetApiVersionSet( IList<object> metadata )
     {
-        var result = default( ApiVersionSet );
-
         for ( var i = metadata.Count - 1; i >= 0; i-- )
         {
             if ( metadata[i] is ApiVersionSet set )
             {
-                result ??= set;
                 metadata.RemoveAt( i );
+                return set;
             }
         }
 
-        return result;
+        return default;
     }
 
     private static bool TryGetApiVersions( IList<object> metadata, out ApiVersionBuckets buckets )

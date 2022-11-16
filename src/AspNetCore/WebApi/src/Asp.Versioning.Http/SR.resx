@@ -129,6 +129,9 @@
   <data name="ConventionAddedAfterEndpointBuilt" xml:space="preserve">
     <value>Conventions cannot be added after building the endpoint.</value>
   </data>
+  <data name="MultipleVersionSets" xml:space="preserve">
+    <value>An endpoint cannot apply multiple API version sets.</value>
+  </data>
   <data name="NoVersionSet" xml:space="preserve">
     <value>The endpoint '{0}' does not have an associated API version set. Are you missing a call to {1} or {2}.</value>
   </data>

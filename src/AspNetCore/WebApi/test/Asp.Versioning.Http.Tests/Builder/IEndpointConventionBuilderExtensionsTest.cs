@@ -6,6 +6,7 @@ using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using static Asp.Versioning.ApiVersionProviderOptions;
 
@@ -249,6 +250,56 @@ public class IEndpointConventionBuilderExtensionsTest
                     .Single()
                     .Should()
                     .BeEquivalentTo( ApiVersionMetadata.Neutral );
+    }
+
+    [Fact]
+    public void with_api_version_set_should_not_be_allowed_multiple_times()
+    {
+        // arrange
+        var builder = WebApplication.CreateBuilder();
+        var services = builder.Services;
+
+        services.AddControllers();
+        services.AddApiVersioning();
+
+        var app = builder.Build();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
+        var get = app.MapGet( "/", () => Results.Ok() );
+        IEndpointRouteBuilder endpoints = app;
+
+        get.WithApiVersionSet( versionSet );
+        get.WithApiVersionSet( versionSet );
+
+        // act
+        var build = () => endpoints.DataSources.Single().Endpoints;
+
+        // assert
+        build.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void with_api_version_set_should_not_override_existing_metadata()
+    {
+        // arrange
+        var builder = WebApplication.CreateBuilder();
+        var services = builder.Services;
+
+        services.AddControllers();
+        services.AddApiVersioning();
+
+        var app = builder.Build();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
+        var group = app.MapApiGroup();
+        var get = group.MapGet( "/", () => Results.Ok() );
+        IEndpointRouteBuilder endpoints = app;
+
+        get.WithApiVersionSet( versionSet );
+
+        // act
+        var build = () => endpoints.DataSources.Single().Endpoints;
+
+        // assert
+        build.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
@@ -694,11 +745,6 @@ public class IEndpointConventionBuilderExtensionsTest
             if ( typeof( IApiVersionParameterSource ) == serviceType )
             {
                 return options.Value.ApiVersionReader;
-            }
-
-            if ( typeof( IApiVersionSetBuilderFactory ) == serviceType )
-            {
-                return new DefaultApiVersionSetBuilderFactory();
             }
 
             return null;
