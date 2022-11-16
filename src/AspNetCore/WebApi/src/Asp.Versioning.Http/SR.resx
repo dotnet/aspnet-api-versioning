@@ -120,8 +120,17 @@
   <data name="ApiVersionUnspecified" xml:space="preserve">
     <value>An API version is required, but was not specified.</value>
   </data>
+  <data name="CannotNestApiGroup" xml:space="preserve">
+    <value>An API group cannot be mapped as a nested group.</value>
+  </data>
+  <data name="CannotNestVersionSet" xml:space="preserve">
+    <value>A grouped API version set cannot be nested under another group.</value>
+  </data>
   <data name="ConventionAddedAfterEndpointBuilt" xml:space="preserve">
     <value>Conventions cannot be added after building the endpoint.</value>
+  </data>
+  <data name="NoVersionSet" xml:space="preserve">
+    <value>The endpoint '{0}' does not have an associated API version set. Are you missing a call to {1} or {2}.</value>
   </data>
   <data name="RequestTypeUnconfigured" xml:space="preserve">
     <value>The request type was not configured.</value>
