@@ -97,6 +97,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An endpoint cannot apply multiple API version sets..
+        /// </summary>
+        internal static string MultipleVersionSets {
+            get {
+                return ResourceManager.GetString("MultipleVersionSets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The endpoint &apos;{0}&apos; does not have an associated API version set. Are you missing a call to {1} or {2}..
         /// </summary>
         internal static string NoVersionSet {

@@ -32,7 +32,7 @@ public static class IEndpointConventionBuilderExtensions
             throw new ArgumentNullException( nameof( apiVersionSet ) );
         }
 
-        builder.Add( endpoint => endpoint.Metadata.Add( apiVersionSet ) );
+        builder.Add( endpoint => AddWithValidation( endpoint, apiVersionSet ) );
         builder.Finally( EndpointBuilderFinalizer.FinalizeEndpoints );
 
         return builder;
@@ -391,6 +391,27 @@ public static class IEndpointConventionBuilderExtensions
     {
         builder.Add( endpoint => AddMetadata( endpoint, Convention.ReportApiVersions ) );
         return builder;
+    }
+
+    private static void AddWithValidation( EndpointBuilder builder, ApiVersionSet versionSet )
+    {
+        var metadata = builder.Metadata;
+        var grouped = builder.ApplicationServices.GetService( typeof( ApiVersionSetBuilder ) ) is not null;
+
+        if ( grouped )
+        {
+            throw new InvalidOperationException( SR.MultipleVersionSets );
+        }
+
+        for ( var i = 0; i < metadata.Count; i++ )
+        {
+            if ( metadata[i] is ApiVersionSet )
+            {
+                throw new InvalidOperationException( SR.MultipleVersionSets );
+            }
+        }
+
+        metadata.Add( versionSet );
     }
 
     private static void AdvertiseInApiVersionSet( IList<object> metadata, ApiVersion apiVersion )
