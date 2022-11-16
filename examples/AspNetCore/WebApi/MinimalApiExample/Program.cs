@@ -17,10 +17,10 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-var forecast = app.MapGroup( "/weatherforecast" ).WithApiVersionSet();
+var forecast = app.MapApiGroup();
 
 // GET /weatherforecast?api-version=1.0
-forecast.MapGet( "/", () =>
+forecast.MapGet( "/weatherforecast", () =>
          {
              return Enumerable.Range( 1, 5 ).Select( index =>
                  new WeatherForecast
@@ -33,24 +33,25 @@ forecast.MapGet( "/", () =>
         .HasApiVersion( 1.0 );
 
 // GET /weatherforecast?api-version=2.0
-forecast.MapGet( "/", () =>
-         {
-             return Enumerable.Range( 0, summaries.Length ).Select( index =>
-                 new WeatherForecast
-                 (
-                     DateTime.Now.AddDays( index ),
-                     Random.Shared.Next( -20, 55 ),
-                     summaries[Random.Shared.Next( summaries.Length )]
-                 ) );
-         } )
-        .HasApiVersion( 2.0 );
+var v2 = forecast.MapGroup( "/weatherforecast" )
+                 .HasApiVersion( 2.0 );
+
+v2.MapGet( "/", () =>
+   {
+       return Enumerable.Range( 0, summaries.Length ).Select( index =>
+           new WeatherForecast
+           (
+               DateTime.Now.AddDays( index ),
+               Random.Shared.Next( -20, 55 ),
+               summaries[Random.Shared.Next( summaries.Length )]
+           ) );
+   } );
 
 // POST /weatherforecast?api-version=2.0
-forecast.MapPost( "/", ( WeatherForecast forecast ) => { } )
-        .HasApiVersion( 2.0 );
+v2.MapPost( "/", ( WeatherForecast forecast ) => Results.Ok() );
 
 // DELETE /weatherforecast
-forecast.MapDelete( "/", () => Results.NoContent() )
+forecast.MapDelete( "/weatherforecast", () => Results.NoContent() )
         .IsApiVersionNeutral();
 
 app.Run();

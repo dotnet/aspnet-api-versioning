@@ -70,11 +70,38 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An API group cannot be mapped as a nested group..
+        /// </summary>
+        internal static string CannotNestApiGroup {
+            get {
+                return ResourceManager.GetString("CannotNestApiGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A grouped API version set cannot be nested under another group..
+        /// </summary>
+        internal static string CannotNestVersionSet {
+            get {
+                return ResourceManager.GetString("CannotNestVersionSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Conventions cannot be added after building the endpoint..
         /// </summary>
         internal static string ConventionAddedAfterEndpointBuilt {
             get {
                 return ResourceManager.GetString("ConventionAddedAfterEndpointBuilt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The endpoint &apos;{0}&apos; does not have an associated API version set. Are you missing a call to {1} or {2}..
+        /// </summary>
+        internal static string NoVersionSet {
+            get {
+                return ResourceManager.GetString("NoVersionSet", resourceCulture);
             }
         }
         

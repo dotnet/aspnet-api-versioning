@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using static Asp.Versioning.ApiVersionProviderOptions;
 
 public class IEndpointConventionBuilderExtensionsTest
 {
@@ -248,6 +249,435 @@ public class IEndpointConventionBuilderExtensionsTest
                     .Single()
                     .Should()
                     .BeEquivalentTo( ApiVersionMetadata.Neutral );
+    }
+
+    [Fact]
+    public void report_api_versions_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var reportApiVersions = default( IReportApiVersions );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       reportApiVersions = endpoint.Metadata.OfType<IReportApiVersions>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.ReportApiVersions();
+
+        // assert
+        reportApiVersions.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void is_api_version_neutral_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var versionNeutral = default( IApiVersionNeutral );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       versionNeutral = endpoint.Metadata.OfType<IApiVersionNeutral>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.IsApiVersionNeutral();
+
+        // assert
+        versionNeutral.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void has_api_version_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var provider = default( IApiVersionProvider );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.HasApiVersion( 1.0 );
+
+        // assert
+        provider.Should().BeEquivalentTo(
+            new
+            {
+                Options = None,
+                Versions = new[] { new ApiVersion( 1.0 ) },
+            } );
+    }
+
+    [Fact]
+    public void has_api_version_should_propagate_to_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.HasApiVersion( 1.0 );
+
+        // assert
+        versionSet.Build( new() ).SupportedApiVersions.Single().Should().Be( new ApiVersion( 1.0 ) );
+    }
+
+    [Fact]
+    public void has_deprecated_api_version_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var provider = default( IApiVersionProvider );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.HasDeprecatedApiVersion( 0.9 );
+
+        // assert
+        provider.Should().BeEquivalentTo(
+            new
+            {
+                Options = Deprecated,
+                Versions = new[] { new ApiVersion( 0.9 ) },
+            } );
+    }
+
+    [Fact]
+    public void has_deprecated_api_version_should_propagate_to_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.HasDeprecatedApiVersion( 0.9 );
+
+        // assert
+        versionSet.Build( new() ).DeprecatedApiVersions.Single().Should().Be( new ApiVersion( 0.9 ) );
+    }
+
+    [Fact]
+    public void advertises_api_version_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var provider = default( IApiVersionProvider );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.AdvertisesApiVersion( 42.0 );
+
+        // assert
+        provider.Should().BeEquivalentTo(
+            new
+            {
+                Options = Advertised,
+                Versions = new[] { new ApiVersion( 42.0 ) },
+            } );
+    }
+
+    [Fact]
+    public void advertises_api_version_should_propagate_to_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.AdvertisesApiVersion( 42.0 );
+
+        // assert
+        versionSet.Build( new() ).SupportedApiVersions.Single().Should().Be( new ApiVersion( 42.0 ) );
+    }
+
+    [Fact]
+    public void advertises_deprecated_api_version_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var provider = default( IApiVersionProvider );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.AdvertisesDeprecatedApiVersion( 42.0, "rc" );
+
+        // assert
+        provider.Should().BeEquivalentTo(
+            new
+            {
+                Options = Advertised | Deprecated,
+                Versions = new[] { new ApiVersion( 42.0, "rc" ) },
+            } );
+    }
+
+    [Fact]
+    public void advertises_deprecated_api_version_should_propagate_to_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var versionSet = new ApiVersionSetBuilder( default ).Build();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.AdvertisesDeprecatedApiVersion( 42.0, "rc" );
+
+        // assert
+        versionSet.Build( new() ).DeprecatedApiVersions.Single().Should().Be( new ApiVersion( 42.0, "rc" ) );
+    }
+
+    [Fact]
+    public void map_to_api_version_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var provider = default( IApiVersionProvider );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        route.MapToApiVersion( 2.0 );
+
+        // assert
+        provider.Should().BeEquivalentTo(
+            new
+            {
+                Options = Mapped,
+                Versions = new[] { new ApiVersion( 2.0 ) },
+            } );
+    }
+
+    [Fact]
+    public void map_to_api_version_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var mapToApiVersion = () => route.MapToApiVersion( 2.0 );
+
+        // assert
+        mapToApiVersion.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void has_api_version_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var hasApiVersion = () => route.HasApiVersion( 2.0 );
+
+        // assert
+        hasApiVersion.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void has_deprecated_api_version_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var hasDeprecatedApiVersion = () => route.HasDeprecatedApiVersion( 2.0 );
+
+        // assert
+        hasDeprecatedApiVersion.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void advertises_api_version_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var advertisesApiVersion = () => route.AdvertisesApiVersion( 2.0 );
+
+        // assert
+        advertisesApiVersion.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void advertises_deprecated_api_version_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var advertisesDeprecatedApiVersion = () => route.AdvertisesDeprecatedApiVersion( 2.0 );
+
+        // assert
+        advertisesDeprecatedApiVersion.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void is_api_version_neutral_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var isApiVersionNeutral = () => route.IsApiVersionNeutral();
+
+        // assert
+        isApiVersionNeutral.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void reports_api_versions_should_throw_exception_without_version_set()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
+
+        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+
+        // act
+        var reportsApiVersions = () => route.ReportApiVersions();
+
+        // assert
+        reportsApiVersions.Should().Throw<InvalidOperationException>();
     }
 
     private sealed class MockServiceProvider : IServiceProvider

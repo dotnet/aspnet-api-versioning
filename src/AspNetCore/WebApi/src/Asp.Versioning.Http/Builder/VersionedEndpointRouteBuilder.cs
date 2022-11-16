@@ -76,6 +76,11 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
                 return versionSet ??= versionSetBuilder.Build();
             }
 
+            if ( typeof( ApiVersionSetBuilder ).Equals( serviceType ) )
+            {
+                return versionSetBuilder;
+            }
+
             return decorated.GetService( serviceType );
         }
     }
@@ -152,7 +157,7 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
 
                     for ( var k = 0; k < versions.Count; k++ )
                     {
-                        add( versions[i] );
+                        add( versions[k] );
                     }
                 }
             }
