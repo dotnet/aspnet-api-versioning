@@ -62,6 +62,7 @@ public static class IApiVersioningBuilderExtensions
 
     private static void AddServices( IServiceCollection services )
     {
+        services.AddMvcCore();
         services.TryAddSingleton<IOptionsFactory<MvcApiVersioningOptions>, MvcApiVersioningOptionsFactory<MvcApiVersioningOptions>>();
         services.TryAddSingleton<IControllerNameConvention, DefaultControllerNameConvention>();
         services.TryAddSingleton<IApiVersionConventionBuilder>( sp => new ApiVersionConventionBuilder( sp.GetRequiredService<IControllerNameConvention>() ) );

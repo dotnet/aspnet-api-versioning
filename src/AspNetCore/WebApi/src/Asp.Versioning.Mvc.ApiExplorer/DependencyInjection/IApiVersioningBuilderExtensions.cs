@@ -31,7 +31,7 @@ public static class IApiVersioningBuilderExtensions
             throw new ArgumentNullException( nameof( builder ) );
         }
 
-        AddApiExplorerServices( builder.Services );
+        AddApiExplorerServices( builder );
         return builder;
     }
 
@@ -48,18 +48,17 @@ public static class IApiVersioningBuilderExtensions
             throw new ArgumentNullException( nameof( builder ) );
         }
 
-        var services = builder.Services;
-        AddApiExplorerServices( services );
-        services.Configure( setupAction );
+        AddApiExplorerServices( builder );
+        builder.Services.Configure( setupAction );
+
         return builder;
     }
 
-    private static void AddApiExplorerServices( IServiceCollection services )
+    private static void AddApiExplorerServices( IApiVersioningBuilder builder )
     {
-        if ( services == null )
-        {
-            throw new ArgumentNullException( nameof( services ) );
-        }
+        builder.AddMvc();
+
+        var services = builder.Services;
 
         services.AddMvcCore().AddApiExplorer();
         services.TryAddSingleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>();
