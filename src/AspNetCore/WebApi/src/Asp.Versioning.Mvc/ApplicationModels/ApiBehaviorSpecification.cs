@@ -3,6 +3,7 @@
 namespace Asp.Versioning.ApplicationModels;
 
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Reflection;
 
 /// <summary>
@@ -11,17 +12,22 @@ using System.Reflection;
 [CLSCompliant( false )]
 public sealed class ApiBehaviorSpecification : IApiControllerSpecification
 {
-    static ApiBehaviorSpecification()
-    {
-        const string ApiBehaviorApplicationModelProviderTypeName = "Microsoft.AspNetCore.Mvc.ApplicationModels.ApiBehaviorApplicationModelProvider, Microsoft.AspNetCore.Mvc.Core";
-        var type = Type.GetType( ApiBehaviorApplicationModelProviderTypeName, throwOnError: true )!;
-        var method = type.GetRuntimeMethods().Single( m => m.Name == "IsApiController" );
-
-        IsApiController = (Func<ControllerModel, bool>) method.CreateDelegate( typeof( Func<ControllerModel, bool> ) );
-    }
-
-    private static Func<ControllerModel, bool> IsApiController { get; }
-
     /// <inheritdoc />
-    public bool IsSatisfiedBy( ControllerModel controller ) => IsApiController( controller );
+    public bool IsSatisfiedBy( ControllerModel controller )
+    {
+        if ( controller == null )
+        {
+            throw new ArgumentNullException( nameof( controller ) );
+        }
+
+        // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ApiBehaviorApplicationModelProvider.cs
+        if ( controller.Attributes.OfType<IApiBehaviorMetadata>().Any() )
+        {
+            return true;
+        }
+
+        var assembly = controller.ControllerType.Assembly;
+
+        return assembly.GetCustomAttributes().OfType<IApiBehaviorMetadata>().Any();
+    }
 }
