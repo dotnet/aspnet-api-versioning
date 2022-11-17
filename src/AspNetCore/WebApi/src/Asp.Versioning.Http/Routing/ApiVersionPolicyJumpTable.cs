@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
 {
     private readonly bool versionsByUrl;
+    private readonly bool versionsByUrlOnly;
     private readonly bool versionsByMediaTypeOnly;
     private readonly RouteDestination rejection;
     private readonly IReadOnlyDictionary<ApiVersion, int> destinations;
@@ -32,6 +33,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
         this.parser = parser;
         this.options = options;
         versionsByUrl = routePatterns.Count > 0;
+        versionsByUrlOnly = source.VersionsByUrl( allowMultipleLocations: false );
         versionsByMediaTypeOnly = source.VersionsByMediaType( allowMultipleLocations: false );
     }
 
@@ -61,15 +63,18 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                     return destination;
                 }
 
-                // 2. short-circuit if a default version cannot be assumed
-                if ( !options.AssumeDefaultVersionWhenUnspecified )
+                // 2. IApiVersionSelector cannot be used yet because there are no candidates that an
+                //    aggregated version model can be computed from to select the 'default' API version
+                if ( options.AssumeDefaultVersionWhenUnspecified )
                 {
-                    return rejection.Unspecified; // 400
+                    return rejection.AssumeDefault;
                 }
 
-                // 3. IApiVersionSelector cannot be used yet because there are no candidates that an
-                //    aggregated version model can be computed from to select the 'default' API version
-                return rejection.AssumeDefault;
+                // 3. unspecified
+                return versionsByUrlOnly
+                       /* 404 */ ? rejection.Exit
+                       /* 400 */ : rejection.Unspecified;
+
             case 1:
                 rawApiVersion = apiVersions[0];
 
