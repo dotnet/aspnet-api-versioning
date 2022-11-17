@@ -123,7 +123,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         }
 
         var groupResults = new List<ApiDescription>( capacity: results.Count );
-        var unversioned = default( List<ApiDescription> );
+        var unversioned = default( Dictionary<int, ApiDescription> );
         var formatGroupName = Options.FormatGroupName;
 
         foreach ( var version in FlattenApiVersions( results ) )
@@ -132,6 +132,11 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
             for ( var i = 0; i < results.Count; i++ )
             {
+                if ( unversioned != null && unversioned.ContainsKey( i ) )
+                {
+                    continue;
+                }
+
                 var result = results[i];
                 var action = result.ActionDescriptor;
 
@@ -140,7 +145,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                     if ( IsUnversioned( action ) )
                     {
                         unversioned ??= new();
-                        unversioned.Add( result );
+                        unversioned.Add( i, result );
                     }
 
                     continue;
@@ -183,9 +188,9 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
             return;
         }
 
-        for ( var i = 0; i < unversioned.Count; i++ )
+        foreach ( var result in unversioned.Values )
         {
-            results.Add( unversioned[i] );
+            results.Add( result );
         }
     }
 
