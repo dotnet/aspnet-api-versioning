@@ -80,18 +80,6 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         AddApiVersionHeader( headers, apiDeprecatedVersionsName, apiVersionModel.DeprecatedApiVersions );
 
 #if NETFRAMEWORK
-        var statusCode = (int) response.StatusCode;
-#else
-        var context = response.HttpContext;
-        var statusCode = response.StatusCode;
-#endif
-
-        if ( statusCode < 200 || statusCode > 299 )
-        {
-            return;
-        }
-
-#if NETFRAMEWORK
         if ( response.RequestMessage is not HttpRequestMessage request ||
              request.GetActionDescriptor()?.GetApiVersionMetadata() is not ApiVersionMetadata metadata )
         {
@@ -102,6 +90,8 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         var policyManager = request.GetConfiguration().DependencyResolver.GetSunsetPolicyManager();
         var version = request.GetRequestedApiVersion();
 #else
+        var context = response.HttpContext;
+
         if ( context.GetEndpoint()?.Metadata.GetMetadata<ApiVersionMetadata>() is not ApiVersionMetadata metadata )
         {
             return;
@@ -113,8 +103,8 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 #endif
 
         if ( policyManager.TryGetPolicy( name, version, out var policy ) ||
-             ( !string.IsNullOrEmpty( name ) && policyManager.TryGetPolicy( name, out policy ) ) ||
-             ( version != null && policyManager.TryGetPolicy( version, out policy ) ) )
+           ( !string.IsNullOrEmpty( name ) && policyManager.TryGetPolicy( name, out policy ) ) ||
+           ( version != null && policyManager.TryGetPolicy( version, out policy ) ) )
         {
             response.WriteSunsetPolicy( policy );
         }
