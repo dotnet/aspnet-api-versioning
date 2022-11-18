@@ -11,7 +11,6 @@ internal static class EndpointProblem
 {
     internal static ProblemDetailsContext New( HttpContext context, ProblemDetailsInfo info, string detail )
     {
-        const string Code = nameof( Code );
         var (type, title, code) = info;
         var newContext = new ProblemDetailsContext()
         {
@@ -27,7 +26,7 @@ internal static class EndpointProblem
 
         if ( string.IsNullOrEmpty( code ) )
         {
-            newContext.ProblemDetails.Extensions[Code] = code;
+            newContext.ProblemDetails.Extensions[nameof( code )] = code;
         }
 
         return newContext;
