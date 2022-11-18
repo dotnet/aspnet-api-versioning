@@ -51,24 +51,24 @@ public sealed class DefaultProblemDetailsFactory : IProblemDetailsFactory
     /// <exception cref="ArgumentNullException"><paramref name="problemDetails"/> is <c>null</c>.</exception>
     public static void ApplyExtensions( ProblemDetails problemDetails )
     {
-        const string Code = nameof( Code );
+        const string code = nameof( code );
         var type = ( problemDetails ?? throw new ArgumentNullException( nameof( problemDetails ) ) ).Type;
 
         if ( type == Ambiguous.Type )
         {
-            problemDetails.Extensions[Code] = Ambiguous.Code;
+            problemDetails.Extensions[code] = Ambiguous.Code;
         }
         else if ( type == Invalid.Type )
         {
-            problemDetails.Extensions[Code] = Invalid.Code;
+            problemDetails.Extensions[code] = Invalid.Code;
         }
         else if ( type == Unspecified.Type )
         {
-            problemDetails.Extensions[Code] = Unspecified.Code;
+            problemDetails.Extensions[code] = Unspecified.Code;
         }
         else if ( type == Unsupported.Type )
         {
-            problemDetails.Extensions[Code] = Unsupported.Code;
+            problemDetails.Extensions[code] = Unsupported.Code;
         }
     }
 }
