@@ -37,7 +37,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
     }
 
     [Fact]
-    public async Task then_the_service_document_should_return_404_for_an_unsupported_version()
+    public async Task then_the_service_document_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -46,7 +46,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         var response = await GetAsync( "api?api-version=4.0" );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
     }
 
     [Fact]
-    public async Task then_X24metadata_should_return_404_for_an_unsupported_version()
+    public async Task then_X24metadata_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -88,7 +88,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         var response = await GetAsync( "api/$metadata?api-version=4.0" );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     protected ODataAcceptanceTest( ODataFixture fixture ) : base( fixture ) { }

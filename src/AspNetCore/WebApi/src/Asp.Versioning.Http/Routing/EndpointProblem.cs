@@ -9,7 +9,10 @@ using System.Globalization;
 
 internal static class EndpointProblem
 {
-    internal static Task UnsupportedApiVersion( HttpContext context, int statusCode )
+    internal static Task UnsupportedApiVersion(
+        HttpContext context,
+        ApiVersioningOptions options,
+        int statusCode )
     {
         var services = context.RequestServices;
         var factory = services.GetRequiredService<IProblemDetailsFactory>();
@@ -30,9 +33,24 @@ internal static class EndpointProblem
 
         context.Response.StatusCode = statusCode;
 
+        if ( options.ReportApiVersions &&
+             context.Features.Get<ApiVersionPolicyFeature>() is ApiVersionPolicyFeature feature )
+        {
+            var reporter = services.GetRequiredService<IReportApiVersions>();
+            var model = feature.Metadata.Map( reporter.Mapping );
+            context.Response.OnStarting( ReportApiVersions, (reporter, context.Response, model) );
+        }
+
         return context.Response.WriteAsJsonAsync(
             problem,
             options: default,
             contentType: ProblemDetailsDefaults.MediaType.Json );
+    }
+
+    private static Task ReportApiVersions( object state )
+    {
+        var (reporter, response, model) = ((IReportApiVersions, HttpResponse, ApiVersionModel)) state;
+        reporter.Report( response, model );
+        return Task.CompletedTask;
     }
 }

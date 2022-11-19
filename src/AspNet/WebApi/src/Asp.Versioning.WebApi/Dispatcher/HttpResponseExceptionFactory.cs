@@ -9,8 +9,6 @@ using System.Web.Http.Dispatcher;
 using System.Web.Http.Tracing;
 using static System.Net.HttpStatusCode;
 
-#pragma warning disable CA2000 // Dispose objects before losing scope
-
 internal sealed class HttpResponseExceptionFactory
 {
     private const string Allow = nameof( Allow );
@@ -64,7 +62,8 @@ internal sealed class HttpResponseExceptionFactory
             }
         }
 
-        var versionsOnlyByMediaType = Options.ApiVersionReader.VersionsByMediaType( allowMultipleLocations: false );
+        var options = Options;
+        var versionsOnlyByMediaType = options.ApiVersionReader.VersionsByMediaType( allowMultipleLocations: false );
 
         if ( versionsOnlyByMediaType )
         {
@@ -75,9 +74,28 @@ internal sealed class HttpResponseExceptionFactory
             if ( couldMatch )
             {
                 properties ??= request.ApiVersionProperties();
-                response = properties.RequestedApiVersion is ApiVersion apiVersion
-                    ? CreateResponseForUnsupportedApiVersion( apiVersion, NotFound )
-                    : CreateNotFound( conventionRouteResult );
+
+                if ( properties.RequestedApiVersion is ApiVersion apiVersion )
+                {
+                    HttpStatusCode statusCode;
+                    var matchedUrlSegment = !string.IsNullOrEmpty( properties.RouteParameter );
+
+                    if ( matchedUrlSegment )
+                    {
+                        statusCode = NotFound;
+                    }
+                    else
+                    {
+                        var versionsByUrlOnly = options.ApiVersionReader.VersionsByUrl( allowMultipleLocations: false );
+                        statusCode = versionsByUrlOnly ? NotFound : options.UnsupportedApiVersionStatusCode;
+                    }
+
+                    response = CreateResponseForUnsupportedApiVersion( apiVersion, statusCode );
+                }
+                else
+                {
+                    response = CreateNotFound( conventionRouteResult );
+                }
             }
             else
             {

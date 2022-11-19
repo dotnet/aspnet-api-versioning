@@ -4,6 +4,7 @@ namespace given_a_versioned_ODataController_using_conventions;
 
 using Asp.Versioning;
 using Asp.Versioning.OData.UsingConventions;
+using System.Net;
 using static System.Net.HttpStatusCode;
 
 public class when_using_a_query_string : ConventionsAcceptanceTest
@@ -24,16 +25,22 @@ public class when_using_a_query_string : ConventionsAcceptanceTest
     }
 
     [Fact]
-    public async Task then_get_should_return_404_for_an_unsupported_version()
+    public async Task then_get_should_return_400_for_an_unsupported_version()
     {
         // arrange
-
+        // note: it's not clear why this is, but it appears to be a change
+        // in the routing system from netcoreapp3.1 to net6.0+
+#if NETCOREAPP3_1
+        const HttpStatusCode StatusCode = NotFound;
+#else
+        const HttpStatusCode StatusCode = BadRequest;
+#endif
 
         // act
         var response = await GetAsync( "api/orders?api-version=2.0" );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( StatusCode );
     }
 
     [Fact]

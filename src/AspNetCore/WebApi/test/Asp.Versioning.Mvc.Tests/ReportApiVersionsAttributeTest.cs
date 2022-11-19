@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 
 public class ReportApiVersionsAttributeTest
 {
@@ -85,7 +86,10 @@ public class ReportApiVersionsAttributeTest
         versioningFeature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1.0 ) );
         features.Set( endpointFeature.Object );
         features.Set( versioningFeature.Object );
-        serviceProvider.Setup( sp => sp.GetService( typeof( IReportApiVersions ) ) ).Returns( new DefaultApiVersionReporter() );
+        serviceProvider.Setup( sp => sp.GetService( typeof( IReportApiVersions ) ) )
+                       .Returns( new DefaultApiVersionReporter() );
+        serviceProvider.Setup( sp => sp.GetService( typeof( ISunsetPolicyManager ) ) )
+                       .Returns( new SunsetPolicyManager( Options.Create( new ApiVersioningOptions() ) ) );
         response.SetupGet( r => r.Headers ).Returns( headers );
         response.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
         response.Setup( r => r.OnStarting( It.IsAny<Func<object, Task>>(), It.IsAny<object>() ) )

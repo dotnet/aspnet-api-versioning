@@ -8,6 +8,7 @@ internal struct RouteDestination
     public int Malformed;
     public int Ambiguous;
     public int Unspecified;
+    public int Unsupported;
     public int UnsupportedMediaType;
     public int AssumeDefault;
     public int NotAcceptable;
@@ -18,6 +19,7 @@ internal struct RouteDestination
         Malformed = exit;
         Ambiguous = exit;
         Unspecified = exit;
+        Unsupported = exit;
         UnsupportedMediaType = exit;
         AssumeDefault = exit;
         NotAcceptable = exit;

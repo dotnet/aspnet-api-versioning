@@ -35,7 +35,7 @@ public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
     }
 
     [Fact]
-    public async Task then_get_should_return_404_for_an_unsupported_version()
+    public async Task then_get_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -45,7 +45,7 @@ public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unsupported.Type );
     }
 

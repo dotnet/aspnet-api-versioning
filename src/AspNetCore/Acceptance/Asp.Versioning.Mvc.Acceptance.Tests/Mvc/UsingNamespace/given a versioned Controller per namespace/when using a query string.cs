@@ -34,7 +34,7 @@ public class when_using_a_query_string : AcceptanceTest
     }
 
     [Fact]
-    public async Task then_get_should_return_404_for_an_unsupported_version()
+    public async Task then_get_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -43,7 +43,7 @@ public class when_using_a_query_string : AcceptanceTest
         var response = await GetAsync( "api/agreements/42?api-version=4.0" );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     [Fact]

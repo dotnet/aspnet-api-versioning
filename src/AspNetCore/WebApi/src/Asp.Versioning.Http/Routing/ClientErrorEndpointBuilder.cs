@@ -6,21 +6,23 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
 internal sealed class ClientErrorEndpointBuilder
 {
     private readonly IApiVersioningFeature feature;
     private readonly CandidateSet candidates;
+    private readonly ApiVersioningOptions options;
     private readonly ILogger logger;
 
     public ClientErrorEndpointBuilder(
         IApiVersioningFeature feature,
         CandidateSet candidates,
+        ApiVersioningOptions options,
         ILogger logger )
     {
         this.feature = feature;
         this.candidates = candidates;
+        this.options = options;
         this.logger = logger;
     }
 
@@ -31,7 +33,7 @@ internal sealed class ClientErrorEndpointBuilder
             return new UnspecifiedApiVersionEndpoint( logger, GetDisplayNames() );
         }
 
-        return new UnsupportedApiVersionEndpoint();
+        return new UnsupportedApiVersionEndpoint( options );
     }
 
     private static string DisplayName( Endpoint endpoint )

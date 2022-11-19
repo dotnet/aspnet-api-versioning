@@ -37,7 +37,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
     }
 
     [Fact]
-    public async Task then_the_service_document_should_return_404_for_an_unsupported_version()
+    public async Task then_the_service_document_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -47,7 +47,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unsupported.Type );
     }
 
@@ -83,7 +83,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
     }
 
     [Fact]
-    public async Task then_X24metadata_should_return_404_for_an_unsupported_version()
+    public async Task then_X24metadata_should_return_400_for_an_unsupported_version()
     {
         // arrange
         Client.DefaultRequestHeaders.Clear();
@@ -93,7 +93,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unsupported.Type );
     }
 
