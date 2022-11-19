@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>6.2.1</VersionPrefix>
-  <AssemblyVersion>6.2.0.0</AssemblyVersion>
+  <VersionPrefix>6.3.0</VersionPrefix>
+  <AssemblyVersion>6.3.0.0</AssemblyVersion>
   <TargetFrameworks>net45;net472</TargetFrameworks>
   <AssemblyTitle>ASP.NET Web API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Web API.</Description>
