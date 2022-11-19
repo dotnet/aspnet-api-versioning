@@ -3,6 +3,9 @@
 namespace Asp.Versioning;
 
 using Asp.Versioning.Routing;
+#if NETFRAMEWORK
+using System.Net;
+#endif
 using static Asp.Versioning.ApiVersionReader;
 
 /// <summary>
@@ -100,4 +103,35 @@ public partial class ApiVersioningOptions
         get => apiVersioningPolicyBuilder ??= new ApiVersioningPolicyBuilder();
         set => apiVersioningPolicyBuilder = value;
     }
+
+    /// <summary>
+    /// Gets or sets the HTTP status code used for unsupported versions of an API.
+    /// </summary>
+    /// <value>The HTTP status code. The default value is 400 (Bad Request).</value>
+    /// <remarks>
+    /// <para>While any HTTP status code can be provided, the following are the most sensible:</para>
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Status</term>
+    ///         <description>Description</description>
+    ///     </listheader>
+    ///     <item>
+    ///         <term>400 (Bad Request)</term>
+    ///         <description>The API doesn't support this version</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>404 (Not Found)</term>
+    ///         <description>The API doesn't exist</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>501 (Not Implemented)</term>
+    ///         <description>The API isn't implemented</description>
+    ///     </item>
+    /// </list>
+    /// </remarks>
+#if NETFRAMEWORK
+    public HttpStatusCode UnsupportedApiVersionStatusCode { get; set; } = HttpStatusCode.BadRequest;
+#else
+    public int UnsupportedApiVersionStatusCode { get; set; } = 400;
+#endif
 }
