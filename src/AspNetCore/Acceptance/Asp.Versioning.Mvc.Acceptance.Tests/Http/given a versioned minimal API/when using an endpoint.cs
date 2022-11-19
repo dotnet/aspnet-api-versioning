@@ -11,7 +11,7 @@ using static System.Net.HttpStatusCode;
 public class when_using_an_endpoint : AcceptanceTest
 {
     [Theory]
-    [InlineData( "api/order?api-version=0.9", NotFound )]
+    [InlineData( "api/order?api-version=0.9", BadRequest )]
     [InlineData( "api/order?api-version=1.0", OK )]
     [InlineData( "api/order?api-version=2.0", OK )]
     [InlineData( "api/order/42?api-version=0.9", OK )]

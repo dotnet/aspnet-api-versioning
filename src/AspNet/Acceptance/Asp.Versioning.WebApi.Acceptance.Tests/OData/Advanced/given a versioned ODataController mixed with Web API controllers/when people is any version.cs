@@ -9,7 +9,7 @@ using static System.Net.HttpStatusCode;
 public class when_people_is_any_version : AdvancedAcceptanceTest
 {
     [Fact]
-    public async Task then_patch_should_return_404_for_an_unsupported_version()
+    public async Task then_patch_should_return_400_for_an_unsupported_version()
     {
         // arrange
         var person = new { lastName = "Me" };
@@ -19,7 +19,7 @@ public class when_people_is_any_version : AdvancedAcceptanceTest
         var problem = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unsupported.Type );
     }
 

@@ -17,14 +17,14 @@ public class when_using_a_query_string : BasicAcceptanceTest
 
 
         // act
-        var response = (await GetAsync( requestUrl )).EnsureSuccessStatusCode();
+        var response = ( await GetAsync( requestUrl ) ).EnsureSuccessStatusCode();
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0" );
     }
 
     [Fact]
-    public async Task then_get_should_return_404_for_an_unsupported_version()
+    public async Task then_get_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -33,7 +33,7 @@ public class when_using_a_query_string : BasicAcceptanceTest
         var response = await GetAsync( "api/orders?api-version=2.0" );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     [Fact]

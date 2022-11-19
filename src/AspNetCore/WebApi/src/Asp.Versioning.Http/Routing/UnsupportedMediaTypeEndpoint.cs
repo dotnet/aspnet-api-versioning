@@ -9,8 +9,12 @@ internal sealed class UnsupportedMediaTypeEndpoint : Endpoint
 {
     private const string Name = "415 HTTP Unsupported Media Type";
 
-    internal UnsupportedMediaTypeEndpoint() : base( OnExecute, Empty, Name ) { }
-
-    private static Task OnExecute( HttpContext context ) =>
-        EndpointProblem.UnsupportedApiVersion( context, StatusCodes.Status415UnsupportedMediaType );
+    internal UnsupportedMediaTypeEndpoint( ApiVersioningOptions options )
+        : base(
+            context => EndpointProblem.UnsupportedApiVersion(
+                context,
+                options,
+                StatusCodes.Status415UnsupportedMediaType ),
+            Empty,
+            Name ) { }
 }

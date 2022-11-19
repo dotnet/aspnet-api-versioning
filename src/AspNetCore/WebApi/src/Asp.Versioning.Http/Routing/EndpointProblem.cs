@@ -4,6 +4,7 @@ namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using static Asp.Versioning.ProblemDetailsDefaults;
 
@@ -32,9 +33,20 @@ internal static class EndpointProblem
         return newContext;
     }
 
-    internal static Task UnsupportedApiVersion( HttpContext context, int statusCode )
+    internal static Task UnsupportedApiVersion(
+        HttpContext context,
+        ApiVersioningOptions options,
+        int statusCode )
     {
         context.Response.StatusCode = statusCode;
+
+        if ( options.ReportApiVersions &&
+             context.Features.Get<ApiVersionPolicyFeature>() is ApiVersionPolicyFeature feature )
+        {
+            var reporter = context.RequestServices.GetRequiredService<IReportApiVersions>();
+            var model = feature.Metadata.Map( reporter.Mapping );
+            context.Response.OnStarting( ReportApiVersions, (reporter, context.Response, model) );
+        }
 
         if ( context.TryGetProblemDetailsService( out var problemDetails ) )
         {
@@ -47,6 +59,13 @@ internal static class EndpointProblem
             return problemDetails.WriteAsync( New( context, Unsupported, detail ) ).AsTask();
         }
 
+        return Task.CompletedTask;
+    }
+
+    private static Task ReportApiVersions( object state )
+    {
+        var (reporter, response, model) = ((IReportApiVersions, HttpResponse, ApiVersionModel)) state;
+        reporter.Report( response, model );
         return Task.CompletedTask;
     }
 }

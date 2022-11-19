@@ -2,14 +2,13 @@
 
 namespace given_a_versioned_ODataController_mixed_with_base_controllers;
 
-using Asp.Versioning;
 using Asp.Versioning.OData.Advanced;
 using static System.Net.HttpStatusCode;
 
 public class when_people_is_any_version : AdvancedAcceptanceTest
 {
     [Fact]
-    public async Task then_patch_should_return_404_for_an_unsupported_version()
+    public async Task then_patch_should_return_400_for_an_unsupported_version()
     {
         // arrange
         var person = new { lastName = "Me" };
@@ -18,7 +17,7 @@ public class when_people_is_any_version : AdvancedAcceptanceTest
         var response = await PatchAsync( $"api/people/42?api-version=4.0", person );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     [Fact]

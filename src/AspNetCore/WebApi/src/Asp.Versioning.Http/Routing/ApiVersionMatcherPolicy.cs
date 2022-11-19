@@ -93,7 +93,7 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
 
         if ( !matched && hasCandidates && !DifferByRouteConstraintsOnly( candidates ) )
         {
-            var builder = new ClientErrorEndpointBuilder( feature, candidates, logger );
+            var builder = new ClientErrorEndpointBuilder( feature, candidates, Options, logger );
             httpContext.SetEndpoint( builder.Build() );
         }
 
@@ -108,19 +108,23 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
             throw new ArgumentNullException( nameof( edges ) );
         }
 
-        const int NumberOfRejectionEndpoints = 4;
         var rejection = new RouteDestination( exitDestination );
-        var capacity = edges.Count - NumberOfRejectionEndpoints;
+        var capacity = edges.Count - EdgeBuilder.NumberOfRejectionEndpoints;
         var destinations = new Dictionary<ApiVersion, int>( capacity );
         var source = ApiVersionSource;
-        var versionsByUrl = source.VersionsByUrl();
-        var routePatterns = default( List<RoutePattern> );
+        var supported = default( SortedSet<ApiVersion> );
+        var deprecated = default( SortedSet<ApiVersion> );
+        var routePatterns = default( RoutePattern[] );
 
         for ( var i = 0; i < edges.Count; i++ )
         {
             var edge = edges[i];
             var state = (EdgeKey) edge.State;
-            var version = state.ApiVersion;
+
+            if ( Options.ReportApiVersions )
+            {
+                Collate( state.Metadata, ref supported, ref deprecated );
+            }
 
             switch ( state.EndpointType )
             {
@@ -133,6 +137,9 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
                 case EndpointType.Unspecified:
                     rejection.Unspecified = edge.Destination;
                     break;
+                case EndpointType.Unsupported:
+                    rejection.Unsupported = edge.Destination;
+                    break;
                 case EndpointType.UnsupportedMediaType:
                     rejection.UnsupportedMediaType = edge.Destination;
                     break;
@@ -143,13 +150,10 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
                     rejection.NotAcceptable = edge.Destination;
                     break;
                 default:
-                    if ( versionsByUrl && state.RoutePatterns.Count > 0 )
-                    {
-                        routePatterns ??= new();
-                        routePatterns.AddRange( state.RoutePatterns );
-                    }
-
-                    destinations.Add( version, edge.Destination );
+                    // the route patterns provided to each edge is a
+                    // singleton so any edge will do
+                    routePatterns ??= state.RoutePatterns.ToArray();
+                    destinations.Add( state.ApiVersion, edge.Destination );
                     break;
             }
         }
@@ -157,7 +161,8 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         return new ApiVersionPolicyJumpTable(
             rejection,
             destinations,
-            routePatterns ?? (IReadOnlyList<RoutePattern>) Array.Empty<RoutePattern>(),
+            NewPolicyFeature( supported, deprecated ),
+            routePatterns ?? Array.Empty<RoutePattern>(),
             apiVersionParser,
             source,
             Options );
@@ -174,8 +179,8 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         var capacity = endpoints.Count;
         var builder = new EdgeBuilder( capacity, ApiVersionSource, Options, logger );
         var versions = new SortedSet<ApiVersion>();
-        var neutralEndpoints = default( List<RouteEndpoint> );
-        var versionedEndpoints = new (RouteEndpoint, ApiVersionModel)[capacity];
+        var neutralEndpoints = default( List<(RouteEndpoint, ApiVersionMetadata)> );
+        var versionedEndpoints = new (RouteEndpoint, ApiVersionModel, ApiVersionMetadata)[capacity];
         var count = 0;
 
         for ( var i = 0; i < endpoints.Count; i++ )
@@ -190,14 +195,14 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
 
             if ( model.IsApiVersionNeutral )
             {
-                builder.Add( endpoint, ApiVersion.Neutral );
+                builder.Add( endpoint, ApiVersion.Neutral, metadata );
                 neutralEndpoints ??= new();
-                neutralEndpoints.Add( endpoint );
+                neutralEndpoints.Add( (endpoint, metadata) );
             }
             else
             {
                 builder.Add( endpoint );
-                versionedEndpoints[count++] = (endpoint, model);
+                versionedEndpoints[count++] = (endpoint, model, metadata);
                 versions.AddRange( model.DeclaredApiVersions );
             }
         }
@@ -206,12 +211,12 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         {
             for ( var j = 0; j < count; j++ )
             {
-                var (endpoint, model) = versionedEndpoints[j];
+                var (endpoint, model, metadata) = versionedEndpoints[j];
                 var mappedWithImplementation = model.ImplementedApiVersions.Contains( version );
 
                 if ( mappedWithImplementation )
                 {
-                    builder.Add( endpoint, version );
+                    builder.Add( endpoint, version, metadata );
                 }
             }
 
@@ -223,7 +228,8 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
             // add an edge for all known versions because version-neutral endpoints can map to any api version
             for ( var j = 0; j < neutralEndpoints.Count; j++ )
             {
-                builder.Add( neutralEndpoints[j], version );
+                var (endpoint, metadata) = neutralEndpoints[j];
+                builder.Add( endpoint, version, metadata );
             }
         }
 
@@ -291,6 +297,77 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         }
 
         return false;
+    }
+
+    private static void Collate(
+        ApiVersionMetadata metadata,
+        ref SortedSet<ApiVersion>? supported,
+        ref SortedSet<ApiVersion>? deprecated )
+    {
+        var model = metadata.Map( Implicit | Explicit );
+        var versions = model.SupportedApiVersions;
+
+        if ( versions.Count > 0 )
+        {
+            supported ??= new();
+
+            for ( var j = 0; j < versions.Count; j++ )
+            {
+                supported.Add( versions[j] );
+            }
+        }
+
+        versions = model.DeprecatedApiVersions;
+
+        if ( versions.Count == 0 )
+        {
+            return;
+        }
+
+        deprecated ??= new();
+
+        for ( var j = 0; j < versions.Count; j++ )
+        {
+            deprecated.Add( versions[j] );
+        }
+    }
+
+    private static ApiVersionPolicyFeature? NewPolicyFeature(
+        SortedSet<ApiVersion>? supported,
+        SortedSet<ApiVersion>? deprecated )
+    {
+        // this is a best guess effort at collating all supported and deprecated
+        // versions for an api when unmatched and it needs to be reported. it's
+        // impossible to sure as there is no way to correlate an arbitrary
+        // request url by endpoint or name. the routing system will build a tree
+        // based on the route template before the jump table policy is created,
+        // which provides a natural method of grouping. manual, contrived tests
+        // demonstrated that were the results were correctly collated together.
+        // it is possible there is an edge case that isn't covered, but it's
+        // unclear what that would look like. one or more test cases should be
+        // added to document that if discovered
+        ApiVersionModel model;
+
+        if ( supported == null )
+        {
+            if ( deprecated == null )
+            {
+                return default;
+            }
+
+            model = new( Enumerable.Empty<ApiVersion>(), deprecated );
+        }
+        else if ( deprecated == null )
+        {
+            model = new( supported, Enumerable.Empty<ApiVersion>() );
+        }
+        else
+        {
+            deprecated.ExceptWith( supported );
+            model = new( supported, deprecated );
+        }
+
+        return new( new( model, model ) );
     }
 
     private static (bool Matched, bool HasCandidates) MatchApiVersion( CandidateSet candidates, ApiVersion? apiVersion )

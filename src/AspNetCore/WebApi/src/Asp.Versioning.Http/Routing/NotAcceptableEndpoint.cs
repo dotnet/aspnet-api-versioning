@@ -9,8 +9,12 @@ internal sealed class NotAcceptableEndpoint : Endpoint
 {
     private const string Name = "406 HTTP Not Acceptable";
 
-    internal NotAcceptableEndpoint() : base( OnExecute, Empty, Name ) { }
-
-    private static Task OnExecute( HttpContext context ) =>
-        EndpointProblem.UnsupportedApiVersion( context, StatusCodes.Status406NotAcceptable );
+    internal NotAcceptableEndpoint( ApiVersioningOptions options )
+        : base(
+            context => EndpointProblem.UnsupportedApiVersion(
+                context,
+                options,
+                StatusCodes.Status406NotAcceptable ),
+            Empty,
+            Name ) { }
 }

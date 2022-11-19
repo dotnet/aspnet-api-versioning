@@ -15,6 +15,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
     private readonly bool versionsByMediaTypeOnly;
     private readonly RouteDestination rejection;
     private readonly IReadOnlyDictionary<ApiVersion, int> destinations;
+    private readonly ApiVersionPolicyFeature? policyFeature;
     private readonly IReadOnlyList<RoutePattern> routePatterns;
     private readonly IApiVersionParser parser;
     private readonly ApiVersioningOptions options;
@@ -22,6 +23,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
     internal ApiVersionPolicyJumpTable(
         RouteDestination rejection,
         IReadOnlyDictionary<ApiVersion, int> destinations,
+        ApiVersionPolicyFeature? policyFeature,
         IReadOnlyList<RoutePattern> routePatterns,
         IApiVersionParser parser,
         IApiVersionParameterSource source,
@@ -29,6 +31,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
     {
         this.rejection = rejection;
         this.destinations = destinations;
+        this.policyFeature = policyFeature;
         this.routePatterns = routePatterns;
         this.parser = parser;
         this.options = options;
@@ -42,6 +45,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
         var request = httpContext.Request;
         var feature = httpContext.ApiVersioningFeature();
         var apiVersions = new List<string>( capacity: feature.RawRequestedApiVersions.Count + 1 );
+        var addedFromUrl = false;
 
         apiVersions.AddRange( feature.RawRequestedApiVersions );
 
@@ -50,6 +54,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
              DoesNotContainApiVersion( apiVersions, rawApiVersion ) )
         {
             apiVersions.Add( rawApiVersion );
+            addedFromUrl = apiVersions.Count == apiVersions.Capacity;
         }
 
         int destination;
@@ -83,6 +88,11 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                     if ( versionsByUrl )
                     {
                         feature.RawRequestedApiVersion = rawApiVersion;
+
+                        if ( versionsByUrlOnly )
+                        {
+                            return rejection.Exit; // 404
+                        }
                     }
 
                     return rejection.Malformed; // 400
@@ -92,6 +102,8 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                 {
                     return destination;
                 }
+
+                httpContext.Features.Set( policyFeature );
 
                 if ( versionsByMediaTypeOnly )
                 {
@@ -103,10 +115,10 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                     return rejection.NotAcceptable; // 406
                 }
 
-                return rejection.Exit; // 404
+                return addedFromUrl
+                       /* 404 */ ? rejection.Exit
+                       /* 400 */ : rejection.Unsupported;
         }
-
-        var addedFromUrl = apiVersions.Count == apiVersions.Capacity;
 
         if ( addedFromUrl )
         {

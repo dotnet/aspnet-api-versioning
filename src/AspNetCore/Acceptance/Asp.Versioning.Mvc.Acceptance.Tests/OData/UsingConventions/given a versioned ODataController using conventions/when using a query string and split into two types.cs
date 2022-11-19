@@ -28,7 +28,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
     }
 
     [Fact]
-    public async Task then_get_should_return_404_for_an_unsupported_version()
+    public async Task then_get_should_return_400_for_an_unsupported_version()
     {
         // arrange
 
@@ -37,7 +37,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
         var response = await GetAsync( "api/people?api-version=4.0" );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
     }
 
     [Fact]
-    public async Task then_patch_should_return_404_for_an_unsupported_version()
+    public async Task then_patch_should_return_400_for_an_unsupported_version()
     {
         // arrange
         var person = new { id = 42, firstName = "John", lastName = "Doe", email = "john.doe@somewhere.com" };
@@ -80,7 +80,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
         var response = await PatchAsync( "api/people/42?api-version=4.0", person );
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
     }
 
     [Fact]

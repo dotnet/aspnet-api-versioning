@@ -163,7 +163,7 @@ public partial class ApiVersionControllerSelectorTest
     }
 
     [Fact]
-    public async Task select_controller_should_return_404_for_unmatchedX2C_attributeX2Dbased_controller_version()
+    public async Task select_controller_should_return_400_for_unmatchedX2C_attributeX2Dbased_controller_version()
     {
         // arrange
         var detail = "The HTTP resource that matches the request URI 'http://localhost/api/test' does not support the API version '42.0'.";
@@ -190,13 +190,13 @@ public partial class ApiVersionControllerSelectorTest
         var content = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
         response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
         content.Should().BeEquivalentTo(
             new ProblemDetails()
             {
-                Status = 404,
+                Status = 400,
                 Title = "Unsupported API version",
                 Type = ProblemDetailsDefaults.Unsupported.Type,
                 Detail = detail,
@@ -255,7 +255,7 @@ public partial class ApiVersionControllerSelectorTest
     }
 
     [Fact]
-    public async Task select_controller_should_return_404_for_unmatchedX2C_conventionX2Dbased_controller_version()
+    public async Task select_controller_should_return_400_for_unmatchedX2C_conventionX2Dbased_controller_version()
     {
         // arrange
         var detail = "The HTTP resource that matches the request URI 'http://localhost/api/test' does not support the API version '4.0'.";
@@ -283,13 +283,13 @@ public partial class ApiVersionControllerSelectorTest
         var content = await response.Content.ReadAsProblemDetailsAsync();
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
         response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "1.8, 1.9" );
         content.Should().BeEquivalentTo(
             new ProblemDetails()
             {
-                Status = 404,
+                Status = 400,
                 Title = "Unsupported API version",
                 Type = ProblemDetailsDefaults.Unsupported.Type,
                 Detail = detail,
@@ -413,7 +413,7 @@ public partial class ApiVersionControllerSelectorTest
     }
 
     [Fact]
-    public void select_controller_should_return_404_for_unmatched_action()
+    public void select_controller_should_return_400_for_unmatched_action()
     {
         // arrange
         var configuration = AttributeRoutingEnabledConfiguration;
@@ -433,7 +433,7 @@ public partial class ApiVersionControllerSelectorTest
         var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
 
         // assert
-        response.StatusCode.Should().Be( NotFound );
+        response.StatusCode.Should().Be( BadRequest );
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0, 4.0" );
         response.Headers.GetValues( "api-deprecated-versions" ).Single().Should().Be( "3.0-Alpha" );
     }

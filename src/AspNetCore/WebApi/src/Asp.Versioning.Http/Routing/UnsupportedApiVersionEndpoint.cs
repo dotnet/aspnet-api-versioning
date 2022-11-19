@@ -7,10 +7,15 @@ using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
 
 internal sealed class UnsupportedApiVersionEndpoint : Endpoint
 {
-    private const string Name = "400 Unsupported API Version";
+    private const string Name = " Unsupported API Version";
 
-    internal UnsupportedApiVersionEndpoint() : base( OnExecute, Empty, Name ) { }
-
-    private static Task OnExecute( HttpContext context ) =>
-        EndpointProblem.UnsupportedApiVersion( context, StatusCodes.Status400BadRequest );
+    internal UnsupportedApiVersionEndpoint( ApiVersioningOptions options )
+        : base(
+            context => EndpointProblem.UnsupportedApiVersion(
+                context,
+                options,
+                options.UnsupportedApiVersionStatusCode ),
+            Empty,
+            options.UnsupportedApiVersionStatusCode + Name )
+    { }
 }
