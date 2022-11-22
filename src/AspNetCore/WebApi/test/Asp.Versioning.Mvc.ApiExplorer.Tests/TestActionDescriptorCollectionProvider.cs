@@ -9,6 +9,26 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
 {
     private readonly Lazy<ActionDescriptorCollection> collection = new( CreateActionDescriptors );
 
+    public TestActionDescriptorCollectionProvider() { }
+
+    public TestActionDescriptorCollectionProvider( ActionDescriptor action, params ActionDescriptor[] otherActions )
+    {
+        ActionDescriptor[] actions;
+
+        if ( otherActions.Length == 0 )
+        {
+            actions = new ActionDescriptor[] { action };
+        }
+        else
+        {
+            actions = new ActionDescriptor[otherActions.Length];
+            actions[0] = action;
+            Array.Copy( otherActions, 0, actions, 1, otherActions.Length );
+        }
+
+        collection = new( () => new( actions, 0 ) );
+    }
+
     public ActionDescriptorCollection ActionDescriptors => collection.Value;
 
     private static ActionDescriptorCollection CreateActionDescriptors()

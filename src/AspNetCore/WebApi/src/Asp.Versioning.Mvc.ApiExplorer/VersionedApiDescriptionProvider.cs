@@ -156,11 +156,11 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                 var groupResult = result.Clone();
                 var metadata = action.GetApiVersionMetadata();
 
-                if ( string.IsNullOrEmpty( groupResult.GroupName ) || formatGroupName is null )
+                if ( string.IsNullOrEmpty( groupResult.GroupName ) )
                 {
                     groupResult.GroupName = formattedVersion;
                 }
-                else
+                else if ( formatGroupName is not null )
                 {
                     groupResult.GroupName = formatGroupName( groupResult.GroupName, formattedVersion );
                 }
