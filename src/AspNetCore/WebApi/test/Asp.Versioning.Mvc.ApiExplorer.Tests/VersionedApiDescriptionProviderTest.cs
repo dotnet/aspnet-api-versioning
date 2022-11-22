@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -90,6 +91,62 @@ public class VersionedApiDescriptionProviderTest
                .All( policy => policy == expected )
                .Should()
                .BeTrue();
+    }
+
+    [Fact]
+    public void versioned_api_explorer_should_preserve_group_name()
+    {
+        // arrange
+        var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( ApiVersion.Default ) );
+        var descriptor = new ActionDescriptor() { EndpointMetadata = new[] { metadata } };
+        var actionProvider = new TestActionDescriptorCollectionProvider( descriptor );
+        var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
+        var apiExplorer = new VersionedApiDescriptionProvider(
+            Mock.Of<ISunsetPolicyManager>(),
+            NewModelMetadataProvider(),
+            Options.Create( new ApiExplorerOptions() ) );
+
+        context.Results.Add( new()
+        {
+            ActionDescriptor = descriptor,
+            GroupName = "Test",
+        } );
+
+        // act
+        apiExplorer.OnProvidersExecuted( context );
+
+        // assert
+        context.Results.Single().GroupName.Should().Be( "Test" );
+    }
+
+    [Fact]
+    public void versioned_api_explorer_should_use_custom_group_name()
+    {
+        // arrange
+        var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( ApiVersion.Default ) );
+        var descriptor = new ActionDescriptor() { EndpointMetadata = new[] { metadata } };
+        var actionProvider = new TestActionDescriptorCollectionProvider( descriptor );
+        var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
+        var options = new ApiExplorerOptions()
+        {
+            FormatGroupName = ( group, version ) => $"{group}-{version}",
+        };
+        var apiExplorer = new VersionedApiDescriptionProvider(
+            Mock.Of<ISunsetPolicyManager>(),
+            NewModelMetadataProvider(),
+            Options.Create( options ) );
+
+        context.Results.Add( new()
+        {
+            ActionDescriptor = descriptor,
+            GroupName = "Test",
+        } );
+
+        // act
+        apiExplorer.OnProvidersExecuted( context );
+
+        // assert
+        context.Results.Single().GroupName.Should().Be( "Test-1.0" );
     }
 
     private static IModelMetadataProvider NewModelMetadataProvider()
