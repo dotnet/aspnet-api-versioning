@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Routing;
 
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -159,6 +160,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
     private static int ApiVersioningPolicy() =>
         new ApiVersionMatcherPolicy(
             ApiVersionParser.Default,
+            Enumerable.Empty<IApiVersionMetadataCollationProvider>(),
             Options.Create( new ApiVersioningOptions() ),
             new NullLogger<ApiVersionMatcherPolicy>() ).Order;
 

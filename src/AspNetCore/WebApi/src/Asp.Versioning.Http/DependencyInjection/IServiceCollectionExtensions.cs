@@ -3,7 +3,7 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
-using Asp.Versioning.Builder;
+using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -92,6 +92,7 @@ public static partial class IServiceCollectionExtensions
         services.TryAddSingleton<ISunsetPolicyManager, SunsetPolicyManager>();
         services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
         services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
+        services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, EndpointApiVersionMetadataCollationProvider>() );
         services.Replace( WithLinkGeneratorDecorator( services ) );
         TryAddProblemDetailsRfc7231Compliance( services );
     }
@@ -157,6 +158,8 @@ public static partial class IServiceCollectionExtensions
         }
     }
 
+    // TODO: Remove in .NET 8.0
+    // REF: https://github.com/dotnet/aspnetcore/issues/45051
     private static void TryAddProblemDetailsRfc7231Compliance( IServiceCollection services )
     {
         var descriptor = services.FirstOrDefault( IsDefaultProblemDetailsWriter );

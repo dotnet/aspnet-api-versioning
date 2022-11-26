@@ -2,12 +2,7 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using static Asp.Versioning.ApiVersionMapping;
 using static System.Globalization.CultureInfo;
 
@@ -23,19 +18,17 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultApiVersionDescriptionProvider"/> class.
     /// </summary>
-    /// <param name="endpointDataSource">The <see cref="EndpointDataSource">data source</see> for <see cref="Endpoint">endpoints</see>.</param>
-    /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider">provider</see>
-    /// used to enumerate the actions within an application.</param>
+    /// <param name="providers">The <see cref="IEnumerable{T}">sequence</see> of
+    /// <see cref="IApiVersionMetadataCollationProvider">API version metadata collation providers.</see>.</param>
     /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
     /// <param name="apiExplorerOptions">The <see cref="IOptions{TOptions}">container</see> of configured
     /// <see cref="ApiExplorerOptions">API explorer options</see>.</param>
     public DefaultApiVersionDescriptionProvider(
-        EndpointDataSource endpointDataSource,
-        IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+        IEnumerable<IApiVersionMetadataCollationProvider> providers,
         ISunsetPolicyManager sunsetPolicyManager,
         IOptions<ApiExplorerOptions> apiExplorerOptions )
     {
-        collection = new( this, endpointDataSource, actionDescriptorCollectionProvider );
+        collection = new( this, providers ?? throw new ArgumentNullException( nameof( providers ) ) );
         SunsetPolicyManager = sunsetPolicyManager;
         options = apiExplorerOptions;
     }
@@ -138,56 +131,45 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     private sealed class ApiVersionDescriptionCollection
     {
         private readonly object syncRoot = new();
-        private readonly DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider;
-        private readonly EndpointApiVersionMetadataCollection endpoints;
-        private readonly ActionApiVersionMetadataCollection actions;
+        private readonly DefaultApiVersionDescriptionProvider provider;
+        private readonly IApiVersionMetadataCollationProvider[] collators;
         private IReadOnlyList<ApiVersionDescription>? items;
-        private long version;
+        private int version;
 
         public ApiVersionDescriptionCollection(
-            DefaultApiVersionDescriptionProvider apiVersionDescriptionProvider,
-            EndpointDataSource endpointDataSource,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider )
+            DefaultApiVersionDescriptionProvider provider,
+            IEnumerable<IApiVersionMetadataCollationProvider> collators )
         {
-            this.apiVersionDescriptionProvider = apiVersionDescriptionProvider;
-            endpoints = new( endpointDataSource );
-            actions = new( actionDescriptorCollectionProvider );
+            this.provider = provider;
+            this.collators = collators.ToArray();
         }
 
         public IReadOnlyList<ApiVersionDescription> Items
         {
             get
             {
-                if ( items is not null && version == CurrentVersion )
+                if ( items is not null && version == ComputeVersion() )
                 {
                     return items;
                 }
 
                 lock ( syncRoot )
                 {
-                    var (items1, version1) = endpoints;
-                    var (items2, version2) = actions;
-                    var currentVersion = ComputeVersion( version1, version2 );
+                    var currentVersion = ComputeVersion();
 
                     if ( items is not null && version == currentVersion )
                     {
                         return items;
                     }
 
-                    var capacity = items1.Count + items2.Count;
-                    var metadata = new List<ApiVersionMetadata>( capacity );
+                    var context = new ApiVersionMetadataCollationContext();
 
-                    for ( var i = 0; i < items1.Count; i++ )
+                    for ( var i = 0; i < collators.Length; i++ )
                     {
-                        metadata.Add( items1[i] );
+                        collators[i].Execute( context );
                     }
 
-                    for ( var i = 0; i < items2.Count; i++ )
-                    {
-                        metadata.Add( items2[i] );
-                    }
-
-                    items = apiVersionDescriptionProvider.Describe( metadata );
+                    items = provider.Describe( context.Results );
                     version = currentVersion;
                 }
 
@@ -195,158 +177,24 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
             }
         }
 
-        private long CurrentVersion
-        {
-            get
+        private int ComputeVersion() =>
+            collators.Length switch
             {
-                lock ( syncRoot )
-                {
-                    return ComputeVersion( endpoints.Version, actions.Version );
-                }
-            }
-        }
+                0 => 0,
+                1 => collators[0].Version,
+                _ => ComputeVersion( collators ),
+            };
 
-        private static long ComputeVersion( int version1, int version2 ) => ( ( (long) version1 ) << 32 ) | (long) version2;
-    }
-
-    private sealed class EndpointApiVersionMetadataCollection
-    {
-        private readonly object syncRoot = new();
-        private readonly EndpointDataSource endpointDataSource;
-        private List<ApiVersionMetadata>? list;
-        private int version;
-        private int currentVersion;
-
-        public EndpointApiVersionMetadataCollection( EndpointDataSource endpointDataSource )
+        private static int ComputeVersion( IApiVersionMetadataCollationProvider[] providers )
         {
-            this.endpointDataSource = endpointDataSource ?? throw new ArgumentNullException( nameof( endpointDataSource ) );
-            ChangeToken.OnChange( endpointDataSource.GetChangeToken, IncrementVersion );
-        }
+            var hash = default( HashCode );
 
-        public int Version => version;
-
-        public IReadOnlyList<ApiVersionMetadata> Items
-        {
-            get
+            for ( var i = 0; i < providers.Length; i++ )
             {
-                if ( list is not null && version == currentVersion )
-                {
-                    return list;
-                }
-
-                lock ( syncRoot )
-                {
-                    if ( list is not null && version == currentVersion )
-                    {
-                        return list;
-                    }
-
-                    var endpoints = endpointDataSource.Endpoints;
-
-                    if ( list == null )
-                    {
-                        list = new( capacity: endpoints.Count );
-                    }
-                    else
-                    {
-                        list.Clear();
-                        list.Capacity = endpoints.Count;
-                    }
-
-                    for ( var i = 0; i < endpoints.Count; i++ )
-                    {
-                        if ( endpoints[i].Metadata.GetMetadata<ApiVersionMetadata>() is ApiVersionMetadata item )
-                        {
-                            list.Add( item );
-                        }
-                    }
-
-                    version = currentVersion;
-                }
-
-                return list;
+                hash.Add( providers[i].Version );
             }
-        }
 
-        public void Deconstruct( out IReadOnlyList<ApiVersionMetadata> items, out int version )
-        {
-            lock ( syncRoot )
-            {
-                version = this.version;
-                items = Items;
-            }
-        }
-
-        private void IncrementVersion()
-        {
-            lock ( syncRoot )
-            {
-                currentVersion++;
-            }
-        }
-    }
-
-    private sealed class ActionApiVersionMetadataCollection
-    {
-        private readonly object syncRoot = new();
-        private readonly IActionDescriptorCollectionProvider provider;
-        private List<ApiVersionMetadata>? list;
-        private int version;
-
-        public ActionApiVersionMetadataCollection( IActionDescriptorCollectionProvider actionDescriptorCollectionProvider ) =>
-            provider = actionDescriptorCollectionProvider ?? throw new ArgumentNullException( nameof( actionDescriptorCollectionProvider ) );
-
-        public int Version => version;
-
-        public IReadOnlyList<ApiVersionMetadata> Items
-        {
-            get
-            {
-                var collection = provider.ActionDescriptors;
-
-                if ( list is not null && collection.Version == version )
-                {
-                    return list;
-                }
-
-                lock ( syncRoot )
-                {
-                    if ( list is not null && collection.Version == version )
-                    {
-                        return list;
-                    }
-
-                    var actions = collection.Items;
-
-                    if ( list == null )
-                    {
-                        list = new( capacity: actions.Count );
-                    }
-                    else
-                    {
-                        list.Clear();
-                        list.Capacity = actions.Count;
-                    }
-
-                    for ( var i = 0; i < actions.Count; i++ )
-                    {
-                        list.Add( actions[i].GetApiVersionMetadata() );
-                    }
-
-                    version = collection.Version;
-                }
-
-                return list;
-            }
-        }
-
-        public void Deconstruct( out IReadOnlyList<ApiVersionMetadata> items, out int version )
-        {
-            lock ( syncRoot )
-            {
-                version = this.version;
-                items = Items;
-            }
+            return hash.ToHashCode();
         }
     }
 }

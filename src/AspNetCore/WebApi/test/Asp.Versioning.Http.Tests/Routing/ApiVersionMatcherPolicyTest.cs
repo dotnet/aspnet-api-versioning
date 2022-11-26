@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.Routing;
 
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
@@ -229,7 +230,11 @@ public class ApiVersionMatcherPolicyTest
     private static Task Limbo( HttpContext context ) => Task.CompletedTask;
 
     private static ApiVersionMatcherPolicy NewApiVersionMatcherPolicy( ApiVersioningOptions options = default ) =>
-        new( ApiVersionParser.Default, Options.Create( options ?? new() ), Mock.Of<ILogger<ApiVersionMatcherPolicy>>() );
+        new(
+            ApiVersionParser.Default,
+            Enumerable.Empty<IApiVersionMetadataCollationProvider>(),
+            Options.Create( options ?? new() ),
+            Mock.Of<ILogger<ApiVersionMatcherPolicy>>() );
 
     private static HttpContext NewHttpContext(
         Mock<IApiVersioningFeature> apiVersioningFeature,

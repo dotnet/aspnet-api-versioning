@@ -14,8 +14,11 @@ public class GroupedApiVersionDescriptionProviderTest
     {
         // arrange
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
-            new TestEndpointDataSource(),
-            new TestActionDescriptorCollectionProvider(),
+            new IApiVersionMetadataCollationProvider[]
+            {
+                new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
+                new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
+            },
             Mock.Of<ISunsetPolicyManager>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
@@ -47,8 +50,11 @@ public class GroupedApiVersionDescriptionProviderTest
         }
 
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
-            source,
-            provider,
+            new IApiVersionMetadataCollationProvider[]
+            {
+                new EndpointApiVersionMetadataCollationProvider( source ),
+                new ActionApiVersionMetadataCollationProvider( provider ),
+            },
             Mock.Of<ISunsetPolicyManager>(),
             Options.Create(
                 new ApiExplorerOptions()
@@ -82,8 +88,11 @@ public class GroupedApiVersionDescriptionProviderTest
         policyManager.Setup( pm => pm.TryGetPolicy( default, apiVersion, out expected ) ).Returns( true );
 
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
-            new TestEndpointDataSource(),
-            new TestActionDescriptorCollectionProvider(),
+            new IApiVersionMetadataCollationProvider[]
+            {
+                new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
+                new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
+            },
             policyManager.Object,
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 

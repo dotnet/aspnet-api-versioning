@@ -3,6 +3,7 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.ApplicationModels;
 using Asp.Versioning.Conventions;
 using Asp.Versioning.Routing;
@@ -70,6 +71,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable( Transient<IApplicationModelProvider, ApiVersioningApplicationModelProvider>() );
         services.TryAddEnumerable( Transient<IActionDescriptorProvider, ApiVersionCollator>() );
         services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
+        services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, ActionApiVersionMetadataCollationProvider>() );
         services.Replace( WithUrlHelperFactoryDecorator( services ) );
     }
 

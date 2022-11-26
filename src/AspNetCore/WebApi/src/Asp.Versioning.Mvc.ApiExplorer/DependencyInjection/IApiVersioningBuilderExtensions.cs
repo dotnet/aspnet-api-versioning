@@ -6,7 +6,6 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -84,41 +83,30 @@ public static class IApiVersioningBuilderExtensions
         return new ApiVersionDescriptionProviderFactory( serviceProvider, mightUseCustomGroups ? NewGroupedProvider : NewDefaultProvider );
 
         static IApiVersionDescriptionProvider NewDefaultProvider(
-            EndpointDataSource endpointDataSource,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+            IEnumerable<IApiVersionMetadataCollationProvider> providers,
             ISunsetPolicyManager sunsetPolicyManager,
             IOptions<ApiExplorerOptions> apiExplorerOptions ) =>
-            new DefaultApiVersionDescriptionProvider( endpointDataSource, actionDescriptorCollectionProvider, sunsetPolicyManager, apiExplorerOptions );
+            new DefaultApiVersionDescriptionProvider( providers, sunsetPolicyManager, apiExplorerOptions );
 
         static IApiVersionDescriptionProvider NewGroupedProvider(
-            EndpointDataSource endpointDataSource,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+            IEnumerable<IApiVersionMetadataCollationProvider> providers,
             ISunsetPolicyManager sunsetPolicyManager,
             IOptions<ApiExplorerOptions> apiExplorerOptions ) =>
-            new GroupedApiVersionDescriptionProvider( endpointDataSource, actionDescriptorCollectionProvider, sunsetPolicyManager, apiExplorerOptions );
+            new GroupedApiVersionDescriptionProvider( providers, sunsetPolicyManager, apiExplorerOptions );
     }
 
     private static IApiVersionDescriptionProvider ResolveApiVersionDescriptionProvider( IServiceProvider serviceProvider )
     {
-        var endpointDataSource = serviceProvider.GetRequiredService<EndpointDataSource>();
-        var actionDescriptorCollectionProvider = serviceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
+        var providers = serviceProvider.GetServices<IApiVersionMetadataCollationProvider>();
         var sunsetPolicyManager = serviceProvider.GetRequiredService<ISunsetPolicyManager>();
         var options = serviceProvider.GetRequiredService<IOptions<ApiExplorerOptions>>();
         var mightUseCustomGroups = options.Value.FormatGroupName is not null;
 
         if ( mightUseCustomGroups )
         {
-            return new GroupedApiVersionDescriptionProvider(
-                endpointDataSource,
-                actionDescriptorCollectionProvider,
-                sunsetPolicyManager,
-                options );
+            return new GroupedApiVersionDescriptionProvider( providers, sunsetPolicyManager, options );
         }
 
-        return new DefaultApiVersionDescriptionProvider(
-            endpointDataSource,
-            actionDescriptorCollectionProvider,
-            sunsetPolicyManager,
-            options );
+        return new DefaultApiVersionDescriptionProvider( providers, sunsetPolicyManager, options );
     }
 }
