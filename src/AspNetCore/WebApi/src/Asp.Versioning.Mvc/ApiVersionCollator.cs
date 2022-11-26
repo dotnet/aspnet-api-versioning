@@ -2,10 +2,8 @@
 
 namespace Asp.Versioning;
 
-using Asp.Versioning.ApplicationModels;
 using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using System.Runtime.CompilerServices;
 using static Asp.Versioning.ApiVersionMapping;

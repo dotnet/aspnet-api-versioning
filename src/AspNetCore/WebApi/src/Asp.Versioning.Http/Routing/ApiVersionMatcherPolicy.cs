@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.Routing;
 
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
@@ -22,6 +23,7 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
     private readonly IOptions<ApiVersioningOptions> options;
     private readonly IApiVersionParser apiVersionParser;
     private readonly ILogger logger;
+    private readonly ApiVersionCollator? collator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionMatcherPolicy"/> class.
@@ -37,6 +39,20 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         this.apiVersionParser = apiVersionParser ?? throw new ArgumentNullException( nameof( apiVersionParser ) );
         this.options = options ?? throw new ArgumentNullException( nameof( options ) );
         this.logger = logger ?? throw new ArgumentNullException( nameof( logger ) );
+    }
+
+    // TODO: avoid a breaking change or surface area change in 6.3; unify and make it public in 7.0
+    // the functionality is still achievable for extenders
+    internal ApiVersionMatcherPolicy(
+        IApiVersionParser apiVersionParser,
+        IEnumerable<IApiVersionMetadataCollationProvider> providers,
+        IOptions<ApiVersioningOptions> options,
+        ILogger<ApiVersionMatcherPolicy> logger )
+    {
+        this.apiVersionParser = apiVersionParser;
+        this.options = options;
+        this.logger = logger;
+        collator = new( providers, options );
     }
 
     /// <inheritdoc />
@@ -219,17 +235,21 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
                     builder.Add( endpoint, version, metadata );
                 }
             }
+        }
 
-            if ( neutralEndpoints is null )
-            {
-                continue;
-            }
+        if ( neutralEndpoints != null && collator != null )
+        {
+            var allVersions = collator.Items;
 
             // add an edge for all known versions because version-neutral endpoints can map to any api version
-            for ( var j = 0; j < neutralEndpoints.Count; j++ )
+            for ( var i = 0; i < neutralEndpoints.Count; i++ )
             {
-                var (endpoint, metadata) = neutralEndpoints[j];
-                builder.Add( endpoint, version, metadata );
+                var (endpoint, metadata) = neutralEndpoints[i];
+
+                for ( var j = 0; j < allVersions.Count; j++ )
+                {
+                    builder.Add( endpoint, allVersions[j], metadata );
+                }
             }
         }
 
@@ -496,6 +516,95 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         {
             var result = -Score.CompareTo( other.Score );
             return result == 0 ? IsExplicit.CompareTo( other.IsExplicit ) : result;
+        }
+    }
+
+    private sealed class ApiVersionCollator
+    {
+        private readonly IApiVersionMetadataCollationProvider[] providers;
+        private readonly IOptions<ApiVersioningOptions> options;
+        private readonly object syncRoot = new();
+        private IReadOnlyList<ApiVersion>? items;
+        private int version;
+
+        internal ApiVersionCollator(
+            IEnumerable<IApiVersionMetadataCollationProvider> providers,
+            IOptions<ApiVersioningOptions> options )
+        {
+            this.providers = providers.ToArray();
+            this.options = options;
+        }
+
+        public IReadOnlyList<ApiVersion> Items
+        {
+            get
+            {
+                if ( items is not null && version == ComputeVersion() )
+                {
+                    return items;
+                }
+
+                lock ( syncRoot )
+                {
+                    var currentVersion = ComputeVersion();
+
+                    if ( items is not null && version == currentVersion )
+                    {
+                        return items;
+                    }
+
+                    var context = new ApiVersionMetadataCollationContext();
+
+                    for ( var i = 0; i < providers.Length; i++ )
+                    {
+                        providers[i].Execute( context );
+                    }
+
+                    var results = context.Results;
+                    var versions = new SortedSet<ApiVersion>();
+
+                    for ( var i = 0; i < results.Count; i++ )
+                    {
+                        var model = results[i].Map( Explicit | Implicit );
+                        var declared = model.DeclaredApiVersions;
+
+                        for ( var j = 0; j < declared.Count; j++ )
+                        {
+                            versions.Add( declared[j] );
+                        }
+                    }
+
+                    if ( versions.Count == 0 )
+                    {
+                        versions.Add( options.Value.DefaultApiVersion );
+                    }
+
+                    items = versions.ToArray();
+                    version = currentVersion;
+                }
+
+                return items;
+            }
+        }
+
+        private int ComputeVersion() =>
+            providers.Length switch
+            {
+                0 => 0,
+                1 => providers[0].Version,
+                _ => ComputeVersion( providers ),
+            };
+
+        private static int ComputeVersion( IApiVersionMetadataCollationProvider[] providers )
+        {
+            var hash = default( HashCode );
+
+            for ( var i = 0; i < providers.Length; i++ )
+            {
+                hash.Add( providers[i].Version );
+            }
+
+            return hash.ToHashCode();
         }
     }
 }

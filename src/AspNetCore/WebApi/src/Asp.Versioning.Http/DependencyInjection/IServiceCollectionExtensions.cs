@@ -3,12 +3,14 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 #if !NETCOREAPP3_1
 using Asp.Versioning.Builder;
 #endif
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
@@ -61,7 +63,15 @@ public static partial class IServiceCollectionExtensions
         services.TryAddSingleton<IReportApiVersions, DefaultApiVersionReporter>();
         services.TryAddSingleton<ISunsetPolicyManager, SunsetPolicyManager>();
         services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
-        services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
+        //// UNDONE: explicit constructor choice to avoid breaking change; revert in next major release
+        services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>(
+            sp => new ApiVersionMatcherPolicy(
+                    sp.GetRequiredService<IApiVersionParser>(),
+                    sp.GetServices<IApiVersionMetadataCollationProvider>(),
+                    sp.GetRequiredService<IOptions<ApiVersioningOptions>>(),
+                    sp.GetRequiredService<ILogger<ApiVersionMatcherPolicy>>() ) ) );
+
+        services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, EndpointApiVersionMetadataCollationProvider>() );
         services.Replace( WithLinkGeneratorDecorator( services ) );
     }
 
