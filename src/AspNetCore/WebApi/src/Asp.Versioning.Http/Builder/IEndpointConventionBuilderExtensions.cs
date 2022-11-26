@@ -412,6 +412,11 @@ public static class IEndpointConventionBuilderExtensions
         }
 
         metadata.Add( versionSet );
+
+        if ( !string.IsNullOrEmpty( versionSet.Name ) )
+        {
+            metadata.Insert( 0, new TagsAttribute( versionSet.Name ) );
+        }
     }
 
     private static void AddMetadata( EndpointBuilder builder, object item )

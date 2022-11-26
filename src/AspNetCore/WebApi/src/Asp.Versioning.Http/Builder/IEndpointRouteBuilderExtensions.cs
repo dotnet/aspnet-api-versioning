@@ -4,6 +4,7 @@ namespace Microsoft.AspNetCore.Builder;
 
 using Asp.Versioning;
 using Asp.Versioning.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
@@ -52,6 +53,11 @@ public static class IEndpointRouteBuilderExtensions
             throw new InvalidOperationException( SR.CannotNestVersionSet );
         }
 
+        if ( !string.IsNullOrEmpty( name ) )
+        {
+            builder.Add( endpoint => endpoint.Metadata.Insert( 0, new TagsAttribute( name ) ) );
+        }
+
         builder.Finally( EndpointBuilderFinalizer.FinalizeRoutes );
 
         return builder.NewVersionedEndpointRouteBuilder( builder, builder, name );
@@ -77,6 +83,11 @@ public static class IEndpointRouteBuilderExtensions
 
         var group = builder.MapGroup( string.Empty );
         IEndpointConventionBuilder convention = group;
+
+        if ( !string.IsNullOrEmpty( name ) )
+        {
+            convention.Add( endpoint => endpoint.Metadata.Insert( 0, new TagsAttribute( name ) ) );
+        }
 
         convention.Finally( EndpointBuilderFinalizer.FinalizeRoutes );
 
