@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Represents a versioned <see cref="IODataTemplateTranslator">OData template translator</see>.
@@ -30,9 +31,7 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
 
         if ( apiVersion == null )
         {
-            var metadata = context.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>();
-
-            if ( metadata == null || !metadata.IsApiVersionNeutral )
+            if ( !IsVersionNeutral( context ) )
             {
                 return default;
             }
@@ -42,7 +41,13 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
             var model = context.Model;
             var otherApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
 
-            if ( !apiVersion.Equals( otherApiVersion ) )
+            // HACK: a version-neutral endpoint can fail to match here because odata tries to match the
+            // first endpoint metadata when there could be multiple. such an endpoint is expected to be
+            // the same in all versions so allow it to flow through. revisit if/when odata fixes this.
+            //
+            // REF: https://github.com/OData/AspNetCoreOData/issues/753
+            // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Routing/ODataRoutingMatcherPolicy.cs#L86
+            if ( !apiVersion.Equals( otherApiVersion ) && !IsVersionNeutral( context ) )
             {
                 return default;
             }
@@ -58,4 +63,9 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
 
         return new( context.Segments );
     }
+
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static bool IsVersionNeutral( ODataTemplateTranslateContext context ) =>
+        context.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>() is ApiVersionMetadata metadata
+        && metadata.IsApiVersionNeutral;
 }
