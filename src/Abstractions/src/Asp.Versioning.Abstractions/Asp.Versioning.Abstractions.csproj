@@ -36,7 +36,7 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard1.0' ">
-  <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
+  <PackageReference Include="Microsoft.Extensions.Primitives" Version="7.0.0" />
  </ItemGroup>
  
 </Project>
