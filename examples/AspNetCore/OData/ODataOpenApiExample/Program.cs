@@ -23,6 +23,7 @@ builder.Services.AddControllers()
                         options.RouteOptions.EnableQualifiedOperationCall = false;
                         options.RouteOptions.EnableUnqualifiedOperationCall = true;
                     } );
+builder.Services.AddProblemDetails();
 builder.Services.AddApiVersioning(
                     options =>
                     {

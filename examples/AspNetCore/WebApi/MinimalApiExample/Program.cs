@@ -2,6 +2,8 @@ var builder = WebApplication.CreateBuilder( args );
 
 // Add services to the container.
 
+builder.Services.AddProblemDetails();
+
 // enable api versioning and return the headers
 // "api-supported-versions" and "api-deprecated-versions"
 builder.Services.AddApiVersioning( options => options.ReportApiVersions = true );

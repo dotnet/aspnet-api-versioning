@@ -27,6 +27,7 @@ builder.Services.Configure<JsonOptions>(
 
 builder.Services.AddControllers()
                 .AddOData( options => options.Select() );
+builder.Services.AddProblemDetails();
 builder.Services.AddApiVersioning()
                 .AddODataApiExplorer(
                     options =>
