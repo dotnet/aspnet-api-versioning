@@ -13,7 +13,7 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.0.0-*" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.0-*" />
  </ItemGroup>
 
  <Import Project="..\Acceptance.Test.Shared\Acceptance.Test.Shared.projitems" />
