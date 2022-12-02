@@ -77,10 +77,16 @@ public static class IApiVersioningBuilderExtensions
 
     private static IApiVersionDescriptionProviderFactory ResolveApiVersionDescriptionProviderFactory( IServiceProvider serviceProvider )
     {
+        var sunsetPolicyManager = serviceProvider.GetRequiredService<ISunsetPolicyManager>();
+        var providers = serviceProvider.GetServices<IApiVersionMetadataCollationProvider>();
         var options = serviceProvider.GetRequiredService<IOptions<ApiExplorerOptions>>();
         var mightUseCustomGroups = options.Value.FormatGroupName is not null;
 
-        return new ApiVersionDescriptionProviderFactory( serviceProvider, mightUseCustomGroups ? NewGroupedProvider : NewDefaultProvider );
+        return new ApiVersionDescriptionProviderFactory(
+            mightUseCustomGroups ? NewGroupedProvider : NewDefaultProvider,
+            sunsetPolicyManager,
+            providers,
+            options );
 
         static IApiVersionDescriptionProvider NewDefaultProvider(
             IEnumerable<IApiVersionMetadataCollationProvider> providers,
