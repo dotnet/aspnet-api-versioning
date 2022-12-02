@@ -5,7 +5,6 @@ namespace Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Represents the API versioning feature.
@@ -34,10 +33,11 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
         {
             if ( rawApiVersions is null )
             {
-                var reader = context.RequestServices.GetService<IApiVersionReader>()
-                             ?? ApiVersionReader.Combine(
-                                 new QueryStringApiVersionReader(),
-                                 new UrlSegmentApiVersionReader() );
+                var reader =
+                    context.RequestServices.GetService<IApiVersionReader>() ??
+                    ApiVersionReader.Combine(
+                        new QueryStringApiVersionReader(),
+                        new UrlSegmentApiVersionReader() );
 
                 rawApiVersions = reader.Read( context.Request );
             }
@@ -58,7 +58,11 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
             {
                 0 => default,
                 1 => values[0],
-                _ => throw NewAmbiguousApiVersionException( values ),
+#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations; existing behavior via IApiVersionReader.Read
+                _ => throw new AmbiguousApiVersionException(
+                        string.Format( CultureInfo.CurrentCulture, CommonSR.MultipleDifferentApiVersionsRequested, string.Join( ", ", values ) ),
+                        values ),
+#pragma warning restore CA1065
             };
         }
         set
@@ -84,8 +88,7 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
                 return apiVersion;
             }
 
-            var parser = context.RequestServices.GetService<IApiVersionParser>()
-                         ?? ApiVersionParser.Default;
+            var parser = context.RequestServices.GetRequiredService<IApiVersionParser>();
 
             try
             {
@@ -102,20 +105,10 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
         {
             apiVersion = value;
 
-            if ( apiVersion is not null &&
-               ( rawApiVersions is null || rawApiVersions.Count == 0 ) )
+            if ( apiVersion is not null && ( rawApiVersions is null || rawApiVersions.Count == 0 ) )
             {
                 rawApiVersions = new[] { apiVersion.ToString() };
             }
         }
     }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static AmbiguousApiVersionException NewAmbiguousApiVersionException( IReadOnlyList<string> values ) =>
-        new(
-            string.Format(
-                CultureInfo.CurrentCulture,
-                CommonSR.MultipleDifferentApiVersionsRequested,
-                string.Join( ", ", values.ToArray(), 0, values.Count ) ),
-            values );
 }

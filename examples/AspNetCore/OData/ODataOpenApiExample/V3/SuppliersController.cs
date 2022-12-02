@@ -29,8 +29,7 @@ public class SuppliersController : ODataController
     /// <returns>All available suppliers.</returns>
     /// <response code="200">Suppliers successfully retrieved.</response>
     [HttpGet]
-    //[EnableQuery]
-    [EnableQuery( MaxTop = 2 )]
+    [EnableQuery]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataValue<IEnumerable<Supplier>> ), Status200OK )]
     public IQueryable<Supplier> Get() => suppliers;

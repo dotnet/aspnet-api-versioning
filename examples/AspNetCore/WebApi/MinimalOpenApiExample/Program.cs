@@ -56,7 +56,6 @@ var ordersV1 = orders.MapGroup( "/api/orders" )
                      .HasApiVersion( 1.0 );
 
 ordersV1.MapGet( "/{id:int}", ( int id ) => new OrderV1() { Id = id, Customer = "John Doe" } )
-        .WithOpenApi()
         .Produces<OrderV1>()
         .Produces( 404 );
 

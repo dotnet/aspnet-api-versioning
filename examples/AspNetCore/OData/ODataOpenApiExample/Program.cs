@@ -16,7 +16,7 @@ builder.Services.AddControllers()
                 .AddOData(
                     options =>
                     {
-                        options.Count().Select().OrderBy().SetMaxTop( 3 );
+                        options.Count().Select().OrderBy();
                         options.RouteOptions.EnableKeyInParenthesis = false;
                         options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
                         options.RouteOptions.EnablePropertyNameCaseInsensitive = true;
