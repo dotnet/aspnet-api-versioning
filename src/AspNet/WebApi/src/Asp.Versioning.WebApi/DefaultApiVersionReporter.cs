@@ -12,7 +12,8 @@ public partial class DefaultApiVersionReporter
 {
     private static DefaultApiVersionReporter? instance;
 
-    internal static IReportApiVersions Instance => instance ??= new();
+    internal static IReportApiVersions GetOrCreate( ISunsetPolicyManager sunsetPolicyManager ) =>
+        instance ??= new( sunsetPolicyManager );
 
     private static void AddApiVersionHeader( HttpResponseHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
     {

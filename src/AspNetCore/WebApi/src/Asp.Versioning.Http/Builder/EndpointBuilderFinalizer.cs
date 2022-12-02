@@ -52,7 +52,10 @@ internal static class EndpointBuilderFinalizer
         if ( reportApiVersions )
         {
             requestDelegate = EnsureRequestDelegate( requestDelegate, endpointBuilder.RequestDelegate );
-            requestDelegate = new ReportApiVersionsDecorator( requestDelegate, metadata );
+
+            var reporter = services.GetRequiredService<IReportApiVersions>();
+
+            requestDelegate = new ReportApiVersionsDecorator( requestDelegate, reporter, metadata );
             endpointBuilder.RequestDelegate = requestDelegate;
         }
 

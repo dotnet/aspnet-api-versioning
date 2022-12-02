@@ -81,15 +81,14 @@ public class ReportApiVersionsAttributeTest
         var actionArguments = new Dictionary<string, object>();
         var controller = default( object );
         var endpoint = new Endpoint( c => Task.CompletedTask, new( new[] { metadata } ), "Test" );
+        var options = Options.Create( new ApiVersioningOptions() );
+        var reporter = new DefaultApiVersionReporter( new SunsetPolicyManager( options ) );
 
         endpointFeature.SetupProperty( f => f.Endpoint, endpoint );
         versioningFeature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1.0 ) );
         features.Set( endpointFeature.Object );
         features.Set( versioningFeature.Object );
-        serviceProvider.Setup( sp => sp.GetService( typeof( IReportApiVersions ) ) )
-                       .Returns( new DefaultApiVersionReporter() );
-        serviceProvider.Setup( sp => sp.GetService( typeof( ISunsetPolicyManager ) ) )
-                       .Returns( new SunsetPolicyManager( Options.Create( new ApiVersioningOptions() ) ) );
+        serviceProvider.Setup( sp => sp.GetService( typeof( IReportApiVersions ) ) ).Returns( reporter );
         response.SetupGet( r => r.Headers ).Returns( headers );
         response.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
         response.Setup( r => r.OnStarting( It.IsAny<Func<object, Task>>(), It.IsAny<object>() ) )

@@ -27,7 +27,5 @@ public sealed partial class ReportApiVersionsAttribute : ActionFilterAttribute
     /// Initializes a new instance of the <see cref="ReportApiVersionsAttribute"/> class.
     /// </summary>
     /// <param name="reportApiVersions">The <see cref="IReportApiVersions">object</see> used to report API versions.</param>
-#pragma warning disable CA1019 // Define accessors for attribute arguments
     public ReportApiVersionsAttribute( IReportApiVersions reportApiVersions ) => this.reportApiVersions = reportApiVersions;
-#pragma warning restore CA1019 // Define accessors for attribute arguments
 }

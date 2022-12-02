@@ -7,7 +7,6 @@ using System.Web.Http;
 using HttpResponse = System.Net.Http.HttpResponseMessage;
 #else
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 #endif
 using static Asp.Versioning.ApiVersionMapping;
 
@@ -23,12 +22,14 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     private const string ApiDeprecatedVersions = "api-deprecated-versions";
     private const string Sunset = nameof( Sunset );
     private const string Link = nameof( Link );
+    private readonly ISunsetPolicyManager sunsetPolicyManager;
     private readonly string apiSupportedVersionsName;
     private readonly string apiDeprecatedVersionsName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultApiVersionReporter"/> class.
     /// </summary>
+    /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
     /// <param name="supportedHeaderName">The HTTP header name used for supported API versions.
     /// The default value is "api-supported-versions".</param>
     /// <param name="deprecatedHeaderName">THe HTTP header name used for deprecated API versions.
@@ -36,11 +37,12 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     /// <param name="mapping">One or more of API versioning mappings. The default value is
     /// <see cref="ApiVersionMapping.Explicit"/> and <see cref="ApiVersionMapping.Implicit"/>.</param>
     public DefaultApiVersionReporter(
+        ISunsetPolicyManager sunsetPolicyManager,
         string supportedHeaderName = ApiSupportedVersions,
         string deprecatedHeaderName = ApiDeprecatedVersions,
         ApiVersionMapping mapping = Explicit | Implicit )
     {
-        Mapping = mapping;
+        this.sunsetPolicyManager = sunsetPolicyManager ?? throw new ArgumentNullException( nameof( sunsetPolicyManager ) );
 
         if ( string.IsNullOrEmpty( apiSupportedVersionsName = supportedHeaderName ) )
         {
@@ -51,6 +53,8 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         {
             throw new ArgumentNullException( nameof( deprecatedHeaderName ) );
         }
+
+        Mapping = mapping;
     }
 
     /// <inheritdoc />
@@ -86,8 +90,6 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
             return;
         }
 
-        var name = metadata.Name;
-        var policyManager = request.GetConfiguration().DependencyResolver.GetSunsetPolicyManager();
         var version = request.GetRequestedApiVersion();
 #else
         var context = response.HttpContext;
@@ -97,14 +99,13 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
             return;
         }
 
-        var name = metadata.Name;
-        var policyManager = context.RequestServices.GetRequiredService<ISunsetPolicyManager>();
         var version = context.GetRequestedApiVersion();
 #endif
+        var name = metadata.Name;
 
-        if ( policyManager.TryGetPolicy( name, version, out var policy ) ||
-           ( !string.IsNullOrEmpty( name ) && policyManager.TryGetPolicy( name, out policy ) ) ||
-           ( version != null && policyManager.TryGetPolicy( version, out policy ) ) )
+        if ( sunsetPolicyManager.TryGetPolicy( name, version, out var policy ) ||
+           ( !string.IsNullOrEmpty( name ) && sunsetPolicyManager.TryGetPolicy( name, out policy ) ) ||
+           ( version != null && sunsetPolicyManager.TryGetPolicy( version, out policy ) ) )
         {
             response.WriteSunsetPolicy( policy );
         }

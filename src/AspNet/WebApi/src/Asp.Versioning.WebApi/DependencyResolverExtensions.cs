@@ -13,7 +13,7 @@ internal static class DependencyResolverExtensions
         resolver.GetService<IApiVersionParser>() ?? ApiVersionParser.Default;
 
     internal static IReportApiVersions GetApiVersionReporter( this IDependencyResolver resolver ) =>
-        resolver.GetService<IReportApiVersions>() ?? DefaultApiVersionReporter.Instance;
+        resolver.GetService<IReportApiVersions>() ?? DefaultApiVersionReporter.GetOrCreate( resolver.GetSunsetPolicyManager() );
 
     internal static IControllerNameConvention GetControllerNameConvention( this IDependencyResolver resolver ) =>
         resolver.GetService<IControllerNameConvention>() ?? ControllerNameConvention.Default;

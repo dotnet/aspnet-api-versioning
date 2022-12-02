@@ -5,7 +5,6 @@ namespace Asp.Versioning;
 using Asp.Versioning.Simulators;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.Dependencies;
 using static System.Net.HttpStatusCode;
 
 public class DefaultApiVersionReporterTest
@@ -14,9 +13,8 @@ public class DefaultApiVersionReporterTest
     public void report_should_add_expected_headers()
     {
         // arrange
-        var reporter = new DefaultApiVersionReporter();
         var sunsetDate = DateTimeOffset.Now;
-        var dependencyResolver = new Mock<IDependencyResolver>();
+        var reporter = new DefaultApiVersionReporter( new TestSunsetPolicyManager( sunsetDate ) );
         var configuration = new HttpConfiguration();
         var request = new HttpRequestMessage();
         var response = new HttpResponseMessage( OK ) { RequestMessage = request };
@@ -34,9 +32,6 @@ public class DefaultApiVersionReporterTest
             deprecatedAdvertisedVersions: Enumerable.Empty<ApiVersion>() );
         var metadata = new ApiVersionMetadata( apiModel, endpointModel, "Test" );
 
-        dependencyResolver.Setup( dr => dr.GetService( typeof( ISunsetPolicyManager ) ) )
-                          .Returns( new TestSunsetPolicyManager( sunsetDate ) );
-        configuration.DependencyResolver = dependencyResolver.Object;
         request.SetConfiguration( configuration );
         request.ApiVersionProperties().RequestedApiVersion = new ApiVersion( 1.0 );
         request.Properties["MS_HttpActionDescriptor"] =

@@ -12,8 +12,8 @@ public class DefaultApiVersionReporterTest
     public void report_should_add_expected_headers()
     {
         // arrange
-        var reporter = new DefaultApiVersionReporter();
         var sunsetDate = DateTimeOffset.Now;
+        var reporter = new DefaultApiVersionReporter( new TestSunsetPolicyManager( sunsetDate ) );
         var httpContext = new Mock<HttpContext>();
         var features = new Mock<IFeatureCollection>();
         var query = new Mock<IQueryCollection>();
@@ -50,7 +50,6 @@ public class DefaultApiVersionReporterTest
         response.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
         serviceProvider.Setup( sp => sp.GetService( typeof( IApiVersionParser ) ) ).Returns( ApiVersionParser.Default );
         serviceProvider.Setup( sp => sp.GetService( typeof( IApiVersionReader ) ) ).Returns( new QueryStringApiVersionReader() );
-        serviceProvider.Setup( sp => sp.GetService( typeof( ISunsetPolicyManager ) ) ).Returns( new TestSunsetPolicyManager( sunsetDate ) );
         httpContext.SetupGet( c => c.Features ).Returns( features.Object );
         httpContext.SetupGet( c => c.Request ).Returns( request.Object );
         httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
