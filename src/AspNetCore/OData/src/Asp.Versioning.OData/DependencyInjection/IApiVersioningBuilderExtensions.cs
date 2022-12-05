@@ -9,7 +9,6 @@ using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
@@ -69,8 +68,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryRemoveODataService( typeof( IApplicationModelProvider ), ODataRoutingApplicationModelProviderType );
 
         var partManager = services.GetOrCreateApplicationPartManager();
-
-        ConfigureDefaultFeatureProviders( partManager );
+        var configured = partManager.ConfigureDefaultFeatureProviders();
 
         services.AddHttpContextAccessor();
         services.TryAddSingleton<VersionedODataOptions>();
@@ -87,24 +85,11 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable( Singleton<MatcherPolicy, DefaultMetadataMatcherPolicy>() );
         services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataApplicationModelProvider>() );
         services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataMultiModelApplicationModelProvider>() );
-        services.AddModelConfigurationsAsServices( partManager );
-    }
 
-    private static T GetService<T>( this IServiceCollection services ) =>
-        (T) services.LastOrDefault( d => d.ServiceType == typeof( T ) )?.ImplementationInstance!;
-
-    private static ApplicationPartManager GetOrCreateApplicationPartManager( this IServiceCollection services )
-    {
-        var partManager = services.GetService<ApplicationPartManager>();
-
-        if ( partManager == null )
+        if ( configured )
         {
-            partManager = new ApplicationPartManager();
-            services.TryAddSingleton( partManager );
+            services.AddModelConfigurationsAsServices( partManager );
         }
-
-        partManager.ApplicationParts.Add( new AssemblyPart( typeof( ODataApiVersioningOptions ).Assembly ) );
-        return partManager;
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -148,27 +133,6 @@ public static class IApiVersioningBuilderExtensions
                 services[i] = replacement;
                 break;
             }
-        }
-    }
-
-    private static void AddModelConfigurationsAsServices( this IServiceCollection services, ApplicationPartManager partManager )
-    {
-        var feature = new ModelConfigurationFeature();
-        var modelConfigurationType = typeof( IModelConfiguration );
-
-        partManager.PopulateFeature( feature );
-
-        foreach ( var modelConfiguration in feature.ModelConfigurations )
-        {
-            services.TryAddEnumerable( Transient( modelConfigurationType, modelConfiguration ) );
-        }
-    }
-
-    private static void ConfigureDefaultFeatureProviders( ApplicationPartManager partManager )
-    {
-        if ( !partManager.FeatureProviders.OfType<ModelConfigurationFeatureProvider>().Any() )
-        {
-            partManager.FeatureProviders.Add( new ModelConfigurationFeatureProvider() );
         }
     }
 
