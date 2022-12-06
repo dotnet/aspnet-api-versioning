@@ -21,6 +21,10 @@
   <Import Project="$(BuildDir)test.targets" />
  </ImportGroup>
 
+ <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+  <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="1.0.3" PrivateAssets="All" />
+ </ItemGroup>
+
  <Target Name="GetTargetPath" Outputs="$(TargetPath)" />
  <Target Name="GetTargetPaths" Outputs="@(TargetFiles)">
 

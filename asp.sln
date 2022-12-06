@@ -26,9 +26,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Abstractions", "Abstractions", "{7B0FA6C2-47BA-4C34-90E0-B75DF44F2124}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNet", "AspNet", "{34A0373F-12C9-44A8-9A1C-5EEE7218C877}"
-	ProjectSection(SolutionItems) = preProject
-		src\AspNet\Directory.Build.targets = src\AspNet\Directory.Build.targets
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", "{EBC9F217-E8BC-4DCE-9C67-F22150959EAF}"
 EndProject
