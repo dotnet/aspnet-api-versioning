@@ -97,5 +97,5 @@ public class AdvertiseApiVersionsAttribute : ApiVersionsBaseAttribute, IApiVersi
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine( GetHashCode(), Deprecated );
+    public override int GetHashCode() => HashCode.Combine( base.GetHashCode(), Deprecated );
 }
