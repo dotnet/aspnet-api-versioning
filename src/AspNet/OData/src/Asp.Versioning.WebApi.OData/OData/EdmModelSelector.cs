@@ -130,15 +130,11 @@ public class EdmModelSelector : IEdmModelSelector
 
     private static void AddVersionFromModel( IEdmModel model, IList<ApiVersion> versions, IDictionary<ApiVersion, IEdmModel> collection )
     {
-        var annotation = model.GetAnnotationValue<ApiVersionAnnotation>( model );
-
-        if ( annotation == null )
+        if ( model.GetApiVersion() is not ApiVersion version )
         {
             var message = string.Format( CultureInfo.CurrentCulture, SR.MissingAnnotation, typeof( ApiVersionAnnotation ).Name );
             throw new ArgumentException( message );
         }
-
-        var version = annotation.ApiVersion;
 
         collection.Add( version, model );
         versions.Add( version );

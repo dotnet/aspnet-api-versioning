@@ -34,7 +34,7 @@ public partial class ODataQueryOptionDescriptionContext
         foreach ( var item in items )
         {
             var model = item.Model;
-            var otherVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+            var otherVersion = model.GetApiVersion();
 
             if ( version.Equals( otherVersion ) )
             {
