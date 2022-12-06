@@ -75,9 +75,8 @@ public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfigu
 
     private void OnModelCreating( ODataModelBuilder builder )
     {
-        foreach ( var type in types )
+        foreach ( var entityType in types.Select( builder.AddEntityType ) )
         {
-            var entityType = builder.AddEntityType( type );
             builder.AddEntitySet( entityType.Name, entityType );
         }
     }
