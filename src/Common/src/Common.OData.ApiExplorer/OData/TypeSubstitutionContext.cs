@@ -36,7 +36,7 @@ public class TypeSubstitutionContext
     /// Gets API version associated with the source model.
     /// </summary>
     /// <value>The associated <see cref="ApiVersion">API version</see>.</value>
-    public ApiVersion ApiVersion => apiVersion ??= Model.GetAnnotationValue<ApiVersionAnnotation>( Model )?.ApiVersion ?? ApiVersion.Neutral;
+    public ApiVersion ApiVersion => apiVersion ??= Model.GetApiVersion() ?? ApiVersion.Neutral;
 
     /// <summary>
     /// Gets the model type builder used to create substitution types.

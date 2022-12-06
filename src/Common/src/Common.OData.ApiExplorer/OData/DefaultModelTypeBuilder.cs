@@ -25,9 +25,18 @@ using static System.Reflection.Emit.AssemblyBuilderAccess;
 public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 {
     private static Type? ienumerableOfT;
+    private readonly bool adHoc;
+    private DefaultModelTypeBuilder? adHocBuilder;
     private ConcurrentDictionary<ApiVersion, ModuleBuilder>? modules;
     private ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>? generatedEdmTypesPerVersion;
     private ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>>? generatedActionParamsPerVersion;
+
+    private DefaultModelTypeBuilder( bool adHoc ) => this.adHoc = adHoc;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultModelTypeBuilder"/> class.
+    /// </summary>
+    public DefaultModelTypeBuilder() { }
 
     /// <inheritdoc />
     public Type NewStructuredType( IEdmModel model, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
@@ -35,6 +44,12 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         if ( model == null )
         {
             throw new ArgumentNullException( nameof( model ) );
+        }
+
+        if ( !adHoc && model.IsAdHoc() )
+        {
+            adHocBuilder ??= new( adHoc: true );
+            return adHocBuilder.NewStructuredType( model, structuredType, clrType, apiVersion );
         }
 
         if ( structuredType == null )
@@ -54,10 +69,9 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         generatedEdmTypesPerVersion ??= new();
 
-        var typeKey = new EdmTypeKey( structuredType, apiVersion );
         var edmTypes = generatedEdmTypesPerVersion.GetOrAdd( apiVersion, key => GenerateTypesForEdmModel( model, key ) );
 
-        return edmTypes[typeKey];
+        return edmTypes[new( structuredType, apiVersion )];
     }
 
     /// <inheritdoc />
@@ -66,6 +80,12 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         if ( model == null )
         {
             throw new ArgumentNullException( nameof( model ) );
+        }
+
+        if ( !adHoc && model.IsAdHoc() )
+        {
+            adHocBuilder ??= new( adHoc: true );
+            return adHocBuilder.NewActionParameters( model, action, controllerName, apiVersion );
         }
 
         if ( action == null )
@@ -85,7 +105,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         generatedActionParamsPerVersion ??= new();
 
-        var paramTypes = generatedActionParamsPerVersion.GetOrAdd( apiVersion, _ => new ConcurrentDictionary<EdmTypeKey, Type>() );
+        var paramTypes = generatedActionParamsPerVersion.GetOrAdd( apiVersion, _ => new() );
         var fullTypeName = $"{controllerName}.{action.Namespace}.{controllerName}{action.Name}Parameters";
         var key = new EdmTypeKey( fullTypeName, apiVersion );
         var type = paramTypes.GetOrAdd( key, _ =>
@@ -322,8 +342,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static Type MakeEnumerable( Type itemType ) =>
-        ( ienumerableOfT ??= typeof( IEnumerable<> ) ).MakeGenericType( itemType );
+    private static Type MakeEnumerable( Type itemType ) => ( ienumerableOfT ??= typeof( IEnumerable<> ) ).MakeGenericType( itemType );
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static Type CreateTypeFromSignature( ModuleBuilder moduleBuilder, ClassSignature @class ) =>
@@ -389,7 +408,11 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         return edmTypes;
     }
 
-    private static PropertyBuilder AddProperty( TypeBuilder addTo, Type shouldBeAdded, string name, IReadOnlyList<CustomAttributeBuilder> customAttributes )
+    private static PropertyBuilder AddProperty(
+        TypeBuilder addTo,
+        Type shouldBeAdded,
+        string name,
+        IReadOnlyList<CustomAttributeBuilder> customAttributes )
     {
         const MethodAttributes propertyMethodAttributes = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
         var field = addTo.DefineField( "_" + name, shouldBeAdded, FieldAttributes.Private );
@@ -418,7 +441,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         return propertyBuilder;
     }
 
-    private static AssemblyName NewAssemblyName(ApiVersion apiVersion)
+    private static AssemblyName NewAssemblyName( ApiVersion apiVersion, bool adHoc )
     {
         // this is not strictly necessary, but it makes debugging a bit easier as each
         // assembly-qualified type name provides visibility as to which api version a
@@ -455,20 +478,26 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         }
 
         name.Insert( 0, 'V' )
-            .Append( NewGuid().ToString( "n", InvariantCulture ) )
-            .Append( ".DynamicModels" );
+            .Append( NewGuid().ToString( "n", InvariantCulture ) );
+
+        if ( adHoc )
+        {
+            name.Append( ".AdHoc" );
+        }
+
+        name.Append( ".DynamicModels" );
 
         return new( name.ToString() );
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static ModuleBuilder CreateModuleForApiVersion( ApiVersion apiVersion )
+    private ModuleBuilder CreateModuleForApiVersion( ApiVersion apiVersion )
     {
-        var name = NewAssemblyName( apiVersion );
+        var assemblyName = NewAssemblyName( apiVersion, adHoc );
 #if NETFRAMEWORK
-        var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly( name, Run );
+        var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly( assemblyName, Run );
 #else
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly( name, Run );
+        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly( assemblyName, Run );
 #endif
         return assemblyBuilder.DefineDynamicModule( "<module>" );
     }

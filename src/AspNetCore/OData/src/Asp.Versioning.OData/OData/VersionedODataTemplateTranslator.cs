@@ -39,7 +39,7 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
         else
         {
             var model = context.Model;
-            var otherApiVersion = model.GetAnnotationValue<ApiVersionAnnotation>( model )?.ApiVersion;
+            var otherApiVersion = model.GetApiVersion();
 
             // HACK: a version-neutral endpoint can fail to match here because odata tries to match the
             // first endpoint metadata when there could be multiple. such an endpoint is expected to be
