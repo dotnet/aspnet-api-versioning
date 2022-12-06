@@ -4,6 +4,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -55,9 +56,12 @@ public static class IApiVersioningBuilderExtensions
         var services = builder.Services;
 
         builder.AddApiExplorer();
+        builder.Services.AddModelConfigurationsAsServices();
         services.TryAddSingleton<IModelTypeBuilder, DefaultModelTypeBuilder>();
-        services.TryAddSingleton<IOptionsFactory<ODataApiExplorerOptions>, ApiExplorerOptionsFactory<ODataApiExplorerOptions>>();
+        services.TryAddSingleton<IOptionsFactory<ODataApiExplorerOptions>, ODataApiExplorerOptionsFactory>();
+        services.TryAddEnumerable( Transient<IApiDescriptionProvider, PartialODataDescriptionProvider>() );
         services.TryAddEnumerable( Transient<IApiDescriptionProvider, ODataApiDescriptionProvider>() );
+        services.TryAddEnumerable( Transient<IModelConfiguration, ImplicitModelBoundSettingsConvention>() );
         services.Replace( Singleton<IOptionsFactory<ApiExplorerOptions>, ODataApiExplorerOptionsAdapter>() );
     }
 
@@ -67,8 +71,7 @@ public static class IApiVersioningBuilderExtensions
     {
         private readonly IOptionsFactory<ODataApiExplorerOptions> factory;
 
-        public ODataApiExplorerOptionsAdapter( IOptionsFactory<ODataApiExplorerOptions> factory ) =>
-            this.factory = factory;
+        public ODataApiExplorerOptionsAdapter( IOptionsFactory<ODataApiExplorerOptions> factory ) => this.factory = factory;
 
         public ApiExplorerOptions Create( string name ) => factory.Create( name );
     }

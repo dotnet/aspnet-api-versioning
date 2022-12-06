@@ -15,7 +15,8 @@ public partial class ODataApiExplorerOptions : ApiExplorerOptions
     /// Initializes a new instance of the <see cref="ODataApiExplorerOptions"/> class.
     /// </summary>
     /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see> associated with the options.</param>
-    public ODataApiExplorerOptions( HttpConfiguration configuration ) : base( configuration ) { }
+    public ODataApiExplorerOptions( HttpConfiguration configuration )
+        : base( configuration ) => AdHocModelBuilder = new( configuration );
 
     /// <summary>
     /// Gets or sets a value indicating whether the API explorer settings are honored.

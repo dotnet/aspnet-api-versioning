@@ -14,6 +14,7 @@ using System.Web.Http.Description;
 /// Represents a RESTful service of books.
 /// </summary>
 [ApiVersion( 1.0 )]
+[RoutePrefix( "api/books" )]
 public class BooksController : ApiController
 {
     private static readonly Book[] books = new Book[]
@@ -33,6 +34,7 @@ public class BooksController : ApiController
     /// <returns>All available books.</returns>
     /// <response code="200">The successfully retrieved books.</response>
     [HttpGet]
+    [Route]
     [ResponseType( typeof( IEnumerable<Book> ) )]
     public IHttpActionResult Get( ODataQueryOptions<Book> options ) =>
         Ok( options.ApplyTo( books.AsQueryable() ) );
@@ -46,6 +48,7 @@ public class BooksController : ApiController
     /// <response code="200">The book was successfully retrieved.</response>
     /// <response code="404">The book does not exist.</response>
     [HttpGet]
+    [Route( "{id}" )]
     [ResponseType( typeof( Book ) )]
     public IHttpActionResult Get( string id, ODataQueryOptions<Book> options )
     {
