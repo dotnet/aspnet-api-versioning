@@ -221,7 +221,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = 0; i < items.Count; i++ )
         {
             var item = items[i];
-            var otherApiVersion = item.Model.GetAnnotationValue<ApiVersionAnnotation>( item.Model )?.ApiVersion;
+            var otherApiVersion = item.Model.GetApiVersion();
 
             if ( apiVersion.Equals( otherApiVersion ) )
             {

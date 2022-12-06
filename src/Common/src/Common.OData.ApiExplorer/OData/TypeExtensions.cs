@@ -3,11 +3,13 @@
 namespace Asp.Versioning.OData;
 
 #if NETFRAMEWORK
+using Microsoft.OData.Edm;
 using System.Net.Http;
 using System.Web.Http;
 #else
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.OData.Edm;
 #endif
 using System.Reflection;
 using System.Reflection.Emit;
@@ -54,12 +56,11 @@ public static partial class TypeExtensions
         var openTypes = new Stack<Type>();
         var apiVersion = context.ApiVersion;
         var resolver = new StructuredTypeResolver( context.Model );
+        IEdmStructuredType? structuredType;
 
         if ( IsSubstitutableGeneric( type, openTypes, out var innerType ) )
         {
-            var structuredType = resolver.GetStructuredType( innerType! );
-
-            if ( structuredType == null )
+            if ( ( structuredType = resolver.GetStructuredType( innerType! ) ) == null )
             {
                 return type;
             }
@@ -74,14 +75,9 @@ public static partial class TypeExtensions
             return CloseGeneric( openTypes, newType );
         }
 
-        if ( CanBeSubstituted( type ) )
+        if ( CanBeSubstituted( type ) && ( structuredType = resolver.GetStructuredType( type ) ) != null )
         {
-            var structuredType = resolver.GetStructuredType( type );
-
-            if ( structuredType != null )
-            {
-                type = context.ModelTypeBuilder.NewStructuredType( context.Model, structuredType, type, apiVersion );
-            }
+            type = context.ModelTypeBuilder.NewStructuredType( context.Model, structuredType, type, apiVersion );
         }
 
         return type;
@@ -242,16 +238,15 @@ public static partial class TypeExtensions
         return type;
     }
 
-    private static bool CanBeSubstituted( Type type )
-    {
-        return Type.GetTypeCode( type ) == TypeCode.Object &&
-              !type.IsValueType &&
-              !type.Equals( ActionResultType ) &&
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static bool CanBeSubstituted( Type type ) =>
+        Type.GetTypeCode( type ) == TypeCode.Object &&
+        !type.IsValueType &&
+        !type.Equals( ActionResultType ) &&
 #if NETFRAMEWORK
-              !type.Equals( HttpResponseType ) &&
+        !type.Equals( HttpResponseType ) &&
 #endif
-              !type.IsODataActionParameters();
-    }
+        !type.IsODataActionParameters();
 
     internal static bool IsEnumerable(
         this Type type,
@@ -295,6 +290,7 @@ public static partial class TypeExtensions
         return false;
     }
 
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static bool IsSingleResult( this Type type ) => type.Is( SingleResultOfT );
 
     private static bool IsODataValue( this Type? type )
@@ -323,6 +319,7 @@ public static partial class TypeExtensions
     private static bool Is( this Type type, Type typeDefinition ) =>
         type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeDefinition );
 
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static bool ShouldExtractInnerType( this Type type ) =>
         type.IsDelta() ||
 #if !NETFRAMEWORK

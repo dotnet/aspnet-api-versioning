@@ -152,7 +152,11 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         for ( var i = 0; i < models.Count; i++ )
         {
             var model = models[i];
-            var version = model.GetAnnotationValue<ApiVersionAnnotation>( model ).ApiVersion;
+
+            if ( model.GetApiVersion() is not ApiVersion version )
+            {
+                continue;
+            }
 
             if ( !mappings.TryGetValue( version, out var options ) )
             {
