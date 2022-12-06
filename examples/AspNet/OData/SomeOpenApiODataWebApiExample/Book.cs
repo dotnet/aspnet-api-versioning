@@ -1,8 +1,15 @@
 ﻿namespace ApiVersioning.Examples;
 
+using Microsoft.AspNet.OData.Query;
+
+// TODO: Model Bound settings can be performed via attributes if the
+// return type is known to the API Explorer or can be explicitly done
+// via one or more IModelConfiguration implementations
+
 /// <summary>
 /// Represents a book.
 /// </summary>
+[Filter( "author", "published" )]
 public class Book
 {
     /// <summary>

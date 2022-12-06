@@ -68,6 +68,10 @@ public partial class Startup
                                         .Allow( Skip | Count )
                                         .AllowTop( 100 )
                                         .AllowOrderBy( "title", "published" );
+
+                // applies model bound settings implicitly using an ad hoc EDM. alternatively, you can create your own
+                // IModelConfiguration + IODataQueryOptionsConvention for full control over what goes in the ad hoc EDM.
+                options.AdHocModelBuilder.ModelConfigurations.Add( new ImplicitModelBoundSettingsConvention() );
             } );
 
         configuration.EnableSwagger(
