@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup>
-  <TargetFrameworks>net6.0;net472;net452</TargetFrameworks>
+  <TargetFrameworks>net6.0;net452;net472</TargetFrameworks>
   <RootNamespace>Asp.Versioning</RootNamespace>
  </PropertyGroup>
  <ItemGroup Condition=" ('$(TargetFramework)' == 'net452') OR ('$(TargetFramework)' == 'net472') ">

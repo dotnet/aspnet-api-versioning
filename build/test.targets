@@ -2,8 +2,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
-  <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
-  <MoqVersion>4.18.2</MoqVersion>
+  <FluentAssertionsVersion>6.8.0</FluentAssertionsVersion>
+  <MoqVersion>4.18.3</MoqVersion>
   <XunitRunnerVersion>2.4.5</XunitRunnerVersion>
   <TestHostVersion>6.0.8-*</TestHostVersion>
  </PropertyGroup>
