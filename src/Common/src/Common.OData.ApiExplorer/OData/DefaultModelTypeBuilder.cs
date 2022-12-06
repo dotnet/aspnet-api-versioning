@@ -24,6 +24,18 @@ using static System.Reflection.Emit.AssemblyBuilderAccess;
 /// </summary>
 public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 {
+    /* design: there is typically a 1:1 relationship between an edm and api version. odata model bound settings
+     * are realized as an annotation in the edm. this can result in two sets of pairs where one edm is the
+     * standard mapping and the other is ad hoc for the purposes of query option settings. aside for the bucket
+     * they land in, there is no difference in how types will be mapped; however if the wrong edm from the
+     * incorrect bucket is picked, then the type mapping will fail. the model type builder detects if a model
+     * is ad hoc. if it is, then it will recursively create a private instance of itself to handle the ad hoc
+     * bucket. normal odata cannot opt out of this process because the explored type must match the edm. a type
+     * mapped via an ad hoc edm is not really odata so it can opt out if desired. the opt out process is more
+     * of a failsafe and optimization. if the ad hoc edm wasn't customized, then the meta model and type should
+     * be exactly the same, which will result in no substitution.
+     */
+
     private static Type? ienumerableOfT;
     private readonly bool adHoc;
     private DefaultModelTypeBuilder? adHocBuilder;
@@ -38,6 +50,14 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     /// </summary>
     public DefaultModelTypeBuilder() { }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether types from an ad hoc Entity Data Model
+    /// (EDM) should be excluded.
+    /// </summary>
+    /// <value>True if types from an ad hoc EDM are excluded; otherwise, false. The
+    /// default value is <c>false</c>.</value>
+    public bool ExcludeAdHocModels { get; set; }
+
     /// <inheritdoc />
     public Type NewStructuredType( IEdmModel model, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
     {
@@ -46,10 +66,17 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
             throw new ArgumentNullException( nameof( model ) );
         }
 
-        if ( !adHoc && model.IsAdHoc() )
+        if ( model.IsAdHoc() )
         {
-            adHocBuilder ??= new( adHoc: true );
-            return adHocBuilder.NewStructuredType( model, structuredType, clrType, apiVersion );
+            if ( ExcludeAdHocModels )
+            {
+                return clrType;
+            }
+            else if ( !adHoc )
+            {
+                adHocBuilder ??= new( adHoc: true );
+                return adHocBuilder.NewStructuredType( model, structuredType, clrType, apiVersion );
+            }
         }
 
         if ( structuredType == null )
