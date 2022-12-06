@@ -41,6 +41,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_allow_null_or_empty_format_string( ApiVersionFormatProvider provider )
     {
@@ -56,6 +57,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_full_formatted_string_without_optional_components( ApiVersionFormatProvider provider )
     {
@@ -70,6 +72,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_full_formatted_string_with_optional_components( ApiVersionFormatProvider provider )
     {
@@ -84,6 +87,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_original_string_format_when_argument_cannot_be_formatted( ApiVersionFormatProvider provider )
     {
@@ -113,6 +117,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( GroupVersionFormatData ) )]
     public void format_should_return_formatted_group_version_string( ApiVersionFormatProvider provider, string format )
     {
@@ -129,6 +134,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_formatted_minor_version_string( ApiVersionFormatProvider provider )
     {
@@ -143,6 +149,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_formatted_major_version_string( ApiVersionFormatProvider provider )
     {
@@ -157,6 +164,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_formatted_major_and_minor_version_string( ApiVersionFormatProvider provider )
     {
@@ -171,6 +179,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_formatted_short_version_string( ApiVersionFormatProvider provider )
     {
@@ -185,6 +194,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_formatted_long_version_string( ApiVersionFormatProvider provider )
     {
@@ -199,6 +209,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
     public void format_should_return_formatted_status_string( ApiVersionFormatProvider provider )
     {
@@ -213,6 +224,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( PaddedMinorVersionFormatData ) )]
     public void format_should_return_formatted_minor_version_with_padding_string( ApiVersionFormatProvider provider, string format )
     {
@@ -233,6 +245,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( PaddedMajorVersionFormatData ) )]
     public void format_should_return_formatted_major_version_with_padding_string( ApiVersionFormatProvider provider, string format )
     {
@@ -253,6 +266,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( CustomFormatData ) )]
     public void format_should_return_custom_format_string( Func<ApiVersion, string> format, string expected )
     {
@@ -268,6 +282,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [AssumeCulture( "en-us" )]
     [MemberData( nameof( MultipleFormatParameterData ) )]
     public void format_should_return_formatted_string_with_multiple_parameters( ApiVersionFormatProvider provider, string format, object secondArgument, string expected )
     {
@@ -284,6 +299,7 @@ public class ApiVersionFormatProviderTest
     }
 
     [Fact]
+    [AssumeCulture( "en-us" )]
     public void format_should_return_formatted_string_with_escape_sequence()
     {
         // arrange
