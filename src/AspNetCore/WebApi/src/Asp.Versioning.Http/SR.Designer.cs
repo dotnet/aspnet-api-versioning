@@ -70,7 +70,7 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An API group cannot be mapped as a nested group..
+        ///   Looks up a localized string similar to A versioned API group cannot be mapped as a nested group..
         /// </summary>
         internal static string CannotNestApiGroup {
             get {

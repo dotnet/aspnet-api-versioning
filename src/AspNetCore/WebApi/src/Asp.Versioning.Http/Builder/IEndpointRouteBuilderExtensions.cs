@@ -69,7 +69,7 @@ public static class IEndpointRouteBuilderExtensions
     /// <param name="builder">The extended <see cref="IEndpointRouteBuilder"/>.</param>
     /// <param name="name">The optional name associated with the builder.</param>
     /// <returns>A new <see cref="IVersionedEndpointRouteBuilder"/> instance.</returns>
-    public static IVersionedEndpointRouteBuilder MapApiGroup( this IEndpointRouteBuilder builder, string? name = default )
+    public static IVersionedEndpointRouteBuilder NewVersionedApi( this IEndpointRouteBuilder builder, string? name = default )
     {
         if ( builder is null )
         {

@@ -444,7 +444,7 @@ public static class IEndpointConventionBuilderExtensions
                 CultureInfo.CurrentCulture,
                 SR.NoVersionSet,
                 builder.DisplayName,
-                nameof( IEndpointRouteBuilderExtensions.MapApiGroup ),
+                nameof( IEndpointRouteBuilderExtensions.NewVersionedApi ),
                 nameof( IEndpointRouteBuilderExtensions.WithApiVersionSet ) ) );
     }
 
