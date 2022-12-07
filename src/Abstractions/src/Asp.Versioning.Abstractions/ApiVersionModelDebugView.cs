@@ -2,8 +2,6 @@
 
 namespace Asp.Versioning;
 
-#pragma warning disable CA1812
-
 using static System.String;
 
 internal sealed class ApiVersionModelDebugView

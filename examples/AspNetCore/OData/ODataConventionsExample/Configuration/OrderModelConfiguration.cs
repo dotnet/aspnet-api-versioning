@@ -9,7 +9,7 @@ public class OrderModelConfiguration : IModelConfiguration
 {
     private static readonly ApiVersion V1 = new( 1, 0 );
 
-    private EntityTypeConfiguration<Order> ConfigureCurrent( ODataModelBuilder builder )
+    private static EntityTypeConfiguration<Order> ConfigureCurrent( ODataModelBuilder builder )
     {
         var order = builder.EntitySet<Order>( "Orders" ).EntityType;
 

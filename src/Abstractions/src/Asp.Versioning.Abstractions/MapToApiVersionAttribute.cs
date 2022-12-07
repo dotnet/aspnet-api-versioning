@@ -4,9 +4,6 @@ namespace Asp.Versioning;
 
 using static System.AttributeTargets;
 
-#pragma warning disable CA1019
-#pragma warning disable CA1813
-
 /// <summary>
 /// Represents the metadata that describes the <see cref="ApiVersion">version</see>-specific implementation of an API.
 /// </summary>
@@ -38,7 +35,5 @@ public class MapToApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionPro
     /// <param name="version">The API version string.</param>
     public MapToApiVersionAttribute( string version ) : base( version ) { }
 
-#pragma warning disable CA1033
     ApiVersionProviderOptions IApiVersionProvider.Options => ApiVersionProviderOptions.Mapped;
-#pragma warning restore CA1033
 }

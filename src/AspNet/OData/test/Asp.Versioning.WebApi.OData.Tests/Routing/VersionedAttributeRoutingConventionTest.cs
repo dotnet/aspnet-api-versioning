@@ -44,8 +44,6 @@ public class VersionedAttributeRoutingConventionTest
         result.Should().BeTrue();
     }
 
-#pragma warning disable CA1812
-
     [ApiVersionNeutral]
     private sealed class NeutralController : ODataController { }
 

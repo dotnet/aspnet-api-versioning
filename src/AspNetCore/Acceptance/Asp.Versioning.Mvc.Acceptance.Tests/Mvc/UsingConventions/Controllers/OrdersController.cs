@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Asp.Versioning.Mvc.UsingConventions.Controllers;
 
 using Asp.Versioning.Mvc.UsingConventions.Models;

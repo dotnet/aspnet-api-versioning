@@ -4,9 +4,6 @@ namespace Asp.Versioning;
 
 using static System.AttributeTargets;
 
-#pragma warning disable CA1019
-#pragma warning disable CA1813
-
 /// <summary>
 /// Represents the metadata that describes the <see cref="ApiVersion">versions</see> associated with an API.
 /// </summary>
@@ -42,9 +39,7 @@ public class ApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     /// <param name="version">The API version string.</param>
     public ApiVersionAttribute( string version ) : base( version ) { }
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types
     ApiVersionProviderOptions IApiVersionProvider.Options => options;
-#pragma warning restore CA1033 // Interface methods should be callable by child types
 
     /// <summary>
     /// Gets or sets a value indicating whether the specified set of API versions are deprecated.

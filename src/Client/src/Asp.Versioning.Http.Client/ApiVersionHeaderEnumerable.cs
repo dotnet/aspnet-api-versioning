@@ -1,7 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 namespace Asp.Versioning.Http;
-#pragma warning disable CA1815 // Override equals and operator equals on value types
 
 /// <summary>
 /// Represents the enumerable object used to create API version enumerators.

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0060
 
 namespace Asp.Versioning.Simulators;
 

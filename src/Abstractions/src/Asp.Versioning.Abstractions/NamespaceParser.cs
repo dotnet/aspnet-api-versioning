@@ -1,8 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 #pragma warning disable IDE0079
+#pragma warning disable SA1114
 #pragma warning disable SA1121
-#pragma warning disable SA1114 // Parameter list should follow declaration
 
 namespace Asp.Versioning;
 

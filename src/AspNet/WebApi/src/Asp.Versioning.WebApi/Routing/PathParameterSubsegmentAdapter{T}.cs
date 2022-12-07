@@ -1,7 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1812
-
 namespace Asp.Versioning.Routing;
 
 using static System.Linq.Expressions.Expression;

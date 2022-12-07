@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0060
+
 namespace Asp.Versioning.Http.Basic.Controllers;
 
 using Asp.Versioning.Http.Basic.Models;

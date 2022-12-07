@@ -2,10 +2,6 @@
 
 #pragma warning disable IDE0007 // Use implicit type
 #pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-#pragma warning disable CA1815 // Override equals and operator equals on value types
-#pragma warning disable CA2231 // Overload operator equals on overriding value type Equals
 #pragma warning disable SA1108 // Block statements should not contain embedded comments
 #pragma warning disable SA1132 // Do not combine fields
 #pragma warning disable SA1200 // Using directives should be placed correctly
@@ -66,8 +62,6 @@ using System.ComponentModel;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-#pragma warning disable CA1066 // Implement IEquatable when overriding Object.Equals
-
 namespace System
 {
     internal struct HashCode
@@ -100,10 +94,7 @@ namespace System
             var epoch = new DateTime(2000, 1, 1);
             var seed = (int) Math.Ceiling(DateTime.Now.Subtract( epoch ).TotalSeconds);
             var random = new Random( seed );
-
-#pragma warning disable CA5394 // Do not use insecure randomness
             random.NextBytes( data );
-#pragma warning restore CA5394 // Do not use insecure randomness
 #endif
             return BitConverter.ToUInt32( data, 0 );
         }

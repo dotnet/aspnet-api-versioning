@@ -15,11 +15,9 @@ public interface IBoundRouteTemplate
     /// <value>The bound template.</value>
     string BoundTemplate { get; set; }
 
-#pragma warning disable CA2227 // Collection properties should be read only
     /// <summary>
     /// Gets or sets the template parameter values.
     /// </summary>
     /// <value>The template <see cref="HttpRouteValueDictionary">route value dictionary</see>.</value>
     HttpRouteValueDictionary Values { get; set; }
-#pragma warning restore CA2227
 }

@@ -22,9 +22,7 @@ public static class HttpRequestMessageExtensions
 
         if ( configuration == null )
         {
-#pragma warning disable CA2000 // Dispose objects before losing scope
             configuration = new HttpConfiguration();
-#pragma warning restore CA2000 // Dispose objects before losing scope
             request.RegisterForDispose( configuration );
             request.SetConfiguration( configuration );
         }
@@ -60,9 +58,7 @@ public static class HttpRequestMessageExtensions
 
         if ( configuration == null )
         {
-#pragma warning disable CA2000 // Dispose objects before losing scope
             configuration = new HttpConfiguration();
-#pragma warning restore CA2000 // Dispose objects before losing scope
             request.RegisterForDispose( configuration );
             request.SetConfiguration( configuration );
         }

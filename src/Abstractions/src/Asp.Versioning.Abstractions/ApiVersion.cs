@@ -341,9 +341,7 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
     public virtual string ToString( string? format, IFormatProvider? formatProvider )
     {
         var provider = ApiVersionFormatProvider.GetInstance( formatProvider );
-#pragma warning disable CA1062 // Validate arguments of public methods
         return provider.Format( format, this, formatProvider );
-#pragma warning restore CA1062 // Validate arguments of public methods
     }
 
     private static string? ValidateStatus( string? status, Func<string?, bool> isValid )

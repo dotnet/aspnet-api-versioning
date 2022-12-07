@@ -94,8 +94,6 @@ public class HttpConfigurationExtensionsTest
         return routingConventions.ToArray();
     }
 
-#pragma warning disable CA1812
-
     [ApiVersion( "1.0" )]
     private sealed class ControllerV1 : ODataController
     {

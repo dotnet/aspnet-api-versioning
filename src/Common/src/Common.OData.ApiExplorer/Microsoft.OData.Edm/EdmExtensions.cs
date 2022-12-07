@@ -53,7 +53,7 @@ internal static class EdmExtensions
 #if NETFRAMEWORK
     private static string Requalify( string edmFullName, string @namespace ) => @namespace + edmFullName.Substring( 3 );
 #else
-    private static string Requalify( string edmFullName, string @namespace ) => string.Concat( @namespace.AsSpan(), edmFullName.AsSpan().Slice( 3 ) );
+    private static string Requalify( string edmFullName, string @namespace ) => string.Concat( @namespace.AsSpan(), edmFullName.AsSpan()[3..] );
 #endif
 
     private static Type? GetTypeFromAssembly( string edmFullName, string assemblyName )

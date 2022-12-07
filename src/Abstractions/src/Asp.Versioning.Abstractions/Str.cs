@@ -1,7 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 #pragma warning disable IDE0079
-#pragma warning disable SA1121 // Use built-in type alias
+#pragma warning disable SA1121
 
 namespace Asp.Versioning;
 

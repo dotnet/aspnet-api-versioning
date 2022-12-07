@@ -30,17 +30,11 @@ public class SwaggerDefaultValues : IOperationFilter
             var description = apiDescription.ParameterDescriptions.First( p => p.Name == parameter.name );
 
             // REF: https://github.com/domaindrivendev/Swashbuckle/issues/1101
-            if ( parameter.description == null )
-            {
-                parameter.description = description.Documentation;
-            }
+            parameter.description ??= description.Documentation;
 
             // REF: https://github.com/domaindrivendev/Swashbuckle/issues/1089
             // REF: https://github.com/domaindrivendev/Swashbuckle/pull/1090
-            if ( parameter.@default == null )
-            {
-                parameter.@default = description.ParameterDescriptor?.DefaultValue;
-            }
+            parameter.@default ??= description.ParameterDescriptor?.DefaultValue;
         }
     }
 }

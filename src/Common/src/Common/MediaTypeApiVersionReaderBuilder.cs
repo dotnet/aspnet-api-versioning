@@ -113,9 +113,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 #if !NETFRAMEWORK
     [CLSCompliant( false )]
 #endif
-#pragma warning disable CA1716 // Identifiers should not match keywords
     public virtual MediaTypeApiVersionReaderBuilder Select( Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>> selector )
-#pragma warning restore CA1716 // Identifiers should not match keywords
     {
         select = selector;
         return this;
