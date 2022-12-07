@@ -112,8 +112,6 @@ public partial class ODataQueryOptionsConventionBuilderTest
         internal new IList<IODataQueryOptionsConvention> Conventions => base.Conventions;
     }
 
-#pragma warning disable CA1034 // Nested types should not be visible
-
     public sealed class StubController : ODataController
     {
         public IActionResult Get() => Ok();

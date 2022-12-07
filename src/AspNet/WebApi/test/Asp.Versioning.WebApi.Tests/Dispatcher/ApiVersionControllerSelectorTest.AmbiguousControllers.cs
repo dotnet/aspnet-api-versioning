@@ -1,7 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1812
-#pragma warning disable CA1822 // Mark members as static
 #pragma warning disable SA1601 // Partial elements should be documented
 
 namespace Asp.Versioning.Dispatcher;

@@ -1,7 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-
 namespace Asp.Versioning.Simulators.Configuration;
 
 using Asp.Versioning.OData;

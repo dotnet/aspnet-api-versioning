@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0060
+
 namespace Asp.Versioning.Mvc.UsingAttributes.Controllers;
 
 using Asp.Versioning.Mvc.UsingAttributes.Models;

@@ -5,7 +5,6 @@ namespace Microsoft.AspNetCore.Builder;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescriptionProviderFactory
@@ -29,9 +28,11 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
 
     public IApiVersionDescriptionProvider Create( EndpointDataSource endpointDataSource )
     {
-        var collators = new List<IApiVersionMetadataCollationProvider>( capacity: providers.Length + 1 );
+        var collators = new List<IApiVersionMetadataCollationProvider>( capacity: providers.Length + 1 )
+        {
+            new EndpointApiVersionMetadataCollationProvider( endpointDataSource ),
+        };
 
-        collators.Add( new EndpointApiVersionMetadataCollationProvider( endpointDataSource ) );
         collators.AddRange( providers );
 
         return activator( collators, sunsetPolicyManager, options );

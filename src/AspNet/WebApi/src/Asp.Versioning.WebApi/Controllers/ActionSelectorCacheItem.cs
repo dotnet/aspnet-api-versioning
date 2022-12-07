@@ -153,8 +153,6 @@ internal sealed class ActionSelectorCacheItem
         bool ignoreSubRoutes )
     {
         var selectedCandidates = FindMatchingActions( controllerContext, ignoreSubRoutes );
-
-#pragma warning disable CA2000 // Dispose objects before losing scope
         if ( selectedCandidates.Count == 0 )
         {
             return new( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
@@ -170,7 +168,6 @@ internal sealed class ActionSelectorCacheItem
         {
             return new( new HttpResponseException( CreateSelectionError( controllerContext ) ) );
         }
-#pragma warning restore CA2000 // Dispose objects before losing scope
 
         var ambiguityList = CreateAmbiguousMatchList( selectedCandidates );
         var message = string.Format( CultureInfo.CurrentCulture, SR.ApiControllerActionSelector_AmbiguousMatch, ambiguityList );

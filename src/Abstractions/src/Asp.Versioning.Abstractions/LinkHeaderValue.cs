@@ -1,5 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0079
+#pragma warning disable SA1121
+
 namespace Asp.Versioning;
 
 #if !NETSTANDARD1_0
@@ -13,7 +16,6 @@ using StringSegmentComparer = System.StringComparer;
 #endif
 
 #pragma warning disable IDE0079
-#pragma warning disable SA1121
 
 /// <summary>
 /// Represents a HTTP Link header value.
@@ -570,13 +572,11 @@ public partial class LinkHeaderValue
                 }
 
                 // REF: https://datatracker.ietf.org/doc/html/rfc8288#appendix-B.3 #9
-#pragma warning disable CA1308 // Normalize strings to uppercase
 #if NETSTANDARD1_0
                 var key = remaining.Substring( start, end - start ).ToLowerInvariant();
 #else
                 var key = new StringSegment( remaining.Substring( start, end - start ).ToLowerInvariant() );
 #endif
-#pragma warning restore CA1308 // Normalize strings to uppercase
 
                 start = end;
                 ConsumeWhitespace();
@@ -649,10 +649,13 @@ public partial class LinkHeaderValue
             return input;
         }
 
+#pragma warning disable IDE0056 // Use index operator
         private static bool IsQuoted( StringSegment input ) =>
-#pragma warning disable IDE0056
-            !StringSegment.IsNullOrEmpty( input ) && input.Length >= 2 && input[0] == '"' && input[input.Length - 1] == '"';
-#pragma warning restore IDE0056
+            !StringSegment.IsNullOrEmpty( input ) &&
+            input.Length >= 2 &&
+            input[0] == '"' &&
+            input[input.Length - 1] == '"';
+#pragma warning restore IDE0056 // Use index operator
 
         private static StringSegment UnescapeAsQuotedString( StringSegment input )
         {

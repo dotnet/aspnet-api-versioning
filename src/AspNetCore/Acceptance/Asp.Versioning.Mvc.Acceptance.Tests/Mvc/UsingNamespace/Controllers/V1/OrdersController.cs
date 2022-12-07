@@ -1,6 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1716 // Identifiers should not match keywords
 
 namespace Asp.Versioning.Mvc.UsingNamespace.Controllers.V1;
 

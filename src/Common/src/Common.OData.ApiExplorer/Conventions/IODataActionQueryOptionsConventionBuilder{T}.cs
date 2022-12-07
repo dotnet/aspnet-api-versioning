@@ -1,10 +1,9 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable SA1001 // Commas should be spaced correctly
+#pragma warning disable IDE0079
+#pragma warning disable SA1001
 
 namespace Asp.Versioning.Conventions;
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
 using System.Reflection;
 #if NETFRAMEWORK

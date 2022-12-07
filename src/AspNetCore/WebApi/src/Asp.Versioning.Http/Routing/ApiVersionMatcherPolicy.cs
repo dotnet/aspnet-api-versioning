@@ -13,12 +13,13 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static Asp.Versioning.ApiVersionMapping;
+using static System.Text.RegularExpressions.RegexOptions;
 
 /// <summary>
 /// Represents the <see cref="MatcherPolicy">matcher policy</see> for API versions.
 /// </summary>
 [CLSCompliant( false )]
-public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy, INodeBuilderPolicy
+public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy, INodeBuilderPolicy
 {
     private readonly IOptions<ApiVersioningOptions> options;
     private readonly IApiVersionParser apiVersionParser;
@@ -274,7 +275,7 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
         //
         // but 3.0 is requested, 400 should be returned if we made it this far
         const string ReplacementPattern = "{$1}";
-        var pattern = new Regex( "{([^:]+):[^}]+}", RegexOptions.Singleline | RegexOptions.IgnoreCase );
+        var pattern = RouteConstraintRegex();
         var comparer = StringComparer.OrdinalIgnoreCase;
         string? template = default;
         string? normalizedTemplate = default;
@@ -597,4 +598,7 @@ public sealed class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSelectorPo
             return hash.ToHashCode();
         }
     }
+
+    [GeneratedRegex( "{([^:]+):[^}]+}", IgnoreCase | Singleline )]
+    private static partial Regex RouteConstraintRegex();
 }

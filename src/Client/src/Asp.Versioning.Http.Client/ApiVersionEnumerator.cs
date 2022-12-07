@@ -2,8 +2,6 @@
 
 namespace Asp.Versioning.Http;
 
-#pragma warning disable CA1815 // Override equals and operator equals on value types
-
 using System.Collections;
 
 /// <summary>

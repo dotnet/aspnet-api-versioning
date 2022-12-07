@@ -20,9 +20,7 @@ public partial class MediaTypeApiVersionReaderBuilder
     /// If a value is not specified, there is expected to be a single template parameter.</param>
     /// <returns>The current <see cref="MediaTypeApiVersionReaderBuilder"/>.</returns>
     /// <remarks>The template syntax is the same used by route templates; however, constraints are not supported.</remarks>
-#pragma warning disable CA1716 // Identifiers should not match keywords
     public virtual MediaTypeApiVersionReaderBuilder Template( string template, string? parameterName = default )
-#pragma warning restore CA1716 // Identifiers should not match keywords
     {
         if ( string.IsNullOrEmpty( template ) )
         {

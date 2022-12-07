@@ -103,9 +103,8 @@ public class ControllerConventionBuilderExtensionsTest
 
 #pragma warning disable IDE0060
 #pragma warning disable IDE0079
-#pragma warning disable CA1034 // Nested types should not be visible
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable CA2234 // Pass system uri objects instead of strings
+#pragma warning disable CA1822
+
 #if !NETFRAMEWORK
     [ApiController]
 #endif

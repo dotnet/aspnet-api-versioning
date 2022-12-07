@@ -78,7 +78,6 @@ public partial class ControllerApiVersionConventionBuilderTest
         internal ActionApiVersionConventionBuilderCollection ProtectedActionBuilders => ActionBuilders;
     }
 
-#pragma warning disable CA1812
 
 #if !NETFRAMEWORK
     [ApiController]

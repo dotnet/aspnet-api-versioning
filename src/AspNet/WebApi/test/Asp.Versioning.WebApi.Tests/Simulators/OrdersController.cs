@@ -1,6 +1,5 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable CA1707 // Identifiers should not contain underscores
 
 namespace Asp.Versioning.Simulators;
 

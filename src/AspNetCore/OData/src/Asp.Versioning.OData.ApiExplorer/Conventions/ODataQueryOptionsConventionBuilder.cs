@@ -20,19 +20,4 @@ public partial class ODataQueryOptionsConventionBuilder
 
         return typeof( object );
     }
-
-    private static bool IsODataLike( ApiDescription description )
-    {
-        var parameters = description.ActionDescriptor.Parameters;
-
-        for ( var i = 0; i < parameters.Count; i++ )
-        {
-            if ( parameters[i].ParameterType.IsODataQueryOptions() )
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

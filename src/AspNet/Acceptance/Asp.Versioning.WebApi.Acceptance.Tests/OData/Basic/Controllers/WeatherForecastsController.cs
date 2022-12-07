@@ -1,7 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 #pragma warning disable IDE0060 // Remove unused parameter
-#pragma warning disable CA1822 // Mark members as static
 
 namespace Asp.Versioning.OData.Basic.Controllers;
 

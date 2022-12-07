@@ -68,14 +68,10 @@ public class ApiVersionUrlHelper : IUrlHelper
         Url.Link( routeName, AddApiVersionRouteValueIfNecessary( values ) );
 
     /// <inheritdoc />
-#pragma warning disable CA1054 // URI-like parameters should not be strings
     public virtual bool IsLocalUrl( string? url ) => Url.IsLocalUrl( url );
-#pragma warning restore CA1054
 
     /// <inheritdoc />
-#pragma warning disable CA1055 // URI-like return values should not be strings
     public virtual string? RouteUrl( UrlRouteContext routeContext )
-#pragma warning restore CA1055
     {
         if ( routeContext == null )
         {

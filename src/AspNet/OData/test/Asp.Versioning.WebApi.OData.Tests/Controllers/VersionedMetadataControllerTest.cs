@@ -81,8 +81,6 @@ public class VersionedMetadataControllerTest
         }
     }
 
-#pragma warning disable CA1812
-
     [ApiVersion( "1.0" )]
     [ApiVersion( "2.0" )]
     private sealed class Controller1 : ODataController

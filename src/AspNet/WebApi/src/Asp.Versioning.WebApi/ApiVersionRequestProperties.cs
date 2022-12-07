@@ -55,11 +55,9 @@ public class ApiVersionRequestProperties
             {
                 0 => default,
                 1 => values[0],
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations; existing behavior via IApiVersionReader.Read
                 _ => throw new AmbiguousApiVersionException(
                         string.Format( CultureInfo.CurrentCulture, CommonSR.MultipleDifferentApiVersionsRequested, string.Join( ", ", values ) ),
                         values ),
-#pragma warning restore CA1065
             };
         }
         set

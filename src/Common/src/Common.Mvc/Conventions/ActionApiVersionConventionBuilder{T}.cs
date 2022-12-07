@@ -116,9 +116,7 @@ public class ActionApiVersionConventionBuilder<T> :
         return this;
     }
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types
     Type IActionConventionBuilder.ControllerType => typeof( T );
-#pragma warning restore CA1033 // Interface methods should be callable by child types
 
     void IDeclareApiVersionConventionBuilder.IsApiVersionNeutral() => IsApiVersionNeutral();
 

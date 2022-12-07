@@ -90,8 +90,6 @@ public class IHttpClientBuilderExtensionsTest
         result1.Should().NotBeSameAs( result2 );
     }
 
-#pragma warning disable CA1812
-
     private sealed class LastHandler : DelegatingHandler
     {
         public HttpRequestMessage Request { get; private set; }

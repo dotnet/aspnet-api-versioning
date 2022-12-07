@@ -52,9 +52,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
                     string.Format(
                         CurrentCulture,
                         ODataExpSR.UnsupportedQueryOption,
-#pragma warning disable CA1308 // Normalize strings to uppercase
                         queryOption.ToString().ToLowerInvariant() ),
-#pragma warning restore CA1308
                     nameof( queryOption ) ),
         };
     }
@@ -290,9 +288,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
                        .AppendFormat(
                             CurrentCulture,
                             ODataExpSR.AllowedFunctionsDesc,
-#pragma warning disable CA1308 // Normalize strings to uppercase
                             context.AllowedFunctions.ToString().ToLowerInvariant() );
-#pragma warning restore CA1308
         }
     }
 
