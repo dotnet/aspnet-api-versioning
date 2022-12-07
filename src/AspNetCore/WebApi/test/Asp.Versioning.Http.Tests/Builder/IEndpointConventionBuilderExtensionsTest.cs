@@ -289,7 +289,7 @@ public class IEndpointConventionBuilderExtensionsTest
 
         var app = builder.Build();
         var versionSet = new ApiVersionSetBuilder( default ).Build();
-        var group = app.MapApiGroup();
+        var group = app.NewVersionedApi();
         var get = group.MapGet( "/", () => Results.Ok() );
         IEndpointRouteBuilder endpoints = app;
 

@@ -47,8 +47,8 @@ services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>
 
 // Configure the HTTP request pipeline.
 var app = builder.Build();
-var orders = app.MapApiGroup( "Orders" );
-var people = app.MapApiGroup( "People" );
+var orders = app.NewVersionedApi( "Orders" );
+var people = app.NewVersionedApi( "People" );
 
 // 1.0
 var ordersV1 = orders.MapGroup( "/api/orders" )

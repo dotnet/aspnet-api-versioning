@@ -121,7 +121,7 @@
     <value>An API version is required, but was not specified.</value>
   </data>
   <data name="CannotNestApiGroup" xml:space="preserve">
-    <value>An API group cannot be mapped as a nested group.</value>
+    <value>A versioned API group cannot be mapped as a nested group.</value>
   </data>
   <data name="CannotNestVersionSet" xml:space="preserve">
     <value>A grouped API version set cannot be nested under another group.</value>

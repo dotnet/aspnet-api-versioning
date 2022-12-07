@@ -17,7 +17,7 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-var forecast = app.MapApiGroup();
+var forecast = app.NewVersionedApi();
 
 // GET /weatherforecast?api-version=1.0
 forecast.MapGet( "/weatherforecast", () =>

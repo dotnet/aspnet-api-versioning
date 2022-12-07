@@ -72,7 +72,7 @@ public class IEndpointRouteBuilderExtensionsTest
     }
 
     [Fact]
-    public void map_api_group_should_not_be_allowed_multiple_times()
+    public void new_versioned_api_should_not_be_allowed_multiple_times()
     {
         // arrange
         var builder = WebApplication.CreateBuilder();
@@ -84,14 +84,14 @@ public class IEndpointRouteBuilderExtensionsTest
         var app = builder.Build();
 
         // act
-        var mapApiGroup = () => app.MapApiGroup().MapApiGroup();
+        var newVersionedApi = () => app.NewVersionedApi().NewVersionedApi();
 
         // assert
-        mapApiGroup.Should().Throw<InvalidOperationException>();
+        newVersionedApi.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
-    public void map_api_group_should_not_allow_nesting()
+    public void new_versioned_api_should_not_allow_nesting()
     {
         // arrange
         var builder = WebApplication.CreateBuilder();
@@ -101,13 +101,13 @@ public class IEndpointRouteBuilderExtensionsTest
         services.AddApiVersioning();
 
         var app = builder.Build();
-        var g1 = app.MapApiGroup();
+        var g1 = app.NewVersionedApi();
         var g2 = g1.MapGroup( "Test" );
 
         // act
-        var mapApiGroup = () => g2.MapApiGroup();
+        var newVersionedApi = () => g2.NewVersionedApi();
 
         // assert
-        mapApiGroup.Should().Throw<InvalidOperationException>();
+        newVersionedApi.Should().Throw<InvalidOperationException>();
     }
 }
