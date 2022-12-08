@@ -31,32 +31,32 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
      * incorrect bucket is picked, then the type mapping will fail. the model type builder detects if a model
      * is ad hoc. if it is, then it will recursively create a private instance of itself to handle the ad hoc
      * bucket. normal odata cannot opt out of this process because the explored type must match the edm. a type
-     * mapped via an ad hoc edm is not really odata so it can opt out if desired. the opt out process is more
-     * of a failsafe and optimization. if the ad hoc edm wasn't customized, then the meta model and type should
-     * be exactly the same, which will result in no substitution.
+     * mapped via an ad hoc edm is not really odata so it should opt out by default because without an edm
+     * there is not away to control member serialization/deserialization easily. such cases will typically
+     * create a type-per-version, as is common for non-odata, which negates the need for model substitution.
+     * a user can opt into ad hoc model substitution if they have a way to deal with member filtering.
      */
 
     private static Type? ienumerableOfT;
     private readonly bool adHoc;
+    private readonly bool excludeAdHocModels;
     private DefaultModelTypeBuilder? adHocBuilder;
     private ConcurrentDictionary<ApiVersion, ModuleBuilder>? modules;
     private ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>? generatedEdmTypesPerVersion;
     private ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>>? generatedActionParamsPerVersion;
 
-    private DefaultModelTypeBuilder( bool adHoc ) => this.adHoc = adHoc;
+    private DefaultModelTypeBuilder( bool excludeAdHocModels, bool adHoc )
+    {
+        this.adHoc = adHoc;
+        this.excludeAdHocModels = excludeAdHocModels;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultModelTypeBuilder"/> class.
     /// </summary>
-    public DefaultModelTypeBuilder() { }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether types from an ad hoc Entity Data Model
-    /// (EDM) should be excluded.
-    /// </summary>
-    /// <value>True if types from an ad hoc EDM are excluded; otherwise, false. The
-    /// default value is <c>false</c>.</value>
-    public bool ExcludeAdHocModels { get; set; }
+    /// <param name="includeAdHocModels">Indicates whether types from an ad hoc Entity
+    /// Data Model (EDM) should be included.</param>
+    public DefaultModelTypeBuilder( bool includeAdHocModels = false ) => excludeAdHocModels = !includeAdHocModels;
 
     /// <inheritdoc />
     public Type NewStructuredType( IEdmModel model, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
@@ -68,13 +68,13 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         if ( model.IsAdHoc() )
         {
-            if ( ExcludeAdHocModels )
+            if ( excludeAdHocModels )
             {
                 return clrType;
             }
             else if ( !adHoc )
             {
-                adHocBuilder ??= new( adHoc: true );
+                adHocBuilder ??= new( excludeAdHocModels, adHoc: true );
                 return adHocBuilder.NewStructuredType( model, structuredType, clrType, apiVersion );
             }
         }
@@ -111,7 +111,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         if ( !adHoc && model.IsAdHoc() )
         {
-            adHocBuilder ??= new( adHoc: true );
+            adHocBuilder ??= new( excludeAdHocModels, adHoc: true );
             return adHocBuilder.NewActionParameters( model, action, controllerName, apiVersion );
         }
 
