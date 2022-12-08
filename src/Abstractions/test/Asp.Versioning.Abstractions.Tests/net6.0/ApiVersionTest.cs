@@ -6,7 +6,7 @@ public partial class ApiVersionTest
 {
     [Theory]
     [MemberData( nameof( FormatData ) )]
-    [AssumeCulture("en-us")]
+    [AssumeCulture( "en-us" )]
     public void try_format_format_should_return_expected_string( string format, string text, string formattedString )
     {
         // arrange
