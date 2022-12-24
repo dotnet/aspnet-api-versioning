@@ -11,6 +11,7 @@ using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 /// <summary>
 /// Provides extension methods for <see cref="IServiceCollection"/>.
 /// </summary>
+[CLSCompliant( false )]
 public static class IServiceCollectionExtensions
 {
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
