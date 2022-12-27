@@ -23,7 +23,7 @@ using Opts = Microsoft.Extensions.Options.Options;
 [CLSCompliant( false )]
 public class PartialODataDescriptionProvider : IApiDescriptionProvider
 {
-    private static int? beforeOData;
+    private static readonly int BeforeOData = ODataOrder() + 10;
     private readonly IOptionsFactory<ODataOptions> odataOptionsFactory;
     private readonly IOptions<ODataApiExplorerOptions> options;
     private bool markedAdHoc;
@@ -42,8 +42,6 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     {
         this.odataOptionsFactory = odataOptionsFactory ?? throw new ArgumentNullException( nameof( odataOptionsFactory ) );
         this.options = options ?? throw new ArgumentNullException( nameof( options ) );
-        beforeOData ??= ODataOrder( odataOptionsFactory, options ) + 10;
-        Order = beforeOData.Value;
     }
 
     /// <summary>
@@ -84,7 +82,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     /// Gets or sets the order precedence of the current API description provider.
     /// </summary>
     /// <value>The order precedence of the current API description provider.</value>
-    public int Order { get; protected set; }
+    public int Order { get; protected set; } = BeforeOData;
 
     /// <inheritdoc />
     public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context )
@@ -107,9 +105,9 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
         {
             var model = models[i];
             var version = model.GetApiVersion();
-            var options = odataOptionsFactory.Create( Opts.DefaultName );
+            var odata = odataOptionsFactory.Create( Opts.DefaultName );
 
-            options.AddRouteComponents( model );
+            odata.AddRouteComponents( model );
 
             for ( var j = 0; j < results.Count; j++ )
             {
@@ -149,12 +147,14 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static int ODataOrder( IOptionsFactory<ODataOptions> factory, IOptions<ODataApiExplorerOptions> options ) =>
+    private static int ODataOrder() =>
         new ODataApiDescriptionProvider(
             new StubModelMetadataProvider(),
             new StubModelTypeBuilder(),
-            factory,
-            options ).Order;
+            new OptionsFactory<ODataOptions>(
+                Enumerable.Empty<IConfigureOptions<ODataOptions>>(),
+                Enumerable.Empty<IPostConfigureOptions<ODataOptions>>() ),
+            Opts.Create( new ODataApiExplorerOptions() ) ).Order;
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static void MarkAsAdHoc( ODataModelBuilder builder, IEdmModel model ) =>
