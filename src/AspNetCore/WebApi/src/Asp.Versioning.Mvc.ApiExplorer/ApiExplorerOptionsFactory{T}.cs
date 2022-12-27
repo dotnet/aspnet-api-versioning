@@ -53,17 +53,23 @@ public class ApiExplorerOptionsFactory<T> : IOptionsFactory<T> where T : ApiExpl
     /// <see cref="IPostConfigureOptions{TOptions}">initialization actions</see> to run.</value>
     protected IEnumerable<IPostConfigureOptions<T>> PostConfigures { get; }
 
+    /// <summary>
+    /// Creates and returns a new options instance.
+    /// </summary>
+    /// <param name="name">The name associated with the options instance.</param>
+    /// <returns>A new options instance.</returns>
+    protected virtual T CreateInstance( string name ) => new();
+
     /// <inheritdoc />
     public virtual T Create( string name )
     {
         var apiVersioningOptions = Options;
-        var options = new T()
-        {
-            AssumeDefaultVersionWhenUnspecified = apiVersioningOptions.AssumeDefaultVersionWhenUnspecified,
-            ApiVersionParameterSource = apiVersioningOptions.ApiVersionReader,
-            DefaultApiVersion = apiVersioningOptions.DefaultApiVersion,
-            RouteConstraintName = apiVersioningOptions.RouteConstraintName,
-        };
+        var options = CreateInstance( name );
+
+        options.AssumeDefaultVersionWhenUnspecified = apiVersioningOptions.AssumeDefaultVersionWhenUnspecified;
+        options.ApiVersionParameterSource = apiVersioningOptions.ApiVersionReader;
+        options.DefaultApiVersion = apiVersioningOptions.DefaultApiVersion;
+        options.RouteConstraintName = apiVersioningOptions.RouteConstraintName;
 
         foreach ( var setup in Setups )
         {

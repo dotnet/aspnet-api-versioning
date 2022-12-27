@@ -3,6 +3,7 @@
 namespace Asp.Versioning.ApiExplorer;
 
 using Asp.Versioning.Conventions;
+using Asp.Versioning.OData;
 
 /// <summary>
 /// Represents the possible API versioning options for an OData API explorer.
@@ -44,4 +45,13 @@ public partial class ODataApiExplorerOptions : ApiExplorerOptions
     /// </summary>
     /// <value>One or more <see cref="ODataMetadataOptions"/> values.</value>
     public ODataMetadataOptions MetadataOptions { get; set; } = ODataMetadataOptions.None;
+
+    /// <summary>
+    /// Gets the builder used to create ad hoc versioned Entity Data Models (EDMs).
+    /// </summary>
+    /// <value>The associated <see cref="VersionedODataModelBuilder">model builder</see>.</value>
+#if !NETFRAMEWORK
+    [CLSCompliant( false )]
+#endif
+    public VersionedODataModelBuilder AdHocModelBuilder { get; }
 }

@@ -7,6 +7,7 @@ using Asp.Versioning.Description;
 using Asp.Versioning.OData;
 using Asp.Versioning.Routing;
 using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Formatter;
 using Microsoft.AspNet.OData.Routing;
@@ -16,6 +17,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System.Collections.ObjectModel;
 using System.Net.Http.Formatting;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -50,7 +52,11 @@ public class ODataApiExplorer : VersionedApiExplorer
     /// <param name="configuration">The current <see cref="HttpConfiguration">HTTP configuration</see>.</param>
     /// <param name="options">The associated <see cref="ODataApiExplorerOptions">API explorer options</see>.</param>
     public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options )
-        : base( configuration, options ) => this.options = options;
+        : base( configuration, options )
+    {
+        this.options = options;
+        options.AdHocModelBuilder.OnModelCreated += MarkAsAdHoc;
+    }
 
     /// <summary>
     /// Gets the options associated with the API explorer.
@@ -172,7 +178,20 @@ public class ODataApiExplorer : VersionedApiExplorer
         if ( route is not ODataRoute )
         {
             apiDescriptions = base.ExploreRouteControllers( controllerMappings, route, apiVersion );
-            return ExploreQueryOptions( route, apiDescriptions );
+
+            if ( Options.AdHocModelBuilder.ModelConfigurations.Count == 0 )
+            {
+                ExploreQueryOptions( route, apiDescriptions );
+            }
+            else if ( apiDescriptions.Count > 0 )
+            {
+                using ( new AdHocEdmScope( apiDescriptions, Options.AdHocModelBuilder ) )
+                {
+                    ExploreQueryOptions( route, apiDescriptions );
+                }
+            }
+
+            return apiDescriptions;
         }
 
         apiDescriptions = new();
@@ -199,7 +218,8 @@ public class ODataApiExplorer : VersionedApiExplorer
             }
         }
 
-        return ExploreQueryOptions( route, apiDescriptions );
+        ExploreQueryOptions( route, apiDescriptions );
+        return apiDescriptions;
     }
 
     /// <inheritdoc />
@@ -210,7 +230,25 @@ public class ODataApiExplorer : VersionedApiExplorer
         ApiVersion apiVersion )
     {
         var apiDescriptions = base.ExploreDirectRouteControllers( controllerDescriptor, candidateActionDescriptors, route, apiVersion );
-        return ExploreQueryOptions( route, apiDescriptions );
+
+        if ( apiDescriptions.Count == 0 )
+        {
+            return apiDescriptions;
+        }
+
+        if ( Options.AdHocModelBuilder.ModelConfigurations.Count == 0 )
+        {
+            ExploreQueryOptions( route, apiDescriptions );
+        }
+        else if ( apiDescriptions.Count > 0 )
+        {
+            using ( new AdHocEdmScope( apiDescriptions, Options.AdHocModelBuilder ) )
+            {
+                ExploreQueryOptions( route, apiDescriptions );
+            }
+        }
+
+        return apiDescriptions;
     }
 
     /// <summary>
@@ -238,20 +276,20 @@ public class ODataApiExplorer : VersionedApiExplorer
         queryOptions.ApplyTo( apiDescriptions, settings );
     }
 
-    private Collection<VersionedApiDescription> ExploreQueryOptions(
-        IHttpRoute route,
-        Collection<VersionedApiDescription> apiDescriptions )
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static void MarkAsAdHoc( ODataModelBuilder builder, IEdmModel model ) =>
+        model.SetAnnotationValue( model, AdHocAnnotation.Instance );
+
+    private void ExploreQueryOptions( IHttpRoute route, Collection<VersionedApiDescription> apiDescriptions )
     {
         if ( apiDescriptions.Count == 0 )
         {
-            return apiDescriptions;
+            return;
         }
 
         var uriResolver = Configuration.GetODataRootContainer( route ).GetRequiredService<ODataUriResolver>();
 
         ExploreQueryOptions( apiDescriptions, uriResolver );
-
-        return apiDescriptions;
     }
 
     private ResponseDescription CreateResponseDescriptionWithRoute(
