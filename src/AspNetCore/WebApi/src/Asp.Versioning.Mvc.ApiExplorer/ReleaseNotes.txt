@@ -1,2 +1,1 @@
-﻿[Fixed #922](https://github.com/dotnet/aspnet-api-versioning/discussions/922)
-[Fixed #923](https://github.com/dotnet/aspnet-api-versioning/issues/923)
+﻿
