@@ -2,10 +2,7 @@
 
 namespace Asp.Versioning.Conventions;
 
-using Asp.Versioning;
-using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OData.ModelBuilder;
 
 /// <content>
 /// Provides additional implementation specific to ASP.NET Core.
