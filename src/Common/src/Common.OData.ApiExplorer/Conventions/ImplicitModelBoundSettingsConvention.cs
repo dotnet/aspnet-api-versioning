@@ -8,6 +8,7 @@ using Asp.Versioning.OData;
 using Microsoft.AspNet.OData.Builder;
 #else
 using Microsoft.OData.ModelBuilder;
+using System.Buffers;
 #endif
 
 /// <summary>
@@ -56,18 +57,56 @@ public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfigu
 
     private static HashSet<Type>? GetExistingTypes( ODataModelBuilder builder )
     {
-        var types = default( HashSet<Type> );
+        HashSet<Type> types;
 
-        foreach ( var entitySet in builder.EntitySets )
+        if ( builder.StructuralTypes is ICollection<StructuralTypeConfiguration> collection )
         {
-            types ??= new();
-            types.Add( entitySet.ClrType );
+            var count = collection.Count;
+
+            if ( count == 0 )
+            {
+                return default;
+            }
+
+#if NETFRAMEWORK
+            var array = new StructuralTypeConfiguration[count];
+            types = new();
+#else
+            var pool = ArrayPool<StructuralTypeConfiguration>.Shared;
+            var array = pool.Rent( count );
+
+            types = new( capacity: count );
+#endif
+
+            collection.CopyTo( array, 0 );
+
+            for ( var i = 0; i < count; i++ )
+            {
+                types.Add( array[i].ClrType );
+            }
+
+#if !NETFRAMEWORK
+            pool.Return( array, clearArray: true );
+#endif
+
+            return types;
         }
 
-        foreach ( var singleton in builder.Singletons )
+        using var structuralTypes = builder.StructuralTypes.GetEnumerator();
+
+        if ( !structuralTypes.MoveNext() )
         {
-            types ??= new();
-            types.Add( singleton.ClrType );
+            return default;
+        }
+
+        types = new HashSet<Type>()
+        {
+            structuralTypes.Current.ClrType,
+        };
+
+        while ( structuralTypes.MoveNext() )
+        {
+            types.Add( structuralTypes.Current.ClrType );
         }
 
         return types;
@@ -75,9 +114,9 @@ public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfigu
 
     private void OnModelCreating( ODataModelBuilder builder )
     {
-        foreach ( var entityType in types.Select( builder.AddEntityType ) )
+        foreach ( var type in types )
         {
-            builder.AddEntitySet( entityType.Name, entityType );
+            builder.AddComplexType( type );
         }
     }
 }
