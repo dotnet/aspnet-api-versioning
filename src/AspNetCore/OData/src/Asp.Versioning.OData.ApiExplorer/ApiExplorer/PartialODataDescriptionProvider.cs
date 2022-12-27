@@ -18,7 +18,7 @@ using System.Runtime.CompilerServices;
 using Opts = Microsoft.Extensions.Options.Options;
 
 /// <summary>
-/// Reprensents an API description provider for partial OData support.
+/// Represents an API description provider for partial OData support.
 /// </summary>
 [CLSCompliant( false )]
 public class PartialODataDescriptionProvider : IApiDescriptionProvider
