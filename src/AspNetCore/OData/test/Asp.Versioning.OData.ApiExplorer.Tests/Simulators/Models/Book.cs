@@ -2,9 +2,12 @@
 
 namespace Asp.Versioning.Simulators.Models;
 
+using Microsoft.OData.ModelBuilder;
+
 /// <summary>
 /// Represents a book.
 /// </summary>
+[Filter( "author", "published" )]
 public class Book
 {
     /// <summary>

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Buffers;
 
 public class ODataApiDescriptionProviderTest
 {
@@ -152,6 +153,8 @@ public class ODataApiDescriptionProviderTest
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
             },
             options => options.ExcludingMissingMembers() );
+
+        AssertQueryOptionWithoutOData( items[0], "filter", "author", "published" );
     }
 
     private void AssertVersion2( ApiDescriptionGroup group )
@@ -227,6 +230,30 @@ public class ODataApiDescriptionProviderTest
         PrintGroup( items );
         group.GroupName.Should().Be( GroupName );
         items.Should().BeEquivalentTo( expected, options => options.ExcludingMissingMembers() );
+    }
+
+    private static void AssertQueryOptionWithoutOData( ApiDescription description, string name, string property, params string[] otherProperties )
+    {
+        var parameter = description.ParameterDescriptions.Single( p => p.Name == name );
+        var count = otherProperties.Length + 1;
+        string suffix;
+
+        if ( count == 1 )
+        {
+            suffix = property;
+        }
+        else
+        {
+            var pool = ArrayPool<string>.Shared;
+            var properties = pool.Rent( count );
+
+            properties[0] = property;
+            Array.Copy( otherProperties, 0, properties, 1, count - 1 );
+
+            suffix = string.Join( ", ", properties, 0, count );
+        }
+
+        parameter.ModelMetadata.Description.Should().EndWith( suffix + '.' );
     }
 
     private void PrintGroup( IReadOnlyList<ApiDescription> items )

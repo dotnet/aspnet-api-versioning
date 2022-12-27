@@ -3,9 +3,13 @@
 namespace Asp.Versioning.Description;
 
 using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Controllers;
+using Asp.Versioning.Conventions;
 using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Extensions;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using static System.Net.Http.HttpMethod;
 
 public class ODataApiExplorerTest
@@ -209,5 +213,35 @@ public class ODataApiExplorerTest
                 new { HttpMethod = Delete, version, RelativePath = "api/Suppliers/{key}/Products/$ref?$id={$id}" },
             },
             options => options.ExcludingMissingMembers() );
+    }
+
+    [Fact]
+    public void api_description_group_should_explore_model_bound_settings()
+    {
+        // arrange
+        var configuration = new HttpConfiguration();
+        var controllerTypeResolver = new ControllerTypeCollection(
+            typeof( VersionedMetadataController ),
+            typeof( Simulators.V1.BooksController ) );
+
+        configuration.Services.Replace( typeof( IHttpControllerTypeResolver ), controllerTypeResolver );
+        configuration.EnableDependencyInjection();
+        configuration.AddApiVersioning();
+        configuration.MapHttpAttributeRoutes();
+
+        var apiVersion = new ApiVersion( 1.0 );
+        var options = new ODataApiExplorerOptions( configuration );
+        var apiExplorer = new ODataApiExplorer( configuration, options );
+
+        options.AdHocModelBuilder.ModelConfigurations.Add( new ImplicitModelBoundSettingsConvention() );
+
+        // act
+        var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
+        var description = descriptionGroup.ApiDescriptions[0];
+
+        // assert
+        var parameter = description.ParameterDescriptions.Single( p => p.Name == "$filter" );
+
+        parameter.Documentation.Should().EndWith( "author, published." );
     }
 }

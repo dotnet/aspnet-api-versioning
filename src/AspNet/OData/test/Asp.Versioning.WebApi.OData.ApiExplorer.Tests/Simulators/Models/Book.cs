@@ -2,6 +2,9 @@
 
 namespace Asp.Versioning.Simulators.Models;
 
+using Microsoft.AspNet.OData.Query;
+
+[Filter( "author", "published" )]
 public class Book
 {
     public string Id { get; set; }
