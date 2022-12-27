@@ -110,11 +110,10 @@ public partial class VersionedODataModelBuilder
                 configurations[j].Apply( builder, apiVersion, routePrefix );
             }
 
+            const int EntityContainerOnly = 1;
             var model = builder.GetEdmModel();
             var container = model.EntityContainer;
-            var empty = !container.EntitySets().Any() &&
-                        !container.Singletons().Any() &&
-                        !container.OperationImports().Any();
+            var empty = model.SchemaElements.Count() == EntityContainerOnly;
 
             if ( empty )
             {
