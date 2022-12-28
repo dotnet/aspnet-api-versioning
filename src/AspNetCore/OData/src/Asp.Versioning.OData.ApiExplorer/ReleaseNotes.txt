@@ -1,1 +1,1 @@
-﻿
+﻿Use complex types instead of entities for ad hoc models
