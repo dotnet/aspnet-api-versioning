@@ -278,10 +278,10 @@ internal static class EndpointBuilderFinalizer
         IReadOnlyList<ApiVersion> Advertised,
         IReadOnlyList<ApiVersion> AdvertisedDeprecated )
     {
-        internal bool AreEmpty = Mapped.Count == 0
-                                 && Supported.Count == 0
-                                 && Deprecated.Count == 0
-                                 && Advertised.Count == 0
-                                 && AdvertisedDeprecated.Count == 0;
+        internal readonly bool AreEmpty = Mapped.Count == 0
+                                          && Supported.Count == 0
+                                          && Deprecated.Count == 0
+                                          && Advertised.Count == 0
+                                          && AdvertisedDeprecated.Count == 0;
     }
 }
