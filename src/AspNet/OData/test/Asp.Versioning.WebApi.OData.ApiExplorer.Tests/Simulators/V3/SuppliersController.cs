@@ -1,9 +1,11 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 #pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SA1625 // Element documentation should not be copied and pasted
 
 namespace Asp.Versioning.Simulators.V3;
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
 using Asp.Versioning.OData;
 using Asp.Versioning.Simulators.Models;

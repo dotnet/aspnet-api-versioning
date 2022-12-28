@@ -22,6 +22,11 @@ public class WeatherForecastModelConfiguration : IModelConfiguration
 
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
+        if ( builder == null )
+        {
+            throw new ArgumentNullException( nameof( builder ) );
+        }
+
         if ( supportedApiVersion == null || supportedApiVersion == apiVersion )
         {
             ConfigureCurrent( builder );

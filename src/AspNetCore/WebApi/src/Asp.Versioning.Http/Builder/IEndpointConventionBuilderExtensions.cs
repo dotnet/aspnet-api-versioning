@@ -478,7 +478,11 @@ public static class IEndpointConventionBuilderExtensions
 
         internal SingleItemReadOnlyList( ApiVersion item ) => this.item = item;
 
+#pragma warning disable IDE0079
+#pragma warning disable CA2201 // Do not raise reserved exception types
         public ApiVersion this[int index] => index == 0 ? item : throw new IndexOutOfRangeException();
+#pragma warning restore CA2201 // Do not raise reserved exception types
+#pragma warning restore IDE0079
 
         public int Count => 1;
 

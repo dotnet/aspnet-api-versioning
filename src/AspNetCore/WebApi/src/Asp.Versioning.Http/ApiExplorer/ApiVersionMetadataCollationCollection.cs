@@ -47,7 +47,11 @@ public class ApiVersionMetadataCollationCollection : IList<ApiVersionMetadata>, 
     /// <inheritdoc />
     public int Count => items.Count;
 
+#pragma warning disable IDE0079
+#pragma warning disable CA1033 // Interface methods should be callable by child types
     bool ICollection<ApiVersionMetadata>.IsReadOnly => ( (ICollection<ApiVersionMetadata>) items ).IsReadOnly;
+#pragma warning restore CA1033 // Interface methods should be callable by child types
+#pragma warning restore IDE0079
 
     /// <inheritdoc />
     public void Add( ApiVersionMetadata item ) => Insert( Count, item, default );

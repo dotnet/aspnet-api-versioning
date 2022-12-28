@@ -34,6 +34,7 @@ public class VersionedMetadataControllerTest
         response.Content.Headers.Allow.Should().BeEquivalentTo( "GET", "OPTIONS" );
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1812
 #pragma warning disable CA1822 // Mark members as static
 

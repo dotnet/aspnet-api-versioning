@@ -139,7 +139,11 @@ public partial class ODataValidationSettingsConvention : IODataQueryOptionsConve
 
     private string GetName( AllowedQueryOptions option )
     {
+#pragma warning disable IDE0079
+#pragma warning disable CA1308 // Normalize strings to uppercase (proper casing is lowercase)
         var name = option.ToString().ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
+#pragma warning restore IDE0079
         return Settings.NoDollarPrefix ? name : name.Insert( 0, "$" );
     }
 

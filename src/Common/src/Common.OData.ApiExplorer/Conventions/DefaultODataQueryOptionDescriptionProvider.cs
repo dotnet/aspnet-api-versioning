@@ -52,7 +52,11 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
                     string.Format(
                         CurrentCulture,
                         ODataExpSR.UnsupportedQueryOption,
+#pragma warning disable IDE0079
+#pragma warning disable CA1308 // Normalize strings to uppercase (proper casing is lowercase)
                         queryOption.ToString().ToLowerInvariant() ),
+#pragma warning restore CA1308 // Normalize strings to uppercase
+#pragma warning restore IDE0079
                     nameof( queryOption ) ),
         };
     }
@@ -284,11 +288,15 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         if ( context.AllowedFunctions != AllowedFunctions.None &&
              context.AllowedFunctions != AllowedFunctions.AllFunctions )
         {
+#pragma warning disable IDE0079
+#pragma warning disable CA1308 // Normalize strings to uppercase (proper casing is lowercase)
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
                             ODataExpSR.AllowedFunctionsDesc,
                             context.AllowedFunctions.ToString().ToLowerInvariant() );
+#pragma warning restore CA1308 // Normalize strings to uppercase
+#pragma warning restore IDE0079
         }
     }
 

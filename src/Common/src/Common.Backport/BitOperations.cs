@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0079
+
 // REF: https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Numerics/BitOperations.cs
 #pragma warning disable CS3019 // CLS compliance checking will not be performed because it is not visible from outside this assembly
 

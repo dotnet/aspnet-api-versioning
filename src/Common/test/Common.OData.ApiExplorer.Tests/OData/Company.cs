@@ -8,7 +8,11 @@ public class Company
 
     public Company ParentCompany { get; set; }
 
+#pragma warning disable CA1002 // Do not expose generic lists
+#pragma warning disable CA2227 // Collection properties should be read only
     public List<Company> Subsidiaries { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
+#pragma warning restore CA1002 // Do not expose generic lists
 
     public string Name { get; set; }
 

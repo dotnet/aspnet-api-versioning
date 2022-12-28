@@ -4,7 +4,7 @@ namespace Asp.Versioning.OData;
 
 using System.Reflection.Emit;
 
-internal class PropertyDependency
+internal sealed class PropertyDependency
 {
     internal PropertyDependency(
         EdmTypeKey dependentOnTypeKey,

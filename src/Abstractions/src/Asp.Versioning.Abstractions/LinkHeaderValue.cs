@@ -572,11 +572,13 @@ public partial class LinkHeaderValue
                 }
 
                 // REF: https://datatracker.ietf.org/doc/html/rfc8288#appendix-B.3 #9
+#pragma warning disable CA1308 // Normalize strings to uppercase (all ascii and should normalize to lowercase)
 #if NETSTANDARD1_0
                 var key = remaining.Substring( start, end - start ).ToLowerInvariant();
 #else
                 var key = new StringSegment( remaining.Substring( start, end - start ).ToLowerInvariant() );
 #endif
+#pragma warning restore CA1308 // Normalize strings to uppercase
 
                 start = end;
                 ConsumeWhitespace();

@@ -65,6 +65,7 @@ public static class IApiVersioningBuilderExtensions
         services.Replace( Singleton<IOptionsFactory<ApiExplorerOptions>, ODataApiExplorerOptionsAdapter>() );
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1812
 
     private sealed class ODataApiExplorerOptionsAdapter : IOptionsFactory<ApiExplorerOptions>

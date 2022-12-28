@@ -121,6 +121,9 @@ namespace Asp.Versioning.Conventions
             internal IDictionary<Type, IControllerConventionBuilder> ProtectedControllerConventionBuilders => ControllerConventionBuilders;
         }
 
+#pragma warning disable IDE0079
+#pragma warning disable CA1812
+
         private sealed class StubController : ControllerBase
         {
             public IActionResult Get() => Ok();

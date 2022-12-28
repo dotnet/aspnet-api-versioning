@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
 
 namespace given_versioned_batch_middleware;
 

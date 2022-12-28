@@ -18,7 +18,7 @@ public abstract partial class HttpServerFixture
 {
     private string visualizationUrl;
 
-    public string DirectedGraphVisualizationUrl =>
+    internal string DirectedGraphVisualizationUrl =>
         visualizationUrl ??= GenerateEndpointDirectedGraph( Server.Services );
 
     protected virtual void OnConfigurePartManager( ApplicationPartManager partManager ) =>

@@ -137,7 +137,7 @@ public class ApiVersionRouteConstraintTest
         url.Should().Be( "/v1.1/Order/Place" );
     }
 
-    private class PassThroughRouter : IRouter
+    private sealed class PassThroughRouter : IRouter
     {
         public VirtualPathData GetVirtualPath( VirtualPathContext context ) => null;
 

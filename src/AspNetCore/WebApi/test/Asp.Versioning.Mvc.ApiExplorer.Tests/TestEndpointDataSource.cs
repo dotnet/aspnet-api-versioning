@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 
-internal class TestEndpointDataSource : EndpointDataSource
+internal sealed class TestEndpointDataSource : EndpointDataSource
 {
     public override IReadOnlyList<Endpoint> Endpoints { get; } = CreateEndpoints();
 

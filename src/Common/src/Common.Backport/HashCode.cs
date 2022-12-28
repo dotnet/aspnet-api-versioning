@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0079
 #pragma warning disable IDE0007 // Use implicit type
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SA1108 // Block statements should not contain embedded comments

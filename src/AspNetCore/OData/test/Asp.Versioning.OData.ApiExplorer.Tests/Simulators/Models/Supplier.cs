@@ -8,5 +8,7 @@ public class Supplier
 
     public string Name { get; set; }
 
+#pragma warning disable CA2227 // Collection properties should be read only
     public ICollection<Product> Products { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
 }
