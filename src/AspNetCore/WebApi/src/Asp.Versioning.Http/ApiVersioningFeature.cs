@@ -58,7 +58,11 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
             {
                 0 => default,
                 1 => values[0],
+#pragma warning disable IDE0079
+#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
                 _ => throw NewAmbiguousApiVersionException( values ),
+#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
+#pragma warning restore IDE0079
             };
         }
         set

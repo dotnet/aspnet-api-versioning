@@ -1,5 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0079
+#pragma warning disable CA1815 // Override equals and operator equals on value types
+
 namespace Asp.Versioning.Http;
 
 using System.Collections;

@@ -637,6 +637,7 @@ public class ODataValidationSettingsConventionTest
     }
 
 #pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable CA1034 // Nested types should not be visible
 
     public class SinglePartController : ODataController
     {

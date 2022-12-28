@@ -29,6 +29,7 @@ public class ODataControllerSpecificationTest
         result.Should().Be( expected );
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1812
 
     private sealed class NormalODataController : ODataController

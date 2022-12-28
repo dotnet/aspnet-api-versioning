@@ -23,6 +23,11 @@ public sealed partial class ReportApiVersionsAttribute : ActionFilterAttribute
     /// </summary>
     public ReportApiVersionsAttribute() { }
 
+    // cannot use attribute syntax, but this allows the attribute to be instantiated just like
+    // any other class implementing IActionFilter. the parameterless constructor uses DI
+#pragma warning disable IDE0079
+#pragma warning disable CA1019 // Define accessors for attribute arguments
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ReportApiVersionsAttribute"/> class.
     /// </summary>

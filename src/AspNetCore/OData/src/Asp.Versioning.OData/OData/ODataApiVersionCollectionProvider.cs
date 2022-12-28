@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1812
 
 namespace Asp.Versioning.OData;

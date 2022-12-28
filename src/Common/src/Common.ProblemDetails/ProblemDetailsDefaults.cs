@@ -48,6 +48,9 @@ public static class ProblemDetailsDefaults
             "Ambiguous API version",
             "AmbiguousApiVersion" );
 
+#pragma warning disable IDE0079
+#pragma warning disable CA1034 // Nested types should not be visible
+
     /// <summary>
     /// Represents the default problem details media type.
     /// </summary>

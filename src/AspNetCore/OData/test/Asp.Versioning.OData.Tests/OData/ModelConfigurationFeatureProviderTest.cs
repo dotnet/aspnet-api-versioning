@@ -32,6 +32,7 @@ namespace Asp.Versioning.OData
         }
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1812
 #pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1403 // File may only contain a single namespace
@@ -43,7 +44,7 @@ namespace Asp.Versioning.OData
             public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
-        internal class PrivateModelConfiguration : IModelConfiguration
+        internal sealed class PrivateModelConfiguration : IModelConfiguration
         {
             public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
@@ -53,12 +54,12 @@ namespace Asp.Versioning.OData
             public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
-        public class GenericModelConfiguration<T> : IModelConfiguration
+        public sealed class GenericModelConfiguration<T> : IModelConfiguration
         {
             public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
-        public class PublicModelConfiguration : IModelConfiguration
+        public sealed class PublicModelConfiguration : IModelConfiguration
         {
             public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }

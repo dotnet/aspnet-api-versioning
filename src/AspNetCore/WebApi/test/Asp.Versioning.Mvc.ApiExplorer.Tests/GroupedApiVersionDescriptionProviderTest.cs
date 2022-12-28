@@ -41,7 +41,7 @@ public class GroupedApiVersionDescriptionProviderTest
     {
         // arrange
         var provider = new TestActionDescriptorCollectionProvider();
-        var source = new CompositeEndpointDataSource( Enumerable.Empty<EndpointDataSource>() );
+        using var source = new CompositeEndpointDataSource( Enumerable.Empty<EndpointDataSource>() );
         var data = new ApiDescriptionActionData() { GroupName = "Test" };
 
         foreach ( var descriptor in provider.ActionDescriptors.Items )

@@ -212,14 +212,8 @@ internal static class EndpointBuilderFinalizer
         ApiVersion[] emptyVersions;
         var inheritedSupported = apiModel.SupportedApiVersions;
         var inheritedDeprecated = apiModel.DeprecatedApiVersions;
-        var (mapped, supported, deprecated, advertised, advertisedDeprecated) = buckets;
-        var isEmpty = mapped.Count == 0 &&
-                      supported.Count == 0 &&
-                      deprecated.Count == 0 &&
-                      advertised.Count == 0 &&
-                      advertisedDeprecated.Count == 0;
 
-        if ( isEmpty )
+        if ( buckets.AreEmpty )
         {
             var noInheritedApiVersions = inheritedSupported.Count == 0 &&
                                          inheritedDeprecated.Count == 0;
@@ -239,24 +233,29 @@ internal static class EndpointBuilderFinalizer
                     emptyVersions );
             }
         }
-        else if ( mapped.Count == 0 )
-        {
-            endpointModel = new(
-                declaredVersions: supported.Union( deprecated ),
-                supported.Union( inheritedSupported ),
-                deprecated.Union( inheritedDeprecated ),
-                advertised,
-                advertisedDeprecated );
-        }
         else
         {
-            emptyVersions = Array.Empty<ApiVersion>();
-            endpointModel = new(
-                declaredVersions: mapped,
-                supportedVersions: inheritedSupported,
-                deprecatedVersions: inheritedDeprecated,
-                advertisedVersions: emptyVersions,
-                deprecatedAdvertisedVersions: emptyVersions );
+            var (mapped, supported, deprecated, advertised, advertisedDeprecated) = buckets;
+
+            if ( mapped.Count == 0 )
+            {
+                endpointModel = new(
+                    declaredVersions: supported.Union( deprecated ),
+                    supported.Union( inheritedSupported ),
+                    deprecated.Union( inheritedDeprecated ),
+                    advertised,
+                    advertisedDeprecated );
+            }
+            else
+            {
+                emptyVersions = Array.Empty<ApiVersion>();
+                endpointModel = new(
+                    declaredVersions: mapped,
+                    supportedVersions: inheritedSupported,
+                    deprecatedVersions: inheritedDeprecated,
+                    advertisedVersions: emptyVersions,
+                    deprecatedAdvertisedVersions: emptyVersions );
+            }
         }
 
         return new( apiModel, endpointModel, name );
@@ -277,5 +276,12 @@ internal static class EndpointBuilderFinalizer
         IReadOnlyList<ApiVersion> Supported,
         IReadOnlyList<ApiVersion> Deprecated,
         IReadOnlyList<ApiVersion> Advertised,
-        IReadOnlyList<ApiVersion> AdvertisedDeprecated );
+        IReadOnlyList<ApiVersion> AdvertisedDeprecated )
+    {
+        internal bool AreEmpty = Mapped.Count == 0
+                                 && Supported.Count == 0
+                                 && Deprecated.Count == 0
+                                 && Advertised.Count == 0
+                                 && AdvertisedDeprecated.Count == 0;
+    }
 }

@@ -26,8 +26,8 @@ public static class IEndpointRouteBuilderExtensions
         }
 
         var services = endpoints.ServiceProvider;
-        var source = new CompositeEndpointDataSource( endpoints.DataSources );
         var factory = services.GetRequiredService<IApiVersionDescriptionProviderFactory>();
+        using var source = new CompositeEndpointDataSource( endpoints.DataSources );
         var provider = factory.Create( source );
 
         return provider.ApiVersionDescriptions;

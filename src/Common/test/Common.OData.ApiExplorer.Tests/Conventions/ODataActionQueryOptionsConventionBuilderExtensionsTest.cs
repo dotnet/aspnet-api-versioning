@@ -230,6 +230,7 @@ public class ODataActionQueryOptionsConventionBuilderExtensionsTest
 
 #pragma warning disable IDE0060
 #pragma warning disable IDE0079
+#pragma warning disable CA1034 // Nested types should not be visible
 #pragma warning disable CA1822
 
     public sealed class StubController : ControllerBase

@@ -87,6 +87,11 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     /// <inheritdoc />
     public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context )
     {
+        if ( context == null )
+        {
+            throw new ArgumentNullException( nameof( context ) );
+        }
+
         var results = FilterResults( context.Results, Conventions );
 
         if ( results.Count == 0 )
@@ -120,6 +125,11 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     /// <inheritdoc />
     public virtual void OnProvidersExecuted( ApiDescriptionProviderContext context )
     {
+        if ( context == null )
+        {
+            throw new ArgumentNullException( nameof( context ) );
+        }
+
         var actions = context.Actions;
 
         for ( var i = 0; i < actions.Count; i++ )
