@@ -54,7 +54,7 @@ public class ODataApiExplorer : VersionedApiExplorer
     public ODataApiExplorer( HttpConfiguration configuration, ODataApiExplorerOptions options )
         : base( configuration, options )
     {
-        this.options = options;
+        this.options = options ?? throw new ArgumentNullException( nameof( options ) );
         options.AdHocModelBuilder.OnModelCreated += MarkAsAdHoc;
     }
 

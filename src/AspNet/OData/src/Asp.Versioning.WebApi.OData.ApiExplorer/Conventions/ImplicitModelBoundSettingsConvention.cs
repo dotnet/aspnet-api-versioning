@@ -13,6 +13,11 @@ public partial class ImplicitModelBoundSettingsConvention : IModelConfiguration,
     /// <inheritdoc />
     public void ApplyTo( ApiDescription apiDescription )
     {
+        if ( apiDescription == null )
+        {
+            throw new ArgumentNullException( nameof( apiDescription ) );
+        }
+
         var response = apiDescription.ResponseDescription;
         var type = response.ResponseType ?? response.DeclaredType;
 
