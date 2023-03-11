@@ -19,6 +19,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Config;
 using System.Reflection;
+using Xunit;
 using static Microsoft.AspNetCore.Http.StatusCodes;
 using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 using static Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators;
@@ -470,6 +471,50 @@ public class ODataValidationSettingsConventionTest
     }
 
     [Fact]
+    public void apply_should_override_model_bound_settings_with_enable_query_attribute()
+    {
+        // arrange
+        var builder = new ODataConventionModelBuilder().EnableLowerCamelCase();
+
+        builder.EntitySet<Customer>( "Customers" );
+
+        var validationSettings = new ODataValidationSettings()
+        {
+            AllowedQueryOptions = AllowedQueryOptions.None,
+            AllowedArithmeticOperators = AllowedArithmeticOperators.None,
+            AllowedLogicalOperators = AllowedLogicalOperators.None,
+            AllowedFunctions = AllowedFunctions.None,
+        };
+        var settings = new TestODataQueryOptionSettings( typeof( Customer ) );
+        var convention = new ODataValidationSettingsConvention( validationSettings, settings );
+        var model = builder.GetEdmModel();
+        var description = NewApiDescription( typeof( CustomersController ), typeof( IEnumerable<Customer> ), model );
+
+        // act
+        convention.ApplyTo( description );
+
+        // assert
+        var parameter = description.ParameterDescriptions.Single();
+
+        parameter.Should().BeEquivalentTo(
+            new
+            {
+                Name = "$filter",
+                Source = Query,
+                Type = typeof( string ),
+                DefaultValue = default( object ),
+                IsRequired = false,
+                ModelMetadata = new { Description = "Test" },
+                ParameterDescriptor = new
+                {
+                    Name = "$filter",
+                    ParameterType = typeof( string ),
+                },
+            },
+            options => options.ExcludingMissingMembers() );
+    }
+
+    [Fact]
     public void apply_to_should_process_odataX2Dlike_api_description()
     {
         // arrange
@@ -678,6 +723,13 @@ public class ODataValidationSettingsConventionTest
         public IActionResult Get( ODataQueryOptions<Order> options ) => Ok();
     }
 
+    public class CustomersController : ODataController
+    {
+        [EnableQuery( AllowedQueryOptions = Filter )]
+        [ProducesResponseType( typeof( IEnumerable<Customer> ), Status200OK )]
+        public IActionResult Get( ODataQueryOptions<Customer> options ) => Ok();
+    }
+
     [Select]
     [Filter]
     [Count]
@@ -691,6 +743,12 @@ public class ODataValidationSettingsConventionTest
         public decimal Price { get; set; }
 
         public int Quantity { get; set; }
+    }
+
+    [Page( MaxTop = 25, PageSize = 25 )]
+    public class Customer
+    {
+        public int CustomerId { get; set; }
     }
 
     private sealed class TestODataQueryOptionSettings : ODataQueryOptionSettings
