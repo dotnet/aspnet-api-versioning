@@ -1,1 +1,1 @@
-﻿Use complex types instead of entities for ad hoc models
+﻿Fix: `EnableQueryAttribute` should override _Model Bound_ settings (Related to [#928](https://github.com/dotnet/aspnet-api-versioning/issues/928))
