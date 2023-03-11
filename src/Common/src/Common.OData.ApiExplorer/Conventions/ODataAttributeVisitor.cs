@@ -38,14 +38,14 @@ internal sealed partial class ODataAttributeVisitor
 
     internal void Visit( ApiDescription apiDescription )
     {
-        VisitAction( apiDescription.ActionDescriptor );
-
         var modelType = context.ReturnType;
 
         if ( modelType != null )
         {
             VisitModel( modelType );
         }
+
+        VisitAction( apiDescription.ActionDescriptor );
     }
 
     private void VisitModel( IEdmStructuredType modelType )
