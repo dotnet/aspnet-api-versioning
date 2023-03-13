@@ -19,11 +19,7 @@ internal readonly struct PolicyKey : IEquatable<PolicyKey>
 
     public bool Equals( PolicyKey other ) => GetHashCode() == other.GetHashCode();
 
-    public override bool Equals(
-#if !NETFRAMEWORK
-        [NotNullWhen( true )]
-#endif
-        object? obj ) => obj is PolicyKey other && Equals( other );
+    public override bool Equals( [NotNullWhen( true )] object? obj ) => obj is PolicyKey other && Equals( other );
 
     public override int GetHashCode()
     {

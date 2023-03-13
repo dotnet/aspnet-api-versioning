@@ -39,9 +39,9 @@ public static class HttpControllerDescriptorExtensions
             throw new ArgumentNullException( nameof( controllerDescriptor ) );
         }
 
-        if ( controllerDescriptor.Properties.TryGetValue( typeof( ApiVersionModel ), out ApiVersionModel value ) )
+        if ( controllerDescriptor.Properties.TryGetValue( typeof( ApiVersionModel ), out ApiVersionModel? value ) )
         {
-            return value;
+            return value!;
         }
 
         return ApiVersionModel.Empty;
@@ -107,12 +107,12 @@ public static class HttpControllerDescriptorExtensions
             yield return controllerDescriptor;
         }
 
-        if ( !includeCandidates || !controllerDescriptor.Properties.TryGetValue( PossibleControllerCandidatesKey, out IEnumerable<HttpControllerDescriptor> candidates ) )
+        if ( !includeCandidates || !controllerDescriptor.Properties.TryGetValue( PossibleControllerCandidatesKey, out IEnumerable<HttpControllerDescriptor>? candidates ) )
         {
             yield break;
         }
 
-        foreach ( var candidate in candidates )
+        foreach ( var candidate in candidates! )
         {
             if ( visited.Add( candidate ) )
             {

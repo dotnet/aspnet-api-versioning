@@ -13,10 +13,7 @@ public partial class SunsetPolicyManager : ISunsetPolicyManager
     public virtual bool TryGetPolicy(
         string? name,
         ApiVersion? apiVersion,
-#if !NETFRAMEWORK
-        [MaybeNullWhen( false )]
-#endif
-        out SunsetPolicy sunsetPolicy )
+        [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
         if ( string.IsNullOrEmpty( name ) && apiVersion == null )
         {

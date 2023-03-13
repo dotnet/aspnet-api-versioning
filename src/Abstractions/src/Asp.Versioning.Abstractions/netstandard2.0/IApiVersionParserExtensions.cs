@@ -33,10 +33,7 @@ public static class IApiVersionParserExtensions
     public static bool TryParse(
         this IApiVersionParser parser,
         string? text,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out ApiVersion apiVersion )
+        [MaybeNullWhen( false )] out ApiVersion apiVersion )
     {
         if ( parser == null )
         {

@@ -71,12 +71,7 @@ public class ODataActionQueryOptionsConventionBuilderCollection<T> :
     /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
     /// <param name="actionBuilder">The <see cref="ODataActionQueryOptionsConventionBuilder{T}">controller action convention builder</see> or <c>null</c>.</param>
     /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-    public virtual bool TryGetValue(
-        MethodInfo? actionMethod,
-#if !NETFRAMEWORK
-        [NotNullWhen( true )]
-#endif
-        out ODataActionQueryOptionsConventionBuilder<T>? actionBuilder )
+    public virtual bool TryGetValue( MethodInfo? actionMethod, [NotNullWhen( true )] out ODataActionQueryOptionsConventionBuilder<T>? actionBuilder )
     {
         if ( actionMethod == null || actionBuilderMappings == null || actionBuilderMappings.Count == 0 )
         {

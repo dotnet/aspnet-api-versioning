@@ -20,10 +20,5 @@ public interface IApiVersionParser
     /// <param name="text">The text to parse as an API version.</param>
     /// <param name="apiVersion">The parsed API version or null.</param>
     /// <returns>True if the parsing was successful; otherwise false.</returns>
-    bool TryParse(
-        ReadOnlySpan<char> text,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out ApiVersion apiVersion );
+    bool TryParse( ReadOnlySpan<char> text, [MaybeNullWhen( false )] out ApiVersion apiVersion );
 }

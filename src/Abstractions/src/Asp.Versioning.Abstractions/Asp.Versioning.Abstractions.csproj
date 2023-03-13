@@ -30,6 +30,10 @@
   <Compile Include="$(BackportDir)Array.cs" Visible="false" />
  </ItemGroup>
 
+ <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard1.0') OR ('$(TargetFramework)' == 'netstandard2.0') ">
+  <Compile Include="$(BackportDir)NullableAttributes.cs" Visible="false" />
+ </ItemGroup>
+
  <ItemGroup Condition=" '$(TargetFramework)' != 'net7.0' ">
   <Compile Include="$(BackportDir)BitOperations.cs" Visible="false" />
   <Compile Include="$(BackportDir)HashCode.cs" Visible="false" />

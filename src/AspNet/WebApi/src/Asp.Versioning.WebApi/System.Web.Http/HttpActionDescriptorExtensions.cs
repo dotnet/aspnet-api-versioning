@@ -25,9 +25,9 @@ public static class HttpActionDescriptorExtensions
             throw new ArgumentNullException( nameof( action ) );
         }
 
-        if ( action.Properties.TryGetValue( typeof( ApiVersionMetadata ), out ApiVersionMetadata value ) )
+        if ( action.Properties.TryGetValue( typeof( ApiVersionMetadata ), out ApiVersionMetadata? value ) )
         {
-            return value;
+            return value!;
         }
 
         return ApiVersionMetadata.Empty;

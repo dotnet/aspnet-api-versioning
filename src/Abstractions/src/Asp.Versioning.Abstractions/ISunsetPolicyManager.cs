@@ -18,11 +18,5 @@ public interface ISunsetPolicyManager
     /// policy for the specified <paramref name="apiVersion">API version</paramref>. If
     /// <paramref name="apiVersion">API version</paramref> is <c>null</c>, it is assumed the caller intends to match
     /// any sunset policy for the specified <paramref name="name"/>.</remarks>
-    bool TryGetPolicy(
-        string? name,
-        ApiVersion? apiVersion,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out SunsetPolicy sunsetPolicy );
+    bool TryGetPolicy( string? name, ApiVersion? apiVersion, [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy );
 }

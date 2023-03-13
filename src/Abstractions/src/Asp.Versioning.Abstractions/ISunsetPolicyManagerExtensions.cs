@@ -17,10 +17,7 @@ public static class ISunsetPolicyManagerExtensions
     public static bool TryGetPolicy(
         this ISunsetPolicyManager policyManager,
         ApiVersion apiVersion,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out SunsetPolicy sunsetPolicy )
+        [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
         if ( policyManager == null )
         {
@@ -40,10 +37,7 @@ public static class ISunsetPolicyManagerExtensions
     public static bool TryGetPolicy(
         this ISunsetPolicyManager policyManager,
         string name,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out SunsetPolicy sunsetPolicy )
+        [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
         if ( policyManager == null )
         {
@@ -104,10 +98,7 @@ public static class ISunsetPolicyManagerExtensions
         this ISunsetPolicyManager policyManager,
         string? name,
         ApiVersion? apiVersion,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out SunsetPolicy sunsetPolicy )
+        [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
         if ( policyManager == null )
         {

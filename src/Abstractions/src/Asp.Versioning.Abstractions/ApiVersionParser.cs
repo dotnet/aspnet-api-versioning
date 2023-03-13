@@ -187,8 +187,6 @@ public class ApiVersionParser : IApiVersionParser
     /// <inheritdoc />
 #if NETSTANDARD1_0
     public virtual bool TryParse( Text? text, out ApiVersion apiVersion )
-#elif NETSTANDARD2_0
-    public virtual bool TryParse( Text text, out ApiVersion apiVersion )
 #else
     public virtual bool TryParse( Text text, [MaybeNullWhen( false )] out ApiVersion apiVersion )
 #endif
