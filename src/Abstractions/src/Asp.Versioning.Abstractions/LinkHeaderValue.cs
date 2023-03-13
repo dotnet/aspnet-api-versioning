@@ -161,10 +161,7 @@ public partial class LinkHeaderValue
     public static bool TryParse(
         StringSegment input,
         Func<Uri, Uri>? resolveRelativeUrl,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out LinkHeaderValue parsedValue )
+        [MaybeNullWhen( false )] out LinkHeaderValue parsedValue )
     {
 #if NETSTANDARD1_0
         if ( string.IsNullOrEmpty( input ) )
@@ -302,9 +299,7 @@ public partial class LinkHeaderValue
     public static bool TryParseList(
         IList<string>? input,
         Func<Uri, Uri>? resolveRelativeUrl,
-#if !NETSTANDARD
         [MaybeNullWhen( false )]
-#endif
         out IList<LinkHeaderValue> parsedValues )
     {
         if ( input == null )
@@ -404,10 +399,7 @@ public partial class LinkHeaderValue
     private static bool TryParseTargetLink(
         ref StringSegment segment,
         Func<Uri, Uri>? resolveRelativeUrl,
-#if !NETSTANDARD
-        [MaybeNullWhen( false )]
-#endif
-        out Uri targetLink )
+        [MaybeNullWhen( false )] out Uri targetLink )
     {
         var start = segment.IndexOf( '<' );
 
@@ -495,7 +487,7 @@ public partial class LinkHeaderValue
 
         public bool TryGetValue(
             StringSegment key,
-#if !NETSTANDARD
+#if !NETSTANDARD1_0
             [MaybeNullWhen( false )]
 #endif
             out StringSegment value ) => items.TryGetValue( key, out value );

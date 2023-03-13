@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Conventions;
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System.Reflection;
 
@@ -50,9 +49,7 @@ public abstract class ControllerApiVersionConventionBuilderBase : ApiVersionConv
     /// <param name="method">The <see cref="MethodInfo">method</see> representing the action to retrieve the convention for.</param>
     /// <param name="convention">The retrieved <see cref="IApiVersionConvention{T}">convention</see> or <c>null</c>.</param>
     /// <returns>True if the convention was successfully retrieved; otherwise, false.</returns>
-    protected abstract bool TryGetConvention(
-        MethodInfo method,
-        [MaybeNullWhen( false )] out IApiVersionConvention<ActionModel> convention );
+    protected abstract bool TryGetConvention( MethodInfo method, [MaybeNullWhen( false )] out IApiVersionConvention<ActionModel> convention );
 
     private void ApplyActionConventions( ControllerModel controller )
     {

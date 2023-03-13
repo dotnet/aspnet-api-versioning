@@ -304,7 +304,7 @@ internal sealed class ActionSelectorCacheItem
                 continue;
             }
 
-            subRouteData.Values.TryGetValue( RouteValueKeys.Action, out string actionName );
+            subRouteData.Values.TryGetValue( RouteValueKeys.Action, out string? actionName );
 
             for ( var i = 0; i < candidates.Length; i++ )
             {
@@ -335,9 +335,9 @@ internal sealed class ActionSelectorCacheItem
         var routeData = controllerContext.RouteData;
         CandidateAction[] candidates;
 
-        if ( routeData.Values.TryGetValue( RouteValueKeys.Action, out string actionName ) )
+        if ( routeData.Values.TryGetValue( RouteValueKeys.Action, out string? actionName ) )
         {
-            var actionsFoundByName = standardActions!.StandardActionNameMapping![actionName].ToArray();
+            var actionsFoundByName = standardActions!.StandardActionNameMapping![actionName!].ToArray();
 
             if ( actionsFoundByName.Length == 0 )
             {

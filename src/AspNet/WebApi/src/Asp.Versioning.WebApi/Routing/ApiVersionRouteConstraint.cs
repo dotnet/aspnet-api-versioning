@@ -31,7 +31,7 @@ public sealed class ApiVersionRouteConstraint : IHttpRouteConstraint
             return false;
         }
 
-        if ( !values.TryGetValue( parameterName, out string value ) )
+        if ( !values.TryGetValue( parameterName, out string? value ) )
         {
             return false;
         }

@@ -78,9 +78,9 @@ public static class HttpRequestMessageExtensions
             throw new ArgumentNullException( nameof( request ) );
         }
 
-        if ( request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties properties ) )
+        if ( request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties? properties ) )
         {
-            return properties;
+            return properties!;
         }
 
         var forceRouteConstraintEvaluation = !request.Properties.ContainsKey( RoutingContextKey );

@@ -123,7 +123,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             return null;
         }
 
-        if ( routeData.Values.TryGetValue( RouteDataTokenKeys.Controller, out string controller ) )
+        if ( routeData.Values.TryGetValue( RouteDataTokenKeys.Controller, out string? controller ) )
         {
             return controller;
         }

@@ -7,10 +7,7 @@ internal static partial class CollectionExtensions
     internal static bool TryGetValue<TKey, TValue>(
         this IDictionary<TKey, object?> dictionary,
         TKey key,
-#if !NETFRAMEWORK
-        [MaybeNullWhen( false )]
-#endif
-        out TValue value )
+        [MaybeNullWhen( false )] out TValue value )
         where TKey : notnull
     {
         if ( dictionary.TryGetValue( key, out var val ) && val is TValue v )

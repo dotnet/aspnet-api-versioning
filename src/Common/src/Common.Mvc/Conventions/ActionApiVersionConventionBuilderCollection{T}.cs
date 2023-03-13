@@ -73,12 +73,7 @@ public class ActionApiVersionConventionBuilderCollection<T> : IReadOnlyCollectio
     /// <param name="actionMethod">The controller action method to get the convention builder for.</param>
     /// <param name="actionBuilder">The <see cref="ActionApiVersionConventionBuilder{T}">controller action convention builder</see> or <c>null</c>.</param>
     /// <returns>True if the <paramref name="actionBuilder">action builder</paramref> is successfully retrieved; otherwise, false.</returns>
-    public virtual bool TryGetValue(
-        MethodInfo? actionMethod,
-#if !NETFRAMEWORK
-        [MaybeNullWhen( false )]
-#endif
-        out ActionApiVersionConventionBuilder<T> actionBuilder )
+    public virtual bool TryGetValue( MethodInfo? actionMethod, [MaybeNullWhen( false )] out ActionApiVersionConventionBuilder<T> actionBuilder )
     {
         if ( actionBuilderMappings == null || actionMethod == null )
         {

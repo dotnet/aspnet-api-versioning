@@ -713,7 +713,7 @@ public class VersionedApiExplorer : IApiExplorer
 
         var apiDescriptions = new Collection<VersionedApiDescription>();
         var routeTemplate = route.RouteTemplate;
-        string controllerVariableValue;
+        string? controllerVariableValue;
 
         if ( controllerVariableRegex.IsMatch( routeTemplate ) )
         {
@@ -734,12 +734,12 @@ public class VersionedApiExplorer : IApiExplorer
             }
         }
         else if ( route.Defaults.TryGetValue( RouteValueKeys.Controller, out controllerVariableValue ) &&
-                  controllerMappings.TryGetValue( controllerVariableValue, out var controllerDescriptor ) )
+                  controllerMappings.TryGetValue( controllerVariableValue!, out var controllerDescriptor ) )
         {
             // bound controller variable {controller = "controllerName"}
             foreach ( var nestedControllerDescriptor in controllerDescriptor.AsEnumerable() )
             {
-                if ( ShouldExploreController( controllerVariableValue, nestedControllerDescriptor, route, apiVersion ) )
+                if ( ShouldExploreController( controllerVariableValue!, nestedControllerDescriptor, route, apiVersion ) )
                 {
                     ExploreRouteActions( route, routeTemplate, nestedControllerDescriptor, apiDescriptions, apiVersion );
                 }
@@ -782,7 +782,7 @@ public class VersionedApiExplorer : IApiExplorer
             return;
         }
 
-        string actionVariableValue;
+        string? actionVariableValue;
 
         if ( actionVariableRegex.IsMatch( localPath ) )
         {
@@ -935,17 +935,8 @@ public class VersionedApiExplorer : IApiExplorer
                      parameter.CanConvertPropertiesFromString() ) > 1;
     }
 
-    private static Type GetCollectionElementType( Type collectionType )
-    {
-        var elementType = collectionType.GetElementType();
-
-        if ( elementType == null )
-        {
-            elementType = typeof( ICollection<> ).GetGenericBinderTypeArgs( collectionType ).First();
-        }
-
-        return elementType;
-    }
+    private static Type GetCollectionElementType( Type collectionType ) =>
+        collectionType.GetElementType() ?? typeof( ICollection<> ).GetGenericBinderTypeArgs( collectionType ).First();
 
     private static void AddPlaceholderForProperties(
         Dictionary<string, object> parameterValuesForRoute,

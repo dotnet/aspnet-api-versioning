@@ -248,12 +248,7 @@ public static partial class TypeExtensions
 #endif
         !type.IsODataActionParameters();
 
-    internal static bool IsEnumerable(
-        this Type type,
-#if !NETFRAMEWORK
-        [NotNullWhen( true )]
-#endif
-        out Type? itemType )
+    internal static bool IsEnumerable( this Type type, [NotNullWhen( true )] out Type? itemType )
     {
         var types = new Queue<Type>();
 
