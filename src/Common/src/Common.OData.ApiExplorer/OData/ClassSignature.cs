@@ -12,7 +12,7 @@ internal sealed class ClassSignature : IEquatable<ClassSignature>
     private static readonly ConstructorInfo newOriginalType = typeof( OriginalTypeAttribute ).GetConstructors()[0];
     private int? hashCode;
 
-    internal ClassSignature( Type originalType, IEnumerable<ClassProperty> properties, ApiVersion apiVersion )
+    internal ClassSignature( string name, Type originalType, IEnumerable<ClassProperty> properties, ApiVersion apiVersion )
     {
         var attributeBuilders = new List<CustomAttributeBuilder>()
         {
@@ -21,7 +21,7 @@ internal sealed class ClassSignature : IEquatable<ClassSignature>
 
         attributeBuilders.AddRange( originalType.DeclaredAttributes() );
 
-        Name = originalType.FullName!;
+        Name = name;
         Attributes = attributeBuilders.ToArray();
         Properties = properties.ToArray();
         ApiVersion = apiVersion;
