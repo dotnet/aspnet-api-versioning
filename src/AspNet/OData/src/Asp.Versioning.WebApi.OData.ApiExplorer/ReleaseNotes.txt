@@ -1,1 +1,1 @@
-﻿Fix: `EnableQueryAttribute` should override _Model Bound_ settings (Related to [#928](https://github.com/dotnet/aspnet-api-versioning/issues/928))
+﻿Fix: Explore model per EDM + API version ([#996](https://github.com/dotnet/aspnet-api-versioning/issues/996))
