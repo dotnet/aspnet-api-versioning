@@ -41,9 +41,9 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     private readonly bool adHoc;
     private readonly bool excludeAdHocModels;
     private DefaultModelTypeBuilder? adHocBuilder;
-    private ConcurrentDictionary<ApiVersion, ModuleBuilder>? modules;
-    private ConcurrentDictionary<ApiVersion, IDictionary<EdmTypeKey, Type>>? generatedEdmTypesPerVersion;
-    private ConcurrentDictionary<ApiVersion, ConcurrentDictionary<EdmTypeKey, Type>>? generatedActionParamsPerVersion;
+    private ConcurrentDictionary<EdmModelKey, ModuleBuilder>? modules;
+    private ConcurrentDictionary<EdmModelKey, IDictionary<EdmTypeKey, Type>>? generatedEdmTypesPerVersion;
+    private ConcurrentDictionary<EdmModelKey, ConcurrentDictionary<EdmTypeKey, Type>>? generatedActionParamsPerVersion;
 
     private DefaultModelTypeBuilder( bool excludeAdHocModels, bool adHoc )
     {
@@ -96,7 +96,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         generatedEdmTypesPerVersion ??= new();
 
-        var edmTypes = generatedEdmTypesPerVersion.GetOrAdd( apiVersion, key => GenerateTypesForEdmModel( model, key ) );
+        var edmTypes = generatedEdmTypesPerVersion.GetOrAdd( new( model, apiVersion ), key => GenerateTypesForEdmModel( model, key.ApiVersion ) );
 
         return edmTypes[new( structuredType, apiVersion )];
     }
@@ -132,7 +132,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         generatedActionParamsPerVersion ??= new();
 
-        var paramTypes = generatedActionParamsPerVersion.GetOrAdd( apiVersion, _ => new() );
+        var paramTypes = generatedActionParamsPerVersion.GetOrAdd( new( model, apiVersion ), _ => new() );
         var fullTypeName = $"{controllerName}.{action.Namespace}.{controllerName}{action.Name}Parameters";
         var key = new EdmTypeKey( fullTypeName, apiVersion );
         var type = paramTypes.GetOrAdd( key, _ =>
@@ -140,7 +140,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
             var context = new TypeSubstitutionContext( model, this, apiVersion );
             var properties = action.Parameters.Where( p => p.Name != "bindingParameter" ).Select( p => new ClassProperty( p, context ) );
             var signature = new ClassSignature( fullTypeName, properties, apiVersion );
-            var moduleBuilder = ( modules ??= new() ).GetOrAdd( apiVersion, CreateModuleForApiVersion );
+            var moduleBuilder = ( modules ??= new() ).GetOrAdd( new( model, apiVersion ), CreateModuleForApiVersion );
 
             return CreateTypeFromSignature( moduleBuilder, signature );
         } );
@@ -150,7 +150,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
     private IDictionary<EdmTypeKey, Type> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )
     {
-        ModuleBuilder NewModuleBuilder() => ( modules ??= new() ).GetOrAdd( apiVersion, CreateModuleForApiVersion );
+        ModuleBuilder NewModuleBuilder() => ( modules ??= new() ).GetOrAdd( new( model, apiVersion ), CreateModuleForApiVersion );
 
         var context = new BuilderContext( model, apiVersion, NewModuleBuilder );
 
@@ -336,7 +336,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
             return type;
         }
 
-        var signature = new ClassSignature( clrType, properties, apiVersion );
+        var signature = new ClassSignature( typeKey.FullName, clrType, properties, apiVersion );
 
         if ( hasUnfinishedTypes )
         {
@@ -518,9 +518,9 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private ModuleBuilder CreateModuleForApiVersion( ApiVersion apiVersion )
+    private ModuleBuilder CreateModuleForApiVersion( EdmModelKey key )
     {
-        var assemblyName = NewAssemblyName( apiVersion, adHoc );
+        var assemblyName = NewAssemblyName( key.ApiVersion, adHoc );
 #if NETFRAMEWORK
         var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly( assemblyName, Run );
 #else

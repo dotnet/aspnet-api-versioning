@@ -8,14 +8,17 @@ internal readonly struct EdmTypeKey : IEquatable<EdmTypeKey>
 {
     private readonly int hashCode;
 
+    public readonly string FullName;
+    public readonly ApiVersion ApiVersion;
+
     internal EdmTypeKey( IEdmStructuredType type, ApiVersion apiVersion ) =>
-        hashCode = HashCode.Combine( type.FullTypeName(), apiVersion );
+        hashCode = HashCode.Combine( FullName = type.FullTypeName(), ApiVersion = apiVersion );
 
     internal EdmTypeKey( IEdmTypeReference type, ApiVersion apiVersion ) =>
-        hashCode = HashCode.Combine( type.FullName(), apiVersion );
+        hashCode = HashCode.Combine( FullName = type.FullName(), ApiVersion = apiVersion );
 
     internal EdmTypeKey( string fullTypeName, ApiVersion apiVersion ) =>
-        hashCode = HashCode.Combine( fullTypeName, apiVersion );
+        hashCode = HashCode.Combine( FullName = fullTypeName, ApiVersion = apiVersion );
 
     public static bool operator ==( EdmTypeKey obj, EdmTypeKey other ) => obj.Equals( other );
 
