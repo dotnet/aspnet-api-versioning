@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>7.0.2</VersionPrefix>
+  <VersionPrefix>7.0.1</VersionPrefix>
   <AssemblyVersion>7.0.0.0</AssemblyVersion>
   <TargetFramework>net7.0</TargetFramework>
   <RootNamespace>Asp.Versioning</RootNamespace>
