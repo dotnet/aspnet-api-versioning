@@ -14,8 +14,7 @@ using Microsoft.Extensions.Options;
 [CLSCompliant( false )]
 public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
 {
-    private readonly IOptions<ApiVersioningOptions> options;
-    private readonly IOptions<MvcApiVersioningOptions> mvcOptions;
+    private readonly MvcApiVersioningOptions mvcOptions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersioningApplicationModelProvider"/> class.
@@ -32,8 +31,8 @@ public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
     {
         ControllerFilter = controllerFilter;
         NamingConvention = namingConvention;
-        this.options = options;
-        this.mvcOptions = mvcOptions;
+        Options = options?.Value ?? throw new ArgumentNullException( nameof( options ) );
+        this.mvcOptions = mvcOptions?.Value ?? throw new ArgumentNullException( nameof( mvcOptions ) );
     }
 
     /// <inheritdoc />
@@ -55,13 +54,13 @@ public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
     /// Gets the builder used to define API version conventions.
     /// </summary>
     /// <value>An <see cref="IApiVersionConventionBuilder">API version convention builder</see>.</value>
-    protected IApiVersionConventionBuilder ConventionBuilder => mvcOptions.Value.Conventions;
+    protected IApiVersionConventionBuilder ConventionBuilder => mvcOptions.Conventions;
 
     /// <summary>
     /// Gets the API versioning options associated with the model provider.
     /// </summary>
     /// <value>The current <see cref="ApiVersioningOptions">API versioning options</see>.</value>
-    protected ApiVersioningOptions Options => options.Value;
+    protected ApiVersioningOptions Options { get; }
 
     /// <inheritdoc />
     public virtual void OnProvidersExecuted( ApplicationModelProviderContext context ) { }
