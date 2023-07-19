@@ -72,7 +72,7 @@ app.UseSwaggerUI(
         // build a swagger endpoint for each discovered API version
         foreach ( var description in descriptions )
         {
-            var url = $"/swagger/{description.GroupName}/swagger.json";
+            var url = $"{description.GroupName}/swagger.json";
             var name = description.GroupName.ToUpperInvariant();
             options.SwaggerEndpoint( url, name );
         }
