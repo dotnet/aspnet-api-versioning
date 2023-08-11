@@ -16,6 +16,14 @@ using Microsoft.AspNetCore.Http;
 #endif
 public static class ApiVersionReader
 {
+    private static IApiVersionReader? @default;
+
+    /// <summary>
+    /// Gets the default API version reader.
+    /// </summary>
+    /// <value>The default <see cref="IApiVersionReader"/>.</value>
+    public static IApiVersionReader Default => @default ??= Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
+
     /// <summary>
     /// Returns a new API version reader that is a combination of the specified set.
     /// </summary>

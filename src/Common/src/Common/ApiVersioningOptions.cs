@@ -6,7 +6,6 @@ using Asp.Versioning.Routing;
 #if NETFRAMEWORK
 using System.Net;
 #endif
-using static Asp.Versioning.ApiVersionReader;
 
 /// <summary>
 /// Represents the possible options for API versioning.
@@ -73,7 +72,7 @@ public partial class ApiVersioningOptions
 #endif
     public IApiVersionReader ApiVersionReader
     {
-        get => apiVersionReader ??= Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
+        get => apiVersionReader ??= Versioning.ApiVersionReader.Default;
         set => apiVersionReader = value;
     }
 
