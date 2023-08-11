@@ -21,6 +21,6 @@ public class ODataId
 #if NETFRAMEWORK
     public Uri Value { get; set; } = default!;
 #else
-    required public Uri Value { get; set; }
+    public required Uri Value { get; set; }
 #endif
 }

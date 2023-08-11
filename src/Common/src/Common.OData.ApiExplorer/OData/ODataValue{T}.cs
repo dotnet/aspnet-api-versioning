@@ -23,6 +23,6 @@ public class ODataValue<T>
 #if NETFRAMEWORK
     public T Value { get; set; } = default!;
 #else
-    required public T Value { get; set; }
+    public required T Value { get; set; }
 #endif
 }

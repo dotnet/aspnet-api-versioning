@@ -107,6 +107,6 @@ public class ODataApiExplorerOptionsFactory : ApiExplorerOptionsFactory<ODataApi
 
     private sealed class ODataApiVersionCollectionProvider : IODataApiVersionCollectionProvider
     {
-        required public IReadOnlyList<ApiVersion> ApiVersions { get; set; }
+        public required IReadOnlyList<ApiVersion> ApiVersions { get; set; }
     }
 }
