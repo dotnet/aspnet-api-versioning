@@ -18,7 +18,11 @@ public class SupplierConfiguration : IModelConfiguration
             return;
         }
 
-        builder.EntitySet<Supplier>( "Suppliers" ).EntityType.HasKey( p => p.Id );
+        var supplier = builder.EntitySet<Supplier>( "Suppliers" ).EntityType;
+
+        supplier.HasKey( p => p.Id );
+        supplier.Page( maxTopValue: 100, pageSizeValue: default );
+
         builder.Singleton<Supplier>( "Acme" );
     }
 }

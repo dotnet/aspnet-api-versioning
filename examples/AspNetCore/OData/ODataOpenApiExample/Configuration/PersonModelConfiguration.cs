@@ -18,6 +18,7 @@ public class PersonModelConfiguration : IModelConfiguration
 
         person.HasKey( p => p.Id );
         person.Select().OrderBy( "firstName", "lastName" );
+        person.Page( maxTopValue: 100, pageSizeValue: default );
 
         if ( apiVersion < ApiVersions.V3 )
         {
