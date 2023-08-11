@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 /// <summary>
 /// Represents an order.
 /// </summary>
+[Page( MaxTop = 100 )]
 [Select]
 [Select( "effectiveDate", SelectType = SelectExpandType.Disabled )]
 public class Order

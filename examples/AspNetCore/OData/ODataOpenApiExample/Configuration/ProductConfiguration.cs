@@ -18,6 +18,9 @@ public class ProductConfiguration : IModelConfiguration
             return;
         }
 
-        var product = builder.EntitySet<Product>( "Products" ).EntityType.HasKey( p => p.Id );
+        var product = builder.EntitySet<Product>( "Products" ).EntityType;
+        
+        product.HasKey( p => p.Id );
+        product.Page( maxTopValue: 100, pageSizeValue: default );
     }
 }

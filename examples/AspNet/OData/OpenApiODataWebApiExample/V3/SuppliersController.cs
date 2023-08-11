@@ -118,7 +118,7 @@ public class SuppliersController : ODataController
     /// </summary>
     /// <param name="key">The supplier identifier.</param>
     /// <returns>The associated supplier products.</returns>
-    [EnableQuery]
+    [EnableQuery( MaxTop = 100 )]
     public IQueryable<Product> GetProducts( [FromODataUri] int key ) =>
         suppliers.Where( s => s.Id == key ).SelectMany( s => s.Products );
 

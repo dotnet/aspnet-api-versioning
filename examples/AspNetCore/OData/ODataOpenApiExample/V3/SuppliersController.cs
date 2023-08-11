@@ -17,9 +17,9 @@ using static Microsoft.AspNetCore.Http.StatusCodes;
 public class SuppliersController : ODataController
 {
     private readonly IQueryable<Supplier> suppliers = new[]
-    { 
-        NewSupplier( 1 ), 
-        NewSupplier( 2 ), 
+    {
+        NewSupplier( 1 ),
+        NewSupplier( 2 ),
         NewSupplier( 3 ),
     }.AsQueryable();
 
@@ -46,7 +46,7 @@ public class SuppliersController : ODataController
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( Supplier ), Status200OK )]
     [ProducesResponseType( Status404NotFound )]
-    public SingleResult<Supplier> Get( int key ) => 
+    public SingleResult<Supplier> Get( int key ) =>
         SingleResult.Create( suppliers.Where( p => p.Id == key ) );
 
     /// <summary>
@@ -147,7 +147,7 @@ public class SuppliersController : ODataController
     /// <param name="key">The supplier identifier.</param>
     /// <returns>The associated supplier products.</returns>
     [HttpGet]
-    [EnableQuery]
+    [EnableQuery( MaxTop = 100 )]
     public IQueryable<Product> GetProducts( int key ) =>
         suppliers.Where( s => s.Id == key ).SelectMany( s => s.Products );
 
@@ -181,8 +181,8 @@ public class SuppliersController : ODataController
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
     public IActionResult DeleteRef(
-        int key, 
-        int relatedKey, 
+        int key,
+        int relatedKey,
         string navigationProperty ) => NoContent();
 
     private static Supplier NewSupplier( int id ) =>
