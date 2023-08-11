@@ -97,6 +97,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}.{1} is an invalid value for {2}.{3}. Did you mean to apply {4} via attribute or convention instead?.
+        /// </summary>
+        internal static string InvalidDefaultApiVersion {
+            get {
+                return ResourceManager.GetString("InvalidDefaultApiVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An endpoint cannot apply multiple API version sets..
         /// </summary>
         internal static string MultipleVersionSets {

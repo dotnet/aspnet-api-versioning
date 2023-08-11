@@ -37,4 +37,17 @@ public class HttpConfigurationExtensionsTest
         configuration.Services.GetActionSelector().Should().BeOfType<ApiVersionActionSelector>();
         configuration.Filters.Single().Instance.Should().BeOfType<ReportApiVersionsAttribute>();
     }
+
+    [Fact]
+    public void add_api_versioning_should_not_allow_default_neutral_api_version()
+    {
+        // arrange
+        var configuration = new HttpConfiguration();
+
+        // act
+        Action options = () => configuration.AddApiVersioning( options => options.DefaultApiVersion = ApiVersion.Neutral );
+
+        // assert
+        options.Should().Throw<InvalidOperationException>();
+    }
 }

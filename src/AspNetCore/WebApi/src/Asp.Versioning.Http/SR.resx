@@ -129,6 +129,14 @@
   <data name="ConventionAddedAfterEndpointBuilt" xml:space="preserve">
     <value>Conventions cannot be added after building the endpoint.</value>
   </data>
+  <data name="InvalidDefaultApiVersion" xml:space="preserve">
+    <value>{0}.{1} is an invalid value for {2}.{3}. Did you mean to apply {4} via attribute or convention instead?</value>
+    <comment>0 = ApiVersion
+1 = Neutral
+2 = ApiVersioningOptions
+3 = DefaultApiVersion
+4 = IApiVersionNeutral</comment>
+  </data>
   <data name="MultipleVersionSets" xml:space="preserve">
     <value>An endpoint cannot apply multiple API version sets.</value>
   </data>

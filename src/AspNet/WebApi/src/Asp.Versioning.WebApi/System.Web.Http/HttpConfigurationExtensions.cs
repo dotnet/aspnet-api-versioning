@@ -5,6 +5,7 @@ namespace System.Web.Http;
 using Asp.Versioning;
 using Asp.Versioning.Controllers;
 using Asp.Versioning.Dispatcher;
+using System.Globalization;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using static Asp.Versioning.ApiVersionParameterLocation;
@@ -65,6 +66,7 @@ public static class HttpConfigurationExtensions
         var options = new ApiVersioningOptions();
 
         setupAction( options );
+        ValidateApiVersioningOptions( options );
         configuration.AddApiVersioning( options );
     }
 
@@ -95,6 +97,30 @@ public static class HttpConfigurationExtensions
         configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
         configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
         SunsetPolicyManager.Default = new SunsetPolicyManager( options );
+    }
+
+    // ApiVersion.Neutral does not have the same meaning as IApiVersionNeutral. setting
+    // ApiVersioningOptions.DefaultApiVersion this value will not make all APIs version-neutral
+    // and will likely lead to many unexpected side effects. this is a best-effort, one-time
+    // validation check to help prevent people from going off the rails. if someone bypasses
+    // this validation by removing the check or updating the value later, then caveat emptor.
+    //
+    // REF: https://github.com/dotnet/aspnet-api-versioning/issues/1011
+    private static void ValidateApiVersioningOptions( ApiVersioningOptions options )
+    {
+        if ( options.DefaultApiVersion == ApiVersion.Neutral )
+        {
+            var message = string.Format(
+                CultureInfo.CurrentCulture,
+                SR.InvalidDefaultApiVersion,
+                nameof( ApiVersion ),
+                nameof( ApiVersion.Neutral ),
+                nameof( ApiVersioningOptions ),
+                nameof( ApiVersioningOptions.DefaultApiVersion ),
+                nameof( IApiVersionNeutral ) );
+
+            throw new InvalidOperationException( message );
+        }
     }
 
     internal static IReportApiVersions GetApiVersionReporter( this HttpConfiguration configuration )
