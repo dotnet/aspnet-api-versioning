@@ -9,7 +9,7 @@ using Microsoft.Net.Http.Headers;
 internal sealed class Rfc7231ProblemDetailsWriter : IProblemDetailsWriter
 {
     private static readonly MediaTypeHeaderValue jsonMediaType = new( "application/json" );
-    private static readonly MediaTypeHeaderValue problemDetailsJsonMediaType = new( "application/problem+json" );
+    private static readonly MediaTypeHeaderValue problemDetailsJsonMediaType = new( ProblemDetailsDefaults.MediaType.Json );
     private readonly IProblemDetailsWriter decorated;
 
     public Rfc7231ProblemDetailsWriter( IProblemDetailsWriter decorated ) => this.decorated = decorated;
@@ -36,8 +36,8 @@ internal sealed class Rfc7231ProblemDetailsWriter : IProblemDetailsWriter
         {
             var acceptHeaderValue = acceptHeader[i];
 
-            if ( jsonMediaType.IsSubsetOf( acceptHeaderValue ) ||
-                 problemDetailsJsonMediaType.IsSubsetOf( acceptHeaderValue ) )
+            if ( acceptHeaderValue.IsSubsetOf( jsonMediaType ) ||
+                 acceptHeaderValue.IsSubsetOf( problemDetailsJsonMediaType ) )
             {
                 return true;
             }

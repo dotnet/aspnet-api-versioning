@@ -76,4 +76,12 @@ public class MinimalApiFixture : HttpServerFixture
                  .WithApiVersionSet( orders )
                  .IsApiVersionNeutral();
     }
+
+    protected override void OnAddApiVersioning( ApiVersioningOptions options )
+    {
+        options.ApiVersionReader = ApiVersionReader.Combine(
+            new QueryStringApiVersionReader(),
+            new UrlSegmentApiVersionReader(),
+            new MediaTypeApiVersionReader() );
+    }
 }
