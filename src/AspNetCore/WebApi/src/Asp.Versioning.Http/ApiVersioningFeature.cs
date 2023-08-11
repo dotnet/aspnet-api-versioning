@@ -34,11 +34,7 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
         {
             if ( rawApiVersions is null )
             {
-                var reader = context.RequestServices.GetService<IApiVersionReader>()
-                             ?? ApiVersionReader.Combine(
-                                 new QueryStringApiVersionReader(),
-                                 new UrlSegmentApiVersionReader() );
-
+                var reader = context.RequestServices.GetService<IApiVersionReader>() ?? ApiVersionReader.Default;
                 rawApiVersions = reader.Read( context.Request );
             }
 
