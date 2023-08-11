@@ -26,9 +26,10 @@
 
  <!-- REF: https://github.com/dotnet/sourcelink/blob/master/README.md -->
  <PropertyGroup Label="SourceLink">
+  <IncludeSymbols>true</IncludeSymbols>
+  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   <PublishRepositoryUrl>true</PublishRepositoryUrl>
   <EmbedUntrackedSources>true</EmbedUntrackedSources>
-  <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 
   <!-- REF: https://github.com/clairernovotny/DeterministicBuilds -->
   <ContinuousIntegrationBuild Condition=" ('$(TF_BUILD)' == 'true') OR ('$(GITHUB_ACTIONS)' == 'true') ">true</ContinuousIntegrationBuild>
