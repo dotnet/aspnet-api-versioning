@@ -150,6 +150,14 @@
   <data name="DirectRoute_AmbiguousController" xml:space="preserve">
     <value>Multiple controller types were found that match the URL. This can happen if attribute routes on multiple controllers match the requested URL.{1}{1}The request has found the following matching controller types: {0}</value>
   </data>
+  <data name="InvalidDefaultApiVersion" xml:space="preserve">
+    <value>{0}.{1} is an invalid value for {2}.{3}. Did you mean to apply {4} via attribute or convention instead?</value>
+    <comment>0 = ApiVersion
+1 = Neutral
+2 = ApiVersioningOptions
+3 = DefaultApiVersion
+4 = IApiVersionNeutral</comment>
+  </data>
   <data name="NoControllerSelected" xml:space="preserve">
     <value>A controller was not selected for request URI '{0}' and API version '{1}'.</value>
   </data>
