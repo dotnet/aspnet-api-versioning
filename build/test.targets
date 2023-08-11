@@ -3,8 +3,13 @@
 
  <PropertyGroup>
   <FluentAssertionsVersion>6.8.0</FluentAssertionsVersion>
-  <MoqVersion>4.18.3</MoqVersion>
-  <XunitRunnerVersion>2.4.5</XunitRunnerVersion>
+  
+  <!--
+   beware of other versions that may contain SponsorLink
+   REF: https://github.com/moq/moq/issues/1372
+   -->
+  <MoqVersion>4.20.69</MoqVersion>
+  <XunitRunnerVersion>2.5.0</XunitRunnerVersion>
  </PropertyGroup>
 
  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -15,14 +20,14 @@
 
  <ItemGroup Condition=" '$(IsSharedProject)' == 'false' ">
   <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
-  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0-*" />
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0-*" />
   <PackageReference Include="Moq" Version="$(MoqVersion)" />
-  <PackageReference Include="xunit" Version="2.4.2" />
+  <PackageReference Include="xunit" Version="2.5.0" />
   <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVersion)" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.0" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.10" />
  </ItemGroup>
 
  <ItemGroup>
