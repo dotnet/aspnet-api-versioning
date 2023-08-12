@@ -1,1 +1,3 @@
-﻿
+﻿Publish NuGet symbol package
+Resolved [#1015](https://github.com/dotnet/aspnet-api-versioning/issues/1011)
+Fixed [#1017](https://github.com/dotnet/aspnet-api-versioning/issues/1017)

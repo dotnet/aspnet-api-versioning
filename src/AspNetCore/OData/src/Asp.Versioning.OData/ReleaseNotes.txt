@@ -1,1 +1,1 @@
-﻿Fix empty EDM detection
+﻿Publish NuGet symbol package
