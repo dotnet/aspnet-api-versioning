@@ -25,32 +25,23 @@ steps:
 - script: dotnet tool restore
   displayName: Restore Tools
 
-- pwsh: >
-    Compress-Archive
-    -Path $(Build.ArtifactStagingDirectory)/packages/*
-    -DestinationPath $(Build.ArtifactStagingDirectory)/packages.zip
-  displayName: Package Artifacts for Signing
-
 - script: >
-    dotnet signclient sign
-    --config build/signing.json
-    --input $(Build.ArtifactStagingDirectory)/packages.zip
-    --user "$(codesign_user)"
-    --secret "$(codesign_secret)"
-    --name "ASP.NET API Versioning"
-    --description "Adds versioning semantics to APIs built with ASP.NET"
-    --descriptionUrl "https://github.com/dotnet/aspnet-api-versioning"
+    dotnet sign code azure-key-vault "*.nupkg" `
+    --base-directory "$(Build.ArtifactStagingDirectory)/packages" `
+    --publisher-name "ASP.NET API Versioning" `
+    --description "Adds versioning semantics to APIs built with ASP.NET" `
+    --description-url "https://github.com/dotnet/aspnet-api-versioning" `
+    --azure-key-vault-tenant-id "$(SignTenantId)" `
+    --azure-key-vault-client-id "$(SignClientId)" `
+    --azure-key-vault-client-secret '$(SignClientSecret)' `
+    --azure-key-vault-certificate "$(SignKeyVaultCertificate)" `
+    --azure-key-vault-url "$(SignKeyVaultUrl)"
+    --timestamp-url http://timestamp.digicert.com
   displayName: Sign Artifacts
 
-- pwsh: >
-    Expand-Archive
-    -Path $(Build.ArtifactStagingDirectory)/packages.zip
-    -DestinationPath $(Build.ArtifactStagingDirectory)/signed-packages
-  displayName: Extract Signed Artifacts
-
 - task: PublishBuildArtifacts@1
-  displayName: Publish package artifacts
+  displayName: Publish Artifacts
   inputs:
-    pathToPublish: $(Build.ArtifactStagingDirectory)/signed-packages
+    pathToPublish: $(Build.ArtifactStagingDirectory)/packages
     publishLocation: Container
     artifactName: NuGet Packages
