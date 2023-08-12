@@ -1,1 +1,1 @@
-﻿Fix: Explore model per EDM + API version ([#996](https://github.com/dotnet/aspnet-api-versioning/issues/996))
+﻿Publish NuGet symbol package
