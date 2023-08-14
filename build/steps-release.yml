@@ -26,15 +26,15 @@ steps:
   displayName: Restore Tools
 
 - script: >
-    dotnet sign code azure-key-vault "*.nupkg" `
-    --base-directory "$(Build.ArtifactStagingDirectory)/packages" `
-    --publisher-name "ASP.NET API Versioning" `
-    --description "Adds versioning semantics to APIs built with ASP.NET" `
-    --description-url "https://github.com/dotnet/aspnet-api-versioning" `
-    --azure-key-vault-tenant-id "$(SignTenantId)" `
-    --azure-key-vault-client-id "$(SignClientId)" `
-    --azure-key-vault-client-secret '$(SignClientSecret)' `
-    --azure-key-vault-certificate "$(SignKeyVaultCertificate)" `
+    dotnet sign code azure-key-vault "*.nupkg"
+    --base-directory "$(Build.ArtifactStagingDirectory)/packages"
+    --publisher-name "ASP.NET API Versioning"
+    --description "Adds versioning semantics to APIs built with ASP.NET"
+    --description-url "https://github.com/dotnet/aspnet-api-versioning"
+    --azure-key-vault-tenant-id "$(SignTenantId)"
+    --azure-key-vault-client-id "$(SignClientId)"
+    --azure-key-vault-client-secret "$(SignClientSecret)"
+    --azure-key-vault-certificate "$(SignKeyVaultCertificate)"
     --azure-key-vault-url "$(SignKeyVaultUrl)"
     --timestamp-url http://timestamp.digicert.com
   displayName: Sign Artifacts
