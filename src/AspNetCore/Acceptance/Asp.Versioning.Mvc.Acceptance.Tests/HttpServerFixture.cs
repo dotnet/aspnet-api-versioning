@@ -1,5 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+
+// Ignore Spelling: app
+// Ignore Spelling: Mvc
 namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Builder;
