@@ -32,7 +32,7 @@ public class ProblemDetails
     /// (e.g., using HTML [W3C.REC-html5-20141028]). When this member is not present, its value is assumed to be
     /// "about:blank".
     /// </summary>
-    [JsonProperty( "type" )]
+    [JsonProperty( "type", NullValueHandling = Ignore )]
     public string? Type { get; set; }
 
     /// <summary>
@@ -72,5 +72,6 @@ public class ProblemDetails
     /// The round-tripping behavior for <see cref="Extensions"/> is determined by the implementation of the Input \ Output formatters.
     /// In particular, complex types or collection types may not round-trip to the original type when using the built-in JSON or XML formatters.
     /// </remarks>
+    [JsonExtensionData]
     public IDictionary<string, object?> Extensions => extensions;
 }
