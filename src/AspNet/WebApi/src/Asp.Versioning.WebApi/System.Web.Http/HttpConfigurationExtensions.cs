@@ -5,6 +5,7 @@ namespace System.Web.Http;
 using Asp.Versioning;
 using Asp.Versioning.Controllers;
 using Asp.Versioning.Dispatcher;
+using Asp.Versioning.Formatting;
 using System.Globalization;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
@@ -30,6 +31,24 @@ public static class HttpConfigurationExtensions
         }
 
         return (ApiVersioningOptions) configuration.Properties.GetOrAdd( ApiVersioningOptionsKey, key => new ApiVersioningOptions() );
+    }
+
+    /// <summary>
+    /// Converts problem details into error objects.
+    /// </summary>
+    /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
+    /// <remarks>This enables backward compatibility by converting <see cref="ProblemDetails"/> into Error Objects that
+    /// conform to the <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
+    /// in the Microsoft REST API Guidelines and
+    /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.</remarks>
+    public static void ConvertProblemDetailsToErrorObject( this HttpConfiguration configuration )
+    {
+        if ( configuration == null )
+        {
+            throw new ArgumentNullException( nameof( configuration ) );
+        }
+
+        configuration.Initializer += EnableErrorObjectResponses;
     }
 
     /// <summary>
@@ -96,6 +115,8 @@ public static class HttpConfigurationExtensions
 
         configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
         configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
+        configuration.Formatters.Insert( 0, new ProblemDetailsMediaTypeFormatter( configuration.Formatters.JsonFormatter ?? new() ) );
+
         SunsetPolicyManager.Default = new SunsetPolicyManager( options );
     }
 
@@ -120,6 +141,28 @@ public static class HttpConfigurationExtensions
                 nameof( IApiVersionNeutral ) );
 
             throw new InvalidOperationException( message );
+        }
+    }
+
+    private static void EnableErrorObjectResponses( HttpConfiguration configuration )
+    {
+        ProblemDetailsFactory.Default = new ErrorObjectFactory();
+
+        var formatters = configuration.Formatters;
+        var problemDetails = ProblemDetailsMediaTypeFormatter.DefaultMediaType;
+
+        for ( var i = 0; i < formatters.Count; i++ )
+        {
+            var mediaTypes = formatters[i].SupportedMediaTypes;
+
+            for ( var j = 0; j < mediaTypes.Count; j++ )
+            {
+                if ( mediaTypes[j].Equals( problemDetails ) )
+                {
+                    formatters.RemoveAt( i );
+                    return;
+                }
+            }
         }
     }
 

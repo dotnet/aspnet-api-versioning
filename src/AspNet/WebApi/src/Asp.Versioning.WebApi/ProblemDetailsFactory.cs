@@ -10,9 +10,13 @@ using static System.Globalization.CultureInfo;
 
 internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
 {
-    private static ProblemDetailsFactory? @default;
+    private static IProblemDetailsFactory? @default;
 
-    public static IProblemDetailsFactory Default => @default ??= new();
+    public static IProblemDetailsFactory Default
+    {
+        get => @default ??= new ProblemDetailsFactory();
+        set => @default = value;
+    }
 
     public ProblemDetails CreateProblemDetails(
         HttpRequestMessage request,
@@ -40,7 +44,7 @@ internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
         else if ( type == Invalid.Type )
         {
             problemDetails.Code = Invalid.Code;
-            return AddInvalidExtensions( request, status, problemDetails );
+            return AddInvalidExtensions( request, status, problemDetails, ApplyMessage );
         }
         else if ( type == Unspecified.Type )
         {
@@ -49,13 +53,17 @@ internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
         else if ( type == Unsupported.Type )
         {
             problemDetails.Code = Unsupported.Code;
-            return AddUnsupportedExtensions( request, status, problemDetails );
+            return AddUnsupportedExtensions( request, status, problemDetails, ApplyMessage );
         }
 
         return problemDetails;
     }
 
-    private static ProblemDetailsEx AddInvalidExtensions( HttpRequestMessage request, int status, ProblemDetailsEx problemDetails )
+    internal static T AddInvalidExtensions<T>(
+        HttpRequestMessage request,
+        int status,
+        T problemDetails,
+        Action<T, string> applyMessage ) where T : ProblemDetails
     {
         if ( status != 400 || !request.ShouldIncludeErrorDetail() )
         {
@@ -64,14 +72,18 @@ internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
 
         var safeUrl = request.RequestUri.SafeFullPath();
         var requestedVersion = request.ApiVersionProperties().RawRequestedApiVersion;
-        var error = string.Format( CurrentCulture, SR.VersionedControllerNameNotFound, safeUrl, requestedVersion );
+        var message = string.Format( CurrentCulture, SR.VersionedControllerNameNotFound, safeUrl, requestedVersion );
 
-        problemDetails.Error = error;
+        applyMessage( problemDetails, message );
 
         return problemDetails;
     }
 
-    private static ProblemDetailsEx AddUnsupportedExtensions( HttpRequestMessage request, int status, ProblemDetailsEx problemDetails )
+    internal static T AddUnsupportedExtensions<T>(
+        HttpRequestMessage request,
+        int status,
+        T problemDetails,
+        Action<T, string> applyMessage ) where T : ProblemDetails
     {
         if ( !request.ShouldIncludeErrorDetail() )
         {
@@ -95,13 +107,16 @@ internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
 
         var safeUrl = request.RequestUri.SafeFullPath();
         var requestedMethod = request.Method;
-        var version = request.GetRequestedApiVersion()?.ToString() ?? "(null)";
-        var error = string.Format( CurrentCulture, messageFormat, safeUrl, version, requestedMethod );
+        var version = request.ApiVersionProperties().RawRequestedApiVersion ?? "(null)";
+        var message = string.Format( CurrentCulture, messageFormat, safeUrl, version, requestedMethod );
 
-        problemDetails.Error = error;
+        applyMessage( problemDetails, message );
 
         return problemDetails;
     }
+
+    private static void ApplyMessage( ProblemDetailsEx problemDetails, string message ) =>
+        problemDetails.Error = message;
 
     private sealed class ProblemDetailsEx : ProblemDetails
     {
