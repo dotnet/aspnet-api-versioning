@@ -1,4 +1,1 @@
-﻿Publish NuGet symbol package
-Resolved [#1011](https://github.com/dotnet/aspnet-api-versioning/issues/1011)
-Fixed [#1015](https://github.com/dotnet/aspnet-api-versioning/issues/1015)
-Fixed [#1017](https://github.com/dotnet/aspnet-api-versioning/issues/1017)
+﻿Add backward compatibility for error objects

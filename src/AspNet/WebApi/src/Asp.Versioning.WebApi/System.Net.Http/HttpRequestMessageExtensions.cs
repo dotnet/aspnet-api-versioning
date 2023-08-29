@@ -122,14 +122,19 @@ public static class HttpRequestMessageExtensions
     {
         var configuration = request.GetConfiguration();
         var negotiator = configuration.Services.GetContentNegotiator();
-        var result = negotiator.Negotiate( typeof( ProblemDetails ), request, configuration.Formatters ) ??
-            new( configuration.Formatters.JsonFormatter ?? new(), MediaTypeHeaderValue.Parse( "application/problem+json" ) );
+        var result = negotiator.Negotiate( typeof( ProblemDetails ), request, configuration.Formatters );
 
         return result.MediaType.MediaType switch
         {
-            "application/json" => Tuple.Create( MediaTypeHeaderValue.Parse( "application/problem+json" ), result.Formatter ),
-            "application/xml" => Tuple.Create( MediaTypeHeaderValue.Parse( "application/problem+xml" ), result.Formatter ),
-            _ => Tuple.Create( result.MediaType, result.Formatter ),
+            null => Tuple.Create(
+                MediaTypeHeaderValue.Parse( ProblemDetailsDefaults.MediaType.Json ),
+                (MediaTypeFormatter) ( configuration.Formatters.JsonFormatter ?? new() ) ),
+            "application/xml" => Tuple.Create(
+                MediaTypeHeaderValue.Parse( ProblemDetailsDefaults.MediaType.Xml ),
+                result.Formatter ),
+            _ => Tuple.Create(
+                result.MediaType,
+                result.Formatter ),
         };
     }
 }

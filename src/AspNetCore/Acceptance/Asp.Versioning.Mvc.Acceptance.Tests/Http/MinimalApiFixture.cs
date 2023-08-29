@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning;
+namespace Asp.Versioning.Http;
 
 using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Builder;
