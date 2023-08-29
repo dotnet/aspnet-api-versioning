@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>6.4.0</VersionPrefix>
-  <AssemblyVersion>6.4.0.0</AssemblyVersion>
+  <VersionPrefix>6.5.0</VersionPrefix>
+  <AssemblyVersion>6.5.0.0</AssemblyVersion>
   <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
   <RootNamespace>Asp.Versioning</RootNamespace>
   <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>

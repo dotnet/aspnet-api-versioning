@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+// Ignore Spelling: Mvc
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
@@ -10,6 +11,7 @@ using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -76,7 +78,18 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, ActionApiVersionMetadataCollationProvider>() );
         services.Replace( WithUrlHelperFactoryDecorator( services ) );
-        services.TryReplace( typeof( DefaultProblemDetailsFactory ), Singleton<IProblemDetailsFactory, MvcProblemDetailsFactory>() );
+
+        if ( !services.TryReplace(
+                typeof( DefaultProblemDetailsFactory ),
+                Singleton<IProblemDetailsFactory, MvcProblemDetailsFactory>() ) )
+        {
+            services.TryReplace(
+                typeof( ErrorObjectFactory ),
+                Singleton<IProblemDetailsFactory, ErrorObjectFactory>(
+                    sp => ErrorObjectFactory.Decorate(
+                        new MvcProblemDetailsFactory(
+                            sp.GetRequiredService<ProblemDetailsFactory>() ) ) ) );
+        }
     }
 
     private static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
@@ -130,18 +143,24 @@ public static class IApiVersioningBuilderExtensions
         return new DecoratedServiceDescriptor( typeof( IUrlHelperFactory ), NewFactory, lifetime );
     }
 
-    private static void TryReplace( this IServiceCollection services, Type implementationType, ServiceDescriptor descriptor )
+    private static bool TryReplace( this IServiceCollection services, Type implementationType, ServiceDescriptor descriptor )
     {
         for ( var i = 0; i < services.Count; i++ )
         {
             var service = services[i];
+            var match = service.ServiceType == descriptor.ServiceType &&
+                      ( service.ImplementationType == implementationType ||
+                        service.ImplementationInstance?.GetType() == implementationType ||
+                        service.ImplementationFactory?.Method.ReturnType == implementationType );
 
-            if ( service.ServiceType == descriptor.ServiceType && descriptor.ImplementationType == implementationType )
+            if ( match )
             {
                 services[i] = descriptor;
-                return;
+                return true;
             }
         }
+
+        return false;
     }
 
     private sealed class DecoratedServiceDescriptor : ServiceDescriptor

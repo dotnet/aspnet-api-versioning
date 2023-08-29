@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+// Ignore Spelling: Mvc
 #pragma warning disable CA1812
 
 namespace Asp.Versioning;
@@ -24,7 +25,7 @@ internal sealed class MvcProblemDetailsFactory : IProblemDetailsFactory
     {
         var httpContext = request.HttpContext;
         var problemDetails = factory.CreateProblemDetails( httpContext, statusCode, title, type, detail, instance );
-        DefaultProblemDetailsFactory.ApplyExtensions(problemDetails );
+        DefaultProblemDetailsFactory.ApplyExtensions( problemDetails );
         return problemDetails;
     }
 }
