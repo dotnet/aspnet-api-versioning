@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+// Ignore Spelling: Mvc
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
