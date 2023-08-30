@@ -124,6 +124,8 @@ public class ErrorObjectWriterTest
             } );
     }
 
+#pragma warning disable IDE0060 // Remove unused parameter
     private static ValueTask<T> DeserializeByExampleAsync<T>( Stream stream, T example ) =>
         JsonSerializer.DeserializeAsync<T>( stream );
+#pragma warning restore IDE0060 // Remove unused parameter
 }
