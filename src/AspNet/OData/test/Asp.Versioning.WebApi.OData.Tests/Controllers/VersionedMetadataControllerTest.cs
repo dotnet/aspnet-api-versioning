@@ -37,6 +37,7 @@ public class VersionedMetadataControllerTest
         configuration.AddApiVersioning(
             options =>
             {
+                options.ReportApiVersions = true;
                 options.Policies.Sunset( "VersionedMetadata" )
                                 .Link( "policies" )
                                     .Title( "Versioning Policy" )

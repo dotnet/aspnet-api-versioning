@@ -36,7 +36,7 @@ internal sealed class HttpResponseExceptionFactory
 
     private ApiVersioningOptions Options => configuration.GetApiVersioningOptions();
 
-    private IProblemDetailsFactory ProblemDetails => configuration.DependencyResolver.GetProblemDetailsFactory();
+    private IProblemDetailsFactory ProblemDetails => configuration.GetProblemDetailsFactory();
 
     private ITraceWriter TraceWriter => configuration.Services.GetTraceWriter() ?? NullTraceWriter.Instance;
 

@@ -101,7 +101,7 @@ public class VersionedApiExplorer : IApiExplorer
     /// <value>The configured <see cref="ISunsetPolicyManager">sunset policy manager</see>.</value>
     protected ISunsetPolicyManager SunsetPolicyManager
     {
-        get => sunsetPolicyManager ??= Configuration.DependencyResolver.GetSunsetPolicyManager();
+        get => sunsetPolicyManager ??= Configuration.GetSunsetPolicyManager();
         set => sunsetPolicyManager = value;
     }
 
@@ -227,7 +227,7 @@ public class VersionedApiExplorer : IApiExplorer
         }
 
         var routes = FlattenRoutes( Configuration.Routes ).ToArray();
-        var policyManager = Configuration.DependencyResolver.GetSunsetPolicyManager();
+        var policyManager = Configuration.GetSunsetPolicyManager();
 
         foreach ( var apiVersion in FlattenApiVersions( controllerMappings ) )
         {

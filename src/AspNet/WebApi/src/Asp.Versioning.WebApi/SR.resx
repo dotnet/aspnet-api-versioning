@@ -161,6 +161,9 @@
   <data name="NoControllerSelected" xml:space="preserve">
     <value>A controller was not selected for request URI '{0}' and API version '{1}'.</value>
   </data>
+  <data name="NoServiceRegistered" xml:space="preserve">
+    <value>No service for type '{0}' has been registered.</value>
+  </data>
   <data name="ResourceNotFound" xml:space="preserve">
     <value>No HTTP resource was found that matches the request URI '{0}'.</value>
   </data>

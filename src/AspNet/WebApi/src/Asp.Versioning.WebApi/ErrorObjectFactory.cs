@@ -43,7 +43,7 @@ internal sealed class ErrorObjectFactory : IProblemDetailsFactory
             return ProblemDetailsFactory.AddUnsupportedExtensions( request, status, problem, ApplyMessage );
         }
 
-        return ProblemDetailsFactory.Default.CreateProblemDetails(
+        return ProblemDetailsFactory.NewProblemDetails(
             request,
             statusCode,
             title,

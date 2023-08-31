@@ -4,6 +4,7 @@ namespace System.Web.Http;
 
 using Asp.Versioning;
 using Asp.Versioning.Controllers;
+using Asp.Versioning.Dependencies;
 using Asp.Versioning.Dispatcher;
 using Asp.Versioning.Formatting;
 using System.Globalization;
@@ -16,7 +17,7 @@ using static Asp.Versioning.ApiVersionParameterLocation;
 /// </summary>
 public static class HttpConfigurationExtensions
 {
-    private const string ApiVersioningOptionsKey = "MS_ApiVersioningOptions";
+    private const string ApiVersioningServicesKey = "MS_ApiVersioningServices";
 
     /// <summary>
     /// Gets the current API versioning options.
@@ -30,7 +31,7 @@ public static class HttpConfigurationExtensions
             throw new ArgumentNullException( nameof( configuration ) );
         }
 
-        return (ApiVersioningOptions) configuration.Properties.GetOrAdd( ApiVersioningOptionsKey, key => new ApiVersioningOptions() );
+        return configuration.ApiVersioningServices().ApiVersioningOptions;
     }
 
     /// <summary>
@@ -113,11 +114,9 @@ public static class HttpConfigurationExtensions
             }
         }
 
-        configuration.Properties.AddOrUpdate( ApiVersioningOptionsKey, options, ( key, oldValue ) => options );
+        configuration.ApiVersioningServices().ApiVersioningOptions = options;
         configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
         configuration.Formatters.Insert( 0, new ProblemDetailsMediaTypeFormatter( configuration.Formatters.JsonFormatter ?? new() ) );
-
-        SunsetPolicyManager.Default = new SunsetPolicyManager( options );
     }
 
     // ApiVersion.Neutral does not have the same meaning as IApiVersionNeutral. setting
@@ -146,7 +145,9 @@ public static class HttpConfigurationExtensions
 
     private static void EnableErrorObjectResponses( HttpConfiguration configuration )
     {
-        ProblemDetailsFactory.Default = new ErrorObjectFactory();
+        configuration.ApiVersioningServices().Replace(
+            typeof( IProblemDetailsFactory ),
+            static ( sc, t ) => new ErrorObjectFactory() );
 
         var formatters = configuration.Formatters;
         var problemDetails = ProblemDetailsMediaTypeFormatter.DefaultMediaType;
@@ -166,15 +167,6 @@ public static class HttpConfigurationExtensions
         }
     }
 
-    internal static IReportApiVersions GetApiVersionReporter( this HttpConfiguration configuration )
-    {
-        var options = configuration.GetApiVersioningOptions();
-
-        if ( options.ReportApiVersions )
-        {
-            return configuration.DependencyResolver.GetApiVersionReporter();
-        }
-
-        return DoNotReportApiVersions.Instance;
-    }
+    internal static DefaultContainer ApiVersioningServices( this HttpConfiguration configuration ) =>
+        (DefaultContainer) configuration.Properties.GetOrAdd( ApiVersioningServicesKey, key => new DefaultContainer() );
 }
