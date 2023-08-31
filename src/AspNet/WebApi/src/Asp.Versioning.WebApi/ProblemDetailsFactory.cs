@@ -10,15 +10,16 @@ using static System.Globalization.CultureInfo;
 
 internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
 {
-    private static IProblemDetailsFactory? @default;
-
-    public static IProblemDetailsFactory Default
-    {
-        get => @default ??= new ProblemDetailsFactory();
-        set => @default = value;
-    }
-
     public ProblemDetails CreateProblemDetails(
+       HttpRequestMessage request,
+       int? statusCode = null,
+       string? title = null,
+       string? type = null,
+       string? detail = null,
+       string? instance = null ) =>
+        NewProblemDetails( request, statusCode, title, type, detail, instance );
+
+    internal static ProblemDetails NewProblemDetails(
         HttpRequestMessage request,
         int? statusCode = null,
         string? title = null,

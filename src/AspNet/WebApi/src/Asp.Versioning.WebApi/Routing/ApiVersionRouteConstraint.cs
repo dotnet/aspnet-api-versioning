@@ -41,7 +41,7 @@ public sealed class ApiVersionRouteConstraint : IHttpRouteConstraint
             return !string.IsNullOrEmpty( value );
         }
 
-        var parser = request.GetConfiguration().DependencyResolver.GetApiVersionParser();
+        var parser = request.GetConfiguration().GetApiVersionParser();
         var properties = request.ApiVersionProperties();
 
         properties.RouteParameter = parameterName;

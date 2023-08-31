@@ -33,7 +33,7 @@ internal sealed class HttpControllerTypeCache
         var services = configuration.Services;
         var assembliesResolver = services.GetAssembliesResolver();
         var typeResolver = services.GetHttpControllerTypeResolver();
-        var convention = configuration.DependencyResolver.GetControllerNameConvention();
+        var convention = configuration.GetControllerNameConvention();
         var comparer = StringComparer.OrdinalIgnoreCase;
 
         return typeResolver.GetControllerTypes( assembliesResolver )

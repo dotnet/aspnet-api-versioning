@@ -221,7 +221,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         }
 
         var actions = mapping.SelectMany( g => g );
-        var namingConvention = controller.Configuration.DependencyResolver.GetControllerNameConvention();
+        var namingConvention = controller.Configuration.GetControllerNameConvention();
         var name = namingConvention.GroupName( controller.ControllerName );
         var metadata = new ApiVersionMetadata( implicitVersionModel, implicitVersionModel, name );
 
@@ -344,7 +344,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         HttpConfiguration configuration,
         List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>> visitedActions )
     {
-        var namingConvention = configuration.DependencyResolver.GetControllerNameConvention();
+        var namingConvention = configuration.GetControllerNameConvention();
 
         for ( var i = 0; i < visitedActions.Count; i++ )
         {

@@ -178,6 +178,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No service for type &apos;{0}&apos; has been registered..
+        /// </summary>
+        internal static string NoServiceRegistered {
+            get {
+                return ResourceManager.GetString("NoServiceRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No HTTP resource was found that matches the request URI &apos;{0}&apos;..
         /// </summary>
         internal static string ResourceNotFound {

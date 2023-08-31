@@ -32,14 +32,7 @@ public sealed partial class ReportApiVersionsAttribute
 
         var context = actionExecutedContext.ActionContext;
         var action = context.ActionDescriptor;
-        var reporter = reportApiVersions;
-
-        if ( reporter is null )
-        {
-            var dependencyResolver = context.ControllerContext.Configuration.DependencyResolver;
-            reporter = dependencyResolver.GetApiVersionReporter();
-        }
-
+        var reporter = reportApiVersions ?? context.ControllerContext.Configuration.GetApiVersionReporter();
         var model = action.GetApiVersionMetadata().Map( reporter.Mapping );
 
         response.RequestMessage ??= actionExecutedContext.Request;

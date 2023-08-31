@@ -29,11 +29,12 @@ public class ReportApiVersionsAttributeTest
         var method = controller.GetType().GetMethod( nameof( TestController.Get ) );
         var controllerDescriptor = new Mock<HttpControllerDescriptor>( configuration, "Test", controller.GetType() ) { CallBase = true };
         var routeData = new HttpRouteData( new HttpRoute( "api/tests" ) );
-        var controllerContext = new HttpControllerContext( new HttpConfiguration(), routeData, new HttpRequestMessage() ) { Controller = controller };
+        var controllerContext = new HttpControllerContext( configuration, routeData, new HttpRequestMessage() ) { Controller = controller };
         var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor.Object, method );
         var actionContext = new HttpActionContext( controllerContext, actionDescriptor ) { Response = new HttpResponseMessage() };
         var context = new HttpActionExecutedContext( actionContext, null );
 
+        configuration.AddApiVersioning( options => options.ReportApiVersions = true );
         controllerContext.Request.SetConfiguration( new() );
         controllerContext.Request.Properties["MS_HttpActionDescriptor"] = actionDescriptor;
         controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) ).Returns( attributes );
@@ -69,11 +70,12 @@ public class ReportApiVersionsAttributeTest
         var method = controller.GetType().GetMethod( nameof( TestVersionNeutralController.Get ) );
         var controllerDescriptor = new Mock<HttpControllerDescriptor>( configuration, "Test", controller.GetType() ) { CallBase = true };
         var routeData = new HttpRouteData( new HttpRoute( "api/tests" ) );
-        var controllerContext = new HttpControllerContext( new HttpConfiguration(), routeData, new HttpRequestMessage() ) { Controller = new TestVersionNeutralController() };
+        var controllerContext = new HttpControllerContext( configuration, routeData, new HttpRequestMessage() ) { Controller = new TestVersionNeutralController() };
         var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor.Object, method );
         var actionContext = new HttpActionContext( controllerContext, actionDescriptor ) { Response = new HttpResponseMessage() };
         var context = new HttpActionExecutedContext( actionContext, null );
 
+        configuration.AddApiVersioning();
         controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) ).Returns( attributes );
         controllerDescriptor.Object.Properties[typeof( ApiVersionModel )] = ApiVersionModel.Neutral;
         actionDescriptor.Properties[typeof( ApiVersionMetadata )] = ApiVersionMetadata.Neutral;

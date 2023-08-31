@@ -10,11 +10,6 @@ using System.Text;
 /// </content>
 public partial class DefaultApiVersionReporter
 {
-    private static DefaultApiVersionReporter? instance;
-
-    internal static IReportApiVersions GetOrCreate( ISunsetPolicyManager sunsetPolicyManager ) =>
-        instance ??= new( sunsetPolicyManager );
-
     private static void AddApiVersionHeader( HttpResponseHeaders headers, string headerName, IReadOnlyList<ApiVersion> versions )
     {
         if ( versions.Count == 0 || headers.Contains( headerName ) )

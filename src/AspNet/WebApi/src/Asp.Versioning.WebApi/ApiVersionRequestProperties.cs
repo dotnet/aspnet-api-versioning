@@ -88,7 +88,7 @@ public class ApiVersionRequestProperties
                 return apiVersion;
             }
 
-            var parser = request.GetConfiguration().DependencyResolver.GetApiVersionParser();
+            var parser = request.GetConfiguration().GetApiVersionParser();
 
             try
             {
