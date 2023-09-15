@@ -26,10 +26,10 @@
   "dotnet-test-explorer.runInParallel": true,
   "dotnet-test-explorer.testProjectPath": "**/*Tests.csproj",
   "editor.formatOnType": true,
-  "omnisharp.enableImportCompletion": true,
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.organizeImportsOnFormat": true,
   "omnisharp.useModernNet": true,
   "omnisharp.enableMsBuildLoadProjectsOnDemand": true,
-  "omnisharp.enableEditorConfigSupport": true
+  "omnisharp.enableEditorConfigSupport": true,
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true
 }
