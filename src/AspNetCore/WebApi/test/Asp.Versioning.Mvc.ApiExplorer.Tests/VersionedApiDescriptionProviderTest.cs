@@ -149,6 +149,97 @@ public class VersionedApiDescriptionProviderTest
         context.Results.Single().GroupName.Should().Be( "Test-1.0" );
     }
 
+    [Fact]
+    public void versioned_api_explorer_should_prefer_explicit_over_implicit_action_match()
+    {
+        // arrange
+        var @implicit = new ActionDescriptor()
+        {
+            DisplayName = "Implicit GET ~/test?api-version=[1.0,2.0]",
+            EndpointMetadata = new[]
+            {
+                new ApiVersionMetadata(
+                    new ApiVersionModel(
+                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
+                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>() ),
+                    new ApiVersionModel(
+                        Array.Empty<ApiVersion>(),
+                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>() ) ),
+            },
+        };
+        var @explicit = new ActionDescriptor()
+        {
+            DisplayName = "Explicit GET ~/test?api-version=2.0",
+            EndpointMetadata = new[]
+            {
+                new ApiVersionMetadata(
+                    new ApiVersionModel(
+                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
+                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>() ),
+                    new ApiVersionModel(
+                        new ApiVersion[] { new( 2.0 ) },
+                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>(),
+                        Array.Empty<ApiVersion>() ) ),
+            },
+        };
+        var actionProvider = new TestActionDescriptorCollectionProvider( @implicit, @explicit );
+        var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
+
+        context.Results.Add(
+            new()
+            {
+                HttpMethod = "GET",
+                RelativePath = "test",
+                ActionDescriptor = context.Actions[0],
+            } );
+
+        context.Results.Add(
+            new()
+            {
+                HttpMethod = "GET",
+                RelativePath = "test",
+                ActionDescriptor = context.Actions[1],
+            } );
+
+        var apiExplorer = new VersionedApiDescriptionProvider(
+            Mock.Of<ISunsetPolicyManager>(),
+            NewModelMetadataProvider(),
+            Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
+
+        // act
+        apiExplorer.OnProvidersExecuted( context );
+
+        // assert
+        context.Results.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    GroupName = "v1",
+                    ActionDescriptor = @implicit,
+                    Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 1.0 ) },
+                },
+                new
+                {
+                    GroupName = "v2",
+                    ActionDescriptor = @explicit,
+                    Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 2.0 ) },
+                },
+            },
+            options => options.ExcludingMissingMembers() );
+    }
+
     private static IModelMetadataProvider NewModelMetadataProvider()
     {
         var provider = new Mock<IModelMetadataProvider>();

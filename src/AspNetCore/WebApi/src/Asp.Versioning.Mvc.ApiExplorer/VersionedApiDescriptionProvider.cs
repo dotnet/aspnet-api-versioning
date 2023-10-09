@@ -172,7 +172,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
                 groupResult.SetApiVersion( version );
                 PopulateApiVersionParameters( groupResult, version );
-                groupResults.Add( groupResult );
+                AddOrUpdateResult( groupResults, groupResult, metadata, version );
             }
         }
 
@@ -243,6 +243,47 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         {
             routeValues["controller"] = metadata.Name;
         }
+    }
+
+    private static void AddOrUpdateResult(
+        List<ApiDescription> results,
+        ApiDescription result,
+        ApiVersionMetadata metadata,
+        ApiVersion version )
+    {
+        var comparer = StringComparer.OrdinalIgnoreCase;
+
+        for ( var i = results.Count - 1; i >= 0; i-- )
+        {
+            var other = results[i];
+
+            if ( comparer.Equals( result.GroupName, other.GroupName ) &&
+                 comparer.Equals( result.RelativePath, other.RelativePath ) &&
+                 comparer.Equals( result.HttpMethod, other.HttpMethod ) )
+            {
+                var mapping = other.ActionDescriptor.GetApiVersionMetadata().MappingTo( version );
+
+                switch ( metadata.MappingTo( version ) )
+                {
+                    case Explicit:
+                        if ( mapping == Implicit )
+                        {
+                            results.RemoveAt( i );
+                        }
+
+                        break;
+                    case Implicit:
+                        if ( mapping == Explicit )
+                        {
+                            return;
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        results.Add( result );
     }
 
     private IEnumerable<ApiVersion> FlattenApiVersions( IList<ApiDescription> descriptions )
