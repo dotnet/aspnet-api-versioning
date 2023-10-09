@@ -30,9 +30,9 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     public ApiVersionParameterDescriptionContext( ApiDescription apiDescription, ApiVersion apiVersion, ApiExplorerOptions options )
     {
         Options = options ?? throw new ArgumentNullException( nameof( options ) );
-        ApiDescription = apiDescription;
-        ApiVersion = apiVersion;
-        optional = options.AssumeDefaultVersionWhenUnspecified && apiVersion == options.DefaultApiVersion;
+        ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
+        ApiVersion = apiVersion ?? throw new ArgumentNullException( nameof( apiVersion ) );
+        optional = FirstParameterIsOptional( apiDescription, apiVersion, options );
     }
 
     /// <summary>
@@ -241,5 +241,27 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
 
             formatters.Add( formatter );
         }
+    }
+
+    private static bool FirstParameterIsOptional(
+        ApiDescription apiDescription,
+        ApiVersion apiVersion,
+        ApiExplorerOptions options )
+    {
+        if ( !options.AssumeDefaultVersionWhenUnspecified )
+        {
+            return false;
+        }
+
+        var mapping = ApiVersionMapping.Explicit | ApiVersionMapping.Implicit;
+        var model = apiDescription.ActionDescriptor.GetApiVersionMetadata().Map( mapping );
+        ApiVersion defaultApiVersion;
+
+        using ( var request = new HttpRequestMessage() )
+        {
+            defaultApiVersion = options.ApiVersionSelector.SelectVersion( request, model );
+        }
+
+        return apiVersion == defaultApiVersion;
     }
 }

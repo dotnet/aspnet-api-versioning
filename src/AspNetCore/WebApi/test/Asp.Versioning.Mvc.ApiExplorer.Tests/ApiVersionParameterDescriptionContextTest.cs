@@ -249,13 +249,14 @@ public class ApiVersionParameterDescriptionContextTest
     public void add_parameter_should_add_optional_parameter_when_allowed()
     {
         // arrange
-        var version = new ApiVersion( 1, 0 );
+        var version = new ApiVersion( 2.0 );
         var description = NewApiDescription( version );
         var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
         var options = new ApiExplorerOptions()
         {
-            DefaultApiVersion = version,
+            DefaultApiVersion = ApiVersion.Default,
             ApiVersionParameterSource = new QueryStringApiVersionReader(),
+            ApiVersionSelector = new ConstantApiVersionSelector( version ),
             AssumeDefaultVersionWhenUnspecified = true,
         };
         var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
@@ -270,7 +271,7 @@ public class ApiVersionParameterDescriptionContextTest
                 Name = "api-version",
                 ModelMetadata = modelMetadata,
                 Source = BindingSource.Query,
-                DefaultValue = (object) "1.0",
+                DefaultValue = (object) "2.0",
                 IsRequired = false,
                 Type = typeof( string ),
             },

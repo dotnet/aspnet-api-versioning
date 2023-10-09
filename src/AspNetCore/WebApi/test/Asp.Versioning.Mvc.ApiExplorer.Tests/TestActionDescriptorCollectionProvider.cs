@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptorCollectionProvider
 {
-    private readonly Lazy<ActionDescriptorCollection> collection = new( CreateActionDescriptors );
+    private readonly Lazy<ActionDescriptorCollection> collection;
 
-    public TestActionDescriptorCollectionProvider() { }
+    public TestActionDescriptorCollectionProvider() => collection = new( CreateActionDescriptors );
 
     public TestActionDescriptorCollectionProvider( ActionDescriptor action, params ActionDescriptor[] otherActions )
     {
@@ -21,7 +21,7 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
         }
         else
         {
-            actions = new ActionDescriptor[otherActions.Length];
+            actions = new ActionDescriptor[otherActions.Length + 1];
             actions[0] = action;
             Array.Copy( otherActions, 0, actions, 1, otherActions.Length );
         }

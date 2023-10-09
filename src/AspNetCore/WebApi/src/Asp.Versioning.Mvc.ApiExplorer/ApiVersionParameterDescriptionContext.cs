@@ -41,7 +41,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
         ApiVersion = apiVersion ?? throw new ArgumentNullException( nameof( apiVersion ) );
         ModelMetadata = modelMetadata ?? throw new ArgumentNullException( nameof( modelMetadata ) );
-        optional = options.AssumeDefaultVersionWhenUnspecified && apiVersion == options.DefaultApiVersion;
+        optional = FirstParameterIsOptional( apiDescription, apiVersion, options );
     }
 
     // intentionally an internal property so the public contract doesn't change. this will be removed
@@ -439,5 +439,23 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
                 }
             }
         }
+    }
+
+    private static bool FirstParameterIsOptional(
+        ApiDescription apiDescription,
+        ApiVersion apiVersion,
+        ApiExplorerOptions options )
+    {
+        if ( !options.AssumeDefaultVersionWhenUnspecified )
+        {
+            return false;
+        }
+
+        var mapping = ApiVersionMapping.Explicit | ApiVersionMapping.Implicit;
+        var model = apiDescription.ActionDescriptor.GetApiVersionMetadata().Map( mapping );
+        var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+        var defaultApiVersion = options.ApiVersionSelector.SelectVersion( context.Request, model );
+
+        return apiVersion == defaultApiVersion;
     }
 }
