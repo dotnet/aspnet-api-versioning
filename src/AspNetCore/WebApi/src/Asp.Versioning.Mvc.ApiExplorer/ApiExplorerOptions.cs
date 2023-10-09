@@ -3,6 +3,7 @@
 namespace Asp.Versioning.ApiExplorer;
 
 using Asp.Versioning.Routing;
+using Microsoft.AspNetCore.Http;
 
 /// <content>
 /// Provides additional implementation specific to ASP.NET Core.
@@ -37,7 +38,7 @@ public partial class ApiExplorerOptions
     /// <value>The <see cref="IApiVersionParameterSource">API version parameter source</see> used to describe API version parameters.</value>
     public IApiVersionParameterSource ApiVersionParameterSource
     {
-        get => parameterSource ??= ApiVersionReader.Combine( new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader() );
+        get => parameterSource ??= ApiVersionReader.Default;
         set => parameterSource = value;
     }
 
@@ -48,6 +49,17 @@ public partial class ApiExplorerOptions
     public string RouteConstraintName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the API version selector.
+    /// </summary>
+    /// <value>An <see cref="IApiVersionSelector">API version selector</see> object.</value>
+    [CLSCompliant( false )]
+    public IApiVersionSelector ApiVersionSelector
+    {
+        get => apiVersionSelector ??= new DefaultApiVersionSelector( this );
+        set => apiVersionSelector = value;
+    }
+
+    /// <summary>
     /// Gets or sets the function used to format the combination of a group name and API version.
     /// </summary>
     /// <value>The <see cref="FormatGroupNameCallback">callback</see> used to format the combination of
@@ -55,4 +67,13 @@ public partial class ApiExplorerOptions
     /// <remarks>The specified callback will only be invoked if a group name has been configured. The API
     /// version will be provided formatted according to the <see cref="GroupNameFormat">group name format</see>.</remarks>
     public FormatGroupNameCallback? FormatGroupName { get; set; }
+
+    private sealed class DefaultApiVersionSelector : IApiVersionSelector
+    {
+        private readonly ApiExplorerOptions options;
+
+        public DefaultApiVersionSelector( ApiExplorerOptions options ) => this.options = options;
+
+        public ApiVersion SelectVersion( HttpRequest request, ApiVersionModel model ) => options.DefaultApiVersion;
+    }
 }

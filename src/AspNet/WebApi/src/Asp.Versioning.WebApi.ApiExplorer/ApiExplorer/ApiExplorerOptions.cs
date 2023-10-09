@@ -44,4 +44,14 @@ public partial class ApiExplorerOptions
     /// </summary>
     /// <value>The name associated with the <see cref="ApiVersionRouteConstraint">API version route constraint</see>.</value>
     public string RouteConstraintName => options.Value.RouteConstraintName;
+
+    /// <summary>
+    /// Gets or sets the API version selector.
+    /// </summary>
+    /// <value>An <see cref="IApiVersionSelector">API version selector</see> object.</value>
+    public IApiVersionSelector ApiVersionSelector
+    {
+        get => apiVersionSelector ?? options.Value.ApiVersionSelector;
+        set => apiVersionSelector = value;
+    }
 }
