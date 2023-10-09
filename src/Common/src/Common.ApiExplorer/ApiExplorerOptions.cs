@@ -2,11 +2,19 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+#if NETFRAMEWORK
+using HttpRequest = System.Net.Http.HttpRequestMessage;
+#else
+using Microsoft.AspNetCore.Http;
+#endif
+
 /// <summary>
 /// Represents the possible API versioning options for the API explorer.
 /// </summary>
 public partial class ApiExplorerOptions
 {
+    private IApiVersionSelector? apiVersionSelector;
+
     /// <summary>
     /// Gets or sets the format used to create group names from API versions.
     /// </summary>
