@@ -55,14 +55,25 @@ public class ApiExplorerOptionsFactory<T> : OptionsFactory<T> where T : ApiExplo
     /// <inheritdoc />
     protected override T CreateInstance( string name )
     {
-        var apiVersioningOptions = Options;
         var options = base.CreateInstance( name );
-
-        options.AssumeDefaultVersionWhenUnspecified = apiVersioningOptions.AssumeDefaultVersionWhenUnspecified;
-        options.ApiVersionParameterSource = apiVersioningOptions.ApiVersionReader;
-        options.DefaultApiVersion = apiVersioningOptions.DefaultApiVersion;
-        options.RouteConstraintName = apiVersioningOptions.RouteConstraintName;
-
+        CopyOptions( Options, options );
         return options;
+    }
+
+    /// <summary>
+    /// Copies the following source options to the target options.
+    /// </summary>
+    /// <param name="sourceOptions">The source options.</param>
+    /// <param name="targetOptions">The target options.</param>
+    protected static void CopyOptions( ApiVersioningOptions sourceOptions, T targetOptions )
+    {
+        ArgumentNullException.ThrowIfNull( targetOptions, nameof( targetOptions ) );
+        ArgumentNullException.ThrowIfNull( sourceOptions, nameof( sourceOptions ) );
+
+        targetOptions.AssumeDefaultVersionWhenUnspecified = sourceOptions.AssumeDefaultVersionWhenUnspecified;
+        targetOptions.ApiVersionParameterSource = sourceOptions.ApiVersionReader;
+        targetOptions.DefaultApiVersion = sourceOptions.DefaultApiVersion;
+        targetOptions.RouteConstraintName = sourceOptions.RouteConstraintName;
+        targetOptions.ApiVersionSelector = sourceOptions.ApiVersionSelector;
     }
 }

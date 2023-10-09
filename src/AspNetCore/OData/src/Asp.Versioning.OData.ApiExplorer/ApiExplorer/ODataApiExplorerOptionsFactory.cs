@@ -69,8 +69,12 @@ public class ODataApiExplorerOptionsFactory : ApiExplorerOptionsFactory<ODataApi
     }
 
     /// <inheritdoc />
-    protected override ODataApiExplorerOptions CreateInstance( string name ) =>
-        new( new( CollateApiVersions( providers, Options ), modelConfigurations ) );
+    protected override ODataApiExplorerOptions CreateInstance( string name )
+    {
+        var options = new ODataApiExplorerOptions( new( CollateApiVersions( providers, Options ), modelConfigurations ) );
+        CopyOptions( Options, options );
+        return options;
+    }
 
     private static ODataApiVersionCollectionProvider CollateApiVersions(
         IApiVersionMetadataCollationProvider[] providers,
