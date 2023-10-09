@@ -234,11 +234,19 @@ public class ApiVersionParameterDescriptionContextTest
         var configuration = new HttpConfiguration();
         var action = NewActionDescriptor();
         var description = new ApiDescription() { ActionDescriptor = action };
-        var version = new ApiVersion( 1, 0 );
-        var options = new ApiExplorerOptions( configuration );
+        var version = new ApiVersion( 2.0 );
+        var options = new ApiExplorerOptions( configuration )
+        {
+            ApiVersionSelector = new ConstantApiVersionSelector( version ),
+        };
 
         action.Configuration = configuration;
-        configuration.AddApiVersioning( o => o.AssumeDefaultVersionWhenUnspecified = true );
+        configuration.AddApiVersioning(
+            options =>
+            {
+                options.DefaultApiVersion = ApiVersion.Default;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+            } );
 
         var context = new ApiVersionParameterDescriptionContext( description, version, options );
 
@@ -255,7 +263,7 @@ public class ApiVersionParameterDescriptionContextTest
                 ParameterDescriptor = new
                 {
                     ParameterName = "api-version",
-                    DefaultValue = "1.0",
+                    DefaultValue = "2.0",
                     IsOptional = true,
                     Configuration = configuration,
                     ActionDescriptor = action,
