@@ -181,3 +181,7 @@ dotnet_naming_style.test_methods.word_separator = _
 dotnet_naming_rule.test_methods.style    = test_methods
 dotnet_naming_rule.test_methods.symbols  = test_methods
 dotnet_naming_rule.test_methods.severity = error
+
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1825
+[*.{cs,vb}]
+dotnet_diagnostic.CA1825.severity = none
