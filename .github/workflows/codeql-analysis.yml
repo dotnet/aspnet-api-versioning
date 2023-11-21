@@ -29,10 +29,14 @@ jobs:
 
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
+      id: installdotnet
       with:
         dotnet-version: | 
           3.1.x
           6.0.x
+    
+    - name: Create temporary global.json
+      run: echo '{"sdk":{"version":"${{ steps.installdotnet.outputs.dotnet-version }}"}}' > ./global.json
 
     # build a temporary *.slnf file that only contains source projects and put it in ~/obj
     # so that it is not tracked by git. then run 'dotnet build' using the *.slnf, which
