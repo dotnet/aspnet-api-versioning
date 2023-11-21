@@ -37,6 +37,7 @@ x86/
 # .NET CLI
 project.lock.json
 artifacts/
+global.json
 
 # Visual Studio profiler
 *.psess
