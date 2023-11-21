@@ -27,6 +27,11 @@ jobs:
         queries: security-and-quality
         languages: csharp
 
+    - name: Setup .NET 3.1 SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 3.1.x
+
     - name: Setup .NET 6.0 SDK
       uses: actions/setup-dotnet@v3
       with:
