@@ -1,1 +1,1 @@
-﻿If Controller Attribute is set, use it for the controller name.
+﻿If Controller Attribute is set, use it for the controller name  ([#1033](https://github.com/dotnet/aspnet-api-versioning/issues/1033))
