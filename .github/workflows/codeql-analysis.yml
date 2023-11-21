@@ -21,12 +21,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        queries: security-and-quality
-        languages: csharp
-
     - name: Setup .NET 3.1
       uses: actions/setup-dotnet@v3
       with:
@@ -36,6 +30,12 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        queries: security-and-quality
+        languages: csharp
 
     # build a temporary *.slnf file that only contains source projects and put it in ~/obj
     # so that it is not tracked by git. then run 'dotnet build' using the *.slnf, which
