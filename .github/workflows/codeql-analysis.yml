@@ -27,15 +27,12 @@ jobs:
         queries: security-and-quality
         languages: csharp
 
-    - name: Setup .NET 3.1 SDK
+    - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 3.1.x
-
-    - name: Setup .NET 6.0 SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
+        dotnet-version: | 
+          3.1.x
+          6.0.x
 
     # build a temporary *.slnf file that only contains source projects and put it in ~/obj
     # so that it is not tracked by git. then run 'dotnet build' using the *.slnf, which
