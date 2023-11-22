@@ -81,7 +81,14 @@ public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
         {
             var controller = controllers[i];
 
-            controller.ControllerName = NamingConvention.NormalizeName( controller.ControllerName );
+            if ( controller.RouteValues.TryGetValue( "controller", out var name ) )
+            {
+                controller.ControllerName = name!;
+            }
+            else
+            {
+                controller.ControllerName = NamingConvention.NormalizeName( controller.ControllerName );
+            }
 
             if ( !ConventionBuilder.ApplyTo( controller ) )
             {
