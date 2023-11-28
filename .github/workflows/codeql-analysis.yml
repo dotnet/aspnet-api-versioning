@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         id: installdotnet
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 7.0.x
 
       - name: Create temporary global.json
         run: echo '{"sdk":{"version":"${{ steps.installdotnet.outputs.dotnet-version }}"}}' > ./global.json
