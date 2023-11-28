@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Http;
 
 using System.Net;
+using System.Net.Http;
 
 internal sealed class TestServer : HttpMessageHandler
 {

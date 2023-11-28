@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Http;
 
 using System;
+using System.Net.Http;
 
 public class QueryStringApiVersionWriterTest
 {

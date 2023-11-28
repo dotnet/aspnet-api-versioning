@@ -4,6 +4,7 @@ namespace Asp.Versioning.Dispatcher;
 
 using System.Globalization;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Http.Tracing;

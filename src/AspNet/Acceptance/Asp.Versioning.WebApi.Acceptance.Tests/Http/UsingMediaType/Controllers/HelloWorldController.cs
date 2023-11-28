@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Http.UsingMediaType.Controllers;
 
 using Asp.Versioning.Http.UsingMediaType.Models;
+using System.Net.Http;
 using System.Web.Http;
 
 [ApiVersion( "1.0" )]

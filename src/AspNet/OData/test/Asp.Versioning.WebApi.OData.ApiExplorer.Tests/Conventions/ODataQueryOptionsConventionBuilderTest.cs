@@ -4,6 +4,7 @@ namespace Asp.Versioning.Conventions;
 
 using Asp.Versioning.Description;
 using Microsoft.OData.Edm;
+using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;

@@ -4,6 +4,7 @@ namespace Asp.Versioning.Routing;
 
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Web.Http.Routing;
 
 internal sealed class WithoutApiVersionUrlHelper : UrlHelper

@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Http.UsingNamespace.Controllers.V3;
 
 using Asp.Versioning.Http.UsingNamespace.Models;
+using System.Net.Http;
 using System.Web.Http;
 
 public class AgreementsController : ApiController

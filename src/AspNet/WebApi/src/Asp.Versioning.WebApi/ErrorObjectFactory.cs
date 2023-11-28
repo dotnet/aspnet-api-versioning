@@ -4,6 +4,7 @@
 namespace Asp.Versioning;
 
 using Newtonsoft.Json;
+using System.Net.Http;
 using static Asp.Versioning.ProblemDetailsDefaults;
 using static Newtonsoft.Json.NullValueHandling;
 

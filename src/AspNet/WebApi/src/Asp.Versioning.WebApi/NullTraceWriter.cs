@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning;
 
+using System.Net.Http;
 using System.Web.Http.Tracing;
 
 internal sealed class NullTraceWriter : ITraceWriter

@@ -4,6 +4,7 @@ namespace Asp.Versioning;
 
 using Asp.Versioning.Routing;
 using System.Globalization;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http.Routing;
 

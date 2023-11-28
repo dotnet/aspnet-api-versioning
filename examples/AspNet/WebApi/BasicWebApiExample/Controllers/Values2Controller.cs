@@ -2,6 +2,7 @@
 
 using Asp.Versioning;
 using System.Web.Http;
+using System.Net.Http;
 
 [ApiVersion( 2.0 )]
 [Route( "api/values" )]

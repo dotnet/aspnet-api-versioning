@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.Routing;
 
+using System.Net.Http;
 using System.Web.Http.Routing;
 
 /// <summary>

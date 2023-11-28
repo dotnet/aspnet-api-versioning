@@ -4,6 +4,7 @@ namespace Asp.Versioning.Http;
 
 using MELT;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 public class ApiVersionHandlerLoggerTTest
 {

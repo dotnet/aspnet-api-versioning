@@ -2,6 +2,8 @@
 
 namespace Asp.Versioning;
 
+using System.Net.Http;
+
 /// <content>
 /// Provides the implementation for ASP.NET Web API.
 /// </content>

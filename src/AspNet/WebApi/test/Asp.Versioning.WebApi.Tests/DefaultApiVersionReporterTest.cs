@@ -3,6 +3,7 @@
 namespace Asp.Versioning;
 
 using Asp.Versioning.Simulators;
+using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using static System.Net.HttpStatusCode;

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 namespace Asp.Versioning.Simulators;
-
+using System.Net.Http;
 using System.Web.Http;
 
 [ControllerName( "Conventions" )]

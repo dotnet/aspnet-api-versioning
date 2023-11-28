@@ -2,6 +2,8 @@
 
 namespace Asp.Versioning.Http;
 
+using System.Net.Http;
+
 public class HeaderApiVersionWriterTest
 {
     [Fact]

@@ -1,6 +1,7 @@
 ﻿namespace ApiVersioning.Examples.Controllers;
 
 using System.Web.Http;
+using System.Net.Http;
 
 [RoutePrefix( "api/values" )]
 public class Values2Controller : ApiController

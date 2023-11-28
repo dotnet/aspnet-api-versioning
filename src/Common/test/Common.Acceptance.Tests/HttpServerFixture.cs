@@ -4,6 +4,7 @@ namespace Asp.Versioning;
 
 #if NETFRAMEWORK
 using Microsoft.Owin.Testing;
+using System.Net.Http;
 #else
 using Microsoft.AspNetCore.TestHost;
 #endif

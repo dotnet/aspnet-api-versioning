@@ -4,6 +4,7 @@ namespace Asp.Versioning.Description;
 
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Routing;
+using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;

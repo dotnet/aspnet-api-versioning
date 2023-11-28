@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning;
 
+using System.Net.Http;
 using static Asp.Versioning.ApiVersionMapping;
 
 internal sealed class DoNotReportApiVersions : IReportApiVersions

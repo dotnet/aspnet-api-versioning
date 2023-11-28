@@ -3,6 +3,7 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning.Http;
+using System.Net.Http;
 
 public class IHttpClientBuilderExtensionsTest
 {

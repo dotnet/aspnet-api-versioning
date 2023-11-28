@@ -3,6 +3,7 @@
 namespace Asp.Versioning.OData.Advanced.Controllers;
 
 using Asp.Versioning.OData.Models;
+using System.Net.Http;
 using System.Web.Http;
 
 [ApiVersion( "3.0" )]

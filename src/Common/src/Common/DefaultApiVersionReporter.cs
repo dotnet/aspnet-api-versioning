@@ -8,6 +8,7 @@ using HttpResponse = System.Net.Http.HttpResponseMessage;
 #else
 using Microsoft.AspNetCore.Http;
 #endif
+using System.Net.Http;
 using static Asp.Versioning.ApiVersionMapping;
 
 /// <summary>

@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Http.UsingMediaType.Controllers;
 
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
 using System.Web.Http;
 
 [ApiVersion( "2.0" )]

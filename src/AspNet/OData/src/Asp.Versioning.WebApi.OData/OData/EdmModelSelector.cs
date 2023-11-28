@@ -5,6 +5,7 @@ namespace Asp.Versioning.OData;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using System.Globalization;
+using System.Net.Http;
 
 /// <summary>
 /// Represents an <see cref="IEdmModelSelector">EDM model selector</see>.
