@@ -11,7 +11,7 @@ steps:
     displayName: Install .NET SDK
     inputs:
       packageType: sdk
-      version: 8.0.x # https://github.com/dotnet/core/blob/main/release-notes/releases-index.json
+      version: 7.0.x # https://github.com/dotnet/core/blob/main/release-notes/releases-index.json
 
   - task: DotNetCoreCLI@2
     displayName: Build and Test
