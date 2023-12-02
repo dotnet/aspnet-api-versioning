@@ -22,6 +22,10 @@
  </ImportGroup>
 
  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+  <Using Include="System.Net.Http" />
+ </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
   <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="1.0.3" PrivateAssets="All" />
  </ItemGroup>
 
