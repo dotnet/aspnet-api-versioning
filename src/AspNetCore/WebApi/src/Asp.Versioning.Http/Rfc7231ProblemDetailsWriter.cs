@@ -36,6 +36,9 @@ internal sealed class Rfc7231ProblemDetailsWriter : IProblemDetailsWriter
         {
             var acceptHeaderValue = acceptHeader[i];
 
+            // TODO: the logic is inverted in .NET 8. remove when fixed
+            // BUG: https://github.com/dotnet/aspnetcore/issues/52577
+            // REF: https://github.com/dotnet/aspnetcore/blob/release/8.0/src/Http/Http.Extensions/src/DefaultProblemDetailsWriter.cs#L38
             if ( acceptHeaderValue.IsSubsetOf( jsonMediaType ) ||
                  acceptHeaderValue.IsSubsetOf( problemDetailsJsonMediaType ) )
             {

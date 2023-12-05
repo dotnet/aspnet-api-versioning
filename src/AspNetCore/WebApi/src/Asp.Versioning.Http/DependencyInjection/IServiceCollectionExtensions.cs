@@ -153,8 +153,8 @@ public static partial class IServiceCollectionExtensions
         }
     }
 
-    // TODO: Remove in .NET 8.0
-    // REF: https://github.com/dotnet/aspnetcore/issues/45051
+    // TODO: Remove in .NET 9.0 or .NET 8.0 patch
+    // BUG: https://github.com/dotnet/aspnetcore/issues/52577
     private static void TryAddProblemDetailsRfc7231Compliance( IServiceCollection services )
     {
         var descriptor = services.FirstOrDefault( IsDefaultProblemDetailsWriter );
