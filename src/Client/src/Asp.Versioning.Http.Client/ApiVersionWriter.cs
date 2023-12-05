@@ -11,27 +11,27 @@ public static class ApiVersionWriter
     /// Returns a new API version writer that is a combination of the specified set.
     /// </summary>
     /// <param name="apiVersionWriter">The primary <see cref="IApiVersionWriter">API version writer</see>.</param>
-    /// <param name="otherApiVersionwriters">An array of the other
+    /// <param name="otherApiVersionWriters">An array of the other
     /// <see cref="IApiVersionWriter">API version writers</see> to combine.</param>
     /// <returns>A new, combined <see cref="IApiVersionWriter">API version writer</see>.</returns>
     public static IApiVersionWriter Combine(
         IApiVersionWriter apiVersionWriter,
-        params IApiVersionWriter[] otherApiVersionwriters )
+        params IApiVersionWriter[] otherApiVersionWriters )
     {
         ArgumentNullException.ThrowIfNull( apiVersionWriter );
 
         int count;
         IApiVersionWriter[] apiVersionWriters;
 
-        if ( otherApiVersionwriters is null || ( count = otherApiVersionwriters.Length ) == 0 )
+        if ( otherApiVersionWriters is null || ( count = otherApiVersionWriters.Length ) == 0 )
         {
-            apiVersionWriters = new[] { apiVersionWriter };
+            apiVersionWriters = [apiVersionWriter];
         }
         else
         {
             apiVersionWriters = new IApiVersionWriter[count + 1];
             apiVersionWriters[0] = apiVersionWriter;
-            System.Array.Copy( otherApiVersionwriters, 0, apiVersionWriters, 1, count );
+            System.Array.Copy( otherApiVersionWriters, 0, apiVersionWriters, 1, count );
         }
 
         return new CombinedApiVersionWriter( apiVersionWriters );
