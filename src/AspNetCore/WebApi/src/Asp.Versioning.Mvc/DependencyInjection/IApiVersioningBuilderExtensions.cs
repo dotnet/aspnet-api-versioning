@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using System.Runtime.CompilerServices;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
@@ -83,19 +84,25 @@ public static class IApiVersioningBuilderExtensions
         return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
     }
 
-    private static ServiceDescriptor WithUrlHelperFactoryDecorator( IServiceCollection services )
+    [SkipLocalsInit]
+    private static DecoratedServiceDescriptor WithUrlHelperFactoryDecorator( IServiceCollection services )
     {
         var descriptor = services.FirstOrDefault( sd => sd.ServiceType == typeof( IUrlHelperFactory ) );
 
-        if ( descriptor is DecoratedServiceDescriptor )
+        if ( descriptor is DecoratedServiceDescriptor sd )
         {
-            return descriptor;
+            return sd;
         }
 
-        var lifetime = ServiceLifetime.Singleton;
-        Func<IServiceProvider, object> instantiate = sp => new UrlHelperFactory();
+        ServiceLifetime lifetime;
+        Func<IServiceProvider, object> instantiate;
 
-        if ( descriptor != null )
+        if ( descriptor == null )
+        {
+            lifetime = ServiceLifetime.Singleton;
+            instantiate = static sp => new UrlHelperFactory();
+        }
+        else
         {
             lifetime = descriptor.Lifetime;
             instantiate = sp => sp.CreateInstance( descriptor );
@@ -116,7 +123,7 @@ public static class IApiVersioningBuilderExtensions
             return (IUrlHelperFactory) instance;
         }
 
-        return new DecoratedServiceDescriptor( typeof( IUrlHelperFactory ), NewFactory, lifetime );
+        return new( typeof( IUrlHelperFactory ), NewFactory, lifetime );
     }
 
     private sealed class DecoratedServiceDescriptor : ServiceDescriptor
