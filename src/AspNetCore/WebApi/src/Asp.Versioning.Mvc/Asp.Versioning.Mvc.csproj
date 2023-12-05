@@ -8,6 +8,7 @@
   <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core MVC.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;MVC;Versioning</PackageTags>
+  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
  </PropertyGroup>
 
  <ItemGroup>
