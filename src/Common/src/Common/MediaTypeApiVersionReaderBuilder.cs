@@ -130,11 +130,16 @@ public partial class MediaTypeApiVersionReaderBuilder
 #endif
     public virtual IApiVersionReader Build() =>
         new BuiltMediaTypeApiVersionReader(
-            parameters?.ToArray() ?? Array.Empty<string>(),
-            included ?? EmptyCollection(),
-            excluded ?? EmptyCollection(),
+            parameters?.ToArray() ?? [],
+#if NET45
+            included ?? [],
+            excluded ?? [],
+#else
+            included ?? new( capacity: 0 ),
+            excluded ?? new( capacity: 0 ),
+#endif
             select ?? DefaultSelector,
-            readers ?? EmptyList() );
+            readers?.ToArray() ?? [] );
 
     /// <summary>
     /// Adds a function used to read the an API version from one or more media types.
@@ -148,7 +153,7 @@ public partial class MediaTypeApiVersionReaderBuilder
     {
         ArgumentNullException.ThrowIfNull( reader );
 
-        readers ??= new();
+        readers ??= [];
         readers.Add( reader );
     }
 

@@ -69,7 +69,7 @@ public class VersionedApiDescription : ApiDescription
     /// </summary>
     /// <value>A <see cref="IDictionary{TKey, TValue}">collection</see> of arbitrary metadata properties
     /// associated with the <see cref="VersionedApiDescription">API description</see>.</value>
-    public IDictionary<object, object> Properties => properties ??= new();
+    public IDictionary<object, object> Properties => properties ??= [];
 
     private static Action<ApiDescription, ResponseDescription> CreateSetResponseDescriptionMutator()
     {

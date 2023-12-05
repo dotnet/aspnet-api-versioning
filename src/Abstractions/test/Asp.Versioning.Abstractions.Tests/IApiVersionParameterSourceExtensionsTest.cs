@@ -146,6 +146,7 @@ public class IApiVersionParameterSourceExtensionsTest
     {
         // arrange
         var source = new Mock<IApiVersionParameterSource>();
+        var expected = new[] { "api-version", "ver" };
 
         source.Setup( s => s.AddParameters( It.IsAny<IApiVersionParameterDescriptionContext>() ) )
               .Callback( ( IApiVersionParameterDescriptionContext context ) =>
@@ -160,6 +161,6 @@ public class IApiVersionParameterSourceExtensionsTest
         var names = source.Object.GetParameterNames( Query );
 
         // assert
-        names.Should().BeEquivalentTo( new[] { "api-version", "ver" } );
+        names.Should().BeEquivalentTo( expected );
     }
 }

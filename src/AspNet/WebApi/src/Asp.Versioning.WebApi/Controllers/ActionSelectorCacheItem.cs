@@ -26,7 +26,7 @@ internal sealed class ActionSelectorCacheItem
     private static readonly HttpMethod[] cacheListMethodKinds = new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Post };
     private readonly HttpControllerDescriptor controllerDescriptor;
     private readonly CandidateAction[] combinedCandidateActions;
-    private readonly Dictionary<HttpActionDescriptor, string[]> actionParameterNames = new();
+    private readonly Dictionary<HttpActionDescriptor, string[]> actionParameterNames = [];
     private readonly ILookup<string, HttpActionDescriptor> combinedActionNameMapping;
     private StandardActionSelectionCache? standardActions;
 
@@ -76,7 +76,7 @@ internal sealed class ActionSelectorCacheItem
 
         if ( controllerDescriptor.IsAttributeRouted() )
         {
-            selectionCache.StandardCandidateActions = Array.Empty<CandidateAction>();
+            selectionCache.StandardCandidateActions = [];
         }
         else
         {
@@ -94,7 +94,7 @@ internal sealed class ActionSelectorCacheItem
                 }
             }
 
-            selectionCache.StandardCandidateActions = standardCandidateActions.ToArray();
+            selectionCache.StandardCandidateActions = [.. standardCandidateActions];
         }
 
         selectionCache.StandardActionNameMapping =
@@ -118,11 +118,7 @@ internal sealed class ActionSelectorCacheItem
         HttpControllerContext controllerContext,
         Func<HttpControllerContext, IReadOnlyList<HttpActionDescriptor>, HttpActionDescriptor?> selector )
     {
-        if ( selector == null )
-        {
-            throw new ArgumentNullException( nameof( selector ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( selector );
         InitializeStandardActions();
 
         var firstAttempt = FindAction( controllerContext, selector, ignoreSubRoutes: false );
@@ -412,7 +408,7 @@ internal sealed class ActionSelectorCacheItem
     }
 
     private List<CandidateActionWithParams> FindActionMatchMostRouteAndQueryParameters( List<CandidateActionWithParams> candidatesFound ) =>
-        candidatesFound.Count < 2 ? candidatesFound : candidatesFound.GroupBy( c => actionParameterNames[c.ActionDescriptor].Length ).OrderByDescending( g => g.Key ).First().ToList();
+        candidatesFound.Count < 2 ? candidatesFound : [.. candidatesFound.GroupBy( c => actionParameterNames[c.ActionDescriptor].Length ).OrderByDescending( g => g.Key ).First()];
 
     private static CandidateActionWithParams[] GetCandidateActionsWithBindings( HttpControllerContext controllerContext, CandidateAction[] candidatesFound )
     {
@@ -485,7 +481,7 @@ internal sealed class ActionSelectorCacheItem
     {
         var listCandidates = new List<CandidateAction>();
         FindActionsForMethod( method, candidates, listCandidates );
-        return listCandidates.ToArray();
+        return [.. listCandidates];
     }
 
     private static void FindActionsForMethod( HttpMethod method, CandidateAction[] candidates, List<CandidateAction> listCandidates )

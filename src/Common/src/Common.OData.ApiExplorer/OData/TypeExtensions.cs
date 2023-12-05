@@ -114,10 +114,10 @@ public static partial class TypeExtensions
             yield return new CustomAttributeBuilder(
                 ctor,
                 ctorArgs,
-                namedProperties.ToArray(),
-                propertyValues.ToArray(),
-                namedFields.ToArray(),
-                fieldValues.ToArray() );
+                [.. namedProperties],
+                [.. propertyValues],
+                [.. namedFields],
+                [.. fieldValues] );
         }
     }
 

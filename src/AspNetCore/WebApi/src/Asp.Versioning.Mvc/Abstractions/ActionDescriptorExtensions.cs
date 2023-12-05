@@ -43,7 +43,7 @@ public static class ActionDescriptorExtensions
 
         if ( endpointMetadata == null )
         {
-            action.EndpointMetadata = new List<object>() { value };
+            action.EndpointMetadata = [value];
             return;
         }
 
@@ -65,7 +65,7 @@ public static class ActionDescriptorExtensions
 
         if ( endpointMetadata.IsReadOnly )
         {
-            action.EndpointMetadata = new List<object>() { value };
+            action.EndpointMetadata = [value];
         }
         else
         {

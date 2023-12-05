@@ -36,7 +36,7 @@ public class ActionApiVersionConventionBuilderCollection : IReadOnlyCollection<A
         if ( actionBuilderMappings is null )
         {
             mapping = new( actionMethod, new( controllerBuilder ) );
-            actionBuilderMappings = new() { mapping };
+            actionBuilderMappings = [mapping];
             return mapping.Builder;
         }
 

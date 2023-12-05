@@ -33,7 +33,7 @@ public class ODataActionQueryOptionsConventionBuilderCollection : IReadOnlyColle
         if ( actionBuilderMappings == null )
         {
             var builder = new ODataActionQueryOptionsConventionBuilder( controllerBuilder );
-            actionBuilderMappings = new() { new( actionMethod, builder ) };
+            actionBuilderMappings = [new( actionMethod, builder )];
             return builder;
         }
 

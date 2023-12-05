@@ -89,7 +89,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
 
             if ( controller.ControllerType.IsMetadataController() )
             {
-                metadataControllers ??= new();
+                metadataControllers ??= [];
                 metadataControllers.Add( controller );
                 continue;
             }
@@ -116,7 +116,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
 
                 if ( supported == null && versions.Count > 0 )
                 {
-                    supported = new();
+                    supported = [];
                 }
 
                 for ( var k = 0; k < versions.Count; k++ )
@@ -128,7 +128,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
 
                 if ( deprecated == null && versions.Count > 0 )
                 {
-                    deprecated = new();
+                    deprecated = [];
                 }
 
                 for ( var k = 0; k < versions.Count; k++ )
@@ -220,7 +220,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         builder.ApplyTo( metadataController );
     }
 
-    private IReadOnlyList<ApiVersion> MergeApiVersions(
+    private ApiVersion[] MergeApiVersions(
         SortedSet<ApiVersion>? supported,
         SortedSet<ApiVersion>? deprecated )
     {
@@ -228,14 +228,14 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         {
             if ( supported == null )
             {
-                return new[] { Options.DefaultApiVersion };
+                return [Options.DefaultApiVersion];
             }
 
-            return supported.ToArray();
+            return [.. supported];
         }
         else if ( supported == null )
         {
-            return deprecated.ToArray();
+            return [.. deprecated];
         }
 
         return supported.Union( deprecated ).ToArray();

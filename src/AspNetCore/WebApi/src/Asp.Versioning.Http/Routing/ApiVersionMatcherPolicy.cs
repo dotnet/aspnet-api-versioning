@@ -151,7 +151,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 default:
                     // the route patterns provided to each edge is a
                     // singleton so any edge will do
-                    routePatterns ??= state.RoutePatterns.ToArray();
+                    routePatterns ??= [.. state.RoutePatterns];
                     destinations.Add( state.ApiVersion, edge.Destination );
                     break;
             }
@@ -161,7 +161,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             rejection,
             destinations,
             NewPolicyFeature( supported, deprecated ),
-            routePatterns ?? Array.Empty<RoutePattern>(),
+            routePatterns ?? [],
             apiVersionParser,
             source,
             Options );
@@ -192,7 +192,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             if ( model.IsApiVersionNeutral )
             {
                 builder.Add( endpoint, ApiVersion.Neutral, metadata );
-                neutralEndpoints ??= new();
+                neutralEndpoints ??= [];
                 neutralEndpoints.Add( (endpoint, metadata) );
             }
             else
@@ -309,7 +309,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
 
         if ( versions.Count > 0 )
         {
-            supported ??= new();
+            supported ??= [];
 
             for ( var j = 0; j < versions.Count; j++ )
             {
@@ -324,7 +324,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             return;
         }
 
-        deprecated ??= new();
+        deprecated ??= [];
 
         for ( var j = 0; j < versions.Count; j++ )
         {

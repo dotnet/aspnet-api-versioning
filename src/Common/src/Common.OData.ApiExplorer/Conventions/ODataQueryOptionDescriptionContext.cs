@@ -53,7 +53,7 @@ public partial class ODataQueryOptionDescriptionContext
         AllowedArithmeticOperators = validationSettings.AllowedArithmeticOperators;
         AllowedFunctions = validationSettings.AllowedFunctions;
         AllowedLogicalOperators = validationSettings.AllowedLogicalOperators;
-        allowedOrderByProperties = validationSettings.AllowedOrderByProperties.ToList();
+        allowedOrderByProperties = [.. validationSettings.AllowedOrderByProperties];
         MaxOrderByNodeCount = validationSettings.MaxOrderByNodeCount;
         MaxAnyAllExpressionDepth = validationSettings.MaxAnyAllExpressionDepth;
         MaxNodeCount = validationSettings.MaxNodeCount;
@@ -90,25 +90,25 @@ public partial class ODataQueryOptionDescriptionContext
     /// Gets the names of properties that can be selected.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of selectable property names.</value>
-    public IList<string> AllowedSelectProperties => allowedSelectProperties ??= new();
+    public IList<string> AllowedSelectProperties => allowedSelectProperties ??= [];
 
     /// <summary>
     /// Gets the names of properties that can be expanded.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of expandable property names.</value>
-    public IList<string> AllowedExpandProperties => allowedExpandProperties ??= new();
+    public IList<string> AllowedExpandProperties => allowedExpandProperties ??= [];
 
     /// <summary>
     /// Gets the names of properties that can be filtered.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of filterable property names.</value>
-    public IList<string> AllowedFilterProperties => allowedFilterProperties ??= new();
+    public IList<string> AllowedFilterProperties => allowedFilterProperties ??= [];
 
     /// <summary>
     /// Gets the names of properties that can be sorted.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of sortable property names.</value>
-    public IList<string> AllowedOrderByProperties => allowedOrderByProperties ??= new();
+    public IList<string> AllowedOrderByProperties => allowedOrderByProperties ??= [];
 
     /// <summary>
     /// Gets or sets the maximum number of expressions that can be present in the $orderby query option.

@@ -8,7 +8,7 @@ using System.Reflection;
 
 internal sealed class FilteredControllerTypes : ControllerFeatureProvider, ICollection<Type>
 {
-    private readonly HashSet<Type> controllerTypes = new();
+    private readonly HashSet<Type> controllerTypes = [];
 
     protected override bool IsController( TypeInfo typeInfo ) => base.IsController( typeInfo ) && controllerTypes.Contains( typeInfo );
 

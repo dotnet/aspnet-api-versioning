@@ -33,7 +33,7 @@ public class ApiVersioningPolicyBuilder : IApiVersioningPolicyBuilder
 
         var key = new PolicyKey( name, apiVersion );
 
-        sunsetPolicies ??= new();
+        sunsetPolicies ??= [];
 
         if ( !sunsetPolicies.TryGetValue( key, out var builder ) )
         {

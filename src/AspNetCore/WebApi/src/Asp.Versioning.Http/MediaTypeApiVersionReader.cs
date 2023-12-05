@@ -22,18 +22,18 @@ public partial class MediaTypeApiVersionReader
 
         if ( accept is null || ReadAcceptHeader( accept ) is not string otherVersion )
         {
-            return version is null ? Array.Empty<string>() : new[] { version };
+            return version is null ? [] : [version];
         }
 
         var comparer = StringComparer.OrdinalIgnoreCase;
 
         if ( version is null || comparer.Equals( version, otherVersion ) )
         {
-            return new[] { otherVersion };
+            return [otherVersion];
         }
 
-        return comparer.Compare( version, otherVersion ) <= 0 ?
-            new[] { version, otherVersion } :
-            new[] { otherVersion, version };
+        return comparer.Compare( version, otherVersion ) <= 0
+               ? [version, otherVersion]
+               : [otherVersion, version];
     }
 }

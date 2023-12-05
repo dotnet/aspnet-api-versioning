@@ -40,13 +40,13 @@ public partial class ApiVersionConventionBuilder : IApiVersionConventionBuilder
     /// Gets a collection of controller convention builders.
     /// </summary>
     /// <value>A <see cref="IDictionary{TKey, TValue}">collection</see> of <see cref="IControllerConventionBuilder">controller convention builders</see>.</value>
-    protected IDictionary<Type, IControllerConventionBuilder> ControllerConventionBuilders => controllerConventionBuilders ??= new();
+    protected IDictionary<Type, IControllerConventionBuilder> ControllerConventionBuilders => controllerConventionBuilders ??= [];
 
     /// <summary>
     /// Gets a collection of controller conventions.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of <see cref="IControllerConvention">controller conventions</see>.</value>
-    protected IList<IControllerConvention> ControllerConventions => controllerConventions ??= new();
+    protected IList<IControllerConvention> ControllerConventions => controllerConventions ??= [];
 
     /// <inheritdoc />
     public virtual int Count =>

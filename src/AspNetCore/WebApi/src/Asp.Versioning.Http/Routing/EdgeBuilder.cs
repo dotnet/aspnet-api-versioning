@@ -86,7 +86,7 @@ internal sealed class EdgeBuilder
 
         if ( !edges.TryGetValue( key, out var endpoints ) )
         {
-            edges.Add( key, endpoints = new() );
+            edges.Add( key, endpoints = [] );
         }
 
         endpoints.Add( endpoint );

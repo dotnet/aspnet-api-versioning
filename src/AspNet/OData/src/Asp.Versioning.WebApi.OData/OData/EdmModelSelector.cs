@@ -53,8 +53,8 @@ public class EdmModelSelector : IEdmModelSelector
 
                 break;
             default:
-                versions = new();
-                collection = new();
+                versions = [];
+                collection = [];
 
                 foreach ( var model in models )
                 {

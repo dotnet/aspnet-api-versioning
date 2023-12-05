@@ -163,11 +163,11 @@ internal static class EndpointBuilderFinalizer
             var versions = provider.Versions;
             var target = provider.Options switch
             {
-                None => supported ??= new(),
-                Mapped => mapped ??= new(),
-                Deprecated => deprecated ??= new(),
-                Advertised => advertised ??= new(),
-                Advertised | Deprecated => deprecatedAdvertised ??= new(),
+                None => supported ??= [],
+                Mapped => mapped ??= [],
+                Deprecated => deprecated ??= [],
+                Advertised => advertised ??= [],
+                Advertised | Deprecated => deprecatedAdvertised ??= [],
                 _ => default,
             };
 
@@ -183,11 +183,11 @@ internal static class EndpointBuilderFinalizer
         }
 
         buckets = new(
-            mapped?.ToArray() ?? Array.Empty<ApiVersion>(),
-            supported?.ToArray() ?? Array.Empty<ApiVersion>(),
-            deprecated?.ToArray() ?? Array.Empty<ApiVersion>(),
-            advertised?.ToArray() ?? Array.Empty<ApiVersion>(),
-            deprecatedAdvertised?.ToArray() ?? Array.Empty<ApiVersion>() );
+            mapped?.ToArray() ?? [],
+            supported?.ToArray() ?? [],
+            deprecated?.ToArray() ?? [],
+            advertised?.ToArray() ?? [],
+            deprecatedAdvertised?.ToArray() ?? [] );
 
         return true;
     }
@@ -224,7 +224,7 @@ internal static class EndpointBuilderFinalizer
             }
             else
             {
-                emptyVersions = Array.Empty<ApiVersion>();
+                emptyVersions = [];
                 endpointModel = new(
                     declaredVersions: emptyVersions,
                     inheritedSupported,
@@ -248,7 +248,7 @@ internal static class EndpointBuilderFinalizer
             }
             else
             {
-                emptyVersions = Array.Empty<ApiVersion>();
+                emptyVersions = [];
                 endpointModel = new(
                     declaredVersions: mapped,
                     supportedVersions: inheritedSupported,

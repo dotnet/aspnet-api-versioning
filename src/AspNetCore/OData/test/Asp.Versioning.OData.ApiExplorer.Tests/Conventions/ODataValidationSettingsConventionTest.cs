@@ -634,7 +634,7 @@ public class ODataValidationSettingsConventionTest
                 MethodInfo = typeof( ControllerBase ).GetRuntimeMethod( nameof( ControllerBase.Ok ), Type.EmptyTypes ),
                 EndpointMetadata = new object[]
                 {
-                    new ODataRoutingMetadata( string.Empty, model, new() ),
+                    new ODataRoutingMetadata( string.Empty, model, [] ),
                 },
             },
             HttpMethod = method,
@@ -665,7 +665,7 @@ public class ODataValidationSettingsConventionTest
                 MethodInfo = controllerType.GetRuntimeMethods().Single( m => m.Name == "Get" ),
                 EndpointMetadata = new object[]
                 {
-                    new ODataRoutingMetadata( string.Empty, model, new() ),
+                    new ODataRoutingMetadata( string.Empty, model, [] ),
                 },
             },
             HttpMethod = "GET",

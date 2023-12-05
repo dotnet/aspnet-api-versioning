@@ -26,7 +26,7 @@ internal sealed class ODataBatchPathMapping
         Debug.Assert( count < mappings.Length, "The capacity has been exceeded." );
 
         var template = TemplateParser.Parse( routeTemplate.TrimStart( '/' ) );
-        var matcher = new TemplateMatcher( template, new() );
+        var matcher = new TemplateMatcher( template, [] );
 
         handler.PrefixName = prefixName;
         mappings[count++] = (matcher, handler, version);

@@ -20,7 +20,7 @@ public partial class ControllerApiVersionConventionBuilderTest
         var controllerDescriptor = mock.Object;
         var controllerBuilder = default( IControllerConventionBuilder );
 
-        mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
+        mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( [] );
         controllerDescriptor.Configuration = configuration;
         controllerDescriptor.ControllerType = typeof( UndecoratedController );
         configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller( typeof( UndecoratedController ) ) );
@@ -55,7 +55,7 @@ public partial class ControllerApiVersionConventionBuilderTest
         var controllerDescriptor = mock.Object;
         var controllerBuilder = default( IControllerConventionBuilder );
 
-        mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
+        mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( [] );
         controllerDescriptor.Configuration = configuration;
         controllerDescriptor.ControllerType = typeof( UndecoratedController );
         configuration.AddApiVersioning( o => controllerBuilder = o.Conventions.Controller( typeof( UndecoratedController ) ) );

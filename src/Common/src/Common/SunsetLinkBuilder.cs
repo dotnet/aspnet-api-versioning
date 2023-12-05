@@ -26,7 +26,7 @@ internal sealed class SunsetLinkBuilder : ILinkBuilder
         }
         else if ( languages == null )
         {
-            languages = new() { language, value };
+            languages = [language, value];
         }
         else
         {

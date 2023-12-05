@@ -63,7 +63,7 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
         }
         set
         {
-            rawApiVersions = string.IsNullOrEmpty( value ) ? default : new[] { value };
+            rawApiVersions = string.IsNullOrEmpty( value ) ? default : [value];
         }
     }
 
@@ -105,7 +105,7 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
             if ( apiVersion is not null &&
                ( rawApiVersions is null || rawApiVersions.Count == 0 ) )
             {
-                rawApiVersions = new[] { apiVersion.ToString() };
+                rawApiVersions = [apiVersion.ToString()];
             }
         }
     }
@@ -116,6 +116,6 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
             string.Format(
                 CultureInfo.CurrentCulture,
                 CommonSR.MultipleDifferentApiVersionsRequested,
-                string.Join( ", ", values.ToArray(), 0, values.Count ) ),
+                string.Join( ", ", [.. values], 0, values.Count ) ),
             values );
 }

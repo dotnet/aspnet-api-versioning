@@ -70,7 +70,7 @@ internal sealed class ControllerSelectionContext
 
             foreach ( var action in actions )
             {
-                candidates ??= new();
+                candidates ??= [];
                 candidates.Add( new( action ) );
             }
         }

@@ -43,13 +43,13 @@ public partial class ODataQueryOptionsConventionBuilder
     /// </summary>
     /// <value>A <see cref="IDictionary{TKey, TValue}">collection</see> of
     /// <see cref="IODataQueryOptionsConventionBuilder">controller convention builders</see>.</value>
-    protected IDictionary<Type, IODataQueryOptionsConventionBuilder> ConventionBuilders => conventionBuilders ??= new();
+    protected IDictionary<Type, IODataQueryOptionsConventionBuilder> ConventionBuilders => conventionBuilders ??= [];
 
     /// <summary>
     /// Gets a collection of OData query option conventions.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of <see cref="IODataQueryOptionsConvention">OData query option conventions</see>.</value>
-    protected IList<IODataQueryOptionsConvention> Conventions => conventions ??= new();
+    protected IList<IODataQueryOptionsConvention> Conventions => conventions ??= [];
 
     /// <summary>
     /// Gets or creates the convention builder for the specified controller.
@@ -144,7 +144,7 @@ public partial class ODataQueryOptionsConventionBuilder
                 }
 
                 convention = builder.Build( queryOptionSettings );
-                controllerConventions ??= new();
+                controllerConventions ??= [];
                 controllerConventions.Add( controller, convention );
             }
 

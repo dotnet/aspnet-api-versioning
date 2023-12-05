@@ -21,5 +21,5 @@ public class ModelConfigurationFeature
     /// Gets the collection of model configurations in an application.
     /// </summary>
     /// <value>The <see cref="ICollection{T}">collection</see> of model configurations in an application.</value>
-    public ICollection<Type> ModelConfigurations => modelConfigurations ??= new();
+    public ICollection<Type> ModelConfigurations => modelConfigurations ??= [];
 }

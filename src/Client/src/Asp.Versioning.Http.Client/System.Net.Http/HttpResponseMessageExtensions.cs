@@ -99,7 +99,7 @@ public static class HttpResponseMessageExtensions
                 }
 
                 var key = GetApiVersionExtension( link, ref parser );
-                urls ??= new();
+                urls ??= [];
                 urls[key] = link.LinkTarget;
             }
 

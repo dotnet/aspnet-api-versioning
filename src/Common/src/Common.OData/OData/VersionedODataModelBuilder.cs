@@ -34,7 +34,7 @@ public partial class VersionedODataModelBuilder
     /// Gets the list of model configurations associated with the builder.
     /// </summary>
     /// <value>A <see cref="IList{T}">list</see> of model configurations associated with the builder.</value>
-    public IList<IModelConfiguration> ModelConfigurations => modelConfigurations ??= new();
+    public IList<IModelConfiguration> ModelConfigurations => modelConfigurations ??= [];
 
     /// <summary>
     /// Gets or sets the action that is invoked after the <see cref="IEdmModel">EDM model</see> has been created.
@@ -97,7 +97,7 @@ public partial class VersionedODataModelBuilder
     private void BuildModelPerApiVersion(
         IReadOnlyList<ApiVersion> apiVersions,
         IReadOnlyList<IModelConfiguration> configurations,
-        ICollection<IEdmModel> models,
+        List<IEdmModel> models,
         string? routePrefix )
     {
         for ( var i = 0; i < apiVersions.Count; i++ )

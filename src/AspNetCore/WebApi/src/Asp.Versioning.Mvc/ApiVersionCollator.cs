@@ -114,7 +114,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
 
             if ( !groups.TryGetValue( key, out var values ) )
             {
-                groups.Add( key, values = new() );
+                groups.Add( key, values = [] );
             }
 
             values.Add( action );

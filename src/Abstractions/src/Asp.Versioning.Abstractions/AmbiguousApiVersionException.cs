@@ -12,14 +12,14 @@ public partial class AmbiguousApiVersionException : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="AmbiguousApiVersionException"/> class.
     /// </summary>
-    public AmbiguousApiVersionException() => apiVersions = Array.Empty<string>();
+    public AmbiguousApiVersionException() => apiVersions = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AmbiguousApiVersionException"/> class.
     /// </summary>
     /// <param name="message">The associated error message.</param>
     public AmbiguousApiVersionException( string message )
-        : base( message ) => apiVersions = Array.Empty<string>();
+        : base( message ) => apiVersions = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AmbiguousApiVersionException"/> class.
@@ -27,7 +27,7 @@ public partial class AmbiguousApiVersionException : Exception
     /// <param name="message">The associated error message.</param>
     /// <param name="innerException">The inner <see cref="Exception">exception</see> that caused the current exception, if any.</param>
     public AmbiguousApiVersionException( string message, Exception innerException )
-        : base( message, innerException ) => apiVersions = Array.Empty<string>();
+        : base( message, innerException ) => apiVersions = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AmbiguousApiVersionException"/> class.

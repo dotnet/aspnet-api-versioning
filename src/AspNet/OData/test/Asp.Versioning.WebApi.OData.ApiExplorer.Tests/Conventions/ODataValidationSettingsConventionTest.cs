@@ -10,7 +10,6 @@ using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Query;
 using Microsoft.OData.Edm;
-using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Reflection;
 using System.Web.Http;
@@ -565,8 +564,8 @@ public class ODataValidationSettingsConventionTest
         var controller = new Mock<HttpControllerDescriptor>() { CallBase = true };
         var action = new Mock<HttpActionDescriptor>() { CallBase = true };
 
-        controller.Setup( m => m.GetCustomAttributes<EnableQueryAttribute>( It.IsAny<bool>() ) ).Returns( new Collection<EnableQueryAttribute>() );
-        action.Setup( m => m.GetCustomAttributes<EnableQueryAttribute>( It.IsAny<bool>() ) ).Returns( new Collection<EnableQueryAttribute>() );
+        controller.Setup( m => m.GetCustomAttributes<EnableQueryAttribute>( It.IsAny<bool>() ) ).Returns( [] );
+        action.Setup( m => m.GetCustomAttributes<EnableQueryAttribute>( It.IsAny<bool>() ) ).Returns( [] );
 
         var actionDescriptor = action.Object;
         var responseType = singleResult ? typeof( object ) : typeof( IEnumerable<object> );

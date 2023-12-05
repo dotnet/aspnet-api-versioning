@@ -44,7 +44,7 @@ public class ODataActionQueryOptionsConventionBuilderCollection<T> :
         if ( actionBuilderMappings == null )
         {
             var builder = new ODataActionQueryOptionsConventionBuilder<T>( controllerBuilder );
-            actionBuilderMappings = new() { new( actionMethod, builder ) };
+            actionBuilderMappings = [new( actionMethod, builder )];
             return builder;
         }
 

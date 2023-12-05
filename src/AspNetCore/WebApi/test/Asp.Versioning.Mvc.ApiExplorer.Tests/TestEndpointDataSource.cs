@@ -10,11 +10,11 @@ using Microsoft.Extensions.Primitives;
 
 internal sealed class TestEndpointDataSource : EndpointDataSource
 {
-    public override IReadOnlyList<Endpoint> Endpoints { get; } = CreateEndpoints();
+    public override List<Endpoint> Endpoints { get; } = CreateEndpoints();
 
     public override IChangeToken GetChangeToken() => NullChangeToken.Singleton;
 
-    private static IReadOnlyList<Endpoint> CreateEndpoints()
+    private static List<Endpoint> CreateEndpoints()
     {
         var endpoints = new List<Endpoint>();
 
@@ -24,154 +24,154 @@ internal sealed class TestEndpointDataSource : EndpointDataSource
         return endpoints;
     }
 
-    private static void AddOrderEndpoints( ICollection<Endpoint> endpoints )
+    private static void AddOrderEndpoints( List<Endpoint> endpoints )
     {
         // api version 0.9 and 1.0
         endpoints.Add(
             NewEndpoint(
                 "GET-orders/{id}",
                 "orders/{id}",
-                declared: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) },
-                deprecated: new ApiVersion[] { new( 0, 9 ) } ) );
+                declared: [new( 0, 9 ), new( 1, 0 )],
+                supported: [new( 1, 0 )],
+                deprecated: [new( 0, 9 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "POST-orders",
                 "orders",
-                declared: new ApiVersion[] { new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) } ) );
+                declared: [new( 1, 0 )],
+                supported: [new( 1, 0 )] ) );
 
         // api version 2.0
         endpoints.Add(
             NewEndpoint(
                 "GET-orders",
                 "orders",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "GET-orders/{id}",
                 "orders/{id}",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "POST-orders",
                 "orders",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         // api version 3.0
         endpoints.Add(
             NewEndpoint(
                 "GET-orders",
                 "orders",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "GET-orders/{id}",
                 "orders/{id}",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "POST-orders",
                 "orders",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "DELETE-orders/{id}",
                 "orders/{id}",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
     }
 
-    private static void AddPeopleEndpoints( ICollection<Endpoint> endpoints )
+    private static void AddPeopleEndpoints( List<Endpoint> endpoints )
     {
         // api version 0.9 and 1.0
         endpoints.Add(
             NewEndpoint(
                 "GET-people/{id}",
                 "people/{id}",
-                declared: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) },
-                deprecated: new ApiVersion[] { new( 0, 9 ) } ) );
+                declared: [new( 0, 9 ), new( 1, 0 )],
+                supported: [new( 1, 0 )],
+                deprecated: [new( 0, 9 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "POST-people",
                 "people",
-                declared: new ApiVersion[] { new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) } ) );
+                declared: [new( 1, 0 )],
+                supported: [new( 1, 0 )] ) );
 
         // api version 2.0
         endpoints.Add(
             NewEndpoint(
                 "GET-people",
                 "people",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "GET-people/{id}",
                 "people/{id}",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "POST-people",
                 "people",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         // api version 3.0
         endpoints.Add(
             NewEndpoint(
                 "GET-people",
                 "people",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "GET-people/{id}",
                 "people/{id}",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         endpoints.Add(
             NewEndpoint(
                 "POST-people",
                 "people",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
     }
 
     private static Endpoint NewEndpoint(
         string displayName,
         string pattern,
-        IEnumerable<ApiVersion> declared,
-        IEnumerable<ApiVersion> supported,
-        IEnumerable<ApiVersion> deprecated = null,
-        IEnumerable<ApiVersion> advertised = null,
-        IEnumerable<ApiVersion> advertisedDeprecated = null )
+        ApiVersion[] declared,
+        ApiVersion[] supported,
+        ApiVersion[] deprecated = null,
+        ApiVersion[] advertised = null,
+        ApiVersion[] advertisedDeprecated = null )
     {
         var metadata = new ApiVersionMetadata(
             ApiVersionModel.Empty,

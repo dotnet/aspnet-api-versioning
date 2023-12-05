@@ -17,7 +17,7 @@ public class DefaultMetadataMatcherPolicyTest
         var paramSource = Mock.Of<IApiVersionParameterSource>();
         var options = Options.Create( new ApiVersioningOptions() );
         var policy = new DefaultMetadataMatcherPolicy( paramSource, options );
-        var metadata = new ODataRoutingMetadata( string.Empty, EdmCoreModel.Instance, new ODataPathTemplate() );
+        var metadata = new ODataRoutingMetadata( string.Empty, EdmCoreModel.Instance, [] );
         var items = new object[] { metadata };
         var endpoints = new Endpoint[] { new( Limbo, new( items ), default ) };
 

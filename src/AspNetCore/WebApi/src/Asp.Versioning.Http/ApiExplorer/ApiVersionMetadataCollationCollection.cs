@@ -17,8 +17,8 @@ public class ApiVersionMetadataCollationCollection : IList<ApiVersionMetadata>, 
     /// </summary>
     public ApiVersionMetadataCollationCollection()
     {
-        items = new();
-        groups = new();
+        items = [];
+        groups = [];
     }
 
     /// <summary>

@@ -128,27 +128,29 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         var groupResults = new List<ApiDescription>( capacity: results.Count );
         var unversioned = default( Dictionary<int, ApiDescription> );
         var formatGroupName = Options.FormatGroupName;
+        var versions = FlattenApiVersions( results );
 
-        foreach ( var version in FlattenApiVersions( results ) )
+        for ( var i = 0; i < versions.Length; i++ )
         {
+            var version = versions[i];
             var formattedVersion = version.ToString( Options.GroupNameFormat, CurrentCulture );
 
-            for ( var i = 0; i < results.Count; i++ )
+            for ( var j = 0; j < results.Count; j++ )
             {
-                if ( unversioned != null && unversioned.ContainsKey( i ) )
+                if ( unversioned != null && unversioned.ContainsKey( j ) )
                 {
                     continue;
                 }
 
-                var result = results[i];
+                var result = results[j];
                 var action = result.ActionDescriptor;
 
                 if ( !ShouldExploreAction( action, version ) )
                 {
                     if ( IsUnversioned( action ) )
                     {
-                        unversioned ??= new();
-                        unversioned.Add( i, result );
+                        unversioned ??= [];
+                        unversioned.Add( j, result );
                     }
 
                     continue;
@@ -181,9 +183,9 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
         results.Clear();
 
-        for ( var i = 0; i < groupResults.Count; i++ )
+        for ( var j = 0; j < groupResults.Count; j++ )
         {
-            results.Add( groupResults[i] );
+            results.Add( groupResults[j] );
         }
 
         if ( unversioned == null )
@@ -289,7 +291,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         results.Add( result );
     }
 
-    private IEnumerable<ApiVersion> FlattenApiVersions( IList<ApiDescription> descriptions )
+    private ApiVersion[] FlattenApiVersions( IList<ApiDescription> descriptions )
     {
         var versions = default( SortedSet<ApiVersion> );
 
@@ -301,7 +303,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
             if ( versions is null && declaredVersions.Count > 0 )
             {
-                versions = new();
+                versions = [];
             }
 
             for ( var j = 0; j < declaredVersions.Count; j++ )
@@ -312,10 +314,10 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
         if ( versions is null )
         {
-            return new[] { Options.DefaultApiVersion };
+            return [Options.DefaultApiVersion];
         }
 
-        return versions;
+        return [.. versions];
     }
 
     private sealed class SimpleConstraintResolver : IInlineConstraintResolver

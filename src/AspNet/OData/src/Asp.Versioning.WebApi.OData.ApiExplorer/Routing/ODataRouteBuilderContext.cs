@@ -355,7 +355,7 @@ internal sealed class ODataRouteBuilderContext
                 {
                     if ( propertyNames is null )
                     {
-                        propertyNames = new();
+                        propertyNames = [];
                     }
                     else
                     {

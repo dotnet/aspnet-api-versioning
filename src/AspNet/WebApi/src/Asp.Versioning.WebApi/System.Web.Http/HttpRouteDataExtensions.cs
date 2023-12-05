@@ -33,6 +33,6 @@ internal static class HttpRouteDataExtensions
             }
         }
 
-        return list.ToArray();
+        return [.. list];
     }
 }

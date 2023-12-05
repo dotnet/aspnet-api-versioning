@@ -5,7 +5,6 @@ namespace Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 public class ApiVersionModelBinderTest
 {
@@ -59,7 +58,7 @@ public class ApiVersionModelBinderTest
 
         bindingContext.SetupGet( bc => bc.HttpContext ).Returns( httpContext );
         bindingContext.SetupProperty( bc => bc.Result );
-        bindingContext.SetupProperty( bc => bc.ValidationState, new ValidationStateDictionary() );
+        bindingContext.SetupProperty( bc => bc.ValidationState, [] );
 
         return bindingContext.Object;
     }

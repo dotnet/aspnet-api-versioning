@@ -258,7 +258,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         CollateControllerModels( controllerModels, visitedControllers, CollateActionModels( actionModels, visitedActions ) );
         ApplyCollatedModelsToActions( configuration, visitedActions );
 
-        return controllers.ToArray();
+        return [.. controllers];
     }
 
     private static void CollateControllerVersions(

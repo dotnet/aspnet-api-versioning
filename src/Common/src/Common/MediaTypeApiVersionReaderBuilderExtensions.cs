@@ -18,8 +18,7 @@ public static class MediaTypeApiVersionReaderBuilderExtensions
     public static T SelectFirstOrDefault<T>( this T builder ) where T : MediaTypeApiVersionReaderBuilder
     {
         ArgumentNullException.ThrowIfNull( builder );
-
-        builder.Select( static ( request, versions ) => versions.Count == 0 ? versions : new[] { versions[0] } );
+        builder.Select( static ( request, versions ) => versions.Count == 0 ? versions : [versions[0]] );
         return builder;
     }
 
@@ -34,8 +33,7 @@ public static class MediaTypeApiVersionReaderBuilderExtensions
     public static T SelectLastOrDefault<T>( this T builder ) where T : MediaTypeApiVersionReaderBuilder
     {
         ArgumentNullException.ThrowIfNull( builder );
-
-        builder.Select( static ( request, versions ) => versions.Count == 0 ? versions : new[] { versions[versions.Count - 1] } );
+        builder.Select( static ( request, versions ) => versions.Count == 0 ? versions : [versions[versions.Count - 1]] );
         return builder;
     }
 }
