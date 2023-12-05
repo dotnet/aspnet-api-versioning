@@ -2,6 +2,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
+  <DefaultTargetFramework>net8.0</DefaultTargetFramework>
+  <DotNetReleaseBasePackageVersion>8.0</DotNetReleaseBasePackageVersion>
+  <DotNetReleasePackageVersion>$(DotNetReleaseBasePackageVersion).0</DotNetReleasePackageVersion>
+  <CurrentTfmFolder>.net</CurrentTfmFolder>
   <RootDir>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), .gitignore))))</RootDir>
   <BuildDir>$([MSBuild]::EnsureTrailingSlash($(RootDir)build))</BuildDir>
   <BackportDir>$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::Combine('$(RootDir)','src','Common','src','Common.Backport'))))</BackportDir>
