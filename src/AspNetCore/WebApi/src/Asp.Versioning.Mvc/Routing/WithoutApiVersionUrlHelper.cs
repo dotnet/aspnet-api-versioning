@@ -28,7 +28,7 @@ internal sealed class WithoutApiVersionUrlHelper : IUrlHelper
         return decorated.Action( actionContext );
     }
 
-    [return: NotNullIfNotNull( "contentPath" )]
+    [return: NotNullIfNotNull( nameof( contentPath ) )]
     public string? Content( string? contentPath )
     {
         if ( Feature is IApiVersioningFeature feature )
