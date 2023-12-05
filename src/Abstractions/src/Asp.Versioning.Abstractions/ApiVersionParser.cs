@@ -336,11 +336,11 @@ public class ApiVersionParser : IApiVersionParser
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static FormatException InvalidGroupVersion( string value ) =>
-        new( string.Format( CultureInfo.CurrentCulture, SR.ApiVersionBadGroupVersion, value ) );
+        new( string.Format( CultureInfo.CurrentCulture, Format.ApiVersionBadGroupVersion, value ) );
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static FormatException InvalidStatus( string value ) =>
-        new( string.Format( CultureInfo.CurrentCulture, SR.ApiVersionBadStatus, value ) );
+        new( string.Format( CultureInfo.CurrentCulture, Format.ApiVersionBadStatus, value ) );
 
     private static bool IsDateLike( Text value )
     {

@@ -34,7 +34,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 
         if ( string.IsNullOrEmpty( parameterName ) && routePattern.Parameters.Count > 1 )
         {
-            var message = string.Format( CultureInfo.CurrentCulture, CommonSR.InvalidMediaTypeTemplate, template );
+            var message = string.Format( CultureInfo.CurrentCulture, Format.InvalidMediaTypeTemplate, template );
             throw new ArgumentException( message, nameof( template ) );
         }
 

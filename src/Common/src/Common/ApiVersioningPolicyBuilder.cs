@@ -27,7 +27,7 @@ public class ApiVersioningPolicyBuilder : IApiVersioningPolicyBuilder
     {
         if ( string.IsNullOrEmpty( name ) && apiVersion == null )
         {
-            var message = string.Format( CultureInfo.CurrentCulture, CommonSR.InvalidPolicyKey, nameof( name ), nameof( apiVersion ) );
+            var message = string.Format( CultureInfo.CurrentCulture, Format.InvalidPolicyKey, nameof( name ), nameof( apiVersion ) );
             throw new System.ArgumentException( message );
         }
 

@@ -52,7 +52,7 @@ internal static class EndpointProblem
         {
             var detail = string.Format(
                 CultureInfo.CurrentCulture,
-                SR.VersionedResourceNotSupported,
+                Format.VersionedResourceNotSupported,
                 new Uri( context.Request.GetDisplayUrl() ).SafeFullPath(),
                 context.ApiVersioningFeature().RawRequestedApiVersion );
 

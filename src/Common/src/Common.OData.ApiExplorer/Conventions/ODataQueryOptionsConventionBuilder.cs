@@ -78,7 +78,7 @@ public partial class ODataQueryOptionsConventionBuilder
             return typedBuilder;
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, ODataExpSR.ConventionStyleMismatch, key.Name );
+        var message = string.Format( CultureInfo.CurrentCulture, Format.ConventionStyleMismatch, key.Name );
         throw new InvalidOperationException( message );
     }
 
@@ -103,7 +103,7 @@ public partial class ODataQueryOptionsConventionBuilder
             return typedBuilder;
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, ODataExpSR.ConventionStyleMismatch, controllerType.Name );
+        var message = string.Format( CultureInfo.CurrentCulture, Format.ConventionStyleMismatch, controllerType.Name );
         throw new InvalidOperationException( message );
     }
 

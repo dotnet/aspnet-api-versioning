@@ -267,7 +267,7 @@ internal static class EndpointBuilderFinalizer
         throw new InvalidOperationException(
             string.Format(
                 CultureInfo.CurrentCulture,
-                SR.UnsetRequestDelegate,
+                Format.UnsetRequestDelegate,
                 nameof( RequestDelegate ),
                 nameof( RouteEndpoint ) ) );
 

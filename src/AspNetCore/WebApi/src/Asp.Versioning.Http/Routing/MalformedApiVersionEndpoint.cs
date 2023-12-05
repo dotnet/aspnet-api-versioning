@@ -29,7 +29,7 @@ internal sealed class MalformedApiVersionEndpoint : Endpoint
 
         var detail = string.Format(
             CultureInfo.CurrentCulture,
-            SR.VersionedResourceNotSupported,
+            Format.VersionedResourceNotSupported,
             new Uri( context.Request.GetDisplayUrl() ).SafeFullPath(),
             requestedVersion );
 

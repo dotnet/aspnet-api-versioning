@@ -102,7 +102,13 @@ public static class IApiVersioningBuilderExtensions
             }
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, SR.UnableToFindServices, nameof( IMvcBuilder ), "AddOData", "ConfigureServices(...)" );
+        var message = string.Format(
+            CultureInfo.CurrentCulture,
+            Format.UnableToFindServices,
+            nameof( IMvcBuilder ),
+            "AddOData",
+            "ConfigureServices(...)" );
+
         throw new InvalidOperationException( message );
     }
 

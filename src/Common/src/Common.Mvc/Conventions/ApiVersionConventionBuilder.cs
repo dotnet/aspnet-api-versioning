@@ -77,7 +77,7 @@ public partial class ApiVersionConventionBuilder : IApiVersionConventionBuilder
 
         // this should only ever happen if a subclass overrides Controller(Type) and adds a
         // IControllerConventionBuilder that is not covariant with IControllerConventionBuilder<TController>
-        var message = string.Format( CultureInfo.CurrentCulture, MvcSR.ConventionStyleMismatch, key.Name );
+        var message = string.Format( CultureInfo.CurrentCulture, MvcFormat.ConventionStyleMismatch, key.Name );
         throw new InvalidOperationException( message );
     }
 

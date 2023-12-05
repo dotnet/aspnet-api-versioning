@@ -18,6 +18,11 @@ using static Microsoft.AspNetCore.OData.Query.AllowedLogicalOperators;
 using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 #endif
 using static System.Globalization.CultureInfo;
+#if NETFRAMEWORK
+using Fmt = Asp.Versioning.ODataExpSR;
+#else
+using Fmt = Asp.Versioning.Format;
+#endif
 
 /// <summary>
 /// Represents the default <see cref="IODataQueryOptionDescriptionProvider">OData query option description provider.</see>.
@@ -51,7 +56,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             _ => throw new System.ArgumentException(
                     string.Format(
                         CurrentCulture,
-                        ODataExpSR.UnsupportedQueryOption,
+                        Fmt.UnsupportedQueryOption,
 #pragma warning disable IDE0079
 #pragma warning disable CA1308 // Normalize strings to uppercase (proper casing is lowercase)
                         queryOption.ToString().ToLowerInvariant() ),
@@ -77,7 +82,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         if ( context.MaxNodeCount > 1 )
         {
             description.Append( Space )
-                       .AppendFormat( CurrentCulture, ODataExpSR.MaxExpressionDesc, context.MaxNodeCount );
+                       .AppendFormat( CurrentCulture, Fmt.MaxExpressionDesc, context.MaxNodeCount );
         }
 
         AppendAllowedOptions( description, context );
@@ -87,7 +92,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
-                            ODataExpSR.AllowedPropertiesDesc,
+                            Fmt.AllowedPropertiesDesc,
                             string.Join( ", ", context.AllowedFilterProperties ) );
         }
 
@@ -116,7 +121,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         if ( hasMaxExpansionDepth )
         {
             description.Append( Space )
-                       .AppendFormat( CurrentCulture, ODataExpSR.MaxDepthDesc, context.MaxExpansionDepth );
+                       .AppendFormat( CurrentCulture, Fmt.MaxDepthDesc, context.MaxExpansionDepth );
         }
 
         if ( context.AllowedExpandProperties.Count > 0 )
@@ -124,7 +129,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
-                            ODataExpSR.AllowedPropertiesDesc,
+                            Fmt.AllowedPropertiesDesc,
                             string.Join( ", ", context.AllowedExpandProperties ) );
         }
 
@@ -150,7 +155,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
                 .Append( Space )
                 .AppendFormat(
                     CurrentCulture,
-                    ODataExpSR.AllowedPropertiesDesc,
+                    Fmt.AllowedPropertiesDesc,
                     string.Join( ", ", context.AllowedSelectProperties ) )
                 .ToString();
     }
@@ -177,7 +182,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         if ( hasMaxOrderByNodeCount )
         {
             description.Append( Space )
-                       .AppendFormat( CurrentCulture, ODataExpSR.MaxExpressionDesc, context.MaxOrderByNodeCount );
+                       .AppendFormat( CurrentCulture, Fmt.MaxExpressionDesc, context.MaxOrderByNodeCount );
         }
 
         if ( context.AllowedOrderByProperties.Count > 0 )
@@ -185,7 +190,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
-                            ODataExpSR.AllowedPropertiesDesc,
+                            Fmt.AllowedPropertiesDesc,
                             string.Join( ", ", context.AllowedOrderByProperties ) );
         }
 
@@ -209,7 +214,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         return GetOrCreateBuilder()
                 .Append( ODataExpSR.TopQueryOptionDesc )
                 .Append( Space )
-                .AppendFormat( CurrentCulture, ODataExpSR.MaxValueDesc, context.MaxTop )
+                .AppendFormat( CurrentCulture, Fmt.MaxValueDesc, context.MaxTop )
                 .ToString();
     }
 
@@ -230,7 +235,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         return GetOrCreateBuilder()
                 .Append( ODataExpSR.SkipQueryOptionDesc )
                 .Append( Space )
-                .AppendFormat( CurrentCulture, ODataExpSR.MaxValueDesc, context.MaxSkip )
+                .AppendFormat( CurrentCulture, Fmt.MaxValueDesc, context.MaxSkip )
                 .ToString();
     }
 
@@ -249,7 +254,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
-                            ODataExpSR.AllowedLogicalOperatorsDesc,
+                            Fmt.AllowedLogicalOperatorsDesc,
                             string.Join(
                                 ", ",
                                 EnumerateLogicalOperators( context.AllowedLogicalOperators ) ) );
@@ -261,7 +266,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
-                            ODataExpSR.AllowedArithmeticOperatorsDesc,
+                            Fmt.AllowedArithmeticOperatorsDesc,
                             string.Join(
                                 ", ",
                                 EnumerateArithmeticOperators( context.AllowedArithmeticOperators ) ) );
@@ -275,7 +280,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             description.Append( Space )
                        .AppendFormat(
                             CurrentCulture,
-                            ODataExpSR.AllowedFunctionsDesc,
+                            Fmt.AllowedFunctionsDesc,
                             context.AllowedFunctions.ToString().ToLowerInvariant() );
 #pragma warning restore CA1308 // Normalize strings to uppercase
 #pragma warning restore IDE0079

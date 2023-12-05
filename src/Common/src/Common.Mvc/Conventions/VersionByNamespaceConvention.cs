@@ -48,7 +48,7 @@ public class VersionByNamespaceConvention : IControllerConvention
             case 1:
                 break;
             default:
-                var message = string.Format( CultureInfo.CurrentCulture, MvcSR.MultipleApiVersionsInferredFromNamespaces, type.Namespace );
+                var message = string.Format( CultureInfo.CurrentCulture, MvcFormat.MultipleApiVersionsInferredFromNamespaces, type.Namespace );
                 throw new InvalidOperationException( message );
         }
 
