@@ -4,9 +4,9 @@ namespace Asp.Versioning.Conventions
 {
 #if NETFRAMEWORK
     using System.Web.Http;
+    using System.Web.Http.Results;
     using ControllerBase = System.Web.Http.ApiController;
     using ControllerModel = System.Web.Http.Controllers.HttpControllerDescriptor;
-    using IActionResult = System.Web.Http.IHttpActionResult;
 #else
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -126,7 +126,7 @@ namespace Asp.Versioning.Conventions
 
         private sealed class StubController : ControllerBase
         {
-            public IActionResult Get() => Ok();
+            public OkResult Get() => Ok();
         }
     }
 
@@ -139,7 +139,7 @@ namespace Asp.Versioning.Conventions
 #endif
         internal sealed class UndecoratedController : ControllerBase
         {
-            public IActionResult Get() => Ok();
+            public OkResult Get() => Ok();
         }
     }
 }

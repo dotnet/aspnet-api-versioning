@@ -198,7 +198,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
 
     private static bool TryMatchModelVersion(
         ApiDescription description,
-        IReadOnlyList<IODataRoutingMetadata> items,
+        IODataRoutingMetadata[] items,
         [NotNullWhen( true )] out IODataRoutingMetadata? metadata )
     {
         if ( description.GetApiVersion() is not ApiVersion apiVersion )
@@ -215,7 +215,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
             return false;
         }
 
-        for ( var i = 0; i < items.Count; i++ )
+        for ( var i = 0; i < items.Length; i++ )
         {
             var item = items[i];
             var otherApiVersion = item.Model.GetApiVersion();

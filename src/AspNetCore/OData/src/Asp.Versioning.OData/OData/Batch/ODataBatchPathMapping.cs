@@ -99,7 +99,7 @@ internal sealed class ODataBatchPathMapping
     private ODataBatchHandler? SelectBestCandidate(
         HttpContext context,
         ref PathString path,
-        IReadOnlyDictionary<ApiVersion, int> candidates,
+        Dictionary<ApiVersion, int> candidates,
         RouteValueDictionary routeData )
     {
         if ( candidates.Count == 0 )

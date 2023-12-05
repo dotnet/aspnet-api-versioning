@@ -41,7 +41,7 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
         return new( actions.ToArray(), 0 );
     }
 
-    private static void AddOrderActionDescriptors( ICollection<ActionDescriptor> actions )
+    private static void AddOrderActionDescriptors( List<ActionDescriptor> actions )
     {
         // api version 0.9 and 1.0
         actions.Add(
@@ -106,7 +106,7 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
                 advertised: new ApiVersion[] { new( 4, 0 ) } ) );
     }
 
-    private static void AddPeopleActionDescriptors( ICollection<ActionDescriptor> actions )
+    private static void AddPeopleActionDescriptors( List<ActionDescriptor> actions )
     {
         // api version 0.9 and 1.0
         actions.Add(

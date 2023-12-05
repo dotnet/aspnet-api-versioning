@@ -69,7 +69,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         return descriptions.OrderBy( d => d.ApiVersion ).ToArray();
     }
 
-    private void BucketizeApiVersions( IReadOnlyList<ApiVersionMetadata> metadata, ISet<ApiVersion> supported, ISet<ApiVersion> deprecated )
+    private void BucketizeApiVersions( IReadOnlyList<ApiVersionMetadata> metadata, HashSet<ApiVersion> supported, HashSet<ApiVersion> deprecated )
     {
         var declared = new HashSet<ApiVersion>();
         var advertisedSupported = new HashSet<ApiVersion>();
@@ -115,7 +115,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         }
     }
 
-    private void AppendDescriptions( ICollection<ApiVersionDescription> descriptions, IEnumerable<ApiVersion> versions, bool deprecated )
+    private void AppendDescriptions( List<ApiVersionDescription> descriptions, IEnumerable<ApiVersion> versions, bool deprecated )
     {
         foreach ( var version in versions )
         {

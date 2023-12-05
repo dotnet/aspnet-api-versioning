@@ -163,11 +163,11 @@ public class ApiVersionRouteConstraintTest
         return httpContext.Object;
     }
 
-    private static IRouteBuilder CreateRouteBuilder( IServiceProvider services )
+    private static RouteBuilder CreateRouteBuilder( IServiceProvider services )
     {
         var app = new Mock<IApplicationBuilder>();
         app.SetupGet( a => a.ApplicationServices ).Returns( services );
-        return new RouteBuilder( app.Object ) { DefaultHandler = new PassThroughRouter() };
+        return new( app.Object ) { DefaultHandler = new PassThroughRouter() };
     }
 
     private static IUrlHelper NewUrlHelper( string controller, string action, string version )

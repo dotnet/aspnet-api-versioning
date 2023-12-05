@@ -128,7 +128,7 @@ public static class IHttpClientBuilderExtensions
         return new( writer, apiVersion, notification, parser );
     }
 
-    private static IApiNotification? BuildFallbackNotification(
+    private static ApiVersionHandlerLogger<ApiVersionHandler>? BuildFallbackNotification(
         IServiceProvider serviceProvider,
         IApiVersionParser? parser )
     {
@@ -142,9 +142,6 @@ public static class IHttpClientBuilderExtensions
 
         var enumerable = serviceProvider.GetService<ApiVersionHeaderEnumerable>();
 
-        return new ApiVersionHandlerLogger<ApiVersionHandler>(
-            logger,
-            parser ?? ApiVersionParser.Default,
-            enumerable ?? new() );
+        return new( logger, parser ?? ApiVersionParser.Default, enumerable ?? new() );
     }
 }

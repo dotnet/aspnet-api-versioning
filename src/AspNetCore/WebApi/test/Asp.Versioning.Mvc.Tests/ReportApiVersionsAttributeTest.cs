@@ -66,7 +66,7 @@ public class ReportApiVersionsAttributeTest
 
     private static ActionExecutingContext CreateContext(
         ApiVersionMetadata metadata,
-        ICollection<(Func<object, Task> Callback, object State)> onStartResponse )
+        List<(Func<object, Task> Callback, object State)> onStartResponse )
     {
         var headers = new HeaderDictionary();
         var response = new Mock<HttpResponse>();
