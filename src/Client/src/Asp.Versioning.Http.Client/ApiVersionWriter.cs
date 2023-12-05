@@ -55,13 +55,8 @@ public static class ApiVersionWriter
         return new CombinedApiVersionWriter( writers );
     }
 
-    private sealed class CombinedApiVersionWriter : IApiVersionWriter
+    private sealed class CombinedApiVersionWriter( IApiVersionWriter[] apiVersionWriters ) : IApiVersionWriter
     {
-        private readonly IApiVersionWriter[] apiVersionWriters;
-
-        public CombinedApiVersionWriter( IApiVersionWriter[] apiVersionWriters ) =>
-            this.apiVersionWriters = apiVersionWriters;
-
         public void Write( HttpRequestMessage request, ApiVersion apiVersion )
         {
             for ( var i = 0; i < apiVersionWriters.Length; i++ )

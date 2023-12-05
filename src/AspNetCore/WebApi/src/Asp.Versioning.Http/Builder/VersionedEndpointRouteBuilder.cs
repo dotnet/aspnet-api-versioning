@@ -59,19 +59,11 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
     public virtual void Add( Action<EndpointBuilder> convention ) =>
         conventionBuilder.Add( convention );
 
-    private sealed class ServiceProviderDecorator : IServiceProvider
+    private sealed class ServiceProviderDecorator(
+        IServiceProvider decorated,
+        ApiVersionSetBuilder versionSetBuilder ) : IServiceProvider
     {
-        private readonly IServiceProvider decorated;
-        private readonly ApiVersionSetBuilder versionSetBuilder;
         private ApiVersionSet? versionSet;
-
-        internal ServiceProviderDecorator(
-            IServiceProvider decorated,
-            ApiVersionSetBuilder versionSetBuilder )
-        {
-            this.decorated = decorated;
-            this.versionSetBuilder = versionSetBuilder;
-        }
 
         public object? GetService( Type serviceType )
         {
@@ -89,19 +81,10 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
         }
     }
 
-    private sealed class EndpointDataSourceDecorator : EndpointDataSource
-    {
-        private readonly EndpointDataSource decorated;
-        private readonly ApiVersionSetBuilder versionSetBuilder;
-
-        internal EndpointDataSourceDecorator(
+    private sealed class EndpointDataSourceDecorator(
             EndpointDataSource decorated,
-            ApiVersionSetBuilder versionSetBuilder )
-        {
-            this.decorated = decorated;
-            this.versionSetBuilder = versionSetBuilder;
-        }
-
+            ApiVersionSetBuilder versionSetBuilder ) : EndpointDataSource
+    {
         public override IReadOnlyList<Endpoint> Endpoints => decorated.Endpoints;
 
         public override IChangeToken GetChangeToken() => decorated.GetChangeToken();
@@ -175,19 +158,10 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
         }
     }
 
-    private sealed class EndpointDataSourceCollectionAdapter : ICollection<EndpointDataSource>
-    {
-        private readonly ICollection<EndpointDataSource> adapted;
-        private readonly ApiVersionSetBuilder versionSetBuilder;
-
-        internal EndpointDataSourceCollectionAdapter(
+    private sealed class EndpointDataSourceCollectionAdapter(
             ICollection<EndpointDataSource> adapted,
-            ApiVersionSetBuilder versionSetBuilder )
-        {
-            this.adapted = adapted;
-            this.versionSetBuilder = versionSetBuilder;
-        }
-
+            ApiVersionSetBuilder versionSetBuilder ) : ICollection<EndpointDataSource>
+    {
         public int Count => adapted.Count;
 
         public bool IsReadOnly => adapted.IsReadOnly;

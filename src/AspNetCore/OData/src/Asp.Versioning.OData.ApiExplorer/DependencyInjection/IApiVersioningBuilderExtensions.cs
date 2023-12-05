@@ -60,12 +60,9 @@ public static class IApiVersioningBuilderExtensions
 #pragma warning disable IDE0079
 #pragma warning disable CA1812
 
-    private sealed class ODataApiExplorerOptionsAdapter : IOptionsFactory<ApiExplorerOptions>
+    private sealed class ODataApiExplorerOptionsAdapter( IOptionsFactory<ODataApiExplorerOptions> factory )
+        : IOptionsFactory<ApiExplorerOptions>
     {
-        private readonly IOptionsFactory<ODataApiExplorerOptions> factory;
-
-        public ODataApiExplorerOptionsAdapter( IOptionsFactory<ODataApiExplorerOptions> factory ) => this.factory = factory;
-
         public ApiExplorerOptions Create( string name ) => factory.Create( name );
     }
 }
