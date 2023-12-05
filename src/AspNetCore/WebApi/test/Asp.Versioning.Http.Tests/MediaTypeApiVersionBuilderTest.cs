@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable ASP0015 // Suggest using IHeaderDictionary properties
+
 namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Http;
@@ -260,7 +262,7 @@ public class MediaTypeApiVersionBuilderTest
     [InlineData( "application/vnd-v{v}+json", "v", "application/vnd-v2.1+json", "2.1" )]
     [InlineData( "application/vnd-v{ver}+json", "ver", "application/vnd-v2022-11-01+json", "2022-11-01" )]
     [InlineData( "application/vnd-{version}+xml", "version", "application/vnd-1.1-beta+xml", "1.1-beta" )]
-    public void read_should_retreive_version_from_media_type_template(
+    public void read_should_retrieve_version_from_media_type_template(
         string template,
         string parameterName,
         string mediaType,
