@@ -3,6 +3,7 @@
 namespace System.Web.Http;
 
 using Asp.Versioning;
+using Backport;
 using System.ComponentModel;
 using System.Web.Http.Controllers;
 
@@ -20,10 +21,7 @@ public static class HttpActionDescriptorExtensions
     /// <returns>The <see cref="ApiVersionMetadata">API version information</see> for the action.</returns>
     public static ApiVersionMetadata GetApiVersionMetadata( this HttpActionDescriptor action )
     {
-        if ( action == null )
-        {
-            throw new ArgumentNullException( nameof( action ) );
-        }
+        ArgumentNullException.ThrowIfNull( action );
 
         if ( action.Properties.TryGetValue( typeof( ApiVersionMetadata ), out ApiVersionMetadata? value ) )
         {
@@ -42,11 +40,7 @@ public static class HttpActionDescriptorExtensions
     [EditorBrowsable( EditorBrowsableState.Never )]
     public static void SetApiVersionMetadata( this HttpActionDescriptor action, ApiVersionMetadata value )
     {
-        if ( action == null )
-        {
-            throw new ArgumentNullException( nameof( action ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( action );
         action.Properties.AddOrUpdate( typeof( ApiVersionMetadata ), value, ( key, oldValue ) => value );
     }
 

@@ -15,10 +15,7 @@ public class ApiVersionModelBinder : IModelBinder
     /// <inheritdoc />
     public virtual Task BindModelAsync( ModelBindingContext bindingContext )
     {
-        if ( bindingContext == null )
-        {
-            throw new ArgumentNullException( nameof( bindingContext ) );
-        }
+        ArgumentNullException.ThrowIfNull( bindingContext );
 
         var feature = bindingContext.HttpContext.ApiVersioningFeature();
         var model = feature.RequestedApiVersion;

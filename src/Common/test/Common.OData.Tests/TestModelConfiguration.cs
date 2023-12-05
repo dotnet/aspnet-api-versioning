@@ -13,10 +13,14 @@ public class TestModelConfiguration : IModelConfiguration
 {
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
-        if ( builder == null )
+#if NETFRAMEWORK
+        if ( builder is null )
         {
             throw new ArgumentNullException( nameof( builder ) );
         }
+#else
+        ArgumentNullException.ThrowIfNull( builder );
+#endif
 
         var tests = builder.EntitySet<TestEntity>( "Tests" ).EntityType;
         var neutralTests = builder.EntitySet<TestNeutralEntity>( "NeutralTests" ).EntityType;

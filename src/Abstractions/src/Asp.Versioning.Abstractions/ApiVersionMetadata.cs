@@ -34,10 +34,7 @@ public class ApiVersionMetadata
     /// <param name="other">The other <see cref="ApiVersionMetadata">instance</see> to initialize from.</param>
     protected ApiVersionMetadata( ApiVersionMetadata other )
     {
-        if ( other == null )
-        {
-            throw new ArgumentNullException( nameof( other ) );
-        }
+        ArgumentNullException.ThrowIfNull( other );
 
         apiModel = other.apiModel;
         endpointModel = other.endpointModel;

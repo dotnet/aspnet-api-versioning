@@ -18,10 +18,7 @@ public static class IApiVersionParameterSourceExtensions
     /// <returns>True if the parameter source versions by query string; otherwise, false.</returns>
     public static bool VersionsByQueryString( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
     {
-        if ( source == null )
-        {
-            throw new ArgumentNullException( nameof( source ) );
-        }
+        ArgumentNullException.ThrowIfNull( source );
 
         var context = new DescriptionContext( Query );
 
@@ -39,10 +36,7 @@ public static class IApiVersionParameterSourceExtensions
     /// <returns>True if the parameter source versions by HTTP header; otherwise, false.</returns>
     public static bool VersionsByHeader( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
     {
-        if ( source == null )
-        {
-            throw new ArgumentNullException( nameof( source ) );
-        }
+        ArgumentNullException.ThrowIfNull( source );
 
         var context = new DescriptionContext( Header );
 
@@ -60,10 +54,7 @@ public static class IApiVersionParameterSourceExtensions
     /// <returns>True if the parameter source versions by URL path segment; otherwise, false.</returns>
     public static bool VersionsByUrl( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
     {
-        if ( source == null )
-        {
-            throw new ArgumentNullException( nameof( source ) );
-        }
+        ArgumentNullException.ThrowIfNull( source );
 
         var context = new DescriptionContext( Path );
 
@@ -81,10 +72,7 @@ public static class IApiVersionParameterSourceExtensions
     /// <returns>True if the parameter source versions by media type; otherwise, false.</returns>
     public static bool VersionsByMediaType( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
     {
-        if ( source == null )
-        {
-            throw new ArgumentNullException( nameof( source ) );
-        }
+        ArgumentNullException.ThrowIfNull( source );
 
         var context = new DescriptionContext( MediaTypeParameter );
 
@@ -102,10 +90,7 @@ public static class IApiVersionParameterSourceExtensions
     /// <paramref name="location"/> or <c>null</c>.</returns>
     public static string GetParameterName( this IApiVersionParameterSource source, ApiVersionParameterLocation location )
     {
-        if ( source == null )
-        {
-            throw new ArgumentNullException( nameof( source ) );
-        }
+        ArgumentNullException.ThrowIfNull( source );
 
         var context = new DescriptionContext( location );
 
@@ -122,10 +107,7 @@ public static class IApiVersionParameterSourceExtensions
     /// <returns>The names of the parameters defined by the parameter source for the specified <paramref name="location"/>.</returns>
     public static IReadOnlyList<string> GetParameterNames( this IApiVersionParameterSource source, ApiVersionParameterLocation location )
     {
-        if ( source == null )
-        {
-            throw new ArgumentNullException( nameof( source ) );
-        }
+        ArgumentNullException.ThrowIfNull( source );
 
         var context = new DescriptionContext( location );
 

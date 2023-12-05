@@ -32,10 +32,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
     /// <inheritdoc />
     public virtual void OnProvidersExecuted( ActionDescriptorProviderContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         foreach ( var actions in GroupActionsByController( context.Results ) )
         {
@@ -82,10 +79,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
     /// </remarks>
     protected virtual string GetControllerName( ActionDescriptor action )
     {
-        if ( action == null )
-        {
-            throw new ArgumentNullException( nameof( action ) );
-        }
+        ArgumentNullException.ThrowIfNull( action );
 
         if ( !action.RouteValues.TryGetValue( "controller", out var name ) || name is null )
         {

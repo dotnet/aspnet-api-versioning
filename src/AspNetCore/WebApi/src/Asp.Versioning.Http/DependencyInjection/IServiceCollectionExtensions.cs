@@ -49,10 +49,7 @@ public static partial class IServiceCollectionExtensions
     /// <returns>The original <paramref name="builder"/>.</returns>
     public static IApiVersioningBuilder EnableApiVersionBinding( this IApiVersioningBuilder builder )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         // currently required because there is no other hook.
         // 1. TryParse does not work because:
@@ -79,10 +76,7 @@ public static partial class IServiceCollectionExtensions
 
     private static void AddApiVersioningServices( IServiceCollection services )
     {
-        if ( services == null )
-        {
-            throw new ArgumentNullException( nameof( services ) );
-        }
+        ArgumentNullException.ThrowIfNull( services );
 
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
         services.AddSingleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );

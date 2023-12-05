@@ -2,6 +2,7 @@
 
 namespace System.Web.Http;
 
+using Backport;
 using System.Reflection;
 using System.Web.Http.Routing;
 using static System.Reflection.BindingFlags;
@@ -19,10 +20,7 @@ public static class HttpRouteCollectionExtensions
     /// <see cref="IHttpRoute">routes</see> mapped to their name.</returns>
     public static IReadOnlyDictionary<string, IHttpRoute> ToDictionary( this HttpRouteCollection routes )
     {
-        if ( routes == null )
-        {
-            throw new ArgumentNullException( nameof( routes ) );
-        }
+        ArgumentNullException.ThrowIfNull( routes );
 
         const string HostedHttpRouteCollection = "System.Web.Http.WebHost.Routing.HostedHttpRouteCollection";
 

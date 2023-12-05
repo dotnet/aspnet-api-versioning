@@ -24,11 +24,7 @@ public static class IApiVersioningBuilderExtensions
     /// <returns>The original <paramref name="builder"/>.</returns>
     public static IApiVersioningBuilder AddODataApiExplorer( this IApiVersioningBuilder builder )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         AddApiExplorerServices( builder );
         return builder;
     }
@@ -41,11 +37,7 @@ public static class IApiVersioningBuilderExtensions
     /// <returns>The original <paramref name="builder"/>.</returns>
     public static IApiVersioningBuilder AddODataApiExplorer( this IApiVersioningBuilder builder, Action<ODataApiExplorerOptions> setupAction )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         AddApiExplorerServices( builder );
         builder.Services.Configure( setupAction );
         return builder;

@@ -17,15 +17,8 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
     /// <inheritdoc />
     public ODataPath? Translate( ODataPathTemplate path, ODataTemplateTranslateContext context )
     {
-        if ( path == null )
-        {
-            throw new ArgumentNullException( nameof( path ) );
-        }
-
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( path );
+        ArgumentNullException.ThrowIfNull( context );
 
         var apiVersion = context.HttpContext.GetRequestedApiVersion();
 

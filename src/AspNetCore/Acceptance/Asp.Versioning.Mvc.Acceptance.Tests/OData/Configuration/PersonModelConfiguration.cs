@@ -25,15 +25,8 @@ public class PersonModelConfiguration : IModelConfiguration
 
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         switch ( apiVersion.MajorVersion )
         {

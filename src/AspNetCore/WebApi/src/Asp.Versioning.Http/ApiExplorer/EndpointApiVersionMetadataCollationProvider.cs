@@ -30,10 +30,7 @@ public sealed class EndpointApiVersionMetadataCollationProvider : IApiVersionMet
     /// <inheritdoc />
     public void Execute( ApiVersionMetadataCollationContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var endpoints = endpointDataSource.Endpoints;
 

@@ -22,10 +22,10 @@ public class ApiInformation
         SunsetPolicy sunsetPolicy,
         IReadOnlyDictionary<ApiVersion, Uri> openApiDocumentUrls )
     {
-        SupportedApiVersions = supportedVersions ?? throw new ArgumentNullException( nameof( supportedVersions ) );
-        DeprecatedApiVersions = deprecatedVersions ?? throw new ArgumentNullException( nameof( deprecatedVersions ) );
-        SunsetPolicy = sunsetPolicy ?? throw new ArgumentNullException( nameof( sunsetPolicy ) );
-        OpenApiDocumentUrls = openApiDocumentUrls ?? throw new ArgumentNullException( nameof( openApiDocumentUrls ) );
+        SupportedApiVersions = supportedVersions ?? throw new System.ArgumentNullException( nameof( supportedVersions ) );
+        DeprecatedApiVersions = deprecatedVersions ?? throw new System.ArgumentNullException( nameof( deprecatedVersions ) );
+        SunsetPolicy = sunsetPolicy ?? throw new System.ArgumentNullException( nameof( sunsetPolicy ) );
+        OpenApiDocumentUrls = openApiDocumentUrls ?? throw new System.ArgumentNullException( nameof( openApiDocumentUrls ) );
     }
 
     private ApiInformation()

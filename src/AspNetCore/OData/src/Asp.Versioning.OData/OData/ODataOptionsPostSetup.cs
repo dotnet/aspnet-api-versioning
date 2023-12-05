@@ -35,10 +35,7 @@ public class ODataOptionsPostSetup : IPostConfigureOptions<ODataOptions>
     /// <inheritdoc />
     public void PostConfigure( string? name, ODataOptions options )
     {
-        if ( options == null )
-        {
-            throw new ArgumentNullException( nameof( options ) );
-        }
+        ArgumentNullException.ThrowIfNull( options );
 
         var conventions = options.Conventions;
         var replacements = 0;

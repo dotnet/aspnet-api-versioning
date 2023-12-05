@@ -24,10 +24,7 @@ public static class IUrlHelperExtensions
     /// it would be erroneously added as a query string parameter.</remarks>
     public static IUrlHelper WithoutApiVersion( this IUrlHelper urlHelper )
     {
-        if ( urlHelper == null )
-        {
-            throw new ArgumentNullException( nameof( urlHelper ) );
-        }
+        ArgumentNullException.ThrowIfNull( urlHelper );
 
         if ( urlHelper is WithoutApiVersionUrlHelper ||
              urlHelper.ActionContext.HttpContext.Features.Get<IApiVersioningFeature>() is null )

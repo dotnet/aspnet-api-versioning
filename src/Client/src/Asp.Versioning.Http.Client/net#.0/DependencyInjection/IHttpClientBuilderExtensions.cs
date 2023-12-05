@@ -103,10 +103,7 @@ public static class IHttpClientBuilderExtensions
         ApiVersion apiVersion,
         IApiVersionWriter? apiVersionWriter = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         var services = builder.Services;
 

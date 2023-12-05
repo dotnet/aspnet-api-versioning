@@ -29,10 +29,7 @@ public sealed class ActionApiVersionMetadataCollationProvider : IApiVersionMetad
     /// <inheritdoc />
     public void Execute( ApiVersionMetadataCollationContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var actions = provider.ActionDescriptors.Items;
 

@@ -28,13 +28,8 @@ public static class IApiVersioningBuilderExtensions
     /// <returns>The original <paramref name="builder"/>.</returns>
     public static IApiVersioningBuilder AddMvc( this IApiVersioningBuilder builder )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         AddServices( builder.Services );
-
         return builder;
     }
 
@@ -46,10 +41,7 @@ public static class IApiVersioningBuilderExtensions
     /// <returns>The original <paramref name="builder"/>.</returns>
     public static IApiVersioningBuilder AddMvc( this IApiVersioningBuilder builder, Action<MvcApiVersioningOptions> setupAction )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         var services = builder.Services;
 

@@ -51,11 +51,7 @@ public class ApiVersionUrlHelper : IUrlHelper
     /// <inheritdoc />
     public virtual string? Action( UrlActionContext actionContext )
     {
-        if ( actionContext == null )
-        {
-            throw new ArgumentNullException( nameof( actionContext ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( actionContext );
         actionContext.Values = AddApiVersionRouteValueIfNecessary( actionContext.Values );
         return Url.Action( actionContext );
     }
@@ -81,11 +77,7 @@ public class ApiVersionUrlHelper : IUrlHelper
 #pragma warning restore CA1055 // URI-like return values should not be strings
 #pragma warning restore IDE0079
     {
-        if ( routeContext == null )
-        {
-            throw new ArgumentNullException( nameof( routeContext ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( routeContext );
         routeContext.Values = AddApiVersionRouteValueIfNecessary( routeContext.Values );
         return Url.RouteUrl( routeContext );
     }

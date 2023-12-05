@@ -26,10 +26,7 @@ public class ApiVersionUrlHelperFactory : IUrlHelperFactory
     /// <inheritdoc />
     public virtual IUrlHelper GetUrlHelper( ActionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var items = context.HttpContext.Items;
 

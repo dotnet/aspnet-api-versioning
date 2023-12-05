@@ -7,6 +7,7 @@ using Asp.Versioning.Controllers;
 using Asp.Versioning.Dependencies;
 using Asp.Versioning.Dispatcher;
 using Asp.Versioning.Formatting;
+using Backport;
 using System.Globalization;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
@@ -26,11 +27,7 @@ public static class HttpConfigurationExtensions
     /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
     public static ApiVersioningOptions GetApiVersioningOptions( this HttpConfiguration configuration )
     {
-        if ( configuration == null )
-        {
-            throw new ArgumentNullException( nameof( configuration ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( configuration );
         return configuration.ApiVersioningServices().ApiVersioningOptions;
     }
 
@@ -44,11 +41,7 @@ public static class HttpConfigurationExtensions
     /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.</remarks>
     public static void ConvertProblemDetailsToErrorObject( this HttpConfiguration configuration )
     {
-        if ( configuration == null )
-        {
-            throw new ArgumentNullException( nameof( configuration ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( configuration );
         configuration.Initializer += EnableErrorObjectResponses;
     }
 
@@ -58,11 +51,7 @@ public static class HttpConfigurationExtensions
     /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use service versioning.</param>
     public static void AddApiVersioning( this HttpConfiguration configuration )
     {
-        if ( configuration == null )
-        {
-            throw new ArgumentNullException( nameof( configuration ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( configuration );
         configuration.AddApiVersioning( new ApiVersioningOptions() );
     }
 
@@ -73,15 +62,8 @@ public static class HttpConfigurationExtensions
     /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
     public static void AddApiVersioning( this HttpConfiguration configuration, Action<ApiVersioningOptions> setupAction )
     {
-        if ( configuration == null )
-        {
-            throw new ArgumentNullException( nameof( configuration ) );
-        }
-
-        if ( setupAction == null )
-        {
-            throw new ArgumentNullException( nameof( setupAction ) );
-        }
+        ArgumentNullException.ThrowIfNull( configuration );
+        ArgumentNullException.ThrowIfNull( setupAction );
 
         var options = new ApiVersioningOptions();
 

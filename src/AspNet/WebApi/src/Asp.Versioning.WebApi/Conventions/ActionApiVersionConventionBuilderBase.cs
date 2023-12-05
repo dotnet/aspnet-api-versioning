@@ -13,10 +13,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
     /// <inheritdoc />
     public virtual void ApplyTo( HttpActionDescriptor item )
     {
-        if ( item == null )
-        {
-            throw new ArgumentNullException( nameof( item ) );
-        }
+        ArgumentNullException.ThrowIfNull( item );
 
         var attributes = new List<object>();
 

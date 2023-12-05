@@ -34,7 +34,13 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         ISunsetPolicyManager sunsetPolicyManager,
         IModelMetadataProvider modelMetadataProvider,
         IOptions<ApiExplorerOptions> options )
-        : this( sunsetPolicyManager, modelMetadataProvider, new SimpleConstraintResolver( options ), options ) { }
+        : this(
+              sunsetPolicyManager,
+              modelMetadataProvider,
+              new SimpleConstraintResolver( options ?? throw new ArgumentNullException( nameof( options ) ) ),
+              options )
+    {
+    }
 
     // intentionally hiding IInlineConstraintResolver from public signature until ASP.NET Core fixes their bug
     // BUG: https://github.com/dotnet/aspnetcore/issues/41773
@@ -110,10 +116,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// <remarks>The default implementation performs no action.</remarks>
     public virtual void OnProvidersExecuted( ApiDescriptionProviderContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var results = context.Results;
 

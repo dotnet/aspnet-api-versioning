@@ -61,10 +61,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     /// <inheritdoc />
     public Type NewStructuredType( IEdmModel model, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
     {
-        if ( model == null )
-        {
-            throw new ArgumentNullException( nameof( model ) );
-        }
+        ArgumentNullException.ThrowIfNull( model );
 
         if ( model.IsAdHoc() )
         {
@@ -79,20 +76,9 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
             }
         }
 
-        if ( structuredType == null )
-        {
-            throw new ArgumentNullException( nameof( structuredType ) );
-        }
-
-        if ( clrType == null )
-        {
-            throw new ArgumentNullException( nameof( clrType ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( structuredType );
+        ArgumentNullException.ThrowIfNull( clrType );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         generatedEdmTypesPerVersion ??= new();
 
@@ -104,10 +90,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     /// <inheritdoc />
     public Type NewActionParameters( IEdmModel model, IEdmAction action, string controllerName, ApiVersion apiVersion )
     {
-        if ( model == null )
-        {
-            throw new ArgumentNullException( nameof( model ) );
-        }
+        ArgumentNullException.ThrowIfNull( model );
 
         if ( !adHoc && model.IsAdHoc() )
         {
@@ -115,20 +98,9 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
             return adHocBuilder.NewActionParameters( model, action, controllerName, apiVersion );
         }
 
-        if ( action == null )
-        {
-            throw new ArgumentNullException( nameof( action ) );
-        }
-
-        if ( string.IsNullOrEmpty( controllerName ) )
-        {
-            throw new ArgumentNullException( nameof( controllerName ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( action );
+        ArgumentException.ThrowIfNullOrEmpty( controllerName );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         generatedActionParamsPerVersion ??= new();
 

@@ -15,26 +15,15 @@ public sealed class HeaderApiVersionWriter : IApiVersionWriter
     /// <param name="headerName">The HTTP header name to write the API version to.</param>
     public HeaderApiVersionWriter( string headerName )
     {
-        if ( string.IsNullOrEmpty( headerName ) )
-        {
-            throw new ArgumentNullException( headerName );
-        }
-
+        ArgumentException.ThrowIfNullOrEmpty( headerName );
         this.headerName = headerName;
     }
 
     /// <inheritdoc />
     public void Write( HttpRequestMessage request, ApiVersion apiVersion )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         var headers = request.Headers;
 

@@ -22,15 +22,8 @@ public partial class ApiVersionFormatProvider
         string? format,
         IFormatProvider? formatProvider )
     {
-        if ( text == null )
-        {
-            throw new ArgumentNullException( nameof( text ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( text );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         if ( !apiVersion.GroupVersion.HasValue || string.IsNullOrEmpty( format ) )
         {
@@ -106,15 +99,8 @@ public partial class ApiVersionFormatProvider
         string? format,
         IFormatProvider? formatProvider )
     {
-        if ( text == null )
-        {
-            throw new ArgumentNullException( nameof( text ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( text );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         if ( apiVersion.GroupVersion.HasValue )
         {

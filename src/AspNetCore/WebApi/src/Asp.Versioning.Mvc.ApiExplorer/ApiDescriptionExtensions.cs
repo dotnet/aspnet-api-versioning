@@ -37,10 +37,7 @@ public static class ApiDescriptionExtensions
     /// <returns><c>True</c> if the <see cref="ApiDescription">API description</see> is deprecated; otherwise, <c>false</c>.</returns>
     public static bool IsDeprecated( this ApiDescription apiDescription )
     {
-        if ( apiDescription == null )
-        {
-            throw new ArgumentNullException( nameof( apiDescription ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescription );
 
         var metatadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
 
@@ -81,15 +78,8 @@ public static class ApiDescriptionExtensions
     /// <returns>True if the <paramref name="apiDescription">API description</paramref> was updated; otherwise, false.</returns>
     public static bool TryUpdateRelativePathAndRemoveApiVersionParameter( this ApiDescription apiDescription, ApiExplorerOptions options )
     {
-        if ( apiDescription == null )
-        {
-            throw new ArgumentNullException( nameof( apiDescription ) );
-        }
-
-        if ( options == null )
-        {
-            throw new ArgumentNullException( nameof( options ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescription );
+        ArgumentNullException.ThrowIfNull( options );
 
         if ( !options.SubstituteApiVersionInUrl )
         {
@@ -137,10 +127,7 @@ public static class ApiDescriptionExtensions
     /// <returns>A new <see cref="ApiDescription">API description</see>.</returns>
     public static ApiDescription Clone( this ApiDescription apiDescription )
     {
-        if ( apiDescription == null )
-        {
-            throw new ArgumentNullException( nameof( apiDescription ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescription );
 
         var clone = new ApiDescription()
         {

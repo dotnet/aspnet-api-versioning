@@ -26,15 +26,8 @@ public readonly struct ApiVersionEnumerator : IEnumerable<ApiVersion>
         string headerName,
         IApiVersionParser? parser = default )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
-
-        if ( string.IsNullOrEmpty( headerName ) )
-        {
-            throw new ArgumentNullException( nameof( headerName ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
+        ArgumentException.ThrowIfNullOrEmpty( headerName );
 
         this.values =
             response.Headers.TryGetValues( headerName, out var values )

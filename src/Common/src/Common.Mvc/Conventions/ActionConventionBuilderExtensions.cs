@@ -35,16 +35,8 @@ public static class ActionConventionBuilderExtensions
         where TController : notnull
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( actionExpression == null )
-        {
-            throw new ArgumentNullException( nameof( actionExpression ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( actionExpression );
         return builder.Action( actionExpression.ExtractMethod() );
     }
 
@@ -65,16 +57,8 @@ public static class ActionConventionBuilderExtensions
         where TController : notnull
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( actionExpression == null )
-        {
-            throw new ArgumentNullException( nameof( actionExpression ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( actionExpression );
         return builder.Action( actionExpression.ExtractMethod() );
     }
 
@@ -91,11 +75,7 @@ public static class ActionConventionBuilderExtensions
     /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
     public static IActionConventionBuilder Action( this IActionConventionBuilder builder, string methodName, params Type[] argumentTypes )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         var method = ActionMethodResolver.Resolve( builder.ControllerType, methodName, argumentTypes );
         return builder.Action( method );
     }

@@ -23,26 +23,15 @@ public sealed class QueryStringApiVersionWriter : IApiVersionWriter
     /// <param name="parameterName">The query string parameter name to write the API version to.</param>
     public QueryStringApiVersionWriter( string parameterName )
     {
-        if ( string.IsNullOrEmpty( parameterName ) )
-        {
-            throw new ArgumentNullException( parameterName );
-        }
-
+        ArgumentException.ThrowIfNullOrEmpty( parameterName );
         this.parameterName = parameterName;
     }
 
     /// <inheritdoc />
     public void Write( HttpRequestMessage request, ApiVersion apiVersion )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         if ( request.RequestUri is not Uri url ||
              url.Query.Contains( parameterName, OrdinalIgnoreCase ) )

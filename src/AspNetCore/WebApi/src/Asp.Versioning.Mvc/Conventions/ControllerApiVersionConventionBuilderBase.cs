@@ -34,11 +34,7 @@ public abstract class ControllerApiVersionConventionBuilderBase : ApiVersionConv
     /// <param name="item">The <see cref="ControllerModel">controller model</see> to apply the conventions to.</param>
     public virtual void ApplyTo( ControllerModel item )
     {
-        if ( item == null )
-        {
-            throw new ArgumentNullException( nameof( item ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( item );
         MergeAttributesWithConventions( item.Attributes );
         ApplyActionConventions( item );
     }

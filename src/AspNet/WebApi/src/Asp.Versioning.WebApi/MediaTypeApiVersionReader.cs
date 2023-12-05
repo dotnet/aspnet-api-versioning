@@ -10,10 +10,7 @@ public partial class MediaTypeApiVersionReader
     /// <inheritdoc />
     public virtual IReadOnlyList<string> Read( HttpRequestMessage request )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
 
         var contentType = request.Content?.Headers.ContentType;
         var version = contentType is null ? default : ReadContentTypeHeader( contentType );

@@ -23,15 +23,11 @@ public sealed class ApiVersionHeaderEnumerable
         string supportedHeaderName = ApiSupportedVersions,
         string deprecatedHeaderName = ApiDeprecatedVersions )
     {
-        if ( string.IsNullOrEmpty( apiSupportedVersionsName = supportedHeaderName ) )
-        {
-            throw new ArgumentNullException( nameof( supportedHeaderName ) );
-        }
+        ArgumentException.ThrowIfNullOrEmpty( supportedHeaderName );
+        ArgumentException.ThrowIfNullOrEmpty( deprecatedHeaderName );
 
-        if ( string.IsNullOrEmpty( apiDeprecatedVersionsName = deprecatedHeaderName ) )
-        {
-            throw new ArgumentNullException( nameof( deprecatedHeaderName ) );
-        }
+        apiSupportedVersionsName = supportedHeaderName;
+        apiDeprecatedVersionsName = deprecatedHeaderName;
     }
 
     /// <summary>

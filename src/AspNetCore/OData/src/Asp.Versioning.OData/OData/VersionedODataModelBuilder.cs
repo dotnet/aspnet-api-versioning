@@ -20,12 +20,10 @@ public partial class VersionedODataModelBuilder
         IODataApiVersionCollectionProvider apiVersionCollectionProvider,
         IEnumerable<IModelConfiguration> modelConfigurations )
     {
-        if ( modelConfigurations == null )
-        {
-            throw new ArgumentNullException( nameof( modelConfigurations ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersionCollectionProvider );
+        ArgumentNullException.ThrowIfNull( modelConfigurations );
 
-        this.apiVersionCollectionProvider = apiVersionCollectionProvider ?? throw new ArgumentNullException( nameof( apiVersionCollectionProvider ) );
+        this.apiVersionCollectionProvider = apiVersionCollectionProvider;
 
         foreach ( var configuration in modelConfigurations )
         {

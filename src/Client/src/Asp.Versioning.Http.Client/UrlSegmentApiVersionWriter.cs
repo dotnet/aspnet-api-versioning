@@ -18,26 +18,15 @@ public sealed class UrlSegmentApiVersionWriter : IApiVersionWriter
     /// <param name="token">The replacement token to write the API version to.</param>
     public UrlSegmentApiVersionWriter( string token )
     {
-        if ( string.IsNullOrEmpty( token ) )
-        {
-            throw new ArgumentNullException( token );
-        }
-
+        ArgumentException.ThrowIfNullOrEmpty( token );
         this.token = token;
     }
 
     /// <inheritdoc />
     public void Write( HttpRequestMessage request, ApiVersion apiVersion )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         if ( request.RequestUri is not Uri url )
         {

@@ -21,10 +21,7 @@ public static class ModelExtensions
     [EditorBrowsable( EditorBrowsableState.Never )]
     public static ApiVersionModel GetApiVersionModel( this ControllerModel controller )
     {
-        if ( controller == null )
-        {
-            throw new ArgumentNullException( nameof( controller ) );
-        }
+        ArgumentNullException.ThrowIfNull( controller );
 
         if ( controller.Properties.TryGetValue( typeof( ApiVersionModel ), out var value ) &&
              value is ApiVersionModel model )

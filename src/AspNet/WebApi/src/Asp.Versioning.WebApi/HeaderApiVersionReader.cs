@@ -10,10 +10,7 @@ public partial class HeaderApiVersionReader
     /// <inheritdoc />
     public virtual IReadOnlyList<string> Read( HttpRequestMessage request )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
 
         var count = HeaderNames.Count;
 

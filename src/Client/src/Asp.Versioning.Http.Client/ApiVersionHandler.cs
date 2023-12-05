@@ -32,8 +32,8 @@ public class ApiVersionHandler : DelegatingHandler
         IApiVersionParser? parser = default,
         ApiVersionHeaderEnumerable? enumerable = default )
     {
-        this.apiVersionWriter = apiVersionWriter ?? throw new ArgumentNullException( nameof( apiVersionWriter ) );
-        this.apiVersion = apiVersion ?? throw new ArgumentNullException( nameof( apiVersion ) );
+        this.apiVersionWriter = apiVersionWriter ?? throw new System.ArgumentNullException( nameof( apiVersionWriter ) );
+        this.apiVersion = apiVersion ?? throw new System.ArgumentNullException( nameof( apiVersion ) );
         this.notification = notification ?? ApiNotification.None;
         this.parser = parser ?? ApiVersionParser.Default;
         this.enumerable = enumerable ?? new();
@@ -67,10 +67,7 @@ public class ApiVersionHandler : DelegatingHandler
     /// <returns>True if the requested API has been deprecated; otherwise, false.</returns>
     protected virtual bool IsDeprecatedApi( HttpResponseMessage response )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
 
         foreach ( var reportedApiVersion in enumerable.Deprecated( response, parser ) )
         {
@@ -91,10 +88,7 @@ public class ApiVersionHandler : DelegatingHandler
     /// <returns>True if the requested API has a newer, supported version than the one requested; otherwise, false.</returns>
     protected virtual bool IsNewApiAvailable( HttpResponseMessage response )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
 
         foreach ( var reportedApiVersion in enumerable.Supported( response, parser ) )
         {

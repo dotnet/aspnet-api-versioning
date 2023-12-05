@@ -61,10 +61,7 @@ public static class IServiceCollectionExtensions
     /// <param name="services">The extended <see cref="IServiceCollection"/>.</param>
     public static void AddModelConfigurationsAsServices( this IServiceCollection services )
     {
-        if ( services == null )
-        {
-            throw new ArgumentNullException( nameof( services ) );
-        }
+        ArgumentNullException.ThrowIfNull( services );
 
         var partManager = services.GetOrCreateApplicationPartManager();
 

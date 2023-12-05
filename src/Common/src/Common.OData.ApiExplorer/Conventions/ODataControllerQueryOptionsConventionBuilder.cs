@@ -28,7 +28,7 @@ public partial class ODataControllerQueryOptionsConventionBuilder : IODataQueryO
         if ( !webApiController.IsAssignableFrom( controllerType ) )
         {
             var message = string.Format( CultureInfo.CurrentCulture, ODataExpSR.RequiredInterfaceNotImplemented, controllerType, webApiController );
-            throw new ArgumentException( message );
+            throw new System.ArgumentException( message );
         }
 #endif
         ControllerType = controllerType;

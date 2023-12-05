@@ -2,8 +2,8 @@
 
 namespace Asp.Versioning.Routing;
 
-using Microsoft.AspNetCore.Routing.Patterns;
 using System.ComponentModel;
+using RoutePattern = Microsoft.AspNetCore.Routing.Patterns.RoutePattern;
 
 /// <summary>
 /// Provides extension methods for <see cref="RoutePattern"/>.
@@ -20,10 +20,7 @@ public static class RoutePatternExtensions
     /// <returns>True if the <paramref name="routePattern"/> has the <paramref name="constraintName"/>; otherwise, false.</returns>
     public static bool HasVersionConstraint( this RoutePattern routePattern, string constraintName )
     {
-        if ( routePattern == null )
-        {
-            throw new ArgumentNullException( nameof( routePattern ) );
-        }
+        ArgumentNullException.ThrowIfNull( routePattern );
 
         if ( string.IsNullOrEmpty( constraintName ) )
         {

@@ -22,10 +22,7 @@ public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfigu
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string? routePrefix )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         if ( types.Count == 0 )
         {

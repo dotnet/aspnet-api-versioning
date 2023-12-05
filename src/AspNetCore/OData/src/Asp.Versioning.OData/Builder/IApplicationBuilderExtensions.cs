@@ -17,11 +17,7 @@ public static class IApplicationBuilderExtensions
     /// <returns>The original <see cref="IApplicationBuilder"/>.</returns>
     public static IApplicationBuilder UseVersionedODataBatching( this IApplicationBuilder app )
     {
-        if ( app == null )
-        {
-            throw new ArgumentNullException( nameof( app ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( app );
         return app.UseMiddleware<VersionedODataBatchMiddleware>();
     }
 }

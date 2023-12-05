@@ -34,7 +34,7 @@ public partial class ODataQueryOptionDescriptionContext
     /// </summary>
     /// <param name="apiDescription">The associated <see cref="ApiDescription">API description</see>.</param>
     public ODataQueryOptionDescriptionContext( ApiDescription apiDescription ) =>
-        ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
+        ApiDescription = apiDescription ?? throw new System.ArgumentNullException( nameof( apiDescription ) );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQueryOptionDescriptionContext"/> class.
@@ -46,12 +46,10 @@ public partial class ODataQueryOptionDescriptionContext
         ApiDescription apiDescription,
         ODataValidationSettings validationSettings )
     {
-        if ( validationSettings == null )
-        {
-            throw new ArgumentNullException( nameof( validationSettings ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescription );
+        ArgumentNullException.ThrowIfNull( validationSettings );
 
-        ApiDescription = apiDescription ?? throw new ArgumentNullException( nameof( apiDescription ) );
+        ApiDescription = apiDescription;
         AllowedArithmeticOperators = validationSettings.AllowedArithmeticOperators;
         AllowedFunctions = validationSettings.AllowedFunctions;
         AllowedLogicalOperators = validationSettings.AllowedLogicalOperators;

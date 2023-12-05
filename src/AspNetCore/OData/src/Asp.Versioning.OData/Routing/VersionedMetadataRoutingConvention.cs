@@ -19,11 +19,7 @@ public class VersionedMetadataRoutingConvention : MetadataRoutingConvention
     /// <inheritdoc />
     public override bool AppliesToController( ODataControllerActionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( context );
         metadataController ??= typeof( VersionedMetadataController );
         return metadataController.IsAssignableFrom( context.Controller.ControllerType );
     }
@@ -31,10 +27,7 @@ public class VersionedMetadataRoutingConvention : MetadataRoutingConvention
     /// <inheritdoc />
     public override bool AppliesToAction( ODataControllerActionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var action = context.Action;
         var actionName = action.ActionMethod.Name;

@@ -24,7 +24,7 @@ public class SunsetPolicyBuilder : ISunsetPolicyBuilder
         if ( string.IsNullOrEmpty( name ) && apiVersion == null )
         {
             var message = string.Format( CultureInfo.CurrentCulture, CommonSR.InvalidPolicyKey, nameof( name ), nameof( apiVersion ) );
-            throw new ArgumentException( message );
+            throw new System.ArgumentException( message );
         }
 
         Name = name;
@@ -39,7 +39,7 @@ public class SunsetPolicyBuilder : ISunsetPolicyBuilder
 
     /// <inheritdoc />
     public virtual void Per( SunsetPolicy policy ) =>
-        sunsetPolicy = policy ?? throw new ArgumentNullException( nameof( policy ) );
+        sunsetPolicy = policy ?? throw new System.ArgumentNullException( nameof( policy ) );
 
     /// <inheritdoc />
     public virtual ISunsetPolicyBuilder Effective( DateTimeOffset sunsetDate )

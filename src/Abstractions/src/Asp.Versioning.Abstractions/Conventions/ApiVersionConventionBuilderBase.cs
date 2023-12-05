@@ -72,10 +72,7 @@ public abstract class ApiVersionConventionBuilderBase
     /// <param name="attributes">The <see cref="IReadOnlyList{T}">read-only list</see> of attributes to merge.</param>
     protected virtual void MergeAttributesWithConventions( IReadOnlyList<object> attributes )
     {
-        if ( attributes == null )
-        {
-            throw new ArgumentNullException( nameof( attributes ) );
-        }
+        ArgumentNullException.ThrowIfNull( attributes );
 
         if ( VersionNeutral )
         {

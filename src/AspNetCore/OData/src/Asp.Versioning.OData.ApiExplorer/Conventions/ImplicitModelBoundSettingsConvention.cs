@@ -13,10 +13,7 @@ public partial class ImplicitModelBoundSettingsConvention
     /// <inheritdoc />
     public void ApplyTo( ApiDescription apiDescription )
     {
-        if ( apiDescription == null )
-        {
-            throw new ArgumentNullException( nameof( apiDescription ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescription );
 
         var responses = apiDescription.SupportedResponseTypes;
 

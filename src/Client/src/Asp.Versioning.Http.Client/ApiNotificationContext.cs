@@ -16,8 +16,8 @@ public class ApiNotificationContext
     /// <param name="apiVersion">The requested API version.</param>
     public ApiNotificationContext( HttpResponseMessage response, ApiVersion apiVersion )
     {
-        Response = response ?? throw new ArgumentNullException( nameof( response ) );
-        ApiVersion = apiVersion ?? throw new ArgumentNullException( nameof( apiVersion ) );
+        Response = response ?? throw new System.ArgumentNullException( nameof( response ) );
+        ApiVersion = apiVersion ?? throw new System.ArgumentNullException( nameof( apiVersion ) );
     }
 
     /// <summary>

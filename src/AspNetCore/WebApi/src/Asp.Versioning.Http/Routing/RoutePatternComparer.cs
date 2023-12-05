@@ -2,7 +2,7 @@
 
 namespace Asp.Versioning.Routing;
 
-using Microsoft.AspNetCore.Routing.Patterns;
+using RoutePattern = Microsoft.AspNetCore.Routing.Patterns.RoutePattern;
 
 /// <summary>
 /// Represents a comparer for comparing <see cref="RoutePattern"/> instances.

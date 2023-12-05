@@ -43,15 +43,8 @@ public static partial class TypeExtensions
     /// provided <paramref name="context"/>.</returns>
     public static Type SubstituteIfNecessary( this Type type, TypeSubstitutionContext context )
     {
-        if ( type == null )
-        {
-            throw new ArgumentNullException( nameof( type ) );
-        }
-
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( type );
+        ArgumentNullException.ThrowIfNull( context );
 
         var openTypes = new Stack<Type>();
         var apiVersion = context.ApiVersion;

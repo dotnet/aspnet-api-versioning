@@ -23,10 +23,7 @@ public sealed class ApiVersionRouteConstraint : IRouteConstraint
     /// <returns>True if the route constraint is matched; otherwise, false.</returns>
     public bool Match( HttpContext? httpContext, IRouter? route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection )
     {
-        if ( values == null )
-        {
-            throw new ArgumentNullException( nameof( values ) );
-        }
+        ArgumentNullException.ThrowIfNull( values );
 
         if ( string.IsNullOrEmpty( routeKey ) )
         {
@@ -43,10 +40,7 @@ public sealed class ApiVersionRouteConstraint : IRouteConstraint
             return !string.IsNullOrEmpty( value );
         }
 
-        if ( httpContext == null )
-        {
-            throw new ArgumentNullException( nameof( httpContext ) );
-        }
+        ArgumentNullException.ThrowIfNull( httpContext );
 
         var parser = httpContext.RequestServices.GetRequiredService<IApiVersionParser>();
         var feature = httpContext.ApiVersioningFeature();

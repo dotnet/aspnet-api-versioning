@@ -14,10 +14,7 @@ public class OrderModelConfiguration : IModelConfiguration
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         var order = builder.EntitySet<Order>( "Orders" ).EntityType.HasKey( o => o.Id );
 

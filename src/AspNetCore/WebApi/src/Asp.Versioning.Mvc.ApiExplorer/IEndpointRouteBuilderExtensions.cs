@@ -20,10 +20,7 @@ public static class IEndpointRouteBuilderExtensions
     /// <returns>A new <see cref="IReadOnlyList{T}">read-only list</see> of<see cref="ApiVersionDescription">API version descriptions</see>.</returns>
     public static IReadOnlyList<ApiVersionDescription> DescribeApiVersions( this IEndpointRouteBuilder endpoints )
     {
-        if ( endpoints == null )
-        {
-            throw new ArgumentNullException( nameof( endpoints ) );
-        }
+        ArgumentNullException.ThrowIfNull( endpoints );
 
         var services = endpoints.ServiceProvider;
         var factory = services.GetRequiredService<IApiVersionDescriptionProviderFactory>();

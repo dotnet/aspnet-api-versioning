@@ -14,10 +14,7 @@ public class PersonModelConfiguration : IModelConfiguration
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         var person = builder.EntitySet<Person>( "People" ).EntityType.HasKey( p => p.Id );
 

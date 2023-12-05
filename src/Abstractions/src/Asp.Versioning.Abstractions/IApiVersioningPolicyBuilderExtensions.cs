@@ -19,11 +19,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( name, default );
     }
 
@@ -43,11 +39,7 @@ public static class IApiVersioningPolicyBuilderExtensions
         int? minorVersion = default,
         string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( name, new ApiVersion( majorVersion, minorVersion, status ) );
     }
 
@@ -61,11 +53,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name, double version, string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( name, new ApiVersion( version, status ) );
     }
 
@@ -81,11 +69,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name, int year, int month, int day, string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( name, new ApiVersion( new DateOnly( year, month, day ), status ) );
     }
 
@@ -99,11 +83,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name, DateOnly groupVersion, string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( name, new ApiVersion( groupVersion, status ) );
     }
 
@@ -115,11 +95,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, ApiVersion apiVersion )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( default, apiVersion );
     }
 
@@ -137,11 +113,7 @@ public static class IApiVersioningPolicyBuilderExtensions
         int? minorVersion = default,
         string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( default, new ApiVersion( majorVersion, minorVersion, status ) );
     }
 
@@ -154,11 +126,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, double version, string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( default, new ApiVersion( version, status ) );
     }
 
@@ -173,11 +141,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, int year, int month, int day, string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( default, new ApiVersion( new DateOnly( year, month, day ), status ) );
     }
 
@@ -190,11 +154,7 @@ public static class IApiVersioningPolicyBuilderExtensions
     /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
     public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, DateOnly groupVersion, string? status = default )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Sunset( default, new ApiVersion( groupVersion, status ) );
     }
 }
