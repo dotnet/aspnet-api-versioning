@@ -46,7 +46,7 @@ public partial class MediaTypeApiVersionReaderBuilder
         return this;
     }
 
-    private static IReadOnlyList<string> ReadMediaTypePattern(
+    private static string[] ReadMediaTypePattern(
         IReadOnlyList<MediaTypeHeaderValue> mediaTypes,
         TemplateMatcher matcher,
         string? parameterName )
@@ -103,11 +103,6 @@ public partial class MediaTypeApiVersionReaderBuilder
             }
         }
 
-        if ( version is null )
-        {
-            return Array.Empty<string>();
-        }
-
-        return versions is null ? new[] { version } : versions.ToArray();
+        return ToArray( ref version, versions );
     }
 }

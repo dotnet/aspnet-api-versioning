@@ -2,28 +2,36 @@
 
 #pragma warning disable IDE0079
 #pragma warning disable SA1121
-
-namespace Asp.Versioning;
+#pragma warning disable SA1135
+#pragma warning disable SA1200
 
 #if NETFRAMEWORK
 using System.Net.Http.Headers;
+using HttpRequest = System.Net.Http.HttpRequestMessage;
+using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeWithQualityHeaderValue;
 #else
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
+#endif
+
+namespace Asp.Versioning;
+
+#if !NETFRAMEWORK
 using System.Buffers;
 #endif
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 #if NETFRAMEWORK
-using HttpRequest = System.Net.Http.HttpRequestMessage;
 using Str = System.String;
 using StrComparer = System.StringComparer;
 #else
-using MediaTypeWithQualityHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 using Str = Microsoft.Extensions.Primitives.StringSegment;
 using StrComparer = Microsoft.Extensions.Primitives.StringSegmentComparer;
 #endif
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.StringComparison;
+using ReaderCallback = Func<IReadOnlyList<MediaTypeHeaderValue>, IReadOnlyList<string>>;
+using SelectorCallback = Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>>;
 
 /// <summary>
 /// Represents a builder for an API version reader that reads the value from a media type HTTP header in the request.
@@ -33,8 +41,8 @@ public partial class MediaTypeApiVersionReaderBuilder
     private HashSet<string>? parameters;
     private HashSet<Str>? included;
     private HashSet<Str>? excluded;
-    private Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>>? select;
-    private List<Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>>>? readers;
+    private SelectorCallback? select;
+    private List<ReaderCallback>? readers;
 
     /// <summary>
     /// Adds the name of a media type parameter to be read.
@@ -114,7 +122,7 @@ public partial class MediaTypeApiVersionReaderBuilder
     [CLSCompliant( false )]
 #endif
 #pragma warning disable CA1716 // Identifiers should not match keywords
-    public virtual MediaTypeApiVersionReaderBuilder Select( Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>> selector )
+    public virtual MediaTypeApiVersionReaderBuilder Select( SelectorCallback selector )
 #pragma warning restore CA1716 // Identifiers should not match keywords
     {
         select = selector;
@@ -149,7 +157,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 #if !NETFRAMEWORK
     [CLSCompliant( false )]
 #endif
-    protected void AddReader( Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>> reader )
+    protected void AddReader( ReaderCallback reader )
     {
         ArgumentNullException.ThrowIfNull( reader );
 
@@ -158,23 +166,29 @@ public partial class MediaTypeApiVersionReaderBuilder
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static ICollection<Str> EmptyCollection() => Array.Empty<Str>();
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static IReadOnlyList<Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>>> EmptyList() =>
-        Array.Empty<Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>>>();
-
     private static IReadOnlyList<string> DefaultSelector( HttpRequest request, IReadOnlyList<string> versions ) => versions;
 
-    private static IReadOnlyList<string> ReadMediaType(
-        IReadOnlyList<MediaTypeWithQualityHeaderValue> mediaTypes,
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static string[] ToArray( ref string? version, List<string>? versions )
+    {
+        if ( version is null )
+        {
+            return [];
+        }
+
+        return versions is null ? [version] : [.. versions];
+    }
+
+    private static string[] ReadMediaType(
+        IReadOnlyList<MediaTypeHeaderValue> mediaTypes,
         string pattern )
     {
         var version = default( string );
         var versions = default( List<string> );
         var regex = default( Regex );
+        var count = mediaTypes.Count;
 
-        for ( var i = 0; i < mediaTypes.Count; i++ )
+        for ( var i = 0; i < count; i++ )
         {
             var mediaType = mediaTypes[i].MediaType;
 
@@ -203,7 +217,7 @@ public partial class MediaTypeApiVersionReaderBuilder
                 }
                 else if ( versions == null )
                 {
-                    versions = new( capacity: mediaTypes.Count - i + 1 )
+                    versions = new( capacity: count - i + 1 )
                     {
                         version,
                         value,
@@ -218,22 +232,18 @@ public partial class MediaTypeApiVersionReaderBuilder
             }
         }
 
-        if ( version is null )
-        {
-            return Array.Empty<string>();
-        }
-
-        return versions is null ? new[] { version } : versions.ToArray();
+        return ToArray( ref version, versions );
     }
 
-    private static IReadOnlyList<string> ReadMediaTypeParameter(
-        IReadOnlyList<MediaTypeWithQualityHeaderValue> mediaTypes,
+    private static string[] ReadMediaTypeParameter(
+        IReadOnlyList<MediaTypeHeaderValue> mediaTypes,
         string parameterName )
     {
         var version = default( string );
         var versions = default( List<string> );
+        var count = mediaTypes.Count;
 
-        for ( var i = 0; i < mediaTypes.Count; i++ )
+        for ( var i = 0; i < count; i++ )
         {
             var mediaType = mediaTypes[i];
 
@@ -256,7 +266,7 @@ public partial class MediaTypeApiVersionReaderBuilder
                 }
                 else if ( versions == null )
                 {
-                    versions = new( capacity: mediaTypes.Count - i + 1 )
+                    versions = new( capacity: count - i + 1 )
                     {
                         version,
                         value,
@@ -269,28 +279,23 @@ public partial class MediaTypeApiVersionReaderBuilder
             }
         }
 
-        if ( version is null )
-        {
-            return Array.Empty<string>();
-        }
-
-        return versions is null ? new[] { version } : versions.ToArray();
+        return ToArray( ref version, versions );
     }
 
     private sealed class BuiltMediaTypeApiVersionReader : IApiVersionReader
     {
-        private readonly IReadOnlyList<string> parameters;
-        private readonly ICollection<Str> included;
-        private readonly ICollection<Str> excluded;
-        private readonly Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>> selector;
-        private readonly IReadOnlyList<Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>>> readers;
+        private readonly string[] parameters;
+        private readonly HashSet<Str> included;
+        private readonly HashSet<Str> excluded;
+        private readonly SelectorCallback selector;
+        private readonly ReaderCallback[] readers;
 
         internal BuiltMediaTypeApiVersionReader(
-            IReadOnlyList<string> parameters,
-            ICollection<Str> included,
-            ICollection<Str> excluded,
-            Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>> selector,
-            IReadOnlyList<Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>>> readers )
+            string[] parameters,
+            HashSet<Str> included,
+            HashSet<Str> excluded,
+            SelectorCallback selector,
+            ReaderCallback[] readers )
         {
             this.parameters = parameters;
             this.included = included;
@@ -301,18 +306,15 @@ public partial class MediaTypeApiVersionReaderBuilder
 
         public void AddParameters( IApiVersionParameterDescriptionContext context )
         {
-            if ( context == null )
-            {
-                throw new ArgumentNullException( nameof( context ) );
-            }
+            ArgumentNullException.ThrowIfNull( context );
 
-            if ( parameters.Count == 0 )
+            if ( parameters.Length == 0 )
             {
                 context.AddParameter( name: string.Empty, MediaTypeParameter );
             }
             else
             {
-                for ( var i = 0; i < parameters.Count; i++ )
+                for ( var i = 0; i < parameters.Length; i++ )
                 {
                     context.AddParameter( parameters[i], MediaTypeParameter );
                 }
@@ -321,7 +323,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 
         public IReadOnlyList<string> Read( HttpRequest request )
         {
-            if ( readers.Count == 0 )
+            if ( readers.Length == 0 )
             {
                 return Array.Empty<string>();
             }
@@ -329,22 +331,21 @@ public partial class MediaTypeApiVersionReaderBuilder
 #if NETFRAMEWORK
             var headers = request.Headers;
             var contentType = request.Content?.Headers.ContentType;
-            var accept = headers.Accept;
 #else
             var headers = request.GetTypedHeaders();
             var contentType = headers.ContentType;
-            var accept = headers.Accept;
 #endif
+            var accept = headers.Accept;
             var version = default( string );
             var versions = default( SortedSet<string> );
-            var mediaTypes = default( List<MediaTypeWithQualityHeaderValue> );
+            var mediaTypes = default( List<MediaTypeHeaderValue> );
 
             if ( contentType != null )
             {
 #if NETFRAMEWORK
-                mediaTypes = new() { MediaTypeWithQualityHeaderValue.Parse( contentType.ToString() ) };
+                mediaTypes = [MediaTypeHeaderValue.Parse( contentType.ToString() )];
 #else
-                mediaTypes = new() { contentType };
+                mediaTypes = [contentType];
 #endif
             }
 
@@ -376,13 +377,13 @@ public partial class MediaTypeApiVersionReaderBuilder
 
             if ( versions == null )
             {
-                return version == null ? Array.Empty<string>() : new[] { version };
+                return version == null ? Array.Empty<string>() : [version];
             }
 
             return selector( request, versions.ToArray() );
         }
 
-        private void Filter( IList<MediaTypeWithQualityHeaderValue> mediaTypes )
+        private void Filter( List<MediaTypeHeaderValue> mediaTypes )
         {
             if ( excluded.Count > 0 )
             {
@@ -412,11 +413,11 @@ public partial class MediaTypeApiVersionReaderBuilder
         }
 
         private void Read(
-            List<MediaTypeWithQualityHeaderValue> mediaTypes,
+            IReadOnlyList<MediaTypeHeaderValue> mediaTypes,
             ref string? version,
             ref SortedSet<string>? versions )
         {
-            for ( var i = 0; i < readers.Count; i++ )
+            for ( var i = 0; i < readers.Length; i++ )
             {
                 var result = readers[i]( mediaTypes );
 
