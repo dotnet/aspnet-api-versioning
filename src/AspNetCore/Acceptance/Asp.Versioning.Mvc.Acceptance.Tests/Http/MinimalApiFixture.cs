@@ -1,5 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable ASP0018 // Unused route parameter
+
 namespace Asp.Versioning.Http;
 
 using Asp.Versioning.Conventions;
@@ -11,23 +14,15 @@ public class MinimalApiFixture : HttpServerFixture
 {
     protected override void OnConfigureEndpoints( IEndpointRouteBuilder endpoints )
     {
+        endpoints.MapGet( "api/ping", () => Results.NoContent() )
+                 .WithApiVersionSet( endpoints.NewApiVersionSet().Build() )
+                 .IsApiVersionNeutral();
+
         var values = endpoints.NewApiVersionSet( "Values" )
                               .HasApiVersion( 1.0 )
                               .HasApiVersion( 2.0 )
                               .ReportApiVersions()
                               .Build();
-
-        var helloWorld = endpoints.NewApiVersionSet( "Hello World" )
-                                  .HasApiVersion( 1.0 )
-                                  .HasApiVersion( 2.0 )
-                                  .ReportApiVersions()
-                                  .Build();
-
-        var orders = endpoints.NewApiVersionSet( "Orders" ).Build();
-
-        endpoints.MapGet( "api/ping", () => Results.NoContent() )
-                 .WithApiVersionSet( endpoints.NewApiVersionSet().Build() )
-                 .IsApiVersionNeutral();
 
         endpoints.MapGet( "api/values", () => "Value 1" )
                  .WithApiVersionSet( values )
@@ -37,44 +32,27 @@ public class MinimalApiFixture : HttpServerFixture
                  .WithApiVersionSet( values )
                  .MapToApiVersion( 2.0 );
 
-        endpoints.MapGet( "api/v{version:apiVersion}/hello", () => "Hello world!" )
-                 .WithApiVersionSet( helloWorld )
-                 .MapToApiVersion( 1.0 );
+        var orders = endpoints.NewVersionedApi( "Orders" )
+                              .MapGroup( "api/order" )
+                              .HasApiVersion( 1.0 )
+                              .HasApiVersion( 2.0 );
 
-        endpoints.MapGet( "api/v{version:apiVersion}/hello/{text}", ( string text ) => text )
-                 .WithApiVersionSet( helloWorld )
-                 .MapToApiVersion( 1.0 );
+        orders.MapGet( "/", () => Results.Ok() );
+        orders.MapGet( "/{id}", ( int id ) => Results.Ok() ).HasDeprecatedApiVersion( 0.9 );
+        orders.MapPost( "/", () => Results.Created() );
+        orders.MapDelete( "/{id}", ( int id ) => Results.NoContent() ).IsApiVersionNeutral();
 
-        endpoints.MapGet( "api/v{version:apiVersion}/hello", () => "Hello world! (v2)" )
-                 .WithApiVersionSet( helloWorld )
-                 .MapToApiVersion( 2.0 );
+        var helloWorld = endpoints.NewVersionedApi( "Orders" )
+                                  .MapGroup( "api/v{version:apiVersion}/hello" )
+                                  .HasApiVersion( 1.0 )
+                                  .HasApiVersion( 2.0 )
+                                  .ReportApiVersions();
 
-        endpoints.MapGet( "api/v{version:apiVersion}/hello/{text}", ( string text ) => text + " (v2)" )
-                 .WithApiVersionSet( helloWorld )
-                 .MapToApiVersion( 2.0 );
-
-        endpoints.MapPost( "api/v{version:apiVersion}/hello", () => { } )
-                 .WithApiVersionSet( helloWorld );
-
-        endpoints.MapGet( "api/order", () => { } )
-                 .WithApiVersionSet( orders )
-                 .HasApiVersion( 1.0 )
-                 .HasApiVersion( 2.0 );
-
-        endpoints.MapGet( "api/order/{id}", ( int id ) => { } )
-                 .WithApiVersionSet( orders )
-                 .HasDeprecatedApiVersion( 0.9 )
-                 .HasApiVersion( 1.0 )
-                 .HasApiVersion( 2.0 );
-
-        endpoints.MapPost( "api/order", () => { } )
-                 .WithApiVersionSet( orders )
-                 .HasApiVersion( 1.0 )
-                 .HasApiVersion( 2.0 );
-
-        endpoints.MapDelete( "api/order/{id}", ( int id ) => { } )
-                 .WithApiVersionSet( orders )
-                 .IsApiVersionNeutral();
+        helloWorld.MapGet( "/", () => "Hello world!" ).MapToApiVersion( 1.0 );
+        helloWorld.MapGet( "/{text}", ( string text ) => text ).MapToApiVersion( 1.0 );
+        helloWorld.MapGet( "/", () => "Hello world! (v2)" ).MapToApiVersion( 2.0 );
+        helloWorld.MapGet( "/{text}", ( string text ) => text + " (v2)" ).MapToApiVersion( 2.0 );
+        helloWorld.MapPost( "/", () => { } );
     }
 
     protected override void OnAddApiVersioning( ApiVersioningOptions options )
