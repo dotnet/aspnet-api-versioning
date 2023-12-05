@@ -161,12 +161,8 @@ public static class IApiVersioningBuilderExtensions
         return Describe( typeof( IHttpContextFactory ), NewFactory, lifetime );
     }
 
-    private sealed class HttpContextFactoryDecorator : IHttpContextFactory
+    private sealed class HttpContextFactoryDecorator( IHttpContextFactory decorated ) : IHttpContextFactory
     {
-        private readonly IHttpContextFactory decorated;
-
-        public HttpContextFactoryDecorator( IHttpContextFactory decorated ) => this.decorated = decorated;
-
         public HttpContext Create( IFeatureCollection featureCollection )
         {
             // features do not support cloning or DI, which is precisely why ASP.NET Core no longer supports

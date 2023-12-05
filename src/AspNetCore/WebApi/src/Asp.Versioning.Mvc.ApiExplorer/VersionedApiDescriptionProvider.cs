@@ -320,12 +320,8 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         return [.. versions];
     }
 
-    private sealed class SimpleConstraintResolver : IInlineConstraintResolver
+    private sealed class SimpleConstraintResolver( IOptions<ApiExplorerOptions> options ) : IInlineConstraintResolver
     {
-        private readonly IOptions<ApiExplorerOptions> options;
-
-        internal SimpleConstraintResolver( IOptions<ApiExplorerOptions> options ) => this.options = options;
-
         public IRouteConstraint? ResolveConstraint( string inlineConstraint )
         {
             if ( options.Value.RouteConstraintName == inlineConstraint )

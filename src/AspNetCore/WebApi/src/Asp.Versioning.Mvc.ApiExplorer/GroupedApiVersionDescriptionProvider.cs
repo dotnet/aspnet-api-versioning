@@ -143,21 +143,15 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         }
     }
 
-    private sealed class ApiVersionDescriptionCollection
-    {
-        private readonly object syncRoot = new();
-        private readonly GroupedApiVersionDescriptionProvider provider;
-        private readonly IApiVersionMetadataCollationProvider[] collators;
-        private IReadOnlyList<ApiVersionDescription>? items;
-        private int version;
-
-        public ApiVersionDescriptionCollection(
+    private sealed class ApiVersionDescriptionCollection(
             GroupedApiVersionDescriptionProvider provider,
             IEnumerable<IApiVersionMetadataCollationProvider> collators )
-        {
-            this.provider = provider;
-            this.collators = collators.ToArray();
-        }
+    {
+        private readonly object syncRoot = new();
+        private readonly GroupedApiVersionDescriptionProvider provider = provider;
+        private readonly IApiVersionMetadataCollationProvider[] collators = collators.ToArray();
+        private IReadOnlyList<ApiVersionDescription>? items;
+        private int version;
 
         public IReadOnlyList<ApiVersionDescription> Items
         {

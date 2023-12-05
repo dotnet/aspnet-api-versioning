@@ -479,18 +479,11 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     bool INodeBuilderPolicy.AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints ) =>
         !ContainsDynamicEndpoints( endpoints ) && AppliesToEndpoints( endpoints );
 
-    private readonly struct Match
+    private readonly struct Match( int index, int score, bool isExplicit )
     {
-        internal readonly int Index;
-        internal readonly int Score;
-        internal readonly bool IsExplicit;
-
-        internal Match( int index, int score, bool isExplicit )
-        {
-            Index = index;
-            Score = score;
-            IsExplicit = isExplicit;
-        }
+        internal readonly int Index = index;
+        internal readonly int Score = score;
+        internal readonly bool IsExplicit = isExplicit;
 
         internal int CompareTo( in Match other )
         {
@@ -499,21 +492,14 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         }
     }
 
-    private sealed class ApiVersionCollator
+    private sealed class ApiVersionCollator(
+            IEnumerable<IApiVersionMetadataCollationProvider> providers,
+            IOptions<ApiVersioningOptions> options )
     {
-        private readonly IApiVersionMetadataCollationProvider[] providers;
-        private readonly IOptions<ApiVersioningOptions> options;
+        private readonly IApiVersionMetadataCollationProvider[] providers = providers.ToArray();
         private readonly object syncRoot = new();
         private IReadOnlyList<ApiVersion>? items;
         private int version;
-
-        internal ApiVersionCollator(
-            IEnumerable<IApiVersionMetadataCollationProvider> providers,
-            IOptions<ApiVersioningOptions> options )
-        {
-            this.providers = providers.ToArray();
-            this.options = options;
-        }
 
         public IReadOnlyList<ApiVersion> Items
         {
