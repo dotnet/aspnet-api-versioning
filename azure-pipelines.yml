@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
     - main
+    - release/*
   paths:
     exclude:
     - .config
@@ -16,6 +17,7 @@ trigger:
 
 pr:
 - main
+- release/*
 
 # build at least once a month so the build badge is up-to-date
 schedules:

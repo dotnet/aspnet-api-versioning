@@ -19,7 +19,7 @@ updates:
   # only servicing 5.x release
   - package-ecosystem: "nuget"
     directory: "/"
-    target-branch: "release/5.0"
+    target-branch: "release/5.1"
     schedule:
       interval: "monthly"
     allow:
@@ -29,5 +29,5 @@ updates:
     reviewers:
       - "commonsensesoftware"
     commit-message:
-      prefix: "[release/5.0] "
+      prefix: "[release/5.1] "
       include: scope
