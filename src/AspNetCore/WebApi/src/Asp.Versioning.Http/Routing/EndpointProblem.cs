@@ -56,7 +56,7 @@ internal static class EndpointProblem
                 new Uri( context.Request.GetDisplayUrl() ).SafeFullPath(),
                 context.ApiVersioningFeature().RawRequestedApiVersion );
 
-            return problemDetails.WriteAsync( New( context, Unsupported, detail ) ).AsTask();
+            return problemDetails.TryWriteAsync( New( context, Unsupported, detail ) ).AsTask();
         }
 
         return Task.CompletedTask;

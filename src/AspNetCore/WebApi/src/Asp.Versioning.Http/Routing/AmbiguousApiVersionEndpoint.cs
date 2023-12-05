@@ -32,7 +32,7 @@ internal sealed class AmbiguousApiVersionEndpoint : Endpoint
             Format.MultipleDifferentApiVersionsRequested,
             string.Join( ", ", apiVersions ) );
 
-        return problemDetails.WriteAsync(
+        return problemDetails.TryWriteAsync(
             EndpointProblem.New(
                 context,
                 ProblemDetailsDefaults.Ambiguous,
