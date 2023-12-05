@@ -29,8 +29,8 @@ public partial class MediaTypeApiVersionReaderBuilder
             var parser = new RouteParser();
             var parsedRoute = parser.Parse( template );
             var segments = from content in parsedRoute.PathSegments.OfType<IPathContentSegment>()
-                             from segment in content.Subsegments.OfType<IPathParameterSubsegment>()
-                             select segment;
+                           from segment in content.Subsegments.OfType<IPathParameterSubsegment>()
+                           select segment;
 
             if ( segments.Count() > 1 )
             {
@@ -108,11 +108,6 @@ public partial class MediaTypeApiVersionReaderBuilder
             }
         }
 
-        if ( version is null )
-        {
-            return Array.Empty<string>();
-        }
-
-        return versions is null ? new[] { version } : versions.ToArray();
+        return ToArray( ref version, versions );
     }
 }
