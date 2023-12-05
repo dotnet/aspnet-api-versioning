@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
- 
+
  <PropertyGroup>
-  <VersionPrefix>7.0.0</VersionPrefix>
-  <AssemblyVersion>7.0.0.0</AssemblyVersion>
+  <VersionPrefix>8.0.0</VersionPrefix>
+  <AssemblyVersion>8.0.0.0</AssemblyVersion>
   <TargetFrameworks>$(DefaultTargetFramework);netstandard1.0;netstandard2.0</TargetFrameworks>
   <AssemblyTitle>API Versioning Abstractions</AssemblyTitle>
   <Description>The abstractions library for API versioning.</Description>
@@ -40,11 +40,10 @@
 
  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
   <Using Include="Backport.ArgumentNullException" Alias="ArgumentNullException" />
-  <Compile Include="$(BackportDir)HashCode.cs" Visible="false" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard1.0' ">
   <PackageReference Include="Microsoft.Extensions.Primitives" Version="$(DotNetReleasePackageVersion)" />
  </ItemGroup>
- 
+
 </Project>

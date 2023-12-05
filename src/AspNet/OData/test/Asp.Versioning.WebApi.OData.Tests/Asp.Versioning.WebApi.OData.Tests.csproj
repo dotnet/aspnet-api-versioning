@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-   <TargetFrameworks>net452;net472</TargetFrameworks>
-   <RootNamespace>Asp.Versioning</RootNamespace>
-  </PropertyGroup>
+ <PropertyGroup>
+  <TargetFrameworks>net452;net472</TargetFrameworks>
+  <RootNamespace>Asp.Versioning</RootNamespace>
+ </PropertyGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\src\Asp.Versioning.WebApi.OData\Asp.Versioning.WebApi.OData.csproj" />
