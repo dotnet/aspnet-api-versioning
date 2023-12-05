@@ -3,7 +3,7 @@
  <PropertyGroup>
   <VersionPrefix>7.0.1</VersionPrefix>
   <AssemblyVersion>7.0.0.0</AssemblyVersion>
-  <TargetFrameworks>net7.0;netstandard1.1;netstandard2.0</TargetFrameworks>
+  <TargetFrameworks>$(DefaultTargetFramework);netstandard1.1;netstandard2.0</TargetFrameworks>
   <RootNamespace>Asp.Versioning.Http</RootNamespace>
   <AssemblyTitle>API Versioning Client Extensions</AssemblyTitle>
   <Description>The HTTP client extensions library for API versioning.</Description>
@@ -11,8 +11,8 @@
  </PropertyGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-  <Compile Remove="net7.0\**\*.cs" />
-  <None Include="net7.0\**\*.cs" />
+  <Compile Remove="net#.0\**\*.cs" />
+  <None Include="net#.0\**\*.cs" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
@@ -27,8 +27,9 @@
   <PackageReference Include="System.Net.Http" Version="4.3.4" />
  </ItemGroup>
 
- <ItemGroup Condition=" ('$(TargetFramework)' == 'net7.0') OR ('$(TargetFramework)' == 'netstandard2.0') ">
-  <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+ <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard1.1' ">
+  <PackageReference Include="Microsoft.Extensions.Http" Version="$(DotNetReleasePackageVersion)" />
+ </ItemGroup>
  </ItemGroup>
 
  <ItemGroup>

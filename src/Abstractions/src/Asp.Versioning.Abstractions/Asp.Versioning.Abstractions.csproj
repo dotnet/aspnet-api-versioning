@@ -3,7 +3,7 @@
  <PropertyGroup>
   <VersionPrefix>7.0.0</VersionPrefix>
   <AssemblyVersion>7.0.0.0</AssemblyVersion>
-  <TargetFrameworks>net7.0;netstandard1.0;netstandard2.0</TargetFrameworks>
+  <TargetFrameworks>$(DefaultTargetFramework);netstandard1.0;netstandard2.0</TargetFrameworks>
   <AssemblyTitle>API Versioning Abstractions</AssemblyTitle>
   <Description>The abstractions library for API versioning.</Description>
   <RootNamespace>Asp.Versioning</RootNamespace>
@@ -11,8 +11,8 @@
  </PropertyGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-  <Compile Remove="netstandard2.0\**\*.cs;net7.0\**\*.cs" />
-  <None Include="netstandard2.0\**\*.cs;net7.0\**\*.cs" />
+  <Compile Remove="netstandard2.0\**\*.cs;net#.0\**\*.cs" />
+  <None Include="netstandard2.0\**\*.cs;net#.0\**\*.cs" />
   <Using Remove="System.Net.Http" />
  </ItemGroup>
 
@@ -22,8 +22,8 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-  <Compile Remove="net7.0\**\*.cs" />
-  <None Include="net7.0\**\*.cs" />
+  <Compile Remove="net#.0\**\*.cs" />
+  <None Include="net#.0\**\*.cs" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
@@ -40,7 +40,7 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard1.0' ">
-  <PackageReference Include="Microsoft.Extensions.Primitives" Version="7.0.0" />
+  <PackageReference Include="Microsoft.Extensions.Primitives" Version="$(DotNetReleasePackageVersion)" />
  </ItemGroup>
  
 </Project>

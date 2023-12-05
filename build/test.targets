@@ -3,7 +3,7 @@
 
  <PropertyGroup>
   <FluentAssertionsVersion>6.8.0</FluentAssertionsVersion>
-  
+
   <!--
    beware of other versions that may contain SponsorLink
    REF: https://github.com/moq/moq/issues/1372
@@ -27,7 +27,7 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.10" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(DotNetReleaseBasePackageVersion)" />
  </ItemGroup>
 
  <ItemGroup>
