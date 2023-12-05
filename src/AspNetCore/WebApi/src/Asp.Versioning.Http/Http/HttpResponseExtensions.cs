@@ -38,7 +38,7 @@ public static class HttpResponseExtensions
 
         if ( sunsetPolicy.Date.HasValue )
         {
-            headers.Add( Sunset, sunsetPolicy.Date.Value.ToString( "r" ) );
+            headers[Sunset] = sunsetPolicy.Date.Value.ToString( "r" );
         }
 
         AddLinkHeaders( headers, sunsetPolicy.Links );
@@ -53,16 +53,7 @@ public static class HttpResponseExtensions
             values[i] = links[i].ToString();
         }
 
-        var newValues = new StringValues( values );
-
-        if ( headers.TryGetValue( Link, out var existingValues ) )
-        {
-            headers[Link] = StringValues.Concat( existingValues, newValues );
-        }
-        else
-        {
-            headers.Add( Link, newValues );
-        }
+        headers.Append( Link, values );
     }
 
     /// <summary>

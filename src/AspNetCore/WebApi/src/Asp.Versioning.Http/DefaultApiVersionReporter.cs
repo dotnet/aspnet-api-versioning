@@ -21,7 +21,7 @@ public partial class DefaultApiVersionReporter
 
         if ( versions.Count == 1 )
         {
-            headers.Add( headerName, versions[0].ToString() );
+            headers[headerName] = versions[0].ToString();
             return;
         }
 
@@ -55,7 +55,7 @@ public partial class DefaultApiVersionReporter
             }
         }
 
-        headers.Add( headerName, headerValue.ToString() );
+        headers[headerName] = headerValue.ToString();
         pool.Return( array );
     }
 }
