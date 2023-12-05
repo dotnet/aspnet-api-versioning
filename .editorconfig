@@ -6,6 +6,8 @@ root = true
 # don't use tabs for indentation
 [*]
 indent_style = space
+vsspell_section_id = 41b65011239a40959ccaae2a4ec7044a
+vsspell_ignored_words_41b65011239a40959ccaae2a4ec7044a = clr|Edm|middleware|Mvc|odata|Validator|Accessor|app|inline
 
 # code files
 [*.{cs,csx,vb,vbx}]
@@ -110,6 +112,13 @@ dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1600.severity = none
 
+# TEMP: currently suppressed rules due to false positives
+# REF: https://github.com/DotNetAnalyzers/StyleCopAnalyzers/issues/3687
+# REF: https://github.com/dotnet/aspnetcore/issues/52556
+dotnet_diagnostic.SA1010.severity = none # Opening square brackets should be spaced correctly
+dotnet_diagnostic.ASP0022.severity = none # Route conflict detected between route handlers
+dotnet_diagnostic.ASP0023.severity = none # Route conflict detected between route handlers
+
 # test settings
 
 # Default severity for analyzer diagnostics with category 'Reliability'
@@ -128,6 +137,7 @@ dotnet_diagnostic.CA1707.severity = none
 dotnet_diagnostic.CA1711.severity = none
 dotnet_diagnostic.CA1716.severity = none
 dotnet_diagnostic.CA1806.severity = none
+dotnet_diagnostic.CA1861.severity = none
 dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA2234.severity = none
 dotnet_code_quality.CA2000.excluded_symbol_names = HttpRequestMessage|HttpResponseMessage|HttpConfiguration|HttpRouteCollection|HostedHttpRouteCollection|HttpServer|HttpClient
@@ -137,6 +147,13 @@ dotnet_diagnostic.SA1122.severity = none
 dotnet_diagnostic.SA1300.severity = none
 dotnet_diagnostic.SA1507.severity = none
 dotnet_diagnostic.SA1601.severity = none
+
+# TEMP: currently suppressed rules due to false positives
+# REF: https://github.com/DotNetAnalyzers/StyleCopAnalyzers/issues/3687
+# REF: https://github.com/dotnet/aspnetcore/issues/52556
+dotnet_diagnostic.SA1010.severity = none # Opening square brackets should be spaced correctly
+dotnet_diagnostic.ASP0022.severity = none # Route conflict detected between route handlers
+dotnet_diagnostic.ASP0023.severity = none # Route conflict detected between route handlers
 
 # test methods should use all lowercase characters
 dotnet_naming_symbols.test_methods.applicable_kinds           = method
