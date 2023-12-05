@@ -34,10 +34,7 @@ public class CurrentImplementationApiVersionSelector : IApiVersionSelector
     /// <remarks>This method always returns the default <see cref="ApiVersion.Default">API version</see>.</remarks>
     public virtual ApiVersion SelectVersion( HttpRequest request, ApiVersionModel model )
     {
-        if ( model == null )
-        {
-            throw new ArgumentNullException( nameof( model ) );
-        }
+        ArgumentNullException.ThrowIfNull( model );
 
         return model.ImplementedApiVersions.Count switch
         {

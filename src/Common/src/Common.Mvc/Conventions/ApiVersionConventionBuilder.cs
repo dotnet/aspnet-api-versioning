@@ -100,10 +100,7 @@ public partial class ApiVersionConventionBuilder : IApiVersionConventionBuilder
     /// <inheritdoc />
     public virtual bool ApplyTo( ControllerModel controller )
     {
-        if ( controller == null )
-        {
-            throw new ArgumentNullException( nameof( controller ) );
-        }
+        ArgumentNullException.ThrowIfNull( controller );
 
         IControllerConventionBuilder? builder;
         bool hasExplicitConventions;

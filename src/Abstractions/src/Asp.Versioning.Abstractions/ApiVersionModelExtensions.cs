@@ -17,15 +17,8 @@ public static class ApiVersionModelExtensions
     /// <paramref name="otherVersion">other version information</paramref> and the current version information.</returns>
     public static ApiVersionModel Aggregate( this ApiVersionModel version, ApiVersionModel otherVersion )
     {
-        if ( version == null )
-        {
-            throw new ArgumentNullException( nameof( version ) );
-        }
-
-        if ( otherVersion == null )
-        {
-            throw new ArgumentNullException( nameof( otherVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( version );
+        ArgumentNullException.ThrowIfNull( otherVersion );
 
         var implemented = new SortedSet<ApiVersion>( version.ImplementedApiVersions );
         var supported = new SortedSet<ApiVersion>( version.SupportedApiVersions );
@@ -50,15 +43,8 @@ public static class ApiVersionModelExtensions
     /// <paramref name="otherVersions">other version information</paramref> and the current version information.</returns>
     public static ApiVersionModel Aggregate( this ApiVersionModel version, IEnumerable<ApiVersionModel> otherVersions )
     {
-        if ( version == null )
-        {
-            throw new ArgumentNullException( nameof( version ) );
-        }
-
-        if ( otherVersions == null )
-        {
-            throw new ArgumentNullException( nameof( otherVersions ) );
-        }
+        ArgumentNullException.ThrowIfNull( version );
+        ArgumentNullException.ThrowIfNull( otherVersions );
 
         if ( ( otherVersions is ICollection<ApiVersionModel> collection && collection.Count == 0 ) ||
              ( otherVersions is IReadOnlyCollection<ApiVersionModel> readOnlyCollection && readOnlyCollection.Count == 0 ) )
@@ -99,10 +85,7 @@ public static class ApiVersionModelExtensions
     /// <returns>A new <see cref="ApiVersionModel"/> that is the aggregated result of the provided <paramref name="versions">version information</paramref>.</returns>
     public static ApiVersionModel Aggregate( this IEnumerable<ApiVersionModel> versions )
     {
-        if ( versions == null )
-        {
-            throw new ArgumentNullException( nameof( versions ) );
-        }
+        ArgumentNullException.ThrowIfNull( versions );
 
         if ( ( versions is ICollection<ApiVersionModel> collection && collection.Count == 0 ) ||
              ( versions is IReadOnlyCollection<ApiVersionModel> readOnlyCollection && readOnlyCollection.Count == 0 ) )

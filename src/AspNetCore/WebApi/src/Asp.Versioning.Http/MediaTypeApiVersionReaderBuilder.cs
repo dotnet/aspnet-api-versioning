@@ -28,10 +28,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 #pragma warning restore CA1716 // Identifiers should not match keywords
 #pragma warning restore IDE0079
     {
-        if ( string.IsNullOrEmpty( template ) )
-        {
-            throw new ArgumentNullException( nameof( template ) );
-        }
+        ArgumentException.ThrowIfNullOrEmpty( template );
 
         var routePattern = RoutePatternFactory.Parse( template );
 

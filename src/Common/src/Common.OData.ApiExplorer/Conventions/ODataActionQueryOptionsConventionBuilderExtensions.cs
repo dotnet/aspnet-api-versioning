@@ -39,11 +39,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         int maxNodeCount,
         params string[] properties )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
     }
 
@@ -58,11 +54,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         this ODataActionQueryOptionsConventionBuilder builder,
         IEnumerable<string> properties )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.AllowOrderBy( default, properties );
     }
 
@@ -77,11 +69,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         this ODataActionQueryOptionsConventionBuilder builder,
         params string[] properties )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.AllowOrderBy( default, properties.AsEnumerable() );
     }
 
@@ -103,11 +91,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         , IHttpController
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
     }
 
@@ -127,11 +111,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         , IHttpController
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.AllowOrderBy( default, properties );
     }
 
@@ -151,11 +131,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         , IHttpController
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.AllowOrderBy( default, properties.AsEnumerable() );
     }
 
@@ -174,16 +150,8 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
        , IHttpController
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( actionExpression == null )
-        {
-            throw new ArgumentNullException( nameof( actionExpression ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( actionExpression );
         return builder.Action( actionExpression.ExtractMethod() );
     }
 
@@ -203,16 +171,8 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
        , IHttpController
 #endif
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( actionExpression == null )
-        {
-            throw new ArgumentNullException( nameof( actionExpression ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( actionExpression );
         return builder.Action( actionExpression.ExtractMethod() );
     }
 
@@ -232,15 +192,8 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         string methodName,
         params Type[] argumentTypes )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( argumentTypes == null )
-        {
-            throw new ArgumentNullException( nameof( argumentTypes ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( argumentTypes );
 
         string message;
         var methods = builder.ControllerType

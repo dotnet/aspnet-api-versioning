@@ -15,11 +15,7 @@ public static class ISunsetPolicyBuilderExtensions
     /// <returns>A new <see cref="ILinkBuilder">link builder</see>.</returns>
     public static ILinkBuilder Link( this ISunsetPolicyBuilder builder, string linkTarget )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Link( new Uri( linkTarget, UriKind.RelativeOrAbsolute ) );
     }
 
@@ -35,11 +31,7 @@ public static class ISunsetPolicyBuilderExtensions
     public static TBuilder Effective<TBuilder>( this TBuilder builder, int year, int month, int day )
         where TBuilder : notnull, ISunsetPolicyBuilder
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         builder.Effective( new DateTimeOffset( new DateTime( year, month, day ) ) );
         return builder;
     }

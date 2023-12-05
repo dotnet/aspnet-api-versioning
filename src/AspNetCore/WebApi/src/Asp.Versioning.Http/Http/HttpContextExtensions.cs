@@ -18,10 +18,7 @@ public static class HttpContextExtensions
     /// <returns>The current <see cref="IApiVersioningFeature">API versioning feature</see>.</returns>
     public static IApiVersioningFeature ApiVersioningFeature( this HttpContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var feature = context.Features.Get<IApiVersioningFeature>();
 

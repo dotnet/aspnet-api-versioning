@@ -15,15 +15,8 @@ public class ModelConfigurationFeatureProvider : IApplicationFeatureProvider<Mod
     /// <inheritdoc />
     public void PopulateFeature( IEnumerable<ApplicationPart> parts, ModelConfigurationFeature feature )
     {
-        if ( parts == null )
-        {
-            throw new ArgumentNullException( nameof( parts ) );
-        }
-
-        if ( feature == null )
-        {
-            throw new ArgumentNullException( nameof( feature ) );
-        }
+        ArgumentNullException.ThrowIfNull( parts );
+        ArgumentNullException.ThrowIfNull( feature );
 
         var types = from part in parts.OfType<IApplicationPartTypeProvider>()
                     from type in part.Types
@@ -43,10 +36,7 @@ public class ModelConfigurationFeatureProvider : IApplicationFeatureProvider<Mod
     /// <returns><c>True</c> if the type is a <see cref="IModelConfiguration">model configuration</see>; otherwise <c>false</c>.</returns>
     protected virtual bool IsModelConfiguration( Type type )
     {
-        if ( type == null )
-        {
-            throw new ArgumentNullException( nameof( type ) );
-        }
+        ArgumentNullException.ThrowIfNull( type );
 
         if ( !type.IsClass || type.IsAbstract || !type.IsPublic || type.ContainsGenericParameters )
         {

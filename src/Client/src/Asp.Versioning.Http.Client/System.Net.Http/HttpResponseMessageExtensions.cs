@@ -5,6 +5,9 @@ namespace System.Net.Http;
 using Asp.Versioning;
 using System.Globalization;
 using static System.StringComparison;
+#if NETSTANDARD
+using ArgumentNullException = Backport.ArgumentNullException;
+#endif
 
 /// <summary>
 /// Provides extension methods for <see cref="HttpResponseMessage"/>.
@@ -21,10 +24,7 @@ public static class HttpResponseMessageExtensions
     /// <returns>A new <see cref="SunsetPolicy">sunset policy</see>.</returns>
     public static SunsetPolicy ReadSunsetPolicy( this HttpResponseMessage response )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
 
         var headers = response.Headers;
         var date = default( DateTimeOffset );
@@ -80,10 +80,7 @@ public static class HttpResponseMessageExtensions
         this HttpResponseMessage response,
         IApiVersionParser? parser = default )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
 
         var urls = default( Dictionary<ApiVersion, Uri> );
 

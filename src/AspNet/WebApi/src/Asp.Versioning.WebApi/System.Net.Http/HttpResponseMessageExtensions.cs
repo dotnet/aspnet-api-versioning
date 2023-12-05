@@ -3,7 +3,7 @@
 namespace System.Net.Http;
 
 using Asp.Versioning;
-using System;
+using Backport;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 
@@ -22,15 +22,8 @@ public static class HttpResponseMessageExtensions
     /// <param name="sunsetPolicy">The <see cref="SunsetPolicy">sunset policy</see> to write.</param>
     public static void WriteSunsetPolicy( this HttpResponseMessage response, SunsetPolicy sunsetPolicy )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
-
-        if ( sunsetPolicy == null )
-        {
-            throw new ArgumentNullException( nameof( sunsetPolicy ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
+        ArgumentNullException.ThrowIfNull( sunsetPolicy );
 
         var headers = response.Headers;
 

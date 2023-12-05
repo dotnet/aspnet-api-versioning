@@ -42,18 +42,13 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         string deprecatedHeaderName = ApiDeprecatedVersions,
         ApiVersionMapping mapping = Explicit | Implicit )
     {
-        this.sunsetPolicyManager = sunsetPolicyManager ?? throw new ArgumentNullException( nameof( sunsetPolicyManager ) );
+        ArgumentNullException.ThrowIfNull( sunsetPolicyManager );
+        ArgumentException.ThrowIfNullOrEmpty( supportedHeaderName );
+        ArgumentException.ThrowIfNullOrEmpty( deprecatedHeaderName );
 
-        if ( string.IsNullOrEmpty( apiSupportedVersionsName = supportedHeaderName ) )
-        {
-            throw new ArgumentNullException( nameof( supportedHeaderName ) );
-        }
-
-        if ( string.IsNullOrEmpty( apiDeprecatedVersionsName = deprecatedHeaderName ) )
-        {
-            throw new ArgumentNullException( nameof( deprecatedHeaderName ) );
-        }
-
+        this.sunsetPolicyManager = sunsetPolicyManager;
+        apiSupportedVersionsName = supportedHeaderName;
+        apiDeprecatedVersionsName = deprecatedHeaderName;
         Mapping = mapping;
     }
 
@@ -63,15 +58,8 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     /// <inheritdoc />
     public void Report( HttpResponse response, ApiVersionModel apiVersionModel )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
-
-        if ( apiVersionModel == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersionModel ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
+        ArgumentNullException.ThrowIfNull( apiVersionModel );
 
         if ( apiVersionModel.IsApiVersionNeutral )
         {

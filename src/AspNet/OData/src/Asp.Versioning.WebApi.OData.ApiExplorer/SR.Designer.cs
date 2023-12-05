@@ -8,9 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Asp.Versioning.Http {
+namespace Asp.Versioning {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -40,7 +39,7 @@ namespace Asp.Versioning.Http {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Asp.Versioning.Http.SR", typeof(SR).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Asp.Versioning.SR", typeof(SR).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -67,15 +66,6 @@ namespace Asp.Versioning.Http {
         internal static string Argument_EmptyString {
             get {
                 return ResourceManager.GetString("Argument_EmptyString", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to At least one IApiVersionWriter must be specified..
-        /// </summary>
-        internal static string ZeroApiVersionWriters {
-            get {
-                return ResourceManager.GetString("ZeroApiVersionWriters", resourceCulture);
             }
         }
     }

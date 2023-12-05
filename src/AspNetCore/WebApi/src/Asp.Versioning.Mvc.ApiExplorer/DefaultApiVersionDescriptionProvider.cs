@@ -56,10 +56,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersionDescription">API version descriptions</see>.</returns>
     protected virtual IReadOnlyList<ApiVersionDescription> Describe( IReadOnlyList<ApiVersionMetadata> metadata )
     {
-        if ( metadata == null )
-        {
-            throw new ArgumentNullException( nameof( metadata ) );
-        }
+        ArgumentNullException.ThrowIfNull( metadata );
 
         var descriptions = new List<ApiVersionDescription>( capacity: metadata.Count );
         var supported = new HashSet<ApiVersion>();

@@ -53,10 +53,7 @@ public class NamespaceParser
     /// <returns>A <see cref="IReadOnlyList{T}">read-only list</see> of <see cref="ApiVersion">API verisons</see>.</returns>
     public IReadOnlyList<ApiVersion> Parse( Type type )
     {
-        if ( type == null )
-        {
-            throw new ArgumentNullException( nameof( type ) );
-        }
+        ArgumentNullException.ThrowIfNull( type );
 
         if ( string.IsNullOrEmpty( type.Namespace ) )
         {

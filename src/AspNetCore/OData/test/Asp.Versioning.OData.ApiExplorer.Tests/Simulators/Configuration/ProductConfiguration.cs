@@ -14,10 +14,7 @@ public class ProductConfiguration : IModelConfiguration
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         if ( apiVersion < ApiVersions.V3 )
         {

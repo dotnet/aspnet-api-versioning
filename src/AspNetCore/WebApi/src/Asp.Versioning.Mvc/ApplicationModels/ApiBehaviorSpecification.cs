@@ -15,10 +15,7 @@ public sealed class ApiBehaviorSpecification : IApiControllerSpecification
     /// <inheritdoc />
     public bool IsSatisfiedBy( ControllerModel controller )
     {
-        if ( controller == null )
-        {
-            throw new ArgumentNullException( nameof( controller ) );
-        }
+        ArgumentNullException.ThrowIfNull( controller );
 
         // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ApiBehaviorApplicationModelProvider.cs
         if ( controller.Attributes.OfType<IApiBehaviorMetadata>().Any() )

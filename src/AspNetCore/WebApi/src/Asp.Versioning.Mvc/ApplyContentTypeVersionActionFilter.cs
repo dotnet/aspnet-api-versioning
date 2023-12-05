@@ -20,13 +20,8 @@ internal sealed class ApplyContentTypeVersionActionFilter : IActionFilter
 
     public void OnActionExecuting( ActionExecutingContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( context );
         var httpContext = context.HttpContext;
-
         httpContext.Response.OnStarting( AddContentTypeApiVersion, httpContext );
     }
 

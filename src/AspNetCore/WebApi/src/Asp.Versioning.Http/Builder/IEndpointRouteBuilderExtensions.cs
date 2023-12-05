@@ -23,14 +23,9 @@ public static class IEndpointRouteBuilderExtensions
     /// <returns>A new <see cref="ApiVersionSetBuilder">API version set builder</see>.</returns>
     public static ApiVersionSetBuilder NewApiVersionSet( this IEndpointRouteBuilder endpoints, string? name = default )
     {
-        if ( endpoints == null )
-        {
-            throw new ArgumentNullException( nameof( endpoints ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( endpoints );
         var create = endpoints.ServiceProvider.GetService<ApiVersionSetBuilderFactory>();
-
-        return create is null ? new ApiVersionSetBuilder( name ) : create( name );
+        return create is null ? new( name ) : create( name );
     }
 
     /// <summary>
@@ -43,10 +38,7 @@ public static class IEndpointRouteBuilderExtensions
     public static IVersionedEndpointRouteBuilder WithApiVersionSet<TBuilder>( this TBuilder builder, string? name = default )
         where TBuilder : notnull, IEndpointRouteBuilder, IEndpointConventionBuilder
     {
-        if ( builder is null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         if ( builder.HasMetadata() )
         {
@@ -71,10 +63,7 @@ public static class IEndpointRouteBuilderExtensions
     /// <returns>A new <see cref="IVersionedEndpointRouteBuilder"/> instance.</returns>
     public static IVersionedEndpointRouteBuilder NewVersionedApi( this IEndpointRouteBuilder builder, string? name = default )
     {
-        if ( builder is null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         if ( builder.IsNestedGroup() )
         {

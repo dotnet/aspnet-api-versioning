@@ -28,7 +28,9 @@ public partial class QueryStringApiVersionReader : IApiVersionReader
     /// <remarks>This constructor adds the "api-version" query string parameter if no other query parameter names are specified.</remarks>
     public QueryStringApiVersionReader( IEnumerable<string> parameterNames )
     {
-        ParameterNames.AddRange( parameterNames ?? throw new ArgumentNullException( nameof( parameterNames ) ) );
+        ArgumentNullException.ThrowIfNull( parameterNames );
+
+        ParameterNames.AddRange( parameterNames );
 
         if ( ParameterNames.Count == 0 )
         {
@@ -43,10 +45,7 @@ public partial class QueryStringApiVersionReader : IApiVersionReader
     /// <param name="otherParameterNames">An array of query string parameter names to read the API version from.</param>
     public QueryStringApiVersionReader( string parameterName, params string[] otherParameterNames )
     {
-        if ( string.IsNullOrEmpty( parameterName ) )
-        {
-            throw new ArgumentNullException( parameterName );
-        }
+        ArgumentException.ThrowIfNullOrEmpty( parameterName );
 
         ParameterNames.Add( parameterName );
 
@@ -77,10 +76,7 @@ public partial class QueryStringApiVersionReader : IApiVersionReader
     /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
     public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var count = ParameterNames.Count;
 #if NETFRAMEWORK

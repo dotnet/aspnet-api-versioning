@@ -69,10 +69,7 @@ public class ApiVersioningApplicationModelProvider : IApplicationModelProvider
     /// <inheritdoc />
     public virtual void OnProvidersExecuting( ApplicationModelProviderContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var application = context.Result;
         var controllers = ControllerFilter.Apply( application.Controllers );

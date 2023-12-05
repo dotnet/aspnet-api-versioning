@@ -22,7 +22,7 @@ public partial class HeaderApiVersionReader : IApiVersionReader
     /// </summary>
     /// <param name="headerNames">A <see cref="IEnumerable{T}">sequence</see> of HTTP header names to read the API version from.</param>
     public HeaderApiVersionReader( IEnumerable<string> headerNames ) =>
-        HeaderNames.AddRange( headerNames ?? throw new ArgumentNullException( nameof( headerNames ) ) );
+        HeaderNames.AddRange( headerNames ?? throw new System.ArgumentNullException( nameof( headerNames ) ) );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HeaderApiVersionReader"/> class.
@@ -31,10 +31,7 @@ public partial class HeaderApiVersionReader : IApiVersionReader
     /// <param name="otherHeaderNames">An array of other HTTP header names to read the API version from.</param>
     public HeaderApiVersionReader( string headerName, params string[] otherHeaderNames )
     {
-        if ( string.IsNullOrEmpty( headerName ) )
-        {
-            throw new ArgumentNullException( headerName );
-        }
+        ArgumentException.ThrowIfNullOrEmpty( headerName );
 
         HeaderNames.Add( headerName );
 
@@ -65,10 +62,7 @@ public partial class HeaderApiVersionReader : IApiVersionReader
     /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
     public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var count = HeaderNames.Count;
 #if NETFRAMEWORK

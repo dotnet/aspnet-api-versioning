@@ -3,7 +3,6 @@
 namespace Asp.Versioning.Routing;
 
 using Asp.Versioning.ApplicationModels;
-using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -29,10 +28,7 @@ public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
     /// <inheritdoc />
     public override bool AppliesToAction( ODataControllerActionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var metadata = context.Action
                               .Selectors

@@ -23,15 +23,8 @@ public static class HttpResponseExtensions
     [CLSCompliant( false )]
     public static void WriteSunsetPolicy( this HttpResponse response, SunsetPolicy sunsetPolicy )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
-
-        if ( sunsetPolicy == null )
-        {
-            throw new ArgumentNullException( nameof( sunsetPolicy ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
+        ArgumentNullException.ThrowIfNull( sunsetPolicy );
 
         var headers = response.Headers;
 
@@ -81,10 +74,7 @@ public static class HttpResponseExtensions
     /// the parameter is already set, or the response does not indicate success.</remarks>
     public static void AddApiVersionToContentType( this HttpResponse response, string name )
     {
-        if ( response == null )
-        {
-            throw new ArgumentNullException( nameof( response ) );
-        }
+        ArgumentNullException.ThrowIfNull( response );
 
         if ( response.StatusCode < 200 && response.StatusCode > 299 )
         {

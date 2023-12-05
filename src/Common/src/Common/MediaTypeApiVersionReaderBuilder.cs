@@ -146,10 +146,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 #endif
     protected void AddReader( Func<IReadOnlyList<MediaTypeWithQualityHeaderValue>, IReadOnlyList<string>> reader )
     {
-        if ( reader is null )
-        {
-            throw new ArgumentNullException( nameof( reader ) );
-        }
+        ArgumentNullException.ThrowIfNull( reader );
 
         readers ??= new();
         readers.Add( reader );

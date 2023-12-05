@@ -17,10 +17,7 @@ public static class MediaTypeApiVersionReaderBuilderExtensions
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> is <c>null</c>.</exception>
     public static T SelectFirstOrDefault<T>( this T builder ) where T : MediaTypeApiVersionReaderBuilder
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         builder.Select( static ( request, versions ) => versions.Count == 0 ? versions : new[] { versions[0] } );
         return builder;
@@ -36,10 +33,7 @@ public static class MediaTypeApiVersionReaderBuilderExtensions
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> is <c>null</c>.</exception>
     public static T SelectLastOrDefault<T>( this T builder ) where T : MediaTypeApiVersionReaderBuilder
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         builder.Select( static ( request, versions ) => versions.Count == 0 ? versions : new[] { versions[versions.Count - 1] } );
         return builder;

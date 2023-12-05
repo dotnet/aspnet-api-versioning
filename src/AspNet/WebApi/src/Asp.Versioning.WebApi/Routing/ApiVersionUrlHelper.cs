@@ -15,7 +15,7 @@ public class ApiVersionUrlHelper : UrlHelper
     /// <param name="url">The inner <see cref="UrlHelper">URL helper</see>.</param>
     public ApiVersionUrlHelper( UrlHelper url )
     {
-        Url = url ?? throw new ArgumentNullException( nameof( url ) );
+        Url = url ?? throw new System.ArgumentNullException( nameof( url ) );
 
         if ( url.Request != null )
         {

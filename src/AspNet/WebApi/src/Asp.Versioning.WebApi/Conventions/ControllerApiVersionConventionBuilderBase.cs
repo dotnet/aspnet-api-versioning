@@ -35,10 +35,7 @@ public abstract class ControllerApiVersionConventionBuilderBase : ApiVersionConv
     /// to apply the conventions to.</param>
     public virtual void ApplyTo( HttpControllerDescriptor item )
     {
-        if ( item == null )
-        {
-            throw new ArgumentNullException( nameof( item ) );
-        }
+        ArgumentNullException.ThrowIfNull( item );
 
         var attributes = new List<object>();
 

@@ -84,10 +84,7 @@ public static class ApiVersionConventionBuilderExtensions
     public static T HasApiVersions<T>( this T builder, IEnumerable<ApiVersion> apiVersions )
         where T : notnull, IDeclareApiVersionConventionBuilder
     {
-        if ( apiVersions == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersions ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersions );
 
         foreach ( var apiVersion in apiVersions )
         {
@@ -170,10 +167,7 @@ public static class ApiVersionConventionBuilderExtensions
     public static T HasDeprecatedApiVersions<T>( this T builder, IEnumerable<ApiVersion> apiVersions )
         where T : notnull, IDeclareApiVersionConventionBuilder
     {
-        if ( apiVersions == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersions ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersions );
 
         foreach ( var apiVersion in apiVersions )
         {
@@ -256,10 +250,7 @@ public static class ApiVersionConventionBuilderExtensions
     public static T AdvertisesApiVersions<T>( this T builder, IEnumerable<ApiVersion> apiVersions )
         where T : notnull, IDeclareApiVersionConventionBuilder
     {
-        if ( apiVersions == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersions ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersions );
 
         foreach ( var apiVersion in apiVersions )
         {
@@ -342,10 +333,7 @@ public static class ApiVersionConventionBuilderExtensions
     public static T AdvertisesDeprecatedApiVersions<T>( this T builder, IEnumerable<ApiVersion> apiVersions )
         where T : notnull, IDeclareApiVersionConventionBuilder
     {
-        if ( apiVersions == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersions ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersions );
 
         foreach ( var apiVersion in apiVersions )
         {
@@ -428,10 +416,7 @@ public static class ApiVersionConventionBuilderExtensions
     public static T MapToApiVersions<T>( this T builder, IEnumerable<ApiVersion> apiVersions )
         where T : notnull, IMapToApiVersionConventionBuilder
     {
-        if ( apiVersions == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersions ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersions );
 
         foreach ( var apiVersion in apiVersions )
         {

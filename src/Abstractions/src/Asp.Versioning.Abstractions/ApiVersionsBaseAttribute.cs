@@ -96,7 +96,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
     /// <param name="parser">The parser used to parse the specified versions.</param>
     /// <param name="version">The API version string.</param>
     protected ApiVersionsBaseAttribute( IApiVersionParser parser, string version ) =>
-        Versions = new[] { ( parser ?? throw new ArgumentNullException( nameof( parser ) ) ).Parse( version ) };
+        Versions = new[] { ( parser ?? throw new System.ArgumentNullException( nameof( parser ) ) ).Parse( version ) };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -106,10 +106,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
     /// <param name="otherVersions">An array of API other version strings.</param>
     protected ApiVersionsBaseAttribute( IApiVersionParser parser, string version, params string[] otherVersions )
     {
-        if ( parser == null )
-        {
-            throw new ArgumentNullException( nameof( parser ) );
-        }
+        ArgumentNullException.ThrowIfNull( parser );
 
         int count;
 

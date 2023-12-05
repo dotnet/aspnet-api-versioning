@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Routing;
 
-using System.Web.Http;
 using System.Web.Http.Routing;
 
 /// <summary>
@@ -21,10 +20,7 @@ public sealed class ApiVersionRouteConstraint : IHttpRouteConstraint
     /// <returns>True if the route constraint is matched; otherwise, false.</returns>
     public bool Match( HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object?> values, HttpRouteDirection routeDirection )
     {
-        if ( values == null )
-        {
-            throw new ArgumentNullException( nameof( values ) );
-        }
+        ArgumentNullException.ThrowIfNull( values );
 
         if ( string.IsNullOrEmpty( parameterName ) )
         {

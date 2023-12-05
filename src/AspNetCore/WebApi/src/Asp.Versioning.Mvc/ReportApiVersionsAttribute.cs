@@ -22,10 +22,7 @@ public sealed partial class ReportApiVersionsAttribute
     /// streaming to the client.</remarks>
     public override void OnActionExecuting( ActionExecutingContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var httpContext = context.HttpContext;
         var endpoint = httpContext.GetEndpoint();

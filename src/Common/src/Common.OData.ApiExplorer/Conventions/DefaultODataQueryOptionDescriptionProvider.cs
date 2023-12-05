@@ -36,7 +36,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
         if ( ( queryOption < Filter || queryOption > Supported ) ||
              ( queryOption != Filter && ( (int) queryOption % 2 != 0 ) ) )
         {
-            throw new ArgumentException( ODataExpSR.MultipleQueryOptionsNotAllowed, nameof( queryOption ) );
+            throw new System.ArgumentException( ODataExpSR.MultipleQueryOptionsNotAllowed, nameof( queryOption ) );
         }
 
         return queryOption switch
@@ -48,7 +48,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
             Top => DescribeTop( context ),
             Skip => DescribeSkip( context ),
             Count => DescribeCount( context ),
-            _ => throw new ArgumentException(
+            _ => throw new System.ArgumentException(
                     string.Format(
                         CurrentCulture,
                         ODataExpSR.UnsupportedQueryOption,
@@ -68,10 +68,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     /// <returns>The query option description.</returns>
     protected virtual string DescribeFilter( ODataQueryOptionDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var description = new StringBuilder();
 
@@ -104,10 +101,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     /// <returns>The query option description.</returns>
     protected virtual string DescribeExpand( ODataQueryOptionDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         bool hasMaxExpansionDepth;
 
@@ -144,10 +138,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     /// <returns>The query option description.</returns>
     protected virtual string DescribeSelect( ODataQueryOptionDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         if ( context.AllowedSelectProperties.Count <= 0 )
         {
@@ -171,10 +162,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     /// <returns>The query option description.</returns>
     protected virtual string DescribeOrderBy( ODataQueryOptionDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         bool hasMaxOrderByNodeCount;
 
@@ -211,10 +199,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     /// <returns>The query option description.</returns>
     protected virtual string DescribeTop( ODataQueryOptionDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         if ( context.MaxTop.NoLimitOrNone() )
         {
@@ -235,10 +220,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     /// <returns>The query option description.</returns>
     protected virtual string DescribeSkip( ODataQueryOptionDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         if ( context.MaxSkip.NoLimitOrNone() )
         {

@@ -3,9 +3,9 @@
 namespace Microsoft.AspNetCore.Http;
 
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.AspNetCore.Routing.Template;
 using System.ComponentModel;
+using RoutePattern = Microsoft.AspNetCore.Routing.Patterns.RoutePattern;
 
 /// <summary>
 /// Provides extension methods for <see cref="HttpRequest"/>.
@@ -29,10 +29,7 @@ public static class HttpRequestExtensions
         string constraintName,
         [NotNullWhen( true )] out string? apiVersion )
     {
-        if ( routePatterns == null )
-        {
-            throw new ArgumentNullException( nameof( routePatterns ) );
-        }
+        ArgumentNullException.ThrowIfNull( routePatterns );
 
         if ( string.IsNullOrEmpty( constraintName ) || routePatterns.Count == 0 )
         {

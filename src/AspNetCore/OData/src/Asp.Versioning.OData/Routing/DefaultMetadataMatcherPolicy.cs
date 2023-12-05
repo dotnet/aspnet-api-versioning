@@ -36,11 +36,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
         IApiVersionParameterSource parameterSource,
         IOptions<ApiVersioningOptions> options )
     {
-        if ( parameterSource == null )
-        {
-            throw new ArgumentNullException( nameof( parameterSource ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( parameterSource );
         versionsByUrl = parameterSource.VersionsByUrl();
         this.options = options;
     }
@@ -51,10 +47,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
     /// <inheritdoc />
     public virtual bool AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints )
     {
-        if ( endpoints == null )
-        {
-            throw new ArgumentNullException( nameof( endpoints ) );
-        }
+        ArgumentNullException.ThrowIfNull( endpoints );
 
         for ( var i = 0; i < endpoints.Count; i++ )
         {
@@ -70,10 +63,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
     /// <inheritdoc />
     public IReadOnlyList<PolicyNodeEdge> GetEdges( IReadOnlyList<Endpoint> endpoints )
     {
-        if ( endpoints == null )
-        {
-            throw new ArgumentNullException( nameof( endpoints ) );
-        }
+        ArgumentNullException.ThrowIfNull( endpoints );
 
         var edges = default( List<Endpoint> );
         var lowestApiVersion = default( ApiVersion );
@@ -138,10 +128,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
     /// <inheritdoc />
     public PolicyJumpTable BuildJumpTable( int exitDestination, IReadOnlyList<PolicyJumpTableEdge> edges )
     {
-        if ( edges == null )
-        {
-            throw new ArgumentNullException( nameof( edges ) );
-        }
+        ArgumentNullException.ThrowIfNull( edges );
 
         Debug.Assert( edges.Count == 1, $"Only a single edge was expected, but {edges.Count} edges were provided" );
 

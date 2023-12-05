@@ -354,15 +354,8 @@ public partial class ApiVersionFormatProvider
         in ReadOnlySpan<char> format,
         IFormatProvider? formatProvider )
     {
-        if ( text == null )
-        {
-            throw new ArgumentNullException( nameof( text ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( text );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         if ( !apiVersion.GroupVersion.HasValue || format.IsEmpty )
         {
@@ -448,15 +441,8 @@ public partial class ApiVersionFormatProvider
         in ReadOnlySpan<char> format,
         IFormatProvider? formatProvider )
     {
-        if ( text == null )
-        {
-            throw new ArgumentNullException( nameof( text ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
+        ArgumentNullException.ThrowIfNull( text );
+        ArgumentNullException.ThrowIfNull( apiVersion );
 
         Span<char> buffer = stackalloc char[10];
 

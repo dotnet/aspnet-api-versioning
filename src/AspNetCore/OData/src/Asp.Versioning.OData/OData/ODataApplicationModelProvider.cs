@@ -62,10 +62,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
     /// <inheritdoc />
     public virtual void OnProvidersExecuting( ApplicationModelProviderContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var (metadataControllers, supported, deprecated) = CollateApiVersions( context.Result );
 

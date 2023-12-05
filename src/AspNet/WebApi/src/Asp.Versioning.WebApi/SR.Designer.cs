@@ -115,6 +115,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value cannot be an empty string..
+        /// </summary>
+        internal static string Argument_EmptyString {
+            get {
+                return ResourceManager.GetString("Argument_EmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No route providing a controller name was found to match request URI &apos;{0}&apos;..
         /// </summary>
         internal static string ControllerNameNotFound {

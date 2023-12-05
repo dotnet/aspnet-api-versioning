@@ -40,10 +40,15 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         IOptions<ApiVersioningOptions> options,
         ILogger<ApiVersionMatcherPolicy> logger )
     {
-        this.apiVersionParser = apiVersionParser ?? throw new ArgumentNullException( nameof( apiVersionParser ) );
-        collator = new( providers ?? throw new ArgumentNullException( nameof( providers ) ), options );
-        this.options = options ?? throw new ArgumentNullException( nameof( options ) );
-        this.logger = logger ?? throw new ArgumentNullException( nameof( logger ) );
+        ArgumentNullException.ThrowIfNull( apiVersionParser );
+        ArgumentNullException.ThrowIfNull( providers );
+        ArgumentNullException.ThrowIfNull( options );
+        ArgumentNullException.ThrowIfNull( logger );
+
+        this.apiVersionParser = apiVersionParser;
+        collator = new( providers, options );
+        this.options = options;
+        this.logger = logger;
     }
 
     /// <inheritdoc />
@@ -58,10 +63,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     /// <inheritdoc />
     public bool AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints )
     {
-        if ( endpoints == null )
-        {
-            throw new ArgumentNullException( nameof( endpoints ) );
-        }
+        ArgumentNullException.ThrowIfNull( endpoints );
 
         for ( var i = 0; i < endpoints.Count; i++ )
         {
@@ -77,15 +79,8 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     /// <inheritdoc />
     public Task ApplyAsync( HttpContext httpContext, CandidateSet candidates )
     {
-        if ( httpContext == null )
-        {
-            throw new ArgumentNullException( nameof( httpContext ) );
-        }
-
-        if ( candidates == null )
-        {
-            throw new ArgumentNullException( nameof( candidates ) );
-        }
+        ArgumentNullException.ThrowIfNull( httpContext );
+        ArgumentNullException.ThrowIfNull( candidates );
 
         var feature = httpContext.ApiVersioningFeature();
         var apiVersion = feature.RequestedApiVersion;
@@ -110,10 +105,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     /// <inheritdoc />
     public PolicyJumpTable BuildJumpTable( int exitDestination, IReadOnlyList<PolicyJumpTableEdge> edges )
     {
-        if ( edges == null )
-        {
-            throw new ArgumentNullException( nameof( edges ) );
-        }
+        ArgumentNullException.ThrowIfNull( edges );
 
         var rejection = new RouteDestination( exitDestination );
         var capacity = edges.Count - EdgeBuilder.NumberOfRejectionEndpoints;
@@ -178,10 +170,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     /// <inheritdoc />
     public IReadOnlyList<PolicyNodeEdge> GetEdges( IReadOnlyList<Endpoint> endpoints )
     {
-        if ( endpoints == null )
-        {
-            throw new ArgumentNullException( nameof( endpoints ) );
-        }
+        ArgumentNullException.ThrowIfNull( endpoints );
 
         var capacity = endpoints.Count;
         var builder = new EdgeBuilder( capacity, ApiVersionSource, Options, logger );

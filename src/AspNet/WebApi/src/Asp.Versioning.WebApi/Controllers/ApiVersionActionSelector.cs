@@ -24,11 +24,7 @@ public class ApiVersionActionSelector : IHttpActionSelector
     /// <paramref name="controllerContext">controller context</paramref>.</returns>
     public virtual HttpActionDescriptor? SelectAction( HttpControllerContext controllerContext )
     {
-        if ( controllerContext == null )
-        {
-            throw new ArgumentNullException( nameof( controllerContext ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( controllerContext );
         var internalSelector = GetInternalSelector( controllerContext.ControllerDescriptor );
         return internalSelector.SelectAction( controllerContext, SelectActionVersion );
     }
@@ -41,10 +37,7 @@ public class ApiVersionActionSelector : IHttpActionSelector
     /// specified <paramref name="controllerDescriptor">controller descriptor</paramref>.</returns>
     public virtual ILookup<string, HttpActionDescriptor> GetActionMapping( HttpControllerDescriptor controllerDescriptor )
     {
-        if ( controllerDescriptor == null )
-        {
-            throw new ArgumentNullException( nameof( controllerDescriptor ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerDescriptor );
 
         var actionMappings = ( from descriptor in controllerDescriptor.AsEnumerable( includeCandidates: true )
                                let selector = GetInternalSelector( descriptor )
@@ -65,15 +58,8 @@ public class ApiVersionActionSelector : IHttpActionSelector
     /// ambiguous among the provided list of <paramref name="candidateActions">candidate actions</paramref>.</remarks>
     protected virtual HttpActionDescriptor? SelectActionVersion( HttpControllerContext controllerContext, IReadOnlyList<HttpActionDescriptor> candidateActions )
     {
-        if ( controllerContext == null )
-        {
-            throw new ArgumentNullException( nameof( controllerContext ) );
-        }
-
-        if ( candidateActions == null )
-        {
-            throw new ArgumentNullException( nameof( candidateActions ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerContext );
+        ArgumentNullException.ThrowIfNull( candidateActions );
 
         if ( candidateActions.Count == 0 )
         {

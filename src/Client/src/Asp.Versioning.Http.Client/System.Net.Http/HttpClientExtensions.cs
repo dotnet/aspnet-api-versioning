@@ -5,6 +5,9 @@ namespace System.Net.Http;
 using Asp.Versioning;
 using Asp.Versioning.Http;
 using static System.Net.HttpStatusCode;
+#if NETSTANDARD
+using ArgumentNullException = Backport.ArgumentNullException;
+#endif
 
 /// <summary>
 /// Provides extension methods for <see cref="HttpClient"/>.
@@ -58,10 +61,7 @@ public static class HttpClientExtensions
         ApiVersionHeaderEnumerable? enumerable = default,
         CancellationToken cancellationToken = default )
     {
-        if ( client == null )
-        {
-            throw new ArgumentNullException( nameof( client ) );
-        }
+        ArgumentNullException.ThrowIfNull( client );
 
         using var request = new HttpRequestMessage( HttpMethod.Options, requestUrl );
         var response = await client.SendAsync( request, cancellationToken ).ConfigureAwait( false );

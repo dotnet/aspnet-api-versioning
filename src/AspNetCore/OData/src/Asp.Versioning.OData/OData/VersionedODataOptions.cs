@@ -87,10 +87,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     /// <returns>True if the <paramref name="handler"/> was successfully retrieved; otherwise, false.</returns>
     public virtual bool TryGetBatchHandler( HttpContext context, [NotNullWhen( true )] out ODataBatchHandler? handler )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         if ( batchMapping is null )
         {

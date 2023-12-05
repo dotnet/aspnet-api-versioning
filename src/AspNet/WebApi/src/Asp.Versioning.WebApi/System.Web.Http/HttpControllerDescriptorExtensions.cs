@@ -4,6 +4,7 @@ namespace System.Web.Http;
 
 using Asp.Versioning;
 using Asp.Versioning.Controllers;
+using Backport;
 using System.ComponentModel;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
@@ -34,10 +35,7 @@ public static class HttpControllerDescriptorExtensions
     [EditorBrowsable( EditorBrowsableState.Never )]
     public static ApiVersionModel GetApiVersionModel( this HttpControllerDescriptor controllerDescriptor )
     {
-        if ( controllerDescriptor == null )
-        {
-            throw new ArgumentNullException( nameof( controllerDescriptor ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerDescriptor );
 
         if ( controllerDescriptor.Properties.TryGetValue( typeof( ApiVersionModel ), out ApiVersionModel? value ) )
         {
@@ -56,10 +54,7 @@ public static class HttpControllerDescriptorExtensions
     [EditorBrowsable( EditorBrowsableState.Never )]
     public static void SetApiVersionModel( this HttpControllerDescriptor controllerDescriptor, ApiVersionModel value )
     {
-        if ( controllerDescriptor == null )
-        {
-            throw new ArgumentNullException( nameof( controllerDescriptor ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerDescriptor );
 
         controllerDescriptor.Properties.AddOrUpdate( typeof( ApiVersionModel ), value, ( key, oldValue ) => value );
 
@@ -84,10 +79,7 @@ public static class HttpControllerDescriptorExtensions
 
     internal static IEnumerable<HttpControllerDescriptor> AsEnumerable( this HttpControllerDescriptor controllerDescriptor, bool includeCandidates )
     {
-        if ( controllerDescriptor == null )
-        {
-            throw new ArgumentNullException( nameof( controllerDescriptor ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerDescriptor );
 
         var visited = new HashSet<HttpControllerDescriptor>();
 

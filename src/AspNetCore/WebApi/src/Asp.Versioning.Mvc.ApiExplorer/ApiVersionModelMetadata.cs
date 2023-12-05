@@ -23,11 +23,7 @@ public sealed class ApiVersionModelMetadata : ModelMetadata
     public ApiVersionModelMetadata( IModelMetadataProvider modelMetadataProvider, string description )
         : base( ModelMetadataIdentity.ForType( typeof( string ) ) )
     {
-        if ( modelMetadataProvider == null )
-        {
-            throw new ArgumentNullException( nameof( modelMetadataProvider ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( modelMetadataProvider );
         inner = modelMetadataProvider.GetMetadataForType( typeof( string ) );
         this.description = description;
     }

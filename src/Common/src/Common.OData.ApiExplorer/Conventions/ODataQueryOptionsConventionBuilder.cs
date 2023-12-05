@@ -89,10 +89,7 @@ public partial class ODataQueryOptionsConventionBuilder
     /// <returns>A new or existing <see cref="ODataControllerQueryOptionsConventionBuilder"/>.</returns>
     public virtual ODataControllerQueryOptionsConventionBuilder Controller( Type controllerType )
     {
-        if ( controllerType == null )
-        {
-            throw new ArgumentNullException( nameof( controllerType ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerType );
 
         if ( !ConventionBuilders.TryGetValue( controllerType, out var builder ) )
         {
@@ -124,10 +121,7 @@ public partial class ODataQueryOptionsConventionBuilder
     /// <param name="queryOptionSettings">The <see cref="ODataQueryOptionSettings">settings</see> used to apply OData query option conventions.</param>
     public virtual void ApplyTo( IEnumerable<ApiDescription> apiDescriptions, ODataQueryOptionSettings queryOptionSettings )
     {
-        if ( apiDescriptions == null )
-        {
-            throw new ArgumentNullException( nameof( apiDescriptions ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescriptions );
 
         var controllerConventions = default( Dictionary<Type, IODataQueryOptionsConvention> );
 

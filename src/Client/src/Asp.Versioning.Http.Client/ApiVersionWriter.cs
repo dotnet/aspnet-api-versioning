@@ -18,10 +18,7 @@ public static class ApiVersionWriter
         IApiVersionWriter apiVersionWriter,
         params IApiVersionWriter[] otherApiVersionwriters )
     {
-        if ( apiVersionWriter == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersionWriter ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersionWriter );
 
         int count;
         IApiVersionWriter[] apiVersionWriters;
@@ -52,7 +49,7 @@ public static class ApiVersionWriter
 
         if ( writers is null || writers.Length == 0 )
         {
-            throw new ArgumentException( SR.ZeroApiVersionWriters, nameof( apiVersionWriters ) );
+            throw new System.ArgumentException( SR.ZeroApiVersionWriters, nameof( apiVersionWriters ) );
         }
 
         return new CombinedApiVersionWriter( writers );

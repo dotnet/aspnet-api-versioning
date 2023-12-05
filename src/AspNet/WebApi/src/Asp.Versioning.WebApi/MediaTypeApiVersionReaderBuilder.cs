@@ -22,10 +22,7 @@ public partial class MediaTypeApiVersionReaderBuilder
     /// <remarks>The template syntax is the same used by route templates; however, constraints are not supported.</remarks>
     public virtual MediaTypeApiVersionReaderBuilder Template( string template, string? parameterName = default )
     {
-        if ( string.IsNullOrEmpty( template ) )
-        {
-            throw new ArgumentNullException( nameof( template ) );
-        }
+        ArgumentException.ThrowIfNullOrEmpty( template );
 
         if ( string.IsNullOrEmpty( parameterName ) )
         {
@@ -38,7 +35,7 @@ public partial class MediaTypeApiVersionReaderBuilder
             if ( segments.Count() > 1 )
             {
                 var message = string.Format( CultureInfo.CurrentCulture, CommonSR.InvalidMediaTypeTemplate, template );
-                throw new ArgumentException( message, nameof( template ) );
+                throw new System.ArgumentException( message, nameof( template ) );
             }
         }
 

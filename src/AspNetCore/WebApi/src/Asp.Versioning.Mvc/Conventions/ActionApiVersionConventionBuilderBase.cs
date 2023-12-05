@@ -16,10 +16,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
     /// <param name="item">The <see cref="ActionModel">action model</see> to apply the conventions to.</param>
     public virtual void ApplyTo( ActionModel item )
     {
-        if ( item == null )
-        {
-            throw new ArgumentNullException( nameof( item ) );
-        }
+        ArgumentNullException.ThrowIfNull( item );
 
         MergeAttributesWithConventions( item.Attributes );
 

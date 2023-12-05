@@ -74,7 +74,7 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
 
         Status = ValidateStatus(
             status,
-            isValidStatus ?? throw new ArgumentNullException( nameof( isValidStatus ) ) );
+            isValidStatus ?? throw new System.ArgumentNullException( nameof( isValidStatus ) ) );
 
         var number = new decimal( version );
         var bits = decimal.GetBits( number );
@@ -124,10 +124,7 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
     /// <param name="other">The instance to derive from.</param>
     protected ApiVersion( ApiVersion other )
     {
-        if ( other == null )
-        {
-            throw new ArgumentNullException( nameof( other ) );
-        }
+        ArgumentNullException.ThrowIfNull( other );
 
         hashCode = other.hashCode;
         GroupVersion = other.GroupVersion;
@@ -355,7 +352,7 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
             return status;
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, SR.ApiVersionBadStatus, status );
+        var message = string.Format( CultureInfo.CurrentCulture, Format.ApiVersionBadStatus, status );
         throw new ArgumentException( message, nameof( status ) );
     }
 }

@@ -19,11 +19,7 @@ public static class ISunsetPolicyManagerExtensions
         ApiVersion apiVersion,
         [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
-        if ( policyManager == null )
-        {
-            throw new ArgumentNullException( nameof( policyManager ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( policyManager );
         return policyManager.TryGetPolicy( default, apiVersion, out sunsetPolicy );
     }
 
@@ -39,11 +35,7 @@ public static class ISunsetPolicyManagerExtensions
         string name,
         [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
-        if ( policyManager == null )
-        {
-            throw new ArgumentNullException( nameof( policyManager ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( policyManager );
         return policyManager.TryGetPolicy( name, default, out sunsetPolicy );
     }
 
@@ -66,10 +58,7 @@ public static class ISunsetPolicyManagerExtensions
         string? name,
         ApiVersion? apiVersion )
     {
-        if ( policyManager == null )
-        {
-            throw new ArgumentNullException( nameof( policyManager ) );
-        }
+        ArgumentNullException.ThrowIfNull( policyManager );
 
         if ( policyManager.TryResolvePolicy( name, apiVersion, out var policy ) )
         {
@@ -100,10 +89,7 @@ public static class ISunsetPolicyManagerExtensions
         ApiVersion? apiVersion,
         [MaybeNullWhen( false )] out SunsetPolicy sunsetPolicy )
     {
-        if ( policyManager == null )
-        {
-            throw new ArgumentNullException( nameof( policyManager ) );
-        }
+        ArgumentNullException.ThrowIfNull( policyManager );
 
         if ( !string.IsNullOrEmpty( name ) )
         {

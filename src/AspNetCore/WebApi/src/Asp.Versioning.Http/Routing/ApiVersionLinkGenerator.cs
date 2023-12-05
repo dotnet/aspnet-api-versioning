@@ -65,7 +65,7 @@ public class ApiVersionLinkGenerator : LinkGenerator
     public override string? GetUriByAddress<TAddress>(
         TAddress address,
         RouteValueDictionary values,
-        string? scheme,
+        string scheme,
         HostString host,
         PathString pathBase = default,
         FragmentString fragment = default,
@@ -73,15 +73,8 @@ public class ApiVersionLinkGenerator : LinkGenerator
 
     private static void AddApiVersionRouteValueIfNecessary( HttpContext httpContext, RouteValueDictionary values )
     {
-        if ( httpContext == null )
-        {
-            throw new ArgumentNullException( nameof( httpContext ) );
-        }
-
-        if ( values == null )
-        {
-            throw new ArgumentNullException( nameof( values ) );
-        }
+        ArgumentNullException.ThrowIfNull( httpContext );
+        ArgumentNullException.ThrowIfNull( values );
 
         var feature = httpContext.ApiVersioningFeature();
         var key = feature.RouteParameter;

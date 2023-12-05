@@ -3,6 +3,7 @@
 namespace System.Net.Http;
 
 using Asp.Versioning;
+using Backport;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;
@@ -73,10 +74,7 @@ public static class HttpRequestMessageExtensions
     /// <returns>The current <see cref="ApiVersionRequestProperties">API versioning properties</see>.</returns>
     public static ApiVersionRequestProperties ApiVersionProperties( this HttpRequestMessage request )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
 
         if ( request.Properties.TryGetValue( ApiVersionPropertiesKey, out ApiVersionRequestProperties? properties ) )
         {

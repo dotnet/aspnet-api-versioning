@@ -3,6 +3,7 @@
 namespace System.Web.Http.Routing;
 
 using Asp.Versioning.Routing;
+using Backport;
 
 /// <summary>
 /// Provides extension methods for <see cref="UrlHelper"/>.
@@ -22,10 +23,7 @@ public static class UrlHelperExtensions
     /// it would be erroneously added as a query string parameter.</remarks>
     public static UrlHelper WithoutApiVersion( this UrlHelper urlHelper )
     {
-        if ( urlHelper == null )
-        {
-            throw new ArgumentNullException( nameof( urlHelper ) );
-        }
+        ArgumentNullException.ThrowIfNull( urlHelper );
 
         if ( urlHelper is WithoutApiVersionUrlHelper )
         {

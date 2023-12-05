@@ -58,10 +58,7 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// version descriptions</see>.</returns>
     protected virtual IReadOnlyList<ApiVersionDescription> Describe( IReadOnlyList<GroupedApiVersionMetadata> metadata )
     {
-        if ( metadata == null )
-        {
-            throw new ArgumentNullException( nameof( metadata ) );
-        }
+        ArgumentNullException.ThrowIfNull( metadata );
 
         var descriptions = new SortedSet<ApiVersionDescription>( new ApiVersionDescriptionComparer() );
         var supported = new HashSet<GroupedApiVersion>();

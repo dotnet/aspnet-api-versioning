@@ -13,10 +13,7 @@ public partial class UrlSegmentApiVersionReader
     /// <inheritdoc />
     public virtual IReadOnlyList<string> Read( HttpRequest request )
     {
-        if ( request == null )
-        {
-            throw new ArgumentNullException( nameof( request ) );
-        }
+        ArgumentNullException.ThrowIfNull( request );
 
         if ( reentrant )
         {

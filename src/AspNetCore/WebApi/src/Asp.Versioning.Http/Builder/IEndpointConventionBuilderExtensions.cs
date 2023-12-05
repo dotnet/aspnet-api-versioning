@@ -27,10 +27,7 @@ public static class IEndpointConventionBuilderExtensions
         ApiVersionSet apiVersionSet )
         where TBuilder : notnull, IEndpointConventionBuilder
     {
-        if ( apiVersionSet == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersionSet ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersionSet );
 
         builder.Add( endpoint => AddMetadata( endpoint, apiVersionSet ) );
         builder.Finally( EndpointBuilderFinalizer.FinalizeEndpoints );

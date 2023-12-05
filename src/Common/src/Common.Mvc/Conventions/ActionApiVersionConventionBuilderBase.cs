@@ -40,10 +40,7 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
     /// <inheritdoc />
     protected override void MergeAttributesWithConventions( IReadOnlyList<object> attributes )
     {
-        if ( attributes == null )
-        {
-            throw new ArgumentNullException( nameof( attributes ) );
-        }
+        ArgumentNullException.ThrowIfNull( attributes );
 
         base.MergeAttributesWithConventions( attributes );
 

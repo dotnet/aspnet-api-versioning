@@ -200,7 +200,7 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
     /// </summary>
     /// <param name="dateTimeFormat">The <see cref="DateTimeFormatInfo"/> used by the format provider.</param>
     public ApiVersionFormatProvider( DateTimeFormatInfo dateTimeFormat )
-        : this( dateTimeFormat ?? throw new ArgumentNullException( nameof( dateTimeFormat ) ), dateTimeFormat.Calendar ) { }
+        : this( dateTimeFormat ?? throw new System.ArgumentNullException( nameof( dateTimeFormat ) ), dateTimeFormat.Calendar ) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionFormatProvider"/> class.
@@ -293,20 +293,11 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
         Text format,
         IFormatProvider formatProvider )
     {
-        if ( text == null )
-        {
-            throw new ArgumentNullException( nameof( text ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
-
-        if ( Str.IsNullOrEmpty( format ) )
-        {
-            throw new ArgumentNullException( nameof( format ) );
-        }
+        ArgumentNullException.ThrowIfNull( text );
+        ArgumentNullException.ThrowIfNull( apiVersion );
+#if NETSTANDARD1_0
+        ArgumentNullException.ThrowIfNull( format );
+#endif
 
         switch ( format[0] )
         {
@@ -334,16 +325,8 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
         Text format,
         IFormatProvider formatProvider )
     {
-        if ( text == null )
-        {
-            throw new ArgumentNullException( nameof( text ) );
-        }
-
-        if ( apiVersion == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersion ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( text );
+        ArgumentNullException.ThrowIfNull( apiVersion );
         text.Append( apiVersion.Status );
     }
 

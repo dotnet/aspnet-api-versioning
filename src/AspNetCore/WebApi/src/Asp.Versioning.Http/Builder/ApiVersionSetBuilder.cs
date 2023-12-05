@@ -110,10 +110,7 @@ public class ApiVersionSetBuilder : ApiVersionConventionBuilderBase, IDeclareApi
     /// <returns>A new <see cref="ApiVersionModel">API version model</see>.</returns>
     protected internal virtual ApiVersionModel BuildApiVersionModel( ApiVersioningOptions options )
     {
-        if ( options == null )
-        {
-            throw new ArgumentNullException( nameof( options ) );
-        }
+        ArgumentNullException.ThrowIfNull( options );
 
         if ( VersionNeutral )
         {

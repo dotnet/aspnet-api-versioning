@@ -66,11 +66,7 @@ public class ODataActionQueryOptionsConventionBuilder<T> :
     /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
     public virtual ODataActionQueryOptionsConventionBuilder<T> Use( ODataValidationSettings validationSettings )
     {
-        if ( validationSettings == null )
-        {
-            throw new ArgumentNullException( nameof( validationSettings ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( validationSettings );
         ValidationSettings.CopyFrom( validationSettings );
         return this;
     }
@@ -214,10 +210,7 @@ public class ODataActionQueryOptionsConventionBuilder<T> :
     /// <returns>The original <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
     public virtual ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy( int maxNodeCount, IEnumerable<string> properties )
     {
-        if ( properties == null )
-        {
-            throw new ArgumentNullException( nameof( properties ) );
-        }
+        ArgumentNullException.ThrowIfNull( properties );
 
         ValidationSettings.AllowedQueryOptions |= OrderBy;
 

@@ -78,10 +78,7 @@ public class ODataApiExplorer : VersionedApiExplorer
         IHttpRoute route,
         ApiVersion apiVersion )
     {
-        if ( actionDescriptor == null )
-        {
-            throw new ArgumentNullException( nameof( actionDescriptor ) );
-        }
+        ArgumentNullException.ThrowIfNull( actionDescriptor );
 
         if ( route is not ODataRoute )
         {
@@ -126,15 +123,8 @@ public class ODataApiExplorer : VersionedApiExplorer
         IHttpRoute route,
         ApiVersion apiVersion )
     {
-        if ( controllerDescriptor == null )
-        {
-            throw new ArgumentNullException( nameof( controllerDescriptor ) );
-        }
-
-        if ( route == null )
-        {
-            throw new ArgumentNullException( nameof( route ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerDescriptor );
+        ArgumentNullException.ThrowIfNull( route );
 
         if ( controllerDescriptor.ControllerType.IsMetadataController() )
         {
@@ -168,10 +158,7 @@ public class ODataApiExplorer : VersionedApiExplorer
         IHttpRoute route,
         ApiVersion apiVersion )
     {
-        if ( controllerMappings == null )
-        {
-            throw new ArgumentNullException( nameof( controllerMappings ) );
-        }
+        ArgumentNullException.ThrowIfNull( controllerMappings );
 
         Collection<VersionedApiDescription> apiDescriptions;
 
@@ -260,10 +247,7 @@ public class ODataApiExplorer : VersionedApiExplorer
         IEnumerable<VersionedApiDescription> apiDescriptions,
         ODataUriResolver uriResolver )
     {
-        if ( uriResolver == null )
-        {
-            throw new ArgumentNullException( nameof( uriResolver ) );
-        }
+        ArgumentNullException.ThrowIfNull( uriResolver );
 
         var queryOptions = Options.QueryOptions;
         var settings = new ODataQueryOptionSettings()

@@ -15,11 +15,7 @@ public static class IApiVersionParserExtensions
     /// <returns>The parsed API version.</returns>
     public static ApiVersion Parse( this IApiVersionParser parser, string? text )
     {
-        if ( parser == null )
-        {
-            throw new ArgumentNullException( nameof( parser ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( parser );
         return parser.Parse( text == null ? default : text.AsSpan() );
     }
 
@@ -35,11 +31,7 @@ public static class IApiVersionParserExtensions
         string? text,
         [MaybeNullWhen( false )] out ApiVersion apiVersion )
     {
-        if ( parser == null )
-        {
-            throw new ArgumentNullException( nameof( parser ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( parser );
         return parser.TryParse( text == null ? default : text.AsSpan(), out apiVersion );
     }
 }

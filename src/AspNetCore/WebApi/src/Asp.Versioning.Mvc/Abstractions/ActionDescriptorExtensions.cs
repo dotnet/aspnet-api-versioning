@@ -17,10 +17,7 @@ public static class ActionDescriptorExtensions
     /// <returns>The <see cref="ApiVersionMetadata">API version information</see> for the action.</returns>
     public static ApiVersionMetadata GetApiVersionMetadata( this ActionDescriptor action )
     {
-        if ( action == null )
-        {
-            throw new ArgumentNullException( nameof( action ) );
-        }
+        ArgumentNullException.ThrowIfNull( action );
 
         var endpointMetadata = action.EndpointMetadata;
 

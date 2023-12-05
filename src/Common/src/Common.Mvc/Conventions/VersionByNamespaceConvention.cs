@@ -35,15 +35,8 @@ public class VersionByNamespaceConvention : IControllerConvention
     /// <inheritdoc />
     public virtual bool Apply( IControllerConventionBuilder builder, ControllerModel controller )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
-        if ( controller == null )
-        {
-            throw new ArgumentNullException( nameof( controller ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( controller );
 
         var type = controller.ControllerType;
         var versions = parser.Parse( type );

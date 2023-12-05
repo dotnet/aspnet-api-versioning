@@ -2,8 +2,8 @@
 
 namespace Asp.Versioning.Routing;
 
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using RouteOptions = Microsoft.AspNetCore.Routing.RouteOptions;
 
 /// <summary>
 /// Represents the API versioning configuration for ASP.NET Core <see cref="RouteOptions">routing options</see>.
@@ -22,10 +22,7 @@ public class ApiVersioningRouteOptionsSetup : IPostConfigureOptions<RouteOptions
     /// <inheritdoc />
     public virtual void PostConfigure( string? name, RouteOptions options )
     {
-        if ( options == null )
-        {
-            throw new ArgumentNullException( nameof( options ) );
-        }
+        ArgumentNullException.ThrowIfNull( options );
 
         var key = versioningOptions.Value.RouteConstraintName;
         options.ConstraintMap.Add( key, typeof( ApiVersionRouteConstraint ) );

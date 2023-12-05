@@ -15,11 +15,7 @@ public static class ILinkBuilderExtensions
     /// <returns>A new <see cref="ILinkBuilder">link builder</see>.</returns>
     public static ILinkBuilder Link( this ILinkBuilder builder, string linkTarget )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         return builder.Link( new Uri( linkTarget, UriKind.RelativeOrAbsolute ) );
     }
 }

@@ -32,7 +32,7 @@ public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnly
     /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
     public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, params HttpControllerDescriptor[] controllerDescriptors )
         : base( configuration, controllerName, controllerDescriptors?[0].ControllerType ) =>
-        descriptors = controllerDescriptors ?? throw new ArgumentNullException( nameof( controllerDescriptors ) );
+        descriptors = controllerDescriptors ?? throw new System.ArgumentNullException( nameof( controllerDescriptors ) );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HttpControllerDescriptorGroup"/> class.
@@ -50,7 +50,7 @@ public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnly
     /// <see cref="HttpControllerDescriptor">HTTP controller descriptors</see>.</param>
     public HttpControllerDescriptorGroup( HttpConfiguration configuration, string controllerName, IReadOnlyList<HttpControllerDescriptor> controllerDescriptors )
         : base( configuration, controllerName, controllerDescriptors?[0].ControllerType ) =>
-        descriptors = controllerDescriptors ?? throw new ArgumentNullException( nameof( controllerDescriptors ) );
+        descriptors = controllerDescriptors ?? throw new System.ArgumentNullException( nameof( controllerDescriptors ) );
 
     /// <summary>
     /// Creates and returns a controller for the specified request.

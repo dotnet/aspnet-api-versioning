@@ -19,10 +19,7 @@ public partial class ODataValidationSettingsConvention
     /// <inheritdoc />
     public virtual void ApplyTo( ApiDescription apiDescription )
     {
-        if ( apiDescription == null )
-        {
-            throw new ArgumentNullException( nameof( apiDescription ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiDescription );
 
         if ( !IsSupported( apiDescription.HttpMethod.Method ) )
         {

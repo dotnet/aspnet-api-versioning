@@ -13,10 +13,7 @@ public class AllConfigurations : IModelConfiguration
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         builder.Function( "GetSalesTaxRate" ).Returns<double>().Parameter<int>( "PostalCode" );
     }

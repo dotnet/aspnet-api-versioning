@@ -25,10 +25,7 @@ public class ApiVersioningMvcOptionsSetup : IPostConfigureOptions<MvcOptions>
     /// <inheritdoc />
     public virtual void PostConfigure( string? name, MvcOptions options )
     {
-        if ( options == null )
-        {
-            throw new ArgumentNullException( nameof( options ) );
-        }
+        ArgumentNullException.ThrowIfNull( options );
 
         var value = versioningOptions.Value;
 

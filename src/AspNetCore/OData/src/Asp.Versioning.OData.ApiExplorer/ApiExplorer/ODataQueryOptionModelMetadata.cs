@@ -23,10 +23,7 @@ public sealed class ODataQueryOptionModelMetadata : ModelMetadata
     public ODataQueryOptionModelMetadata( IModelMetadataProvider modelMetadataProvider, Type modelType, string description )
         : base( ModelMetadataIdentity.ForType( modelType ) )
     {
-        if ( modelMetadataProvider == null )
-        {
-            throw new ArgumentNullException( nameof( modelMetadataProvider ) );
-        }
+        ArgumentNullException.ThrowIfNull( modelMetadataProvider );
 
         inner = modelMetadataProvider.GetMetadataForType( modelType );
         Description = description;

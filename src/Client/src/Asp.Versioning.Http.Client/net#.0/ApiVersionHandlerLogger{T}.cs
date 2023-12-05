@@ -23,18 +23,15 @@ public class ApiVersionHandlerLogger<T> : ApiNotification
     /// <param name="enumerable">The <see cref="ApiVersionHeaderEnumerable">enumerable</see> used to enumerate API versions.</param>
     public ApiVersionHandlerLogger( ILogger<T> logger, IApiVersionParser parser, ApiVersionHeaderEnumerable enumerable )
     {
-        this.logger = logger ?? throw new ArgumentNullException( nameof( logger ) );
-        this.parser = parser ?? throw new ArgumentNullException( nameof( parser ) );
-        this.enumerable = enumerable ?? throw new ArgumentNullException( nameof( enumerable ) );
+        this.logger = logger ?? throw new System.ArgumentNullException( nameof( logger ) );
+        this.parser = parser ?? throw new System.ArgumentNullException( nameof( parser ) );
+        this.enumerable = enumerable ?? throw new System.ArgumentNullException( nameof( enumerable ) );
     }
 
     /// <inheritdoc />
     protected override void OnApiDeprecated( ApiNotificationContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var requestUrl = context.Response.RequestMessage!.RequestUri!;
         var apiVersion = context.ApiVersion;
@@ -46,10 +43,7 @@ public class ApiVersionHandlerLogger<T> : ApiNotification
     /// <inheritdoc />
     protected override void OnNewApiAvailable( ApiNotificationContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var requestUrl = context.Response.RequestMessage!.RequestUri!;
         var currentApiVersion = context.ApiVersion;

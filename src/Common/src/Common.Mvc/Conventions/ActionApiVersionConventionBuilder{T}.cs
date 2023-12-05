@@ -31,7 +31,7 @@ public class ActionApiVersionConventionBuilder<T> :
     /// <param name="controllerBuilder">The <see cref="ControllerApiVersionConventionBuilder{T}">controller builder</see>
     /// the action builder belongs to.</param>
     public ActionApiVersionConventionBuilder( ControllerApiVersionConventionBuilder<T> controllerBuilder )
-        : base( ( controllerBuilder ?? throw new ArgumentNullException( nameof( controllerBuilder ) ) ).NamingConvention )
+        : base( ( controllerBuilder ?? throw new System.ArgumentNullException( nameof( controllerBuilder ) ) ).NamingConvention )
     {
         ControllerBuilder = controllerBuilder;
     }

@@ -44,7 +44,7 @@ public class ControllerApiVersionConventionBuilder : ControllerApiVersionConvent
         if ( !webApiController.IsAssignableFrom( controllerType ) )
         {
             var message = string.Format( CultureInfo.CurrentCulture, MvcSR.RequiredInterfaceNotImplemented, controllerType, webApiController );
-            throw new ArgumentException( message, nameof( controllerType ) );
+            throw new System.ArgumentException( message, nameof( controllerType ) );
         }
 #endif
         ControllerType = controllerType;

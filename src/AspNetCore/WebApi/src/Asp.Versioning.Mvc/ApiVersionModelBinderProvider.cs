@@ -10,10 +10,7 @@ internal sealed class ApiVersionModelBinderProvider : IModelBinderProvider
 
     public IModelBinder? GetBinder( ModelBinderProviderContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         if ( typeof( ApiVersion ).IsAssignableFrom( context.Metadata.ModelType ) )
         {

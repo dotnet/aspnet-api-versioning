@@ -31,10 +31,7 @@ public class VersionedODataBatchMiddleware
     /// <returns>A <see cref="Task">task</see> representing the asynchronous operation.</returns>
     public Task Invoke( HttpContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         if ( HttpMethods.IsPost( context.Request.Method ) &&
              options.TryGetBatchHandler( context, out var handler ) )

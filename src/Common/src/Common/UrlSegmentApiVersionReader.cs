@@ -22,11 +22,7 @@ public partial class UrlSegmentApiVersionReader : IApiVersionReader
     /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
     public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( context );
         context.AddParameter( name: string.Empty, Path );
     }
 }

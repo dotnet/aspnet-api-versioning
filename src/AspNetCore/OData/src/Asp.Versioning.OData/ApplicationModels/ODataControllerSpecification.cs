@@ -14,10 +14,7 @@ public sealed class ODataControllerSpecification : IApiControllerSpecification
     /// <inheritdoc />
     public bool IsSatisfiedBy( ControllerModel controller )
     {
-        if ( controller == null )
-        {
-            throw new ArgumentNullException( nameof( controller ) );
-        }
+        ArgumentNullException.ThrowIfNull( controller );
 
         if ( ODataControllerSpecification.IsSatisfiedBy( controller ) )
         {

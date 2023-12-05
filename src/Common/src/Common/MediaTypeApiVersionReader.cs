@@ -28,11 +28,7 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     /// <param name="parameterName">The name of the media type parameter to read the API version from.</param>
     public MediaTypeApiVersionReader( string parameterName )
     {
-        if ( string.IsNullOrEmpty( parameterName ) )
-        {
-            throw new ArgumentNullException( parameterName );
-        }
-
+        ArgumentException.ThrowIfNullOrEmpty( parameterName );
         ParameterName = parameterName;
     }
 
@@ -53,10 +49,7 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     /// quality parameter.</remarks>
     protected virtual string? ReadAcceptHeader( ICollection<MediaTypeWithQualityHeaderValue> accept )
     {
-        if ( accept == null )
-        {
-            throw new ArgumentNullException( nameof( accept ) );
-        }
+        ArgumentNullException.ThrowIfNull( accept );
 
         var count = accept.Count;
 
@@ -103,10 +96,7 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     /// <returns>The API version read or <c>null</c>.</returns>
     protected virtual string? ReadContentTypeHeader( MediaTypeHeaderValue contentType )
     {
-        if ( contentType == null )
-        {
-            throw new ArgumentNullException( nameof( contentType ) );
-        }
+        ArgumentNullException.ThrowIfNull( contentType );
 #if NETFRAMEWORK
         var parameters = contentType.Parameters.ToArray();
         var count = parameters.Length;
@@ -137,11 +127,7 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
     public virtual void AddParameters( IApiVersionParameterDescriptionContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( context );
         context.AddParameter( ParameterName, MediaTypeParameter );
     }
 

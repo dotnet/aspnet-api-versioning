@@ -35,10 +35,7 @@ public static class ApiVersionReader
         IApiVersionReader apiVersionReader,
         params IApiVersionReader[] otherApiVersionReaders )
     {
-        if ( apiVersionReader == null )
-        {
-            throw new ArgumentNullException( nameof( apiVersionReader ) );
-        }
+        ArgumentNullException.ThrowIfNull( apiVersionReader );
 
         int count;
         IApiVersionReader[] apiVersionReaders;
@@ -69,7 +66,7 @@ public static class ApiVersionReader
 
         if ( readers is null || readers.Length == 0 )
         {
-            throw new ArgumentException( CommonSR.ZeroApiVersionReaders, nameof( apiVersionReaders ) );
+            throw new System.ArgumentException( CommonSR.ZeroApiVersionReaders, nameof( apiVersionReaders ) );
         }
 
         return new CombinedApiVersionReader( readers );

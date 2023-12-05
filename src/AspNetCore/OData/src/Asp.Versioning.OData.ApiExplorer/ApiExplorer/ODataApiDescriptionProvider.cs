@@ -92,10 +92,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
     /// <remarks>The default implementation performs no action.</remarks>
     public virtual void OnProvidersExecuted( ApiDescriptionProviderContext context )
     {
-        if ( context == null )
-        {
-            throw new ArgumentNullException( nameof( context ) );
-        }
+        ArgumentNullException.ThrowIfNull( context );
 
         var results = context.Results;
         var visited = new HashSet<ApiDescription>( capacity: results.Count, new ApiDescriptionComparer() );

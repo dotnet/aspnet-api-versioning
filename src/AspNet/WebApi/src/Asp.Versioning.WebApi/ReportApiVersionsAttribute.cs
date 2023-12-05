@@ -18,10 +18,7 @@ public sealed partial class ReportApiVersionsAttribute
     /// response provided that there is a response and the executed action was not version-neutral.</remarks>
     public override void OnActionExecuted( HttpActionExecutedContext actionExecutedContext )
     {
-        if ( actionExecutedContext == null )
-        {
-            throw new ArgumentNullException( nameof( actionExecutedContext ) );
-        }
+        ArgumentNullException.ThrowIfNull( actionExecutedContext );
 
         var response = actionExecutedContext.Response;
 

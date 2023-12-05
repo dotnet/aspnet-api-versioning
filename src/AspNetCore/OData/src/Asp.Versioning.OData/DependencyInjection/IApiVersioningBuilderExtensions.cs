@@ -31,11 +31,7 @@ public static class IApiVersioningBuilderExtensions
     /// <returns>The original <paramref name="builder"/>.</returns>
     public static IApiVersioningBuilder AddOData( this IApiVersioningBuilder builder )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
-
+        ArgumentNullException.ThrowIfNull( builder );
         AddServices( builder.AddMvc().Services );
         return builder;
     }
@@ -49,10 +45,7 @@ public static class IApiVersioningBuilderExtensions
     [CLSCompliant( false )]
     public static IApiVersioningBuilder AddOData( this IApiVersioningBuilder builder, Action<ODataApiVersioningOptions> setupAction )
     {
-        if ( builder == null )
-        {
-            throw new ArgumentNullException( nameof( builder ) );
-        }
+        ArgumentNullException.ThrowIfNull( builder );
 
         var services = builder.AddMvc().Services;
         AddServices( services );
