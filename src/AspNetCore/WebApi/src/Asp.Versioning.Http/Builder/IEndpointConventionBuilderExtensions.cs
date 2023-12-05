@@ -7,6 +7,7 @@ using Asp.Versioning.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Collections;
 using System.Globalization;
+using System.Runtime.Serialization;
 using static Asp.Versioning.ApiVersionProviderOptions;
 
 /// <summary>
@@ -439,7 +440,7 @@ public static class IEndpointConventionBuilderExtensions
         throw new InvalidOperationException(
             string.Format(
                 CultureInfo.CurrentCulture,
-                SR.NoVersionSet,
+                Format.NoVersionSet,
                 builder.DisplayName,
                 nameof( IEndpointRouteBuilderExtensions.NewVersionedApi ),
                 nameof( IEndpointRouteBuilderExtensions.WithApiVersionSet ) ) );

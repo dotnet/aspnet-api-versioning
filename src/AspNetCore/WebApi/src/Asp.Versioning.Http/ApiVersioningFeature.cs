@@ -115,7 +115,7 @@ public sealed class ApiVersioningFeature : IApiVersioningFeature
         new(
             string.Format(
                 CultureInfo.CurrentCulture,
-                CommonSR.MultipleDifferentApiVersionsRequested,
+                Format.MultipleDifferentApiVersionsRequested,
                 string.Join( ", ", [.. values], 0, values.Count ) ),
             values );
 }

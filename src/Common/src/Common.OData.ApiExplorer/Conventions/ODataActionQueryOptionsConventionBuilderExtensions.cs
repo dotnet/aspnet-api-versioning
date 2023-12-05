@@ -204,7 +204,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         switch ( methods.Length )
         {
             case 0:
-                message = string.Format( CultureInfo.CurrentCulture, ODataExpSR.ActionMethodNotFound, methodName );
+                message = string.Format( CultureInfo.CurrentCulture, Format.ActionMethodNotFound, methodName );
                 throw new MissingMethodException( message );
             case 1:
                 return builder.Action( methods[0] );
@@ -218,7 +218,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
             return builder.Action( methods[0] );
         }
 
-        message = string.Format( CultureInfo.CurrentCulture, ODataExpSR.AmbiguousActionMethod, methodName );
+        message = string.Format( CultureInfo.CurrentCulture, Format.AmbiguousActionMethod, methodName );
         throw new AmbiguousMatchException( message );
     }
 
@@ -263,7 +263,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
             return methodCall.Method;
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, ODataExpSR.InvalidActionMethodExpression, expression );
+        var message = string.Format( CultureInfo.CurrentCulture, Format.InvalidActionMethodExpression, expression );
         throw new InvalidOperationException( message );
     }
 }

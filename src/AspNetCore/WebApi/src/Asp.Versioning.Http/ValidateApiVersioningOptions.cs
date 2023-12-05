@@ -27,7 +27,7 @@ internal sealed class ValidateApiVersioningOptions : IValidateOptions<ApiVersion
         {
             var message = string.Format(
                 CultureInfo.CurrentCulture,
-                SR.InvalidDefaultApiVersion,
+                Format.InvalidDefaultApiVersion,
                 nameof( ApiVersion ),
                 nameof( ApiVersion.Neutral ),
                 nameof( ApiVersioningOptions ),

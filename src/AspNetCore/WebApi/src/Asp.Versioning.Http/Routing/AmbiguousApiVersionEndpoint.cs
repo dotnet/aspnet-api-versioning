@@ -29,7 +29,7 @@ internal sealed class AmbiguousApiVersionEndpoint : Endpoint
 
         var detail = string.Format(
             CultureInfo.CurrentCulture,
-            CommonSR.MultipleDifferentApiVersionsRequested,
+            Format.MultipleDifferentApiVersionsRequested,
             string.Join( ", ", apiVersions ) );
 
         return problemDetails.WriteAsync(

@@ -15,7 +15,7 @@ internal static class ExpressionExtensions
             return methodCall.Method;
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, MvcSR.InvalidActionMethodExpression, expression );
+        var message = string.Format( CultureInfo.CurrentCulture, MvcFormat.InvalidActionMethodExpression, expression );
         throw new InvalidOperationException( message );
     }
 }

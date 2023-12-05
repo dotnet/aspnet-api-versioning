@@ -20,7 +20,7 @@ internal static class ActionMethodResolver
         switch ( methods.Length )
         {
             case 0:
-                throw new MissingMethodException( string.Format( CultureInfo.CurrentCulture, MvcSR.ActionMethodNotFound, methodName ) );
+                throw new MissingMethodException( string.Format( CultureInfo.CurrentCulture, MvcFormat.ActionMethodNotFound, methodName ) );
             case 1:
                 return methods[0];
         }
@@ -33,7 +33,7 @@ internal static class ActionMethodResolver
             return methods[0];
         }
 
-        throw new AmbiguousMatchException( string.Format( CultureInfo.CurrentCulture, MvcSR.AmbiguousActionMethod, methodName ) );
+        throw new AmbiguousMatchException( string.Format( CultureInfo.CurrentCulture, MvcFormat.AmbiguousActionMethod, methodName ) );
     }
 
     private static bool IsAction( MethodInfo method ) =>
