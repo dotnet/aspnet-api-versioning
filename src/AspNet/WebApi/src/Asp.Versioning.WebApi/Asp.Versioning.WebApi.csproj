@@ -15,9 +15,20 @@
  </ItemGroup>
 
  <ItemGroup>
+  <Compile Include="$(BackportDir)ArgumentException.cs" Visible="false" />
+  <Compile Include="$(BackportDir)ArgumentNullException.cs" Visible="false" />
+  <Compile Include="$(BackportDir)CallerArgumentExpressionAttribute.cs" Visible="false" />
   <Compile Include="$(BackportDir)BitOperations.cs" Visible="false" />
   <Compile Include="$(BackportDir)HashCode.cs" Visible="false" />
   <Compile Include="$(BackportDir)NullableAttributes.cs" Visible="false" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Using Include="Backport.ArgumentException" Alias="ArgumentException" />
+  <Using Include="Backport.ArgumentNullException" Alias="ArgumentNullException" />
+  <Using Include="Asp.Versioning.SR" Alias="BackportSR" />
+  <Using Include="Asp.Versioning.CommonSR" Alias="Format" />
+  <Using Include="Asp.Versioning.MvcSR" Alias="MvcFormat" />
  </ItemGroup>
 
  <ItemGroup>

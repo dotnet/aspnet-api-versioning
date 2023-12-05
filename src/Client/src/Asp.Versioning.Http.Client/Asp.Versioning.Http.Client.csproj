@@ -19,7 +19,11 @@
   <Compile Include="$(BackportDir)Array.cs" Visible="false" />
  </ItemGroup>
  
- <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard1.1') OR ('$(TargetFramework)' == 'netstandard2.0') ">
+ <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
+  <Compile Include="$(BackportDir)ArgumentException.cs" Visible="false" />
+  <Compile Include="$(BackportDir)ArgumentNullException.cs" Visible="false" />
+  <Compile Include="$(BackportDir)CallerArgumentExpressionAttribute.cs" Visible="false" />
+  <Compile Include="$(BackportDir)NullableAttributes.cs" Visible="false" />
   <Compile Include="$(BackportDir)StringExtensions.cs" Visible="false" />
  </ItemGroup>
 
@@ -30,6 +34,11 @@
  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard1.1' ">
   <PackageReference Include="Microsoft.Extensions.Http" Version="$(DotNetReleasePackageVersion)" />
  </ItemGroup>
+
+ <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
+  <Using Include="Backport.ArgumentException" Alias="ArgumentException" />
+  <Using Include="Backport.ArgumentNullException" Alias="ArgumentNullException" />
+  <Using Include="Asp.Versioning.Http.SR" Alias="BackportSR" />
  </ItemGroup>
 
  <ItemGroup>
