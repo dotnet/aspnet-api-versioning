@@ -78,7 +78,7 @@ public partial class VersionedODataModelBuilder
 
                 if ( versions.Count > 0 && supported == null )
                 {
-                    supported = new();
+                    supported = [];
                 }
 
                 for ( var j = 0; j < versions.Count; j++ )
@@ -90,7 +90,7 @@ public partial class VersionedODataModelBuilder
 
                 if ( versions.Count > 0 && deprecated == null )
                 {
-                    deprecated = new();
+                    deprecated = [];
                 }
 
                 for ( var j = 0; j < versions.Count; j++ )

@@ -65,7 +65,7 @@ public partial class HeaderApiVersionReader
 
         if ( versions == null )
         {
-            return version == null ? Array.Empty<string>() : new[] { version };
+            return version == null ? [] : [version];
         }
 
         return versions.ToArray();

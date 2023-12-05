@@ -4,7 +4,6 @@ namespace Asp.Versioning.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
-using Microsoft.Extensions.Primitives;
 using static Microsoft.OData.ODataConstants;
 using static Microsoft.OData.ODataUtils;
 using static Microsoft.OData.ODataVersion;
@@ -17,6 +16,8 @@ using static Microsoft.OData.ODataVersion;
 [ControllerName( "OData" )]
 public class VersionedMetadataController : MetadataController
 {
+    private static readonly string[] values = ["GET", "OPTIONS"];
+
     /// <summary>
     /// Handles a request for the HTTP OPTIONS method.
     /// </summary>
@@ -55,8 +56,8 @@ public class VersionedMetadataController : MetadataController
     {
         var headers = Response.Headers;
 
-        headers.Add( "Allow", new StringValues( new[] { "GET", "OPTIONS" } ) );
-        headers.Add( ODataVersionHeader, ODataVersionToString( V4 ) );
+        headers.Allow = new( values );
+        headers[ODataVersionHeader] = ODataVersionToString( V4 );
 
         return Ok();
     }

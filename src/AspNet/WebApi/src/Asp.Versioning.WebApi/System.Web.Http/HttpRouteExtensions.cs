@@ -49,6 +49,6 @@ internal static class HttpRouteExtensions
             candidates.Add( new CandidateAction( directRouteActions[i], order, precedence ) );
         }
 
-        return candidates.ToArray();
+        return [.. candidates];
     }
 }

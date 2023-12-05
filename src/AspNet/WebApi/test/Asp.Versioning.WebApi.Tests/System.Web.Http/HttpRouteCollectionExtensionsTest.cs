@@ -56,7 +56,7 @@ namespace System.Web.Http.WebHost.Routing
     internal sealed class HostedHttpRouteCollection : HttpRouteCollection
     {
 #pragma warning disable SA1309 // Field names should not begin with underscore
-        private readonly RouteCollection _routeCollection = new();
+        private readonly RouteCollection _routeCollection = [];
 #pragma warning restore SA1309 // Field names should not begin with underscore
 
         public override string VirtualPathRoot => throw NotUsedInUnitTest();
@@ -131,7 +131,7 @@ namespace System.Web.Http.WebHost.Routing
     internal sealed class HttpWebRoute : Route
     {
         public HttpWebRoute( IHttpRoute httpRoute )
-            : base( httpRoute.RouteTemplate, new(), new(), new(), Mock.Of<IRouteHandler>() ) => HttpRoute = httpRoute;
+            : base( httpRoute.RouteTemplate, [], [], [], Mock.Of<IRouteHandler>() ) => HttpRoute = httpRoute;
 
         public IHttpRoute HttpRoute { get; }
     }

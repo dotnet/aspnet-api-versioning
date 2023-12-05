@@ -29,7 +29,7 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
     /// Gets the collection of API versions mapped to the current action.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of mapped <see cref="ApiVersion">API versions</see>.</value>
-    protected ICollection<ApiVersion> MappedVersions => mapped ??= new();
+    protected ICollection<ApiVersion> MappedVersions => mapped ??= [];
 
     /// <summary>
     /// Gets the controller naming convention associated with the builder.

@@ -109,8 +109,8 @@ public static class IApiVersioningBuilderExtensions
 
             if ( source.VersionsByUrl() )
             {
-                var factory = ActivatorUtilities.CreateFactory( typeof( ApiVersionUrlHelperFactory ), new[] { typeof( IUrlHelperFactory ) } );
-                instance = factory( serviceProvider, new[] { decorated } );
+                var factory = ActivatorUtilities.CreateFactory( typeof( ApiVersionUrlHelperFactory ), [typeof( IUrlHelperFactory )] );
+                instance = factory( serviceProvider, [decorated] );
             }
 
             return (IUrlHelperFactory) instance;

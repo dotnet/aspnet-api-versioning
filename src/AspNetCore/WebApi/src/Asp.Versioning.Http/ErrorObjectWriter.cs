@@ -78,7 +78,7 @@ public class ErrorObjectWriter : IProblemDetailsWriter
     {
         private readonly ProblemDetails problemDetails;
         private readonly InnerError? innerError;
-        private readonly Dictionary<string, object> extensions = new();
+        private readonly Dictionary<string, object> extensions = [];
 
         internal ErrorDetail( ProblemDetails problemDetails )
         {
@@ -157,7 +157,7 @@ public class ErrorObjectWriter : IProblemDetailsWriter
     protected readonly struct InnerError
     {
         private readonly ProblemDetails problemDetails;
-        private readonly Dictionary<string, object> extensions = new();
+        private readonly Dictionary<string, object> extensions = [];
 
         internal InnerError( ProblemDetails problemDetails ) =>
             this.problemDetails = problemDetails;

@@ -4,13 +4,11 @@ namespace Asp.Versioning.Description;
 
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Routing;
-using System.Collections.ObjectModel;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using System.Web.Http.Filters;
 using System.Web.Http.Routing;
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.Web.Http.Description.ApiParameterSource;
@@ -299,9 +297,9 @@ public class ApiVersionParameterDescriptionContextTest
         var action = new Mock<HttpActionDescriptor>() { CallBase = true }.Object;
         var controller = new Mock<HttpControllerDescriptor>() { CallBase = true };
 
-        controller.Setup( c => c.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) ).Returns( new Collection<IApiVersionProvider>() );
-        controller.Setup( c => c.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) ).Returns( new Collection<IApiVersionNeutral>() );
-        controller.Setup( c => c.GetFilters() ).Returns( new Collection<IFilter>() );
+        controller.Setup( c => c.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) ).Returns( [] );
+        controller.Setup( c => c.GetCustomAttributes<IApiVersionNeutral>( It.IsAny<bool>() ) ).Returns( [] );
+        controller.Setup( c => c.GetFilters() ).Returns( [] );
         action.ControllerDescriptor = controller.Object;
 
         return action;

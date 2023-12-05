@@ -64,7 +64,7 @@ internal sealed class AdHocEdmScope : IDisposable
                 continue;
             }
 
-            results ??= new();
+            results ??= [];
             results.Add( apiDescription );
 
             for ( var j = 0; j < conventions.Count; j++ )
@@ -73,7 +73,7 @@ internal sealed class AdHocEdmScope : IDisposable
             }
         }
 
-        return results?.ToArray() ?? Array.Empty<VersionedApiDescription>();
+        return results?.ToArray() ?? [];
     }
 
     private static void ApplyAdHocEdm(

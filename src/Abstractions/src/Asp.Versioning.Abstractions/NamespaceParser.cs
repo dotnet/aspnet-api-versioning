@@ -92,7 +92,7 @@ public class NamespaceParser
                 }
                 else if ( versions is null )
                 {
-                    versions = new() { version, result };
+                    versions = [version, result];
                 }
                 else
                 {

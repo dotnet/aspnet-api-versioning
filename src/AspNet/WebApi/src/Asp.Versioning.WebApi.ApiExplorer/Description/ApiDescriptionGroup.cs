@@ -56,5 +56,5 @@ public class ApiDescriptionGroup
     /// </summary>
     /// <value>A <see cref="Collection{T}">collection</see> of
     /// <see cref="VersionedApiDescription">versioned API descriptions</see>.</value>
-    public virtual Collection<VersionedApiDescription> ApiDescriptions { get; } = new();
+    public virtual Collection<VersionedApiDescription> ApiDescriptions { get; } = [];
 }

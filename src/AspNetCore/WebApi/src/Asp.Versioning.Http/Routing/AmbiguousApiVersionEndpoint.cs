@@ -19,7 +19,7 @@ internal sealed class AmbiguousApiVersionEndpoint : Endpoint
     {
         var apiVersions = context.ApiVersioningFeature().RawRequestedApiVersions;
 
-        logger.ApiVersionAmbiguous( apiVersions.ToArray() );
+        logger.ApiVersionAmbiguous( [.. apiVersions] );
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
         if ( !context.TryGetProblemDetailsService( out var problemDetails ) )

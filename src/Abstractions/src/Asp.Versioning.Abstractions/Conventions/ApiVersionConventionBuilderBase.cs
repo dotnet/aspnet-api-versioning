@@ -39,25 +39,25 @@ public abstract class ApiVersionConventionBuilderBase
     /// Gets the collection of API versions supported by the current controller.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of supported <see cref="ApiVersion">API versions</see>.</value>
-    protected ICollection<ApiVersion> SupportedVersions => supported ??= new();
+    protected ICollection<ApiVersion> SupportedVersions => supported ??= [];
 
     /// <summary>
     /// Gets the collection of API versions deprecated by the current controller.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of deprecated <see cref="ApiVersion">API versions</see>.</value>
-    protected ICollection<ApiVersion> DeprecatedVersions => deprecated ??= new();
+    protected ICollection<ApiVersion> DeprecatedVersions => deprecated ??= [];
 
     /// <summary>
     /// Gets the collection of API versions advertised by the current controller.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of advertised <see cref="ApiVersion">API versions</see>.</value>
-    protected ICollection<ApiVersion> AdvertisedVersions => advertised ??= new();
+    protected ICollection<ApiVersion> AdvertisedVersions => advertised ??= [];
 
     /// <summary>
     /// Gets the collection of API versions advertised and deprecated by the current controller.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of advertised and deprecated <see cref="ApiVersion">API versions</see>.</value>
-    protected ICollection<ApiVersion> DeprecatedAdvertisedVersions => deprecatedAdvertised ??= new();
+    protected ICollection<ApiVersion> DeprecatedAdvertisedVersions => deprecatedAdvertised ??= [];
 
     /// <summary>
     /// Merges API version information from the specified attributes with the current conventions.
@@ -99,19 +99,19 @@ public abstract class ApiVersionConventionBuilderBase
                     switch ( provider.Options )
                     {
                         case None:
-                            target = newSupported ??= new();
+                            target = newSupported ??= [];
                             source = provider.Versions;
                             break;
                         case Deprecated:
-                            target = newDeprecated ??= new();
+                            target = newDeprecated ??= [];
                             source = provider.Versions;
                             break;
                         case Advertised:
-                            target = newAdvertised ??= new();
+                            target = newAdvertised ??= [];
                             source = provider.Versions;
                             break;
                         case DeprecatedAdvertised:
-                            target = newDeprecatedAdvertised ??= new();
+                            target = newDeprecatedAdvertised ??= [];
                             source = provider.Versions;
                             break;
                         default:

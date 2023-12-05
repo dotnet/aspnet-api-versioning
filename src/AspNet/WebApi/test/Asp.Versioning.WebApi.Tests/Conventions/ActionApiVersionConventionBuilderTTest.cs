@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Conventions;
 
-using System.Collections.ObjectModel;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using static Asp.Versioning.ApiVersionMapping;
@@ -17,7 +16,7 @@ public partial class ActionApiVersionConventionBuilderTTest
         var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder );
         var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
 
-        actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
+        actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( [] );
         actionDescriptor.Object.ControllerDescriptor = new();
 
         // act
@@ -43,7 +42,7 @@ public partial class ActionApiVersionConventionBuilderTTest
         var actionBuilder = new ActionApiVersionConventionBuilder<UndecoratedController>( controllerBuilder );
         var actionDescriptor = new Mock<HttpActionDescriptor>() { CallBase = true };
 
-        actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( new Collection<IApiVersionProvider>() );
+        actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>() ).Returns( [] );
         actionDescriptor.Object.ControllerDescriptor = new();
         actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) );
 

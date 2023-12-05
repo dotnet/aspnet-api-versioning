@@ -181,7 +181,7 @@ public class ODataApiExplorer : VersionedApiExplorer
             return apiDescriptions;
         }
 
-        apiDescriptions = new();
+        apiDescriptions = [];
         var modelSelector = Configuration.GetODataRootContainer( route ).GetRequiredService<IEdmModelSelector>();
         var edmModel = modelSelector.SelectModel( apiVersion );
 

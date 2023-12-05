@@ -79,7 +79,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
                 continue;
             }
 
-            edges ??= new();
+            edges ??= [];
             edges.Add( endpoint );
 
             var model = endpoint.Metadata.GetMetadata<ApiVersionMetadata>()!.Map( Explicit | Implicit );
@@ -121,7 +121,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
             return Array.Empty<PolicyNodeEdge>();
         }
 
-        var state = (lowestApiVersion, routePatterns?.ToArray() ?? Array.Empty<RoutePattern>());
+        var state = (lowestApiVersion, routePatterns?.ToArray() ?? []);
         return new PolicyNodeEdge[] { new( state, edges ) };
     }
 

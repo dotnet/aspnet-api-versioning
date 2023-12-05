@@ -24,6 +24,7 @@ using static System.StringSplitOptions;
 
 internal sealed partial class ODataAttributeVisitor
 {
+    private static readonly char[] Comma = [','];
     private readonly ODataQueryOptionDescriptionContext context;
 
     internal ODataAttributeVisitor(
@@ -124,7 +125,7 @@ internal sealed partial class ODataAttributeVisitor
                 continue;
             }
 
-            var properties = attribute.AllowedOrderByProperties.Split( new[] { ',' }, RemoveEmptyEntries );
+            var properties = attribute.AllowedOrderByProperties.Split( Comma, RemoveEmptyEntries );
             var allowedOrderByProperties = context.AllowedOrderByProperties;
             var comparer = StringComparer.OrdinalIgnoreCase;
 

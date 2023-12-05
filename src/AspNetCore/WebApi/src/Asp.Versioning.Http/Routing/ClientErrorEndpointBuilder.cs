@@ -57,7 +57,7 @@ internal sealed class ClientErrorEndpointBuilder
     {
         if ( candidates.Count == 0 )
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         ref readonly var candidate = ref candidates[0];

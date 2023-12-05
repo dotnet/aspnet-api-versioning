@@ -85,7 +85,7 @@ public partial class LinkHeaderValue
 #endif
             if ( languages is null )
             {
-                languages = new() { value };
+                languages = [value];
             }
             else if ( languages.Count == 0 )
             {
@@ -105,7 +105,7 @@ public partial class LinkHeaderValue
     /// <remarks>This is only a hint; for example, it does not override the Content-Language header field of
     /// a HTTP response obtained by actually following the link. A single link may indicate that multiple
     /// languages are available from the indicated resource.</remarks>
-    public IList<StringSegment> Languages => languages ??= new();
+    public IList<StringSegment> Languages => languages ??= [];
 
     /// <summary>
     /// Gets or sets the link media.
@@ -206,11 +206,11 @@ public partial class LinkHeaderValue
                     type = attribute.Value;
                     break;
                 case "hreflang":
-                    languages ??= new();
+                    languages ??= [];
                     languages.Add( attribute.Value );
                     break;
                 default:
-                    extensions ??= new();
+                    extensions ??= [];
                     extensions.Add( attribute );
                     break;
             }

@@ -17,7 +17,7 @@ using System.Buffers;
 /// </summary>
 public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfiguration, IODataQueryOptionsConvention
 {
-    private readonly HashSet<Type> types = new();
+    private readonly HashSet<Type> types = [];
 
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string? routePrefix )
@@ -67,7 +67,7 @@ public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfigu
 
 #if NETFRAMEWORK
             var array = new StructuralTypeConfiguration[count];
-            types = new();
+            types = [];
 #else
             var pool = ArrayPool<StructuralTypeConfiguration>.Shared;
             var array = pool.Rent( count );
@@ -96,10 +96,7 @@ public sealed partial class ImplicitModelBoundSettingsConvention : IModelConfigu
             return default;
         }
 
-        types = new HashSet<Type>()
-        {
-            structuralTypes.Current.ClrType,
-        };
+        types = [structuralTypes.Current.ClrType];
 
         while ( structuralTypes.MoveNext() )
         {

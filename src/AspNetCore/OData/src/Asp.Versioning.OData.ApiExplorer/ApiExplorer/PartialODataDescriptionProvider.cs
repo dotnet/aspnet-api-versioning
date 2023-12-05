@@ -91,7 +91,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
 
         var results = FilterResults( context.Results, Conventions );
 
-        if ( results.Count == 0 )
+        if ( results.Length == 0 )
         {
             return;
         }
@@ -106,7 +106,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
 
             odata.AddRouteComponents( model );
 
-            for ( var j = 0; j < results.Count; j++ )
+            for ( var j = 0; j < results.Length; j++ )
             {
                 var result = results[j];
                 var metadata = result.ActionDescriptor.GetApiVersionMetadata();
@@ -158,7 +158,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     private static void MarkAsAdHoc( ODataModelBuilder builder, IEdmModel model ) =>
         model.SetAnnotationValue( model, AdHocAnnotation.Instance );
 
-    private static IReadOnlyList<ApiDescription> FilterResults(
+    private static ApiDescription[] FilterResults(
         IList<ApiDescription> results,
         IReadOnlyList<IODataQueryOptionsConvention> conventions )
     {
@@ -193,7 +193,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
             }
         }
 
-        return filtered?.ToArray() ?? Array.Empty<ApiDescription>();
+        return filtered?.ToArray() ?? [];
     }
 
     private sealed class StubModelMetadataProvider : IModelMetadataProvider

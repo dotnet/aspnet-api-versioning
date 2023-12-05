@@ -74,7 +74,7 @@ internal static partial class ILoggerExtensions
     {
         if ( !sunsetPolicy.HasLinks )
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         // <Title> (<Language>[,<Language>]): <Url>
