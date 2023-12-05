@@ -28,7 +28,7 @@ internal sealed class UnspecifiedApiVersionEndpoint : Endpoint
 
         if ( context.TryGetProblemDetailsService( out var problemDetails ) )
         {
-            return problemDetails.WriteAsync(
+            return problemDetails.TryWriteAsync(
                 EndpointProblem.New(
                     context,
                     ProblemDetailsDefaults.Unspecified,

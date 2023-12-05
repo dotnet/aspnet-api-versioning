@@ -33,7 +33,7 @@ internal sealed class MalformedApiVersionEndpoint : Endpoint
             new Uri( context.Request.GetDisplayUrl() ).SafeFullPath(),
             requestedVersion );
 
-        return problemDetails.WriteAsync(
+        return problemDetails.TryWriteAsync(
             EndpointProblem.New(
                 context,
                 ProblemDetailsDefaults.Invalid,
