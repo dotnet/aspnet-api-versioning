@@ -3,8 +3,8 @@
 namespace Asp.Versioning.Conventions;
 
 #if NETFRAMEWORK
+using System.Web.Http.Results;
 using ControllerBase = System.Web.Http.ApiController;
-using IActionResult = System.Web.Http.IHttpActionResult;
 #else
 using Microsoft.AspNetCore.Mvc;
 #endif
@@ -86,7 +86,7 @@ public partial class ControllerApiVersionConventionBuilderTest
 #endif
     private sealed class UndecoratedController : ControllerBase
     {
-        public IActionResult Get() => Ok();
+        public OkResult Get() => Ok();
     }
 
 #if !NETFRAMEWORK
@@ -98,6 +98,6 @@ public partial class ControllerApiVersionConventionBuilderTest
     [AdvertiseApiVersions( "3.0-Beta", Deprecated = true )]
     private sealed class DecoratedController : ControllerBase
     {
-        public IActionResult Get() => Ok();
+        public OkResult Get() => Ok();
     }
 }

@@ -35,20 +35,20 @@ public class ODataControllerSpecificationTest
     private sealed class NormalODataController : ODataController
     {
         [EnableQuery]
-        public IActionResult Get() => Ok();
+        public OkResult Get() => Ok();
     }
 
     [ODataAttributeRouting]
     private sealed class CustomODataController : ControllerBase
     {
         [EnableQuery]
-        public IActionResult Get() => Ok();
+        public OkResult Get() => Ok();
     }
 
     [Route( "api/test" )]
     private sealed class NonODataController : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get() => Ok();
+        public OkResult Get() => Ok();
     }
 }

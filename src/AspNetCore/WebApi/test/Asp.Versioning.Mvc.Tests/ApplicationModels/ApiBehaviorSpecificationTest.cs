@@ -33,13 +33,13 @@ public class ApiBehaviorSpecificationTest
     private sealed class ApiBehaviorController : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get() => Ok();
+        public OkResult Get() => Ok();
     }
 
     [Route( "/" )]
     private sealed class NonApiBehaviorController : Controller
     {
         [HttpGet]
-        public IActionResult Index() => View();
+        public ViewResult Index() => View();
     }
 }

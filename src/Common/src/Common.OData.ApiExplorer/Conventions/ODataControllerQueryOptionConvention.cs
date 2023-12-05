@@ -41,7 +41,7 @@ internal sealed class ODataControllerQueryOptionConvention : IODataQueryOptionsC
         convention!.ApplyTo( apiDescription );
     }
 
-    private static IODataQueryOptionsConvention ImplicitActionConvention( ODataQueryOptionSettings settings )
+    private static ODataValidationSettingsConvention ImplicitActionConvention( ODataQueryOptionSettings settings )
     {
         var validationSettings = new ODataValidationSettings()
         {
@@ -51,6 +51,6 @@ internal sealed class ODataControllerQueryOptionConvention : IODataQueryOptionsC
             AllowedQueryOptions = AllowedQueryOptions.None,
         };
 
-        return new ODataValidationSettingsConvention( validationSettings, settings );
+        return new( validationSettings, settings );
     }
 }

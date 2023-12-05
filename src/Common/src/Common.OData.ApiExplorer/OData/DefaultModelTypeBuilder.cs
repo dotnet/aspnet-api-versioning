@@ -120,7 +120,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         return type;
     }
 
-    private IDictionary<EdmTypeKey, Type> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )
+    private Dictionary<EdmTypeKey, Type> GenerateTypesForEdmModel( IEdmModel model, ApiVersion apiVersion )
     {
         ModuleBuilder NewModuleBuilder() => ( modules ??= new() ).GetOrAdd( new( model, apiVersion ), CreateModuleForApiVersion );
 
@@ -195,8 +195,8 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
     private static Tuple<bool, bool> BuildSignatureProperties(
         Type clrType,
-        IReadOnlyDictionary<string, IEdmProperty> structuralProperties,
-        IReadOnlyDictionary<PropertyInfo, IEdmProperty> mappedClrProperties,
+        Dictionary<string, IEdmProperty> structuralProperties,
+        Dictionary<PropertyInfo, IEdmProperty> mappedClrProperties,
         List<ClassProperty> properties,
         List<PropertyDependency> dependentProperties,
         BuilderContext context )
@@ -370,7 +370,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         return typeBuilder;
     }
 
-    private static IDictionary<EdmTypeKey, Type> ResolveDependencies( BuilderContext context )
+    private static Dictionary<EdmTypeKey, Type> ResolveDependencies( BuilderContext context )
     {
         var edmTypes = context.EdmTypes;
 
@@ -520,11 +520,11 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 
         internal IEdmModel EdmModel { get; }
 
-        internal IDictionary<EdmTypeKey, Type> EdmTypes { get; } = new Dictionary<EdmTypeKey, Type>();
+        internal Dictionary<EdmTypeKey, Type> EdmTypes { get; } = [];
 
-        internal ISet<EdmTypeKey> VisitedEdmTypes => visitedEdmTypes ??= new();
+        internal HashSet<EdmTypeKey> VisitedEdmTypes => visitedEdmTypes ??= [];
 
-        internal IList<PropertyDependency> Dependencies => dependencies ??= new();
+        internal List<PropertyDependency> Dependencies => dependencies ??= [];
 
         internal bool HasDependencies => dependencies != null && dependencies.Count > 0;
     }
