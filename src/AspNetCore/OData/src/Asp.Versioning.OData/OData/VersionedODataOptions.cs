@@ -85,6 +85,8 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
     /// <param name="handler">The retrieved <see cref="ODataBatchHandler">OData batch handler</see> or <c>null</c>.</param>
     /// <returns>True if the <paramref name="handler"/> was successfully retrieved; otherwise, false.</returns>
+    /// <remarks>Prefer the asynchronous version of this method
+    /// <see cref="TryGetBatchHandlerAsync(HttpContext, CancellationToken)"/>.</remarks>
     public virtual bool TryGetBatchHandler( HttpContext context, [NotNullWhen( true )] out ODataBatchHandler? handler )
     {
         ArgumentNullException.ThrowIfNull( context );
@@ -99,11 +101,32 @@ public class VersionedODataOptions : IOptions<ODataOptions>
     }
 
     /// <summary>
+    /// Attempts to retrieve the configured batch handler for the current context.
+    /// </summary>
+    /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
+    /// <param name="cancellationToken">The token that can be used to cancel the operation.</param>
+    /// <returns>A <see cref="ValueTask{TResult}">task</see> containing the matched <see cref="ODataBatchHandler"/>
+    /// or <c>null</c> if the no match was found.</returns>
+    public virtual ValueTask<ODataBatchHandler?> TryGetBatchHandlerAsync( HttpContext context, CancellationToken cancellationToken )
+    {
+        ArgumentNullException.ThrowIfNull( context );
+
+        if ( batchMapping is null )
+        {
+            return ValueTask.FromResult( default( ODataBatchHandler? ) );
+        }
+
+        return batchMapping.TryGetHandlerAsync( context, cancellationToken );
+    }
+
+    /// <summary>
     /// Attempts to get the current OData options.
     /// </summary>
     /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
     /// <param name="options">The resolved <see cref="ODataOptions">OData options</see> or <c>null</c>.</param>
     /// <returns>True if the current OData were successfully resolved; otherwise, false.</returns>
+    /// <remarks>Prefer the asynchronous version of this method
+    /// <see cref="TryGetValueAsync(HttpContext?, CancellationToken)"/>.</remarks>
     public virtual bool TryGetValue( HttpContext? context, [NotNullWhen( true )] out ODataOptions? options )
     {
         if ( context == null || mapping == null || mapping.Count == 0 )
@@ -127,6 +150,36 @@ public class VersionedODataOptions : IOptions<ODataOptions>
         }
 
         return mapping.TryGetValue( apiVersion, out options );
+    }
+
+    /// <summary>
+    /// Attempts to get the current OData options.
+    /// </summary>
+    /// <param name="context">The current <see cref="HttpContext">HTTP context</see>.</param>
+    /// <param name="cancellationToken">The token that can be used to cancel the operation.</param>
+    /// <returns>A <see cref="ValueTask{TResult}">task</see> containing the matched <see cref="ODataOptions"/>
+    /// or <c>null</c> if the no match was found.</returns>
+    public virtual async ValueTask<ODataOptions?> TryGetValueAsync( HttpContext? context, CancellationToken cancellationToken )
+    {
+        if ( context == null || mapping == null || mapping.Count == 0 )
+        {
+            return default;
+        }
+
+        var apiVersion = context.GetRequestedApiVersion();
+
+        if ( apiVersion == null )
+        {
+            var model = new ApiVersionModel( mapping.Keys, Array.Empty<ApiVersion>() );
+            apiVersion = await ApiVersionSelector.SelectVersionAsync( context.Request, model, cancellationToken ).ConfigureAwait( false );
+
+            if ( apiVersion == null )
+            {
+                return default;
+            }
+        }
+
+        return mapping.TryGetValue( apiVersion, out var options ) ? options : default;
     }
 
     /// <summary>

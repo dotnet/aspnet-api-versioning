@@ -47,7 +47,7 @@ public partial class ApiVersioningOptions
     /// <value>True if the a default API version should be assumed when a client does not
     /// provide an API version; otherwise, false. The default value is <c>false</c>.</value>
     /// <remarks>When a default API version is assumed, the version used is based up the
-    /// result of the <see cref="IApiVersionSelector.SelectVersion"/> method.</remarks>
+    /// result from <see cref="IApiVersionSelector"/>.</remarks>
     public bool AssumeDefaultVersionWhenUnspecified { get; set; }
 
     /// <summary>

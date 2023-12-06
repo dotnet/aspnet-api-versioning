@@ -11,10 +11,7 @@ using Microsoft.AspNetCore.Http;
 /// <summary>
 /// Defines the behavior of an API version selector.
 /// </summary>
-#if !NETFRAMEWORK
-[CLSCompliant( false )]
-#endif
-public interface IApiVersionSelector
+public partial interface IApiVersionSelector
 {
     /// <summary>
     /// Selects an API version given the specified HTTP request and API version information.
