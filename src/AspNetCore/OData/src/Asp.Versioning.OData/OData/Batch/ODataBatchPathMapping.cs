@@ -59,9 +59,9 @@ internal sealed class ODataBatchPathMapping
         var routeData = new RouteValueDictionary();
         var candidates = new Dictionary<ApiVersion, int>( capacity: mappings.Length );
 
-        if ( SelectExactMatch( context, routeData, candidates ) is { } handler )
+        if ( SelectExactMatch( context, routeData, candidates ) is var handler )
         {
-            return ValueTask.FromResult<ODataBatchHandler?>( handler );
+            return ValueTask.FromResult( handler );
         }
 
         return SelectBestCandidateAsync( context, candidates, routeData, cancellationToken );
