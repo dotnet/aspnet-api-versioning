@@ -453,8 +453,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
 
         var mapping = ApiVersionMapping.Explicit | ApiVersionMapping.Implicit;
         var model = apiDescription.ActionDescriptor.GetApiVersionMetadata().Map( mapping );
-        var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
-        var defaultApiVersion = options.ApiVersionSelector.SelectVersion( context.Request, model );
+        var defaultApiVersion = options.ApiVersionSelector.SelectVersion( model );
 
         return apiVersion == defaultApiVersion;
     }
