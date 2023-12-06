@@ -77,7 +77,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     }
 
     /// <inheritdoc />
-    public Task ApplyAsync( HttpContext httpContext, CandidateSet candidates )
+    public async Task ApplyAsync( HttpContext httpContext, CandidateSet candidates )
     {
         ArgumentNullException.ThrowIfNull( httpContext );
         ArgumentNullException.ThrowIfNull( candidates );
@@ -87,7 +87,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
 
         if ( apiVersion == null && Options.AssumeDefaultVersionWhenUnspecified )
         {
-            apiVersion = TrySelectApiVersion( httpContext, candidates );
+            apiVersion = await TrySelectApiVersionAsync( httpContext, candidates ).ConfigureAwait( false );
             feature.RequestedApiVersion = apiVersion;
         }
 
@@ -98,8 +98,6 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             var builder = new ClientErrorEndpointBuilder( feature, candidates, Options, logger );
             httpContext.SetEndpoint( builder.Build() );
         }
-
-        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
@@ -453,7 +451,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         return (matched, hasCandidates);
     }
 
-    private ApiVersion TrySelectApiVersion( HttpContext httpContext, CandidateSet candidates )
+    private ValueTask<ApiVersion> TrySelectApiVersionAsync( HttpContext httpContext, CandidateSet candidates )
     {
         var models = new List<ApiVersionModel>( capacity: candidates.Count );
 
@@ -473,7 +471,10 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             }
         }
 
-        return ApiVersionSelector.SelectVersion( httpContext.Request, models.Aggregate() );
+        return ApiVersionSelector.SelectVersionAsync(
+            httpContext.Request,
+            models.Aggregate(),
+            httpContext.RequestAborted );
     }
 
     bool INodeBuilderPolicy.AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints ) =>
