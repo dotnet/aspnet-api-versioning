@@ -74,6 +74,7 @@ public partial class ControllerApiVersionConventionBuilderTTest
         internal ActionApiVersionConventionBuilderCollection<ControllerBase> ProtectedActionBuilders => ActionBuilders;
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1812
 
 #if !NETFRAMEWORK

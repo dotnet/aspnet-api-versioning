@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dneutral
+
 namespace Asp.Versioning.Routing;
 
 using Asp.Versioning.OData;

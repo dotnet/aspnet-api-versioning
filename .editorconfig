@@ -90,6 +90,9 @@ csharp_space_between_method_declaration_parameter_list_parentheses = true
 csharp_space_between_method_call_parameter_list_parentheses = true
 csharp_space_between_parentheses = control_flow_statements, expressions
 
+# primary construcrtors
+csharp_style_prefer_primary_constructors = false:none
+
 # style code suppressions
 dotnet_diagnostic.SA1002.severity = none
 dotnet_diagnostic.SA1003.severity = none

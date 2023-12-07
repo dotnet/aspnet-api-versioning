@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: DX
+
 namespace Asp.Versioning;
 
 public partial class ApiVersionTest

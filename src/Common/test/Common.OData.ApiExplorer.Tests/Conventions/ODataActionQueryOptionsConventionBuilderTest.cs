@@ -239,6 +239,7 @@ public class ODataActionQueryOptionsConventionBuilderTest
         controllerBuilder.Verify( cb => cb.Action( method ), Once() );
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1034 // Nested types should not be visible
 
     public sealed class TestController : ControllerBase

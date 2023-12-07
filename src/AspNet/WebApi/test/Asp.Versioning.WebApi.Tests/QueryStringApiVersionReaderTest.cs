@@ -86,8 +86,8 @@ public class QueryStringApiVersionReaderTest
     }
 
     [Theory]
-    [InlineData( new object[] { new string[0] } )]
-    [InlineData( new object[] { new[] { "api-version" } } )]
+    [InlineData( [new string[0]] )]
+    [InlineData( [new[] { "api-version" }] )]
     public void add_parameters_should_add_single_parameter_from_query_string( string[] parameterNames )
     {
         // arrange

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dneutral
+
 namespace Asp.Versioning;
 
 using Asp.Versioning.Simulators;

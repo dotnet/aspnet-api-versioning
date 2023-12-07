@@ -125,7 +125,7 @@ public class MediaTypeApiVersionReaderBuilderTest
         var versions = reader.Read( request );
 
         // assert
-        versions.Should().BeEquivalentTo( new[] { "1.5", "2.0" } );
+        versions.Should().BeEquivalentTo( ["1.5", "2.0"] );
     }
 
     [Fact]
@@ -246,7 +246,7 @@ public class MediaTypeApiVersionReaderBuilderTest
     [InlineData( "application/vnd-v{v}+json", "v", "application/vnd-v2.1+json", "2.1" )]
     [InlineData( "application/vnd-v{ver}+json", "ver", "application/vnd-v2022-11-01+json", "2022-11-01" )]
     [InlineData( "application/vnd-{version}+xml", "version", "application/vnd-1.1-beta+xml", "1.1-beta" )]
-    public void read_should_retreive_version_from_media_type_template(
+    public void read_should_retrieve_version_from_media_type_template(
         string template,
         string parameterName,
         string mediaType,

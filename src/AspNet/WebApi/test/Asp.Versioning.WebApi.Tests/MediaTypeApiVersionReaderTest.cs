@@ -111,7 +111,7 @@ public class MediaTypeApiVersionReaderTest
         var versions = reader.Read( request );
 
         // assert
-        versions.Should().BeEquivalentTo( new[] { "1.5", "2.0" } );
+        versions.Should().BeEquivalentTo( ["1.5", "2.0"] );
     }
 
     [Fact]

@@ -1,7 +1,10 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dcase
+//// Ignore Spelling: Dinsensitive
 
 namespace Asp.Versioning.ApiExplorer;
+
 using Asp.Versioning.Models;
 using Asp.Versioning.Routing;
 using Asp.Versioning.Simulators;

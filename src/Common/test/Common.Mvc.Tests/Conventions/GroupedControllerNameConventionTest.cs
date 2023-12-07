@@ -37,13 +37,13 @@ public partial class GroupedControllerNameConventionTest
     {
         get
         {
-            return new[]
+            return new object[][]
             {
-                new object[] { "Values" },
+                ["Values"],
 #if NETFRAMEWORK
-                new object[] { "ValuesController2" },
+                ["ValuesController2"],
 #else
-                new object[] { "Values2" },
+                ["Values2"],
 #endif
             };
         }

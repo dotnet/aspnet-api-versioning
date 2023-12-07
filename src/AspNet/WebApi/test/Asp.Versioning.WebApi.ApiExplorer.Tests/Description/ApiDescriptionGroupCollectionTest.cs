@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: denormalized
+
 namespace Asp.Versioning.Description;
 
 using System.Collections.ObjectModel;

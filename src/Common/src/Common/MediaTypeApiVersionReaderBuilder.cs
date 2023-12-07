@@ -24,7 +24,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 #if NETFRAMEWORK
-using FrozenSet = HashSet<String>;
+using FrozenSet = HashSet<string>;
 #else
 using FrozenSet = FrozenSet<StringSegment>;
 #endif

@@ -1,5 +1,10 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dlike
+//// Ignore Spelling: Multipart
+//// Ignore Spelling: nonaction
+//// Ignore Spelling: nonquery
+
 namespace Asp.Versioning.Conventions;
 
 using Asp.Versioning.Description;
