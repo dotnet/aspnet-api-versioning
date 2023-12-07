@@ -41,7 +41,7 @@ namespace Asp.Versioning.OData
     {
         internal struct ValueTypeModelConfiguration : IModelConfiguration
         {
-            public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
+            public readonly void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix ) { }
         }
 
         internal sealed class PrivateModelConfiguration : IModelConfiguration
