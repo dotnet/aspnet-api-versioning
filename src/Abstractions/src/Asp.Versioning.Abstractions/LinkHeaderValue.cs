@@ -532,16 +532,10 @@ public partial class LinkHeaderValue
         }
     }
 
-    private struct TargetAttributesEnumerator : IEnumerable<KeyValuePair<StringSegment, StringSegment>>
+    private struct TargetAttributesEnumerator( StringSegment remaining )
+        : IEnumerable<KeyValuePair<StringSegment, StringSegment>>
     {
-        private readonly StringSegment remaining;
-        private int start;
-
-        public TargetAttributesEnumerator( StringSegment remaining )
-        {
-            this.remaining = remaining;
-            start = 0;
-        }
+        private int start = 0;
 
         public IEnumerator<KeyValuePair<StringSegment, StringSegment>> GetEnumerator()
         {
