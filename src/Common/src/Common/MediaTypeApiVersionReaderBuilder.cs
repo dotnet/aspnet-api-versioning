@@ -11,30 +11,34 @@ using HttpRequest = System.Net.Http.HttpRequestMessage;
 using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeWithQualityHeaderValue;
 #else
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using System.Collections.Frozen;
 #endif
 
 namespace Asp.Versioning;
 
 #if !NETFRAMEWORK
 using System.Buffers;
-using System.Collections.Frozen;
 #endif
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 #if NETFRAMEWORK
-using FrozenSet = System.Collections.Generic.HashSet<System.String>;
-using Str = string;
-using StrComparer = System.StringComparer;
+using FrozenSet = HashSet<String>;
 #else
-using FrozenSet = System.Collections.Frozen.FrozenSet<Microsoft.Extensions.Primitives.StringSegment>;
-using Str = Microsoft.Extensions.Primitives.StringSegment;
-using StrComparer = Microsoft.Extensions.Primitives.StringSegmentComparer;
+using FrozenSet = FrozenSet<StringSegment>;
+#endif
+using ReaderCallback = Func<IReadOnlyList<MediaTypeHeaderValue>, IReadOnlyList<string>>;
+using SelectorCallback = Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>>;
+#if NETFRAMEWORK
+using Str = String;
+using StrComparer = StringComparer;
+#else
+using Str = StringSegment;
+using StrComparer = StringSegmentComparer;
 #endif
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.StringComparison;
-using ReaderCallback = Func<IReadOnlyList<MediaTypeHeaderValue>, IReadOnlyList<string>>;
-using SelectorCallback = Func<HttpRequest, IReadOnlyList<string>, IReadOnlyList<string>>;
 
 /// <summary>
 /// Represents a builder for an API version reader that reads the value from a media type HTTP header in the request.

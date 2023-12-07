@@ -1,6 +1,9 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable SA1402, SA1649
+#pragma warning disable IDE0060
+#pragma warning disable IDE0079
+#pragma warning disable SA1402
+#pragma warning disable SA1649
 
 // REF: https://github.com/dotnet/runtime/blob/1c8d37af80667daffb3cb80ce0fe915621e8f039/src/libraries/System.Private.CoreLib/src/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 //

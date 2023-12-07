@@ -20,9 +20,11 @@ public class ODataControllerQueryOptionsConventionBuilder<T> :
     IODataActionQueryOptionsConventionBuilder<T>
     where T : notnull
 #if NETFRAMEWORK
+#pragma warning disable IDE0079
 #pragma warning disable SA1001 // Commas should be spaced correctly
     , IHttpController
 #pragma warning restore SA1001 // Commas should be spaced correctly
+#pragma warning restore IDE0079
 #endif
 {
     private ODataActionQueryOptionsConventionBuilderCollection<T>? actionBuilders;
