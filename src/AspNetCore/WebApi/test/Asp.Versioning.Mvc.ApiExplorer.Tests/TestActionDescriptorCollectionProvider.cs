@@ -17,7 +17,7 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
 
         if ( otherActions.Length == 0 )
         {
-            actions = new ActionDescriptor[] { action };
+            actions = [action];
         }
         else
         {
