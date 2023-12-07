@@ -19,9 +19,12 @@ public partial class VersionedODataModelBuilder
     /// <summary>
     /// Gets or sets the factory method used to create model builders.
     /// </summary>
-    /// <value>The factory <see cref="Func{TResult}">method</see> used to create <see cref="ODataModelBuilder">model builders</see>.</value>
-    /// <remarks>The default implementation creates default instances of the <see cref="ODataConventionModelBuilder"/> class.</remarks>
-    public Func<ODataModelBuilder> ModelBuilderFactory { get; set; } = () => new ODataConventionModelBuilder().EnableLowerCamelCase();
+    /// <value>The factory <see cref="Func{TResult}">method</see> used to create
+    /// <see cref="ODataModelBuilder">model builders</see>.</value>
+    /// <remarks>The default implementation creates default instances of the
+    /// <see cref="ODataConventionModelBuilder"/> class.</remarks>
+    public Func<ODataModelBuilder> ModelBuilderFactory { get; set; } =
+        static () => new ODataConventionModelBuilder().EnableLowerCamelCase();
 
     /// <summary>
     /// Gets or sets the default model configuration.
