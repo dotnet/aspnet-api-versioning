@@ -7,7 +7,7 @@ root = true
 [*]
 indent_style = space
 vsspell_section_id = 41b65011239a40959ccaae2a4ec7044a
-vsspell_ignored_words_41b65011239a40959ccaae2a4ec7044a = clr|Edm|middleware|Mvc|odata|Validator|Accessor|app|inline
+vsspell_ignored_words_41b65011239a40959ccaae2a4ec7044a = Accessor|app|clr|Edm|inline|middleware|Mvc|odata|Validator|Deconstruct
 
 # code files
 [*.{cs,csx,vb,vbx}]
