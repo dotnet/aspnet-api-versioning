@@ -2,6 +2,8 @@
 
 #pragma warning disable IDE1006 // Naming Styles
 
+//// Ignore Spelling: Dbased
+
 namespace given_a_versioned_ApiController_per_namespace;
 
 using Asp.Versioning;

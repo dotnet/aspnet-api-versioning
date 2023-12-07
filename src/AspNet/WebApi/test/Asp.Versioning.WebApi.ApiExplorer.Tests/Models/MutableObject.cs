@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Foo
+
 namespace Asp.Versioning.Models;
 
 public class MutableObject

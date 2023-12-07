@@ -23,7 +23,7 @@ using static System.StringComparer;
 /// </summary>
 internal sealed class ActionSelectorCacheItem
 {
-    private static readonly HttpMethod[] cacheListMethodKinds = new[] { HttpMethod.Get, HttpMethod.Put, HttpMethod.Post };
+    private static readonly HttpMethod[] cacheListMethodKinds = [HttpMethod.Get, HttpMethod.Put, HttpMethod.Post];
     private readonly HttpControllerDescriptor controllerDescriptor;
     private readonly CandidateAction[] combinedCandidateActions;
     private readonly Dictionary<HttpActionDescriptor, string[]> actionParameterNames = [];

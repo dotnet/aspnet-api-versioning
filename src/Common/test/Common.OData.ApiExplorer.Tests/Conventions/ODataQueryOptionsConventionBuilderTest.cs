@@ -1,7 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.Conventions;
+//// Ignore Spelling: Dtime
 
+namespace Asp.Versioning.Conventions;
 
 #if NETFRAMEWORK
 using Microsoft.AspNet.OData;
@@ -112,6 +113,7 @@ public partial class ODataQueryOptionsConventionBuilderTest
         internal new IList<IODataQueryOptionsConvention> Conventions => base.Conventions;
     }
 
+#pragma warning disable IDE0079
 #pragma warning disable CA1034 // Nested types should not be visible
 
     public sealed class StubController : ODataController

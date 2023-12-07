@@ -1,5 +1,8 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dbased
+//// Ignore Spelling: Dneutral
+
 namespace Asp.Versioning.Dispatcher;
 
 using Asp.Versioning;

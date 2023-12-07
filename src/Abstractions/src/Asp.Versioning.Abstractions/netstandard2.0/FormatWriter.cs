@@ -45,7 +45,7 @@ internal ref struct FormatWriter
 
     public bool Succeeded { get; private set; }
 
-    public int Written => totalWritten;
+    public readonly int Written => totalWritten;
 
     public void Write( in FormatToken token )
     {

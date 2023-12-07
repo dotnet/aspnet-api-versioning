@@ -35,14 +35,14 @@ public partial class DefaultControllerNameConventionTest
     {
         get
         {
-            return new[]
+            return new object[][]
             {
 #if NETFRAMEWORK
-                new object[] { "ValuesController" },
-                new object[] { "Values2Controller" },
+                ["ValuesController"],
+                ["Values2Controller"],
 #else
-                new object[] { "Values" },
-                new object[] { "Values2" },
+                ["Values"],
+                ["Values2"],
 #endif
             };
         }

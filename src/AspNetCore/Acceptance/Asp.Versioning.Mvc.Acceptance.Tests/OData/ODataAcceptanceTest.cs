@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dspecific
+
 namespace Asp.Versioning.OData;
 
 using static System.Net.HttpStatusCode;

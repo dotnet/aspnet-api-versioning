@@ -33,7 +33,9 @@ public class MediaTypeApiVersionReaderTest
         var request = new Mock<HttpRequest>();
         var headers = new Mock<IHeaderDictionary>();
 
+#pragma warning disable ASP0015 // Suggest using IHeaderDictionary properties
         headers.SetupGet( h => h["Content-Type"] ).Returns( new StringValues( "application/json;v=2.0" ) );
+#pragma warning restore ASP0015 // Suggest using IHeaderDictionary properties
         request.SetupGet( r => r.Headers ).Returns( headers.Object );
         request.SetupProperty( r => r.Body, Null );
         request.SetupProperty( r => r.ContentLength, 0L );

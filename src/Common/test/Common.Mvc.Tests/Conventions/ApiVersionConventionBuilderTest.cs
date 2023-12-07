@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Dtime
+
 namespace Asp.Versioning.Conventions
 {
 #if NETFRAMEWORK

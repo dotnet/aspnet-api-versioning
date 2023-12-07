@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: Admin
+
 namespace Asp.Versioning.Simulators;
 
 using System.Web.Http;

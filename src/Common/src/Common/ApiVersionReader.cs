@@ -42,7 +42,7 @@ public static class ApiVersionReader
 
         if ( otherApiVersionReaders is null || ( count = otherApiVersionReaders.Length ) == 0 )
         {
-            apiVersionReaders = new[] { apiVersionReader };
+            apiVersionReaders = [apiVersionReader];
         }
         else
         {

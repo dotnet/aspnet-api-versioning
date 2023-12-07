@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+//// Ignore Spelling: eq
+
 namespace Asp.Versioning.Controllers;
 
 using System.Collections.ObjectModel;
