@@ -51,12 +51,12 @@ public class HttpControllerDescriptorGroupTest
         var configuration = new HttpConfiguration();
 
         descriptor1.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
-                   .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "1.0" ) } );
+                   .Returns( () => new Collection<ApiVersionAttribute>() { new( "1.0" ) } );
         descriptor1.Object.Configuration = configuration;
         descriptor1.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 1, 0 ) );
 
         descriptor2.Setup( d => d.GetCustomAttributes<ApiVersionAttribute>( It.IsAny<bool>() ) )
-                   .Returns( () => new Collection<ApiVersionAttribute>() { new ApiVersionAttribute( "2.0" ) } );
+                   .Returns( () => new Collection<ApiVersionAttribute>() { new( "2.0" ) } );
         descriptor2.Object.Configuration = configuration;
         descriptor2.Object.Properties[typeof( ApiVersionModel )] = new ApiVersionModel( new ApiVersion( 2, 0 ) );
 

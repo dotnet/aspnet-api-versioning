@@ -17,9 +17,9 @@ public class DefaultApiControllerFilterTest
         var attributes = Array.Empty<object>();
         var controllers = new List<ControllerModel>()
             {
-                new ControllerModel( controllerType, attributes ),
-                new ControllerModel( controllerType, attributes ),
-                new ControllerModel( controllerType, attributes ),
+                new( controllerType, attributes ),
+                new( controllerType, attributes ),
+                new( controllerType, attributes ),
             };
 
         // act
@@ -44,9 +44,9 @@ public class DefaultApiControllerFilterTest
         var attributes = Array.Empty<object>();
         var controllers = new List<ControllerModel>()
             {
-                new ControllerModel( controllerType, attributes ),
-                new ControllerModel( controllerBaseType, attributes ),
-                new ControllerModel( controllerType, attributes ),
+                new( controllerType, attributes ),
+                new( controllerBaseType, attributes ),
+                new( controllerType, attributes ),
             };
 
         // act
