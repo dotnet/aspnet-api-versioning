@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Net.Http.Headers;
+using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
 
 internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
@@ -14,17 +15,17 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
     private readonly bool versionsByUrlOnly;
     private readonly bool versionsByMediaTypeOnly;
     private readonly RouteDestination rejection;
-    private readonly IReadOnlyDictionary<ApiVersion, int> destinations;
+    private readonly FrozenDictionary<ApiVersion, int> destinations;
     private readonly ApiVersionPolicyFeature? policyFeature;
-    private readonly IReadOnlyList<RoutePattern> routePatterns;
+    private readonly RoutePattern[] routePatterns;
     private readonly IApiVersionParser parser;
     private readonly ApiVersioningOptions options;
 
     internal ApiVersionPolicyJumpTable(
         RouteDestination rejection,
-        IReadOnlyDictionary<ApiVersion, int> destinations,
+        FrozenDictionary<ApiVersion, int> destinations,
         ApiVersionPolicyFeature? policyFeature,
-        IReadOnlyList<RoutePattern> routePatterns,
+        RoutePattern[] routePatterns,
         IApiVersionParser parser,
         IApiVersionParameterSource source,
         ApiVersioningOptions options )
@@ -35,7 +36,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
         this.routePatterns = routePatterns;
         this.parser = parser;
         this.options = options;
-        versionsByUrl = routePatterns.Count > 0;
+        versionsByUrl = routePatterns.Length > 0;
         versionsByUrlOnly = source.VersionsByUrl( allowMultipleLocations: false );
         versionsByMediaTypeOnly = source.VersionsByMediaType( allowMultipleLocations: false );
     }

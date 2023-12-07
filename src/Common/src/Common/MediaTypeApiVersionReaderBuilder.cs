@@ -18,13 +18,16 @@ namespace Asp.Versioning;
 
 #if !NETFRAMEWORK
 using System.Buffers;
+using System.Collections.Frozen;
 #endif
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 #if NETFRAMEWORK
-using Str = System.String;
+using FrozenSet = System.Collections.Generic.HashSet<System.String>;
+using Str = string;
 using StrComparer = System.StringComparer;
 #else
+using FrozenSet = System.Collections.Frozen.FrozenSet<Microsoft.Extensions.Primitives.StringSegment>;
 using Str = Microsoft.Extensions.Primitives.StringSegment;
 using StrComparer = Microsoft.Extensions.Primitives.StringSegmentComparer;
 #endif
@@ -142,9 +145,12 @@ public partial class MediaTypeApiVersionReaderBuilder
 #if NET45
             included ?? [],
             excluded ?? [],
-#else
+#elif NETFRAMEWORK
             included ?? new( capacity: 0 ),
             excluded ?? new( capacity: 0 ),
+#else
+            included?.ToFrozenSet( included.Comparer ) ?? FrozenSet<Str>.Empty,
+            excluded?.ToFrozenSet( excluded.Comparer ) ?? FrozenSet<Str>.Empty,
 #endif
             select ?? DefaultSelector,
             readers?.ToArray() ?? [] );
@@ -285,15 +291,15 @@ public partial class MediaTypeApiVersionReaderBuilder
     private sealed class BuiltMediaTypeApiVersionReader : IApiVersionReader
     {
         private readonly string[] parameters;
-        private readonly HashSet<Str> included;
-        private readonly HashSet<Str> excluded;
+        private readonly FrozenSet included;
+        private readonly FrozenSet excluded;
         private readonly SelectorCallback selector;
         private readonly ReaderCallback[] readers;
 
         internal BuiltMediaTypeApiVersionReader(
             string[] parameters,
-            HashSet<Str> included,
-            HashSet<Str> excluded,
+            FrozenSet included,
+            FrozenSet excluded,
             SelectorCallback selector,
             ReaderCallback[] readers )
         {
