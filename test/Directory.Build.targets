@@ -3,7 +3,7 @@
 
  <PropertyGroup>
   <FluentAssertionsVersion>6.7.0</FluentAssertionsVersion>
-  <MoqVersion>4.18.2</MoqVersion>
+  <MoqVersion>4.20.70</MoqVersion>
   <XunitRunnerVersion>2.4.5</XunitRunnerVersion>
   <TestHostVersion>5.0.17-*</TestHostVersion>
  </PropertyGroup>
