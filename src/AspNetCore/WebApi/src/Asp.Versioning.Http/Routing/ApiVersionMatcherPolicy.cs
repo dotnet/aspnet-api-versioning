@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Buffers;
+using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static Asp.Versioning.ApiVersionMapping;
@@ -157,7 +158,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
 
         return new ApiVersionPolicyJumpTable(
             rejection,
-            destinations,
+            destinations.ToFrozenDictionary( destinations.Comparer ),
             NewPolicyFeature( supported, deprecated ),
             routePatterns ?? [],
             apiVersionParser,

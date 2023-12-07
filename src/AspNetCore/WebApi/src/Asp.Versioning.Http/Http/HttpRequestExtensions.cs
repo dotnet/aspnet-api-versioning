@@ -16,6 +16,7 @@ public static class HttpRequestExtensions
     /// <summary>
     /// Attempts to get the API version from current request path using the provided patterns.
     /// </summary>
+    /// <typeparam name="TList">The type of <see cref="IReadOnlyList{T}">read-only list</see>.</typeparam>
     /// <param name="request">The current <see cref="HttpRequest">HTTP request</see>.</param>
     /// <param name="routePatterns">The <see cref="IReadOnlyList{T}">read-only list</see> of
     /// <see cref="RoutePattern">patterns</see> to evaluate.</param>
@@ -23,11 +24,12 @@ public static class HttpRequestExtensions
     /// <param name="apiVersion">The raw API version, if retrieved.</param>
     /// <returns>True if the raw API version was retrieved; otherwise, false.</returns>
     [EditorBrowsable( EditorBrowsableState.Never )]
-    public static bool TryGetApiVersionFromPath(
+    public static bool TryGetApiVersionFromPath<TList>(
         this HttpRequest request,
-        IReadOnlyList<RoutePattern> routePatterns,
+        TList routePatterns,
         string constraintName,
         [NotNullWhen( true )] out string? apiVersion )
+        where TList : IReadOnlyList<RoutePattern>
     {
         ArgumentNullException.ThrowIfNull( routePatterns );
 
