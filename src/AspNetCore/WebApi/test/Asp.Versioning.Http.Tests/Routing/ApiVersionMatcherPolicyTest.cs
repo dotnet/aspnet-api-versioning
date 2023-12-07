@@ -97,7 +97,7 @@ public class ApiVersionMatcherPolicyTest
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), default );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, new[] { 0 } );
+        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
         var policy = NewApiVersionMatcherPolicy();
 
         feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
@@ -125,7 +125,7 @@ public class ApiVersionMatcherPolicyTest
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), default );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, new[] { 0 } );
+        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
         var httpContext = NewHttpContext( feature );
 
         // act
@@ -192,7 +192,7 @@ public class ApiVersionMatcherPolicyTest
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), "Test" );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, new[] { 0 } );
+        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
         var httpContext = NewHttpContext( feature );
 
         // act
@@ -210,7 +210,7 @@ public class ApiVersionMatcherPolicyTest
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), default );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, new[] { 0 } );
+        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
         var options = new ApiVersioningOptions() { AssumeDefaultVersionWhenUnspecified = true };
         var policy = NewApiVersionMatcherPolicy( options );
 

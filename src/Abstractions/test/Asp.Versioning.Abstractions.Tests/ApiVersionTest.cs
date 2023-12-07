@@ -595,27 +595,27 @@ public partial class ApiVersionTest
     }
 
     public static IEnumerable<object[]> FormatData =>
-        new[]
+        new object[][]
         {
-            new[] { null, "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" },
-            new[] { "", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" },
-            new[] { "F", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" },
-            new[] { "G", "2013-08-06", "2013-08-06" },
-            new[] { "GG", "2013-08-06-Alpha", "2013-08-06-Alpha" },
-            new[] { "G", "1.1", "" },
-            new[] { "G", "1.1-Alpha", "" },
-            new[] { "G", "2013-08-06.1.1", "2013-08-06" },
-            new[] { "GG", "2013-08-06.1.1-Alpha", "2013-08-06-Alpha" },
-            new[] { "V", "2013-08-06", "" },
-            new[] { "VVVV", "2013-08-06-Alpha", "" },
-            new[] { "VV", "1.1", "1.1" },
-            new[] { "VVVV", "1.1-Alpha", "1.1-Alpha" },
-            new[] { "VV", "2013-08-06.1.1", "1.1" },
-            new[] { "VVVV", "2013-08-06.1.1-Alpha", "1.1-Alpha" },
-            new[] { "S", "1.1-Alpha", "Alpha" },
-            new[] { "'v'VVV", "1.1", "v1.1" },
-            new[] { "'Major': %V, 'Minor': %v", "1.1", "Major: 1, Minor: 1" },
-            new[] { "MMM yyyy '('S')'", "2013-08-06-preview.1", "Aug 2013 (preview.1)" },
+            [null, "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha"],
+            ["", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha"],
+            ["F", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha"],
+            ["G", "2013-08-06", "2013-08-06"],
+            ["GG", "2013-08-06-Alpha", "2013-08-06-Alpha"],
+            ["G", "1.1", ""],
+            ["G", "1.1-Alpha", ""],
+            ["G", "2013-08-06.1.1", "2013-08-06"],
+            ["GG", "2013-08-06.1.1-Alpha", "2013-08-06-Alpha"],
+            ["V", "2013-08-06", ""],
+            ["VVVV", "2013-08-06-Alpha", ""],
+            ["VV", "1.1", "1.1"],
+            ["VVVV", "1.1-Alpha", "1.1-Alpha"],
+            ["VV", "2013-08-06.1.1", "1.1"],
+            ["VVVV", "2013-08-06.1.1-Alpha", "1.1-Alpha"],
+            ["S", "1.1-Alpha", "Alpha"],
+            ["'v'VVV", "1.1", "v1.1"],
+            ["'Major': %V, 'Minor': %v", "1.1", "Major: 1, Minor: 1"],
+            ["MMM yyyy '('S')'", "2013-08-06-preview.1", "Aug 2013 (preview.1)"],
         };
 
 #if NETFRAMEWORK

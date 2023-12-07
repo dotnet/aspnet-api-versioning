@@ -68,7 +68,7 @@ public class ApiDescriptionExtensionsTest
     {
         var configuration = new HttpConfiguration();
         var controllerType = typeof( Asp.Versioning.Simulators.V1.OrdersController );
-        var actionMethod = controllerType.GetRuntimeMethod( "Get", new[] { typeof( int ) } );
+        var actionMethod = controllerType.GetRuntimeMethod( "Get", [typeof( int )] );
         var controllerDescriptor = new HttpControllerDescriptor( configuration, "Orders", controllerType );
         var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, actionMethod );
         var apiDescription = new VersionedApiDescription()

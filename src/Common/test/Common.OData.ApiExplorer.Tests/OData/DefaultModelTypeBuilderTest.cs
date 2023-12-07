@@ -383,7 +383,7 @@ public class DefaultModelTypeBuilderTest
         var property = substitutionType.GetRuntimeProperty( "Salary" );
         var attributeWithParams = property.GetCustomAttribute<AllowedRolesAttribute>();
 
-        attributeWithParams.AllowedRoles.Should().BeEquivalentTo( new[] { "Manager", "Employer" } );
+        attributeWithParams.AllowedRoles.Should().BeEquivalentTo( ["Manager", "Employer"] );
     }
 
     [Fact]

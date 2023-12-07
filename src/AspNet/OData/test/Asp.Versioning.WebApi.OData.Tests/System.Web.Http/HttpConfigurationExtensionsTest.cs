@@ -46,7 +46,7 @@ public class HttpConfigurationExtensionsTest
         var selector = GetODataRootContainer( configuration, routeName ).GetRequiredService<IEdmModelSelector>();
         var routingConventions = GetRoutingConventions( configuration, route );
 
-        selector.ApiVersions.Should().Equal( new ApiVersion[] { new( 1, 0 ), new( 2, 0 ) } );
+        selector.ApiVersions.Should().Equal( [new( 1, 0 ), new( 2, 0 )] );
         routingConventions[0].Should().BeOfType<VersionedAttributeRoutingConvention>();
         routingConventions[1].Should().BeOfType<VersionedMetadataRoutingConvention>();
         routingConventions.OfType<MetadataRoutingConvention>().Should().BeEmpty();

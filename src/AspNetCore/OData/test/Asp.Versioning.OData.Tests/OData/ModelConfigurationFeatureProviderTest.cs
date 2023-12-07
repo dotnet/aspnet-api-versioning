@@ -28,7 +28,7 @@ namespace Asp.Versioning.OData
             provider.PopulateFeature( partManager.ApplicationParts, feature );
 
             // assert
-            feature.ModelConfigurations.Should().Equal( new[] { typeof( PublicModelConfiguration ) } );
+            feature.ModelConfigurations.Should().Equal( [typeof( PublicModelConfiguration )] );
         }
     }
 

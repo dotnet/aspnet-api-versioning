@@ -20,9 +20,9 @@ internal static class InternalTypeExtensions
         Debug.Assert( route.GetType().Name == "RouteCollectionRoute", "Extension method only intended to support testing RouteCollectionRoute.EnsureInitialized" );
 
         var type = route.GetType();
-        var method = type.GetRuntimeMethod( nameof( EnsureInitialized ), new[] { initializer.GetType() } );
+        var method = type.GetRuntimeMethod( nameof( EnsureInitialized ), [initializer.GetType()] );
 
-        method.Invoke( route, new object[] { initializer } );
+        method.Invoke( route, [initializer] );
     }
 
     internal static IDirectRouteBuilder NewDirectRouteBuilder( IReadOnlyCollection<HttpActionDescriptor> actions, bool targetIsAction )

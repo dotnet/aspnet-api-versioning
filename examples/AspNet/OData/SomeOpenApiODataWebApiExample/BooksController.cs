@@ -14,15 +14,15 @@ using System.Web.Http.Description;
 [RoutePrefix( "api/books" )]
 public class BooksController : ApiController
 {
-    private static readonly Book[] books = new Book[]
-    {
+    private static readonly Book[] books =
+    [
         new() { Id = "9781847490599", Title = "Anna Karenina", Author = "Leo Tolstoy", Published = 1878 },
         new() { Id = "9780198800545", Title = "War and Peace", Author = "Leo Tolstoy", Published = 1869 },
         new() { Id = "9780684801520", Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", Published = 1925 },
         new() { Id = "9780486280615", Title = "The Adventures of Huckleberry Finn", Author = "Mark Twain", Published = 1884 },
         new() { Id = "9780140430820", Title = "Moby Dick", Author = "Herman Melville", Published = 1851 },
         new() { Id = "9780060934347", Title = "Don Quixote", Author = "Miguel de Cervantes", Published = 1605 },
-    };
+    ];
 
     /// <summary>
     /// Gets all books.
