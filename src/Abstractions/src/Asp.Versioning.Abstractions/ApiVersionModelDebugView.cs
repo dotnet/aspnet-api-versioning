@@ -4,12 +4,9 @@ namespace Asp.Versioning;
 
 using static System.String;
 
-internal sealed class ApiVersionModelDebugView
+internal sealed class ApiVersionModelDebugView( ApiVersionModel model )
 {
     private const string Comma = ", ";
-    private readonly ApiVersionModel model;
-
-    public ApiVersionModelDebugView( ApiVersionModel model ) => this.model = model;
 
     public bool VersionNeutral => model.IsApiVersionNeutral;
 
