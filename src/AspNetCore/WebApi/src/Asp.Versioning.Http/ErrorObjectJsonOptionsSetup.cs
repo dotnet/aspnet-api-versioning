@@ -20,5 +20,5 @@ internal sealed class ErrorObjectJsonOptionsSetup : IConfigureOptions<JsonOption
     // before any other resolvers currently added. If apps need to customize serialization, they can
     // prepend a custom ErrorObject resolver to the chain in an IConfigureOptions<JsonOptions> registered.
     public void Configure( JsonOptions options ) =>
-        options.SerializerOptions.TypeInfoResolverChain.Insert( 0, new ErrorObjectWriter.ErrorObjectJsonContext() );
+        options.SerializerOptions.TypeInfoResolverChain.Insert( 0, ErrorObjectWriter.ErrorObjectJsonContext.Default );
 }
