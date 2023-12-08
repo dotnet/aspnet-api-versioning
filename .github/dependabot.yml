@@ -15,19 +15,3 @@ updates:
     commit-message:
       prefix: "[main] "
       include: scope
-
-  # only servicing 5.x release
-  - package-ecosystem: "nuget"
-    directory: "/"
-    target-branch: "release/5.1"
-    schedule:
-      interval: "monthly"
-    allow:
-      - dependency-type: "all"
-    assignees:
-      - "commonsensesoftware"
-    reviewers:
-      - "commonsensesoftware"
-    commit-message:
-      prefix: "[release/5.1] "
-      include: scope
