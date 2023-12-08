@@ -3,6 +3,8 @@
 namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ public class ErrorObjectWriterTest
     public void can_write_should_be_true_for_api_versioning_problem_types( string type )
     {
         // arrange
-        var writer = new ErrorObjectWriter();
+        var writer = new ErrorObjectWriter( Options.Create( new JsonOptions() ) );
         var context = new ProblemDetailsContext()
         {
             HttpContext = new DefaultHttpContext(),
@@ -38,7 +40,7 @@ public class ErrorObjectWriterTest
     {
         // arrange
         const string BadRequest = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
-        var writer = new ErrorObjectWriter();
+        var writer = new ErrorObjectWriter( Options.Create( new JsonOptions() ) );
         var context = new ProblemDetailsContext()
         {
             HttpContext = new DefaultHttpContext(),
@@ -73,14 +75,14 @@ public class ErrorObjectWriterTest
             },
         };
 
-        var writer = new ErrorObjectWriter();
+        var writer = new ErrorObjectWriter( Options.Create( new JsonOptions() ) );
         using var stream = new MemoryStream();
         var response = new Mock<HttpResponse>() { CallBase = true };
         var httpContext = new Mock<HttpContext>() { CallBase = true };
 
         response.SetupGet( r => r.Body ).Returns( stream );
         response.SetupProperty( r => r.ContentType );
-        response.SetupGet(r => r.HttpContext).Returns(() => httpContext.Object );
+        response.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
         httpContext.SetupGet( c => c.Response ).Returns( response.Object );
 
         var context = new ProblemDetailsContext()

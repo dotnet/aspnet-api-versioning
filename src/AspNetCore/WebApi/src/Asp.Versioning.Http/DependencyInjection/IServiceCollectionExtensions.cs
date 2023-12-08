@@ -6,6 +6,7 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -90,26 +91,7 @@ public static partial class IServiceCollectionExtensions
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, EndpointApiVersionMetadataCollationProvider>() );
         services.Replace( WithLinkGeneratorDecorator( services ) );
         TryAddProblemDetailsRfc7231Compliance( services );
-    }
-
-    // REF: https://github.com/dotnet/runtime/blob/master/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L125
-    private static Type GetImplementationType( this ServiceDescriptor descriptor )
-    {
-        if ( descriptor.ImplementationType != null )
-        {
-            return descriptor.ImplementationType;
-        }
-        else if ( descriptor.ImplementationInstance != null )
-        {
-            return descriptor.ImplementationInstance.GetType();
-        }
-        else if ( descriptor.ImplementationFactory != null )
-        {
-            var typeArguments = descriptor.ImplementationFactory.GetType().GenericTypeArguments;
-            return typeArguments[1];
-        }
-
-        throw new InvalidOperationException();
+        TryAddErrorObjectJsonOptions( services );
     }
 
     private static ServiceDescriptor WithLinkGeneratorDecorator( IServiceCollection services )
@@ -127,12 +109,31 @@ public static partial class IServiceCollectionExtensions
 
         if ( factory == null )
         {
-            var decoratedType = descriptor.GetImplementationType();
-            var decoratorType = typeof( ApiVersionLinkGenerator<> ).MakeGenericType( decoratedType );
+            // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/DependencyInjection/RoutingServiceCollectionExtensions.cs#L96
+            // REF: https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L292
+            var decoratedType = descriptor switch
+            {
+                { ImplementationType: var type } when type is not null => type,
+                { ImplementationInstance: var instance } when instance is not null => instance.GetType(),
+                _ => throw new InvalidOperationException(),
+            };
 
             services.Replace( Describe( decoratedType, decoratedType, lifetime ) );
 
-            return Describe( typeof( LinkGenerator ), decoratorType, lifetime );
+            LinkGenerator NewFactory( IServiceProvider serviceProvider )
+            {
+                var instance = (LinkGenerator) serviceProvider.GetRequiredService( decoratedType! );
+                var source = serviceProvider.GetRequiredService<IApiVersionParameterSource>();
+
+                if ( source.VersionsByUrl() )
+                {
+                    instance = new ApiVersionLinkGenerator( instance );
+                }
+
+                return instance;
+            }
+
+            return Describe( typeof( LinkGenerator ), NewFactory, lifetime );
         }
         else
         {
@@ -176,5 +177,25 @@ public static partial class IServiceCollectionExtensions
 
         static Rfc7231ProblemDetailsWriter NewProblemDetailsWriter( IServiceProvider serviceProvider, Type decoratedType ) =>
             new( (IProblemDetailsWriter) serviceProvider.GetRequiredService( decoratedType ) );
+    }
+
+    private static void TryAddErrorObjectJsonOptions( IServiceCollection services )
+    {
+        var serviceType = typeof( IProblemDetailsWriter );
+        var implementationType = typeof( ErrorObjectWriter );
+
+        for ( var i = 0; i < services.Count; i++ )
+        {
+            var service = services[i];
+
+            // inheritance is intentionally not considered here because it will require a user-defined
+            // JsonSerlizerContext and IConfigureOptions<JsonOptions>
+            if ( service.ServiceType == serviceType &&
+                 service.ImplementationType == implementationType )
+            {
+                services.TryAddEnumerable( Singleton<IConfigureOptions<JsonOptions>, ErrorObjectJsonOptionsSetup>() );
+                return;
+            }
+        }
     }
 }
