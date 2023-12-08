@@ -10,6 +10,10 @@
   <PackageTags>Asp;AspNet;AspNetCore;Versioning;Http</PackageTags>
  </PropertyGroup>
 
+ <PropertyGroup Condition=" '$(TargetFramework)' == '$(DefaultTargetFramework)' ">
+  <IsAotCompatible>true</IsAotCompatible>
+ </PropertyGroup>
+
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
   <Compile Remove="net#.0\**\*.cs" />
   <None Include="net#.0\**\*.cs" />
@@ -44,5 +48,5 @@
  <ItemGroup>
   <ProjectReference Include="..\..\..\Abstractions\src\Asp.Versioning.Abstractions\Asp.Versioning.Abstractions.csproj" />
  </ItemGroup>
- 
+
 </Project>

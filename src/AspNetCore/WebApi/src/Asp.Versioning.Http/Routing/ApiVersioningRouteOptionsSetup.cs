@@ -24,7 +24,7 @@ public class ApiVersioningRouteOptionsSetup : IPostConfigureOptions<RouteOptions
     {
         ArgumentNullException.ThrowIfNull( options );
 
-        var key = versioningOptions.Value.RouteConstraintName;
-        options.ConstraintMap.Add( key, typeof( ApiVersionRouteConstraint ) );
+        var token = versioningOptions.Value.RouteConstraintName;
+        options.SetParameterPolicy<ApiVersionRouteConstraint>( token );
     }
 }

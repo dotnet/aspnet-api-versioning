@@ -8,6 +8,7 @@
   <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;Versioning</PackageTags>
+  <IsAotCompatible>true</IsAotCompatible>
  </PropertyGroup>
 
  <ItemGroup>

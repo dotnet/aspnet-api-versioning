@@ -4,8 +4,11 @@ namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Text.Json.Serialization.JsonIgnoreCondition;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 /// <summary>
 /// Represents a problem details writer that outputs error objects in responses.
@@ -15,8 +18,18 @@ using static System.Text.Json.Serialization.JsonIgnoreCondition;
 /// in the Microsoft REST API Guidelines and
 /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.</remarks>
 [CLSCompliant( false )]
-public class ErrorObjectWriter : IProblemDetailsWriter
+public partial class ErrorObjectWriter : IProblemDetailsWriter
 {
+    private readonly JsonSerializerOptions options;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ErrorObjectWriter"/> class.
+    /// </summary>
+    /// <param name="options">The current <see cref="JsonOptions">JSON options</see>.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> is <c>null</c>.</exception>
+    public ErrorObjectWriter( IOptions<JsonOptions> options ) =>
+        this.options = ( options ?? throw new ArgumentNullException( nameof( options ) ) ).Value.SerializerOptions;
+
     /// <inheritdoc />
     public virtual bool CanWrite( ProblemDetailsContext context )
     {
@@ -40,7 +53,7 @@ public class ErrorObjectWriter : IProblemDetailsWriter
 
         OnBeforeWrite( context, ref obj );
 
-        return new( response.WriteAsJsonAsync( obj ) );
+        return new( response.WriteAsJsonAsync( obj, options.GetTypeInfo( obj.GetType() ) ) );
     }
 
     /// <summary>
@@ -58,7 +71,7 @@ public class ErrorObjectWriter : IProblemDetailsWriter
     /// <summary>
     /// Represents an error object.
     /// </summary>
-    protected readonly struct ErrorObject
+    protected internal readonly partial struct ErrorObject
     {
         internal ErrorObject( ProblemDetails problemDetails ) =>
             Error = new( problemDetails );
@@ -74,7 +87,7 @@ public class ErrorObjectWriter : IProblemDetailsWriter
     /// <summary>
     /// Represents the error detail.
     /// </summary>
-    protected readonly struct ErrorDetail
+    protected internal readonly partial struct ErrorDetail
     {
         private readonly ProblemDetails problemDetails;
         private readonly InnerError? innerError;
@@ -154,7 +167,7 @@ public class ErrorObjectWriter : IProblemDetailsWriter
     /// <summary>
     /// Represents an inner error.
     /// </summary>
-    protected readonly struct InnerError
+    protected internal readonly partial struct InnerError
     {
         private readonly ProblemDetails problemDetails;
         private readonly Dictionary<string, object> extensions = [];
@@ -180,5 +193,10 @@ public class ErrorObjectWriter : IProblemDetailsWriter
         /// <value>A collection of extension key/value pair members.</value>
         [JsonExtensionData]
         public IDictionary<string, object> Extensions => extensions;
+    }
+
+    [JsonSerializable( typeof( ErrorObject ) )]
+    internal sealed partial class ErrorObjectJsonContext : JsonSerializerContext
+    {
     }
 }
