@@ -23,22 +23,6 @@ versioning in the past or supported API versioning with semantics that are diffe
 
 The supported flavors of ASP.NET are:
 
-* **ASP.NET Web API**
-  <div>Adds API versioning to your Web API applications</div>
-
-  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi)
-  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-web-api)
-  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/WebApi)
-
-* **ASP.NET Web API and OData**
-  <div>Adds API versioning to your Web API applications using OData v4.0</div>
-
-  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.OData.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData)
-  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.OData.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-web-api-with-odata-v40)
-  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/OData)
-
 * **ASP.NET Core**
   <div>Adds API versioning to your ASP.NET Core <i>Minimal API</i> applications</div>
 
@@ -63,23 +47,23 @@ The supported flavors of ASP.NET are:
   [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-core-with-odata-v40)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/OData)
 
+* **ASP.NET Web API**
+  <div>Adds API versioning to your Web API applications</div>
+
+  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi)
+  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-web-api)
+  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/WebApi)
+
+* **ASP.NET Web API and OData**
+  <div>Adds API versioning to your Web API applications using OData v4.0</div>
+
+  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.OData.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData)
+  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.OData.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-web-api-with-odata-v40)
+  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/OData)
+
 This is also the home of the ASP.NET API versioning API explorers that you can use to easily document your REST APIs with OpenAPI:
-
-* **ASP.NET Web API Versioned API Explorer**
-  <div>Replaces the default API explorer in your Web API applications</div>
-
-  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.ApiExplorer)
-  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-web-api)
-  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/WebApi/OpenApiWebApiSample)
-
-* **ASP.NET Web API with OData API Explorer**
-  <div>Adds an API explorer to your Web API applications using OData v4.0</div>
-
-  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.OData.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData.ApiExplorer)
-  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.OData.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-web-api-with-odata)
-  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/OData/OpenApiODataWebApiSample)
 
 * **ASP.NET Core Versioned API Explorer**
   <div>Adds additional API explorer support to your ASP.NET Core applications</div>
@@ -96,6 +80,22 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.OData.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.OData.ApiExplorer)
   [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-core-with-odata)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/OData/OpenApiODataSample)
+
+* **ASP.NET Web API Versioned API Explorer**
+  <div>Replaces the default API explorer in your Web API applications</div>
+
+  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.ApiExplorer)
+  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.ApiExplorer)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-web-api)
+  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/WebApi/OpenApiWebApiSample)
+
+* **ASP.NET Web API with OData API Explorer**
+  <div>Adds an API explorer to your Web API applications using OData v4.0</div>
+
+  [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.OData.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData.ApiExplorer)
+  [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.OData.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData.ApiExplorer)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-web-api-with-odata)
+  [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/OData/OpenApiODataWebApiSample)
 
 The client-side libraries make it simple to create API version-aware HTTP clients.
 
