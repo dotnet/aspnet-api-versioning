@@ -65,11 +65,10 @@ public class ISunsetPolicyManagerExtensionsTest
         var expected = new SunsetPolicy();
         var other = new SunsetPolicy();
 
-        manager.Setup( m => m.TryGetPolicy( "Test", new ApiVersion( 1.0, null ), out other ) ).Returns( true );
-        manager.Setup( m => m.TryGetPolicy( default, new ApiVersion( 1.0, null ), out expected ) ).Returns( true );
+        manager.Setup( m => m.TryGetPolicy( It.IsAny<string>(), new ApiVersion( 1.0, null ), out expected ) ).Returns( true );
 
         // act
-        var policy = manager.Object.ResolvePolicyOrDefault( default, new ApiVersion( 1.0 ) );
+        var policy = manager.Object.ResolvePolicyOrDefault( "Test", new ApiVersion( 1.0 ) );
 
         // assert
         policy.Should().BeSameAs( expected );

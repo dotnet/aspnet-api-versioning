@@ -46,7 +46,7 @@ public static class ISunsetPolicyManagerExtensions
     /// <param name="name">The name of the API.</param>
     /// <param name="apiVersion">The API version to get the policy for.</param>
     /// <returns>The applicable <see cref="SunsetPolicy">sunset policy</see>, if any.</returns>
-    /// <remarks>The resolution or is as follows:
+    /// <remarks>The resolution order is as follows:
     /// <list type="bullet">
     ///  <item><paramref name="name"/> and <paramref name="apiVersion"/></item>
     ///  <item><paramref name="name"/> only</item>
@@ -76,7 +76,7 @@ public static class ISunsetPolicyManagerExtensions
     /// <param name="apiVersion">The API version to get the policy for.</param>
     /// /// <param name="sunsetPolicy">The applicable <see cref="SunsetPolicy">sunset policy</see>, if any.</param>
     /// <returns>True if the <paramref name="sunsetPolicy">sunset policy</paramref> was retrieved; otherwise, false.</returns>
-    /// <remarks>The resolution or is as follows:
+    /// <remarks>The resolution order is as follows:
     /// <list type="bullet">
     ///  <item><paramref name="name"/> and <paramref name="apiVersion"/></item>
     ///  <item><paramref name="name"/> only</item>
@@ -102,7 +102,8 @@ public static class ISunsetPolicyManagerExtensions
                 return true;
             }
         }
-        else if ( apiVersion != null && policyManager.TryGetPolicy( apiVersion, out sunsetPolicy ) )
+
+        if ( apiVersion != null && policyManager.TryGetPolicy( apiVersion, out sunsetPolicy ) )
         {
             return true;
         }

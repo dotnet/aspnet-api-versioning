@@ -91,9 +91,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 #endif
         var name = metadata.Name;
 
-        if ( sunsetPolicyManager.TryGetPolicy( name, version, out var policy ) ||
-           ( !string.IsNullOrEmpty( name ) && sunsetPolicyManager.TryGetPolicy( name, out policy ) ) ||
-           ( version != null && sunsetPolicyManager.TryGetPolicy( version, out policy ) ) )
+        if ( sunsetPolicyManager.TryResolvePolicy( name, version, out var policy ) )
         {
             response.WriteSunsetPolicy( policy );
         }
