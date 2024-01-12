@@ -2,9 +2,8 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+using Asp.Versioning.ApiExplorer.Internal;
 using Microsoft.Extensions.Options;
-using static Asp.Versioning.ApiVersionMapping;
-using static System.Globalization.CultureInfo;
 
 /// <summary>
 /// Represents the default implementation of an object that discovers and describes the API version information within an application.
@@ -12,7 +11,7 @@ using static System.Globalization.CultureInfo;
 [CLSCompliant( false )]
 public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvider
 {
-    private readonly ApiVersionDescriptionCollection collection;
+    private readonly ApiVersionDescriptionCollection<GroupedApiVersionMetadata> collection;
     private readonly IOptions<ApiExplorerOptions> options;
 
     /// <summary>
@@ -28,7 +27,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         ISunsetPolicyManager sunsetPolicyManager,
         IOptions<ApiExplorerOptions> apiExplorerOptions )
     {
-        collection = new( this, providers ?? throw new ArgumentNullException( nameof( providers ) ) );
+        collection = new( Describe, providers ?? throw new ArgumentNullException( nameof( providers ) ) );
         SunsetPolicyManager = sunsetPolicyManager;
         options = apiExplorerOptions;
     }
@@ -58,132 +57,52 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     {
         ArgumentNullException.ThrowIfNull( metadata );
 
-        var descriptions = new List<ApiVersionDescription>( capacity: metadata.Count );
-        var supported = new HashSet<ApiVersion>();
-        var deprecated = new HashSet<ApiVersion>();
+        // TODO: consider refactoring and removing GroupedApiVersionDescriptionProvider as both implementations are now
+        // effectively the same. this cast is safe as an internal implementation detail. if this method is
+        // overridden, then this code doesn't even run
+        //
+        // REF: https://github.com/dotnet/aspnet-api-versioning/issues/1066
+        if ( metadata is GroupedApiVersionMetadata[] groupedMetadata )
+        {
+            return DescriptionProvider.Describe( groupedMetadata, SunsetPolicyManager, Options );
+        }
 
-        BucketizeApiVersions( metadata, supported, deprecated );
-        AppendDescriptions( descriptions, supported, deprecated: false );
-        AppendDescriptions( descriptions, deprecated, deprecated: true );
-
-        return descriptions.OrderBy( d => d.ApiVersion ).ToArray();
+        return Array.Empty<ApiVersionDescription>();
     }
 
-    private void BucketizeApiVersions( IReadOnlyList<ApiVersionMetadata> metadata, HashSet<ApiVersion> supported, HashSet<ApiVersion> deprecated )
+    private sealed class GroupedApiVersionMetadata :
+        ApiVersionMetadata,
+        IEquatable<GroupedApiVersionMetadata>,
+        IGroupedApiVersionMetadata,
+        IGroupedApiVersionMetadataFactory<GroupedApiVersionMetadata>
     {
-        var declared = new HashSet<ApiVersion>();
-        var advertisedSupported = new HashSet<ApiVersion>();
-        var advertisedDeprecated = new HashSet<ApiVersion>();
+        private GroupedApiVersionMetadata( string? groupName, ApiVersionMetadata metadata )
+            : base( metadata ) => GroupName = groupName;
 
-        for ( var i = 0; i < metadata.Count; i++ )
-        {
-            var model = metadata[i].Map( Explicit | Implicit );
-            var versions = model.DeclaredApiVersions;
+        public string? GroupName { get; }
 
-            for ( var j = 0; j < versions.Count; j++ )
-            {
-                declared.Add( versions[j] );
-            }
+        static GroupedApiVersionMetadata IGroupedApiVersionMetadataFactory<GroupedApiVersionMetadata>.New(
+            string? groupName,
+            ApiVersionMetadata metadata ) => new( groupName, metadata );
 
-            versions = model.SupportedApiVersions;
+        public bool Equals( GroupedApiVersionMetadata? other ) =>
+            other is not null && other.GetHashCode() == GetHashCode();
 
-            for ( var j = 0; j < versions.Count; j++ )
-            {
-                var version = versions[j];
-                supported.Add( version );
-                advertisedSupported.Add( version );
-            }
+        public override bool Equals( object? obj ) =>
+            obj is not null &&
+            GetType().Equals( obj.GetType() ) &&
+            GetHashCode() == obj.GetHashCode();
 
-            versions = model.DeprecatedApiVersions;
-
-            for ( var j = 0; j < versions.Count; j++ )
-            {
-                var version = versions[j];
-                deprecated.Add( version );
-                advertisedDeprecated.Add( version );
-            }
-        }
-
-        advertisedSupported.ExceptWith( declared );
-        advertisedDeprecated.ExceptWith( declared );
-        supported.ExceptWith( advertisedSupported );
-        deprecated.ExceptWith( supported.Concat( advertisedDeprecated ) );
-
-        if ( supported.Count == 0 && deprecated.Count == 0 )
-        {
-            supported.Add( Options.DefaultApiVersion );
-        }
-    }
-
-    private void AppendDescriptions( List<ApiVersionDescription> descriptions, IEnumerable<ApiVersion> versions, bool deprecated )
-    {
-        foreach ( var version in versions )
-        {
-            var groupName = version.ToString( Options.GroupNameFormat, CurrentCulture );
-            var sunsetPolicy = SunsetPolicyManager.TryGetPolicy( version, out var policy ) ? policy : default;
-            descriptions.Add( new( version, groupName, deprecated, sunsetPolicy ) );
-        }
-    }
-
-    private sealed class ApiVersionDescriptionCollection(
-        DefaultApiVersionDescriptionProvider provider,
-        IEnumerable<IApiVersionMetadataCollationProvider> collators )
-    {
-        private readonly object syncRoot = new();
-        private readonly DefaultApiVersionDescriptionProvider provider = provider;
-        private readonly IApiVersionMetadataCollationProvider[] collators = collators.ToArray();
-        private IReadOnlyList<ApiVersionDescription>? items;
-        private int version;
-
-        public IReadOnlyList<ApiVersionDescription> Items
-        {
-            get
-            {
-                if ( items is not null && version == ComputeVersion() )
-                {
-                    return items;
-                }
-
-                lock ( syncRoot )
-                {
-                    var currentVersion = ComputeVersion();
-
-                    if ( items is not null && version == currentVersion )
-                    {
-                        return items;
-                    }
-
-                    var context = new ApiVersionMetadataCollationContext();
-
-                    for ( var i = 0; i < collators.Length; i++ )
-                    {
-                        collators[i].Execute( context );
-                    }
-
-                    items = provider.Describe( context.Results );
-                    version = currentVersion;
-                }
-
-                return items;
-            }
-        }
-
-        private int ComputeVersion() =>
-            collators.Length switch
-            {
-                0 => 0,
-                1 => collators[0].Version,
-                _ => ComputeVersion( collators ),
-            };
-
-        private static int ComputeVersion( IApiVersionMetadataCollationProvider[] providers )
+        public override int GetHashCode()
         {
             var hash = default( HashCode );
 
-            for ( var i = 0; i < providers.Length; i++ )
+            if ( !string.IsNullOrEmpty( GroupName ) )
             {
-                hash.Add( providers[i].Version );
+                hash.Add( GroupName, StringComparer.Ordinal );
             }
+
+            hash.Add( base.GetHashCode() );
 
             return hash.ToHashCode();
         }
