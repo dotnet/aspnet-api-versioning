@@ -12,15 +12,29 @@ using Microsoft.Extensions.Primitives;
 public sealed class EndpointApiVersionMetadataCollationProvider : IApiVersionMetadataCollationProvider
 {
     private readonly EndpointDataSource endpointDataSource;
+    private readonly IEndpointInspector endpointInspector;
     private int version;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EndpointApiVersionMetadataCollationProvider"/> class.
     /// </summary>
     /// <param name="endpointDataSource">The underlying <see cref="endpointDataSource">endpoint data source</see>.</param>
+    [Obsolete( "Use the constructor that accepts IEndpointInspector. This constructor will be removed in a future version." )]
     public EndpointApiVersionMetadataCollationProvider( EndpointDataSource endpointDataSource )
+        : this( endpointDataSource, new DefaultEndpointInspector() ) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EndpointApiVersionMetadataCollationProvider"/> class.
+    /// </summary>
+    /// <param name="endpointDataSource">The underlying <see cref="endpointDataSource">endpoint data source</see>.</param>
+    /// <param name="endpointInspector">The <see cref="IEndpointInspector">endpoint inspector</see> used to inspect endpoints.</param>
+    public EndpointApiVersionMetadataCollationProvider( EndpointDataSource endpointDataSource, IEndpointInspector endpointInspector )
     {
-        this.endpointDataSource = endpointDataSource ?? throw new ArgumentNullException( nameof( endpointDataSource ) );
+        ArgumentNullException.ThrowIfNull( endpointDataSource );
+        ArgumentNullException.ThrowIfNull( endpointInspector );
+
+        this.endpointDataSource = endpointDataSource;
+        this.endpointInspector = endpointInspector;
         ChangeToken.OnChange( endpointDataSource.GetChangeToken, () => ++version );
     }
 
@@ -38,7 +52,8 @@ public sealed class EndpointApiVersionMetadataCollationProvider : IApiVersionMet
         {
             var endpoint = endpoints[i];
 
-            if ( endpoint.Metadata.GetMetadata<ApiVersionMetadata>() is not ApiVersionMetadata item )
+            if ( endpoint.Metadata.GetMetadata<ApiVersionMetadata>() is not ApiVersionMetadata item ||
+                 endpointInspector.IsControllerAction( endpoint ) )
             {
                 continue;
             }

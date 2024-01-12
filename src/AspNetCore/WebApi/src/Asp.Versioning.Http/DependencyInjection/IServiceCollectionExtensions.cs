@@ -89,6 +89,7 @@ public static partial class IServiceCollectionExtensions
         services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
         services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, EndpointApiVersionMetadataCollationProvider>() );
+        services.TryAddTransient<IEndpointInspector, DefaultEndpointInspector>();
         services.Replace( WithLinkGeneratorDecorator( services ) );
         TryAddProblemDetailsRfc7231Compliance( services );
         TryAddErrorObjectJsonOptions( services );
