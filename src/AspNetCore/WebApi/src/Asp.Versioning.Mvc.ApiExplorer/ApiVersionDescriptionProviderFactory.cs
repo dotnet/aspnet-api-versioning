@@ -16,6 +16,7 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
 {
     private readonly ISunsetPolicyManager sunsetPolicyManager;
     private readonly IApiVersionMetadataCollationProvider[] providers;
+    private readonly IEndpointInspector endpointInspector;
     private readonly IOptions<ApiExplorerOptions> options;
     private readonly Activator activator;
 
@@ -23,11 +24,13 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
         Activator activator,
         ISunsetPolicyManager sunsetPolicyManager,
         IEnumerable<IApiVersionMetadataCollationProvider> providers,
+        IEndpointInspector endpointInspector,
         IOptions<ApiExplorerOptions> options )
     {
         this.activator = activator;
         this.sunsetPolicyManager = sunsetPolicyManager;
         this.providers = providers.ToArray();
+        this.endpointInspector = endpointInspector;
         this.options = options;
     }
 
@@ -35,7 +38,7 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
     {
         var collators = new List<IApiVersionMetadataCollationProvider>( capacity: providers.Length + 1 )
         {
-            new EndpointApiVersionMetadataCollationProvider( endpointDataSource ),
+            new EndpointApiVersionMetadataCollationProvider( endpointDataSource, endpointInspector ),
         };
 
         collators.AddRange( providers );

@@ -67,6 +67,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, ActionApiVersionMetadataCollationProvider>() );
         services.Replace( WithUrlHelperFactoryDecorator( services ) );
+        services.TryReplace<IEndpointInspector, DefaultEndpointInspector, MvcEndpointInspector>();
     }
 
     private static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
@@ -82,6 +83,23 @@ public static class IApiVersioningBuilderExtensions
         }
 
         return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
+    }
+
+    private static void TryReplace<TService, TImplementation, TReplacement>( this IServiceCollection services )
+    {
+        var serviceType = typeof( TService );
+        var implementationType = typeof( TImplementation );
+
+        for ( var i = services.Count - 1; i >= 0; i-- )
+        {
+            var service = services[i];
+
+            if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
+            {
+                services[i] = Describe( serviceType, typeof( TReplacement ), service.Lifetime );
+                break;
+            }
+        }
     }
 
     [SkipLocalsInit]
