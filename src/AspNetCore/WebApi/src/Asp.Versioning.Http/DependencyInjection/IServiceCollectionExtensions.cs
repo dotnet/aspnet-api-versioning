@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
+using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
 /// <summary>
 /// Provides extension methods for the <see cref="IServiceCollection"/> interface.
@@ -74,6 +76,65 @@ public static partial class IServiceCollectionExtensions
 
         return builder;
     }
+
+    /// <summary>
+    /// Adds error object support in problem details.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
+    /// <param name="setup">The <see cref="JsonOptions">JSON options</see> setup <see cref="Action{T}"/> to perform, if any.</param>
+    /// <returns>The original <paramref name="services"/>.</returns>
+    /// <remarks>
+    /// <para>
+    /// This method is only intended to provide backward compatibility with previous library versions by converting
+    /// <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/> into Error Objects that conform to the
+    /// <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
+    /// in the Microsoft REST API Guidelines and
+    /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.
+    /// </para>
+    /// <para>
+    /// This method should be called before <see cref="ProblemDetailsServiceCollectionExtensions.AddProblemDetails(IServiceCollection)"/>.
+    /// </para>
+    /// </remarks>
+    public static IServiceCollection AddErrorObjects( this IServiceCollection services, Action<JsonOptions>? setup = default ) =>
+        AddErrorObjects<ErrorObjectWriter>( services, setup );
+
+    /// <summary>
+    /// Adds error object support in problem details.
+    /// </summary>
+    /// <typeparam name="TWriter">The type of <see cref="ErrorObjectWriter"/>.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
+    /// <param name="setup">The <see cref="JsonOptions">JSON options</see> setup <see cref="Action{T}"/> to perform, if any.</param>
+    /// <returns>The original <paramref name="services"/>.</returns>
+    /// <remarks>
+    /// <para>
+    /// This method is only intended to provide backward compatibility with previous library versions by converting
+    /// <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/> into Error Objects that conform to the
+    /// <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
+    /// in the Microsoft REST API Guidelines and
+    /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.
+    /// </para>
+    /// <para>
+    /// This method should be called before <see cref="ProblemDetailsServiceCollectionExtensions.AddProblemDetails(IServiceCollection)"/>.
+    /// </para>
+    /// </remarks>
+    public static IServiceCollection AddErrorObjects<[DynamicallyAccessedMembers( PublicConstructors )] TWriter>(
+        this IServiceCollection services,
+        Action<JsonOptions>? setup = default )
+        where TWriter : ErrorObjectWriter
+    {
+        ArgumentNullException.ThrowIfNull( services );
+
+        services.TryAddEnumerable( Singleton<IProblemDetailsWriter, TWriter>() );
+        services.Configure( setup ?? DefaultErrorObjectJsonConfig );
+
+        // TODO: remove with TryAddErrorObjectJsonOptions in 9.0+
+        services.AddTransient<ErrorObjectsAdded>();
+
+        return services;
+    }
+
+    private static void DefaultErrorObjectJsonConfig( JsonOptions options ) =>
+        options.SerializerOptions.TypeInfoResolverChain.Insert( 0, ErrorObjectWriter.ErrorObjectJsonContext.Default );
 
     private static void AddApiVersioningServices( IServiceCollection services )
     {
@@ -180,23 +241,46 @@ public static partial class IServiceCollectionExtensions
             new( (IProblemDetailsWriter) serviceProvider.GetRequiredService( decoratedType ) );
     }
 
+    // TODO: retain for 8.1.x back-compat, but remove in 9.0+ in favor of AddErrorObjects for perf
     private static void TryAddErrorObjectJsonOptions( IServiceCollection services )
     {
         var serviceType = typeof( IProblemDetailsWriter );
         var implementationType = typeof( ErrorObjectWriter );
+        var markerType = typeof( ErrorObjectsAdded );
+        var hasErrorObjects = false;
+        var hasErrorObjectsJsonConfig = false;
 
         for ( var i = 0; i < services.Count; i++ )
         {
             var service = services[i];
 
-            // inheritance is intentionally not considered here because it will require a user-defined
-            // JsonSerlizerContext and IConfigureOptions<JsonOptions>
-            if ( service.ServiceType == serviceType &&
-                 service.ImplementationType == implementationType )
+            if ( !hasErrorObjects &&
+                 service.ServiceType == serviceType &&
+                 implementationType.IsAssignableFrom( service.ImplementationType ) )
             {
-                services.TryAddEnumerable( Singleton<IConfigureOptions<JsonOptions>, ErrorObjectJsonOptionsSetup>() );
-                return;
+                hasErrorObjects = true;
+
+                if ( hasErrorObjectsJsonConfig )
+                {
+                    break;
+                }
+            }
+            else if ( service.ServiceType == markerType )
+            {
+                hasErrorObjectsJsonConfig = true;
+
+                if ( hasErrorObjects )
+                {
+                    break;
+                }
             }
         }
+
+        if ( hasErrorObjects && !hasErrorObjectsJsonConfig )
+        {
+            services.Configure<JsonOptions>( DefaultErrorObjectJsonConfig );
+        }
     }
+
+    private sealed class ErrorObjectsAdded { }
 }
