@@ -1,5 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+// Ignore Spelling: Serializer
 namespace Asp.Versioning;
 
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,19 @@ public partial class ErrorObjectWriter : IProblemDetailsWriter
     /// <exception cref="ArgumentNullException"><paramref name="options"/> is <c>null</c>.</exception>
     public ErrorObjectWriter( IOptions<JsonOptions> options ) =>
         this.options = ( options ?? throw new ArgumentNullException( nameof( options ) ) ).Value.SerializerOptions;
+
+    /// <summary>
+    /// Gets the associated, default <see cref="JsonSerializerContext"/>.
+    /// </summary>
+    /// <value>The associated, default <see cref="JsonSerializerContext"/>.</value>
+    public static JsonSerializerContext DefaultJsonSerializerContext => ErrorObjectJsonContext.Default;
+
+    /// <summary>
+    /// Creates and returns a new <see cref="JsonSerializerContext"/> associated with the writer.
+    /// </summary>
+    /// <param name="options">The <see cref="JsonSerializerOptions">JSON serializer options</see> to use.</param>
+    /// <returns>A new <see cref="JsonSerializerContext"/>.</returns>
+    public static JsonSerializerContext NewJsonSerializerContext( JsonSerializerOptions options ) => new ErrorObjectJsonContext( options );
 
     /// <inheritdoc />
     public virtual bool CanWrite( ProblemDetailsContext context )
@@ -89,6 +103,7 @@ public partial class ErrorObjectWriter : IProblemDetailsWriter
     /// </summary>
     protected internal readonly partial struct ErrorDetail
     {
+        private const string CodeProperty = "code";
         private readonly ProblemDetails problemDetails;
         private readonly InnerError? innerError;
         private readonly Dictionary<string, object> extensions = [];
@@ -103,23 +118,21 @@ public partial class ErrorObjectWriter : IProblemDetailsWriter
         /// Gets or sets one of a server-defined set of error codes.
         /// </summary>
         /// <value>A server-defined error code.</value>
-        [JsonPropertyName( "code" )]
+        [JsonPropertyName( CodeProperty )]
         [JsonIgnore( Condition = WhenWritingNull )]
         public string? Code
         {
-            get => problemDetails.Extensions.TryGetValue( "code", out var value ) &&
-                   value is string code ?
-                   code :
-                   default;
+            get => problemDetails.Extensions.TryGetValue( CodeProperty, out var value ) &&
+                   value is string code ? code : default;
             set
             {
                 if ( value is null )
                 {
-                    problemDetails.Extensions.Remove( "code" );
+                    problemDetails.Extensions.Remove( CodeProperty );
                 }
                 else
                 {
-                    problemDetails.Extensions["code"] = value;
+                    problemDetails.Extensions[CodeProperty] = value;
                 }
             }
         }
