@@ -282,5 +282,7 @@ public static partial class IServiceCollectionExtensions
         }
     }
 
+// TEMP: this is a marker class to test whether Error Objects have been explicitly added. remove in 9.0+
+#pragma warning disable CA1812 // Avoid uninstantiated internal classes
     private sealed class ErrorObjectsAdded { }
 }
