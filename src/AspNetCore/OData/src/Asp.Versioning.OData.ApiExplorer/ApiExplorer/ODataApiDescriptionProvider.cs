@@ -142,6 +142,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
             else
             {
                 UpdateModelTypes( result, matched );
+                UpdateFunctionCollectionParameters( result, matched );
             }
         }
 
@@ -454,6 +455,75 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
             responseType.Type = type;
             responseType.ModelMetadata = modelMetadata.SubstituteIfNecessary( type );
         }
+    }
+
+    private static void UpdateFunctionCollectionParameters( ApiDescription description, IODataRoutingMetadata metadata )
+    {
+        var parameters = description.ParameterDescriptions;
+
+        if ( parameters.Count == 0 )
+        {
+            return;
+        }
+
+        var function = default( IEdmFunction );
+        var mapping = default( IDictionary<string, string> );
+
+        for ( var i = 0; i < metadata.Template.Count; i++ )
+        {
+            var segment = metadata.Template[i];
+
+            if ( segment is FunctionSegmentTemplate func )
+            {
+                function = func.Function;
+                mapping = func.ParameterMappings;
+                break;
+            }
+            else if ( segment is FunctionImportSegmentTemplate import )
+            {
+                function = import.FunctionImport.Function;
+                mapping = import.ParameterMappings;
+                break;
+            }
+        }
+
+        if ( function is null || mapping is null )
+        {
+            return;
+        }
+
+        var name = default( string );
+
+        foreach ( var parameter in function.Parameters )
+        {
+            if ( parameter.Type.IsCollection() &&
+                 mapping.TryGetValue( parameter.Name, out name ) &&
+                 parameters.SingleOrDefault( p => p.Name == name ) is { } param )
+            {
+                param.Source = BindingSource.Path;
+                break;
+            }
+        }
+
+        var path = description.RelativePath;
+
+        if ( string.IsNullOrEmpty( name ) || string.IsNullOrEmpty( path ) )
+        {
+            return;
+        }
+
+        var span = name.AsSpan();
+        Span<char> oldValue = stackalloc char[name.Length + 2];
+        Span<char> newValue = stackalloc char[name.Length + 4];
+
+        newValue[1] = oldValue[0] = '{';
+        newValue[^2] = oldValue[^1] = '}';
+        newValue[0] = '[';
+        newValue[^1] = ']';
+        span.CopyTo( oldValue.Slice( 1, name.Length ) );
+        span.CopyTo( newValue.Slice( 2, name.Length ) );
+
+        description.RelativePath = path.Replace( oldValue.ToString(), newValue.ToString(), Ordinal );
     }
 
     private sealed class ApiDescriptionComparer : IEqualityComparer<ApiDescription>
