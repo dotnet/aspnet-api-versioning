@@ -106,9 +106,14 @@ public static class ApiDescriptionExtensions
             return false;
         }
 
-        var token = '{' + parameter.Name + '}';
+        Span<char> token = stackalloc char[parameter.Name.Length + 2];
+
+        token[0] = '{';
+        token[^1] = '}';
+        parameter.Name.AsSpan().CopyTo( token.Slice( 1, parameter.Name.Length ) );
+
         var value = apiVersion.ToString( options.SubstitutionFormat, CultureInfo.InvariantCulture );
-        var newRelativePath = relativePath.Replace( token, value, StringComparison.Ordinal );
+        var newRelativePath = relativePath.Replace( token.ToString(), value, StringComparison.Ordinal );
 
         if ( relativePath == newRelativePath )
         {

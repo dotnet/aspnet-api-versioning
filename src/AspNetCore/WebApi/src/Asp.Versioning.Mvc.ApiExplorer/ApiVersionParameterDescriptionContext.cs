@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.AspNetCore.Routing.Template;
+using System.Runtime.CompilerServices;
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static System.Linq.Enumerable;
 using static System.StringComparison;
@@ -304,7 +305,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
                         continue;
                     }
 
-                    var token = $"{parameter.Name}:{constraintName}";
+                    var token = FormatToken( parameter.Name, constraintName );
 
                     parameterDescription.Name = parameter.Name;
                     description.RelativePath = relativePath.Replace( token, parameter.Name, Ordinal );
@@ -375,7 +376,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
                 },
                 Source = BindingSource.Path,
             };
-            var token = $"{parameter.Name}:{constraintName}";
+            var token = FormatToken( parameter.Name!, constraintName! );
 
             description.RelativePath = relativePath.Replace( token, parameter.Name, Ordinal );
             description.ParameterDescriptions.Insert( 0, result );
@@ -456,5 +457,19 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         var defaultApiVersion = options.ApiVersionSelector.SelectVersion( model );
 
         return apiVersion == defaultApiVersion;
+    }
+
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    private static string FormatToken( ReadOnlySpan<char> parameterName, ReadOnlySpan<char> constraintName )
+    {
+        var left = parameterName.Length;
+        var right = constraintName.Length;
+        Span<char> token = stackalloc char[left + right + 1];
+
+        parameterName.CopyTo( token[..left] );
+        token[left] = ':';
+        constraintName.CopyTo( token.Slice( left + 1, right ) );
+
+        return token.ToString();
     }
 }
