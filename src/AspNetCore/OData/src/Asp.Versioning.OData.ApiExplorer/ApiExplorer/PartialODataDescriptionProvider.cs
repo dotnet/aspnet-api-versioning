@@ -145,14 +145,10 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
         new ODataApiDescriptionProvider(
             new StubModelMetadataProvider(),
             new StubModelTypeBuilder(),
-            new OptionsFactory<ODataOptions>(
-                Enumerable.Empty<IConfigureOptions<ODataOptions>>(),
-                Enumerable.Empty<IPostConfigureOptions<ODataOptions>>() ),
+            new OptionsFactory<ODataOptions>( [], [] ),
             Opts.Create(
                 new ODataApiExplorerOptions(
-                    new(
-                        new StubODataApiVersionCollectionProvider(),
-                        Enumerable.Empty<IModelConfiguration>() ) ) ) ).Order;
+                    new( new StubODataApiVersionCollectionProvider(), [] ) ) ) ).Order;
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static void MarkAsAdHoc( ODataModelBuilder builder, IEdmModel model ) =>
