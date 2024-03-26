@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
-using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
+using static ServiceDescriptor;
 
 /// <summary>
 /// Provides ASP.NET Core MVC specific extension methods for <see cref="IApiVersioningBuilder"/>.
@@ -57,9 +57,9 @@ public static class IApiVersioningBuilderExtensions
         services.AddMvcCore();
         services.TryAddSingleton<IOptionsFactory<MvcApiVersioningOptions>, MvcApiVersioningOptionsFactory<MvcApiVersioningOptions>>();
         services.TryAddSingleton<IControllerNameConvention, DefaultControllerNameConvention>();
-        services.TryAddSingleton<IApiVersionConventionBuilder>( sp => new ApiVersionConventionBuilder( sp.GetRequiredService<IControllerNameConvention>() ) );
+        services.TryAddSingleton<IApiVersionConventionBuilder>( static sp => new ApiVersionConventionBuilder( sp.GetRequiredService<IControllerNameConvention>() ) );
         services.TryAddSingleton<IApiControllerFilter, DefaultApiControllerFilter>();
-        services.TryAddSingleton( sp => new ReportApiVersionsAttribute( sp.GetRequiredService<IReportApiVersions>() ) );
+        services.TryAddSingleton( static sp => new ReportApiVersionsAttribute( sp.GetRequiredService<IReportApiVersions>() ) );
         services.AddSingleton<ApplyContentTypeVersionActionFilter>();
         services.TryAddEnumerable( Transient<IPostConfigureOptions<MvcOptions>, ApiVersioningMvcOptionsSetup>() );
         services.TryAddEnumerable( Transient<IApplicationModelProvider, ApiVersioningApplicationModelProvider>() );
