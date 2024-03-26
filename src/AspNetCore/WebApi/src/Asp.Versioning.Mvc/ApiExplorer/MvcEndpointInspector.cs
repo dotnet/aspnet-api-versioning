@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 /// Represents the <see cref="IEndpointInspector">inspector</see> that understands
 /// <see cref="Endpoint">endpoints</see> defined by MVC controllers.
 /// </summary>
-[CLSCompliant(false)]
+[CLSCompliant( false )]
 public sealed class MvcEndpointInspector : IEndpointInspector
 {
     /// <inheritdoc />
