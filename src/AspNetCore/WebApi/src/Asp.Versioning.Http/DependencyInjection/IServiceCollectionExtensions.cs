@@ -10,9 +10,8 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
+using static ServiceDescriptor;
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
 /// <summary>
@@ -141,9 +140,9 @@ public static partial class IServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull( services );
 
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
-        services.AddSingleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
-        services.AddSingleton( sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
-        services.AddSingleton( sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector );
+        services.AddSingleton( static sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
+        services.AddSingleton( static sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
+        services.AddSingleton( static sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector );
         services.TryAddSingleton<IReportApiVersions, DefaultApiVersionReporter>();
         services.TryAddSingleton<ISunsetPolicyManager, SunsetPolicyManager>();
         services.TryAddEnumerable( Transient<IValidateOptions<ApiVersioningOptions>, ValidateApiVersioningOptions>() );
