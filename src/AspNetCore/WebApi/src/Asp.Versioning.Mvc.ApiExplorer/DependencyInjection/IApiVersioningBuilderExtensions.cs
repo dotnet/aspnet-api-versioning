@@ -5,13 +5,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using static ServiceDescriptor;
 
 /// <summary>
@@ -54,54 +52,17 @@ public static class IApiVersioningBuilderExtensions
 
         services.AddMvcCore().AddApiExplorer();
         services.TryAddSingleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>();
-        services.TryAddTransient( ResolveApiVersionDescriptionProviderFactory );
-        services.TryAddSingleton( ResolveApiVersionDescriptionProvider );
+        services.TryAddTransient<IApiVersionDescriptionProviderFactory, ApiVersionDescriptionProviderFactory>();
+        services.TryAddSingleton( static sp => sp.GetRequiredService<IApiVersionDescriptionProviderFactory>().Create() );
 
         // use internal constructor until ASP.NET Core fixes their bug
         // BUG: https://github.com/dotnet/aspnetcore/issues/41773
         services.TryAddEnumerable(
             Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>(
-                sp => new(
+                static sp => new(
                     sp.GetRequiredService<ISunsetPolicyManager>(),
                     sp.GetRequiredService<IModelMetadataProvider>(),
                     sp.GetRequiredService<IInlineConstraintResolver>(),
                     sp.GetRequiredService<IOptions<ApiExplorerOptions>>() ) ) );
-    }
-
-    private static IApiVersionDescriptionProviderFactory ResolveApiVersionDescriptionProviderFactory( IServiceProvider serviceProvider )
-    {
-        var sunsetPolicyManager = serviceProvider.GetRequiredService<ISunsetPolicyManager>();
-        var providers = serviceProvider.GetServices<IApiVersionMetadataCollationProvider>();
-        var inspector = serviceProvider.GetRequiredService<IEndpointInspector>();
-        var options = serviceProvider.GetRequiredService<IOptions<ApiExplorerOptions>>();
-
-        return new ApiVersionDescriptionProviderFactory(
-            NewDefaultProvider,
-            sunsetPolicyManager,
-            providers,
-            inspector,
-            options );
-
-        static DefaultApiVersionDescriptionProvider NewDefaultProvider(
-            IEnumerable<IApiVersionMetadataCollationProvider> providers,
-            ISunsetPolicyManager sunsetPolicyManager,
-            IOptions<ApiExplorerOptions> apiExplorerOptions ) =>
-            new( providers, sunsetPolicyManager, apiExplorerOptions );
-    }
-
-    private static IApiVersionDescriptionProvider ResolveApiVersionDescriptionProvider( IServiceProvider serviceProvider )
-    {
-        var factory = serviceProvider.GetRequiredService<IApiVersionDescriptionProviderFactory>();
-        var endpointDataSource = new EmptyEndpointDataSource();
-        return factory.Create( endpointDataSource );
-    }
-
-    private sealed class EmptyEndpointDataSource : EndpointDataSource
-    {
-        public override IReadOnlyList<Endpoint> Endpoints => Array.Empty<Endpoint>();
-
-        public override IChangeToken GetChangeToken() => new CancellationChangeToken( CancellationToken.None );
-
-        public override IReadOnlyList<Endpoint> GetGroupedEndpoints( RouteGroupContext context ) => Array.Empty<Endpoint>();
     }
 }
