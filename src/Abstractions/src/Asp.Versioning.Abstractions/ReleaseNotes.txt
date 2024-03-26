@@ -1,1 +1,1 @@
-﻿TryResolvePolicy should correctly fall back ([#1064](https://github.com/dotnet/aspnet-api-versioning/issues/1064))
+﻿
