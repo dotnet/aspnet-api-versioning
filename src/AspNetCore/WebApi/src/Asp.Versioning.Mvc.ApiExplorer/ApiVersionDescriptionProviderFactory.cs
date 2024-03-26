@@ -1,16 +1,13 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-#pragma warning disable SA1135 // Using directives should be qualified
-#pragma warning disable SA1200 // Using directives should be placed correctly
-
-using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
-using Microsoft.Extensions.Options;
+#pragma warning disable CA1812 // Avoid uninstantiated internal classes
 
 namespace Microsoft.AspNetCore.Builder;
 
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Routing;
-using Activator = Func<IEnumerable<IApiVersionMetadataCollationProvider>, ISunsetPolicyManager, IOptions<ApiExplorerOptions>, IApiVersionDescriptionProvider>;
+using Microsoft.Extensions.Options;
 
 internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescriptionProviderFactory
 {
@@ -18,16 +15,13 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
     private readonly IApiVersionMetadataCollationProvider[] providers;
     private readonly IEndpointInspector endpointInspector;
     private readonly IOptions<ApiExplorerOptions> options;
-    private readonly Activator activator;
 
     public ApiVersionDescriptionProviderFactory(
-        Activator activator,
         ISunsetPolicyManager sunsetPolicyManager,
         IEnumerable<IApiVersionMetadataCollationProvider> providers,
         IEndpointInspector endpointInspector,
         IOptions<ApiExplorerOptions> options )
     {
-        this.activator = activator;
         this.sunsetPolicyManager = sunsetPolicyManager;
         this.providers = providers.ToArray();
         this.endpointInspector = endpointInspector;
@@ -43,6 +37,6 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
 
         collators.AddRange( providers );
 
-        return activator( collators, sunsetPolicyManager, options );
+        return new DefaultApiVersionDescriptionProvider( collators, sunsetPolicyManager, options );
     }
 }
