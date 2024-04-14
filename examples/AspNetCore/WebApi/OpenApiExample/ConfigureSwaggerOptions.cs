@@ -1,6 +1,5 @@
 ﻿namespace ApiVersioning.Examples;
 
-using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -51,9 +50,9 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             text.Append( " This API version has been deprecated." );
         }
 
-        if ( description.SunsetPolicy is SunsetPolicy policy )
+        if ( description.SunsetPolicy is { } policy )
         {
-            if ( policy.Date is DateTimeOffset when )
+            if ( policy.Date is { } when )
             {
                 text.Append( " The API will be sunset on " )
                     .Append( when.Date.ToShortDateString() )
