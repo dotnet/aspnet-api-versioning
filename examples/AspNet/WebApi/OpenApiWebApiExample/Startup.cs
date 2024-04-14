@@ -2,6 +2,7 @@
 
 using Asp.Versioning;
 using Asp.Versioning.Routing;
+using Microsoft.Extensions.Primitives;
 using Owin;
 using Swashbuckle.Application;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.Http.Routing;
+using static System.Net.Mime.MediaTypeNames;
 
 /// <summary>
 /// Represents the startup process for the application.
@@ -88,25 +90,45 @@ public partial class Startup
                             {
                                 description.AppendLine();
 
+                                var rendered = false;
+
                                 for ( var i = 0; i < policy.Links.Count; i++ )
                                 {
                                     var link = policy.Links[i];
 
                                     if ( link.Type == "text/html" )
                                     {
-                                        description.AppendLine();
-
-                                        if ( link.Title.HasValue )
+                                        if ( !rendered )
                                         {
-                                            description.Append( link.Title.Value ).Append( ": " );
+                                            description.AppendLine();
+                                            description.Append( "**Links**" );
+                                            description.AppendLine();
+                                            rendered = true;
                                         }
 
-                                        description.Append( link.LinkTarget.OriginalString );
+                                        if ( StringSegment.IsNullOrEmpty( link.Title ) )
+                                        {
+                                            if ( link.LinkTarget.IsAbsoluteUri )
+                                            {
+                                                description.AppendLine( $"- {link.LinkTarget.OriginalString}" );
+                                            }
+                                            else
+                                            {
+                                                description.AppendFormat( "- <a href=\"{0}\">{0}</a>", link.LinkTarget.OriginalString );
+                                                description.AppendLine();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            description.AppendLine( $"- [{link.Title}]({link.LinkTarget.OriginalString})" );
+                                        }
                                     }
                                 }
                             }
                         }
 
+                        description.AppendLine();
+                        description.AppendLine( "**Additional Information**" );
                         info.Version( group.Name, $"Example API {group.ApiVersion}" )
                             .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
                             .Description( description.ToString() )

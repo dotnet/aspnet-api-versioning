@@ -3,6 +3,7 @@
 using Asp.Versioning;
 using Asp.Versioning.Conventions;
 using Microsoft.AspNet.OData.Extensions;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Newtonsoft.Json.Serialization;
 using Owin;
@@ -105,25 +106,45 @@ public partial class Startup
                             {
                                 description.AppendLine();
 
+                                var rendered = false;
+
                                 for ( var i = 0; i < policy.Links.Count; i++ )
                                 {
                                     var link = policy.Links[i];
 
                                     if ( link.Type == "text/html" )
                                     {
-                                        description.AppendLine();
-
-                                        if ( link.Title.HasValue )
+                                        if ( !rendered )
                                         {
-                                            description.Append( link.Title.Value ).Append( ": " );
+                                            description.AppendLine();
+                                            description.Append( "**Links**" );
+                                            description.AppendLine();
+                                            rendered = true;
                                         }
 
-                                        description.Append( link.LinkTarget.OriginalString );
+                                        if ( StringSegment.IsNullOrEmpty( link.Title ) )
+                                        {
+                                            if ( link.LinkTarget.IsAbsoluteUri )
+                                            {
+                                                description.AppendLine( $"- {link.LinkTarget.OriginalString}" );
+                                            }
+                                            else
+                                            {
+                                                description.AppendFormat( "- <a href=\"{0}\">{0}</a>", link.LinkTarget.OriginalString );
+                                                description.AppendLine();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            description.AppendLine( $"- [{link.Title}]({link.LinkTarget.OriginalString})" );
+                                        }
                                     }
                                 }
                             }
                         }
 
+                        description.AppendLine();
+                        description.AppendLine( "**Additional Information**" );
                         info.Version( group.Name, $"Sample API {group.ApiVersion}" )
                             .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
                             .Description( description.ToString() )

@@ -4,6 +4,7 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
@@ -63,25 +64,39 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             {
                 text.AppendLine();
 
+                var rendered = false;
+
                 for ( var i = 0; i < policy.Links.Count; i++ )
                 {
                     var link = policy.Links[i];
 
                     if ( link.Type == "text/html" )
                     {
-                        text.AppendLine();
-
-                        if ( link.Title.HasValue )
+                        if ( !rendered )
                         {
-                            text.Append( link.Title.Value ).Append( ": " );
+                            text.Append( "<h4>Links</h4><ul>" );
+                            rendered = true;
                         }
 
+                        text.Append( "<li><a href=\"" );
                         text.Append( link.LinkTarget.OriginalString );
+                        text.Append( "\">" );
+                        text.Append(
+                            StringSegment.IsNullOrEmpty( link.Title )
+                            ? link.LinkTarget.OriginalString
+                            : link.Title.ToString() );
+                        text.Append( "</a></li>" );
                     }
+                }
+
+                if ( rendered )
+                {
+                    text.Append( "</ul>" );
                 }
             }
         }
 
+        text.Append( "<h4>Additional Information</h4>" );
         info.Description = text.ToString();
 
         return info;
