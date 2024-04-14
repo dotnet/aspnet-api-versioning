@@ -1,6 +1,5 @@
 ﻿namespace ApiVersioning.Examples;
 
-using Asp.Versioning;
 using Asp.Versioning.Conventions;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.Extensions.Primitives;
@@ -93,9 +92,9 @@ public partial class Startup
                             description.Append( " This API version has been deprecated." );
                         }
 
-                        if ( group.SunsetPolicy is SunsetPolicy policy )
+                        if ( group.SunsetPolicy is { } policy )
                         {
-                            if ( policy.Date is DateTimeOffset when )
+                            if ( policy.Date is { } when )
                             {
                                 description.Append( " The API will be sunset on " )
                                            .Append( when.Date.ToShortDateString() )

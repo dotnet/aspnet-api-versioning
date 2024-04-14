@@ -11,7 +11,6 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.Http.Routing;
-using static System.Net.Mime.MediaTypeNames;
 
 /// <summary>
 /// Represents the startup process for the application.
@@ -77,9 +76,9 @@ public partial class Startup
                             description.Append( " This API version has been deprecated." );
                         }
 
-                        if ( group.SunsetPolicy is SunsetPolicy policy )
+                        if ( group.SunsetPolicy is { } policy )
                         {
-                            if ( policy.Date is DateTimeOffset when )
+                            if ( policy.Date is { } when )
                             {
                                 description.Append( " The API will be sunset on " )
                                            .Append( when.Date.ToShortDateString() )
