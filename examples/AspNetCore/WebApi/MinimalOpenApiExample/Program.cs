@@ -264,18 +264,20 @@ peopleV3.MapPost( "/", ( HttpRequest request, ApiVersion version, PersonV3 perso
         .Produces( 400 );
 
 app.UseSwagger();
-app.UseSwaggerUI(
-    options =>
-    {
-        var descriptions = app.DescribeApiVersions();
-
-        // build a swagger endpoint for each discovered API version
-        foreach ( var description in descriptions )
+if ( builder.Environment.IsDevelopment() )
+{
+    app.UseSwaggerUI(
+        options =>
         {
-            var url = $"/swagger/{description.GroupName}/swagger.json";
-            var name = description.GroupName.ToUpperInvariant();
-            options.SwaggerEndpoint( url, name );
-        }
-    } );
+            var descriptions = app.DescribeApiVersions();
 
+            // build a swagger endpoint for each discovered API version
+            foreach ( var description in descriptions )
+            {
+                var url = $"/swagger/{description.GroupName}/swagger.json";
+                var name = description.GroupName.ToUpperInvariant();
+                options.SwaggerEndpoint( url, name );
+            }
+        } );
+}
 app.Run();
