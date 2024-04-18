@@ -89,6 +89,8 @@ if ( app.Environment.IsDevelopment() )
 }
 
 app.UseSwagger();
+if ( app.Environment.IsDevelopment() )
+{
 app.UseSwaggerUI(
     options =>
     {
@@ -102,6 +104,7 @@ app.UseSwaggerUI(
             options.SwaggerEndpoint( url, name );
         }
     } );
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
