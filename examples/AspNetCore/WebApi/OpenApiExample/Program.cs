@@ -57,7 +57,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseSwagger();
-app.UseSwaggerUI(
+if ( app.Environment.IsDevelopment() )
+{
+    app.UseSwaggerUI(
     options =>
     {
         var descriptions = app.DescribeApiVersions();
@@ -70,6 +72,7 @@ app.UseSwaggerUI(
             options.SwaggerEndpoint( url, name );
         }
     } );
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
