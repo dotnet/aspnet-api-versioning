@@ -80,11 +80,11 @@ builder.Services.AddSwaggerGen(
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure HTTP request pipeline.
 
 if ( app.Environment.IsDevelopment() )
 {
-    // navigate to ~/$odata to determine whether any endpoints did not match an odata route template
+    // Access ~/$odata to identify OData endpoints that failed to match a route template.
     app.UseODataRouteDebug();
 }
 
