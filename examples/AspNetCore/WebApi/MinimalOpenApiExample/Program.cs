@@ -264,7 +264,7 @@ peopleV3.MapPost( "/", ( HttpRequest request, ApiVersion version, PersonV3 perso
         .Produces( 400 );
 
 app.UseSwagger();
-if ( builder.Environment.IsDevelopment() )
+if ( app.Environment.IsDevelopment() )
 {
     app.UseSwaggerUI(
         options =>
