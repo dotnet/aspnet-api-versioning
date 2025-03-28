@@ -256,9 +256,9 @@ public class ODataApiDescriptionProviderTest
         parameter.ModelMetadata.Description.Should().EndWith( suffix + '.' );
     }
 
-    private void PrintGroup( IReadOnlyList<ApiDescription> items )
+    private void PrintGroup( ApiDescription[] items )
     {
-        for ( var i = 0; i < items.Count; i++ )
+        for ( var i = 0; i < items.Length; i++ )
         {
             var item = items[i];
             console.WriteLine( $"[{item.GroupName}] {item.HttpMethod} {item.RelativePath}" );

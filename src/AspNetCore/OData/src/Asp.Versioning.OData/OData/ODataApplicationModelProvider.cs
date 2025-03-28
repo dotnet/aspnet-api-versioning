@@ -141,7 +141,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         return (metadataControllers, supported, deprecated);
     }
 
-    private static ControllerModel? SelectBestMetadataController( IReadOnlyList<ControllerModel> controllers )
+    private static ControllerModel? SelectBestMetadataController( ControllerModel[] controllers )
     {
         // note: there should be at least 2 metadata controllers, but there could be 3+
         // if a developer defines their own custom controller. ultimately, there can be
@@ -154,7 +154,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         var original = typeof( MetadataController ).GetTypeInfo();
         var versioned = typeof( VersionedMetadataController ).GetTypeInfo();
 
-        for ( var i = 0; i < controllers.Count; i++ )
+        for ( var i = 0; i < controllers.Length; i++ )
         {
             var controller = controllers[i];
 
@@ -192,7 +192,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
             return;
         }
 
-        var metadataController = SelectBestMetadataController( metadataControllers );
+        var metadataController = SelectBestMetadataController( metadataControllers.ToArray() );
 
         if ( metadataController == null )
         {

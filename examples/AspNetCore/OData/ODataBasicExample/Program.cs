@@ -4,7 +4,8 @@ var builder = WebApplication.CreateBuilder( args );
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddOData();
+builder.Services.AddControllers()
+    .AddOData( options => options.Select().Filter().OrderBy().SetMaxTop( null ).Count() );
 builder.Services.AddProblemDetails();
 builder.Services.AddApiVersioning()
                 .AddOData(
