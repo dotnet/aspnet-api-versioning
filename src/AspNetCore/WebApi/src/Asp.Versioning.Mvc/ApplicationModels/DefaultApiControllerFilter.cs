@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 [CLSCompliant( false )]
 public sealed class DefaultApiControllerFilter : IApiControllerFilter
 {
-    private readonly IReadOnlyList<IApiControllerSpecification> specifications;
+    private readonly List<IApiControllerSpecification> specifications;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultApiControllerFilter"/> class.
@@ -19,7 +19,7 @@ public sealed class DefaultApiControllerFilter : IApiControllerFilter
     /// <see cref="IApiControllerSpecification">specifications</see> used by the filter
     /// to identify API controllers.</param>
     public DefaultApiControllerFilter( IEnumerable<IApiControllerSpecification> specifications ) =>
-        this.specifications = specifications.ToArray();
+        this.specifications = specifications.ToList();
 
     /// <inheritdoc />
     public IList<ControllerModel> Apply( IList<ControllerModel> controllers )
