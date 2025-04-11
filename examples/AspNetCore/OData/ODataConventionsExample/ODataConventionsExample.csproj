@@ -4,8 +4,4 @@
   <ProjectReference Include="..\..\..\..\src\AspNetCore\OData\src\Asp.Versioning.OData\Asp.Versioning.OData.csproj" />
  </ItemGroup>
 
- <ItemGroup>
-   <PackageReference Update="Microsoft.AspNetCore.OData" Version="9.2.1" />
- </ItemGroup>
-
 </Project>
