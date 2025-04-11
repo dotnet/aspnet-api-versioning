@@ -76,11 +76,11 @@ internal sealed partial class ODataAttributeVisitor
         VisitMaxTop( querySettings );
     }
 
-    private void VisitEnableQuery( IReadOnlyList<EnableQueryAttribute> attributes )
+    private void VisitEnableQuery( EnableQueryAttribute[] attributes )
     {
         var @default = new EnableQueryAttribute();
 
-        for ( var i = 0; i < attributes.Count; i++ )
+        for ( var i = 0; i < attributes.Length; i++ )
         {
             var attribute = attributes[i];
 

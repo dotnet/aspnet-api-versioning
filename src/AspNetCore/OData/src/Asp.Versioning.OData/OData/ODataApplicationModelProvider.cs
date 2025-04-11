@@ -141,7 +141,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         return (metadataControllers, supported, deprecated);
     }
 
-    private static ControllerModel? SelectBestMetadataController( IReadOnlyList<ControllerModel> controllers )
+    private static ControllerModel? SelectBestMetadataController( List<ControllerModel> controllers )
     {
         // note: there should be at least 2 metadata controllers, but there could be 3+
         // if a developer defines their own custom controller. ultimately, there can be
