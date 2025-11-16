@@ -49,6 +49,7 @@ public class when_using_a_query_string : BasicAcceptanceTest
         // assert
         response.StatusCode.Should().Be( BadRequest );
         problem.Type.Should().Be( ProblemDetailsDefaults.Unspecified.Type );
+        problem.Extensions["code"].ToString().Should().Be( "ApiVersionUnspecified" );
     }
 
     public when_using_a_query_string( BasicFixture fixture, ITestOutputHelper console )

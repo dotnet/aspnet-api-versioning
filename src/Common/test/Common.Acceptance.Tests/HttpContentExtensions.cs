@@ -6,20 +6,30 @@ namespace Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 #endif
 using System.Net.Http;
+#if NETFRAMEWORK
 using System.Net.Http.Formatting;
+#else
+using System.Net.Http.Json;
+#endif
 
 internal static class HttpContentExtensions
 {
+#if NETFRAMEWORK
     private static readonly JsonMediaTypeFormatter ProblemDetailsMediaTypeFormatter = new()
     {
         SupportedMediaTypes = { new( ProblemDetailsDefaults.MediaType.Json ) },
     };
     private static readonly IEnumerable<MediaTypeFormatter> MediaTypeFormatters = new[] { ProblemDetailsMediaTypeFormatter };
+#endif
 
     public static Task<ProblemDetails> ReadAsProblemDetailsAsync(
         this HttpContent content,
         CancellationToken cancellationToken = default ) =>
+#if NETFRAMEWORK
         content.ReadAsAsync<ProblemDetails>( MediaTypeFormatters, cancellationToken );
+#else
+        content.ReadFromJsonAsync<ProblemDetails>( cancellationToken );
+#endif
 
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable IDE0079 // Remove unnecessary suppression

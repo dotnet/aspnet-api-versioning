@@ -25,7 +25,7 @@ internal static class EndpointProblem
             },
         };
 
-        if ( string.IsNullOrEmpty( code ) )
+        if ( !string.IsNullOrEmpty( code ) )
         {
             newContext.ProblemDetails.Extensions[nameof( code )] = code;
         }
