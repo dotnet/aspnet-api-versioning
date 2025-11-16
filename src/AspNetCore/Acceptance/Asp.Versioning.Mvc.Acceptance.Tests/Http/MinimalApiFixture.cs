@@ -57,6 +57,7 @@ public class MinimalApiFixture : HttpServerFixture
 
     protected override void OnAddApiVersioning( ApiVersioningOptions options )
     {
+        options.ReportApiVersions = true;
         options.ApiVersionReader = ApiVersionReader.Combine(
             new QueryStringApiVersionReader(),
             new UrlSegmentApiVersionReader(),

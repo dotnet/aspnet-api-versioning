@@ -76,6 +76,8 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                     return rejection.AssumeDefault;
                 }
 
+                httpContext.Features.Set( policyFeature );
+
                 // 3. unspecified
                 return versionsByUrlOnly
                        /* 404 */ ? rejection.Exit
@@ -86,6 +88,8 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
 
                 if ( !parser.TryParse( rawApiVersion, out var apiVersion ) )
                 {
+                    httpContext.Features.Set( policyFeature );
+
                     if ( versionsByUrl )
                     {
                         feature.RawRequestedApiVersion = rawApiVersion;
