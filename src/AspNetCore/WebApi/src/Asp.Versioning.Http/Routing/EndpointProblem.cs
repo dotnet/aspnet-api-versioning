@@ -33,6 +33,22 @@ internal static class EndpointProblem
         return newContext;
     }
 
+    internal static bool TryReportApiVersions( HttpContext context, ApiVersioningOptions options )
+    {
+        if ( options.ReportApiVersions &&
+             context.Features.Get<ApiVersionPolicyFeature>() is ApiVersionPolicyFeature feature )
+        {
+            var reporter = context.RequestServices.GetRequiredService<IReportApiVersions>();
+            var model = feature.Metadata.Map( reporter.Mapping );
+            context.Response.OnStarting( ReportApiVersions, (reporter, context.Response, model) );
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     internal static Task UnsupportedApiVersion(
         HttpContext context,
         ApiVersioningOptions options,
@@ -40,13 +56,7 @@ internal static class EndpointProblem
     {
         context.Response.StatusCode = statusCode;
 
-        if ( options.ReportApiVersions &&
-             context.Features.Get<ApiVersionPolicyFeature>() is ApiVersionPolicyFeature feature )
-        {
-            var reporter = context.RequestServices.GetRequiredService<IReportApiVersions>();
-            var model = feature.Metadata.Map( reporter.Mapping );
-            context.Response.OnStarting( ReportApiVersions, (reporter, context.Response, model) );
-        }
+        TryReportApiVersions( context, options );
 
         if ( context.TryGetProblemDetailsService( out var problemDetails ) )
         {
