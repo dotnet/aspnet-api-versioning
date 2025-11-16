@@ -32,12 +32,12 @@ internal sealed class EdgeBuilder
         keys = new( capacity + 1 );
         edges = new( capacity + RejectionEndpointCapacity )
         {
-            [EdgeKey.Malformed] = new( capacity: 1 ) { new MalformedApiVersionEndpoint( logger ) },
-            [EdgeKey.Ambiguous] = new( capacity: 1 ) { new AmbiguousApiVersionEndpoint( logger ) },
-            [EdgeKey.Unspecified] = new( capacity: 1 ) { new UnspecifiedApiVersionEndpoint( logger ) },
-            [EdgeKey.Unsupported] = new( capacity: 1 ) { new UnsupportedApiVersionEndpoint( options ) },
-            [EdgeKey.UnsupportedMediaType] = new( capacity: 1 ) { new UnsupportedMediaTypeEndpoint( options ) },
-            [EdgeKey.NotAcceptable] = new( capacity: 1 ) { new NotAcceptableEndpoint( options ) },
+            [EdgeKey.Malformed] = [new MalformedApiVersionEndpoint( logger, options )],
+            [EdgeKey.Ambiguous] = [new AmbiguousApiVersionEndpoint( logger )],
+            [EdgeKey.Unspecified] = [new UnspecifiedApiVersionEndpoint( logger, options )],
+            [EdgeKey.Unsupported] = [new UnsupportedApiVersionEndpoint( options )],
+            [EdgeKey.UnsupportedMediaType] = [new UnsupportedMediaTypeEndpoint( options )],
+            [EdgeKey.NotAcceptable] = [new NotAcceptableEndpoint( options )],
         };
     }
 

@@ -10,10 +10,17 @@ internal sealed class UnspecifiedApiVersionEndpoint : Endpoint
 {
     private const string Name = "400 Unspecified API Version";
 
-    internal UnspecifiedApiVersionEndpoint( ILogger logger, string[]? displayNames = default )
-        : base( c => OnExecute( c, displayNames, logger ), Empty, Name ) { }
+    internal UnspecifiedApiVersionEndpoint(
+        ILogger logger,
+        ApiVersioningOptions options,
+        string[]? displayNames = default )
+        : base( context => OnExecute( context, options, displayNames, logger ), Empty, Name ) { }
 
-    private static Task OnExecute( HttpContext context, string[]? candidateEndpoints, ILogger logger )
+    private static Task OnExecute(
+        HttpContext context,
+        ApiVersioningOptions options,
+        string[]? candidateEndpoints,
+        ILogger logger )
     {
         if ( candidateEndpoints == null || candidateEndpoints.Length == 0 )
         {
@@ -25,6 +32,8 @@ internal sealed class UnspecifiedApiVersionEndpoint : Endpoint
         }
 
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+        EndpointProblem.TryReportApiVersions( context, options );
 
         if ( context.TryGetProblemDetailsService( out var problemDetails ) )
         {

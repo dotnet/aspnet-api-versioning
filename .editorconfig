@@ -6,6 +6,7 @@ root = true
 # don't use tabs for indentation
 [*]
 indent_style = space
+guidelines = 120 1px solid yellow
 vsspell_section_id = 41b65011239a40959ccaae2a4ec7044a
 vsspell_ignored_words_41b65011239a40959ccaae2a4ec7044a = Accessor|app|clr|Edm|inline|middleware|Mvc|odata|Validator|Deconstruct
 

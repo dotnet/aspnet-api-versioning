@@ -337,14 +337,14 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     {
         // this is a best guess effort at collating all supported and deprecated
         // versions for an api when unmatched and it needs to be reported. it's
-        // impossible to sure as there is no way to correlate an arbitrary
+        // impossible to be sure as there is no way to correlate an arbitrary
         // request url by endpoint or name. the routing system will build a tree
         // based on the route template before the jump table policy is created,
         // which provides a natural method of grouping. manual, contrived tests
         // demonstrated that were the results were correctly collated together.
         // it is possible there is an edge case that isn't covered, but it's
         // unclear what that would look like. one or more test cases should be
-        // added to document that if discovered
+        // added to document that is discovered
         ApiVersionModel model;
 
         if ( supported == null )
