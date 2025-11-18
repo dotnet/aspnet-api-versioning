@@ -4,8 +4,10 @@ var builder = WebApplication.CreateBuilder( args );
 
 // Add services to the container.
 
-builder.Services.AddControllers()
+builder.Services
+    .AddControllers()
     .AddOData( options => options.Select().Filter().OrderBy().SetMaxTop( null ).Count() );
+
 builder.Services.AddProblemDetails();
 builder.Services.AddApiVersioning()
                 .AddOData(
@@ -16,10 +18,10 @@ builder.Services.AddApiVersioning()
                         // is merely illustrating that they can coexist and allows you
                         // to easily experiment with either configuration. one of these
                         // would be removed in a real application.
-                        
+
                         // WHEN VERSIONING BY: query string, header, or media type
                         options.AddRouteComponents( "api" );
-                        
+
                         // WHEN VERSIONING BY: url segment
                         options.AddRouteComponents( "api/v{version:apiVersion}" );
                     } );
