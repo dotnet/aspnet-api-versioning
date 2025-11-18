@@ -192,7 +192,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
             return;
         }
 
-        var metadataController = SelectBestMetadataController( metadataControllers);
+        var metadataController = SelectBestMetadataController( metadataControllers );
 
         if ( metadataController == null )
         {
