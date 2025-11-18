@@ -76,7 +76,7 @@ internal sealed partial class ODataAttributeVisitor
         VisitMaxTop( querySettings );
     }
 
-    private void VisitEnableQuery(EnableQueryAttribute[] attributes )
+    private void VisitEnableQuery( EnableQueryAttribute[] attributes )
     {
         var @default = new EnableQueryAttribute();
 

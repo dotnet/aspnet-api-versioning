@@ -59,14 +59,16 @@ public partial class ApiVersioningOptions
     /// <summary>
     /// Gets or sets the API version reader.
     /// </summary>
-    /// <value>An <see cref="IApiVersionReader">API version reader</see> object. The default value
-    /// is an instance of the <see cref="QueryStringApiVersionReader"/>.</value>
-    /// <remarks>The <see cref="IApiVersionReader">API version reader</see> is used to read the
-    /// API version specified by a client. The default value is the
-    /// <see cref="QueryStringApiVersionReader"/>, which only reads the API version from
-    /// the "api-version" query string parameter. Replace the default value with an alternate
-    /// implementation, such as the <see cref="HeaderApiVersionReader"/>, which
-    /// can read the API version from additional information like HTTP headers.</remarks>
+    /// <value>An <see cref="IApiVersionReader">API version reader</see> object. The default value is a combined reader
+    /// with both <see cref="QueryStringApiVersionReader"/> and <see cref="UrlSegmentApiVersionReader"/>.</value>
+    /// <remarks>
+    /// The <see cref="IApiVersionReader">API version reader</see> is used to read the API version specified by a
+    /// client. The default value consist of both <see cref="QueryStringApiVersionReader"/> and
+    /// <see cref="UrlSegmentApiVersionReader"/>, which reads the API version from the "api-version" query string
+    /// parameter and a path segment in the request URL respectively.
+    /// Replace the default value with an alternate implementation, such as the <see cref="HeaderApiVersionReader"/>,
+    /// which can read the API version from additional information like HTTP headers.
+    /// </remarks>
 #if !NETFRAMEWORK
     [CLSCompliant( false )]
 #endif
