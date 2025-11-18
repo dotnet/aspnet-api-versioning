@@ -24,7 +24,7 @@ public sealed class DefaultApiControllerFilter : IApiControllerFilter
     /// <inheritdoc />
     public IList<ControllerModel> Apply( IList<ControllerModel> controllers )
     {
-        if ( specifications.Length == 0 )
+        if ( specifications.Count == 0 )
         {
             return controllers;
         }
@@ -44,7 +44,7 @@ public sealed class DefaultApiControllerFilter : IApiControllerFilter
 
     private bool IsApiController( ControllerModel controller )
     {
-        for ( var i = 0; i < specifications.Length; i++ )
+        for ( var i = 0; i < specifications.Count; i++ )
         {
             if ( specifications[i].IsSatisfiedBy( controller ) )
             {

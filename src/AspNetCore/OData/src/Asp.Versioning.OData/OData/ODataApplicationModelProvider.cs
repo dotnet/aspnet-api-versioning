@@ -154,7 +154,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         var original = typeof( MetadataController ).GetTypeInfo();
         var versioned = typeof( VersionedMetadataController ).GetTypeInfo();
 
-        for ( var i = 0; i < controllers.Length; i++ )
+        for ( var i = 0; i < controllers.Count; i++ )
         {
             var controller = controllers[i];
 
@@ -192,7 +192,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
             return;
         }
 
-        var metadataController = SelectBestMetadataController( metadataControllers.ToArray() );
+        var metadataController = SelectBestMetadataController( metadataControllers);
 
         if ( metadataController == null )
         {
