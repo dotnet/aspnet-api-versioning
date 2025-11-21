@@ -1,0 +1,46 @@
+###
+# ConventionsExample - ASP.NET Core API Versioning using Conventions
+# This example demonstrates API versioning configured using conventions
+###
+
+@baseUrl = http://localhost:5000
+
+### ValuesController - Version 1.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=1.0
+
+### ValuesController - Get by ID - Version 1.0
+# Get specific value by ID
+GET {{baseUrl}}/api/values/42?api-version=1.0
+
+### ValuesController - Version 2.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=2.0
+
+### ValuesController - Get by ID - Version 2.0
+# Get specific value by ID
+GET {{baseUrl}}/api/values/42?api-version=2.0
+
+### ValuesController - Version 3.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=3.0
+
+### ValuesController - Get by ID - Version 3.0
+# Get specific value by ID
+GET {{baseUrl}}/api/values/42?api-version=3.0
+
+### HelloWorldController - Version 1.0
+# Get hello world with URL segment versioning
+GET {{baseUrl}}/api/v1.0/helloworld
+
+### HelloWorldController - Get by ID - Version 1.0
+# Get hello world with specific ID
+GET {{baseUrl}}/api/v1.0/helloworld/42
+
+### HelloWorldController - Version 2.0
+# Get hello world with URL segment versioning
+GET {{baseUrl}}/api/v2.0/helloworld
+
+### HelloWorldController - Get by ID - Version 2.0
+# Get hello world with specific ID
+GET {{baseUrl}}/api/v2.0/helloworld/42

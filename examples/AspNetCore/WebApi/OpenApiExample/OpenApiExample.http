@@ -1,0 +1,118 @@
+###
+# OpenApiExample - ASP.NET Core API Versioning with OpenAPI/Swagger
+# This example demonstrates comprehensive API versioning with Swagger documentation
+###
+
+@baseUrl = http://localhost:5000
+
+### Orders - Get by ID - Version 0.9 (Deprecated)
+# Get a specific order (deprecated version)
+GET {{baseUrl}}/api/orders/1?api-version=0.9
+
+### Orders - Get by ID - Version 1.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=1.0
+
+### Orders - Create - Version 1.0
+# Place a new order
+POST {{baseUrl}}/api/orders?api-version=1.0
+Content-Type: application/json
+
+{
+  "customer": "John Doe"
+}
+
+### Orders - Update - Version 1.0
+# Update an existing order
+PATCH {{baseUrl}}/api/orders/42?api-version=1.0
+Content-Type: application/json
+
+{
+  "customer": "Jane Doe"
+}
+
+### Orders - Get All - Version 2.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=2.0
+
+### Orders - Get by ID - Version 2.0
+# Get a specific order with effective date
+GET {{baseUrl}}/api/orders/1?api-version=2.0
+
+### Orders - Create - Version 2.0
+# Place a new order with effective date
+POST {{baseUrl}}/api/orders?api-version=2.0
+Content-Type: application/json
+
+{
+  "customer": "Bob Smith",
+  "effectiveDate": "2024-01-15T00:00:00Z"
+}
+
+### Orders - Update - Version 2.0
+# Update an existing order with effective date
+PATCH {{baseUrl}}/api/orders/42?api-version=2.0
+Content-Type: application/json
+
+{
+  "customer": "Alice Johnson",
+  "effectiveDate": "2024-01-20T00:00:00Z"
+}
+
+### Orders - Get All - Version 3.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=3.0
+
+### Orders - Get by ID - Version 3.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=3.0
+
+### Orders - Create - Version 3.0
+# Place a new order
+POST {{baseUrl}}/api/orders?api-version=3.0
+Content-Type: application/json
+
+{
+  "customer": "Charlie Brown",
+  "effectiveDate": "2024-02-01T00:00:00Z"
+}
+
+### Orders - Delete - Version 3.0
+# Delete an order
+DELETE {{baseUrl}}/api/orders/42?api-version=3.0
+
+### People - Get by ID - Version 0.9 (Deprecated)
+# Get a specific person (deprecated version)
+GET {{baseUrl}}/api/v0.9/people/1
+
+### People - Get by ID - Version 1.0
+# Get a specific person
+GET {{baseUrl}}/api/v1.0/people/1
+
+### People - Get All - Version 2.0
+# Get all people
+GET {{baseUrl}}/api/v2.0/people
+
+### People - Get by ID - Version 2.0
+# Get a specific person with email
+GET {{baseUrl}}/api/v2.0/people/1
+
+### People - Get All - Version 3.0
+# Get all people with phone numbers
+GET {{baseUrl}}/api/v3.0/people
+
+### People - Get by ID - Version 3.0
+# Get a specific person with phone number
+GET {{baseUrl}}/api/v3.0/people/1
+
+### People - Create - Version 3.0
+# Create a new person
+POST {{baseUrl}}/api/v3.0/people
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "555-123-4567"
+}

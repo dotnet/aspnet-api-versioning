@@ -1,0 +1,54 @@
+###
+# ByNamespaceExample - ASP.NET Core API Versioning by Namespace
+# This example demonstrates organizing API versions by namespace
+###
+
+@baseUrl = http://localhost:5000
+
+### OrdersController - Version 1.0 (URL segment)
+# Get orders for an account using URL segment versioning
+GET {{baseUrl}}/v1/orders/account123
+
+### OrdersController - Version 1.0 (Query string)
+# Get orders for an account using query string versioning
+GET {{baseUrl}}/orders/account123?api-version=1.0
+
+### AgreementsController - Version 1.0 (URL segment)
+# Get agreement for an account using URL segment versioning
+GET {{baseUrl}}/v1/agreements/account123
+
+### AgreementsController - Version 1.0 (Query string)
+# Get agreement for an account using query string versioning
+GET {{baseUrl}}/agreements/account123?api-version=1.0
+
+### OrdersController - Version 2.0 (URL segment)
+# Get orders for an account using URL segment versioning
+GET {{baseUrl}}/v2/orders/account456
+
+### OrdersController - Version 2.0 (Query string)
+# Get orders for an account using query string versioning
+GET {{baseUrl}}/orders/account456?api-version=2.0
+
+### AgreementsController - Version 2.0 (URL segment)
+# Get agreement for an account using URL segment versioning
+GET {{baseUrl}}/v2/agreements/account456
+
+### AgreementsController - Version 2.0 (Query string)
+# Get agreement for an account using query string versioning
+GET {{baseUrl}}/agreements/account456?api-version=2.0
+
+### OrdersController - Version 3.0 (URL segment)
+# Get orders for an account using URL segment versioning
+GET {{baseUrl}}/v3/orders/account789
+
+### OrdersController - Version 3.0 (Query string)
+# Get orders for an account using query string versioning
+GET {{baseUrl}}/orders/account789?api-version=3.0
+
+### AgreementsController - Version 3.0 (URL segment)
+# Get agreement for an account using URL segment versioning
+GET {{baseUrl}}/v3/agreements/account789
+
+### AgreementsController - Version 3.0 (Query string)
+# Get agreement for an account using query string versioning
+GET {{baseUrl}}/agreements/account789?api-version=3.0

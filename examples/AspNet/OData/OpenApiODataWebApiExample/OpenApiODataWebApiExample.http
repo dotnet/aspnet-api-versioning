@@ -1,0 +1,111 @@
+###
+# OpenApiODataWebApiExample - ASP.NET OData Web API with OpenAPI/Swagger
+# This example demonstrates comprehensive OData endpoints with Swagger documentation for legacy ASP.NET Web API
+###
+
+@baseUrl = http://localhost:52667
+
+### Orders - Get by Key - Version 0.9 (Deprecated)
+# Get a specific order (deprecated version)
+GET {{baseUrl}}/api/orders/1?api-version=0.9
+
+### Orders - Get by Key - Version 1.0
+# Get a specific order with $select option
+GET {{baseUrl}}/api/orders/1?api-version=1.0
+
+### Orders - Get by Key with $select - Version 1.0
+# Get a specific order with selected fields
+GET {{baseUrl}}/api/orders/1?api-version=1.0&$select=Id,Customer
+
+### Orders - Create - Version 1.0
+# Place a new order
+POST {{baseUrl}}/api/orders?api-version=1.0
+Content-Type: application/json
+
+{
+  "customer": "John Doe"
+}
+
+### People - Get by Key - Version 1.0
+# Get a specific person
+GET {{baseUrl}}/api/people/1?api-version=1.0
+
+### Orders - Get All - Version 2.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=2.0
+
+### Orders - Get All with $select - Version 2.0
+# Get orders with specific fields
+GET {{baseUrl}}/api/orders?api-version=2.0&$select=Id,Customer
+
+### Orders - Get by Key - Version 2.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=2.0
+
+### Orders - Create - Version 2.0
+# Place a new order with effective date
+POST {{baseUrl}}/api/orders?api-version=2.0
+Content-Type: application/json
+
+{
+  "customer": "Bob Smith",
+  "effectiveDate": "2024-01-15T00:00:00Z"
+}
+
+### People - Get All - Version 2.0
+# Get all people
+GET {{baseUrl}}/api/people?api-version=2.0
+
+### People - Get All with $select - Version 2.0
+# Get people with specific fields
+GET {{baseUrl}}/api/people?api-version=2.0&$select=FirstName,LastName,Email
+
+### People - Get by Key - Version 2.0
+# Get a specific person with email
+GET {{baseUrl}}/api/people/1?api-version=2.0
+
+### Orders - Get All - Version 3.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=3.0
+
+### Orders - Get All with $filter - Version 3.0
+# Get filtered orders
+GET {{baseUrl}}/api/orders?api-version=3.0&$filter=Id gt 1
+
+### Orders - Get by Key - Version 3.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=3.0
+
+### Orders - Create - Version 3.0
+# Place a new order
+POST {{baseUrl}}/api/orders?api-version=3.0
+Content-Type: application/json
+
+{
+  "customer": "Charlie Brown",
+  "effectiveDate": "2024-02-01T00:00:00Z"
+}
+
+### People - Get All - Version 3.0
+# Get all people with phone numbers
+GET {{baseUrl}}/api/people?api-version=3.0
+
+### People - Get by Key - Version 3.0
+# Get a specific person with phone number
+GET {{baseUrl}}/api/people/1?api-version=3.0
+
+### Products - Get All - Version 3.0
+# Get all products
+GET {{baseUrl}}/api/products?api-version=3.0
+
+### Products - Get by Key - Version 3.0
+# Get a specific product
+GET {{baseUrl}}/api/products/1?api-version=3.0
+
+### Suppliers - Get All - Version 3.0
+# Get all suppliers
+GET {{baseUrl}}/api/suppliers?api-version=3.0
+
+### Suppliers - Get by Key - Version 3.0
+# Get a specific supplier
+GET {{baseUrl}}/api/suppliers/1?api-version=3.0

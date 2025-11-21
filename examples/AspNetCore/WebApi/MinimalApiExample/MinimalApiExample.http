@@ -1,0 +1,33 @@
+###
+# MinimalApiExample - ASP.NET Core Minimal API with Versioning
+# This example demonstrates API versioning with Minimal APIs
+###
+
+@baseUrl = http://localhost:5000
+
+### WeatherForecast - Version 1.0
+# Get weather forecast (5 days)
+GET {{baseUrl}}/weatherforecast?api-version=1.0
+
+### WeatherForecast - Version 2.0
+# Get weather forecast (all summaries)
+GET {{baseUrl}}/weatherforecast?api-version=2.0
+
+### WeatherForecast - Create - Version 2.0
+# Create a new weather forecast
+POST {{baseUrl}}/weatherforecast?api-version=2.0
+Content-Type: application/json
+
+{
+  "date": "2024-01-15",
+  "temperatureC": 25,
+  "summary": "Warm"
+}
+
+### WeatherForecast - Delete (Version Neutral)
+# Delete weather forecast (version neutral endpoint)
+DELETE {{baseUrl}}/weatherforecast?api-version=1.0
+
+### WeatherForecast - Delete (Version Neutral with v2)
+# Delete weather forecast (version neutral endpoint)
+DELETE {{baseUrl}}/weatherforecast?api-version=2.0

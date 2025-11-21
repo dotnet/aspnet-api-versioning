@@ -1,0 +1,88 @@
+###
+# ODataAdvancedExample - ASP.NET Core OData Advanced Versioning
+# This example demonstrates advanced OData scenarios with multiple versioning strategies
+###
+
+@baseUrl = http://localhost:5000
+
+### People - Get All (Default Version)
+# Get all people (defaults to latest version when AssumeDefaultVersionWhenUnspecified is enabled)
+GET {{baseUrl}}/api/people
+
+### People - Get All - Version 1.0
+# Get all people using OData query
+GET {{baseUrl}}/api/people?api-version=1.0
+
+### People - Get All with $select - Version 1.0
+# Get all people with specific fields
+GET {{baseUrl}}/api/people?api-version=1.0&$select=FirstName,LastName
+
+### People - Get All with $filter - Version 1.0
+# Get filtered people
+GET {{baseUrl}}/api/people?api-version=1.0&$filter=Id eq 1
+
+### People - Get by Key - Version 1.0
+# Get a specific person by ID
+GET {{baseUrl}}/api/people/1?api-version=1.0
+
+### People - Get All - Version 2.0
+# Get all people using OData query
+GET {{baseUrl}}/api/people?api-version=2.0
+
+### People - Get All with $select - Version 2.0
+# Get all people with specific fields
+GET {{baseUrl}}/api/people?api-version=2.0&$select=FirstName,LastName,Email
+
+### People - Get by Key - Version 2.0
+# Get a specific person by ID
+GET {{baseUrl}}/api/people/1?api-version=2.0
+
+### People - Patch - Version 2.0
+# Update a person using OData PATCH
+PATCH {{baseUrl}}/api/people/1?api-version=2.0
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "email": "jane.mei@somewhere.com"
+}
+
+### People (V2) - Get All - Version 2.0
+# Get all people from version 2 specific controller
+GET {{baseUrl}}/api/people2?api-version=2.0
+
+### People (V2) - Get by Key - Version 2.0
+# Get a specific person by ID from version 2 controller
+GET {{baseUrl}}/api/people2/1?api-version=2.0
+
+### Orders - Get All - Version 1.0
+# Get all orders
+GET {{baseUrl}}/api/v1/orders
+
+### Orders - Get All with $select - Version 1.0
+# Get orders with specific fields
+GET {{baseUrl}}/api/v1/orders?$select=Id,Customer
+
+### Orders - Get by Key - Version 1.0
+# Get a specific order by ID
+GET {{baseUrl}}/api/v1/orders/1
+
+### Orders - Get All - Version 2.0
+# Get all orders for version 2.0
+GET {{baseUrl}}/api/v2/orders
+
+### Orders - Get by Key - Version 2.0
+# Get a specific order by ID for version 2.0
+GET {{baseUrl}}/api/v2/orders/1
+
+### Orders - Get All - Version 3.0
+# Get all orders for version 3.0
+GET {{baseUrl}}/api/v3/orders
+
+### Orders - Get by Key - Version 3.0
+# Get a specific order by ID for version 3.0
+GET {{baseUrl}}/api/v3/orders/1
+
+### Orders - Get All with $expand - Version 3.0
+# Get orders with expanded customer details
+GET {{baseUrl}}/api/v3/orders?$expand=customer
