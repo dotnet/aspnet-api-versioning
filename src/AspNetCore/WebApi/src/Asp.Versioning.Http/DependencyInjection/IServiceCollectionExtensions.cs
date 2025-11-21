@@ -214,7 +214,7 @@ public static partial class IServiceCollectionExtensions
         }
     }
 
-    // TODO: Remove in .NET 9.0 or .NET 8.0 patch
+    // TODO: Fixed and released; remove in .NET 10.0
     // BUG: https://github.com/dotnet/aspnetcore/issues/52577
     private static void TryAddProblemDetailsRfc7231Compliance( IServiceCollection services )
     {
@@ -225,11 +225,12 @@ public static partial class IServiceCollectionExtensions
             return;
         }
 
+        var index = services.IndexOf( descriptor );
         var decoratedType = descriptor.ImplementationType!;
         var lifetime = descriptor.Lifetime;
 
+        services[index] = Describe( typeof( IProblemDetailsWriter ), sp => NewProblemDetailsWriter( sp, decoratedType ), lifetime );
         services.Add( Describe( decoratedType, decoratedType, lifetime ) );
-        services.Replace( Describe( typeof( IProblemDetailsWriter ), sp => NewProblemDetailsWriter( sp, decoratedType ), lifetime ) );
 
         static bool IsDefaultProblemDetailsWriter( ServiceDescriptor serviceDescriptor ) =>
             serviceDescriptor.ServiceType == typeof( IProblemDetailsWriter ) &&
