@@ -18,7 +18,7 @@ GET {{baseUrl}}/api/orders/1?api-version=1.0
 GET {{baseUrl}}/api/orders/1?api-version=1.0&$select=Id,Customer
 
 ### Orders - Create - Version 1.0
-# Place a new order
+# Create a new order
 POST {{baseUrl}}/api/orders?api-version=1.0
 Content-Type: application/json
 
@@ -43,7 +43,7 @@ GET {{baseUrl}}/api/orders?api-version=2.0&$select=Id,Customer
 GET {{baseUrl}}/api/orders/1?api-version=2.0
 
 ### Orders - Create - Version 2.0
-# Place a new order with effective date
+# Create a new order with effective date
 POST {{baseUrl}}/api/orders?api-version=2.0
 Content-Type: application/json
 
@@ -77,7 +77,7 @@ GET {{baseUrl}}/api/orders?api-version=3.0&$filter=Id gt 1
 GET {{baseUrl}}/api/orders/1?api-version=3.0
 
 ### Orders - Create - Version 3.0
-# Place a new order
+# Create a new order
 POST {{baseUrl}}/api/orders?api-version=3.0
 Content-Type: application/json
 

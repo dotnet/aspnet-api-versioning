@@ -40,7 +40,7 @@ GET {{baseUrl}}/api/orders?api-version=2.0
 GET {{baseUrl}}/api/orders/1?api-version=2.0
 
 ### Orders - Create - Version 2.0
-# Place a new order with effective date
+# Create a new order with effective date
 POST {{baseUrl}}/api/orders?api-version=2.0
 Content-Type: application/json
 
@@ -68,7 +68,7 @@ GET {{baseUrl}}/api/orders?api-version=3.0
 GET {{baseUrl}}/api/orders/1?api-version=3.0
 
 ### Orders - Create - Version 3.0
-# Place a new order
+# Create a new order
 POST {{baseUrl}}/api/orders?api-version=3.0
 Content-Type: application/json
 
