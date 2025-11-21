@@ -36,7 +36,7 @@ Content-Type: application/json
 GET {{baseUrl}}/api/orders?api-version=2.0
 
 ### Orders - Get by ID - Version 2.0
-# Get a specific order
+# Get a specific order (supports effective date in v2.0)
 GET {{baseUrl}}/api/orders/1?api-version=2.0
 
 ### Orders - Create - Version 2.0
@@ -50,7 +50,7 @@ Content-Type: application/json
 }
 
 ### Orders - Update - Version 2.0
-# Update an existing order
+# Update an existing order (supports effective date in v2.0)
 PATCH {{baseUrl}}/api/orders/42?api-version=2.0
 Content-Type: application/json
 

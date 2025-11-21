@@ -14,7 +14,7 @@ GET {{baseUrl}}/api/orders/1?api-version=0.9
 GET {{baseUrl}}/api/orders/1?api-version=1.0
 
 ### Orders - Create - Version 1.0
-# Place a new order
+# Create a new order
 POST {{baseUrl}}/api/orders?api-version=1.0
 Content-Type: application/json
 
@@ -36,7 +36,7 @@ Content-Type: application/json
 GET {{baseUrl}}/api/orders?api-version=2.0
 
 ### Orders - Get by ID - Version 2.0
-# Get a specific order with effective date
+# Get a specific order
 GET {{baseUrl}}/api/orders/1?api-version=2.0
 
 ### Orders - Create - Version 2.0
