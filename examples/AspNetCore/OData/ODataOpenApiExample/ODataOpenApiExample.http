@@ -1,0 +1,82 @@
+###
+# ODataOpenApiExample - ASP.NET Core OData with OpenAPI/Swagger
+# This example demonstrates comprehensive OData endpoints with Swagger documentation
+###
+
+@baseUrl = http://localhost:5000
+
+### Orders - Get by Key - Version 0.9 (Deprecated)
+# Get a specific order (deprecated version)
+GET {{baseUrl}}/api/orders/1?api-version=0.9
+
+### Orders - Get by Key - Version 1.0
+# Get a specific order with $select option
+GET {{baseUrl}}/api/orders/1?api-version=1.0
+
+### Orders - Get by Key with $select - Version 1.0
+# Get a specific order with selected fields
+GET {{baseUrl}}/api/orders/1?api-version=1.0&$select=Id,Customer
+
+### People - Get by Key - Version 1.0
+# Get a specific person
+GET {{baseUrl}}/api/people/1?api-version=1.0
+
+### Orders - Get All - Version 2.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=2.0
+
+### Orders - Get All with $select - Version 2.0
+# Get orders with specific fields
+GET {{baseUrl}}/api/orders?api-version=2.0&$select=Id,Customer
+
+### Orders - Get by Key - Version 2.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=2.0
+
+### People - Get All - Version 2.0
+# Get all people
+GET {{baseUrl}}/api/people?api-version=2.0
+
+### People - Get All with $select - Version 2.0
+# Get people with specific fields
+GET {{baseUrl}}/api/people?api-version=2.0&$select=FirstName,LastName,Email
+
+### People - Get by Key - Version 2.0
+# Get a specific person with email
+GET {{baseUrl}}/api/people/1?api-version=2.0
+
+### Orders - Get All - Version 3.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=3.0
+
+### Orders - Get All with $filter - Version 3.0
+# Get filtered orders
+GET {{baseUrl}}/api/orders?api-version=3.0&$filter=Id gt 1
+
+### Orders - Get by Key - Version 3.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=3.0
+
+### People - Get All - Version 3.0
+# Get all people with phone numbers
+GET {{baseUrl}}/api/people?api-version=3.0
+
+### People - Get by Key - Version 3.0
+# Get a specific person with phone number
+GET {{baseUrl}}/api/people/1?api-version=3.0
+
+### Products - Get All - Version 3.0
+# Get all products
+GET {{baseUrl}}/api/products?api-version=3.0
+
+### Products - Get by Key - Version 3.0
+# Get a specific product
+GET {{baseUrl}}/api/products/1?api-version=3.0
+
+### Suppliers - Get All - Version 3.0
+# Get all suppliers
+GET {{baseUrl}}/api/suppliers?api-version=3.0
+
+### Suppliers - Get by Key - Version 3.0
+# Get a specific supplier
+GET {{baseUrl}}/api/suppliers/1?api-version=3.0

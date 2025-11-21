@@ -1,0 +1,22 @@
+###
+# BasicWebApiExample - ASP.NET Web API Versioning Examples
+# This file demonstrates basic API versioning scenarios for legacy ASP.NET Web API
+###
+
+@baseUrl = http://localhost:52667
+
+### ValuesController - Version 1.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=1.0
+
+### ValuesController - Version 2.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=2.0
+
+### HelloWorldController - Version 1.0
+# Get hello world with URL segment versioning
+GET {{baseUrl}}/api/v1.0/helloworld
+
+### HelloWorldController - Get by ID - Version 1.0
+# Get hello world with specific ID
+GET {{baseUrl}}/api/v1.0/helloworld/42

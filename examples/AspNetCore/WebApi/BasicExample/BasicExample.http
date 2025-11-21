@@ -1,0 +1,30 @@
+###
+# BasicExample - ASP.NET Core API Versioning Examples
+# This file demonstrates basic API versioning scenarios with query string versioning
+###
+
+@baseUrl = http://localhost:5000
+
+### ValuesController - Version 1.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=1.0
+
+### ValuesController - Version 2.0
+# Get values using query string versioning
+GET {{baseUrl}}/api/values?api-version=2.0
+
+### HelloWorldController - Version 1.0
+# Get hello world with URL segment versioning
+GET {{baseUrl}}/api/v1.0/helloworld
+
+### HelloWorldController - Get by ID - Version 1.0
+# Get hello world with specific ID
+GET {{baseUrl}}/api/v1.0/helloworld/42
+
+### MultiVersionedController - Version 1.0
+# Get from controller that supports multiple versions
+GET {{baseUrl}}/api/v1.0/multiversioned
+
+### MultiVersionedController - Version 2.0
+# Get from controller that supports multiple versions (v2 specific endpoint)
+GET {{baseUrl}}/api/v2.0/multiversioned
