@@ -21,11 +21,6 @@ GET {{baseUrl}}/api/v1.0/helloworld
 # Get hello world with specific ID
 GET {{baseUrl}}/api/v1.0/helloworld/42
 
-### HelloWorldController - Create - Version 1.0
-# Create new hello world resource
-POST {{baseUrl}}/api/v1.0/helloworld
-Content-Type: application/json
-
 ### MultiVersionedController - Version 1.0
 # Get from controller that supports multiple versions
 GET {{baseUrl}}/api/v1.0/multiversioned

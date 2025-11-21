@@ -20,8 +20,3 @@ GET {{baseUrl}}/api/v1.0/helloworld
 ### HelloWorldController - Get by ID - Version 1.0
 # Get hello world with specific ID
 GET {{baseUrl}}/api/v1.0/helloworld/42
-
-### HelloWorldController - Create - Version 1.0
-# Create new hello world resource
-POST {{baseUrl}}/api/v1.0/helloworld
-Content-Type: application/json

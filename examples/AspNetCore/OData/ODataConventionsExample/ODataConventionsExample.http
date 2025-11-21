@@ -33,16 +33,6 @@ GET {{baseUrl}}/api/people?api-version=2.0&$select=FirstName,LastName,Email
 # Get a specific person by ID
 GET {{baseUrl}}/api/people/1?api-version=2.0
 
-### People - Patch - Version 2.0
-# Update a person using OData PATCH
-PATCH {{baseUrl}}/api/people/1?api-version=2.0
-Content-Type: application/json
-
-{
-  "firstName": "Jane",
-  "email": "jane.mei@somewhere.com"
-}
-
 ### Orders - Get All - Version 1.0
 # Get all orders
 GET {{baseUrl}}/api/v1/orders
