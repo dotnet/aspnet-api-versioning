@@ -52,7 +52,7 @@ public partial class ODataApiVersioningOptions
     /// </summary>
     /// <param name="prefix">The associated OData prefix.</param>
     /// <returns>The original <see cref="ODataApiVersioningOptions">options</see>.</returns>
-    public virtual ODataApiVersioningOptions AddRouteComponents( string prefix ) =>
+    public virtual ODataApiVersioningOptions AddRouteComponents( [StringSyntax( "Route" )] string prefix ) =>
         AddRouteComponents( prefix, static _ => { } );
 
     /// <summary>
@@ -70,7 +70,7 @@ public partial class ODataApiVersioningOptions
     /// <param name="batchHandler">The <see cref="ODataBatchHandler">$batch handler</see>.</param>
     /// <returns>The original <see cref="ODataApiVersioningOptions">options</see>.</returns>
     [CLSCompliant( false )]
-    public ODataApiVersioningOptions AddRouteComponents( string prefix, ODataBatchHandler batchHandler ) =>
+    public ODataApiVersioningOptions AddRouteComponents( [StringSyntax( "Route" )] string prefix, ODataBatchHandler batchHandler ) =>
         AddRouteComponents( prefix, builder => builder.AddSingleton( batchHandler ) );
 
     /// <summary>
@@ -89,7 +89,7 @@ public partial class ODataApiVersioningOptions
     /// <param name="configureAction">The configuration <see cref="Action{T}">action</see>.</param>
     /// <returns>The original <see cref="ODataApiVersioningOptions">options</see>.</returns>
     public virtual ODataApiVersioningOptions AddRouteComponents(
-        string prefix,
+        [StringSyntax( "Route" )] string prefix,
         Action<IServiceCollection> configureAction )
     {
         configurations ??= new( StringComparer.OrdinalIgnoreCase );
