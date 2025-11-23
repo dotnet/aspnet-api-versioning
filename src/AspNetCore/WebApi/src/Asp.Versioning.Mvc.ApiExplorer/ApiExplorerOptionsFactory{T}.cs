@@ -3,13 +3,15 @@
 namespace Asp.Versioning.ApiExplorer;
 
 using Microsoft.Extensions.Options;
+using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
 /// <summary>
 /// Represents a factory to create API explorer options.
 /// </summary>
 /// <typeparam name="T">The type of options to create.</typeparam>
 [CLSCompliant( false )]
-public class ApiExplorerOptionsFactory<T> : OptionsFactory<T> where T : ApiExplorerOptions
+public class ApiExplorerOptionsFactory<[DynamicallyAccessedMembers( PublicParameterlessConstructor )] T>
+    : OptionsFactory<T> where T : ApiExplorerOptions
 {
     private readonly IOptions<ApiVersioningOptions> optionsHolder;
 

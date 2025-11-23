@@ -8,6 +8,7 @@
   <AssemblyTitle>ASP.NET Core API Versioning with OData v4.0</AssemblyTitle>
   <Description>A service API versioning library for Microsoft ASP.NET Core with OData v4.0.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;Versioning;OData</PackageTags>
+  <IsTrimmable>true</IsTrimmable>
  </PropertyGroup>
 
  <ItemGroup>

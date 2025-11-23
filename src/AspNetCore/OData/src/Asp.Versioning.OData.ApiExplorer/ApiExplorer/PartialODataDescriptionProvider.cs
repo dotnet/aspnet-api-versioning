@@ -201,6 +201,8 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
             throw new NotImplementedException();
     }
 
+    [UnconditionalSuppressMessage( "ILLink", "IL2092" )]
+    [UnconditionalSuppressMessage( "ILLink", "IL2093" )]
     private sealed class StubModelTypeBuilder : IModelTypeBuilder
     {
         public Type NewActionParameters( IEdmModel model, IEdmAction action, string controllerName, ApiVersion apiVersion ) =>

@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 #endif
+using static System.Reflection.BindingFlags;
 
 /// <summary>
 /// Provides extension methods for the <see cref="ODataActionQueryOptionsConventionBuilder"/>
@@ -187,6 +188,9 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
     /// If there is only one corresponding match found, then the <paramref name="argumentTypes">argument types</paramref> are ignored;
     /// otherwise, the <paramref name="argumentTypes">argument types</paramref> are used for method overload resolution. Action
     /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
+#if !NETFRAMEWORK
+    [UnconditionalSuppressMessage( "ILLink", "IL2075", Justification = "Controller types and actions are never trimmed" )]
+#endif
     public static ODataActionQueryOptionsConventionBuilder Action(
         this IODataActionQueryOptionsConventionBuilder builder,
         string methodName,
@@ -197,7 +201,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
 
         string message;
         var methods = builder.ControllerType
-                             .GetRuntimeMethods()
+                             .GetMethods( Instance | Public )
                              .Where( m => m.Name == methodName && IsAction( m ) )
                              .ToArray();
 

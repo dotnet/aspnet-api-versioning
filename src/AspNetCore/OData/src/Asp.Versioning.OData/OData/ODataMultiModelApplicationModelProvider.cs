@@ -135,7 +135,8 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         return Type.GetType( $"{TypeName}, {assemblyName}", throwOnError: true, ignoreCase: false )!;
     }
 
-    private static Func<IOptions<ODataOptions>, IApplicationModelProvider> CreateActivator( Type type )
+    private static Func<IOptions<ODataOptions>, IApplicationModelProvider> CreateActivator(
+        [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors )] Type type )
     {
         var options = Parameter( typeof( IOptions<ODataOptions> ), "options" );
         var @new = New( type.GetConstructors()[0], options );

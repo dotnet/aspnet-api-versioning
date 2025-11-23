@@ -10,12 +10,19 @@ using System.Reflection;
 #if NETFRAMEWORK
 using System.Web.Http;
 #endif
+using static System.Reflection.BindingFlags;
 
 internal static class ActionMethodResolver
 {
-    internal static MethodInfo Resolve( Type controllerType, string methodName, Type[] argumentTypes )
+    internal static MethodInfo Resolve(
+#if !NETFRAMEWORK
+        [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicMethods )]
+#endif
+        Type controllerType,
+        string methodName,
+        Type[] argumentTypes )
     {
-        var methods = controllerType.GetRuntimeMethods().Where( m => m.Name == methodName && IsAction( m ) ).ToArray();
+        var methods = controllerType.GetMethods( Instance | Public ).Where( m => m.Name == methodName && IsAction( m ) ).ToArray();
 
         switch ( methods.Length )
         {

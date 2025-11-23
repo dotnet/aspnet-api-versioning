@@ -410,16 +410,16 @@ public class DefaultModelTypeBuilderTest
     }
 
     [Fact]
-    public void substituted_type_should_have_valid_runtime_properties__issue1104()
+    public void ignoring_property_should_force_substitution_with_valid_runtime_properties()
     {
         // arrange
         var modelBuilder = new ODataConventionModelBuilder();
-
         var address = modelBuilder.EntitySet<Address>( nameof( Address ) ).EntityType;
-        address.Ignore( x => x.City ); // force substitution
-        var addressType = typeof( Address );
+
+        address.Ignore( x => x.City );
 
         var context = NewContext( modelBuilder.GetEdmModel() );
+        var addressType = typeof( Address );
 
         // act
         var substitutedType = addressType.SubstituteIfNecessary( context );
@@ -428,6 +428,7 @@ public class DefaultModelTypeBuilderTest
         substitutedType.Should().NotBe( addressType );
 #if NET452
         substitutedType.GetRuntimeProperties().Should().HaveCount( 5 );
+
         foreach ( var substitutedProperty in substitutedType.GetRuntimeProperties() )
         {
             substitutedProperty.Should().NotBeNull();

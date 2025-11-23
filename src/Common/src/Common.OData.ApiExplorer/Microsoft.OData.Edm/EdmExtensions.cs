@@ -37,6 +37,9 @@ internal static class EdmExtensions
         return null;
     }
 
+#if !NETFRAMEWORK
+    [UnconditionalSuppressMessage( "ILLink", "IL2057", Justification = "The types being referenced are well-known and will not be trimmed." )]
+#endif
     private static Type? DeriveFromWellKnowPrimitive( string edmFullName ) => edmFullName switch
     {
         "Edm.String" or "Edm.Byte" or "Edm.SByte" or "Edm.Int16" or "Edm.Int32" or "Edm.Int64" or
