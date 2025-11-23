@@ -14,6 +14,10 @@
   <IsAotCompatible>true</IsAotCompatible>
  </PropertyGroup>
 
+ <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+  <CheckNotRecommendedTargetFramework>false</CheckNotRecommendedTargetFramework>
+ </PropertyGroup>
+
  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
   <Compile Remove="netstandard2.0\**\*.cs;net#.0\**\*.cs" />
   <None Include="netstandard2.0\**\*.cs;net#.0\**\*.cs" />

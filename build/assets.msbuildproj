@@ -2,6 +2,7 @@
  <PropertyGroup>
   <TargetFramework>netstandard1.0</TargetFramework>
   <IsPackable>false</IsPackable>
+  <NoWarn>$(NoWarn);NETSDK1215</NoWarn>
  </PropertyGroup>
  <ItemGroup>
   <None Include="**\*.*" Exclude="*.msbuildproj;obj\**\*.*" />
