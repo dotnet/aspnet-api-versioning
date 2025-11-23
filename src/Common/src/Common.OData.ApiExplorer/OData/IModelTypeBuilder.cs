@@ -8,6 +8,9 @@ using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.OData.Formatter;
 #endif
 using Microsoft.OData.Edm;
+#if !NETFRAMEWORK
+using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
+#endif
 
 /// <summary>
 /// Defines the behavior of a model type builder.
@@ -26,7 +29,17 @@ public interface IModelTypeBuilder
     /// <paramref name="structuredType">structured type</paramref>.</returns>
     /// <remarks>If a substitution is not required, the original <paramref name="clrType">CLR type</paramref> is returned. When a substitution
     /// <see cref="Type">type</see> is generated, it is performed only once per <paramref name="apiVersion">API version</paramref>.</remarks>
-    Type NewStructuredType( IEdmModel model, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion );
+#if !NETFRAMEWORK
+    [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+    Type NewStructuredType(
+        IEdmModel model,
+        IEdmStructuredType structuredType,
+#if !NETFRAMEWORK
+        [DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+        Type clrType,
+        ApiVersion apiVersion );
 
     /// <summary>
     /// Creates an returns a strongly-typed definition for OData action parameters.
@@ -39,5 +52,8 @@ public interface IModelTypeBuilder
     /// <remarks><see cref="ODataActionParameters">OData action parameters</see> are modeled as a <see cref="Dictionary{TKey,TValue}">dictionary</see>,
     /// which is difficult to use effectively by documentation tools such as the API Explorer. The corresponding type is generated only once per
     /// <paramref name="apiVersion">API version</paramref>.</remarks>
+#if !NETFRAMEWORK
+    [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
     Type NewActionParameters( IEdmModel model, IEdmAction action, string controllerName, ApiVersion apiVersion );
 }

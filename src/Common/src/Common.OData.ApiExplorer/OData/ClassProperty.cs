@@ -21,6 +21,9 @@ internal readonly struct ClassProperty
         Attributes = clrProperty.DeclaredAttributes().ToArray();
     }
 
+#if !NETFRAMEWORK
+    [UnconditionalSuppressMessage( "ILLink", "IL2072" )]
+#endif
     internal ClassProperty( IEdmOperationParameter parameter, TypeSubstitutionContext context )
     {
         Name = parameter.Name;

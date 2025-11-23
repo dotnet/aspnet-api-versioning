@@ -98,9 +98,30 @@ public class ApiVersionUrlHelper : IUrlHelper
             return current;
         }
 
-        if ( current is not RouteValueDictionary values )
+        RouteValueDictionary values;
+
+        if ( current is null )
         {
-            values = current == null ? new() : new( current );
+            values = new() { { key, value } };
+            return values;
+        }
+
+        if ( current is RouteValueDictionary dictionary )
+        {
+            values = dictionary;
+        }
+        else if ( current is IEnumerable<KeyValuePair<string, object?>> kvps )
+        {
+            values = [];
+
+            foreach ( var kvp in kvps )
+            {
+                values.Add( kvp.Key, kvp.Value );
+            }
+        }
+        else
+        {
+            return current;
         }
 
         if ( !values.ContainsKey( key ) )

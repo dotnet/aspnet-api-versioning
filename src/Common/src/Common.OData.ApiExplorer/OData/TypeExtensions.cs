@@ -16,6 +16,8 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 #if NETFRAMEWORK
 using IActionResult = System.Web.Http.IHttpActionResult;
+#else
+using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 #endif
 
 /// <summary>
@@ -41,7 +43,17 @@ public static partial class TypeExtensions
     /// <param name="context">The current <see cref="TypeSubstitutionContext">type substitution context</see>.</param>
     /// <returns>The original <paramref name="type"/> or a substitution <see cref="Type">type</see> based on the
     /// provided <paramref name="context"/>.</returns>
-    public static Type SubstituteIfNecessary( this Type type, TypeSubstitutionContext context )
+#if !NETFRAMEWORK
+    [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
+    [UnconditionalSuppressMessage( "ILLink", "IL2073" )]
+    [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+    public static Type SubstituteIfNecessary(
+#if !NETFRAMEWORK
+        [DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+        this Type type,
+        TypeSubstitutionContext context )
     {
         ArgumentNullException.ThrowIfNull( type );
         ArgumentNullException.ThrowIfNull( context );
@@ -151,7 +163,13 @@ public static partial class TypeExtensions
         return type;
     }
 
-    private static bool IsSubstitutableGeneric( Type type, Stack<Type> openTypes, out Type? innerType )
+    private static bool IsSubstitutableGeneric(
+#if !NETFRAMEWORK
+        [DynamicallyAccessedMembers( Interfaces )]
+#endif
+        Type type,
+        Stack<Type> openTypes,
+        out Type? innerType )
     {
         innerType = default;
 
@@ -212,6 +230,10 @@ public static partial class TypeExtensions
         return true;
     }
 
+#if !NETFRAMEWORK
+    [RequiresDynamicCode( "Might not be available at runtime" )]
+    [RequiresUnreferencedCode( "Cannot be validated by trim analysis" )]
+#endif
     private static Type CloseGeneric( Stack<Type> openTypes, Type innerType )
     {
         var type = openTypes.Pop();
@@ -241,7 +263,10 @@ public static partial class TypeExtensions
 #endif
         !type.IsODataActionParameters();
 
-    internal static bool IsEnumerable( this Type type, [NotNullWhen( true )] out Type? itemType )
+#if !NETFRAMEWORK
+    [UnconditionalSuppressMessage( "ILLink", "IL2070" )]
+#endif
+    internal static bool IsEnumerable(this Type type, [NotNullWhen( true )] out Type? itemType )
     {
         var types = new Queue<Type>();
 

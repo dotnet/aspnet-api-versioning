@@ -14,6 +14,9 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
+#if !NETFRAMEWORK
+using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
+#endif
 using static System.Globalization.CultureInfo;
 using static System.Guid;
 using static System.Reflection.BindingFlags;
@@ -22,6 +25,11 @@ using static System.Reflection.Emit.AssemblyBuilderAccess;
 /// <summary>
 /// Represents the default model type builder.
 /// </summary>
+#if !NETFRAMEWORK
+[UnconditionalSuppressMessage( "ILLink", "IL2055")]
+[UnconditionalSuppressMessage( "ILLink", "IL2070")]
+[UnconditionalSuppressMessage( "ILLink", "IL2073")]
+#endif
 public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 {
     /* design: there is typically a 1:1 relationship between an edm and api version. odata model bound settings
@@ -59,7 +67,17 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     public DefaultModelTypeBuilder( bool includeAdHocModels = false ) => excludeAdHocModels = !includeAdHocModels;
 
     /// <inheritdoc />
-    public Type NewStructuredType( IEdmModel model, IEdmStructuredType structuredType, Type clrType, ApiVersion apiVersion )
+#if !NETFRAMEWORK
+    [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+    public Type NewStructuredType(
+        IEdmModel model,
+        IEdmStructuredType structuredType,
+#if !NETFRAMEWORK
+        [DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+        Type clrType,
+        ApiVersion apiVersion )
     {
         ArgumentNullException.ThrowIfNull( model );
 
@@ -88,6 +106,9 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     }
 
     /// <inheritdoc />
+#if !NETFRAMEWORK
+    [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
     public Type NewActionParameters( IEdmModel model, IEdmAction action, string controllerName, ApiVersion apiVersion )
     {
         ArgumentNullException.ThrowIfNull( model );
@@ -417,10 +438,6 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
         var field = addTo.DefineField( "_" + name, shouldBeAdded, FieldAttributes.Private );
         var propertyBuilder = addTo.DefineProperty( name, PropertyAttributes.HasDefault, shouldBeAdded, null );
         var getter = addTo.DefineMethod( "get_" + name, propertyMethodAttributes, shouldBeAdded, Type.EmptyTypes );
-
-        /* returnType is 'null' instead of type(void) as per docs
-        * see: https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.propertybuilder?view=net-9.0
-        */
         var setter = addTo.DefineMethod( "set_" + name, propertyMethodAttributes, null, [shouldBeAdded] );
         var il = getter.GetILGenerator();
 

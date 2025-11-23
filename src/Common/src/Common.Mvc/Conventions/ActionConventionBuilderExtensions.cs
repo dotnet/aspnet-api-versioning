@@ -73,6 +73,9 @@ public static class ActionConventionBuilderExtensions
     /// If there is only one corresponding match found, then the <paramref name="argumentTypes">argument types</paramref> are ignored;
     /// otherwise, the <paramref name="argumentTypes">argument types</paramref> are used for method overload resolution. Action
     /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
+#if !NETFRAMEWORK
+    [UnconditionalSuppressMessage( "ILLink", "IL2072", Justification = "Controller types are never trimmed" )]
+#endif
     public static IActionConventionBuilder Action( this IActionConventionBuilder builder, string methodName, params Type[] argumentTypes )
     {
         ArgumentNullException.ThrowIfNull( builder );

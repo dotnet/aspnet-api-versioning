@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
 using static ServiceDescriptor;
+using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
 /// <summary>
 /// Provides ASP.NET Core MVC specific extension methods for <see cref="IApiVersioningBuilder"/>.
@@ -85,7 +86,11 @@ public static class IApiVersioningBuilderExtensions
         return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
     }
 
-    private static void TryReplace<TService, TImplementation, TReplacement>( this IServiceCollection services )
+    private static void TryReplace<
+        TService,
+        TImplementation,
+        [DynamicallyAccessedMembers( NonPublicConstructors | PublicConstructors )]
+        TReplacement>( this IServiceCollection services )
     {
         var serviceType = typeof( TService );
         var implementationType = typeof( TImplementation );

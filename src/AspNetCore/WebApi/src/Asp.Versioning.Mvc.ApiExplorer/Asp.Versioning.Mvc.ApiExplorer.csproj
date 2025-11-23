@@ -8,6 +8,7 @@
   <AssemblyTitle>ASP.NET Core API Versioning API Explorer</AssemblyTitle>
   <Description>The API Explorer extensions for ASP.NET Core API Versioning.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;Versioning;ApiExplorer</PackageTags>
+  <IsTrimmable>true</IsTrimmable>
  </PropertyGroup>
 
  <ItemGroup>

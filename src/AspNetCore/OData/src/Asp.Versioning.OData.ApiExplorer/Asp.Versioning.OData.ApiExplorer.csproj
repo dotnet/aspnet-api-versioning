@@ -8,6 +8,7 @@
   <AssemblyTitle>ASP.NET Core API Versioning API Explorer for OData v4.0</AssemblyTitle>
   <Description>The API Explorer extensions for ASP.NET Core API Versioning and OData v4.0.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;Versioning;ApiExplorer;OData</PackageTags>
+  <IsTrimmable>true</IsTrimmable>
  </PropertyGroup>
 
  <ItemGroup>

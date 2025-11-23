@@ -31,6 +31,7 @@ public static class IServiceCollectionExtensions
         return partManager;
     }
 
+    [UnconditionalSuppressMessage( "ILLink", "IL2072", Justification = "Model configuration types are never trimmed" )]
     internal static void AddModelConfigurationsAsServices( this IServiceCollection services, ApplicationPartManager partManager )
     {
         var feature = new ModelConfigurationFeature();
