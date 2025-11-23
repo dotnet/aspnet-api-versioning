@@ -82,7 +82,7 @@ public class ApiVersionParameterDescriptionContextTest
             Name = "api-version",
             RouteInfo = new()
             {
-                Constraints = new[] { new ApiVersionRouteConstraint() },
+                Constraints = [new ApiVersionRouteConstraint()],
             },
             Source = BindingSource.Path,
         };
@@ -120,6 +120,55 @@ public class ApiVersionParameterDescriptionContextTest
     }
 
     [Fact]
+    public void add_parameter_should_add_descriptor_for_path_when_version_neutral()
+    {
+        // arrange
+        var version = new ApiVersion( 1, 0 );
+        var description = new ApiDescription()
+        {
+            ActionDescriptor = new ActionDescriptor() { EndpointMetadata = [ApiVersionMetadata.Neutral] },
+            ParameterDescriptions =
+            {
+                new()
+                {
+                    Name = "api-version",
+                    RouteInfo = new() { Constraints = [new ApiVersionRouteConstraint()] },
+                    Source = BindingSource.Path,
+                },
+            },
+        };
+        var modelMetadata = new Mock<ModelMetadata>( ModelMetadataIdentity.ForType( typeof( string ) ) ).Object;
+        var options = new ApiExplorerOptions()
+        {
+            DefaultApiVersion = version,
+            ApiVersionParameterSource = new UrlSegmentApiVersionReader(),
+        };
+        var context = new ApiVersionParameterDescriptionContext( description, version, modelMetadata, options );
+
+        // act
+        context.AddParameter( "api-version", Path );
+
+        // assert
+        description.ParameterDescriptions.Single().Should().BeEquivalentTo(
+            new
+            {
+                Name = "api-version",
+                ModelMetadata = modelMetadata,
+                Source = BindingSource.Path,
+                DefaultValue = (object) "1.0",
+                IsRequired = true,
+                RouteInfo = new ApiParameterRouteInfo()
+                {
+                    DefaultValue = "1.0",
+                    IsOptional = false,
+                    Constraints = description.ParameterDescriptions[0].RouteInfo.Constraints,
+                },
+                Type = typeof( string ),
+            },
+            o => o.ExcludingMissingMembers() );
+    }
+
+    [Fact]
     public void add_parameter_should_remove_other_descriptors_after_path_parameter_is_added()
     {
         // arrange
@@ -128,7 +177,7 @@ public class ApiVersionParameterDescriptionContextTest
             Name = "api-version",
             RouteInfo = new()
             {
-                Constraints = new[] { new ApiVersionRouteConstraint() },
+                Constraints = [new ApiVersionRouteConstraint()],
             },
             Source = BindingSource.Path,
         };
@@ -179,7 +228,7 @@ public class ApiVersionParameterDescriptionContextTest
             Name = "api-version",
             RouteInfo = new()
             {
-                Constraints = new[] { new ApiVersionRouteConstraint() },
+                Constraints = [new ApiVersionRouteConstraint()],
             },
             Source = BindingSource.Path,
         };
@@ -214,7 +263,7 @@ public class ApiVersionParameterDescriptionContextTest
         var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( version ) );
         var description = new ApiDescription()
         {
-            ActionDescriptor = new() { EndpointMetadata = new[] { metadata } },
+            ActionDescriptor = new() { EndpointMetadata = [metadata] },
             SupportedRequestFormats = { new() { MediaType = Json } },
             SupportedResponseTypes = { new() { ApiResponseFormats = { new() { MediaType = Json } } } },
         };
@@ -304,7 +353,7 @@ public class ApiVersionParameterDescriptionContextTest
     private static ApiDescription NewApiDescription( ApiVersion apiVersion, params ApiParameterDescription[] parameters )
     {
         var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( apiVersion ) );
-        var action = new ActionDescriptor() { EndpointMetadata = new[] { metadata } };
+        var action = new ActionDescriptor() { EndpointMetadata = [metadata] };
         var description = new ApiDescription() { ActionDescriptor = action };
 
         for ( var i = 0; i < parameters.Length; i++ )

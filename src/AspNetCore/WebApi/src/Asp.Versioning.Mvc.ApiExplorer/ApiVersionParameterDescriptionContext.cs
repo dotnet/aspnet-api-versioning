@@ -117,6 +117,11 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     {
         if ( IsApiVersionNeutral && !Options.AddApiVersionParametersWhenVersionNeutral )
         {
+            if ( location == Path )
+            {
+                UpdateUrlSegment();
+            }
+
             return;
         }
 
