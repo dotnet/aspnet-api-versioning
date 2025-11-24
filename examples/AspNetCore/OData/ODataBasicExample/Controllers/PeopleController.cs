@@ -24,6 +24,13 @@ public class PeopleController : ODataController
                 Email = "bill.mei@somewhere.com",
                 Phone = "555-555-5555",
             },
+            new() {
+                Id = 2,
+                FirstName = "Xavier",
+                LastName = "John",
+                Email = "xavier@heaven.com",
+                Phone = "666-666-6666",
+            }
         } );
 
     // GET ~/api/people/{key}?api-version=[1.0|2.0]

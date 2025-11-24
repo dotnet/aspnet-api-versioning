@@ -1,0 +1,22 @@
+﻿@HostAddress = https://localhost:5001
+
+// Get all records
+GET {{HostAddress}}/api/People?api-version=1.0
+Accept: application/json
+###
+
+// Get all records
+GET {{HostAddress}}/api/People?api-version=1.0&$top=1
+Accept: application/json
+###
+
+// Select firstName
+GET {{HostAddress}}/api/People?api-version=1.0&$select=firstName
+Accept: application/json
+###
+
+
+// By Key
+GET {{HostAddress}}/api/People/5?api-version=1.0
+Accept: application/json
+###
