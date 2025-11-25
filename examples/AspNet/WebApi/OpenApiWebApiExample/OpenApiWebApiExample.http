@@ -1,0 +1,54 @@
+###
+# OpenApiWebApiExample - ASP.NET Web API with OpenAPI/Swagger
+# This example demonstrates comprehensive API versioning with Swagger documentation for legacy ASP.NET Web API
+###
+
+@baseUrl = http://localhost:52667
+
+### Orders - Get by ID - Version 0.9 (Deprecated)
+# Get a specific order (deprecated version)
+GET {{baseUrl}}/api/orders/1?api-version=0.9
+
+### Orders - Get by ID - Version 1.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=1.0
+
+### Orders - Get All - Version 2.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=2.0
+
+### Orders - Get by ID - Version 2.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=2.0
+
+### Orders - Get All - Version 3.0
+# Get all orders
+GET {{baseUrl}}/api/orders?api-version=3.0
+
+### Orders - Get by ID - Version 3.0
+# Get a specific order
+GET {{baseUrl}}/api/orders/1?api-version=3.0
+
+### People - Get by ID - Version 0.9 (Deprecated)
+# Get a specific person (deprecated version)
+GET {{baseUrl}}/api/v0.9/people/1
+
+### People - Get by ID - Version 1.0
+# Get a specific person
+GET {{baseUrl}}/api/v1.0/people/1
+
+### People - Get All - Version 2.0
+# Get all people
+GET {{baseUrl}}/api/v2.0/people
+
+### People - Get by ID - Version 2.0
+# Get a specific person with email
+GET {{baseUrl}}/api/v2.0/people/1
+
+### People - Get All - Version 3.0
+# Get all people with phone numbers
+GET {{baseUrl}}/api/v3.0/people
+
+### People - Get by ID - Version 3.0
+# Get a specific person with phone number
+GET {{baseUrl}}/api/v3.0/people/1

@@ -1,0 +1,14 @@
+###
+# MinimalApiExample - ASP.NET Core Minimal API with Versioning
+# This example demonstrates API versioning with Minimal APIs
+###
+
+@baseUrl = http://localhost:5000
+
+### WeatherForecast - Version 1.0
+# Get weather forecast (5 days)
+GET {{baseUrl}}/weatherforecast?api-version=1.0
+
+### WeatherForecast - Version 2.0
+# Get weather forecast (all summaries)
+GET {{baseUrl}}/weatherforecast?api-version=2.0
