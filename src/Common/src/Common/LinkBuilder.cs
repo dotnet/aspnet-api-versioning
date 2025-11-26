@@ -2,17 +2,16 @@
 
 namespace Asp.Versioning;
 
-internal sealed class SunsetLinkBuilder : ILinkBuilder
+internal abstract class LinkBuilder : ILinkBuilder
 {
-    private readonly SunsetPolicyBuilder policy;
+    protected abstract string RelationType { get; }
     private string? language;
     private List<string>? languages;
     private string? title;
     private string? type;
 
-    public SunsetLinkBuilder( SunsetPolicyBuilder policy, Uri linkTarget )
+    public LinkBuilder( Uri linkTarget )
     {
-        this.policy = policy;
         LinkTarget = linkTarget;
     }
 
@@ -36,8 +35,6 @@ internal sealed class SunsetLinkBuilder : ILinkBuilder
         return this;
     }
 
-    public ILinkBuilder Link( Uri linkTarget ) => policy.Link( linkTarget );
-
     public ILinkBuilder Title( string value )
     {
         title = value;
@@ -50,9 +47,11 @@ internal sealed class SunsetLinkBuilder : ILinkBuilder
         return this;
     }
 
+    public abstract ILinkBuilder Link( Uri linkTarget );
+
     public LinkHeaderValue Build()
     {
-        var link = new LinkHeaderValue( LinkTarget, "sunset" );
+        var link = new LinkHeaderValue( LinkTarget, RelationType );
 
         if ( title != null )
         {
