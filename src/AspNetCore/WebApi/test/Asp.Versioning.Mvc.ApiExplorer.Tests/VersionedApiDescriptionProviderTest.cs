@@ -18,6 +18,7 @@ public class VersionedApiDescriptionProviderTest
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var apiExplorer = new VersionedApiDescriptionProvider(
             Mock.Of<ISunsetPolicyManager>(),
+            Mock.Of<IDeprecationPolicyManager>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
@@ -73,6 +74,7 @@ public class VersionedApiDescriptionProviderTest
 
         var apiExplorer = new VersionedApiDescriptionProvider(
             policyManager.Object,
+            Mock.Of<IDeprecationPolicyManager>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
@@ -103,6 +105,7 @@ public class VersionedApiDescriptionProviderTest
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var apiExplorer = new VersionedApiDescriptionProvider(
             Mock.Of<ISunsetPolicyManager>(),
+            Mock.Of<IDeprecationPolicyManager>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() ) );
 
@@ -133,6 +136,7 @@ public class VersionedApiDescriptionProviderTest
         };
         var apiExplorer = new VersionedApiDescriptionProvider(
             Mock.Of<ISunsetPolicyManager>(),
+            Mock.Of<IDeprecationPolicyManager>(),
             NewModelMetadataProvider(),
             Options.Create( options ) );
 
@@ -214,6 +218,7 @@ public class VersionedApiDescriptionProviderTest
 
         var apiExplorer = new VersionedApiDescriptionProvider(
             Mock.Of<ISunsetPolicyManager>(),
+            Mock.Of<IDeprecationPolicyManager>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
