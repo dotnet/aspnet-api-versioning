@@ -27,15 +27,18 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// Initializes a new instance of the <see cref="VersionedApiDescriptionProvider"/> class.
     /// </summary>
     /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
+    /// <param name="deprecationPolicyManager">The <see cref="IDeprecationPolicyManager">manager</see> used to resolve deprecation policies.</param>
     /// <param name="modelMetadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
     /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured
     /// <see cref="ApiExplorerOptions">API explorer options</see>.</param>
     public VersionedApiDescriptionProvider(
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         IModelMetadataProvider modelMetadataProvider,
         IOptions<ApiExplorerOptions> options )
         : this(
               sunsetPolicyManager,
+              deprecationPolicyManager,
               modelMetadataProvider,
               new SimpleConstraintResolver( options ?? throw new ArgumentNullException( nameof( options ) ) ),
               options )
@@ -46,11 +49,13 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     // BUG: https://github.com/dotnet/aspnetcore/issues/41773
     internal VersionedApiDescriptionProvider(
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         IModelMetadataProvider modelMetadataProvider,
         IInlineConstraintResolver constraintResolver,
         IOptions<ApiExplorerOptions> options )
     {
         SunsetPolicyManager = sunsetPolicyManager;
+        DeprecationPolicyManager = deprecationPolicyManager;
         ModelMetadataProvider = modelMetadataProvider;
         this.constraintResolver = constraintResolver;
         this.options = options;
@@ -67,6 +72,12 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// </summary>
     /// <value>The associated <see cref="ISunsetPolicyManager">sunset policy manager</see>.</value>
     protected ISunsetPolicyManager SunsetPolicyManager { get; }
+
+    /// <summary>
+    /// Gets the manager used to resolve deprecation policies.
+    /// </summary>
+    /// <value>The associated <see cref="IDeprecationPolicyManager">deprecation policy manager</see>.</value>
+    protected IDeprecationPolicyManager DeprecationPolicyManager { get; }
 
     /// <summary>
     /// Gets the options associated with the API explorer.
@@ -170,9 +181,14 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                     groupResult.GroupName = formatGroupName( groupResult.GroupName, formattedVersion );
                 }
 
-                if ( SunsetPolicyManager.TryResolvePolicy( metadata.Name, version, out var policy ) )
+                if ( SunsetPolicyManager.TryResolvePolicy( metadata.Name, version, out var sunsetPolicy ) )
                 {
-                    groupResult.SetSunsetPolicy( policy );
+                    groupResult.SetSunsetPolicy( sunsetPolicy );
+                }
+
+                if ( DeprecationPolicyManager.TryResolvePolicy( metadata.Name, version, out var deprecationPolicy ) )
+                {
+                    groupResult.SetDeprecationPolicy( deprecationPolicy );
                 }
 
                 groupResult.SetApiVersion( version );

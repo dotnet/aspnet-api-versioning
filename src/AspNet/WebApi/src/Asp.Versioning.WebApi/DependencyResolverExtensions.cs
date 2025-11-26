@@ -38,4 +38,8 @@ internal static class DependencyResolverExtensions
     internal static ISunsetPolicyManager GetSunsetPolicyManager( this HttpConfiguration configuration ) =>
         configuration.DependencyResolver.GetService<ISunsetPolicyManager>() ??
         configuration.ApiVersioningServices().GetRequiredService<ISunsetPolicyManager>();
+
+    internal static IDeprecationPolicyManager GetDeprecationPolicyManager( this HttpConfiguration configuration ) =>
+        configuration.DependencyResolver.GetService<IDeprecationPolicyManager>() ??
+        configuration.ApiVersioningServices().GetRequiredService<IDeprecationPolicyManager>();
 }

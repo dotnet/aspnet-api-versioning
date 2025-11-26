@@ -3,33 +3,33 @@
 namespace Asp.Versioning;
 
 /// <summary>
-/// Represents the default sunset policy builder.
+/// Represents the default deprecation policy builder.
 /// </summary>
-public class SunsetPolicyBuilder : PolicyBuilder<SunsetPolicy>, ISunsetPolicyBuilder
+public class DeprecationPolicyBuilder : PolicyBuilder<DeprecationPolicy>, IDeprecationPolicyBuilder
 {
     private DateTimeOffset? date;
-    private SunsetLinkBuilder? linkBuilder;
-    private Dictionary<Uri, SunsetLinkBuilder>? linkBuilders;
+    private DeprecationLinkBuilder? linkBuilder;
+    private Dictionary<Uri, DeprecationLinkBuilder>? linkBuilders;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SunsetPolicyBuilder"/> class.
+    /// Initializes a new instance of the <see cref="DeprecationPolicyBuilder"/> class.
     /// </summary>
     /// <param name="name">The name of the API the policy is for.</param>
     /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the policy is for.</param>
-    public SunsetPolicyBuilder( string? name, ApiVersion? apiVersion )
+    public DeprecationPolicyBuilder( string? name, ApiVersion? apiVersion )
         : base( name, apiVersion ) { }
 
     /// <inheritdoc />
-    public virtual ISunsetPolicyBuilder Effective( DateTimeOffset sunsetDate )
+    public virtual IDeprecationPolicyBuilder Effective( DateTimeOffset deprecationDate )
     {
-        date = sunsetDate;
+        date = deprecationDate;
         return this;
     }
 
     /// <inheritdoc />
     public virtual ILinkBuilder Link( Uri linkTarget )
     {
-        SunsetLinkBuilder newLinkBuilder;
+        DeprecationLinkBuilder newLinkBuilder;
 
         if ( linkBuilder == null )
         {
@@ -56,14 +56,14 @@ public class SunsetPolicyBuilder : PolicyBuilder<SunsetPolicy>, ISunsetPolicyBui
     }
 
     /// <inheritdoc />
-    public override SunsetPolicy Build()
+    public override DeprecationPolicy Build()
     {
         if ( Policy is not null )
         {
             return Policy;
         }
 
-        SunsetPolicy policy = date is null ? new() : new( date.Value );
+        DeprecationPolicy policy = date is null ? new() : new( date.Value );
 
         if ( linkBuilders == null )
         {
@@ -83,13 +83,13 @@ public class SunsetPolicyBuilder : PolicyBuilder<SunsetPolicy>, ISunsetPolicyBui
         return policy;
     }
 
-    private sealed class SunsetLinkBuilder : LinkBuilder, ILinkBuilder
+    private sealed class DeprecationLinkBuilder : LinkBuilder, ILinkBuilder
     {
-        protected override string RelationType => "sunset";
+        protected override string RelationType => "deprecation";
 
-        private readonly SunsetPolicyBuilder policyBuilder;
+        private readonly DeprecationPolicyBuilder policyBuilder;
 
-        public SunsetLinkBuilder( SunsetPolicyBuilder policy, Uri linkTarget )
+        public DeprecationLinkBuilder( DeprecationPolicyBuilder policy, Uri linkTarget )
             : base( linkTarget )
         {
             policyBuilder = policy;

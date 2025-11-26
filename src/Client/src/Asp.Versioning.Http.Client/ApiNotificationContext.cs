@@ -8,6 +8,7 @@ namespace Asp.Versioning.Http;
 public class ApiNotificationContext
 {
     private SunsetPolicy? sunsetPolicy;
+    private DeprecationPolicy? deprecationPolicy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiNotificationContext"/> class.
@@ -37,4 +38,10 @@ public class ApiNotificationContext
     /// </summary>
     /// <value>The reported API <see cref="SunsetPolicy">sunset policy</see>.</value>
     public SunsetPolicy SunsetPolicy => sunsetPolicy ??= Response.ReadSunsetPolicy();
+
+    /// <summary>
+    /// Gets the API deprecation policy reported in the response.
+    /// </summary>
+    /// <value>The reported API <see cref="DeprecationPolicy">deprecation policy</see>.</value>
+    public DeprecationPolicy DeprecationPolicy => deprecationPolicy ??= Response.ReadDeprecationPolicy();
 }

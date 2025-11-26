@@ -144,6 +144,7 @@ public static partial class IServiceCollectionExtensions
         services.AddSingleton( static sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector );
         services.TryAddSingleton<IReportApiVersions, DefaultApiVersionReporter>();
         services.TryAddSingleton<ISunsetPolicyManager, SunsetPolicyManager>();
+        services.TryAddSingleton<IDeprecationPolicyManager, DeprecationPolicyManager>();
         services.TryAddEnumerable( Transient<IValidateOptions<ApiVersioningOptions>, ValidateApiVersioningOptions>() );
         services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
         services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
@@ -281,7 +282,7 @@ public static partial class IServiceCollectionExtensions
         }
     }
 
-// TEMP: this is a marker class to test whether Error Objects have been explicitly added. remove in 9.0+
+    // TEMP: this is a marker class to test whether Error Objects have been explicitly added. remove in 9.0+
 #pragma warning disable CA1812 // Avoid uninstantiated internal classes
     private sealed class ErrorObjectsAdded { }
 }

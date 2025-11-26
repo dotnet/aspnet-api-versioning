@@ -41,6 +41,7 @@ public class HttpClientExtensionsTest
                 {
                     Type = "text/html",
                 } ),
+                new(),
                 new Dictionary<ApiVersion, Uri>() { [new( 1.0 )] = new( "http://tempuri.org/swagger/v1/swagger.json" ) } ) );
     }
 }

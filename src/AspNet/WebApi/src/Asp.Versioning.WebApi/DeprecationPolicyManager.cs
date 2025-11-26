@@ -5,7 +5,7 @@ namespace Asp.Versioning;
 /// <content>
 /// Provides additional content specific to ASP.NET Web API.
 /// </content>
-public partial class SunsetPolicyManager
+public partial class DeprecationPolicyManager
 {
     private readonly ApiVersioningOptions options;
 
@@ -13,8 +13,8 @@ public partial class SunsetPolicyManager
     protected override ApiVersioningOptions Options => options;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SunsetPolicyManager"/> class.
+    /// Initializes a new instance of the <see cref="DeprecationPolicyManager"/> class.
     /// </summary>
     /// <param name="options">The associated <see cref="ApiVersioningOptions">API versioning options</see>.</param>
-    public SunsetPolicyManager( ApiVersioningOptions options ) => this.options = options;
+    public DeprecationPolicyManager( ApiVersioningOptions options ) => this.options = options;
 }
