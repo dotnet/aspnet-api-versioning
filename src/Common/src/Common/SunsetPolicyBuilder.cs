@@ -82,4 +82,19 @@ public class SunsetPolicyBuilder : PolicyBuilder<SunsetPolicy>, ISunsetPolicyBui
 
         return policy;
     }
+
+    private sealed class SunsetLinkBuilder : LinkBuilder, ILinkBuilder
+    {
+        protected override string RelationType => "sunset";
+
+        private readonly SunsetPolicyBuilder policyBuilder;
+
+        public SunsetLinkBuilder( SunsetPolicyBuilder policy, Uri linkTarget )
+            : base( linkTarget )
+        {
+            policyBuilder = policy;
+        }
+
+        public override ILinkBuilder Link( Uri linkTarget ) => policyBuilder.Link( linkTarget );
+    }
 }
