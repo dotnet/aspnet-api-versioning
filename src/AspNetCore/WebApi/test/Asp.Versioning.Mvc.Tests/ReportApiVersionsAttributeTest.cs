@@ -84,7 +84,7 @@ public class ReportApiVersionsAttributeTest
         var controller = default( object );
         var endpoint = new Endpoint( c => Task.CompletedTask, new( new[] { metadata } ), "Test" );
         var options = Options.Create( new ApiVersioningOptions() );
-        var reporter = new DefaultApiVersionReporter( new SunsetPolicyManager( options ) );
+        var reporter = new DefaultApiVersionReporter( new SunsetPolicyManager( options ), new DeprecationPolicyManager( options ) );
 
         endpointFeature.SetupProperty( f => f.Endpoint, endpoint );
         versioningFeature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1.0 ) );

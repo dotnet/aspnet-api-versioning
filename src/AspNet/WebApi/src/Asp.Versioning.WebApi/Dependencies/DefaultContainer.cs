@@ -19,6 +19,7 @@ internal sealed class DefaultContainer : IDependencyResolver, IDependencyScope
         container.AddService( typeof( IControllerNameConvention ), static ( sc, t ) => ControllerNameConvention.Default );
         container.AddService( typeof( IProblemDetailsFactory ), static ( sc, t ) => new ProblemDetailsFactory() );
         container.AddService( typeof( ISunsetPolicyManager ), NewSunsetPolicyManager );
+        container.AddService( typeof( IDeprecationPolicyManager ), NewDeprecationPolicyManager );
         container.AddService( typeof( IReportApiVersions ), NewApiVersionReporter );
     }
 
@@ -69,6 +70,9 @@ internal sealed class DefaultContainer : IDependencyResolver, IDependencyScope
     private static ISunsetPolicyManager NewSunsetPolicyManager( IServiceProvider serviceProvider, Type type ) =>
         new SunsetPolicyManager( GetApiVersioningOptions( serviceProvider ) );
 
+    private static IDeprecationPolicyManager NewDeprecationPolicyManager( IServiceProvider serviceProvider, Type type ) =>
+        new DeprecationPolicyManager( GetApiVersioningOptions( serviceProvider ) );
+
     private static IReportApiVersions NewApiVersionReporter( IServiceProvider serviceProvider, Type type )
     {
         var options = GetApiVersioningOptions( serviceProvider );
@@ -76,7 +80,8 @@ internal sealed class DefaultContainer : IDependencyResolver, IDependencyScope
         if ( options.ReportApiVersions )
         {
             var sunsetPolicyManager = (ISunsetPolicyManager) serviceProvider.GetService( typeof( ISunsetPolicyManager ) );
-            return new DefaultApiVersionReporter( sunsetPolicyManager );
+            var deprecationPolicyManager = (IDeprecationPolicyManager) serviceProvider.GetService( typeof( IDeprecationPolicyManager ) );
+            return new DefaultApiVersionReporter( sunsetPolicyManager, deprecationPolicyManager );
         }
 
         return new DoNotReportApiVersions();

@@ -14,7 +14,8 @@ public class DefaultApiVersionReporterTest
     {
         // arrange
         var sunsetDate = DateTimeOffset.Now;
-        var reporter = new DefaultApiVersionReporter( new TestSunsetPolicyManager( sunsetDate ) );
+        var deprecationDate = DateTimeOffset.Now;
+        var reporter = new DefaultApiVersionReporter( new TestSunsetPolicyManager( sunsetDate ), new TestDeprecationPolicyManager( deprecationDate ) );
         var configuration = new HttpConfiguration();
         var request = new HttpRequestMessage();
         var response = new HttpResponseMessage( OK ) { RequestMessage = request };
@@ -50,16 +51,24 @@ public class DefaultApiVersionReporterTest
         // assert
         var headers = response.Headers;
 
+        long unixTimestamp = (int) deprecationDate.Subtract( new DateTime( 1970, 1, 1 ) ).TotalSeconds;
+
         headers.GetValues( "api-supported-versions" ).Should().Equal( "1.0, 2.0" );
         headers.GetValues( "api-deprecated-versions" ).Should().Equal( "0.9" );
         headers.GetValues( "Sunset" )
                .Single()
                .Should()
                .Be( sunsetDate.ToString( "r" ) );
-        headers.GetValues( "Link" )
+        headers.GetValues( "Deprecation" )
                .Single()
                .Should()
-               .Be( "<http://docs.api.com/policy.html>; rel=\"sunset\"" );
+               .Be( $"@{unixTimestamp}" );
+        headers.GetValues( "Link" )
+               .Should()
+               .BeEquivalentTo( [
+                    "<http://docs.api.com/sunset.html>; rel=\"sunset\"",
+                    "<http://docs.api.com/deprecation.html>; rel=\"deprecation\"",
+                ] );
     }
 
     private sealed class TestSunsetPolicyManager : ISunsetPolicyManager
@@ -73,12 +82,33 @@ public class DefaultApiVersionReporterTest
         {
             if ( name == "Test" )
             {
-                var link = new LinkHeaderValue( new Uri( "http://docs.api.com/policy.html" ), "sunset" );
+                var link = new LinkHeaderValue( new Uri( "http://docs.api.com/sunset.html" ), "sunset" );
                 sunsetPolicy = new( sunsetDate, link );
                 return true;
             }
 
             sunsetPolicy = default;
+            return false;
+        }
+    }
+
+    private sealed class TestDeprecationPolicyManager : IDeprecationPolicyManager
+    {
+        private readonly DateTimeOffset deprecationDate;
+
+        public TestDeprecationPolicyManager( DateTimeOffset deprecationDate ) =>
+            this.deprecationDate = deprecationDate;
+
+        public bool TryGetPolicy( string name, ApiVersion apiVersion, out DeprecationPolicy deprecationPolicy )
+        {
+            if ( name == "Test" )
+            {
+                var link = new LinkHeaderValue( new Uri( "http://docs.api.com/deprecation.html" ), "deprecation" );
+                deprecationPolicy = new( deprecationDate, link );
+                return true;
+            }
+
+            deprecationPolicy = default;
             return false;
         }
     }
