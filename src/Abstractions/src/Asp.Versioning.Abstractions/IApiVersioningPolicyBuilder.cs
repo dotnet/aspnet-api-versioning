@@ -23,4 +23,14 @@ public interface IApiVersioningPolicyBuilder
     /// <exception cref="ArgumentException">The <paramref name="name"/> and <paramref name="apiVersion"/>
     /// parameters are both <c>null</c>.</exception>
     ISunsetPolicyBuilder Sunset( string? name, ApiVersion? apiVersion );
+
+    /// <summary>
+    /// Creates and returns a new deprecation policy builder.
+    /// </summary>
+    /// <param name="name">The optional name of the API the policy is for.</param>
+    /// <param name="apiVersion">The optional <see cref="ApiVersion">API version</see> the policy is for.</param>
+    /// <returns>A new <see cref="IDeprecationPolicyBuilder">deprecation policy builder</see>.</returns>
+    /// <exception cref="ArgumentException">The <paramref name="name"/> and <paramref name="apiVersion"/>
+    /// parameters are both <c>null</c>.</exception>
+    public IDeprecationPolicyBuilder Deprecate( string? name, ApiVersion? apiVersion );
 }
