@@ -12,17 +12,20 @@ using Microsoft.Extensions.Options;
 internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescriptionProviderFactory
 {
     private readonly ISunsetPolicyManager sunsetPolicyManager;
+    private readonly IDeprecationPolicyManager deprecationPolicyManager;
     private readonly IApiVersionMetadataCollationProvider[] providers;
     private readonly IEndpointInspector endpointInspector;
     private readonly IOptions<ApiExplorerOptions> options;
 
     public ApiVersionDescriptionProviderFactory(
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         IEnumerable<IApiVersionMetadataCollationProvider> providers,
         IEndpointInspector endpointInspector,
         IOptions<ApiExplorerOptions> options )
     {
         this.sunsetPolicyManager = sunsetPolicyManager;
+        this.deprecationPolicyManager = deprecationPolicyManager;
         this.providers = providers.ToArray();
         this.endpointInspector = endpointInspector;
         this.options = options;
@@ -37,6 +40,6 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
 
         collators.AddRange( providers );
 
-        return new DefaultApiVersionDescriptionProvider( collators, sunsetPolicyManager, options );
+        return new DefaultApiVersionDescriptionProvider( collators, sunsetPolicyManager, deprecationPolicyManager, options );
     }
 }

@@ -20,15 +20,18 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// <param name="providers">The <see cref="IEnumerable{T}">sequence</see> of
     /// <see cref="IApiVersionMetadataCollationProvider">API version metadata collation providers.</see>.</param>
     /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
+    /// <param name="deprecationPolicyManager">The <see cref="IDeprecationPolicyManager">manager</see> used to resolve deprecation policies.</param>
     /// <param name="apiExplorerOptions">The <see cref="IOptions{TOptions}">container</see> of configured
     /// <see cref="ApiExplorerOptions">API explorer options</see>.</param>
     public GroupedApiVersionDescriptionProvider(
         IEnumerable<IApiVersionMetadataCollationProvider> providers,
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         IOptions<ApiExplorerOptions> apiExplorerOptions )
     {
         collection = new( Describe, providers ?? throw new ArgumentNullException( nameof( providers ) ) );
         SunsetPolicyManager = sunsetPolicyManager;
+        DeprecationPolicyManager = deprecationPolicyManager;
         options = apiExplorerOptions;
     }
 
@@ -37,6 +40,12 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// </summary>
     /// <value>The associated <see cref="ISunsetPolicyManager">sunset policy manager</see>.</value>
     protected ISunsetPolicyManager SunsetPolicyManager { get; }
+
+    /// <summary>
+    /// Gets the manager used to resolve deprecation policies.
+    /// </summary>
+    /// <value>The associated <see cref="IDeprecationPolicyManager">deprecation policy manager</see>.</value>
+    protected IDeprecationPolicyManager DeprecationPolicyManager { get; }
 
     /// <summary>
     /// Gets the options associated with the API explorer.
@@ -57,7 +66,7 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     protected virtual IReadOnlyList<ApiVersionDescription> Describe( IReadOnlyList<GroupedApiVersionMetadata> metadata )
     {
         ArgumentNullException.ThrowIfNull( metadata );
-        return DescriptionProvider.Describe( metadata, SunsetPolicyManager, Options );
+        return DescriptionProvider.Describe( metadata, SunsetPolicyManager, DeprecationPolicyManager, Options );
     }
 
     /// <summary>

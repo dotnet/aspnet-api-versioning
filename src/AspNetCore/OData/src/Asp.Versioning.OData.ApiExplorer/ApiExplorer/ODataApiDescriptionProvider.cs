@@ -15,8 +15,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using static System.StringComparison;
 using static ODataMetadataOptions;
+using static System.StringComparison;
 using Opts = Microsoft.Extensions.Options.Options;
 
 /// <summary>
@@ -181,10 +181,11 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static int ApiVersioningOrder()
     {
-        var policyManager = new SunsetPolicyManager( Opts.Create( new ApiVersioningOptions() ) );
+        var sunsetPolicyManager = new SunsetPolicyManager( Opts.Create( new ApiVersioningOptions() ) );
+        var deprecationPolicyManager = new DeprecationPolicyManager( Opts.Create( new ApiVersioningOptions() ) );
         var options = Opts.Create( new ApiExplorerOptions() );
         var provider = new EmptyModelMetadataProvider();
-        return new VersionedApiDescriptionProvider( policyManager, provider, options ).Order;
+        return new VersionedApiDescriptionProvider( sunsetPolicyManager, deprecationPolicyManager, provider, options ).Order;
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]

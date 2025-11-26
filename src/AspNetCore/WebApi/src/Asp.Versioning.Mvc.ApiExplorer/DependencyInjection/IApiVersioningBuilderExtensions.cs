@@ -61,6 +61,7 @@ public static class IApiVersioningBuilderExtensions
             Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>(
                 static sp => new(
                     sp.GetRequiredService<ISunsetPolicyManager>(),
+                    sp.GetRequiredService<IDeprecationPolicyManager>(),
                     sp.GetRequiredService<IModelMetadataProvider>(),
                     sp.GetRequiredService<IInlineConstraintResolver>(),
                     sp.GetRequiredService<IOptions<ApiExplorerOptions>>() ) ) );
