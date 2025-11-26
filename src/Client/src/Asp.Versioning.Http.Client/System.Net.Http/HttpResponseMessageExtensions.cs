@@ -90,10 +90,19 @@ public static class HttpResponseMessageExtensions
             foreach ( var value in values )
             {
                 var split = value.Trim( '@' );
-                if ( long.TryParse( split, out var unixTimestamp ) &&
-                     ( date == default || date < DateTimeOffset.FromUnixTimeSeconds( unixTimestamp ) ) )
+                if ( long.TryParse( split, out var unixTimestamp ) )
                 {
-                    date = DateTimeOffset.FromUnixTimeSeconds( unixTimestamp );
+                    DateTimeOffset parsed;
+#if NETSTANDARD
+                    parsed = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(unixTimestamp);
+#else
+                    parsed = DateTimeOffset.FromUnixTimeSeconds( unixTimestamp );
+#endif
+
+                    if ( date == default || date < parsed )
+                    {
+                        date = parsed;
+                    }
                 }
             }
 
