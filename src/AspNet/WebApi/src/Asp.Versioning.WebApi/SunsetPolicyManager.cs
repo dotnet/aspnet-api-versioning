@@ -9,6 +9,9 @@ public partial class SunsetPolicyManager
 {
     private readonly ApiVersioningOptions options;
 
+    /// <inheritdoc/>
+    protected override ApiVersioningOptions Options => options;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="SunsetPolicyManager"/> class.
     /// </summary>

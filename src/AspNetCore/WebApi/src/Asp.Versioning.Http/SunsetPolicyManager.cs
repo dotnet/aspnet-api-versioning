@@ -11,6 +11,9 @@ public partial class SunsetPolicyManager
 {
     private readonly IOptions<ApiVersioningOptions> options;
 
+    /// <inheritdoc/>
+    protected override ApiVersioningOptions Options => options.Value;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="SunsetPolicyManager"/> class.
     /// </summary>
