@@ -52,6 +52,12 @@ public class ApiDescriptionGroup
     public SunsetPolicy? SunsetPolicy { get; set; }
 
     /// <summary>
+    /// Gets or sets described API deprecation policy.
+    /// </summary>
+    /// <value>The defined deprecation policy defined for the API, if any.</value>
+    public DeprecationPolicy? DeprecationPolicy { get; set; }
+
+    /// <summary>
     /// Gets a collection of API descriptions for the current version.
     /// </summary>
     /// <value>A <see cref="Collection{T}">collection</see> of

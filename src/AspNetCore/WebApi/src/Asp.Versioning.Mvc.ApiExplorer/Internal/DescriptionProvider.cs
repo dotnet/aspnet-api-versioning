@@ -10,6 +10,7 @@ internal static class DescriptionProvider
     internal static ApiVersionDescription[] Describe<T>(
         IReadOnlyList<T> metadata,
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         ApiExplorerOptions options )
         where T : IGroupedApiVersionMetadata, IEquatable<T>
     {
@@ -18,8 +19,8 @@ internal static class DescriptionProvider
         var deprecated = new HashSet<GroupedApiVersion>();
 
         BucketizeApiVersions( metadata, supported, deprecated, options );
-        AppendDescriptions( descriptions, supported, sunsetPolicyManager, options, deprecated: false );
-        AppendDescriptions( descriptions, deprecated, sunsetPolicyManager, options, deprecated: true );
+        AppendDescriptions( descriptions, supported, sunsetPolicyManager, deprecationPolicyManager, options, deprecated: false );
+        AppendDescriptions( descriptions, deprecated, sunsetPolicyManager, deprecationPolicyManager, options, deprecated: true );
 
         return [.. descriptions];
     }
@@ -81,6 +82,7 @@ internal static class DescriptionProvider
         SortedSet<ApiVersionDescription> descriptions,
         HashSet<GroupedApiVersion> versions,
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         ApiExplorerOptions options,
         bool deprecated )
     {
@@ -100,8 +102,9 @@ internal static class DescriptionProvider
                 formattedGroupName = formatGroupName( formattedGroupName, version.ToString( format, CurrentCulture ) );
             }
 
-            var sunsetPolicy = sunsetPolicyManager.TryGetPolicy( version, out var policy ) ? policy : default;
-            descriptions.Add( new( version, formattedGroupName, deprecated, sunsetPolicy ) );
+            sunsetPolicyManager.TryGetPolicy( version, out var sunsetPolicy );
+            deprecationPolicyManager.TryGetPolicy( version, out var deprecationPolicy );
+            descriptions.Add( new( version, formattedGroupName, deprecated, sunsetPolicy, deprecationPolicy ) );
         }
     }
 }

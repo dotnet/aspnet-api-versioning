@@ -65,10 +65,19 @@ public static class ApiDescriptionExtensions
     /// Sets the API sunset policy associated with the API description.
     /// </summary>
     /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to set the sunset policy for.</param>
-    /// <param name="sunsetPolicy">The associated <see cref="SunsetPolicy">sunst policy</see>.</param>
+    /// <param name="sunsetPolicy">The associated <see cref="SunsetPolicy">sunset policy</see>.</param>
     /// <remarks>This API is meant for infrastructure and should not be used by application code.</remarks>
     [EditorBrowsable( EditorBrowsableState.Never )]
     public static void SetSunsetPolicy( this ApiDescription apiDescription, SunsetPolicy sunsetPolicy ) => apiDescription.SetProperty( sunsetPolicy );
+
+    /// <summary>
+    /// Sets the API deprecation policy associated with the API description.
+    /// </summary>
+    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to set the sunset policy for.</param>
+    /// <param name="deprecationPolicy">The associated <see cref="DeprecationPolicy">deprecation policy</see>.</param>
+    /// <remarks>This API is meant for infrastructure and should not be used by application code.</remarks>
+    [EditorBrowsable( EditorBrowsableState.Never )]
+    public static void SetDeprecationPolicy( this ApiDescription apiDescription, DeprecationPolicy deprecationPolicy ) => apiDescription.SetProperty( deprecationPolicy );
 
     /// <summary>
     /// Attempts to update the relate path of the specified API description and remove the corresponding parameter according to the specified options.

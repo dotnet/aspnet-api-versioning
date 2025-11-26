@@ -566,6 +566,7 @@ public class ODataApiExplorer : VersionedApiExplorer
                 ApiVersion = apiVersion,
                 IsDeprecated = deprecated,
                 SunsetPolicy = SunsetPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
+                DeprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
                 Properties = { [typeof( IEdmModel )] = routeBuilderContext.EdmModel },
             };
 

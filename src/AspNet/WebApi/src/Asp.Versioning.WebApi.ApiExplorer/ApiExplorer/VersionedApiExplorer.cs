@@ -33,6 +33,7 @@ public class VersionedApiExplorer : IApiExplorer
     private readonly Lazy<ApiDescriptionGroupCollection> apiDescriptionsHolder;
     private IDocumentationProvider? documentationProvider;
     private ISunsetPolicyManager? sunsetPolicyManager;
+    private IDeprecationPolicyManager? deprecationPolicyManager;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
@@ -103,6 +104,16 @@ public class VersionedApiExplorer : IApiExplorer
     {
         get => sunsetPolicyManager ??= Configuration.GetSunsetPolicyManager();
         set => sunsetPolicyManager = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the manager used to resolve deprecation policies for API descriptions.
+    /// </summary>
+    /// <value>The configured <see cref="IDeprecationPolicyManager">deprecation policy manager</see>.</value>
+    protected IDeprecationPolicyManager DeprecationPolicyManager
+    {
+        get => deprecationPolicyManager ??= Configuration.GetDeprecationPolicyManager();
+        set => deprecationPolicyManager = value;
     }
 
     /// <summary>
@@ -227,11 +238,13 @@ public class VersionedApiExplorer : IApiExplorer
         }
 
         var routes = FlattenRoutes( Configuration.Routes ).ToArray();
-        var policyManager = Configuration.GetSunsetPolicyManager();
+        var sunsetPolicyManager = Configuration.GetSunsetPolicyManager();
+        var deprecationPolicyManager = Configuration.GetDeprecationPolicyManager();
 
         foreach ( var apiVersion in FlattenApiVersions( controllerMappings ) )
         {
-            var sunsetPolicy = policyManager.TryGetPolicy( apiVersion, out var policy ) ? policy : default;
+            sunsetPolicyManager.TryGetPolicy( apiVersion, out var sunsetPolicy );
+            deprecationPolicyManager.TryGetPolicy( apiVersion, out var deprecationPolicy );
 
             for ( var i = 0; i < routes.Length; i++ )
             {
@@ -244,6 +257,7 @@ public class VersionedApiExplorer : IApiExplorer
                         ExploreRouteControllers( controllerMappings, route, apiVersion );
 
                 apiDescriptionGroup.SunsetPolicy = sunsetPolicy;
+                apiDescriptionGroup.DeprecationPolicy = deprecationPolicy;
 
                 // Remove ApiDescription that will lead to ambiguous action matching.
                 // E.g. a controller with Post() and PostComment(). When the route template is {controller}, it produces POST /controller and POST /controller.
@@ -878,6 +892,7 @@ public class VersionedApiExplorer : IApiExplorer
                 ApiVersion = apiVersion,
                 IsDeprecated = deprecated,
                 SunsetPolicy = SunsetPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
+                DeprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
             };
 
             foreach ( var supportedResponseFormatter in supportedResponseFormatters )

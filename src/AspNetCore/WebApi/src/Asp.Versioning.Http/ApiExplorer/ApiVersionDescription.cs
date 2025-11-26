@@ -14,16 +14,19 @@ public class ApiVersionDescription
     /// <param name="groupName">The group name for the API version.</param>
     /// <param name="deprecated">Indicates whether the API version is deprecated.</param>
     /// <param name="sunsetPolicy">The defined <see cref="SunsetPolicy">sunset policy</see>, if any.</param>
+    /// <param name="deprecationPolicy">The defined <see cref="DeprecationPolicy">deprecation policy</see>, if any.</param>
     public ApiVersionDescription(
         ApiVersion apiVersion,
         string groupName,
         bool deprecated = false,
-        SunsetPolicy? sunsetPolicy = default )
+        SunsetPolicy? sunsetPolicy = default,
+        DeprecationPolicy? deprecationPolicy = default )
     {
         ApiVersion = apiVersion;
         GroupName = groupName;
         IsDeprecated = deprecated;
         SunsetPolicy = sunsetPolicy;
+        DeprecationPolicy = deprecationPolicy;
     }
 
     /// <summary>
@@ -54,4 +57,10 @@ public class ApiVersionDescription
     /// </summary>
     /// <value>The defined sunset policy defined for the API, if any.</value>
     public SunsetPolicy? SunsetPolicy { get; }
+
+    /// <summary>
+    /// Gets described API deprecation policy.
+    /// </summary>
+    /// <value>The defined deprecation policy defined for the API, if any.</value>
+    public DeprecationPolicy? DeprecationPolicy { get; }
 }

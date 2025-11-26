@@ -50,6 +50,12 @@ public class VersionedApiDescription : ApiDescription
     public SunsetPolicy? SunsetPolicy { get; set; }
 
     /// <summary>
+    /// Gets or sets the described API deprecation policy.
+    /// </summary>
+    /// <value>The defined <see cref="Versioning.DeprecationPolicy">deprecation policy</see> defined for the API, if any.</value>
+    public DeprecationPolicy? DeprecationPolicy { get; set; }
+
+    /// <summary>
     /// Gets or sets the response description.
     /// </summary>
     /// <value>The <see cref="ResponseDescription">response description</see>.</value>
