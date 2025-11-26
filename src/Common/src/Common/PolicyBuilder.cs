@@ -21,7 +21,7 @@ public abstract class PolicyBuilder<TPolicy> : IPolicyBuilder<TPolicy>
     /// </summary>
     /// <param name="name">The name of the API the policy is for.</param>
     /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the policy is for.</param>
-    public PolicyBuilder( string? name, ApiVersion? apiVersion )
+    protected PolicyBuilder( string? name, ApiVersion? apiVersion )
     {
         if ( string.IsNullOrEmpty( name ) && apiVersion == null )
         {
