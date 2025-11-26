@@ -55,11 +55,7 @@ public static class HttpResponseMessageExtensions
             long unixTimestamp;
             DateTimeOffset deprecationDate = deprecationPolicy.Date.Value;
 
-#if NETFRAMEWORK
             unixTimestamp = (int) deprecationDate.Subtract( unixEpoch ).TotalSeconds;
-#else
-            unixTimestamp = deprecationDate.ToUnixTimeSeconds();
-#endif
 
             headers.Add( Deprecation, $"@{unixTimestamp}" );
         }

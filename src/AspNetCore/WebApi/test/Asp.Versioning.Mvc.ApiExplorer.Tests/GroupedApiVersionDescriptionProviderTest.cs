@@ -20,6 +20,7 @@ public class GroupedApiVersionDescriptionProviderTest
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
             Mock.Of<ISunsetPolicyManager>(),
+            Mock.Of<IDeprecationPolicyManager>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
         // act
@@ -56,6 +57,7 @@ public class GroupedApiVersionDescriptionProviderTest
                 new ActionApiVersionMetadataCollationProvider( provider ),
             },
             Mock.Of<ISunsetPolicyManager>(),
+            Mock.Of<IDeprecationPolicyManager>(),
             Options.Create(
                 new ApiExplorerOptions()
                 {
@@ -94,6 +96,7 @@ public class GroupedApiVersionDescriptionProviderTest
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
             policyManager.Object,
+            Mock.Of<IDeprecationPolicyManager>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
         // act

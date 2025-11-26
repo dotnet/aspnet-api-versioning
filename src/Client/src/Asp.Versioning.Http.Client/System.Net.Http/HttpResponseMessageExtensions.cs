@@ -15,6 +15,7 @@ using ArgumentNullException = Backport.ArgumentNullException;
 public static class HttpResponseMessageExtensions
 {
     private const string Sunset = nameof( Sunset );
+    private const string Deprecation = nameof( Deprecation );
     private const string Link = nameof( Link );
 
     /// <summary>
@@ -60,6 +61,58 @@ public static class HttpResponseMessageExtensions
             {
                 if ( LinkHeaderValue.TryParse( value, resolver, out var link ) &&
                      link.RelationType.Equals( "sunset", OrdinalIgnoreCase ) )
+                {
+                    policy.Links.Add( link );
+                }
+            }
+        }
+
+        return policy;
+    }
+
+    /// <summary>
+    /// Gets an API deprecation policy from the HTTP response.
+    /// </summary>
+    /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to read from.</param>
+    /// <returns>A new <see cref="DeprecationPolicy">deprecation policy</see>.</returns>
+    public static DeprecationPolicy ReadDeprecationPolicy( this HttpResponseMessage response )
+    {
+        ArgumentNullException.ThrowIfNull( response );
+
+        var headers = response.Headers;
+        var date = default( DateTimeOffset );
+        DeprecationPolicy policy;
+
+        if ( headers.TryGetValues( Deprecation, out var values ) )
+        {
+            var culture = CultureInfo.CurrentCulture;
+
+            foreach ( var value in values )
+            {
+                var split = value.Trim( '@' );
+                if ( long.TryParse( split, out var unixTimestamp ) &&
+                     ( date == default || date < DateTimeOffset.FromUnixTimeSeconds( unixTimestamp ) ) )
+                {
+                    date = DateTimeOffset.FromUnixTimeSeconds( unixTimestamp );
+                }
+            }
+
+            policy = date == default ? new() : new( date );
+        }
+        else
+        {
+            policy = new();
+        }
+
+        if ( headers.TryGetValues( Link, out values ) )
+        {
+            var baseUrl = response.RequestMessage?.RequestUri;
+            Func<Uri, Uri> resolver = baseUrl is null ? url => url : url => new( baseUrl, url );
+
+            foreach ( var value in values )
+            {
+                if ( LinkHeaderValue.TryParse( value, resolver, out var link ) &&
+                     link.RelationType.Equals( "deprecation", OrdinalIgnoreCase ) )
                 {
                     policy.Links.Add( link );
                 }

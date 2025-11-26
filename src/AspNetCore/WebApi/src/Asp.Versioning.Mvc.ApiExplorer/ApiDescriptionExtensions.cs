@@ -31,6 +31,13 @@ public static class ApiDescriptionExtensions
     public static SunsetPolicy? GetSunsetPolicy( this ApiDescription apiDescription ) => apiDescription.GetProperty<SunsetPolicy>();
 
     /// <summary>
+    /// Gets the API deprecation policy associated with the API description, if any.
+    /// </summary>
+    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the deprecation policy for.</param>
+    /// <returns>The defined deprecation policy defined for the API or <c>null</c>.</returns>
+    public static DeprecationPolicy? GetDeprecationPolicy( this ApiDescription apiDescription ) => apiDescription.GetProperty<DeprecationPolicy>();
+
+    /// <summary>
     /// Gets a value indicating whether the associated API description is deprecated.
     /// </summary>
     /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to evaluate.</param>

@@ -104,6 +104,7 @@ internal static class DescriptionProvider
 
             sunsetPolicyManager.TryGetPolicy( version, out var sunsetPolicy );
             deprecationPolicyManager.TryGetPolicy( version, out var deprecationPolicy );
+
             descriptions.Add( new( version, formattedGroupName, deprecated, sunsetPolicy, deprecationPolicy ) );
         }
     }

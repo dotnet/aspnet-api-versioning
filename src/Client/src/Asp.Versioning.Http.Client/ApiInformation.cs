@@ -15,16 +15,19 @@ public class ApiInformation
     /// <param name="supportedVersions">The supported read-only list of API versions.</param>
     /// <param name="deprecatedVersions">The deprecated read-only list of API versions.</param>
     /// <param name="sunsetPolicy">The API sunset policy.</param>
+    /// <param name="deprecationPolicy">The API deprecation policy.</param>
     /// <param name="openApiDocumentUrls">The read-only mapping of API version to OpenAPI document URLs.</param>
     public ApiInformation(
         IReadOnlyList<ApiVersion> supportedVersions,
         IReadOnlyList<ApiVersion> deprecatedVersions,
         SunsetPolicy sunsetPolicy,
+        DeprecationPolicy deprecationPolicy,
         IReadOnlyDictionary<ApiVersion, Uri> openApiDocumentUrls )
     {
         SupportedApiVersions = supportedVersions ?? throw new System.ArgumentNullException( nameof( supportedVersions ) );
         DeprecatedApiVersions = deprecatedVersions ?? throw new System.ArgumentNullException( nameof( deprecatedVersions ) );
         SunsetPolicy = sunsetPolicy ?? throw new System.ArgumentNullException( nameof( sunsetPolicy ) );
+        DeprecationPolicy = deprecationPolicy ?? throw new System.ArgumentNullException( nameof( deprecationPolicy ) );
         OpenApiDocumentUrls = openApiDocumentUrls ?? throw new System.ArgumentNullException( nameof( openApiDocumentUrls ) );
     }
 
@@ -33,6 +36,7 @@ public class ApiInformation
         SupportedApiVersions = Array.Empty<ApiVersion>();
         DeprecatedApiVersions = Array.Empty<ApiVersion>();
         SunsetPolicy = new();
+        DeprecationPolicy = new();
         OpenApiDocumentUrls = new Dictionary<ApiVersion, Uri>( capacity: 0 );
     }
 
@@ -61,6 +65,12 @@ public class ApiInformation
     /// </summary>
     /// <value>The <see cref="SunsetPolicy">sunset policy</see> for the API.</value>
     public SunsetPolicy SunsetPolicy { get; }
+
+    /// <summary>
+    /// Gets the API deprecation policy.
+    /// </summary>
+    /// <value>The <see cref="DeprecationPolicy">deprecation policy</see> for the API.</value>
+    public DeprecationPolicy DeprecationPolicy { get; }
 
     /// <summary>
     /// Gets the OpenAPI document URLs for each version.

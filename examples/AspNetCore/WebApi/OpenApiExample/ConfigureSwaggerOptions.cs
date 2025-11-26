@@ -50,25 +50,84 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
             text.Append( " This API version has been deprecated." );
         }
 
-        if ( description.SunsetPolicy is { } policy )
+        if ( description.DeprecationPolicy is { } deprecationPolicy )
         {
-            if ( policy.Date is { } when )
+            if ( deprecationPolicy.Date is { } when )
             {
-                text.Append( " The API will be sunset on " )
-                    .Append( when.Date.ToShortDateString() )
-                    .Append( '.' );
+                if ( when < DateTime.Now )
+                {
+                    text.Append( " The API has been deprecated on " )
+                        .Append( when.Date.ToShortDateString() )
+                        .Append( '.' );
+                }
+                else
+                {
+                    text.Append( " The API will be deprecated on " )
+                        .Append( when.Date.ToShortDateString() )
+                        .Append( '.' );
+                }
             }
 
-            if ( policy.HasLinks )
+            if ( deprecationPolicy.HasLinks )
             {
                 text.AppendLine();
 
                 var rendered = false;
 
-                for ( var i = 0; i < policy.Links.Count; i++ )
+                foreach ( var link in deprecationPolicy.Links )
                 {
-                    var link = policy.Links[i];
+                    if ( link.Type == "text/html" )
+                    {
+                        if ( !rendered )
+                        {
+                            text.Append( "<h4>Links</h4><ul>" );
+                            rendered = true;
+                        }
 
+                        text.Append( "<li><a href=\"" );
+                        text.Append( link.LinkTarget.OriginalString );
+                        text.Append( "\">" );
+                        text.Append(
+                            StringSegment.IsNullOrEmpty( link.Title )
+                            ? link.LinkTarget.OriginalString
+                            : link.Title.ToString() );
+                        text.Append( "</a></li>" );
+                    }
+                }
+
+                if ( rendered )
+                {
+                    text.Append( "</ul>" );
+                }
+            }
+        }
+
+        if ( description.SunsetPolicy is { } sunsetPolicy )
+        {
+            if ( sunsetPolicy.Date is { } when )
+            {
+                if ( when < DateTime.Now )
+                {
+                    text.Append( " The API has been sunset on " )
+                        .Append( when.Date.ToShortDateString() )
+                        .Append( '.' );
+                }
+                else
+                {
+                    text.Append( " The API will be sunset on " )
+                        .Append( when.Date.ToShortDateString() )
+                        .Append( '.' );
+                }
+            }
+
+            if ( sunsetPolicy.HasLinks )
+            {
+                text.AppendLine();
+
+                var rendered = false;
+
+                foreach ( var link in sunsetPolicy.Links )
+                {
                     if ( link.Type == "text/html" )
                     {
                         if ( !rendered )

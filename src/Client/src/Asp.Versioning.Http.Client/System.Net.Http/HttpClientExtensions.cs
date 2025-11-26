@@ -94,8 +94,9 @@ public static class HttpClientExtensions
 
         var deprecated = versions.ToArray();
         var sunsetPolicy = response.ReadSunsetPolicy();
+        var deprecationPolicy = response.ReadDeprecationPolicy();
         var urls = response.GetOpenApiDocumentUrls( parser );
 
-        return new( supported, deprecated, sunsetPolicy, urls );
+        return new( supported, deprecated, sunsetPolicy, deprecationPolicy, urls );
     }
 }
