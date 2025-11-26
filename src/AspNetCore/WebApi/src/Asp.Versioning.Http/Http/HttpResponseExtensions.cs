@@ -13,6 +13,7 @@ using Microsoft.Net.Http.Headers;
 public static class HttpResponseExtensions
 {
     private const string Sunset = nameof( Sunset );
+    private const string Deprecation = nameof( Deprecation );
     private const string Link = nameof( Link );
 
     /// <summary>
@@ -42,6 +43,44 @@ public static class HttpResponseExtensions
         }
 
         AddLinkHeaders( headers, sunsetPolicy.Links );
+    }
+
+    /// <summary>
+    /// Writes the deprecation policy to the specified HTTP response.
+    /// </summary>
+    /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to write to.</param>
+    /// <param name="deprecationPolicy">The <see cref="DeprecationPolicy">deprecation policy</see> to write.</param>
+    [CLSCompliant( false )]
+    public static void WriteDeprecationPolicy( this HttpResponse response, DeprecationPolicy deprecationPolicy )
+    {
+        ArgumentNullException.ThrowIfNull( response );
+        ArgumentNullException.ThrowIfNull( deprecationPolicy );
+
+        var headers = response.Headers;
+
+        if ( headers.ContainsKey( Deprecation ) )
+        {
+            // the 'Deprecation' header is present, assume the headers have been written.
+            // this can happen when ApiVersioningOptions.ReportApiVersions = true
+            // and [ReportApiVersions] are both applied
+            return;
+        }
+
+        if ( deprecationPolicy.Date.HasValue )
+        {
+            long unixTimestamp;
+            DateTimeOffset deprecationDate = deprecationPolicy.Date.Value;
+
+#if NETFRAMEWORK
+            unixTimestamp = (int) deprecationDate.Subtract( unixEpoch ).TotalSeconds;
+#else
+            unixTimestamp = deprecationDate.ToUnixTimeSeconds();
+#endif
+
+            headers[Deprecation] = $"@{unixTimestamp}";
+        }
+
+        AddLinkHeaders( headers, deprecationPolicy.Links );
     }
 
     private static void AddLinkHeaders( IHeaderDictionary headers, IList<LinkHeaderValue> links )

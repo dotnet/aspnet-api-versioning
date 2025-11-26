@@ -23,6 +23,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     private const string Sunset = nameof( Sunset );
     private const string Link = nameof( Link );
     private readonly ISunsetPolicyManager sunsetPolicyManager;
+    private readonly IDeprecationPolicyManager deprecationPolicyManager;
     private readonly string apiSupportedVersionsName;
     private readonly string apiDeprecatedVersionsName;
 
@@ -30,6 +31,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     /// Initializes a new instance of the <see cref="DefaultApiVersionReporter"/> class.
     /// </summary>
     /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
+    /// <param name="deprecationPolicyManager">The <see cref="IDeprecationPolicyManager">manager</see> used to resolve deprecation policies.</param>
     /// <param name="supportedHeaderName">The HTTP header name used for supported API versions.
     /// The default value is "api-supported-versions".</param>
     /// <param name="deprecatedHeaderName">THe HTTP header name used for deprecated API versions.
@@ -38,6 +40,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     /// <see cref="ApiVersionMapping.Explicit"/> and <see cref="ApiVersionMapping.Implicit"/>.</param>
     public DefaultApiVersionReporter(
         ISunsetPolicyManager sunsetPolicyManager,
+        IDeprecationPolicyManager deprecationPolicyManager,
         string supportedHeaderName = ApiSupportedVersions,
         string deprecatedHeaderName = ApiDeprecatedVersions,
         ApiVersionMapping mapping = Explicit | Implicit )
@@ -47,6 +50,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         ArgumentException.ThrowIfNullOrEmpty( deprecatedHeaderName );
 
         this.sunsetPolicyManager = sunsetPolicyManager;
+        this.deprecationPolicyManager = deprecationPolicyManager;
         apiSupportedVersionsName = supportedHeaderName;
         apiDeprecatedVersionsName = deprecatedHeaderName;
         Mapping = mapping;
@@ -91,9 +95,14 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 #endif
         var name = metadata.Name;
 
-        if ( sunsetPolicyManager.TryResolvePolicy( name, version, out var policy ) )
+        if ( sunsetPolicyManager.TryResolvePolicy( name, version, out var sunsetPolicy ) )
         {
-            response.WriteSunsetPolicy( policy );
+            response.WriteSunsetPolicy( sunsetPolicy );
+        }
+
+        if ( deprecationPolicyManager.TryResolvePolicy( name, version, out var deprecationPolicy ) )
+        {
+            response.WriteDeprecationPolicy( deprecationPolicy );
         }
     }
 }
