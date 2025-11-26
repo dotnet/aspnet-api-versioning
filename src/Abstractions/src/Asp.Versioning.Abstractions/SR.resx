@@ -144,4 +144,7 @@
   <data name="InvalidSunsetRelationType" xml:space="preserve">
     <value>The relation type for a sunset policy link must be "sunset".</value>
   </data>
+  <data name="InvalidDeprecationRelationType" xml:space="preserve">
+    <value>The relation type for a deprecation policy link must be "deprecation".</value>
+  </data>
 </root>

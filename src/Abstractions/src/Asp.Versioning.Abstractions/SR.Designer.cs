@@ -141,5 +141,14 @@ namespace Asp.Versioning {
                 return ResourceManager.GetString("InvalidSunsetRelationType", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The relation type for a deprecation policy link must be &quot;deprecation&quot;..
+        /// </summary>
+        internal static string InvalidDeprecationRelationType {
+            get {
+                return ResourceManager.GetString("InvalidDeprecationRelationType", resourceCulture);
+            }
+        }
     }
 }
