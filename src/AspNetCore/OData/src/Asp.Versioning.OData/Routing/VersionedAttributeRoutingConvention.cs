@@ -95,12 +95,12 @@ public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
 
     private static bool IsODataController( ODataControllerActionContext context )
     {
-        if ( ODataControllerSpecification.IsSatisfiedBy( context.Controller ) )
+        if ( ODataControllerSpecification.Matches( context.Controller ) )
         {
             return true;
         }
 
-        return ODataControllerSpecification.IsSatisfiedBy( context.Action );
+        return ODataControllerSpecification.Matches( context.Action );
     }
 
     private static IEdmModel? FindModel( ODataControllerActionContext context )

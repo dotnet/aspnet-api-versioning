@@ -3,6 +3,7 @@
 namespace Asp.Versioning.ApplicationModels;
 
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 /// <summary>
@@ -16,7 +17,7 @@ public sealed class ODataControllerSpecification : IApiControllerSpecification
     {
         ArgumentNullException.ThrowIfNull( controller );
 
-        if ( ODataControllerSpecification.IsSatisfiedBy( controller ) )
+        if ( Matches( controller ) )
         {
             return true;
         }
@@ -25,7 +26,7 @@ public sealed class ODataControllerSpecification : IApiControllerSpecification
 
         for ( var i = 0; i < actions.Count; i++ )
         {
-            if ( IsSatisfiedBy( actions[i] ) )
+            if ( Matches( actions[i] ) )
             {
                 return true;
             }
@@ -34,7 +35,7 @@ public sealed class ODataControllerSpecification : IApiControllerSpecification
         return false;
     }
 
-    internal static bool IsSatisfiedBy( ICommonModel model )
+    internal static bool Matches( ICommonModel model )
     {
         var attributes = model.Attributes;
 

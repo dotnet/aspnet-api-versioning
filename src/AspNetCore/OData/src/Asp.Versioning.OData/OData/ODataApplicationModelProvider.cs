@@ -79,6 +79,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         CollateApiVersions( ApplicationModel application )
     {
         var controllers = application.Controllers;
+        var specification = new ODataControllerSpecification();
         var metadataControllers = default( List<ControllerModel> );
         var supported = default( SortedSet<ApiVersion> );
         var deprecated = default( SortedSet<ApiVersion> );
@@ -93,7 +94,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
                 metadataControllers.Add( controller );
                 continue;
             }
-            else if ( !ODataControllerSpecification.IsSatisfiedBy( controller ) )
+            else if ( !specification.IsSatisfiedBy( controller ) )
             {
                 continue;
             }
