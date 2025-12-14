@@ -3,19 +3,22 @@
 namespace Asp.Versioning.Simulators.Configuration;
 
 using Asp.Versioning.OData;
+using Asp.Versioning.Simulators.Models;
 using Microsoft.OData.ModelBuilder;
 
 /// <summary>
-/// Represents the model configuration for all configurations.
+/// Represents the model configuration for records.
 /// </summary>
-public class AllConfigurations : IModelConfiguration
+public class RecordModelConfiguration : IModelConfiguration
 {
     /// <inheritdoc />
     public void Apply( ODataModelBuilder builder, ApiVersion apiVersion, string routePrefix )
     {
         ArgumentNullException.ThrowIfNull( builder );
 
-        builder.Function( "GetSalesTaxRate" ).Returns<double>().Parameter<int>( "PostalCode" );
-        builder.Function( "GetHash" ).Returns<int>().Parameter<string>( "Input" );
+        if ( apiVersion == ApiVersions.V1 )
+        {
+            builder.EntitySet<Record>( "Records" ).EntityType.HasKey( r => new { r.Id, r.Source } );
+        }
     }
 }

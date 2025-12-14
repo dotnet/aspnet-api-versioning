@@ -13,10 +13,12 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using static System.StringComparison;
+using System.Text;
 using static ODataMetadataOptions;
+using static System.StringComparison;
 using Opts = Microsoft.Extensions.Options.Options;
 
 /// <summary>
@@ -144,6 +146,8 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
                 UpdateModelTypes( result, matched );
                 UpdateFunctionCollectionParameters( result, matched );
             }
+
+            QuoteStringParameters( result );
         }
 
         if ( results.Count > 0 )
@@ -524,6 +528,118 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         span.CopyTo( newValue.Slice( 2, name.Length ) );
 
         description.RelativePath = path.Replace( oldValue.ToString(), newValue.ToString(), Ordinal );
+    }
+
+    private static void AddStringParameterNames(
+        IEdmFunction function,
+        IDictionary<string, string> parameterMappings,
+        ref HashSet<string>? names )
+    {
+        foreach ( var parameter in function.Parameters )
+        {
+            if ( parameter.Type.IsString() )
+            {
+                names ??= [];
+                names.Add( parameterMappings[parameter.Name] );
+            }
+        }
+    }
+
+    private static void QuoteStringParameters( ApiDescription description )
+    {
+        if ( description.RelativePath is not string path )
+        {
+            return;
+        }
+
+        var action = description.ActionDescriptor;
+        var metadata = action.EndpointMetadata;
+        var names = default( HashSet<string>? );
+
+        for ( var i = metadata.Count - 1; i >= 0; i-- )
+        {
+            if ( metadata[i] is not IODataRoutingMetadata odata )
+            {
+                continue;
+            }
+
+            for ( var j = 0; j < odata.Template.Count; j++ )
+            {
+                switch ( odata.Template[j] )
+                {
+                    case KeySegmentTemplate key when key.KeyProperties.Count > 1:
+                        foreach ( (var name, var property) in key.KeyProperties )
+                        {
+                            if ( property.Type.IsString() )
+                            {
+                                names ??= [];
+                                names.Add( key.KeyMappings[name] );
+                            }
+                        }
+
+                        break;
+
+                    case FunctionSegmentTemplate function when function.ParameterMappings.Count > 0:
+                        AddStringParameterNames( function.Function, function.ParameterMappings, ref names );
+                        break;
+
+                    case FunctionImportSegmentTemplate function when function.ParameterMappings.Count > 0:
+                        AddStringParameterNames( function.FunctionImport.Function, function.ParameterMappings, ref names );
+                        break;
+                }
+            }
+
+            break;
+        }
+
+        if ( names is null )
+        {
+            return;
+        }
+
+        var capacity = path.Length + ( names.Count << 1 );
+        var template = new StringBuilder( path, capacity );
+        var position = 0;
+        var inParens = false;
+
+        while ( position < template.Length )
+        {
+            switch ( template[position++] )
+            {
+                case '(':
+                    inParens = true;
+                    continue;
+                case ')':
+                    inParens = false;
+                    continue;
+                case '{':
+                    break;
+                default:
+                    continue;
+            }
+
+            var start = position;
+
+            while ( position < template.Length && template[position] != '}' )
+            {
+                position++;
+            }
+
+            if ( inParens && position < template.Length )
+            {
+                var end = position;
+                var name = template.ToString( start, end - start );
+
+                if ( names.Contains( name ) )
+                {
+                    template.Insert( start - 1, '\'' );
+                    template.Insert( end + 2, '\'' );
+                    position += 2;
+                }
+            }
+        }
+
+        description.RelativePath = template.ToString();
     }
 
     private sealed class ApiDescriptionComparer : IEqualityComparer<ApiDescription>

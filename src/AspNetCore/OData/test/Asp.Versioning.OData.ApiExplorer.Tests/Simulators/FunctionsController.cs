@@ -22,4 +22,13 @@ public class FunctionsController : ODataController
     [HttpGet( "api/GetSalesTaxRate(PostalCode={postalCode})" )]
     [ProducesResponseType( typeof( double ), Status200OK )]
     public IActionResult GetSalesTaxRate( int postalCode ) => Ok( 5.6 );
+
+    /// <summary>
+    /// Computes the hash of the specified text.
+    /// </summary>
+    /// <param name="input">The text to hash.</param>
+    /// <returns>The hash of the input string.</returns>
+    [HttpGet( "api/GetHash(Input={input})" )]
+    [ProducesResponseType( typeof( int ), Status200OK )]
+    public IActionResult GetHash( string input ) => Ok( input.GetHashCode() );
 }

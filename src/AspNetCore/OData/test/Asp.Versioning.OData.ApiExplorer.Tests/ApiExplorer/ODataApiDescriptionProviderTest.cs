@@ -125,12 +125,12 @@ public class ODataApiDescriptionProviderTest
         PrintGroup( items );
         group.GroupName.Should().Be( GroupName );
         items.Should().BeEquivalentTo(
-            new[]
-            {
+            [
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/GetHash(Input='{input}')" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -142,16 +142,19 @@ public class ODataApiDescriptionProviderTest
         PrintGroup( items );
         group.GroupName.Should().Be( GroupName );
         items.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Books" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Books/{id}" },
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/GetHash(Input='{input}')" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
                 new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/{key}" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders/MostExpensive" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
-            },
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/Records(id='{id}', source={source})" },
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/Records" },
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/Records/$count" },
+            ],
             options => options.ExcludingMissingMembers() );
 
         AssertQueryOptionWithoutOData( items[0], "filter", "author", "published" );
@@ -165,8 +168,8 @@ public class ODataApiDescriptionProviderTest
         PrintGroup( items );
         group.GroupName.Should().Be( GroupName );
         items.Should().BeEquivalentTo(
-            new[]
-            {
+            [
+                new { HttpMethod = "GET", GroupName, RelativePath = "api/GetHash(Input='{input}')" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders" },
                 new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
@@ -179,7 +182,7 @@ public class ODataApiDescriptionProviderTest
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/People/{key}" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/People/$count" },
                 new { HttpMethod = "GET", GroupName, RelativePath = "api/People/NewHires(Since={since})" },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -189,6 +192,7 @@ public class ODataApiDescriptionProviderTest
         var items = group.Items.OrderBy( i => i.RelativePath ).ThenBy( i => i.HttpMethod ).ToArray();
         var expected = new[]
         {
+            new { HttpMethod = "GET", GroupName, RelativePath = "api/GetHash(Input='{input}')" },
             new { HttpMethod = "GET", GroupName, RelativePath = "api/GetSalesTaxRate(PostalCode={postalCode})" },
             new { HttpMethod = "GET", GroupName, RelativePath = "api/Orders" },
             new { HttpMethod = "POST", GroupName, RelativePath = "api/Orders" },
