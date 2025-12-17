@@ -5,7 +5,9 @@
 
 namespace Asp.Versioning.Mvc.UsingAttributes.Controllers;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 
 [ApiController]
 [ApiVersion( "1.0" )]
@@ -31,4 +33,13 @@ public class OverlappingRouteTemplateController : ControllerBase
     [HttpGet( "[action]/{id}" )]
     [MapToApiVersion( "1.0" )]
     public string Echo( string id ) => id;
+
+    [HttpGet]
+    [ProducesResponseType( StatusCodes.Status200OK )]
+    public IActionResult Get() => Ok();
+
+    [HttpPost]
+    [Consumes( MediaTypeNames.Application.Json )]
+    [ProducesResponseType( StatusCodes.Status201Created )]
+    public IActionResult Post( [FromBody] string body ) => CreatedAtAction( nameof( Get ), body );
 }

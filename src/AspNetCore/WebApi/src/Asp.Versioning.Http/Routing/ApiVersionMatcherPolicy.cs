@@ -372,14 +372,9 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     private static (bool Matched, bool HasCandidates) MatchApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
     {
         var total = candidates.Count;
-        var count = 0;
-        var array = default( Match[] );
-        var bestMatch = default( Match? );
+        var matched = false;
+        var implicitMatches = new Matches( stackalloc int[total] );
         var hasCandidates = false;
-        Span<Match> matches =
-            total <= 16
-            ? stackalloc Match[total]
-            : ( array = ArrayPool<Match>.Shared.Rent( total ) ).AsSpan();
 
         for ( var i = 0; i < total; i++ )
         {
@@ -397,56 +392,38 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 continue;
             }
 
-            var score = candidate.Score;
-            bool isExplicit;
-
-            // perf: always make the candidate invalid so we only need to loop through the
-            // final, best matches for any remaining candidates
-            candidates.SetValidity( i, false );
-
             switch ( metadata.MappingTo( apiVersion ) )
             {
                 case Explicit:
-                    isExplicit = true;
+                    matched = true;
                     break;
                 case Implicit:
-                    isExplicit = metadata.IsApiVersionNeutral;
+                    if ( metadata.IsApiVersionNeutral )
+                    {
+                        matched = true;
+                    }
+                    else
+                    {
+                        implicitMatches.Add( i );
+                    }
+
                     break;
                 default:
+                    candidates.SetValidity( i, false );
                     continue;
             }
-
-            var match = new Match( i, score, isExplicit );
-
-            matches[count++] = match;
-
-            if ( !bestMatch.HasValue || match.CompareTo( bestMatch.Value ) > 0 )
-            {
-                bestMatch = match;
-            }
         }
 
-        var matched = false;
-
-        if ( bestMatch.HasValue )
+        if ( matched )
         {
-            matched = true;
-            var match = bestMatch.Value;
-
-            for ( var i = 0; i < count; i++ )
+            for ( var i = 0; i < implicitMatches.Count; i++ )
             {
-                ref readonly var otherMatch = ref matches[i];
-
-                if ( match.CompareTo( otherMatch ) == 0 )
-                {
-                    candidates.SetValidity( otherMatch.Index, true );
-                }
+                candidates.SetValidity( implicitMatches[i], false );
             }
         }
-
-        if ( array is not null )
+        else
         {
-            ArrayPool<Match>.Shared.Return( array );
+            matched = !implicitMatches.IsEmpty;
         }
 
         return (matched, hasCandidates);
@@ -481,17 +458,18 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
     bool INodeBuilderPolicy.AppliesToEndpoints( IReadOnlyList<Endpoint> endpoints ) =>
         !ContainsDynamicEndpoints( endpoints ) && AppliesToEndpoints( endpoints );
 
-    private readonly struct Match( int index, int score, bool isExplicit )
+    private ref struct Matches( Span<int> indexes )
     {
-        internal readonly int Index = index;
-        internal readonly int Score = score;
-        internal readonly bool IsExplicit = isExplicit;
+        private readonly Span<int> indexes = indexes;
+        private int count;
 
-        internal int CompareTo( in Match other )
-        {
-            var result = -Score.CompareTo( other.Score );
-            return result == 0 ? IsExplicit.CompareTo( other.IsExplicit ) : result;
-        }
+        public readonly int this[int index] => indexes[index];
+
+        public readonly bool IsEmpty => count == 0;
+
+        public readonly int Count => count;
+
+        public void Add( int index ) => indexes[count++] = index;
     }
 
     private sealed class ApiVersionCollator(

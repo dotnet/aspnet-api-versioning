@@ -86,6 +86,21 @@ public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<Ov
         response.StatusCode.Should().Be( statusCode );
     }
 
+    [Fact]
+    public async Task then_route_with_different_scores_and_same_version_should_return_expected_status()
+    {
+        // arrange
+
+
+        // act
+        var get = await GetAsync( "api/v1/values" );
+        var post = await PostAsync( "api/v1/values", "test" );
+
+        // assert
+        get.StatusCode.Should().Be( OK );
+        post.StatusCode.Should().Be( Created );
+    }
+
     public when_two_route_templates_overlap( OverlappingRouteTemplateFixture fixture, ITestOutputHelper console )
         : base( fixture ) => console.WriteLine( fixture.DirectedGraphVisualizationUrl );
 }
