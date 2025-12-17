@@ -57,12 +57,18 @@ internal sealed class EdgeBuilder
 
     public void Add( RouteEndpoint endpoint, ApiVersion apiVersion, ApiVersionMetadata metadata )
     {
-        // use a singleton of all route patterns that version by url segment. this
-        // is needed to extract the value for selecting a destination in the jump
-        // table. any matching template will do and every edge should have the
-        // same list known through the application, which may be zero
+        // use a singleton of all route patterns that version by url segment. this is needed to extract the value for
+        // selecting a destination in the jump table. any matching template will do and every edge should have the same
+        // list known through the application, which may be zero
         var key = new EdgeKey( apiVersion, metadata, routePatterns );
+
         Add( ref key, endpoint );
+
+        // include version-neutral endpoints when assuming the default so they are also considered when unspecified
+        if ( unspecifiedAllowed && metadata.IsApiVersionNeutral && apiVersion == ApiVersion.Neutral )
+        {
+            Add( ref assumeDefault, endpoint );
+        }
     }
 
     private void Add( ref EdgeKey key, RouteEndpoint endpoint )

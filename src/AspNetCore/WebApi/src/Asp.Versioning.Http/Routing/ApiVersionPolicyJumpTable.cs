@@ -63,17 +63,18 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
         switch ( apiVersions.Count )
         {
             case 0:
-                // 1. version-neutral endpoints take precedence
-                if ( destinations.TryGetValue( ApiVersion.Neutral, out destination ) )
-                {
-                    return destination;
-                }
-
-                // 2. IApiVersionSelector cannot be used yet because there are no candidates that an
-                //    aggregated version model can be computed from to select the 'default' API version
+                // 1. IApiVersionSelector cannot be used yet because there are no candidates that an
+                //    aggregated version model can be computed from to select the default API version.
+                //    version-neutral endpoints are still included in these candidates
                 if ( options.AssumeDefaultVersionWhenUnspecified )
                 {
                     return rejection.AssumeDefault;
+                }
+
+                // 2. use version-neutral endpoints, if any
+                if ( destinations.TryGetValue( ApiVersion.Neutral, out destination ) )
+                {
+                    return destination;
                 }
 
                 httpContext.Features.Set( policyFeature );
