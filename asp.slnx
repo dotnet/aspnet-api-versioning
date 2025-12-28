@@ -1,0 +1,152 @@
+<Solution>
+  <Folder Name="/.config/">
+    <File Path=".config/dotnet-tools.json" />
+  </Folder>
+  <Folder Name="/.devcontainer/">
+    <File Path=".devcontainer/Dockerfile" />
+    <File Path=".devcontainer/devcontainer.json" />
+  </Folder>
+  <Folder Name="/.devcontainer/scripts/">
+    <File Path=".devcontainer/scripts/container-creation.sh" />
+  </Folder>
+  <Folder Name="/.github/">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/pull_request_template.md" />
+  </Folder>
+  <Folder Name="/.github/ISSUE_TEMPLATE/">
+    <File Path=".github/ISSUE_TEMPLATE/10_bug_report.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/20_feature_request.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/30_api_proposal.md" />
+    <File Path=".github/ISSUE_TEMPLATE/config.yml" />
+  </Folder>
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/codeql-analysis.yml" />
+  </Folder>
+  <Folder Name="/.vscode/">
+    <File Path=".vscode/extensions.json" />
+    <File Path=".vscode/launch.json" />
+    <File Path=".vscode/project.code-snippets" />
+    <File Path=".vscode/settings.json" />
+    <File Path=".vscode/tasks.json" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/CONTRIBUTING.md" />
+  </Folder>
+  <Folder Name="/(misc)/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="azure-pipelines.yml" />
+    <File Path="LICENSE.txt" />
+    <File Path="logo.svg" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/build/">
+    <Project Path="build/assets.msbuildproj" Type="13b669be-bb05-4ddf-9536-439f39a36129" />
+  </Folder>
+  <Folder Name="/examples/">
+    <File Path="examples/.editorconfig" />
+    <File Path="examples/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/examples/AspNet/">
+    <File Path="examples/AspNet/Directory.Build.props" />
+    <File Path="examples/AspNet/Startup.Newtonsoft.cs" />
+  </Folder>
+  <Folder Name="/examples/AspNet/OData/">
+    <Project Path="examples/AspNet/OData/AdvancedODataWebApiExample/AdvancedODataWebApiExample.csproj" />
+    <Project Path="examples/AspNet/OData/BasicODataWebApiExample/BasicODataWebApiExample.csproj" />
+    <Project Path="examples/AspNet/OData/ConventionsODataWebApiExample/ConventionsODataWebApiExample.csproj" />
+    <Project Path="examples/AspNet/OData/OpenApiODataWebApiExample/OpenApiODataWebApiExample.csproj" />
+    <Project Path="examples/AspNet/OData/SomeOpenApiODataWebApiExample/SomeOpenApiODataWebApiExample.csproj" />
+  </Folder>
+  <Folder Name="/examples/AspNet/WebApi/">
+    <Project Path="examples/AspNet/WebApi/BasicWebApiExample/BasicWebApiExample.csproj" />
+    <Project Path="examples/AspNet/WebApi/ByNamespaceWebApiExample/ByNamespaceWebApiExample.csproj" />
+    <Project Path="examples/AspNet/WebApi/ConventionsWebApiExample/ConventionsWebApiExample.csproj" />
+    <Project Path="examples/AspNet/WebApi/OpenApiWebApiExample/OpenApiWebApiExample.csproj" />
+  </Folder>
+  <Folder Name="/examples/AspNetCore/" />
+  <Folder Name="/examples/AspNetCore/OData/">
+    <File Path="examples/AspNetCore/OData/Directory.Build.props" />
+    <Project Path="examples/AspNetCore/OData/ODataAdvancedExample/ODataAdvancedExample.csproj" />
+    <Project Path="examples/AspNetCore/OData/ODataBasicExample/ODataBasicExample.csproj" />
+    <Project Path="examples/AspNetCore/OData/ODataConventionsExample/ODataConventionsExample.csproj" />
+    <Project Path="examples/AspNetCore/OData/ODataOpenApiExample/ODataOpenApiExample.csproj" />
+    <Project Path="examples/AspNetCore/OData/SomeODataOpenApiExample/SomeODataOpenApiExample.csproj" />
+  </Folder>
+  <Folder Name="/examples/AspNetCore/WebApi/">
+    <Project Path="examples/AspNetCore/WebApi/BasicExample/BasicExample.csproj" />
+    <Project Path="examples/AspNetCore/WebApi/ByNamespaceExample/ByNamespaceExample.csproj" />
+    <Project Path="examples/AspNetCore/WebApi/ConventionsExample/ConventionsExample.csproj" />
+    <Project Path="examples/AspNetCore/WebApi/MinimalApiExample/MinimalApiExample.csproj" />
+    <Project Path="examples/AspNetCore/WebApi/MinimalOpenApiExample/MinimalOpenApiExample.csproj" />
+    <Project Path="examples/AspNetCore/WebApi/OpenApiExample/OpenApiExample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/src/Abstractions/" />
+  <Folder Name="/src/Abstractions/src/">
+    <Project Path="src/Abstractions/src/Asp.Versioning.Abstractions/Asp.Versioning.Abstractions.csproj" />
+  </Folder>
+  <Folder Name="/src/Abstractions/test/">
+    <Project Path="src/Abstractions/test/Asp.Versioning.Abstractions.Tests/Asp.Versioning.Abstractions.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/AspNet/" />
+  <Folder Name="/src/AspNet/src/">
+    <Project Path="src/AspNet/OData/src/Asp.Versioning.WebApi.OData.ApiExplorer/Asp.Versioning.WebApi.OData.ApiExplorer.csproj" />
+    <Project Path="src/AspNet/OData/src/Asp.Versioning.WebApi.OData/Asp.Versioning.WebApi.OData.csproj" />
+    <Project Path="src/AspNet/WebApi/src/Asp.Versioning.WebApi.ApiExplorer/Asp.Versioning.WebApi.ApiExplorer.csproj" />
+    <Project Path="src/AspNet/WebApi/src/Asp.Versioning.WebApi/Asp.Versioning.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/src/AspNet/test/">
+    <Project Path="src/AspNet/Acceptance/Asp.Versioning.WebApi.Acceptance.Tests/Asp.Versioning.WebApi.Acceptance.Tests.csproj" />
+    <Project Path="src/AspNet/OData/test/Asp.Versioning.WebApi.OData.ApiExplorer.Tests/Asp.Versioning.WebApi.OData.ApiExplorer.Tests.csproj" />
+    <Project Path="src/AspNet/OData/test/Asp.Versioning.WebApi.OData.Tests/Asp.Versioning.WebApi.OData.Tests.csproj" />
+    <Project Path="src/AspNet/WebApi/test/Asp.Versioning.WebApi.ApiExplorer.Tests/Asp.Versioning.WebApi.ApiExplorer.Tests.csproj" />
+    <Project Path="src/AspNet/WebApi/test/Asp.Versioning.WebApi.Tests/Asp.Versioning.WebApi.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/AspNetCore/" />
+  <Folder Name="/src/AspNetCore/src/">
+    <Project Path="src/AspNetCore/OData/src/Asp.Versioning.OData.ApiExplorer/Asp.Versioning.OData.ApiExplorer.csproj" />
+    <Project Path="src/AspNetCore/OData/src/Asp.Versioning.OData/Asp.Versioning.OData.csproj" />
+    <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Http/Asp.Versioning.Http.csproj" />
+    <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Mvc.ApiExplorer/Asp.Versioning.Mvc.ApiExplorer.csproj" />
+    <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Mvc/Asp.Versioning.Mvc.csproj" />
+  </Folder>
+  <Folder Name="/src/AspNetCore/test/">
+    <Project Path="src/AspNetCore/Acceptance/Asp.Versioning.Mvc.Acceptance.Tests/Asp.Versioning.Mvc.Acceptance.Tests.csproj" />
+    <Project Path="src/AspNetCore/OData/test/Asp.Versioning.OData.ApiExplorer.Tests/Asp.Versioning.OData.ApiExplorer.Tests.csproj" />
+    <Project Path="src/AspNetCore/OData/test/Asp.Versioning.OData.Tests/Asp.Versioning.OData.Tests.csproj" />
+    <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Http.Tests/Asp.Versioning.Http.Tests.csproj" />
+    <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Mvc.ApiExplorer.Tests/Asp.Versioning.Mvc.ApiExplorer.Tests.csproj" />
+    <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Mvc.Tests/Asp.Versioning.Mvc.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/Client/" />
+  <Folder Name="/src/Client/src/">
+    <Project Path="src/Client/src/Asp.Versioning.Http.Client/Asp.Versioning.Http.Client.csproj" />
+  </Folder>
+  <Folder Name="/src/Client/test/">
+    <Project Path="src/Client/test/Asp.Versioning.Http.Client.Tests/Asp.Versioning.Http.Client.Tests.csproj" />
+  </Folder>
+  <Folder Name="/src/Common/" />
+  <Folder Name="/src/Common/src/">
+    <Project Path="src/Common/src/Common.ApiExplorer/Common.ApiExplorer.shproj" />
+    <Project Path="src/Common/src/Common.Backport/Common.Backport.msbuildproj" Type="13b669be-bb05-4ddf-9536-439f39a36129" />
+    <Project Path="src/Common/src/Common.Mvc/Common.Mvc.shproj" />
+    <Project Path="src/Common/src/Common.OData.ApiExplorer/Common.OData.ApiExplorer.shproj" />
+    <Project Path="src/Common/src/Common.OData/Common.OData.shproj" />
+    <Project Path="src/Common/src/Common.ProblemDetails/Common.ProblemDetails.shproj" />
+    <Project Path="src/Common/src/Common.TypeInfo/Common.TypeInfo.shproj" />
+    <Project Path="src/Common/src/Common/Common.shproj" />
+  </Folder>
+  <Folder Name="/src/Common/test/">
+    <Project Path="src/Common/test/Common.Acceptance.Tests/Common.Acceptance.Tests.shproj" />
+    <Project Path="src/Common/test/Common.Mvc.Tests/Common.Mvc.Tests.shproj" />
+    <Project Path="src/Common/test/Common.OData.ApiExplorer.Tests/Common.OData.ApiExplorer.Tests.shproj" />
+    <Project Path="src/Common/test/Common.OData.Tests/Common.OData.Tests.shproj" />
+    <Project Path="src/Common/test/Common.Tests/Common.Tests.shproj" />
+  </Folder>
+</Solution>
