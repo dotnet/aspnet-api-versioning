@@ -94,15 +94,20 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         var version = context.GetRequestedApiVersion();
 #endif
         var name = metadata.Name;
+        DateTimeOffset? sunsetDate = null;
 
         if ( sunsetPolicyManager.TryResolvePolicy( name, version, out var sunsetPolicy ) )
         {
+            sunsetDate = sunsetPolicy.Date;
             response.WriteSunsetPolicy( sunsetPolicy );
         }
 
         if ( deprecationPolicyManager.TryResolvePolicy( name, version, out var deprecationPolicy ) )
         {
-            response.WriteDeprecationPolicy( deprecationPolicy );
+            if ( deprecationPolicy.IsEffective( sunsetDate ) )
+            {
+                response.WriteDeprecationPolicy( deprecationPolicy );
+            }
         }
     }
 }
