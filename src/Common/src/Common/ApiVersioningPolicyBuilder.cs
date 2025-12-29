@@ -17,11 +17,11 @@ public class ApiVersioningPolicyBuilder : IApiVersioningPolicyBuilder
     {
         if ( typeof( T ) == typeof( ISunsetPolicyBuilder ) && sunsetPolicies != null )
         {
-            return sunsetPolicies.Values.Cast<T>().ToArray();
+            return ( sunsetPolicies.Values.ToArray() as IReadOnlyList<T> )!;
         }
         else if ( typeof( T ) == typeof( IDeprecationPolicyBuilder ) && deprecationPolicies != null )
         {
-            return deprecationPolicies.Values.Cast<T>().ToArray();
+            return ( deprecationPolicies.Values.ToArray() as IReadOnlyList<T> )!;
         }
 
         return Array.Empty<T>();

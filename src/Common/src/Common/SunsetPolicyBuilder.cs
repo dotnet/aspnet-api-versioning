@@ -90,10 +90,7 @@ public class SunsetPolicyBuilder : PolicyBuilder<SunsetPolicy>, ISunsetPolicyBui
         private readonly SunsetPolicyBuilder policyBuilder;
 
         public SunsetLinkBuilder( SunsetPolicyBuilder policy, Uri linkTarget )
-            : base( linkTarget )
-        {
-            policyBuilder = policy;
-        }
+            : base( linkTarget ) => policyBuilder = policy;
 
         public override ILinkBuilder Link( Uri linkTarget ) => policyBuilder.Link( linkTarget );
     }

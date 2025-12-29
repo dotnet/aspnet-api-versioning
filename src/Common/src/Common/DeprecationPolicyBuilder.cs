@@ -90,10 +90,7 @@ public class DeprecationPolicyBuilder : PolicyBuilder<DeprecationPolicy>, IDepre
         private readonly DeprecationPolicyBuilder policyBuilder;
 
         public DeprecationLinkBuilder( DeprecationPolicyBuilder policy, Uri linkTarget )
-            : base( linkTarget )
-        {
-            policyBuilder = policy;
-        }
+            : base( linkTarget ) => policyBuilder = policy;
 
         public override ILinkBuilder Link( Uri linkTarget ) => policyBuilder.Link( linkTarget );
     }
