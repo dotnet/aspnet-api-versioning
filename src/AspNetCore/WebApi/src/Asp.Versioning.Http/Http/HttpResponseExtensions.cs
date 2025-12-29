@@ -5,6 +5,7 @@ namespace Microsoft.AspNetCore.Http;
 using Asp.Versioning;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using System.Globalization;
 
 /// <summary>
 /// Provides extension methods for <see cref="HttpResponse"/>.
@@ -66,14 +67,9 @@ public static class HttpResponseExtensions
             return;
         }
 
-        if ( deprecationPolicy.Date.HasValue )
+        if ( deprecationPolicy.Date is { } when )
         {
-            long unixTimestamp;
-            DateTimeOffset deprecationDate = deprecationPolicy.Date.Value;
-
-            unixTimestamp = deprecationDate.ToUnixTimeSeconds();
-
-            headers[Deprecation] = $"@{unixTimestamp}";
+            headers[Deprecation] = when.ToUnixTimeSeconds().ToString( "'@'0", CultureInfo.InvariantCulture );
         }
 
         AddLinkHeaders( headers, deprecationPolicy.Links );

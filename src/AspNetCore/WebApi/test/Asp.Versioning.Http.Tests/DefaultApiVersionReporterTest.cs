@@ -61,7 +61,7 @@ public class DefaultApiVersionReporterTest
         reporter.Report( response.Object, model );
 
         // assert
-        long unixTimestamp = (int) deprecationDate.Subtract( new DateTime( 1970, 1, 1 ) ).TotalSeconds;
+        var unixTimestamp = deprecationDate.ToUnixTimeSeconds();
 
         headers["api-supported-versions"].Should().Equal( "1.0, 2.0" );
         headers["api-deprecated-versions"].Should().Equal( "0.9" );

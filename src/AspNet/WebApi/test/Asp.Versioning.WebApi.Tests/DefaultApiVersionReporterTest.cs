@@ -51,7 +51,8 @@ public class DefaultApiVersionReporterTest
         // assert
         var headers = response.Headers;
 
-        long unixTimestamp = (int) deprecationDate.Subtract( new DateTime( 1970, 1, 1 ) ).TotalSeconds;
+        // This line uses an explicit calculation of the unix timestamp to surface any bugs in the backport of ToUnixTimeSeconds.
+        var unixTimestamp = (long) deprecationDate.Subtract( new DateTime( 1970, 1, 1 ) ).TotalSeconds;
 
         headers.GetValues( "api-supported-versions" ).Should().Equal( "1.0, 2.0" );
         headers.GetValues( "api-deprecated-versions" ).Should().Equal( "0.9" );

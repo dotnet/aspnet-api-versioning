@@ -16,8 +16,6 @@ public static class HttpResponseMessageExtensions
     private const string Deprecation = nameof( Deprecation );
     private const string Link = nameof( Link );
 
-    private static readonly DateTime unixEpoch = new DateTime( 1970, 1, 1 );
-
     /// <summary>
     /// Writes the sunset policy to the specified HTTP response.
     /// </summary>
@@ -50,14 +48,11 @@ public static class HttpResponseMessageExtensions
 
         var headers = response.Headers;
 
-        if ( deprecationPolicy.Date.HasValue )
+        if ( deprecationPolicy.Date is { } when )
         {
-            long unixTimestamp;
-            DateTimeOffset deprecationDate = deprecationPolicy.Date.Value;
+            var unixTimestamp = when.ToUnixTimeSeconds();
 
-            unixTimestamp = (int) deprecationDate.Subtract( unixEpoch ).TotalSeconds;
-
-            headers.Add( Deprecation, $"@{unixTimestamp}" );
+            headers.Add( Deprecation, unixTimestamp.ToString( "'@'0" ) );
         }
 
         AddLinkHeaders( headers, deprecationPolicy.Links );

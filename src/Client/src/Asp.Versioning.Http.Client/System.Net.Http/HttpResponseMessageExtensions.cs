@@ -18,6 +18,10 @@ public static class HttpResponseMessageExtensions
     private const string Deprecation = nameof( Deprecation );
     private const string Link = nameof( Link );
 
+#if NETSTANDARD1_1
+    private static readonly DateTime UnixEpoch = new DateTime( 1970, 1, 1 );
+#endif
+
     /// <summary>
     /// Gets an API sunset policy from the HTTP response.
     /// </summary>
@@ -89,12 +93,20 @@ public static class HttpResponseMessageExtensions
 
             foreach ( var value in values )
             {
-                var split = value.Trim( '@' );
-                if ( long.TryParse( split, out var unixTimestamp ) )
+                if ( value.Length < 2 || value[0] != '@' )
+                {
+                    continue;
+                }
+
+#if NETSTANDARD
+                if ( long.TryParse( value.Substring( 1 ), out var unixTimestamp ) )
+#else
+                if ( long.TryParse( value.AsSpan()[1..], out var unixTimestamp ) )
+#endif
                 {
                     DateTimeOffset parsed;
-#if NETSTANDARD
-                    parsed = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(unixTimestamp);
+#if NETSTANDARD1_1
+                    parsed = UnixEpoch + TimeSpan.FromSeconds( unixTimestamp );
 #else
                     parsed = DateTimeOffset.FromUnixTimeSeconds( unixTimestamp );
 #endif
