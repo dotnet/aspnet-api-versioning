@@ -3,10 +3,11 @@
 namespace Asp.Versioning;
 
 using System.Collections.ObjectModel;
+using System.Globalization;
 
-internal abstract class LinkList : Collection<LinkHeaderValue>
+internal sealed class LinkList( string relationType ) : Collection<LinkHeaderValue>
 {
-    public LinkList() { }
+    private readonly string relationType = relationType;
 
     protected override void InsertItem( int index, LinkHeaderValue item )
     {
@@ -20,5 +21,12 @@ internal abstract class LinkList : Collection<LinkHeaderValue>
         base.SetItem( index, item );
     }
 
-    protected abstract void EnsureRelationType( LinkHeaderValue item );
+    private void EnsureRelationType( LinkHeaderValue item )
+    {
+        if ( !item.RelationType.Equals( relationType, StringComparison.OrdinalIgnoreCase ) )
+        {
+            var message = string.Format( CultureInfo.CurrentCulture, Format.InvalidRelationType, relationType );
+            throw new ArgumentException( message, nameof( item ) );
+        }
+    }
 }

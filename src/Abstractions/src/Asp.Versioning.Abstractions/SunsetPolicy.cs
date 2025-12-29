@@ -14,7 +14,7 @@ public class SunsetPolicy
     /// </summary>
     public SunsetPolicy()
     {
-        links = new SunsetLinkList();
+        links = new LinkList( "sunset" );
     }
 
     /// <summary>
@@ -63,15 +63,4 @@ public class SunsetPolicy
     /// links might be provided for different languages or different formats such as a HTML page
     /// or a JSON file.</remarks>
     public IList<LinkHeaderValue> Links => links;
-
-    internal sealed class SunsetLinkList : LinkList
-    {
-        protected override void EnsureRelationType( LinkHeaderValue item )
-        {
-            if ( !item.RelationType.Equals( "sunset", StringComparison.OrdinalIgnoreCase ) )
-            {
-                throw new ArgumentException( SR.InvalidSunsetRelationType, nameof( item ) );
-            }
-        }
-    }
 }

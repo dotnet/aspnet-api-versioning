@@ -141,10 +141,7 @@
   <data name="InvalidOrMalformedHeader" xml:space="preserve">
     <value>The header contains invalid or missing values.</value>
   </data>
-  <data name="InvalidSunsetRelationType" xml:space="preserve">
-    <value>The relation type for a sunset policy link must be "sunset".</value>
-  </data>
-  <data name="InvalidDeprecationRelationType" xml:space="preserve">
-    <value>The relation type for a deprecation policy link must be "deprecation".</value>
+  <data name="InvalidRelationType" xml:space="preserve">
+    <value>The relation type for a {0} policy link must be "{0}".</value>
   </data>
 </root>

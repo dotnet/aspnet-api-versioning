@@ -14,7 +14,7 @@ public class DeprecationPolicy
     /// </summary>
     public DeprecationPolicy()
     {
-        links = new DeprecationLinkList();
+        links = new LinkList( "deprecation" );
     }
 
     /// <summary>
@@ -63,15 +63,4 @@ public class DeprecationPolicy
     /// links might be provided for different languages or different formats such as a HTML page
     /// or a JSON file.</remarks>
     public IList<LinkHeaderValue> Links => links;
-
-    internal sealed class DeprecationLinkList : LinkList
-    {
-        protected override void EnsureRelationType( LinkHeaderValue item )
-        {
-            if ( !item.RelationType.Equals( "deprecation", StringComparison.OrdinalIgnoreCase ) )
-            {
-                throw new ArgumentException( SR.InvalidDeprecationRelationType, nameof( item ) );
-            }
-        }
-    }
 }

@@ -134,20 +134,11 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The relation type for a sunset policy link must be &quot;sunset&quot;..
+        ///   Looks up a localized string similar to The relation type for a {0} policy link must be &quot;{0}&quot;..
         /// </summary>
-        internal static string InvalidSunsetRelationType {
+        internal static string InvalidRelationType {
             get {
-                return ResourceManager.GetString("InvalidSunsetRelationType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The relation type for a deprecation policy link must be &quot;deprecation&quot;..
-        /// </summary>
-        internal static string InvalidDeprecationRelationType {
-            get {
-                return ResourceManager.GetString("InvalidDeprecationRelationType", resourceCulture);
+                return ResourceManager.GetString("InvalidRelationType", resourceCulture);
             }
         }
     }
