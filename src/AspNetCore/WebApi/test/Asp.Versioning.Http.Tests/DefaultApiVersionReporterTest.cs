@@ -78,7 +78,7 @@ public class DefaultApiVersionReporterTest
                        ] );
     }
 
-    private sealed class TestSunsetPolicyManager : ISunsetPolicyManager
+    private sealed class TestSunsetPolicyManager : IPolicyManager<SunsetPolicy>
     {
         private readonly DateTimeOffset sunsetDate;
 
@@ -99,7 +99,7 @@ public class DefaultApiVersionReporterTest
         }
     }
 
-    private sealed class TestDeprecationPolicyManager : IDeprecationPolicyManager
+    private sealed class TestDeprecationPolicyManager : IPolicyManager<DeprecationPolicy>
     {
         private readonly DateTimeOffset deprecationDate;
 

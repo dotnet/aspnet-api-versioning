@@ -35,11 +35,11 @@ internal static class DependencyResolverExtensions
         configuration.DependencyResolver.GetService<IProblemDetailsFactory>() ??
         configuration.ApiVersioningServices().GetRequiredService<IProblemDetailsFactory>();
 
-    internal static ISunsetPolicyManager GetSunsetPolicyManager( this HttpConfiguration configuration ) =>
-        configuration.DependencyResolver.GetService<ISunsetPolicyManager>() ??
-        configuration.ApiVersioningServices().GetRequiredService<ISunsetPolicyManager>();
+    internal static IPolicyManager<SunsetPolicy> GetSunsetPolicyManager( this HttpConfiguration configuration ) =>
+        configuration.DependencyResolver.GetService<IPolicyManager<SunsetPolicy>>() ??
+        configuration.ApiVersioningServices().GetRequiredService<IPolicyManager<SunsetPolicy>>();
 
-    internal static IDeprecationPolicyManager GetDeprecationPolicyManager( this HttpConfiguration configuration ) =>
-        configuration.DependencyResolver.GetService<IDeprecationPolicyManager>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IDeprecationPolicyManager>();
+    internal static IPolicyManager<DeprecationPolicy> GetDeprecationPolicyManager( this HttpConfiguration configuration ) =>
+        configuration.DependencyResolver.GetService<IPolicyManager<DeprecationPolicy>>() ??
+        configuration.ApiVersioningServices().GetRequiredService<IPolicyManager<DeprecationPolicy>>();
 }

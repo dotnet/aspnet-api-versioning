@@ -8,7 +8,7 @@ public class ISunsetPolicyManagerExtensionsTest
     public void try_get_policy_should_get_global_policy_by_version()
     {
         // arrange
-        var manager = new Mock<ISunsetPolicyManager>();
+        var manager = new Mock<IPolicyManager<SunsetPolicy>>();
         var version = ApiVersion.Default;
         var expected = new SunsetPolicy();
 
@@ -26,7 +26,7 @@ public class ISunsetPolicyManagerExtensionsTest
     public void try_get_policy_should_get_global_policy_by_name()
     {
         // arrange
-        var manager = new Mock<ISunsetPolicyManager>();
+        var manager = new Mock<IPolicyManager<SunsetPolicy>>();
         var expected = new SunsetPolicy();
 
         manager.Setup( m => m.TryGetPolicy( "Test", default, out expected ) )
@@ -43,7 +43,7 @@ public class ISunsetPolicyManagerExtensionsTest
     public void resolve_policy_should_return_most_specific_result()
     {
         // arrange
-        var manager = new Mock<ISunsetPolicyManager>();
+        var manager = new Mock<IPolicyManager<SunsetPolicy>>();
         var expected = new SunsetPolicy();
         var other = new SunsetPolicy();
 
@@ -61,7 +61,7 @@ public class ISunsetPolicyManagerExtensionsTest
     public void resolve_policy_should_fall_back_to_global_result()
     {
         // arrange
-        var manager = new Mock<ISunsetPolicyManager>();
+        var manager = new Mock<IPolicyManager<SunsetPolicy>>();
         var expected = new SunsetPolicy();
         var other = new SunsetPolicy();
 

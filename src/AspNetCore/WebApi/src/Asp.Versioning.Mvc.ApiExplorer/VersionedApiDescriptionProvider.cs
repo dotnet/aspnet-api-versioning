@@ -26,14 +26,14 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="VersionedApiDescriptionProvider"/> class.
     /// </summary>
-    /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
-    /// <param name="deprecationPolicyManager">The <see cref="IDeprecationPolicyManager">manager</see> used to resolve deprecation policies.</param>
+    /// <param name="sunsetPolicyManager">The <see cref="IPolicyManager{TPolicy}">manager</see> used to resolve sunset policies.</param>
+    /// <param name="deprecationPolicyManager">The <see cref="IPolicyManager{TPolicy}">manager</see> used to resolve deprecation policies.</param>
     /// <param name="modelMetadataProvider">The <see cref="IModelMetadataProvider">provider</see> used to retrieve model metadata.</param>
     /// <param name="options">The <see cref="IOptions{TOptions}">container</see> of configured
     /// <see cref="ApiExplorerOptions">API explorer options</see>.</param>
     public VersionedApiDescriptionProvider(
-        ISunsetPolicyManager sunsetPolicyManager,
-        IDeprecationPolicyManager deprecationPolicyManager,
+        IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+        IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
         IModelMetadataProvider modelMetadataProvider,
         IOptions<ApiExplorerOptions> options )
         : this(
@@ -48,8 +48,8 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     // intentionally hiding IInlineConstraintResolver from public signature until ASP.NET Core fixes their bug
     // BUG: https://github.com/dotnet/aspnetcore/issues/41773
     internal VersionedApiDescriptionProvider(
-        ISunsetPolicyManager sunsetPolicyManager,
-        IDeprecationPolicyManager deprecationPolicyManager,
+        IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+        IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
         IModelMetadataProvider modelMetadataProvider,
         IInlineConstraintResolver constraintResolver,
         IOptions<ApiExplorerOptions> options )
@@ -70,14 +70,14 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// <summary>
     /// Gets the manager used to resolve sunset policies.
     /// </summary>
-    /// <value>The associated <see cref="ISunsetPolicyManager">sunset policy manager</see>.</value>
-    protected ISunsetPolicyManager SunsetPolicyManager { get; }
+    /// <value>The associated <see cref="IPolicyManager{TPolicy}">sunset policy manager</see>.</value>
+    protected IPolicyManager<SunsetPolicy> SunsetPolicyManager { get; }
 
     /// <summary>
     /// Gets the manager used to resolve deprecation policies.
     /// </summary>
-    /// <value>The associated <see cref="IDeprecationPolicyManager">deprecation policy manager</see>.</value>
-    protected IDeprecationPolicyManager DeprecationPolicyManager { get; }
+    /// <value>The associated <see cref="IPolicyManager{TPolicy}">deprecation policy manager</see>.</value>
+    protected IPolicyManager<DeprecationPolicy> DeprecationPolicyManager { get; }
 
     /// <summary>
     /// Gets the options associated with the API explorer.

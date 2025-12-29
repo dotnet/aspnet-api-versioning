@@ -19,14 +19,14 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// </summary>
     /// <param name="providers">The <see cref="IEnumerable{T}">sequence</see> of
     /// <see cref="IApiVersionMetadataCollationProvider">API version metadata collation providers.</see>.</param>
-    /// <param name="sunsetPolicyManager">The <see cref="ISunsetPolicyManager">manager</see> used to resolve sunset policies.</param>
-    /// <param name="deprecationPolicyManager">The <see cref="IDeprecationPolicyManager">manager</see> used to resolve deprecation policies.</param>
+    /// <param name="sunsetPolicyManager">The <see cref="IPolicyManager{TPolicy}">manager</see> used to resolve sunset policies.</param>
+    /// <param name="deprecationPolicyManager">The <see cref="IPolicyManager{TPolicy}">manager</see> used to resolve deprecation policies.</param>
     /// <param name="apiExplorerOptions">The <see cref="IOptions{TOptions}">container</see> of configured
     /// <see cref="ApiExplorerOptions">API explorer options</see>.</param>
     public DefaultApiVersionDescriptionProvider(
         IEnumerable<IApiVersionMetadataCollationProvider> providers,
-        ISunsetPolicyManager sunsetPolicyManager,
-        IDeprecationPolicyManager deprecationPolicyManager,
+        IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+        IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
         IOptions<ApiExplorerOptions> apiExplorerOptions )
     {
         collection = new( Describe, providers ?? throw new ArgumentNullException( nameof( providers ) ) );
@@ -38,14 +38,14 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     /// <summary>
     /// Gets the manager used to resolve sunset policies.
     /// </summary>
-    /// <value>The associated <see cref="ISunsetPolicyManager">sunset policy manager</see>.</value>
-    protected ISunsetPolicyManager SunsetPolicyManager { get; }
+    /// <value>The associated <see cref="IPolicyManager{TPolicy}">sunset policy manager</see>.</value>
+    protected IPolicyManager<SunsetPolicy> SunsetPolicyManager { get; }
 
     /// <summary>
     /// Gets the manager used to resolve deprecation policies.
     /// </summary>
-    /// <value>The associated <see cref="IDeprecationPolicyManager">deprecation policy manager</see>.</value>
-    protected IDeprecationPolicyManager DeprecationPolicyManager { get; }
+    /// <value>The associated <see cref="IPolicyManager{TPolicy}">deprecation policy manager</see>.</value>
+    protected IPolicyManager<DeprecationPolicy> DeprecationPolicyManager { get; }
 
     /// <summary>
     /// Gets the options associated with the API explorer.

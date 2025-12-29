@@ -60,8 +60,8 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable(
             Transient<IApiDescriptionProvider, VersionedApiDescriptionProvider>(
                 static sp => new(
-                    sp.GetRequiredService<ISunsetPolicyManager>(),
-                    sp.GetRequiredService<IDeprecationPolicyManager>(),
+                    sp.GetRequiredService<IPolicyManager<SunsetPolicy>>(),
+                    sp.GetRequiredService<IPolicyManager<DeprecationPolicy>>(),
                     sp.GetRequiredService<IModelMetadataProvider>(),
                     sp.GetRequiredService<IInlineConstraintResolver>(),
                     sp.GetRequiredService<IOptions<ApiExplorerOptions>>() ) ) );

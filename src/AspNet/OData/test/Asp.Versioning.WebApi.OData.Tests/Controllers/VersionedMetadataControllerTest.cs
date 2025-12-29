@@ -31,10 +31,10 @@ public class VersionedMetadataControllerTest
         var resolver = new SimpleDependencyResolver( configuration );
 
         resolver.AddService(
-            typeof( ISunsetPolicyManager ),
+            typeof( IPolicyManager<SunsetPolicy> ),
             ( sp, t ) => new SunsetPolicyManager( sp.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions() ) );
         resolver.AddService(
-            typeof( IDeprecationPolicyManager ),
+            typeof( IPolicyManager<DeprecationPolicy> ),
             ( sp, t ) => new DeprecationPolicyManager( sp.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions() ) );
         configuration.DependencyResolver = resolver;
         configuration.AddApiVersioning(

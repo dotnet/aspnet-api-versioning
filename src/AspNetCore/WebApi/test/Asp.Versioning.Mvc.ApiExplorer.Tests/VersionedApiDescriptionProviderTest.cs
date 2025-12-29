@@ -17,8 +17,8 @@ public class VersionedApiDescriptionProviderTest
         var actionProvider = new TestActionDescriptorCollectionProvider();
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var apiExplorer = new VersionedApiDescriptionProvider(
-            Mock.Of<ISunsetPolicyManager>(),
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<SunsetPolicy>>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
@@ -68,13 +68,13 @@ public class VersionedApiDescriptionProviderTest
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var expected = new SunsetPolicy();
         var apiVersion = new ApiVersion( 0.9 );
-        var policyManager = new Mock<ISunsetPolicyManager>();
+        var policyManager = new Mock<IPolicyManager<SunsetPolicy>>();
 
         policyManager.Setup( pm => pm.TryGetPolicy( default, apiVersion, out expected ) ).Returns( true );
 
         var apiExplorer = new VersionedApiDescriptionProvider(
             policyManager.Object,
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
@@ -104,8 +104,8 @@ public class VersionedApiDescriptionProviderTest
         var actionProvider = new TestActionDescriptorCollectionProvider( descriptor );
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var apiExplorer = new VersionedApiDescriptionProvider(
-            Mock.Of<ISunsetPolicyManager>(),
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<SunsetPolicy>>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() ) );
 
@@ -135,8 +135,8 @@ public class VersionedApiDescriptionProviderTest
             FormatGroupName = ( group, version ) => $"{group}-{version}",
         };
         var apiExplorer = new VersionedApiDescriptionProvider(
-            Mock.Of<ISunsetPolicyManager>(),
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<SunsetPolicy>>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             NewModelMetadataProvider(),
             Options.Create( options ) );
 
@@ -217,8 +217,8 @@ public class VersionedApiDescriptionProviderTest
             } );
 
         var apiExplorer = new VersionedApiDescriptionProvider(
-            Mock.Of<ISunsetPolicyManager>(),
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<SunsetPolicy>>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             NewModelMetadataProvider(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 

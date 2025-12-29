@@ -9,8 +9,8 @@ internal static class DescriptionProvider
 {
     internal static ApiVersionDescription[] Describe<T>(
         IReadOnlyList<T> metadata,
-        ISunsetPolicyManager sunsetPolicyManager,
-        IDeprecationPolicyManager deprecationPolicyManager,
+        IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+        IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
         ApiExplorerOptions options )
         where T : IGroupedApiVersionMetadata, IEquatable<T>
     {
@@ -81,8 +81,8 @@ internal static class DescriptionProvider
     private static void AppendDescriptions(
         SortedSet<ApiVersionDescription> descriptions,
         HashSet<GroupedApiVersion> versions,
-        ISunsetPolicyManager sunsetPolicyManager,
-        IDeprecationPolicyManager deprecationPolicyManager,
+        IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+        IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
         ApiExplorerOptions options,
         bool deprecated )
     {

@@ -16,8 +16,8 @@ public class DefaultApiVersionDescriptionProviderTest
                 new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
-            Mock.Of<ISunsetPolicyManager>(),
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<SunsetPolicy>>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
         // act
@@ -40,7 +40,7 @@ public class DefaultApiVersionDescriptionProviderTest
         // arrange
         var expected = new SunsetPolicy();
         var apiVersion = new ApiVersion( 0.9 );
-        var policyManager = new Mock<ISunsetPolicyManager>();
+        var policyManager = new Mock<IPolicyManager<SunsetPolicy>>();
 
         policyManager.Setup( pm => pm.TryGetPolicy( default, apiVersion, out expected ) ).Returns( true );
 
@@ -51,7 +51,7 @@ public class DefaultApiVersionDescriptionProviderTest
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
             policyManager.Object,
-            Mock.Of<IDeprecationPolicyManager>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
 
         // act

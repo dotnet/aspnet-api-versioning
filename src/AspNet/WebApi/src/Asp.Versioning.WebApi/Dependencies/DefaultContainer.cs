@@ -18,8 +18,8 @@ internal sealed class DefaultContainer : IDependencyResolver, IDependencyScope
         container.AddService( typeof( IApiVersionParser ), static ( sc, t ) => ApiVersionParser.Default );
         container.AddService( typeof( IControllerNameConvention ), static ( sc, t ) => ControllerNameConvention.Default );
         container.AddService( typeof( IProblemDetailsFactory ), static ( sc, t ) => new ProblemDetailsFactory() );
-        container.AddService( typeof( ISunsetPolicyManager ), NewSunsetPolicyManager );
-        container.AddService( typeof( IDeprecationPolicyManager ), NewDeprecationPolicyManager );
+        container.AddService( typeof( IPolicyManager<SunsetPolicy> ), NewSunsetPolicyManager );
+        container.AddService( typeof( IPolicyManager<DeprecationPolicy> ), NewDeprecationPolicyManager );
         container.AddService( typeof( IReportApiVersions ), NewApiVersionReporter );
     }
 
@@ -67,10 +67,10 @@ internal sealed class DefaultContainer : IDependencyResolver, IDependencyScope
     private static ApiVersioningOptions GetApiVersioningOptions( IServiceProvider serviceProvider ) =>
         (ApiVersioningOptions) serviceProvider.GetService( typeof( ApiVersioningOptions ) );
 
-    private static ISunsetPolicyManager NewSunsetPolicyManager( IServiceProvider serviceProvider, Type type ) =>
+    private static IPolicyManager<SunsetPolicy> NewSunsetPolicyManager( IServiceProvider serviceProvider, Type type ) =>
         new SunsetPolicyManager( GetApiVersioningOptions( serviceProvider ) );
 
-    private static IDeprecationPolicyManager NewDeprecationPolicyManager( IServiceProvider serviceProvider, Type type ) =>
+    private static IPolicyManager<DeprecationPolicy> NewDeprecationPolicyManager( IServiceProvider serviceProvider, Type type ) =>
         new DeprecationPolicyManager( GetApiVersioningOptions( serviceProvider ) );
 
     private static IReportApiVersions NewApiVersionReporter( IServiceProvider serviceProvider, Type type )
@@ -79,8 +79,8 @@ internal sealed class DefaultContainer : IDependencyResolver, IDependencyScope
 
         if ( options.ReportApiVersions )
         {
-            var sunsetPolicyManager = (ISunsetPolicyManager) serviceProvider.GetService( typeof( ISunsetPolicyManager ) );
-            var deprecationPolicyManager = (IDeprecationPolicyManager) serviceProvider.GetService( typeof( IDeprecationPolicyManager ) );
+            var sunsetPolicyManager = (IPolicyManager<SunsetPolicy>) serviceProvider.GetService( typeof( IPolicyManager<SunsetPolicy> ) );
+            var deprecationPolicyManager = (IPolicyManager<DeprecationPolicy>) serviceProvider.GetService( typeof( IPolicyManager<DeprecationPolicy> ) );
             return new DefaultApiVersionReporter( sunsetPolicyManager, deprecationPolicyManager );
         }
 

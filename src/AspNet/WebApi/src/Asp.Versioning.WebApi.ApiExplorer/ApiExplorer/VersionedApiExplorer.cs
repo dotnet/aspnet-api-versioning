@@ -32,8 +32,8 @@ public class VersionedApiExplorer : IApiExplorer
     private readonly ApiExplorerOptions options;
     private readonly Lazy<ApiDescriptionGroupCollection> apiDescriptionsHolder;
     private IDocumentationProvider? documentationProvider;
-    private ISunsetPolicyManager? sunsetPolicyManager;
-    private IDeprecationPolicyManager? deprecationPolicyManager;
+    private IPolicyManager<SunsetPolicy>? sunsetPolicyManager;
+    private IPolicyManager<DeprecationPolicy>? deprecationPolicyManager;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VersionedApiExplorer"/> class.
@@ -99,8 +99,8 @@ public class VersionedApiExplorer : IApiExplorer
     /// <summary>
     /// Gets or sets the manager used to resolve sunset policies for API descriptions.
     /// </summary>
-    /// <value>The configured <see cref="ISunsetPolicyManager">sunset policy manager</see>.</value>
-    protected ISunsetPolicyManager SunsetPolicyManager
+    /// <value>The configured <see cref="IPolicyManager{TPolicy}">sunset policy manager</see>.</value>
+    protected IPolicyManager<SunsetPolicy> SunsetPolicyManager
     {
         get => sunsetPolicyManager ??= Configuration.GetSunsetPolicyManager();
         set => sunsetPolicyManager = value;
@@ -109,8 +109,8 @@ public class VersionedApiExplorer : IApiExplorer
     /// <summary>
     /// Gets or sets the manager used to resolve deprecation policies for API descriptions.
     /// </summary>
-    /// <value>The configured <see cref="IDeprecationPolicyManager">deprecation policy manager</see>.</value>
-    protected IDeprecationPolicyManager DeprecationPolicyManager
+    /// <value>The configured <see cref="IPolicyManager{TPolicy}">deprecation policy manager</see>.</value>
+    protected IPolicyManager<DeprecationPolicy> DeprecationPolicyManager
     {
         get => deprecationPolicyManager ??= Configuration.GetDeprecationPolicyManager();
         set => deprecationPolicyManager = value;

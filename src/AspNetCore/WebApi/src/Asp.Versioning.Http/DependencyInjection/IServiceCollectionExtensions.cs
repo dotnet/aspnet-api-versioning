@@ -143,8 +143,8 @@ public static partial class IServiceCollectionExtensions
         services.AddSingleton( static sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
         services.AddSingleton( static sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionSelector );
         services.TryAddSingleton<IReportApiVersions, DefaultApiVersionReporter>();
-        services.TryAddSingleton<ISunsetPolicyManager, SunsetPolicyManager>();
-        services.TryAddSingleton<IDeprecationPolicyManager, DeprecationPolicyManager>();
+        services.TryAddSingleton<IPolicyManager<SunsetPolicy>, SunsetPolicyManager>();
+        services.TryAddSingleton<IPolicyManager<DeprecationPolicy>, DeprecationPolicyManager>();
         services.TryAddEnumerable( Transient<IValidateOptions<ApiVersioningOptions>, ValidateApiVersioningOptions>() );
         services.TryAddEnumerable( Transient<IPostConfigureOptions<RouteOptions>, ApiVersioningRouteOptionsSetup>() );
         services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );

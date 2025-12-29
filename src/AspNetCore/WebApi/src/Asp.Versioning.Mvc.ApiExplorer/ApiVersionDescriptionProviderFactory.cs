@@ -11,15 +11,15 @@ using Microsoft.Extensions.Options;
 
 internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescriptionProviderFactory
 {
-    private readonly ISunsetPolicyManager sunsetPolicyManager;
-    private readonly IDeprecationPolicyManager deprecationPolicyManager;
+    private readonly IPolicyManager<SunsetPolicy> sunsetPolicyManager;
+    private readonly IPolicyManager<DeprecationPolicy> deprecationPolicyManager;
     private readonly IApiVersionMetadataCollationProvider[] providers;
     private readonly IEndpointInspector endpointInspector;
     private readonly IOptions<ApiExplorerOptions> options;
 
     public ApiVersionDescriptionProviderFactory(
-        ISunsetPolicyManager sunsetPolicyManager,
-        IDeprecationPolicyManager deprecationPolicyManager,
+        IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+        IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
         IEnumerable<IApiVersionMetadataCollationProvider> providers,
         IEndpointInspector endpointInspector,
         IOptions<ApiExplorerOptions> options )
