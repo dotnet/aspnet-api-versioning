@@ -7,15 +7,33 @@ namespace Asp.Versioning;
 /// </summary>
 public class SunsetPolicy
 {
-    private readonly LinkList links;
+    private LinkList? links;
+
+    /// <summary>
+    /// Gets a read-only list of links that provide information about the sunset policy.
+    /// </summary>
+    /// <value>A read-only list of HTTP links.</value>
+    /// <remarks>If a link is provided, generally only one link is necessary; however, additional
+    /// links might be provided for different languages or different formats such as a HTML page
+    /// or a JSON file.</remarks>
+    public IList<LinkHeaderValue> Links => links ??= new( "sunset" );
+
+    /// <summary>
+    /// Gets a value indicating whether the sunset policy has any associated links.
+    /// </summary>
+    /// <value>True if the sunset policy has associated links; otherwise, false.</value>
+    public bool HasLinks => links is not null && links.Count > 0;
+
+    /// <summary>
+    /// Gets the date and time when the API version will be sunset.
+    /// </summary>
+    /// <value>The date and time when the API version will be sunset, if any.</value>
+    public DateTimeOffset? Date { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SunsetPolicy"/> class.
     /// </summary>
-    public SunsetPolicy()
-    {
-        links = new LinkList( "sunset" );
-    }
+    public SunsetPolicy() { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SunsetPolicy"/> class.
@@ -29,7 +47,7 @@ public class SunsetPolicy
 
         if ( link is not null )
         {
-            links.Add( link );
+            Links.Add( link );
         }
     }
 
@@ -37,30 +55,5 @@ public class SunsetPolicy
     /// Initializes a new instance of the <see cref="SunsetPolicy"/> class.
     /// </summary>
     /// <param name="link">The link which provides information about the sunset policy.</param>
-    public SunsetPolicy( LinkHeaderValue link )
-        : this()
-    {
-        links.Add( link );
-    }
-
-    /// <summary>
-    /// Gets the date and time when the API version will be sunset.
-    /// </summary>
-    /// <value>The date and time when the API version will be sunset, if any.</value>
-    public DateTimeOffset? Date { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether the sunset policy has any associated links.
-    /// </summary>
-    /// <value>True if the sunset policy has associated links; otherwise, false.</value>
-    public bool HasLinks => links.Count > 0;
-
-    /// <summary>
-    /// Gets a read-only list of links that provide information about the sunset policy.
-    /// </summary>
-    /// <value>A read-only list of HTTP links.</value>
-    /// <remarks>If a link is provided, generally only one link is necessary; however, additional
-    /// links might be provided for different languages or different formats such as a HTML page
-    /// or a JSON file.</remarks>
-    public IList<LinkHeaderValue> Links => links;
+    public SunsetPolicy( LinkHeaderValue link ) => Links.Add( link );
 }
