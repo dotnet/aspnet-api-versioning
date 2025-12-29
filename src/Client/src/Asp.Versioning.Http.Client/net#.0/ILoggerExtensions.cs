@@ -19,7 +19,7 @@ internal static partial class ILoggerExtensions
         SunsetPolicy sunsetPolicy )
     {
         var sunsetDate = FormatDate( sunsetPolicy.Date );
-        var additionalInfo = FormatLinks( sunsetPolicy.Links );
+        var additionalInfo = FormatLinks( sunsetPolicy );
 
         ApiVersionDeprecated(
             logger,
@@ -46,7 +46,7 @@ internal static partial class ILoggerExtensions
         SunsetPolicy sunsetPolicy )
     {
         var sunsetDate = FormatDate( sunsetPolicy.Date );
-        var additionalInfo = FormatLinks( sunsetPolicy.Links );
+        var additionalInfo = FormatLinks( sunsetPolicy );
 
         NewApiVersionAvailable(
             logger,
@@ -69,6 +69,16 @@ internal static partial class ILoggerExtensions
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static string FormatDate( DateTimeOffset? date ) =>
         date.HasValue ? date.Value.ToString( CultureInfo.CurrentCulture ) : "<unspecified>";
+
+    private static string[] FormatLinks( SunsetPolicy sunsetPolicy )
+    {
+        if ( !sunsetPolicy.HasLinks )
+        {
+            return [];
+        }
+
+        return FormatLinks( sunsetPolicy.Links );
+    }
 
     private static string[] FormatLinks( IList<LinkHeaderValue> links )
     {
