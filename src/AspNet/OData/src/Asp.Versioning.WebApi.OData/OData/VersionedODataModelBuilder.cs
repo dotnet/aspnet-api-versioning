@@ -108,7 +108,7 @@ public partial class VersionedODataModelBuilder
         if ( ( supported == null || supported.Count == 0 ) &&
              ( deprecated == null || deprecated.Count == 0 ) )
         {
-            ConfigureMetadataController( new[] { Options.DefaultApiVersion }, Enumerable.Empty<ApiVersion>() );
+            ConfigureMetadataController( [Options.DefaultApiVersion], [] );
         }
         else
         {
@@ -121,18 +121,18 @@ public partial class VersionedODataModelBuilder
         {
             if ( deprecated == null )
             {
-                return Array.Empty<ApiVersion>();
+                return [];
             }
 
-            return deprecated.ToArray();
+            return [.. deprecated];
         }
         else if ( deprecated == null )
         {
-            return supported.ToArray();
+            return [.. supported];
         }
 
         supported.UnionWith( deprecated );
-        return supported.ToArray();
+        return [.. supported];
     }
 
     /// <summary>

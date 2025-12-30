@@ -57,7 +57,7 @@ public class NamespaceParser
 
         if ( string.IsNullOrEmpty( type.Namespace ) )
         {
-            return Array.Empty<ApiVersion>();
+            return [];
         }
 
 #if NETSTANDARD
@@ -114,11 +114,11 @@ public class NamespaceParser
         {
             if ( version is null )
             {
-                return new[] { result };
+                return [result];
             }
             else if ( versions is null )
             {
-                return new[] { version, result };
+                return [version, result];
             }
             else
             {
@@ -129,11 +129,11 @@ public class NamespaceParser
 
         if ( version is null )
         {
-            return Array.Empty<ApiVersion>();
+            return [];
         }
         else if ( versions is null )
         {
-            return new[] { version };
+            return [version];
         }
 
         return versions;

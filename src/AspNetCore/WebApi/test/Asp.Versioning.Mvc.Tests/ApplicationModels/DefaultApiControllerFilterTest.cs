@@ -12,7 +12,7 @@ public class DefaultApiControllerFilterTest
     public void apply_should_not_filter_list_without_specifications()
     {
         // arrange
-        var filter = new DefaultApiControllerFilter( Enumerable.Empty<IApiControllerSpecification>() );
+        var filter = new DefaultApiControllerFilter( [] );
         var controllerType = typeof( ControllerBase ).GetTypeInfo();
         var attributes = Array.Empty<object>();
         var controllers = new List<ControllerModel>()
@@ -40,7 +40,7 @@ public class DefaultApiControllerFilterTest
         specification.Setup( s => s.IsSatisfiedBy( It.Is<ControllerModel>( m => m.ControllerType.Equals( controllerBaseType ) ) ) ).Returns( true );
         specification.Setup( s => s.IsSatisfiedBy( It.Is<ControllerModel>( m => m.ControllerType.Equals( controllerType ) ) ) ).Returns( false );
 
-        var filter = new DefaultApiControllerFilter( new[] { specification.Object } );
+        var filter = new DefaultApiControllerFilter( [specification.Object] );
         var attributes = Array.Empty<object>();
         var controllers = new List<ControllerModel>()
             {

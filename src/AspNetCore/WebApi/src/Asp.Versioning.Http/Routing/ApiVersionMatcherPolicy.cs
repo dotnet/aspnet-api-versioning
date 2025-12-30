@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Buffers;
 using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -354,11 +353,11 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 return default;
             }
 
-            model = new( Enumerable.Empty<ApiVersion>(), deprecated );
+            model = new( [], deprecated );
         }
         else if ( deprecated == null )
         {
-            model = new( supported, Enumerable.Empty<ApiVersion>() );
+            model = new( supported, [] );
         }
         else
         {
@@ -476,8 +475,8 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             IEnumerable<IApiVersionMetadataCollationProvider> providers,
             IOptions<ApiVersioningOptions> options )
     {
-        private readonly IApiVersionMetadataCollationProvider[] providers = providers.ToArray();
-        private readonly object syncRoot = new();
+        private readonly IApiVersionMetadataCollationProvider[] providers = [.. providers];
+        private readonly Lock syncRoot = new();
         private IReadOnlyList<ApiVersion>? items;
         private int version;
 
@@ -490,7 +489,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                     return items;
                 }
 
-                lock ( syncRoot )
+                using ( syncRoot.EnterScope() )
                 {
                     var currentVersion = ComputeVersion();
 
@@ -525,7 +524,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                         versions.Add( options.Value.DefaultApiVersion );
                     }
 
-                    items = versions.ToArray();
+                    items = [.. versions];
                     version = currentVersion;
                 }
 

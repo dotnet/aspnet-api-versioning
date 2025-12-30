@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
  <PropertyGroup>
+  <TargetFramework>net10.0</TargetFramework>
   <Nullable>enable</Nullable>
  </PropertyGroup>
 
  <ItemGroup>
-   <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />
+  <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />
  </ItemGroup>
 
 </Project>

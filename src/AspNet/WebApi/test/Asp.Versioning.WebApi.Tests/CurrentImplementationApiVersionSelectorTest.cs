@@ -8,7 +8,7 @@ public class CurrentImplementationApiVersionSelectorTest
 {
     [Theory]
     [ClassData( typeof( MaxSelectVersionData ) )]
-    public void select_version_should_return_max_api_version( IEnumerable<ApiVersion> supportedVersions, IEnumerable<ApiVersion> deprecatedVersions, ApiVersion expectedVersion )
+    public void select_version_should_return_max_api_version( ApiVersion[] supportedVersions, ApiVersion[] deprecatedVersions, ApiVersion expectedVersion )
     {
         // arrange
         var options = new ApiVersioningOptions() { DefaultApiVersion = new ApiVersion( 42, 0 ) };

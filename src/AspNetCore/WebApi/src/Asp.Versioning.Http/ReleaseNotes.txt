@@ -1,5 +1,1 @@
-﻿Fixed assuming default version with version-neutral ([#1083](https://github.com/dotnet/aspnet-api-versioning/issues/1083))
-Fixed missing 'code' member on error responses ([#1091](https://github.com/dotnet/aspnet-api-versioning/issues/1091))
-Fixed invalidation of valid routing candidates ([#1101](https://github.com/dotnet/aspnet-api-versioning/issues/1101))
-Fixed reporting versions when request is unspecified or malformed ([#1120](https://github.com/dotnet/aspnet-api-versioning/issues/1120))
-Fixed replacing DI registered IProblemDetailsWriter in-place ([#1135](https://github.com/dotnet/aspnet-api-versioning/issues/1135))
+﻿

@@ -19,7 +19,7 @@ public sealed class DefaultApiControllerFilter : IApiControllerFilter
     /// <see cref="IApiControllerSpecification">specifications</see> used by the filter
     /// to identify API controllers.</param>
     public DefaultApiControllerFilter( IEnumerable<IApiControllerSpecification> specifications ) =>
-        this.specifications = specifications.ToList();
+        this.specifications = [.. specifications];
 
     /// <inheritdoc />
     public IList<ControllerModel> Apply( IList<ControllerModel> controllers )

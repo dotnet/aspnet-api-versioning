@@ -10,7 +10,7 @@ using System.Reflection;
 
 internal sealed class TestApplicationPart : ApplicationPart, IApplicationPartTypeProvider
 {
-    public TestApplicationPart() => Types = Enumerable.Empty<TypeInfo>();
+    public TestApplicationPart() => Types = [];
 
     public TestApplicationPart( params TypeInfo[] types ) => Types = types;
 

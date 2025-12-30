@@ -12,12 +12,11 @@ public class ApiVersionActionSelectorTest
 {
     [Theory]
     [MemberData( nameof( SelectActionVersionData ) )]
-    public void select_action_version_should_return_expected_result(
-        IReadOnlyList<HttpActionDescriptor> candidates,
-        string version,
-        HttpActionDescriptor expectedAction )
+    public void select_action_version_should_return_expected_result( string version, int index )
     {
         // arrange
+        var candidates = NewCandidates();
+        var expectedAction = candidates[index];
         var configuration = new HttpConfiguration();
         var request = new HttpRequestMessage( Get, "http://localhost/api/test?api-version=" + version );
         var context = new HttpControllerContext() { Request = request };
@@ -33,22 +32,19 @@ public class ApiVersionActionSelectorTest
         selectedAction.Should().Be( expectedAction );
     }
 
-    public static IEnumerable<object[]> SelectActionVersionData
-    {
-        get
-        {
-            var candidates = new List<HttpActionDescriptor>()
-            {
-                CreateActionDescriptor( "1.0" ),
-                CreateActionDescriptor( "2.0" ),
-                CreateActionDescriptor( "3.0" ),
-            };
+    private static HttpActionDescriptor[] NewCandidates() =>
+    [
+        CreateActionDescriptor( "1.0" ),
+        CreateActionDescriptor( "2.0" ),
+        CreateActionDescriptor( "3.0" ),
+    ];
 
-            yield return new object[] { candidates, "1.0", candidates[0] };
-            yield return new object[] { candidates, "2.0", candidates[1] };
-            yield return new object[] { candidates, "3.0", candidates[2] };
-        }
-    }
+    public static TheoryData<string, int> SelectActionVersionData => new()
+    {
+        { "1.0", 0 },
+        { "2.0", 1 },
+        { "3.0", 2 },
+    };
 
     private static HttpActionDescriptor CreateActionDescriptor( string version )
     {
@@ -60,10 +56,10 @@ public class ApiVersionActionSelectorTest
         var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( attribute.Versions[0] ) );
 
         controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
-                            .Returns( () => new Collection<IApiVersionProvider>() );
+                            .Returns( () => [] );
 
         actionDescriptor.Setup( ad => ad.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) )
-                        .Returns( () => new Collection<IApiVersionProvider>() { attribute } );
+                        .Returns( () => [attribute] );
 
         var newActionDescriptor = actionDescriptor.Object;
 

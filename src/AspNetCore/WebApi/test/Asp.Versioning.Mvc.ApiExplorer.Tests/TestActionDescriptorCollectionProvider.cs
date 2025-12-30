@@ -38,7 +38,7 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
         AddOrderActionDescriptors( actions );
         AddPeopleActionDescriptors( actions );
 
-        return new( actions.ToArray(), 0 );
+        return new( [.. actions], 0 );
     }
 
     private static void AddOrderActionDescriptors( List<ActionDescriptor> actions )
@@ -47,63 +47,63 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
         actions.Add(
             NewActionDescriptor(
                 "GET-orders/{id}",
-                declared: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) },
-                deprecated: new ApiVersion[] { new( 0, 9 ) } ) );
+                declared: [new( 0, 9 ), new( 1, 0 )],
+                supported: [new( 1, 0 )],
+                deprecated: [new( 0, 9 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "POST-orders",
-                declared: new ApiVersion[] { new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) } ) );
+                declared: [new( 1, 0 )],
+                supported: [new( 1, 0 )] ) );
 
         // api version 2.0
         actions.Add(
             NewActionDescriptor(
                 "GET-orders",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "GET-orders/{id}",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "POST-orders",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         // api version 3.0
         actions.Add(
             NewActionDescriptor(
                 "GET-orders",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "GET-orders/{id}",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "POST-orders",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "DELETE-orders/{id}",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
     }
 
     private static void AddPeopleActionDescriptors( List<ActionDescriptor> actions )
@@ -112,56 +112,56 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
         actions.Add(
             NewActionDescriptor(
                 "GET-people/{id}",
-                declared: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) },
-                deprecated: new ApiVersion[] { new( 0, 9 ) } ) );
+                declared: [new( 0, 9 ), new( 1, 0 )],
+                supported: [new( 1, 0 )],
+                deprecated: [new( 0, 9 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "POST-people",
-                declared: new ApiVersion[] { new( 1, 0 ) },
-                supported: new ApiVersion[] { new( 1, 0 ) } ) );
+                declared: [new( 1, 0 )],
+                supported: [new( 1, 0 )] ) );
 
         // api version 2.0
         actions.Add(
             NewActionDescriptor(
                 "GET-people",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "GET-people/{id}",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "POST-people",
-                declared: new ApiVersion[] { new( 2, 0 ) },
-                supported: new ApiVersion[] { new( 2, 0 ) } ) );
+                declared: [new( 2, 0 )],
+                supported: [new( 2, 0 )] ) );
 
         // api version 3.0
         actions.Add(
             NewActionDescriptor(
                 "GET-people",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "GET-people/{id}",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
 
         actions.Add(
             NewActionDescriptor(
                 "POST-people",
-                declared: new ApiVersion[] { new( 3, 0 ) },
-                supported: new ApiVersion[] { new( 3, 0 ) },
-                advertised: new ApiVersion[] { new( 4, 0 ) } ) );
+                declared: [new( 3, 0 )],
+                supported: [new( 3, 0 )],
+                advertised: [new( 4, 0 )] ) );
     }
 
     private static ActionDescriptor NewActionDescriptor(
@@ -177,14 +177,14 @@ internal sealed class TestActionDescriptorCollectionProvider : IActionDescriptor
             new ApiVersionModel(
                 declared,
                 supported,
-                deprecated ?? Enumerable.Empty<ApiVersion>(),
-                advertised ?? Enumerable.Empty<ApiVersion>(),
-                advertisedDeprecated ?? Enumerable.Empty<ApiVersion>() ) );
+                deprecated ?? [],
+                advertised ?? [],
+                advertisedDeprecated ?? [] ) );
 
         return new()
         {
             DisplayName = displayName,
-            EndpointMetadata = new[] { metadata },
+            EndpointMetadata = [metadata],
         };
     }
 }

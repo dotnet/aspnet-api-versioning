@@ -16,10 +16,10 @@ public class when_orders_is_v3 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders?api-version=3.0" );
-        var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
-        orders.Should().BeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v3.0" } } );
+        orders.Should().BeEquivalentTo( [new { Id = 1, Customer = "Customer v3.0" }] );
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class when_orders_is_v3 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders/42?api-version=3.0" );
-        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v3.0" } );

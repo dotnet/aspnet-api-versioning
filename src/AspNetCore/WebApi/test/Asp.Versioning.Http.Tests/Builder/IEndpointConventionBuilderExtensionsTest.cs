@@ -68,11 +68,11 @@ public class IEndpointConventionBuilderExtensionsTest
                 .BeEquivalentTo(
                     new ApiVersionMetadata(
                         new ApiVersionModel(
-                            new ApiVersion[] { new( 0.9 ), new( 1.0 ) },
-                            new ApiVersion[] { new( 1.0 ) },
-                            new ApiVersion[] { new( 0.9 ) },
-                            new ApiVersion[] { new( 2.0 ) },
-                            new ApiVersion[] { new( 2.0, "beta" ) } ),
+                            [new( 0.9 ), new( 1.0 )],
+                            [new( 1.0 )],
+                            [new( 0.9 )],
+                            [new( 2.0 )],
+                            [new( 2.0, "beta" )] ),
                         ApiVersionModel.Empty ) );
     }
 
@@ -120,17 +120,17 @@ public class IEndpointConventionBuilderExtensionsTest
                     .BeEquivalentTo(
                         new ApiVersionMetadata(
                             new ApiVersionModel(
-                                new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                                new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                                Array.Empty<ApiVersion>(),
-                                Array.Empty<ApiVersion>(),
-                                Array.Empty<ApiVersion>() ),
+                                [new( 1.0 ), new( 2.0 )],
+                                [new( 1.0 ), new( 2.0 )],
+                                [],
+                                [],
+                                [] ),
                             new ApiVersionModel(
-                                new ApiVersion[] { new( 0.9 ), new( 1.0 ) },
-                                new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                                new ApiVersion[] { new( 0.9 ) },
-                                Array.Empty<ApiVersion>(),
-                                Array.Empty<ApiVersion>() ) ) );
+                                [new( 0.9 ), new( 1.0 )],
+                                [new( 1.0 ), new( 2.0 )],
+                                [new( 0.9 )],
+                                [],
+                                [] ) ) );
 
         endpoints[1].Metadata
                    .OfType<ApiVersionMetadata>()
@@ -139,17 +139,17 @@ public class IEndpointConventionBuilderExtensionsTest
                    .BeEquivalentTo(
                        new ApiVersionMetadata(
                            new ApiVersionModel(
-                               new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                               new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                               Array.Empty<ApiVersion>(),
-                               Array.Empty<ApiVersion>(),
-                               Array.Empty<ApiVersion>() ),
+                               [new( 1.0 ), new( 2.0 )],
+                               [new( 1.0 ), new( 2.0 )],
+                               [],
+                               [],
+                               [] ),
                            new ApiVersionModel(
-                               new ApiVersion[] { new( 2.0 ) },
-                               new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                               new ApiVersion[] { new( 0.9 ) },
-                               Array.Empty<ApiVersion>(),
-                               Array.Empty<ApiVersion>() ) ) );
+                               [new( 2.0 )],
+                               [new( 1.0 ), new( 2.0 )],
+                               [new( 0.9 )],
+                               [],
+                               [] ) ) );
     }
 
     [Fact]
@@ -184,11 +184,11 @@ public class IEndpointConventionBuilderExtensionsTest
                     new ApiVersionMetadata(
                         ApiVersionModel.Empty,
                         new ApiVersionModel(
-                            new ApiVersion[] { new( 0.9 ), new( 1.0 ) },
-                            new ApiVersion[] { new( 1.0 ) },
-                            new ApiVersion[] { new( 0.9 ) },
-                            new ApiVersion[] { new( 2.0 ) },
-                            new ApiVersion[] { new( 2.0, "beta" ) } ) ) );
+                            [new( 0.9 ), new( 1.0 )],
+                            [new( 1.0 )],
+                            [new( 0.9 )],
+                            [new( 2.0 )],
+                            [new( 2.0, "beta" )] ) ) );
     }
 
     [Fact]
@@ -225,11 +225,11 @@ public class IEndpointConventionBuilderExtensionsTest
                         new ApiVersionMetadata(
                             ApiVersionModel.Empty,
                             new ApiVersionModel(
-                                new ApiVersion[] { new( 0.9 ), new( 1.0 ) },
-                                new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                                new ApiVersion[] { new( 0.9 ) },
-                                Array.Empty<ApiVersion>(),
-                                Array.Empty<ApiVersion>() ) ) );
+                                [new( 0.9 ), new( 1.0 )],
+                                [new( 1.0 ), new( 2.0 )],
+                                [new( 0.9 )],
+                                [],
+                                [] ) ) );
 
         endpoints[1].Metadata
                     .OfType<ApiVersionMetadata>()
@@ -239,11 +239,11 @@ public class IEndpointConventionBuilderExtensionsTest
                         new ApiVersionMetadata(
                             ApiVersionModel.Empty,
                             new ApiVersionModel(
-                                new ApiVersion[] { new( 2.0 ) },
-                                new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                                new ApiVersion[] { new( 0.9 ) },
-                                Array.Empty<ApiVersion>(),
-                                Array.Empty<ApiVersion>() ) ) );
+                                [new( 2.0 )],
+                                [new( 1.0 ), new( 2.0 )],
+                                [new( 0.9 )],
+                                [],
+                                [] ) ) );
 
         endpoints[2].Metadata
                     .OfType<ApiVersionMetadata>()
@@ -319,7 +319,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        reportApiVersions = endpoint.Metadata.OfType<IReportApiVersions>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.ReportApiVersions();
@@ -345,7 +345,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        versionNeutral = endpoint.Metadata.OfType<IApiVersionNeutral>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.IsApiVersionNeutral();
@@ -371,7 +371,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.HasApiVersion( 1.0 );
@@ -400,7 +400,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        callback( endpoint );
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.HasApiVersion( 1.0 );
@@ -426,7 +426,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.HasDeprecatedApiVersion( 0.9 );
@@ -455,7 +455,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        callback( endpoint );
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.HasDeprecatedApiVersion( 0.9 );
@@ -481,7 +481,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.AdvertisesApiVersion( 42.0 );
@@ -510,7 +510,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        callback( endpoint );
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.AdvertisesApiVersion( 42.0 );
@@ -536,7 +536,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.AdvertisesDeprecatedApiVersion( 42.0, "rc" );
@@ -565,7 +565,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        callback( endpoint );
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.AdvertisesDeprecatedApiVersion( 42.0, "rc" );
@@ -591,7 +591,7 @@ public class IEndpointConventionBuilderExtensionsTest
                        provider = endpoint.Metadata.OfType<IApiVersionProvider>().First();
                    } );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         route.MapToApiVersion( 2.0 );
@@ -614,7 +614,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var mapToApiVersion = () => route.MapToApiVersion( 2.0 );
@@ -632,7 +632,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var hasApiVersion = () => route.HasApiVersion( 2.0 );
@@ -650,7 +650,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var hasDeprecatedApiVersion = () => route.HasDeprecatedApiVersion( 2.0 );
@@ -668,7 +668,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var advertisesApiVersion = () => route.AdvertisesApiVersion( 2.0 );
@@ -686,7 +686,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var advertisesDeprecatedApiVersion = () => route.AdvertisesDeprecatedApiVersion( 2.0 );
@@ -704,7 +704,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var isApiVersionNeutral = () => route.IsApiVersionNeutral();
@@ -722,7 +722,7 @@ public class IEndpointConventionBuilderExtensionsTest
         conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
                    .Callback( ( Action<EndpointBuilder> callback ) => callback( Mock.Of<EndpointBuilder>() ) );
 
-        var route = new RouteHandlerBuilder( new[] { conventions.Object } );
+        var route = new RouteHandlerBuilder( [conventions.Object] );
 
         // act
         var reportsApiVersions = () => route.ReportApiVersions();

@@ -22,7 +22,9 @@ public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
 
         // act
         var response = await GetAsync( $"api/values?api-version={apiVersion}" );
-        var content = await response.EnsureSuccessStatusCode().Content.ReadAsAsync<IDictionary<string, string>>();
+        var content = await response.EnsureSuccessStatusCode()
+                                    .Content
+                                    .ReadAsAsync<IDictionary<string, string>>( CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0, 3.0" );
@@ -42,7 +44,7 @@ public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/values?api-version=4.0" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -57,7 +59,7 @@ public class when_using_a_query_string_and_split_into_two_types : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/values" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

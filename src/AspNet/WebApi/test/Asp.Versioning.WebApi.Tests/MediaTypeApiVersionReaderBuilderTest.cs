@@ -80,7 +80,7 @@ public class MediaTypeApiVersionReaderBuilderTest
         var reader = new MediaTypeApiVersionReaderBuilder()
             .Parameter( "v" )
             .Parameter( "api.ver" )
-            .Select( ( request, versions ) => versions.Count == 0 ? versions : new[] { versions[versions.Count - 1] } )
+            .Select( ( request, versions ) => versions.Count == 0 ? versions : [versions[versions.Count - 1]] )
             .Build();
         var request = new HttpRequestMessage( Get, "http://tempuri.org" );
 

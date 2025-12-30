@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Net.Http;
 
 using Asp.Versioning;
@@ -61,7 +63,7 @@ public static class HttpResponseMessageExtensions
     private static void AddLinkHeaders( HttpResponseHeaders headers, IList<LinkHeaderValue> links )
     {
         var values = headers.TryGetValues( Link, out var existing )
-            ? existing is ICollection<string> collection && !collection.IsReadOnly ? collection : new List<string>( existing )
+            ? existing is ICollection<string> collection && !collection.IsReadOnly ? collection : [.. existing]
             : new List<string>( capacity: links.Count );
 
         for ( var i = 0; i < links.Count; i++ )

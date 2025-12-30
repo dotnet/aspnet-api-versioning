@@ -8,9 +8,9 @@ public class ApiVersionModelExtensionsTest
     public void aggregate_should_merge_api_version_models()
     {
         // arrange
-        var model1 = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ) }, new[] { new ApiVersion( 0, 9 ) } );
-        var model2 = new ApiVersionModel( new[] { new ApiVersion( 2, 0 ) }, Enumerable.Empty<ApiVersion>() );
-        var expected = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) }, new[] { new ApiVersion( 0, 9 ) } );
+        var model1 = new ApiVersionModel( [new ApiVersion( 1, 0 )], [new ApiVersion( 0, 9 )] );
+        var model2 = new ApiVersionModel( [new ApiVersion( 2, 0 )], [] );
+        var expected = new ApiVersionModel( [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 )], [new ApiVersion( 0, 9 )] );
 
         // act
         var aggregatedModel = model1.Aggregate( model2 );
@@ -31,15 +31,15 @@ public class ApiVersionModelExtensionsTest
     public void aggregate_should_merge_api_version_model_sequence()
     {
         // arrange
-        var model = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ) }, new[] { new ApiVersion( 0, 9 ) } );
+        var model = new ApiVersionModel( [new ApiVersion( 1, 0 )], [new ApiVersion( 0, 9 )] );
         var otherModels = new[]
         {
-                new ApiVersionModel( new[] { new ApiVersion( 2, 0 ) }, Enumerable.Empty<ApiVersion>() ),
-                new ApiVersionModel( new[] { new ApiVersion( 3, 0 ) }, new[] { new ApiVersion( 3, 0, "Alpha" ) } ),
+                new ApiVersionModel( [new ApiVersion( 2, 0 )], [] ),
+                new ApiVersionModel( [new ApiVersion( 3, 0 )], [new ApiVersion( 3, 0, "Alpha" )] ),
         };
         var expected = new ApiVersionModel(
-            new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) },
-            new[] { new ApiVersion( 0, 9 ), new ApiVersion( 3, 0, "Alpha" ) } );
+            [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 )],
+            [new ApiVersion( 0, 9 ), new ApiVersion( 3, 0, "Alpha" )] );
 
         // act
         var aggregatedModel = model.Aggregate( otherModels );
@@ -60,9 +60,9 @@ public class ApiVersionModelExtensionsTest
     public void aggregate_should_not_merge_deprecated_api_version_when_also_supported()
     {
         // arrange
-        var model1 = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ) }, Enumerable.Empty<ApiVersion>() );
-        var model2 = new ApiVersionModel( new[] { new ApiVersion( 2, 0 ) }, new[] { new ApiVersion( 1, 0 ) } );
-        var expected = new ApiVersionModel( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) }, Enumerable.Empty<ApiVersion>() );
+        var model1 = new ApiVersionModel( [new ApiVersion( 1, 0 )], [] );
+        var model2 = new ApiVersionModel( [new ApiVersion( 2, 0 )], [new ApiVersion( 1, 0 )] );
+        var expected = new ApiVersionModel( [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 )], [] );
 
         // act
         var aggregatedModel = model1.Aggregate( model2 );

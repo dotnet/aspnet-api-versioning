@@ -64,7 +64,7 @@ internal sealed class ParsedRouteAdapter<T> : IParsedRoute where T : notnull
             adapters.Add( adapter );
         }
 
-        return adapters.ToArray();
+        return [.. adapters];
     }
 
     private static Func<T, IEnumerable<object>> NewPathSegmentsAccessor()

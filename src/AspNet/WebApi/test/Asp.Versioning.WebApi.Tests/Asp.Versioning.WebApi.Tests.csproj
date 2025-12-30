@@ -1,13 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>net452;net472</TargetFrameworks>
+  <TargetFrameworks>net472</TargetFrameworks>
   <RootNamespace>Asp.Versioning</RootNamespace>
  </PropertyGroup>
-
- <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-  <Compile Include="$(BackportDir)Array.cs" Visible="false" />
- </ItemGroup>
  
  <ItemGroup>
    <ProjectReference Include="..\..\src\Asp.Versioning.WebApi\Asp.Versioning.WebApi.csproj" />

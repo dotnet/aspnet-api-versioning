@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Web.Http;
 
 using Asp.Versioning;
@@ -91,7 +93,7 @@ public class HttpConfigurationExtensionsTest
         var serviceProvider = GetODataRootContainer( configuration, key );
         var routingConventions = (IEnumerable<IODataRoutingConvention>) serviceProvider.GetService( typeof( IEnumerable<IODataRoutingConvention> ) );
 
-        return routingConventions.ToArray();
+        return [.. routingConventions];
     }
 
     [ApiVersion( "1.0" )]

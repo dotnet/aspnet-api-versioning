@@ -76,7 +76,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     /// <value>A <see cref="IReadOnlyList{T}">read-only list</see> of
     /// <see cref="IODataQueryOptionsConvention">OData query option conventions</see>.</value>
     protected IReadOnlyList<IODataQueryOptionsConvention> Conventions =>
-        conventions ??= Options.AdHocModelBuilder.ModelConfigurations.OfType<IODataQueryOptionsConvention>().ToArray();
+        conventions ??= [.. Options.AdHocModelBuilder.ModelConfigurations.OfType<IODataQueryOptionsConvention>()];
 
     /// <summary>
     /// Gets or sets the order precedence of the current API description provider.
@@ -85,6 +85,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     public int Order { get; protected set; } = BeforeOData;
 
     /// <inheritdoc />
+    [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
     public virtual void OnProvidersExecuting( ApiDescriptionProviderContext context )
     {
         ArgumentNullException.ThrowIfNull( context );
@@ -154,6 +155,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
     private static void MarkAsAdHoc( ODataModelBuilder builder, IEdmModel model ) =>
         model.SetAnnotationValue( model, AdHocAnnotation.Instance );
 
+    [RequiresUnreferencedCode( "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
     private static ApiDescription[] FilterResults(
         IList<ApiDescription> results,
         IReadOnlyList<IODataQueryOptionsConvention> conventions )

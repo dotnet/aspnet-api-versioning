@@ -4,22 +4,41 @@ namespace Asp.Versioning.ApiExplorer;
 
 using Asp.Versioning.Conventions;
 using Asp.Versioning.Simulators;
-using System.Collections;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Http.Tracing;
+using static Asp.Versioning.ApiExplorer.TestConfigurations;
 using static System.Web.Http.RouteParameter;
 
-public class TestConfigurations : IEnumerable<object[]>
+public class TestConfigurations : TheoryData<Kind>
 {
-    public IEnumerator<object[]> GetEnumerator()
+    public enum Kind
     {
-        yield return new object[] { NewConventionRouteConfiguration() };
-        yield return new object[] { NewDirectRouteConfiguration() };
+        /// <summary>
+        /// Indicates convention-based routing.
+        /// </summary>
+        ConventionBased,
+
+        /// <summary>
+        /// Indicates direct routing.
+        /// </summary>
+        DirectRouteBased,
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public TestConfigurations()
+    {
+        Add( Kind.ConventionBased );
+        Add( Kind.DirectRouteBased );
+    }
+
+    public static HttpConfiguration Get(Kind kind) =>
+        kind switch
+        {
+            Kind.ConventionBased => NewConventionRouteConfiguration(),
+            Kind.DirectRouteBased => NewDirectRouteConfiguration(),
+            _ => throw new ArgumentOutOfRangeException( nameof( kind ) ),
+        };
 
     private static HttpConfiguration NewConventionRouteConfiguration()
     {

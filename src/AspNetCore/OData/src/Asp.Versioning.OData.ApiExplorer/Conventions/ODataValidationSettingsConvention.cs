@@ -14,6 +14,7 @@ using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 public partial class ODataValidationSettingsConvention
 {
     /// <inheritdoc />
+    [RequiresUnreferencedCode( "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
     public virtual void ApplyTo( ApiDescription apiDescription )
     {
         ArgumentNullException.ThrowIfNull( apiDescription );
@@ -24,7 +25,7 @@ public partial class ODataValidationSettingsConvention
         }
 
         var context = new ODataQueryOptionDescriptionContext( apiDescription, ValidationSettings );
-        var queryOptions = GetQueryOptions( Settings.DefaultQuerySettings!, context );
+        var queryOptions = GetQueryOptions( Settings.QueryConfigurations, context );
         var visitor = new ODataAttributeVisitor( context, queryOptions );
 
         visitor.Visit( apiDescription );

@@ -7,9 +7,9 @@ internal sealed class ApiVersionDescriptionCollection<T>(
     IEnumerable<IApiVersionMetadataCollationProvider> collators )
     where T : IGroupedApiVersionMetadata, IGroupedApiVersionMetadataFactory<T>
 {
-    private readonly object syncRoot = new();
+    private readonly Lock syncRoot = new();
     private readonly Func<IReadOnlyList<T>, IReadOnlyList<ApiVersionDescription>> describe = describe;
-    private readonly IApiVersionMetadataCollationProvider[] collators = collators.ToArray();
+    private readonly IApiVersionMetadataCollationProvider[] collators = [.. collators];
     private IReadOnlyList<ApiVersionDescription>? items;
     private int version;
 
@@ -22,7 +22,7 @@ internal sealed class ApiVersionDescriptionCollection<T>(
                 return items;
             }
 
-            lock ( syncRoot )
+            using ( syncRoot.EnterScope() )
             {
                 var currentVersion = ComputeVersion();
 

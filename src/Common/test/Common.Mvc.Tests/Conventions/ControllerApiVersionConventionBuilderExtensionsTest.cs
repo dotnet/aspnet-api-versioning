@@ -128,7 +128,7 @@ public class ControllerApiVersionConventionBuilderExtensionsTest
         controllerBuilder.HasApiVersions( apiVersions );
 
         // assert
-        controllerBuilder.ProtectedSupportedVersions.Should().BeEquivalentTo( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) } );
+        controllerBuilder.ProtectedSupportedVersions.Should().BeEquivalentTo( [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 )] );
     }
 
     [Fact]
@@ -248,7 +248,7 @@ public class ControllerApiVersionConventionBuilderExtensionsTest
         controllerBuilder.HasDeprecatedApiVersions( apiVersions );
 
         // assert
-        controllerBuilder.ProtectedDeprecatedVersions.Should().BeEquivalentTo( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) } );
+        controllerBuilder.ProtectedDeprecatedVersions.Should().BeEquivalentTo( [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 )] );
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public class ControllerApiVersionConventionBuilderExtensionsTest
         controllerBuilder.AdvertisesApiVersions( apiVersions );
 
         // assert
-        controllerBuilder.ProtectedAdvertisedVersions.Should().BeEquivalentTo( new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) } );
+        controllerBuilder.ProtectedAdvertisedVersions.Should().BeEquivalentTo( [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 )] );
     }
 
     [Fact]

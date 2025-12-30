@@ -20,17 +20,17 @@ public class DefaultApiVersionReporterTest
         var request = new HttpRequestMessage();
         var response = new HttpResponseMessage( OK ) { RequestMessage = request };
         var apiModel = new ApiVersionModel(
-            declaredVersions: new ApiVersion[] { new( 0.9 ), new( 1.0 ), new( 2.0 ) },
-            supportedVersions: new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-            deprecatedVersions: new[] { new ApiVersion( 0.9 ) },
-            advertisedVersions: Enumerable.Empty<ApiVersion>(),
-            deprecatedAdvertisedVersions: Enumerable.Empty<ApiVersion>() );
+            declaredVersions: [new( 0.9 ), new( 1.0 ), new( 2.0 )],
+            supportedVersions: [new( 1.0 ), new( 2.0 )],
+            deprecatedVersions: [new ApiVersion( 0.9 )],
+            advertisedVersions: [],
+            deprecatedAdvertisedVersions: [] );
         var endpointModel = new ApiVersionModel(
-            declaredVersions: new ApiVersion[] { new( 1.0 ) },
-            supportedVersions: new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-            deprecatedVersions: new[] { new ApiVersion( 0.9 ) },
-            advertisedVersions: Enumerable.Empty<ApiVersion>(),
-            deprecatedAdvertisedVersions: Enumerable.Empty<ApiVersion>() );
+            declaredVersions: [new( 1.0 )],
+            supportedVersions: [new( 1.0 ), new( 2.0 )],
+            deprecatedVersions: [new ApiVersion( 0.9 )],
+            advertisedVersions: [],
+            deprecatedAdvertisedVersions: [] );
         var metadata = new ApiVersionMetadata( apiModel, endpointModel, "Test" );
 
         request.SetConfiguration( configuration );

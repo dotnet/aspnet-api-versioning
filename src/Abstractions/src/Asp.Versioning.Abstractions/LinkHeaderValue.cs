@@ -276,7 +276,7 @@ public partial class LinkHeaderValue
     {
         if ( input == null )
         {
-            return new List<LinkHeaderValue>();
+            return [];
         }
 
         var list = new List<LinkHeaderValue>( capacity: input.Count );

@@ -24,7 +24,7 @@ public class ApiVersioningPolicyBuilder : IApiVersioningPolicyBuilder
             return ( deprecationPolicies.Values.ToArray() as IReadOnlyList<T> )!;
         }
 
-        return Array.Empty<T>();
+        return [];
     }
 
     /// <inheritdoc />

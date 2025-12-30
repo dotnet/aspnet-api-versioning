@@ -7,7 +7,7 @@ public sealed class AllowedRolesAttribute : Attribute
 {
     public AllowedRolesAttribute( params string[] allowedRoles )
     {
-        AllowedRoles = allowedRoles.ToList();
+        AllowedRoles = [.. allowedRoles];
     }
 
     public IReadOnlyList<string> AllowedRoles { get; }

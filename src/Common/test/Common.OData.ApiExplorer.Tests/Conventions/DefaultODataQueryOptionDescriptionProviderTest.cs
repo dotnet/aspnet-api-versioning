@@ -200,61 +200,58 @@ public class DefaultODataQueryOptionDescriptionProviderTest
         description.Should().Be( expected );
     }
 
-    public static IEnumerable<object[]> FilterDescriptionData
+    public static TheoryData<
+        int,
+        string[],
+        AllowedLogicalOperators,
+        AllowedArithmeticOperators,
+        AllowedFunctions,
+        string> FilterDescriptionData => new()
     {
-        get
         {
-            yield return new object[]
-            {
-                0,
-                Array.Empty<string>(),
-                AllowedLogicalOperators.None,
-                AllowedArithmeticOperators.None,
-                AllowedFunctions.None,
-                "Restricts the set of items returned.",
-            };
-
-            yield return new object[]
-            {
-                2,
-                Array.Empty<string>(),
-                AllowedLogicalOperators.None,
-                AllowedArithmeticOperators.None,
-                AllowedFunctions.None,
-                "Restricts the set of items returned. The maximum number of expressions is 2.",
-            };
-
-            yield return new object[]
-            {
-                3,
-                Array.Empty<string>(),
-                AllowedLogicalOperators.All,
-                Add | Subtract,
-                AllowedFunctions.None,
-                "Restricts the set of items returned. The maximum number of expressions is 3. The allowed arithmetic operators are: add, sub.",
-            };
-
-            yield return new object[]
-            {
-                5,
-                new[] { "name", "price", "quantity" },
-                And,
-                AllowedArithmeticOperators.All,
-                Contains | StartsWith | EndsWith,
-                "Restricts the set of items returned. The maximum number of expressions is 5. The allowed logical operators are: and. The allowed functions are: startswith, endswith, contains. The allowed properties are: name, price, quantity.",
-            };
-
-            yield return new object[]
-            {
-                0,
-                new[] { "category", "price", "quantity" },
-                AllowedLogicalOperators.All,
-                AllowedArithmeticOperators.All,
-                AllFunctions,
-                "Restricts the set of items returned. The allowed properties are: category, price, quantity.",
-            };
-        }
-    }
+            0,
+            [],
+            AllowedLogicalOperators.None,
+            AllowedArithmeticOperators.None,
+            AllowedFunctions.None,
+            "Restricts the set of items returned."
+        },
+        {
+            2,
+            [],
+            AllowedLogicalOperators.None,
+            AllowedArithmeticOperators.None,
+            AllowedFunctions.None,
+            "Restricts the set of items returned. The maximum number of expressions is 2."
+        },
+        {
+            3,
+            [],
+            AllowedLogicalOperators.All,
+            Add | Subtract,
+            AllowedFunctions.None,
+            "Restricts the set of items returned. The maximum number of expressions is 3. " +
+            "The allowed arithmetic operators are: add, sub."
+        },
+        {
+            5,
+            new[] { "name", "price", "quantity" },
+            And,
+            AllowedArithmeticOperators.All,
+            Contains | StartsWith | EndsWith,
+            "Restricts the set of items returned. The maximum number of expressions is 5. " +
+            "The allowed logical operators are: and. The allowed functions are: startswith, endswith, contains. " +
+            "The allowed properties are: name, price, quantity."
+        },
+        {
+            0,
+            new[] { "category", "price", "quantity" },
+            AllowedLogicalOperators.All,
+            AllowedArithmeticOperators.All,
+            AllFunctions,
+            "Restricts the set of items returned. The allowed properties are: category, price, quantity."
+        },
+    };
 
     private static string FormatMessage( string message, string paramName ) =>
         new ArgumentException( message, paramName ).Message;

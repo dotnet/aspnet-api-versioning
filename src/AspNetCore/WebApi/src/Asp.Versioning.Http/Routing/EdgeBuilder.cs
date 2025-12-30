@@ -44,7 +44,7 @@ internal sealed class EdgeBuilder
     public IReadOnlyList<PolicyNodeEdge> Build()
     {
         routePatterns.TrimExcess();
-        return edges.Select( edge => new PolicyNodeEdge( edge.Key, edge.Value ) ).ToArray();
+        return [.. edges.Select( edge => new PolicyNodeEdge( edge.Key, edge.Value ) )];
     }
 
     public void Add( RouteEndpoint endpoint )

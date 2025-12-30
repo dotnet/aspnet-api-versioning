@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Web.Http;
 
 using Asp.Versioning;
@@ -79,9 +81,10 @@ public class HttpActionDescriptorExtensionsTest
 
     [Theory]
     [MemberData( nameof( ApiVersionData ) )]
-    public void get_api_versions_should_return_expected_action_descriptor_results( HttpActionDescriptor actionDescriptor, IEnumerable<ApiVersion> expectedVersions )
+    public void get_api_versions_should_return_expected_action_descriptor_results( Type controllerType, string actionName, ApiVersion[] expectedVersions )
     {
         // arrange
+        var actionDescriptor = NewAction( controllerType, actionName, expectedVersions );
 
         // act
         var declaredVersions = actionDescriptor.GetApiVersionMetadata().Map( Explicit ).DeclaredApiVersions;
@@ -90,39 +93,23 @@ public class HttpActionDescriptorExtensionsTest
         declaredVersions.Should().BeEquivalentTo( expectedVersions );
     }
 
-    public static IEnumerable<object[]> ApiVersionData
+    private static HttpActionDescriptor NewAction( Type controllerType, string methodName, ApiVersion[] expected )
     {
-        get
+        var method = controllerType.GetMethod( methodName );
+        var metadata = new ApiVersionMetadata(
+            ApiVersionModel.Empty,
+            new ApiVersionModel( expected, [], [], [] ) );
+        var controllerDescriptor = new HttpControllerDescriptor( new HttpConfiguration(), "Tests", controllerType );
+
+        return new ReflectedHttpActionDescriptor( controllerDescriptor, method )
         {
-            var runs = new[]
-            {
-                Tuple.Create( typeof( TestController ), nameof( TestController.Get ), Array.Empty<ApiVersion>() ),
-                Tuple.Create( typeof( TestVersion2Controller ), nameof( TestVersion2Controller.Get3 ), new[] { new ApiVersion( 3, 0 ) } ),
-            };
-            return CreateActionDescriptorData( runs );
-        }
+            Properties = { [typeof( ApiVersionMetadata )] = metadata },
+        };
     }
 
-    private static IEnumerable<object[]> CreateActionDescriptorData( Tuple<Type, string, ApiVersion[]>[] runs )
+    public static TheoryData<Type, string, ApiVersion[]> ApiVersionData => new()
     {
-        foreach ( var run in runs )
-        {
-            var controllerType = run.Item1;
-            var method = controllerType.GetMethod( run.Item2 );
-            var expected = run.Item3;
-            var metadata = new ApiVersionMetadata(
-                ApiVersionModel.Empty,
-                new ApiVersionModel(
-                    expected,
-                    Enumerable.Empty<ApiVersion>(),
-                    Enumerable.Empty<ApiVersion>(),
-                    Enumerable.Empty<ApiVersion>() ) );
-            var controllerDescriptor = new HttpControllerDescriptor( new HttpConfiguration(), "Tests", controllerType );
-            var actionDescriptor = new ReflectedHttpActionDescriptor( controllerDescriptor, method )
-            {
-                Properties = { [typeof( ApiVersionMetadata )] = metadata },
-            };
-            yield return new object[] { actionDescriptor, expected };
-        }
-    }
+        { typeof( TestController ), nameof( TestController.Get ), [] },
+        { typeof( TestVersion2Controller ), nameof( TestVersion2Controller.Get3 ), [new(3, 0)] },
+    };
 }

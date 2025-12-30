@@ -56,7 +56,7 @@ internal sealed class PathContentSegmentAdapter<T> : IPathContentSegment where T
             adapters.Add( adapter );
         }
 
-        return adapters.ToArray();
+        return [.. adapters];
     }
 
     private static Func<T, bool> NewCatchAllAccessor()

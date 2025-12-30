@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
@@ -17,11 +19,14 @@ using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 [CLSCompliant( false )]
 public static class IApiVersioningBuilderExtensions
 {
+    private const string TrimmingMessage = "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming";
+
     /// <summary>
     /// Adds the API versioning extensions for the API Explorer with OData.
     /// </summary>
     /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
+    [RequiresUnreferencedCode( TrimmingMessage )]
     public static IApiVersioningBuilder AddODataApiExplorer( this IApiVersioningBuilder builder )
     {
         ArgumentNullException.ThrowIfNull( builder );
@@ -35,6 +40,7 @@ public static class IApiVersioningBuilderExtensions
     /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
     /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
+    [RequiresUnreferencedCode( TrimmingMessage )]
     public static IApiVersioningBuilder AddODataApiExplorer( this IApiVersioningBuilder builder, Action<ODataApiExplorerOptions> setupAction )
     {
         ArgumentNullException.ThrowIfNull( builder );
@@ -43,6 +49,7 @@ public static class IApiVersioningBuilderExtensions
         return builder;
     }
 
+    [RequiresUnreferencedCode( TrimmingMessage )]
     private static void AddApiExplorerServices( IApiVersioningBuilder builder )
     {
         var services = builder.Services;

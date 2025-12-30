@@ -81,7 +81,7 @@ public class MediaTypeApiVersionBuilderTest
         var reader = new MediaTypeApiVersionReaderBuilder()
             .Parameter( "v" )
             .Parameter( "api.ver" )
-            .Select( ( request, versions ) => versions.Count == 0 ? versions : new[] { versions[^1] } )
+            .Select( ( request, versions ) => versions.Count == 0 ? versions : [versions[^1]] )
             .Build();
         var request = new Mock<HttpRequest>();
         var headers = new HeaderDictionary()

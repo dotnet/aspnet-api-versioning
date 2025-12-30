@@ -25,7 +25,7 @@ public class when_accessing_a_view_using_convention_routing : AcceptanceTest, IC
         };
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
         var mediaType = response.EnsureSuccessStatusCode().Content.Headers.ContentType.MediaType;
 
         // assert

@@ -10,6 +10,18 @@ using System.Threading.Tasks;
 
 public class ErrorObjectWriterTest
 {
+    private static IOptions<JsonOptions> JsonOptions => Options.Create(
+            new JsonOptions()
+            {
+                SerializerOptions =
+                {
+                    TypeInfoResolverChain =
+                    {
+                        ErrorObjectWriter.DefaultJsonSerializerContext,
+                    },
+                },
+            } );
+
     [Theory]
     [InlineData( "https://docs.api-versioning.org/problems#unsupported" )]
     [InlineData( "https://docs.api-versioning.org/problems#unspecified" )]
@@ -18,7 +30,7 @@ public class ErrorObjectWriterTest
     public void can_write_should_be_true_for_api_versioning_problem_types( string type )
     {
         // arrange
-        var writer = new ErrorObjectWriter( Options.Create( new JsonOptions() ) );
+        var writer = new ErrorObjectWriter( JsonOptions );
         var context = new ProblemDetailsContext()
         {
             HttpContext = new DefaultHttpContext(),
@@ -40,7 +52,7 @@ public class ErrorObjectWriterTest
     {
         // arrange
         const string BadRequest = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
-        var writer = new ErrorObjectWriter( Options.Create( new JsonOptions() ) );
+        var writer = new ErrorObjectWriter( JsonOptions );
         var context = new ProblemDetailsContext()
         {
             HttpContext = new DefaultHttpContext(),
@@ -75,12 +87,14 @@ public class ErrorObjectWriterTest
             },
         };
 
-        var writer = new ErrorObjectWriter( Options.Create( new JsonOptions() ) );
+        var writer = new ErrorObjectWriter( JsonOptions );
         using var stream = new MemoryStream();
+        var feature = new StreamResponseBodyFeature( stream );
         var response = new Mock<HttpResponse>() { CallBase = true };
         var httpContext = new Mock<HttpContext>() { CallBase = true };
 
-        response.SetupGet( r => r.Body ).Returns( stream );
+        response.SetupProperty( r => r.Body, feature.Stream );
+        response.SetupGet( r => r.BodyWriter ).Returns( feature.Writer );
         response.SetupProperty( r => r.ContentType );
         response.SetupGet( r => r.HttpContext ).Returns( () => httpContext.Object );
         httpContext.SetupGet( c => c.Response ).Returns( response.Object );
@@ -104,7 +118,7 @@ public class ErrorObjectWriterTest
         // act
         await writer.WriteAsync( context );
 
-        await stream.FlushAsync();
+        await stream.FlushAsync( TestContext.Current.CancellationToken );
         stream.Position = 0;
 
         var error = await DeserializeByExampleAsync( stream, example );

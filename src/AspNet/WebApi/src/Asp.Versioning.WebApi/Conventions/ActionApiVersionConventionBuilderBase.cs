@@ -48,7 +48,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
                 }
                 else
                 {
-                    emptyVersions = Enumerable.Empty<ApiVersion>();
+                    emptyVersions = [];
                     endpointModel = new(
                         declaredVersions: emptyVersions,
                         inheritedSupported,
@@ -68,7 +68,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             }
             else
             {
-                emptyVersions = Enumerable.Empty<ApiVersion>();
+                emptyVersions = [];
                 endpointModel = new(
                     declaredVersions: mapped,
                     supportedVersions: apiModel.SupportedApiVersions,

@@ -215,7 +215,7 @@ public static class ODataActionQueryOptionsConventionBuilderExtensions
         }
 
         // perf: stop if there are 2+ matches; it's ambiguous
-        methods = methods.Where( m => SignatureMatches( m, argumentTypes ) ).Take( 2 ).ToArray();
+        methods = [.. methods.Where( m => SignatureMatches( m, argumentTypes ) ).Take( 2 )];
 
         if ( methods.Length == 1 )
         {

@@ -1,2 +1,1 @@
-﻿Enable trimming support ([#1094](https://github.com/dotnet/aspnet-api-versioning/issues/1094))
-Fixed exploring version-neutral API version parameter in URL ([#1149](https://github.com/dotnet/aspnet-api-versioning/issues/1149))
+﻿

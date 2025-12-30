@@ -251,7 +251,7 @@ public class VersionedApiExplorer : IApiExplorer
                 var directRouteController = GetDirectRouteController( directRouteCandidates, apiVersion );
                 var apiDescriptionGroup = newApiDescriptions.GetOrAdd( apiVersion, GetGroupName );
                 var descriptionsFromRoute = ( directRouteController != null && directRouteCandidates != null ) ?
-                        ExploreDirectRouteControllers( directRouteController, directRouteCandidates.Select( c => c.ActionDescriptor ).ToArray(), route, apiVersion ) :
+                        ExploreDirectRouteControllers( directRouteController, [.. directRouteCandidates.Select( c => c.ActionDescriptor )], route, apiVersion ) :
                         ExploreRouteControllers( controllerMappings, route, apiVersion );
 
                 apiDescriptionGroup.SunsetPolicy = sunsetPolicy;
@@ -860,14 +860,14 @@ public class VersionedApiExplorer : IApiExplorer
         var supportedRequestBodyFormatters =
             bodyParameter != null ?
             formatters.Where( f => f.CanReadType( bodyParameter.ParameterDescriptor.ParameterType ) ) :
-            Enumerable.Empty<MediaTypeFormatter>();
+            [];
 
         var responseDescription = CreateResponseDescription( actionDescriptor );
         var returnType = responseDescription.ResponseType ?? responseDescription.DeclaredType;
         var supportedResponseFormatters =
             ( returnType != null && returnType != typeof( void ) ) ?
             formatters.Where( f => f.CanWriteType( returnType ) ) :
-            Enumerable.Empty<MediaTypeFormatter>();
+            [];
 
         supportedRequestBodyFormatters = GetInnerFormatters( supportedRequestBodyFormatters );
         supportedResponseFormatters = GetInnerFormatters( supportedResponseFormatters );
@@ -982,7 +982,7 @@ public class VersionedApiExplorer : IApiExplorer
         IParsedRoute parsedRoute,
         IDictionary<string, object> routeDefaults )
     {
-        IList<ApiParameterDescription> parameterDescriptions = new List<ApiParameterDescription>();
+        IList<ApiParameterDescription> parameterDescriptions = [];
         var actionBinding = GetActionBinding( actionDescriptor );
 
         // try get parameter binding information if available
@@ -1115,7 +1115,7 @@ public class VersionedApiExplorer : IApiExplorer
             }
         }
 
-        return new( filteredDescriptions.Values.ToList() );
+        return new( [.. filteredDescriptions.Values] );
     }
 
     private static bool MatchRegexConstraint( IHttpRoute route, string parameterName, string parameterValue )

@@ -88,7 +88,7 @@ public partial class ControllerApiVersionConventionBuilderTTest
         var configuration = new HttpConfiguration();
         var mock = new Mock<HttpControllerDescriptor>() { CallBase = true };
         var controllerDescriptor = mock.Object;
-        var attributes = new Collection<IApiVersionProvider>( typeof( DecoratedController ).GetCustomAttributes().OfType<IApiVersionProvider>().ToList() );
+        var attributes = new Collection<IApiVersionProvider>( [.. typeof( DecoratedController ).GetCustomAttributes().OfType<IApiVersionProvider>()] );
         var controllerBuilder = default( IControllerConventionBuilder<DecoratedController> );
 
         mock.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>() ).Returns( attributes );

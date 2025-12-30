@@ -59,7 +59,7 @@ public class RouteParser
     {
         var routeParserType = Type.GetType( "System.Web.Http.Routing.RouteParser, System.Web.Http", throwOnError: true, ignoreCase: false );
         var routeTemplate = Parameter( typeof( string ), "routeTemplate" );
-        var parse = routeParserType.GetRuntimeMethod( nameof( Parse ), new[] { typeof( string ) } );
+        var parse = routeParserType.GetRuntimeMethod( nameof( Parse ), [typeof( string )] );
         var body = Call( parse, routeTemplate );
         var lambda = Lambda<Func<string, object>>( body, routeTemplate );
 

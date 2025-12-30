@@ -1,40 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
- <PropertyGroup>
-  <FluentAssertionsVersion>6.8.0</FluentAssertionsVersion>
-
-  <!--
-   beware of other versions that may contain SponsorLink
-   REF: https://github.com/moq/moq/issues/1372
-   -->
-  <MoqVersion>4.20.69</MoqVersion>
-  <XunitRunnerVersion>2.5.0</XunitRunnerVersion>
- </PropertyGroup>
-
- <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
-  <FluentAssertionsVersion>5.10.3</FluentAssertionsVersion>
-  <MoqVersion>4.17.2</MoqVersion>
-  <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
- </PropertyGroup>
-
  <ItemGroup Condition=" '$(IsSharedProject)' == 'false' ">
-  <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
-  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.0-*" />
-  <PackageReference Include="Moq" Version="$(MoqVersion)" />
-  <PackageReference Include="xunit" Version="2.5.0" />
-  <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVersion)" />
+  <PackageReference Include="FluentAssertions" Version="8.8.*" />
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.*" />
+  <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.*" />
+  <PackageReference Include="Moq" Version="4.20.69" />
+  <PackageReference Include="xunit.v3.mtp-v2" Version="3.*" />
  </ItemGroup>
 
  <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(DotNetReleaseBasePackageVersion)" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(DotNetReleaseBasePackageVersion).*" />
  </ItemGroup>
 
  <ItemGroup>
   <Using Include="FluentAssertions" />
   <Using Include="Moq" />
   <Using Include="Xunit" />
-  <Using Include="Xunit.Abstractions" />
+  <Using Include="Xunit.Sdk" />
+  <Using Include="Xunit.v3" />
  </ItemGroup>
 
 </Project>

@@ -31,7 +31,7 @@ public class when_using_a_query_string : BasicAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders?api-version=2.0" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -46,7 +46,7 @@ public class when_using_a_query_string : BasicAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

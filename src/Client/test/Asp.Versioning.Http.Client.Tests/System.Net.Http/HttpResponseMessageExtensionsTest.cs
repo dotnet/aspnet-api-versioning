@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Net.Http;
 
 using Asp.Versioning;
@@ -42,12 +44,11 @@ public class HttpResponseMessageExtensionsTest
 
         response.Headers.Add(
             "sunset",
-            new string[]
-            {
+            [
                 date.ToString( "r" ),
                 expected.ToString( "r" ),
                 date.AddDays( 3 ).ToString( "r" ),
-            } );
+            ] );
 
         // act
         var policy = response.ReadSunsetPolicy();
@@ -66,12 +67,11 @@ public class HttpResponseMessageExtensionsTest
 
         response.Headers.Add(
             "link",
-            new[]
-            {
+            [
                 "<swagger.json>; rel=\"openapi\"; type=\"application/json\" title=\"OpenAPI\"",
                 "<policy>; rel=\"sunset\"; type=\"text/html\"",
                 "<docs>; rel=\"info\"; type=\"text/html\" title=\"Documentation\"",
-            } );
+            ] );
 
         // act
         var policy = response.ReadSunsetPolicy();
@@ -177,13 +177,12 @@ public class HttpResponseMessageExtensionsTest
 
         response.Headers.Add(
             "link",
-            new[]
-            {
+            [
                 "<swagger/swagger.json>; rel=\"openapi\"; type=\"application/json\" title=\"OpenAPI\"",
                 "<policy>; rel=\"sunset\"; type=\"text/html\"",
                 "<docs>; rel=\"info\"; type=\"text/html\" title=\"Documentation\"",
                 "<swagger/v1/swagger.json>; rel=\"swagger\"; type=\"application/json\"; api-version=\"1.0\"",
-            } );
+            ] );
 
         // act
         var urls = response.GetOpenApiDocumentUrls();

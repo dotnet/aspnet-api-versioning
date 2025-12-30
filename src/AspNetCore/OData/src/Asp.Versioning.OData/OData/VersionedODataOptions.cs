@@ -139,7 +139,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
 
         if ( apiVersion == null )
         {
-            var model = new ApiVersionModel( mapping.Keys, Array.Empty<ApiVersion>() );
+            var model = new ApiVersionModel( mapping.Keys, [] );
             apiVersion = ApiVersionSelector.SelectVersion( context.Request, model );
 
             if ( apiVersion == null )
@@ -170,7 +170,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
 
         if ( apiVersion == null )
         {
-            var model = new ApiVersionModel( mapping.Keys, Array.Empty<ApiVersion>() );
+            var model = new ApiVersionModel( mapping.Keys, [] );
             apiVersion = await ApiVersionSelector.SelectVersionAsync( context.Request, model, cancellationToken ).ConfigureAwait( false );
 
             if ( apiVersion == null )

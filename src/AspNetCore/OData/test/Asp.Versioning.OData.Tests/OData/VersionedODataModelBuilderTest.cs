@@ -16,7 +16,7 @@ public class VersionedODataModelBuilderTest
         var apiVersion = new ApiVersion( 1, 0 );
         var apiVersionCollectionProvider = Mock.Of<IODataApiVersionCollectionProvider>();
 
-        apiVersionCollectionProvider.ApiVersions = new[] { apiVersion };
+        apiVersionCollectionProvider.ApiVersions = [apiVersion];
 
         var modelConfigurations = Enumerable.Empty<IModelConfiguration>();
         var builder = new VersionedODataModelBuilder( apiVersionCollectionProvider, modelConfigurations )
@@ -41,7 +41,7 @@ public class VersionedODataModelBuilderTest
         var apiVersion = new ApiVersion( 1, 0 );
         var apiVersionCollectionProvider = Mock.Of<IODataApiVersionCollectionProvider>();
 
-        apiVersionCollectionProvider.ApiVersions = new[] { apiVersion, new ApiVersion( 2, 0 ) };
+        apiVersionCollectionProvider.ApiVersions = [apiVersion, new ApiVersion( 2, 0 )];
 
         var modelConfigurations = Enumerable.Empty<IModelConfiguration>();
         var builder = new VersionedODataModelBuilder( apiVersionCollectionProvider, modelConfigurations )

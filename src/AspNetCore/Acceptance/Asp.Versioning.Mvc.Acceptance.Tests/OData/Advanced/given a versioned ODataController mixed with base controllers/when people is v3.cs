@@ -16,11 +16,11 @@ public class when_people_is_v3 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/people?api-version=3.0" );
-        var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         people.value.Should().BeEquivalentTo(
-            new[] { new { id = 1, firstName = "Bill", lastName = "Mei", email = "bill.mei@somewhere.com", phone = "555-555-5555" } },
+            [new { id = 1, firstName = "Bill", lastName = "Mei", email = "bill.mei@somewhere.com", phone = "555-555-5555" }],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -32,7 +32,7 @@ public class when_people_is_v3 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/people/42?api-version=3.0" );
-        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         order.Should().BeEquivalentTo(
@@ -48,7 +48,7 @@ public class when_people_is_v3 : AdvancedAcceptanceTest
 
         // act
         var response = await PatchAsync( $"api/people/42?api-version=3.0", person );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

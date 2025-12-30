@@ -4,7 +4,7 @@
  <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../'))" />
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.2.1" />
+  <PackageReference Include="Microsoft.AspNetCore.OData" Version="10.0.0-*" />
  </ItemGroup>
 
 </Project>

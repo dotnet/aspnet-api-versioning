@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFrameworks>$(DefaultTargetFramework);net452;net472</TargetFrameworks>
+  <TargetFrameworks>$(DefaultTargetFramework);net472</TargetFrameworks>
   <RootNamespace>Asp.Versioning.Http</RootNamespace>
  </PropertyGroup>
 
- <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-  <Compile Remove="net#.0\**\*.cs" />
-  <None Include="net#.0\**\*.cs" />
- </ItemGroup>
-
- <ItemGroup Condition="'$(TargetFramework)' != 'net452'">
-   <PackageReference Include="MELT" Version="0.9.0" />
+ <ItemGroup>
+   <PackageReference Include="MELT" Version="1.1.0" />
  </ItemGroup>
 
  <ItemGroup>

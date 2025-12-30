@@ -25,7 +25,7 @@ public class VersionedODataOptionsTest
         var accessor = Mock.Of<IHttpContextAccessor>();
 
         features.Set<IApiVersioningFeature>( feature );
-        Mock.Get( reader ).Setup( r => r.Read( It.IsAny<HttpRequest>() ) ).Returns( new[] { "2.0" } );
+        Mock.Get( reader ).Setup( r => r.Read( It.IsAny<HttpRequest>() ) ).Returns( ["2.0"] );
         Mock.Get( serviceProvider ).Setup( sp => sp.GetService( typeof( IApiVersionReader ) ) ).Returns( reader );
         Mock.Get( serviceProvider ).Setup( sp => sp.GetService( typeof( IApiVersionParser ) ) ).Returns( ApiVersionParser.Default );
         Mock.Get( context ).SetupGet( c => c.Features ).Returns( features );
@@ -64,7 +64,7 @@ public class VersionedODataOptionsTest
         var accessor = Mock.Of<IHttpContextAccessor>();
 
         features.Set<IApiVersioningFeature>( feature );
-        Mock.Get( reader ).Setup( r => r.Read( It.IsAny<HttpRequest>() ) ).Returns( new[] { "2.0" } );
+        Mock.Get( reader ).Setup( r => r.Read( It.IsAny<HttpRequest>() ) ).Returns( ["2.0"] );
         Mock.Get( serviceProvider ).Setup( sp => sp.GetService( typeof( IApiVersionReader ) ) ).Returns( reader );
         Mock.Get( serviceProvider ).Setup( sp => sp.GetService( typeof( IApiVersionParser ) ) ).Returns( ApiVersionParser.Default );
         Mock.Get( context ).SetupGet( c => c.Features ).Returns( features );

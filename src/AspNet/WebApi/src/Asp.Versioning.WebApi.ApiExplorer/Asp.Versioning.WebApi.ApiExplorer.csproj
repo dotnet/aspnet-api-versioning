@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>7.1.0</VersionPrefix>
-  <AssemblyVersion>7.1.0.0</AssemblyVersion>
+  <VersionPrefix>8.0.0</VersionPrefix>
+  <AssemblyVersion>8.0.0.0</AssemblyVersion>
   <TargetFrameworks>net45;net472</TargetFrameworks>
   <AssemblyTitle>ASP.NET Web API Versioning API Explorer</AssemblyTitle>
   <Description>The API Explorer extensions for ASP.NET Web API Versioning.</Description>

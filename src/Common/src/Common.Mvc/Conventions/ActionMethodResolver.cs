@@ -33,7 +33,7 @@ internal static class ActionMethodResolver
         }
 
         argumentTypes ??= Type.EmptyTypes;
-        methods = methods.Where( m => SignatureMatches( m, argumentTypes ) ).ToArray();
+        methods = [.. methods.Where( m => SignatureMatches( m, argumentTypes ) )];
 
         if ( methods.Length == 1 )
         {

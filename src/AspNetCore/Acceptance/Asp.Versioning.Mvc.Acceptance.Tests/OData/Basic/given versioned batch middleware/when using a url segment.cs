@@ -20,12 +20,12 @@ public class when_using_a_url_segment : BatchAcceptanceTest
             NewGet( "v2/people/42" ) );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();
 
-        var multipart = await response.Content.ReadAsMultipartAsync();
+        var multipart = await response.Content.ReadAsMultipartAsync( CancellationToken );
         var contents = multipart.Contents;
 
         contents.Should().HaveCount( 2 );
@@ -71,12 +71,12 @@ public class when_using_a_url_segment : BatchAcceptanceTest
             NewGet( "v1/orders/42" ) );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();
 
-        var multipart = await response.Content.ReadAsMultipartAsync();
+        var multipart = await response.Content.ReadAsMultipartAsync( CancellationToken );
         var contents = multipart.Contents;
 
         contents.Should().HaveCount( 2 );
@@ -106,7 +106,7 @@ public class when_using_a_url_segment : BatchAcceptanceTest
             NewDelete( "v3/customers/42" ) );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();

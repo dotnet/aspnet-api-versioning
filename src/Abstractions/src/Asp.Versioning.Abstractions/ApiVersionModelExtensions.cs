@@ -29,7 +29,7 @@ public static class ApiVersionModelExtensions
         deprecated.UnionWith( otherVersion.DeprecatedApiVersions );
         deprecated.ExceptWith( supported );
 
-        return new( version, implemented.ToArray(), supported.ToArray(), deprecated.ToArray() );
+        return new( version, [.. implemented], [.. supported], [.. deprecated] );
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public static class ApiVersionModelExtensions
 
         deprecated.ExceptWith( supported );
 
-        return new( version, implemented.ToArray(), supported.ToArray(), deprecated.ToArray() );
+        return new( version, [.. implemented], [.. supported], [.. deprecated] );
     }
 
     /// <summary>

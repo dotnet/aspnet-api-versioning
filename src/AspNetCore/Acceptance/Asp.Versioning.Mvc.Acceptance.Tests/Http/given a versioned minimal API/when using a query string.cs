@@ -19,7 +19,7 @@ public class when_using_a_query_string : AcceptanceTest
 
         // act
         var response = await GetAsync( $"api/values?api-version={version}.0" );
-        var result = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // assert
         result.Should().Be( "Value " + version );
@@ -47,7 +47,7 @@ public class when_using_a_query_string : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/values?api-version=3.0" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -63,7 +63,7 @@ public class when_using_a_query_string : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/values" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -79,7 +79,7 @@ public class when_using_a_query_string : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/values?api-version=abc" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

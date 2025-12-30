@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Net.Http;
 
 using Asp.Versioning;
@@ -21,22 +23,21 @@ public class HttpClientExtensionsTest
         response.Headers.Add( "sunset", date.ToString( "r" ) );
         response.Headers.Add(
             "link",
-            new[]
-            {
+            [
                 "<policy?api-version=1.0>; rel=\"sunset\"; type=\"text/html\"",
                 "<swagger/v1/swagger.json>; rel=\"openapi\"; type=\"application/json\"; api-version=\"1.0\"",
-            } );
+            ] );
         using var server = new TestServer( response );
         var client = new HttpClient( server ) { BaseAddress = new( "http://tempuri.org" ) };
 
         // act
-        var info = await client.GetApiInformationAsync( "/?api-version=1.0" );
+        var info = await client.GetApiInformationAsync( "/?api-version=1.0", cancellationToken: TestContext.Current.CancellationToken );
 
         // assert
         info.Should().BeEquivalentTo(
             new ApiInformation(
-                new[] { new ApiVersion( 2.0 ) },
-                new[] { new ApiVersion( 1.0 ) },
+                [new ApiVersion( 2.0 )],
+                [new ApiVersion( 1.0 )],
                 new( roundtripDate, new( new( "http://tempuri.org/policy?api-version=1.0" ), "sunset" )
                 {
                     Type = "text/html",

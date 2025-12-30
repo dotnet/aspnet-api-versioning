@@ -32,7 +32,7 @@ public class CompositeApiVersionReaderTest
     {
         // arrange
         var query = new Mock<IQueryCollection>();
-        var headers = new HeaderDictionary() { ["api-version"] = new StringValues( new[] { "1.0" } ) };
+        var headers = new HeaderDictionary() { ["api-version"] = new StringValues( ["1.0"] ) };
         var request = new Mock<HttpRequest>();
         var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 
@@ -52,7 +52,7 @@ public class CompositeApiVersionReaderTest
     {
         // arrange
         var query = new Mock<IQueryCollection>();
-        var headers = new HeaderDictionary() { ["api-version"] = new StringValues( new[] { "1.0" } ) };
+        var headers = new HeaderDictionary() { ["api-version"] = new StringValues( ["1.0"] ) };
         var request = new Mock<HttpRequest>();
         var reader = ApiVersionReader.Combine( new QueryStringApiVersionReader(), new HeaderApiVersionReader( "api-version" ) );
 

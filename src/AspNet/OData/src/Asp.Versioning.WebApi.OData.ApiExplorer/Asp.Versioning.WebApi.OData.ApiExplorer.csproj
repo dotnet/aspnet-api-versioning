@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>7.1.1</VersionPrefix>
-  <AssemblyVersion>7.1.0.0</AssemblyVersion>
+  <VersionPrefix>8.0.0</VersionPrefix>
+  <AssemblyVersion>8.0.0.0</AssemblyVersion>
   <TargetFrameworks>net45;net472</TargetFrameworks>
   <RootNamespace>Asp.Versioning</RootNamespace>
   <AssemblyTitle>ASP.NET Web API Versioning API Explorer for OData v4.0</AssemblyTitle>

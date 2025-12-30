@@ -1,3 +1,1 @@
-﻿Enable trimming support ([#1094](https://github.com/dotnet/aspnet-api-versioning/issues/1094))
-Fixed invalid property setter on substituted type ([#1104](https://github.com/dotnet/aspnet-api-versioning/issues/1104))
-Fixed single-quote OData strings within parentheses syntax ([#1152](https://github.com/dotnet/aspnet-api-versioning/issues/1152))
+﻿

@@ -230,7 +230,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
 
         var modelSelector = request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();
         var versionSelector = request.GetApiVersioningOptions().ApiVersionSelector;
-        var model = new ApiVersionModel( modelSelector.ApiVersions, Enumerable.Empty<ApiVersion>() );
+        var model = new ApiVersionModel( modelSelector.ApiVersions, [] );
 
         return versionSelector.SelectVersion( request, model );
     }

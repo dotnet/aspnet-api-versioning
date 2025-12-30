@@ -57,7 +57,7 @@ public partial class VersionedODataModelBuilder
 
         if ( configurations.Count == 0 )
         {
-            return Array.Empty<IEdmModel>();
+            return [];
         }
 
         var apiVersions = GetApiVersions();
@@ -76,7 +76,7 @@ public partial class VersionedODataModelBuilder
         {
             if ( modelConfigurations == null )
             {
-                return Array.Empty<IModelConfiguration>();
+                return [];
             }
 
             return modelConfigurations;
@@ -86,7 +86,7 @@ public partial class VersionedODataModelBuilder
 
         if ( modelConfigurations == null || modelConfigurations.Count == 0 )
         {
-            return new[] { delegatingConfiguration };
+            return [delegatingConfiguration];
         }
 
         var configurations = new IModelConfiguration[modelConfigurations.Count + 1];

@@ -61,7 +61,7 @@ public class VersionedMetadataControllerTest
         using var client = new HttpClient( server );
 
         // act
-        var response = await client.SendAsync( request );
+        var response = await client.SendAsync( request, TestContext.Current.CancellationToken );
 
         // assert
         response.EnsureSuccessStatusCode();

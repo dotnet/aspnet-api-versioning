@@ -7,5 +7,5 @@ using System.Runtime.CompilerServices;
 internal static class Array
 {
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    public static T[] Empty<T>() => new T[0];
+    public static T[] Empty<T>() => [];
 }

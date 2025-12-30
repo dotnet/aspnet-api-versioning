@@ -2,9 +2,13 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
+  <OutputType>Exe</OutputType>
   <IsPackable>false</IsPackable>
   <Nullable>disable</Nullable>
   <IsClsCompliant>false</IsClsCompliant>
+  <NoWarn>$(NoWarn);CA1515</NoWarn>
+  <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
   <AcceptanceTestPrefix Condition="$(MSBuildProjectName.Contains('Acceptance'))">acceptance.</AcceptanceTestPrefix>
  </PropertyGroup>
 

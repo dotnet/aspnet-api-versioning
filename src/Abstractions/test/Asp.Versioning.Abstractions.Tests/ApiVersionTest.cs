@@ -596,29 +596,28 @@ public partial class ApiVersionTest
         result.Should().Be( expected );
     }
 
-    public static IEnumerable<object[]> FormatData =>
-        new object[][]
-        {
-            [null, "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha"],
-            ["", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha"],
-            ["F", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha"],
-            ["G", "2013-08-06", "2013-08-06"],
-            ["GG", "2013-08-06-Alpha", "2013-08-06-Alpha"],
-            ["G", "1.1", ""],
-            ["G", "1.1-Alpha", ""],
-            ["G", "2013-08-06.1.1", "2013-08-06"],
-            ["GG", "2013-08-06.1.1-Alpha", "2013-08-06-Alpha"],
-            ["V", "2013-08-06", ""],
-            ["VVVV", "2013-08-06-Alpha", ""],
-            ["VV", "1.1", "1.1"],
-            ["VVVV", "1.1-Alpha", "1.1-Alpha"],
-            ["VV", "2013-08-06.1.1", "1.1"],
-            ["VVVV", "2013-08-06.1.1-Alpha", "1.1-Alpha"],
-            ["S", "1.1-Alpha", "Alpha"],
-            ["'v'VVV", "1.1", "v1.1"],
-            ["'Major': %V, 'Minor': %v", "1.1", "Major: 1, Minor: 1"],
-            ["MMM yyyy '('S')'", "2013-08-06-preview.1", "Aug 2013 (preview.1)"],
-        };
+    public static TheoryData<string, string, string> FormatData => new()
+    {
+        { null, "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" },
+        { "", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" },
+        { "F", "2013-08-06.1.1-Alpha", "2013-08-06.1.1-Alpha" },
+        { "G", "2013-08-06", "2013-08-06" },
+        { "GG", "2013-08-06-Alpha", "2013-08-06-Alpha" },
+        { "G", "1.1", "" },
+        { "G", "1.1-Alpha", "" },
+        { "G", "2013-08-06.1.1", "2013-08-06" },
+        { "GG", "2013-08-06.1.1-Alpha", "2013-08-06-Alpha" },
+        { "V", "2013-08-06", "" },
+        { "VVVV", "2013-08-06-Alpha", "" },
+        { "VV", "1.1", "1.1" },
+        { "VVVV", "1.1-Alpha", "1.1-Alpha" },
+        { "VV", "2013-08-06.1.1", "1.1" },
+        { "VVVV", "2013-08-06.1.1-Alpha", "1.1-Alpha" },
+        { "S", "1.1-Alpha", "Alpha" },
+        { "'v'VVV", "1.1", "v1.1" },
+        { "'Major': %V, 'Minor': %v", "1.1", "Major: 1, Minor: 1" },
+        { "MMM yyyy '('S')'", "2013-08-06-preview.1", "Aug 2013 (preview.1)" },
+    };
 
 #if NETFRAMEWORK
     private static DateTime Today => DateTime.Today;

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Internal;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -59,7 +60,7 @@ public abstract partial class HttpServerFixture
         {
             if ( i < count )
             {
-                fragment.Append( Uri.EscapeDataString( graph.Substring( MaxUriLength * i, MaxUriLength ) ) );
+                fragment.Append( Uri.EscapeDataString( graph.AsSpan( MaxUriLength * i, MaxUriLength ) ) );
             }
             else
             {
@@ -72,12 +73,17 @@ public abstract partial class HttpServerFixture
 
     private TestServer CreateServer()
     {
-        var builder = new WebHostBuilder()
-            .ConfigureServices( OnDefaultConfigureServices )
-            .Configure( OnBuildApplication )
-            .UseContentRoot( GetContentRoot() );
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults(
+                builder => builder.ConfigureServices( OnDefaultConfigureServices )
+                                  .Configure( OnBuildApplication )
+                                  .UseContentRoot( GetContentRoot() )
+                                  .UseTestServer() )
+            .Build();
 
-        return new TestServer( builder );
+        host.Start();
+
+        return host.GetTestServer();
     }
 
     private void OnDefaultConfigureServices( IServiceCollection services )

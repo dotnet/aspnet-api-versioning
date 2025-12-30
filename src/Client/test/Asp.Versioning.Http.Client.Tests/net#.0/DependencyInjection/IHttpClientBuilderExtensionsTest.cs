@@ -21,7 +21,7 @@ public class IHttpClientBuilderExtensionsTest
         var client = factory.CreateClient( "Test" );
 
         // act
-        var response = await client.GetAsync( "http://tempuri.org" );
+        var response = await client.GetAsync( "http://tempuri.org", TestContext.Current.CancellationToken );
 
         // assert
         response.RequestMessage.RequestUri.Should().Be( new Uri( "http://tempuri.org?api-version=1.0" ) );
@@ -43,7 +43,7 @@ public class IHttpClientBuilderExtensionsTest
         var client = factory.CreateClient( "Test" );
 
         // act
-        var response = await client.GetAsync( "http://tempuri.org" );
+        var response = await client.GetAsync( "http://tempuri.org", TestContext.Current.CancellationToken );
 
         // assert
         response.RequestMessage.Headers.GetValues( "x-ms-version" ).Single().Should().Be( "1.0" );
@@ -66,7 +66,7 @@ public class IHttpClientBuilderExtensionsTest
         var client = factory.CreateClient( "Test" );
 
         // act
-        var response = await client.GetAsync( "http://tempuri.org" );
+        var response = await client.GetAsync( "http://tempuri.org", TestContext.Current.CancellationToken );
 
         // assert
         response.RequestMessage.RequestUri.Should().Be( new Uri( "http://tempuri.org?ver=2022-02-01" ) );

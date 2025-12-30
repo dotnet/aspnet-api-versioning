@@ -28,7 +28,7 @@ public class ApiVersionWriterTest
 
 
         // act
-        Func<IApiVersionWriter> combine = () => ApiVersionWriter.Combine( Enumerable.Empty<IApiVersionWriter>() );
+        Func<IApiVersionWriter> combine = () => ApiVersionWriter.Combine( [] );
 
         // assert
         combine.Should().Throw<ArgumentException>().And.ParamName.Should().Be( "apiVersionWriters" );

@@ -31,20 +31,14 @@ public partial class DefaultControllerNameConventionTest
         name.Should().Be( "Values" );
     }
 
-    public static IEnumerable<object[]> NormalizeNameData
+    public static TheoryData<string> NormalizeNameData => new()
     {
-        get
-        {
-            return new object[][]
-            {
 #if NETFRAMEWORK
-                ["ValuesController"],
-                ["Values2Controller"],
+        { "ValuesController" },
+        { "Values2Controller" },
 #else
-                ["Values"],
-                ["Values2"],
+        { "Values" },
+        { "Values2" },
 #endif
-            };
-        }
-    }
+    };
 }

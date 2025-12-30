@@ -16,22 +16,22 @@ internal sealed class ClassSignature : IEquatable<ClassSignature>
     {
         var attributeBuilders = new List<CustomAttributeBuilder>()
         {
-            new( newOriginalType, new[] { originalType } ),
+            new( newOriginalType, [originalType] ),
         };
 
         attributeBuilders.AddRange( originalType.DeclaredAttributes() );
 
         Name = name;
-        Attributes = attributeBuilders.ToArray();
-        Properties = properties.ToArray();
+        Attributes = [.. attributeBuilders];
+        Properties = [.. properties];
         ApiVersion = apiVersion;
     }
 
     internal ClassSignature( string name, IEnumerable<ClassProperty> properties, ApiVersion apiVersion )
     {
         Name = name;
-        Attributes = Array.Empty<CustomAttributeBuilder>();
-        Properties = properties.ToArray();
+        Attributes = [];
+        Properties = [.. properties];
         ApiVersion = apiVersion;
     }
 

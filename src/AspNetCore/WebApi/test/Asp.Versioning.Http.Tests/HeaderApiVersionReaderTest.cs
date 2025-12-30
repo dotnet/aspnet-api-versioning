@@ -30,7 +30,7 @@ public class HeaderApiVersionReaderTest
     public void read_should_return_ambiguous_api_versions()
     {
         // arrange
-        var headers = new HeaderDictionary() { ["api-version"] = new StringValues( new[] { "1.0", "2.0" } ) };
+        var headers = new HeaderDictionary() { ["api-version"] = new StringValues( ["1.0", "2.0"] ) };
         var request = new Mock<HttpRequest>();
         var reader = new HeaderApiVersionReader() { HeaderNames = { "api-version" } };
 

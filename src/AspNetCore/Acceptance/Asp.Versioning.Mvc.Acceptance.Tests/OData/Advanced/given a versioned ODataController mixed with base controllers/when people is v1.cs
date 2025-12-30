@@ -18,11 +18,11 @@ public class when_people_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var people = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         people.value.Should().BeEquivalentTo(
-            new[] { new { id = 1, firstName = "Bill", lastName = "Mei" } },
+            [new { id = 1, firstName = "Bill", lastName = "Mei" }],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -36,7 +36,7 @@ public class when_people_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         order.Should().BeEquivalentTo(
@@ -52,7 +52,7 @@ public class when_people_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await PatchAsync( $"api/people/42?api-version=1.0", person );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

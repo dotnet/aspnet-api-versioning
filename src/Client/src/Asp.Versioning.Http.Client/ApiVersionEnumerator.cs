@@ -35,7 +35,7 @@ public readonly struct ApiVersionEnumerator : IEnumerable<ApiVersion>
         ArgumentNullException.ThrowIfNull( response );
         ArgumentException.ThrowIfNullOrEmpty( headerName );
 
-        this.values = response.Headers.TryGetValues( headerName, out var values ) ? values.ToArray() : [];
+        this.values = response.Headers.TryGetValues( headerName, out var values ) ? [.. values] : [];
         this.parser = parser ?? ApiVersionParser.Default;
     }
 

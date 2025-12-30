@@ -3,7 +3,6 @@
 namespace Asp.Versioning.ApplicationModels;
 
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 
 /// <summary>

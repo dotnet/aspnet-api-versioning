@@ -69,31 +69,25 @@ public class VersionedMetadataRoutingConventionTest
         var selector = new Mock<IEdmModelSelector>();
         var serviceProvider = new Mock<IServiceProvider>();
 
-        selector.SetupGet( s => s.ApiVersions ).Returns( new[] { ApiVersion.Default } );
+        selector.SetupGet( s => s.ApiVersions ).Returns( [ApiVersion.Default] );
         serviceProvider.Setup( sp => sp.GetService( typeof( IEdmModelSelector ) ) ).Returns( selector.Object );
         request.Properties[RequestContainerKey] = serviceProvider.Object;
     }
 
-    public static IEnumerable<object[]> SelectControllerData
+    public static TheoryData<string, string> SelectControllerData => new()
     {
-        get
-        {
-            yield return new object[] { "", "VersionedMetadata" };
-            yield return new object[] { "$metadata", "VersionedMetadata" };
-            yield return new object[] { "Tests", null };
-            yield return new object[] { "Tests/42", null };
-        }
-    }
+        { "", "VersionedMetadata" },
+        { "$metadata", "VersionedMetadata" },
+        { "Tests", null },
+        { "Tests/42", null },
+    };
 
-    public static IEnumerable<object[]> SelectActionData
+    public static TheoryData<string, string, string> SelectActionData => new()
     {
-        get
-        {
-            yield return new object[] { "", "GET", "GetServiceDocument" };
-            yield return new object[] { "$metadata", "GET", "GetMetadata" };
-            yield return new object[] { "$metadata", "OPTIONS", "GetOptions" };
-            yield return new object[] { "Tests", "GET", null };
-            yield return new object[] { "Tests/42", "GET", null };
-        }
-    }
+        { "", "GET", "GetServiceDocument" },
+        { "$metadata", "GET", "GetMetadata" },
+        { "$metadata", "OPTIONS", "GetOptions" },
+        { "Tests", "GET", null },
+        { "Tests/42", "GET", null },
+    };
 }

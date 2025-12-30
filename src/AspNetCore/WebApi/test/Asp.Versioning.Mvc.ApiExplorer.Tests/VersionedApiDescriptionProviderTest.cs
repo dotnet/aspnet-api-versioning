@@ -32,8 +32,8 @@ public class VersionedApiDescriptionProviderTest
 
         // assert
         context.Results.Should().BeEquivalentTo(
-            new[]
-            {
+            [
+
                 // orders
                 new { GroupName = "v0.9", Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 0, 9 ) } },
                 new { GroupName = "v1", Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 1, 0 ) } },
@@ -56,7 +56,7 @@ public class VersionedApiDescriptionProviderTest
                 new { GroupName = "v3", Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 3, 0 ) } },
                 new { GroupName = "v3", Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 3, 0 ) } },
                 new { GroupName = "v3", Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 3, 0 ) } },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -100,7 +100,7 @@ public class VersionedApiDescriptionProviderTest
     {
         // arrange
         var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( ApiVersion.Default ) );
-        var descriptor = new ActionDescriptor() { EndpointMetadata = new[] { metadata } };
+        var descriptor = new ActionDescriptor() { EndpointMetadata = [metadata] };
         var actionProvider = new TestActionDescriptorCollectionProvider( descriptor );
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var apiExplorer = new VersionedApiDescriptionProvider(
@@ -127,7 +127,7 @@ public class VersionedApiDescriptionProviderTest
     {
         // arrange
         var metadata = new ApiVersionMetadata( ApiVersionModel.Empty, new ApiVersionModel( ApiVersion.Default ) );
-        var descriptor = new ActionDescriptor() { EndpointMetadata = new[] { metadata } };
+        var descriptor = new ActionDescriptor() { EndpointMetadata = [metadata] };
         var actionProvider = new TestActionDescriptorCollectionProvider( descriptor );
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
         var options = new ApiExplorerOptions()
@@ -160,42 +160,42 @@ public class VersionedApiDescriptionProviderTest
         var @implicit = new ActionDescriptor()
         {
             DisplayName = "Implicit GET ~/test?api-version=[1.0,2.0]",
-            EndpointMetadata = new[]
-            {
+            EndpointMetadata =
+            [
                 new ApiVersionMetadata(
                     new ApiVersionModel(
-                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>() ),
+                        [new( 1.0 ), new( 2.0 )],
+                        [new( 1.0 ), new( 2.0 )],
+                        [],
+                        [],
+                        [] ),
                     new ApiVersionModel(
-                        Array.Empty<ApiVersion>(),
-                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>() ) ),
-            },
+                        [],
+                        [new( 1.0 ), new( 2.0 )],
+                        [],
+                        [],
+                        [] ) ),
+            ],
         };
         var @explicit = new ActionDescriptor()
         {
             DisplayName = "Explicit GET ~/test?api-version=2.0",
-            EndpointMetadata = new[]
-            {
+            EndpointMetadata =
+            [
                 new ApiVersionMetadata(
                     new ApiVersionModel(
-                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>() ),
+                        [new( 1.0 ), new( 2.0 )],
+                        [new( 1.0 ), new( 2.0 )],
+                        [],
+                        [],
+                        [] ),
                     new ApiVersionModel(
-                        new ApiVersion[] { new( 2.0 ) },
-                        new ApiVersion[] { new( 1.0 ), new( 2.0 ) },
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>(),
-                        Array.Empty<ApiVersion>() ) ),
-            },
+                        [new( 2.0 )],
+                        [new( 1.0 ), new( 2.0 )],
+                        [],
+                        [],
+                        [] ) ),
+            ],
         };
         var actionProvider = new TestActionDescriptorCollectionProvider( @implicit, @explicit );
         var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
@@ -227,8 +227,7 @@ public class VersionedApiDescriptionProviderTest
 
         // assert
         context.Results.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     GroupName = "v1",
@@ -241,7 +240,7 @@ public class VersionedApiDescriptionProviderTest
                     ActionDescriptor = @explicit,
                     Properties = new Dictionary<object, object>() { [typeof( ApiVersion )] = new ApiVersion( 2.0 ) },
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 

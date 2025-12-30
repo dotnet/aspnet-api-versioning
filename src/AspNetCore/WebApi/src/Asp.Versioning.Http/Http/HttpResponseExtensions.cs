@@ -1,9 +1,10 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.AspNetCore.Http;
 
 using Asp.Versioning;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using System.Globalization;
 

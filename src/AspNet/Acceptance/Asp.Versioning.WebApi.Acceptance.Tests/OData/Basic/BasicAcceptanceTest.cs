@@ -16,7 +16,7 @@ public abstract class BasicAcceptanceTest : ODataAcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( NotFound );
@@ -34,7 +34,7 @@ public abstract class BasicAcceptanceTest : ODataAcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
 
         // assert
@@ -51,8 +51,8 @@ public abstract class BasicAcceptanceTest : ODataAcceptanceTest
         Client.DefaultRequestHeaders.Clear();
 
         // act
-        var response = await Client.GetAsync( "v4/$metadata" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var response = await Client.GetAsync( "v4/$metadata", CancellationToken );
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( NotFound );

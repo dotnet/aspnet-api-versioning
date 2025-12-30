@@ -48,13 +48,13 @@ internal sealed class ActionSelectorCacheItem
             combinedCandidateActions[i] = new( actionDescriptor );
             actionParameterNames.Add(
                 actionDescriptor,
-                actionDescriptor.ActionBinding
+                [.. actionDescriptor.ActionBinding
                                 .ParameterBindings
                                 .Where( binding => !binding.Descriptor.IsOptional &&
                                                    binding.Descriptor.ParameterType.CanConvertFromString() &&
                                                    binding.WillReadUri() )
                                 .Select( binding => binding.Descriptor.Prefix ??
-                                                    binding.Descriptor.ParameterName ).ToArray() );
+                                                    binding.Descriptor.ParameterName )] );
         }
 
         combinedActionNameMapping =
@@ -226,7 +226,7 @@ internal sealed class ActionSelectorCacheItem
         var precedenceCandidates = RunPrecedenceFilter( orderCandidates );
         var selectedCandidates = FindActionMatchMostRouteAndQueryParameters( precedenceCandidates );
 
-        return selectedCandidates.Select( c => new CandidateHttpActionDescriptor( c ) ).ToArray();
+        return [.. selectedCandidates.Select( c => new CandidateHttpActionDescriptor( c ) )];
     }
 
     private IEnumerable<HttpMethod> GetAllowedMethods( HttpControllerContext controllerContext )
@@ -364,7 +364,7 @@ internal sealed class ActionSelectorCacheItem
     }
 
     private static CandidateAction[] FilterIncompatibleMethods( HttpMethod incomingMethod, CandidateAction[] candidatesFoundByName ) =>
-        candidatesFoundByName.Where( c => c.ActionDescriptor.SupportedHttpMethods.Contains( incomingMethod ) ).ToArray();
+        [.. candidatesFoundByName.Where( c => c.ActionDescriptor.SupportedHttpMethods.Contains( incomingMethod ) )];
 
     internal ILookup<string, HttpActionDescriptor> GetActionMapping() => combinedActionNameMapping;
 

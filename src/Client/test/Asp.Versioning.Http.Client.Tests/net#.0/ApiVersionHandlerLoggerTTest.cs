@@ -31,7 +31,7 @@ public class ApiVersionHandlerLoggerTTest
         response.Headers.Add( "link", "<policy/es>; rel=\"sunset\"; type=\"text/html\"; title=\"API Política\"; hreflang=\"es\"" );
 
         // act
-        await notification.OnApiDeprecatedAsync( context, default );
+        await notification.OnApiDeprecatedAsync( context, TestContext.Current.CancellationToken );
 
         // assert
         var entry = factory.Sink.LogEntries.Single();
@@ -61,11 +61,11 @@ public class ApiVersionHandlerLoggerTTest
                       $"until <unspecified>. Additional information: " +
                       "http://tempuri.org/policy";
 
-        response.Headers.Add( "api-supported-versions", new[] { "1.0", "2.0" } );
+        response.Headers.Add( "api-supported-versions", ["1.0", "2.0"] );
         response.Headers.Add( "link", "<policy>; rel=\"sunset\"; type=\"text/html\"" );
 
         // act
-        await notification.OnNewApiAvailableAsync( context, default );
+        await notification.OnNewApiAvailableAsync( context, TestContext.Current.CancellationToken );
 
         // assert
         var entry = factory.Sink.LogEntries.Single();

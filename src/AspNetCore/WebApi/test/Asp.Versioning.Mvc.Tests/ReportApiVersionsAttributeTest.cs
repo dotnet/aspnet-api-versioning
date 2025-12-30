@@ -82,7 +82,7 @@ public class ReportApiVersionsAttributeTest
         var filters = Array.Empty<IFilterMetadata>();
         var actionArguments = new Dictionary<string, object>();
         var controller = default( object );
-        var endpoint = new Endpoint( c => Task.CompletedTask, new( new[] { metadata } ), "Test" );
+        var endpoint = new Endpoint( c => Task.CompletedTask, new( [metadata] ), "Test" );
         var options = Options.Create( new ApiVersioningOptions() );
         var reporter = new DefaultApiVersionReporter( new SunsetPolicyManager( options ), new DeprecationPolicyManager( options ) );
 
@@ -98,7 +98,7 @@ public class ReportApiVersionsAttributeTest
         httpContext.SetupGet( c => c.Response ).Returns( response.Object );
         httpContext.SetupGet( c => c.Features ).Returns( features );
         httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
-        action.EndpointMetadata = new[] { metadata };
+        action.EndpointMetadata = [metadata];
 
         return new( actionContext, filters, actionArguments, controller );
     }

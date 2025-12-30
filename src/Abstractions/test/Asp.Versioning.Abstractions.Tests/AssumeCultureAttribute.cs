@@ -4,7 +4,6 @@ namespace Asp.Versioning;
 
 using System.Globalization;
 using System.Reflection;
-using Xunit.Sdk;
 using static System.AttributeTargets;
 using static System.Threading.Thread;
 
@@ -12,7 +11,7 @@ using static System.Threading.Thread;
 /// Allows a test method to assume that it is running in a specific locale.
 /// </summary>
 [AttributeUsage( Class | Method, AllowMultiple = false, Inherited = true )]
-public sealed class AssumeCultureAttribute : BeforeAfterTestAttribute
+internal sealed class AssumeCultureAttribute : BeforeAfterTestAttribute
 {
     private CultureInfo originalCulture;
     private CultureInfo originalUICulture;
@@ -21,7 +20,7 @@ public sealed class AssumeCultureAttribute : BeforeAfterTestAttribute
 
     public string Name { get; }
 
-    public override void Before( MethodInfo methodUnderTest )
+    public override void Before( MethodInfo methodUnderTest, IXunitTest test )
     {
         originalCulture = CurrentThread.CurrentCulture;
         originalUICulture = CurrentThread.CurrentUICulture;
@@ -32,7 +31,7 @@ public sealed class AssumeCultureAttribute : BeforeAfterTestAttribute
         CurrentThread.CurrentUICulture = culture;
     }
 
-    public override void After( MethodInfo methodUnderTest )
+    public override void After( MethodInfo methodUnderTest, IXunitTest test )
     {
         CurrentThread.CurrentCulture = originalCulture;
         CurrentThread.CurrentUICulture = originalUICulture;

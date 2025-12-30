@@ -13,7 +13,7 @@ public class ODataApiVersioningOptionsTest
         // arrange
         var builder = new VersionedODataModelBuilder(
             Mock.Of<IODataApiVersionCollectionProvider>(),
-            Enumerable.Empty<IModelConfiguration>() );
+            [] );
 
         // act
         var options = new ODataApiVersioningOptions( builder );
@@ -28,7 +28,7 @@ public class ODataApiVersioningOptionsTest
         // arrange
         var builder = new VersionedODataModelBuilder(
             Mock.Of<IODataApiVersionCollectionProvider>(),
-            Enumerable.Empty<IModelConfiguration>() );
+            [] );
 
         // act
         var options = new ODataApiVersioningOptions( builder ).AddRouteComponents();
@@ -43,7 +43,7 @@ public class ODataApiVersioningOptionsTest
         // arrange
         var builder = new VersionedODataModelBuilder(
             Mock.Of<IODataApiVersionCollectionProvider>(),
-            Enumerable.Empty<IModelConfiguration>() );
+            [] );
         var options = new ODataApiVersioningOptions( builder );
 
         // act
@@ -59,7 +59,7 @@ public class ODataApiVersioningOptionsTest
         // arrange
         var builder = new VersionedODataModelBuilder(
             Mock.Of<IODataApiVersionCollectionProvider>(),
-            Enumerable.Empty<IModelConfiguration>() );
+            [] );
         var options = new ODataApiVersioningOptions( builder );
         var configureAction = Mock.Of<Action<IServiceCollection>>();
         var services = new ServiceCollection();
@@ -78,7 +78,7 @@ public class ODataApiVersioningOptionsTest
         // arrange
         var builder = new VersionedODataModelBuilder(
             Mock.Of<IODataApiVersionCollectionProvider>(),
-            Enumerable.Empty<IModelConfiguration>() );
+            [] );
         var options = new ODataApiVersioningOptions( builder );
         var handler = new DefaultODataBatchHandler();
         var services = new ServiceCollection();

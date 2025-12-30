@@ -42,14 +42,14 @@ public class ReportApiVersionsAttributeTest
         controllerDescriptor.Setup( cd => cd.GetCustomAttributes<IApiVersionProvider>( It.IsAny<bool>() ) ).Returns( attributes );
         actionDescriptor.Properties[typeof( ApiVersionMetadata )] = new ApiVersionMetadata(
             new ApiVersionModel(
-                declaredVersions: new ApiVersion[] { new( 0, 5 ), new( 1, 0 ), new( 2, 0 ) },
-                supportedVersions: new ApiVersion[] { new( 1, 0 ), new( 2, 0 ) },
-                deprecatedVersions: new ApiVersion[] { new( 0, 5 ), new( 1, 0 ), new( 2, 0 ) },
+                declaredVersions: [new( 0, 5 ), new( 1, 0 ), new( 2, 0 )],
+                supportedVersions: [new( 1, 0 ), new( 2, 0 )],
+                deprecatedVersions: [new( 0, 5 ), new( 1, 0 ), new( 2, 0 )],
                 advertisedVersions: Empty<ApiVersion>(),
                 deprecatedAdvertisedVersions: Empty<ApiVersion>() ),
             new ApiVersionModel(
-                supportedVersions: new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ) },
-                deprecatedVersions: new[] { new ApiVersion( 0, 5 ) },
+                supportedVersions: [new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 )],
+                deprecatedVersions: [new ApiVersion( 0, 5 )],
                 advertisedVersions: Empty<ApiVersion>(),
                 deprecatedAdvertisedVersions: Empty<ApiVersion>() ) );
 

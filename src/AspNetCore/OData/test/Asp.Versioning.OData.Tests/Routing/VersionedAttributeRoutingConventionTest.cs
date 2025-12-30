@@ -27,7 +27,7 @@ public class VersionedAttributeRoutingConventionTest
         var convention = new VersionedAttributeRoutingConvention( logger, parser );
         var action = new ActionModel(
             Mock.Of<MethodInfo>(),
-            Array.Empty<object>() )
+            [] )
         {
             Selectors =
             {
@@ -39,7 +39,7 @@ public class VersionedAttributeRoutingConventionTest
         };
         var controller = new ControllerModel(
             typeof( ODataController ).GetTypeInfo(),
-            Array.Empty<object>() )
+            [] )
         {
             Actions = { action },
         };
@@ -68,7 +68,7 @@ public class VersionedAttributeRoutingConventionTest
         var convention = new VersionedAttributeRoutingConvention( logger, parser );
         var action = new ActionModel(
             Mock.Of<MethodInfo>(),
-            Array.Empty<object>() )
+            [] )
         {
             Selectors =
             {
@@ -86,7 +86,7 @@ public class VersionedAttributeRoutingConventionTest
         };
         var controller = new ControllerModel(
             typeof( ODataController ).GetTypeInfo(),
-            new object[] { new ODataAttributeRoutingAttribute() } )
+            [new ODataAttributeRoutingAttribute()] )
         {
             Actions = { action },
         };
@@ -120,7 +120,7 @@ public class VersionedAttributeRoutingConventionTest
         var convention = new VersionedAttributeRoutingConvention( logger, parser );
         var action = new ActionModel(
             Mock.Of<MethodInfo>(),
-            Array.Empty<object>() )
+            [] )
         {
             Selectors =
             {
@@ -138,7 +138,7 @@ public class VersionedAttributeRoutingConventionTest
         };
         var controller = new ControllerModel(
             typeof( ODataController ).GetTypeInfo(),
-            new object[] { new ODataAttributeRoutingAttribute() } )
+            [new ODataAttributeRoutingAttribute()] )
         {
             Actions = { action },
         };

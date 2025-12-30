@@ -39,7 +39,7 @@ internal sealed class ConventionRouteControllerSelector : ControllerSelector
                 break;
             case 1:
                 result.Controller = bestMatches.First();
-                result.Controller.SetPossibleCandidates( context.ConventionRouteCandidates!.Select( c => c.ActionDescriptor.ControllerDescriptor ).ToArray() );
+                result.Controller.SetPossibleCandidates( [.. context.ConventionRouteCandidates!.Select( c => c.ActionDescriptor.ControllerDescriptor )] );
                 break;
             default:
                 if ( TryDisambiguateControllerByAction( request, bestMatches, out var resolvedController ) )

@@ -9,11 +9,11 @@ internal static class IApiDescriptionProviderExtensions
 {
     internal static IReadOnlyList<ApiDescription> Execute( this IApiDescriptionProvider apiDescriptionProvider, ActionDescriptor actionDescriptor )
     {
-        var context = new ApiDescriptionProviderContext( new[] { actionDescriptor } );
+        var context = new ApiDescriptionProviderContext( [actionDescriptor] );
 
         apiDescriptionProvider.OnProvidersExecuting( context );
         apiDescriptionProvider.OnProvidersExecuted( context );
 
-        return context.Results.ToArray();
+        return [.. context.Results];
     }
 }

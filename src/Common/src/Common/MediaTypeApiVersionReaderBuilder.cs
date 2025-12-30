@@ -150,11 +150,11 @@ public partial class MediaTypeApiVersionReaderBuilder
             included ?? [],
             excluded ?? [],
 #elif NETFRAMEWORK
-            included ?? new( capacity: 0 ),
-            excluded ?? new( capacity: 0 ),
+            included ?? [],
+            excluded ?? [],
 #else
-            included?.ToFrozenSet( included.Comparer ) ?? FrozenSet<Str>.Empty,
-            excluded?.ToFrozenSet( excluded.Comparer ) ?? FrozenSet<Str>.Empty,
+            included?.ToFrozenSet( included.Comparer ) ?? [],
+            excluded?.ToFrozenSet( excluded.Comparer ) ?? [],
 #endif
             select ?? DefaultSelector,
             readers?.ToArray() ?? [] );
@@ -335,7 +335,7 @@ public partial class MediaTypeApiVersionReaderBuilder
         {
             if ( readers.Length == 0 )
             {
-                return Array.Empty<string>();
+                return [];
             }
 
 #if NETFRAMEWORK
@@ -367,7 +367,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 
             if ( mediaTypes == null )
             {
-                return Array.Empty<string>();
+                return [];
             }
 
             Filter( mediaTypes );
@@ -375,7 +375,7 @@ public partial class MediaTypeApiVersionReaderBuilder
             switch ( mediaTypes.Count )
             {
                 case 0:
-                    return Array.Empty<string>();
+                    return [];
                 case 1:
                     break;
                 default:
@@ -390,7 +390,7 @@ public partial class MediaTypeApiVersionReaderBuilder
                 return version == null ? Array.Empty<string>() : [version];
             }
 
-            return selector( request, versions.ToArray() );
+            return selector( request, [.. versions] );
         }
 
         private void Filter( List<MediaTypeHeaderValue> mediaTypes )

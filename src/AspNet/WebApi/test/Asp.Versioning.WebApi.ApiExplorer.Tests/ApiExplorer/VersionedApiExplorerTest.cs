@@ -235,9 +235,10 @@ public class VersionedApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_collate_expected_versions( HttpConfiguration configuration )
+    public void api_descriptions_should_collate_expected_versions( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new VersionedApiExplorer( configuration );
 
         // act
@@ -254,9 +255,10 @@ public class VersionedApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_group_versioned_controllers( HttpConfiguration configuration )
+    public void api_descriptions_should_group_versioned_controllers( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var assembliesResolver = configuration.Services.GetAssembliesResolver();
         var controllerTypes = configuration.Services.GetHttpControllerTypeResolver().GetControllerTypes( assembliesResolver );
         var apiExplorer = new VersionedApiExplorer( configuration );
@@ -274,9 +276,10 @@ public class VersionedApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_flatten_versioned_controllers( HttpConfiguration configuration )
+    public void api_descriptions_should_flatten_versioned_controllers( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var assembliesResolver = configuration.Services.GetAssembliesResolver();
         var controllerTypes = configuration.Services.GetHttpControllerTypeResolver().GetControllerTypes( assembliesResolver );
         var apiExplorer = new VersionedApiExplorer( configuration );
@@ -294,9 +297,10 @@ public class VersionedApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_description_group_should_explore_v1_actions( HttpConfiguration configuration )
+    public void api_description_group_should_explore_v1_actions( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new VersionedApiExplorer( configuration );
         var apiVersion = new ApiVersion( 1, 0 );
         var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
@@ -318,9 +322,10 @@ public class VersionedApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_description_group_should_explore_v2_actions( HttpConfiguration configuration )
+    public void api_description_group_should_explore_v2_actions( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new VersionedApiExplorer( configuration );
         var apiVersion = new ApiVersion( 2, 0 );
         var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
@@ -330,8 +335,7 @@ public class VersionedApiExplorerTest
 
         // assert
         descriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                     new
                     {
                         ID = "GETValues",
@@ -346,15 +350,16 @@ public class VersionedApiExplorerTest
                         RelativePath = "Values/{id}",
                         Version = apiVersion,
                     },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_description_group_should_explore_v3_actions( HttpConfiguration configuration )
+    public void api_description_group_should_explore_v3_actions( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new VersionedApiExplorer( configuration );
         var apiVersion = new ApiVersion( 3, 0 );
         var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
@@ -364,8 +369,7 @@ public class VersionedApiExplorerTest
 
         // assert
         descriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                     new
                     {
                         ID = "GETValues",
@@ -390,15 +394,16 @@ public class VersionedApiExplorerTest
                         Version = apiVersion,
                         ActionDescriptor = new { ActionName = "Post" },
                     },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_description_group_should_explore_v3_beta_actions( HttpConfiguration configuration )
+    public void api_description_group_should_explore_v3_beta_actions( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new VersionedApiExplorer( configuration );
         var apiVersion = new ApiVersion( 3, 0, "beta" );
         var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
@@ -409,8 +414,7 @@ public class VersionedApiExplorerTest
         // assert
         descriptionGroup.IsDeprecated.Should().BeTrue();
         descriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                     new
                     {
                         ID = "GETValues",
@@ -425,15 +429,16 @@ public class VersionedApiExplorerTest
                         RelativePath = "Values/{id}",
                         Version = apiVersion,
                     },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_description_group_should_explore_v4_actions( HttpConfiguration configuration )
+    public void api_description_group_should_explore_v4_actions( TestConfigurations.Kind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new VersionedApiExplorer( configuration );
         var apiVersion = new ApiVersion( 4, 0 );
         var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
@@ -443,8 +448,7 @@ public class VersionedApiExplorerTest
 
         // assert
         descriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                     new
                     {
                         ID = "GETValues",
@@ -473,7 +477,7 @@ public class VersionedApiExplorerTest
                         RelativePath = "Values/{id}",
                         Version = apiVersion,
                     },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 

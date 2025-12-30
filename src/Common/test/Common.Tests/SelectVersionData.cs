@@ -2,17 +2,13 @@
 
 namespace Asp.Versioning;
 
-using System.Collections;
-
-public abstract class SelectVersionData : IEnumerable<object[]>
+public abstract class SelectVersionData : TheoryData<ApiVersion[], ApiVersion[], ApiVersion>
 {
-    public abstract IEnumerator<object[]> GetEnumerator();
+    protected SelectVersionData() { }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    protected static ApiVersion[] Supported( params ApiVersion[] versions ) => versions;
 
-    protected static IEnumerable<ApiVersion> Supported( params ApiVersion[] versions ) => versions.AsEnumerable();
-
-    protected static IEnumerable<ApiVersion> Deprecated( params ApiVersion[] versions ) => versions.AsEnumerable();
+    protected static ApiVersion[] Deprecated( params ApiVersion[] versions ) => versions;
 
     protected static ApiVersion Expected( ApiVersion version ) => version;
 }

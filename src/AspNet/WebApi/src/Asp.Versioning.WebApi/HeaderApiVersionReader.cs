@@ -16,7 +16,7 @@ public partial class HeaderApiVersionReader
 
         if ( count == 0 )
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var version = default( string );
@@ -68,6 +68,6 @@ public partial class HeaderApiVersionReader
             return version == null ? [] : [version];
         }
 
-        return versions.ToArray();
+        return [.. versions];
     }
 }

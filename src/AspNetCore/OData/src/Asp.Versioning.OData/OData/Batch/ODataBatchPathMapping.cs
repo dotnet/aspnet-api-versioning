@@ -163,7 +163,7 @@ internal sealed class ODataBatchPathMapping
         // ApiVersioningOptions.AllowDefaultVersionWhenUnspecified. use the
         // configured IApiVersionSelector to provide a chance to select the
         // most appropriate version.
-        var model = new ApiVersionModel( candidates.Keys, Enumerable.Empty<ApiVersion>() );
+        var model = new ApiVersionModel( candidates.Keys, [] );
         var version = selector.SelectVersion( context.Request, model );
 
         return SelectBestCandidate( context, candidates, routeData, version );
@@ -184,7 +184,7 @@ internal sealed class ODataBatchPathMapping
         // ApiVersioningOptions.AllowDefaultVersionWhenUnspecified. use the
         // configured IApiVersionSelector to provide a chance to select the
         // most appropriate version.
-        var model = new ApiVersionModel( candidates.Keys, Enumerable.Empty<ApiVersion>() );
+        var model = new ApiVersionModel( candidates.Keys, [] );
         var version = await selector.SelectVersionAsync( context.Request, model, cancellationToken ).ConfigureAwait( false );
 
         return SelectBestCandidate( context, candidates, routeData, version );

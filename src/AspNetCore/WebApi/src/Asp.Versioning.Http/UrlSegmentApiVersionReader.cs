@@ -17,7 +17,7 @@ public partial class UrlSegmentApiVersionReader
 
         if ( reentrant )
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         reentrant = true;

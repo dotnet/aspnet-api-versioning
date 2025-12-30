@@ -14,8 +14,8 @@ public sealed class ApiVersionModel
     private const int DefaultModel = 0;
     private const int NeutralModel = 1;
     private const int EmptyModel = 2;
-    private static readonly IReadOnlyList<ApiVersion> emptyVersions = Array.Empty<ApiVersion>();
-    private static readonly IReadOnlyList<ApiVersion> defaultVersions = new[] { ApiVersion.Default };
+    private static readonly IReadOnlyList<ApiVersion> emptyVersions = [];
+    private static readonly IReadOnlyList<ApiVersion> defaultVersions = [ApiVersion.Default];
     private static ApiVersionModel? defaultVersion;
     private static ApiVersionModel? neutralVersion;
     private static ApiVersionModel? emptyVersion;
@@ -69,7 +69,7 @@ public sealed class ApiVersionModel
     /// <remarks>The declared version also represents the only implemented and supported API version.</remarks>
     public ApiVersionModel( ApiVersion declaredVersion )
     {
-        DeclaredApiVersions = new[] { declaredVersion };
+        DeclaredApiVersions = [declaredVersion];
         ImplementedApiVersions = DeclaredApiVersions;
         SupportedApiVersions = DeclaredApiVersions;
         DeprecatedApiVersions = emptyVersions;
@@ -87,9 +87,9 @@ public sealed class ApiVersionModel
     public ApiVersionModel( IEnumerable<ApiVersion> supportedVersions, IEnumerable<ApiVersion> deprecatedVersions )
     {
         DeclaredApiVersions = emptyVersions;
-        SupportedApiVersions = supportedVersions.Distinct().OrderBy( v => v ).ToArray();
-        DeprecatedApiVersions = deprecatedVersions.Distinct().OrderBy( v => v ).ToArray();
-        ImplementedApiVersions = SupportedApiVersions.Union( DeprecatedApiVersions ).OrderBy( v => v ).ToArray();
+        SupportedApiVersions = [.. supportedVersions.Distinct().OrderBy( v => v )];
+        DeprecatedApiVersions = [.. deprecatedVersions.Distinct().OrderBy( v => v )];
+        ImplementedApiVersions = [.. SupportedApiVersions.Union( DeprecatedApiVersions ).OrderBy( v => v )];
     }
 
     /// <summary>
@@ -121,10 +121,10 @@ public sealed class ApiVersionModel
         IEnumerable<ApiVersion> advertisedVersions,
         IEnumerable<ApiVersion> deprecatedAdvertisedVersions )
     {
-        DeclaredApiVersions = declaredVersions.Distinct().OrderBy( v => v ).ToArray();
-        SupportedApiVersions = supportedVersions.Union( advertisedVersions ).OrderBy( v => v ).ToArray();
-        DeprecatedApiVersions = deprecatedVersions.Union( deprecatedAdvertisedVersions ).OrderBy( v => v ).ToArray();
-        ImplementedApiVersions = SupportedApiVersions.Union( DeprecatedApiVersions ).OrderBy( v => v ).ToArray();
+        DeclaredApiVersions = [.. declaredVersions.Distinct().OrderBy( v => v )];
+        SupportedApiVersions = [.. supportedVersions.Union( advertisedVersions ).OrderBy( v => v )];
+        DeprecatedApiVersions = [.. deprecatedVersions.Union( deprecatedAdvertisedVersions ).OrderBy( v => v )];
+        ImplementedApiVersions = [.. SupportedApiVersions.Union( DeprecatedApiVersions ).OrderBy( v => v )];
     }
 
     private string DebuggerDisplayText => IsApiVersionNeutral ? "*.*" : string.Join( ", ", DeclaredApiVersions );

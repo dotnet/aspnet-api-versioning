@@ -23,6 +23,8 @@ public abstract partial class AcceptanceTest : IDisposable
 
     protected HttpClient Client => client.Value;
 
+    protected static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
     public void Dispose()
     {
         Dispose( true );
@@ -76,21 +78,29 @@ public abstract partial class AcceptanceTest : IDisposable
         return new HttpRequestMessage( method, requestUri ) { Content = content };
     }
 
-    protected virtual Task<HttpResponseMessage> GetAsync( string requestUri ) => Client.SendAsync( CreateRequest( requestUri, default( object ), Get ) );
+    protected virtual Task<HttpResponseMessage> GetAsync( string requestUri ) =>
+        Client.SendAsync( CreateRequest( requestUri, default( object ), Get ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> PostAsync<TEntity>( string requestUri, TEntity entity ) => Client.SendAsync( CreateRequest( requestUri, entity, Post ) );
+    protected virtual Task<HttpResponseMessage> PostAsync<TEntity>( string requestUri, TEntity entity ) =>
+        Client.SendAsync( CreateRequest( requestUri, entity, Post ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> PostAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Post ) );
+    protected virtual Task<HttpResponseMessage> PostAsync( string requestUri, HttpContent content ) =>
+        Client.SendAsync( CreateRequest( requestUri, content, Post ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> PutAsync<TEntity>( string requestUri, TEntity entity ) => Client.SendAsync( CreateRequest( requestUri, entity, Put ) );
+    protected virtual Task<HttpResponseMessage> PutAsync<TEntity>( string requestUri, TEntity entity ) =>
+        Client.SendAsync( CreateRequest( requestUri, entity, Put ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> PutAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Put ) );
+    protected virtual Task<HttpResponseMessage> PutAsync( string requestUri, HttpContent content ) =>
+        Client.SendAsync( CreateRequest( requestUri, content, Put ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> PatchAsync<TEntity>( string requestUri, TEntity entity ) => Client.SendAsync( CreateRequest( requestUri, entity, Patch ) );
+    protected virtual Task<HttpResponseMessage> PatchAsync<TEntity>( string requestUri, TEntity entity ) =>
+        Client.SendAsync( CreateRequest( requestUri, entity, Patch ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> PatchAsync( string requestUri, HttpContent content ) => Client.SendAsync( CreateRequest( requestUri, content, Patch ) );
+    protected virtual Task<HttpResponseMessage> PatchAsync( string requestUri, HttpContent content ) =>
+        Client.SendAsync( CreateRequest( requestUri, content, Patch ), CancellationToken );
 
-    protected virtual Task<HttpResponseMessage> DeleteAsync( string requestUri ) => Client.SendAsync( CreateRequest( requestUri, default( object ), Delete ) );
+    protected virtual Task<HttpResponseMessage> DeleteAsync( string requestUri ) =>
+        Client.SendAsync( CreateRequest( requestUri, default( object ), Delete ), CancellationToken );
 
     private void AddDefaultAcceptHeaderIfNecessary()
     {

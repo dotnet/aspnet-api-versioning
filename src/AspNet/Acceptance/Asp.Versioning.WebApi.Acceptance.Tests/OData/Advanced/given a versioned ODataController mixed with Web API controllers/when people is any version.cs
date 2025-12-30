@@ -16,7 +16,7 @@ public class when_people_is_any_version : AdvancedAcceptanceTest
 
         // act
         var response = await PatchAsync( $"api/people/42?api-version=4.0", person );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

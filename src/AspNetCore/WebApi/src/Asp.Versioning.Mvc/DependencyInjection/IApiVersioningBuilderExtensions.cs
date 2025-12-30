@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-// Ignore Spelling: Mvc
+#pragma warning disable IDE0130
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;

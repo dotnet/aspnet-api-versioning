@@ -19,12 +19,12 @@ public class when_using_a_query_string : BatchAcceptanceTest
             NewGet( "api/people/42?api-version=2.0" ) );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();
 
-        var multipart = await response.Content.ReadAsMultipartAsync();
+        var multipart = await response.Content.ReadAsMultipartAsync( CancellationToken );
         var contents = multipart.Contents;
 
         contents.Should().HaveCount( 2 );
@@ -70,12 +70,12 @@ public class when_using_a_query_string : BatchAcceptanceTest
             NewGet( "api/orders/42?api-version=1.0" ) );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();
 
-        var multipart = await response.Content.ReadAsMultipartAsync();
+        var multipart = await response.Content.ReadAsMultipartAsync( CancellationToken );
         var contents = multipart.Contents;
 
         contents.Should().HaveCount( 2 );
@@ -105,7 +105,7 @@ public class when_using_a_query_string : BatchAcceptanceTest
             NewDelete( "api/customers/42" ) );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();

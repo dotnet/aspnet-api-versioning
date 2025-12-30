@@ -27,7 +27,7 @@ public class when_error_objects_are_enabled : AcceptanceTest, IClassFixture<Inte
 
         // act
         var response = await GetAsync( "api/values?api-version=3.0" );
-        var error = await response.Content.ReadAsExampleAsync( example );
+        var error = await response.Content.ReadAsExampleAsync( example, TestContext.Current.CancellationToken );
 
         // assert
         response.Content.Headers.ContentType.MediaType.Should().Be( "application/json" );

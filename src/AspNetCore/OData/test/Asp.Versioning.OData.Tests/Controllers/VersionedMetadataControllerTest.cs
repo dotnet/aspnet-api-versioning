@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Net.Http;
 
 public class VersionedMetadataControllerTest
@@ -17,15 +18,16 @@ public class VersionedMetadataControllerTest
     {
         // arrange
         var request = new HttpRequestMessage( new HttpMethod( "OPTIONS" ), "http://localhost/$metadata" );
-        var builder = new WebHostBuilder().UseStartup<ODataStartup>();
-
-        using var server = new TestServer( builder );
-        using var client = server.CreateClient();
+        var builder = Host.CreateDefaultBuilder()
+                          .ConfigureWebHostDefaults( builder => builder.UseTestServer().UseStartup<ODataStartup>() );
+        using var server = await builder.StartAsync( TestContext.Current.CancellationToken );
+        using var client = server.GetTestClient();
 
         client.BaseAddress = new Uri( "http://localhost" );
 
         // act
-        var response = ( await client.SendAsync( request ) ).EnsureSuccessStatusCode();
+        var response = await client.SendAsync( request, TestContext.Current.CancellationToken );
+        response = response.EnsureSuccessStatusCode();
 
         // assert
         response.Headers.GetValues( "OData-Version" ).Single().Should().Be( "4.0" );

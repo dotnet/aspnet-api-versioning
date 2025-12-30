@@ -86,6 +86,6 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
 
     private static class Set
     {
-        public static readonly HashSet<RoutePattern> Empty = new( capacity: 0 );
+        public static readonly HashSet<RoutePattern> Empty = [];
     }
 }

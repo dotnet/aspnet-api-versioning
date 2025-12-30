@@ -30,7 +30,7 @@ public class when_no_version_is_specified : AcceptanceTest
 
         // act
         var response = await PostAsync( "api/ping", entity );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( TestContext.Current.CancellationToken );
         var traceId = problem.Extensions["traceId"];
 
         // assert

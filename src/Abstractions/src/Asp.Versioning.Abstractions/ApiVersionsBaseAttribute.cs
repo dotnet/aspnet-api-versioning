@@ -13,7 +13,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
     /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
     /// </summary>
     /// <param name="version">The <see cref="ApiVersion">API version</see>.</param>
-    protected ApiVersionsBaseAttribute( ApiVersion version ) => Versions = new[] { version };
+    protected ApiVersionsBaseAttribute( ApiVersion version ) => Versions = [version];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -26,7 +26,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
 
         if ( otherVersions is null || ( count = otherVersions.Length ) == 0 )
         {
-            Versions = new[] { version };
+            Versions = [version];
         }
         else
         {
@@ -41,7 +41,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
     /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
     /// </summary>
     /// <param name="version">A numeric API version.</param>
-    protected ApiVersionsBaseAttribute( double version ) => Versions = new ApiVersion[] { new( version ) };
+    protected ApiVersionsBaseAttribute( double version ) => Versions = [new( version )];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -54,7 +54,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
 
         if ( otherVersions is null || ( count = otherVersions.Length ) == 0 )
         {
-            Versions = new ApiVersion[] { new( version ) };
+            Versions = [new( version )];
         }
         else
         {
@@ -96,7 +96,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
     /// <param name="parser">The parser used to parse the specified versions.</param>
     /// <param name="version">The API version string.</param>
     protected ApiVersionsBaseAttribute( IApiVersionParser parser, string version ) =>
-        Versions = new[] { ( parser ?? throw new System.ArgumentNullException( nameof( parser ) ) ).Parse( version ) };
+        Versions = [( parser ?? throw new System.ArgumentNullException( nameof( parser ) ) ).Parse( version )];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionsBaseAttribute"/> class.
@@ -112,7 +112,7 @@ public abstract partial class ApiVersionsBaseAttribute : Attribute
 
         if ( otherVersions is null || ( count = otherVersions.Length ) == 0 )
         {
-            Versions = new[] { parser.Parse( version ) };
+            Versions = [parser.Parse( version )];
         }
         else
         {

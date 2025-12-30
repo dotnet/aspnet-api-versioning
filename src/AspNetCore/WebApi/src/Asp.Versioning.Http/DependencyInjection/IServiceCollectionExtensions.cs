@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using System;
 using static ServiceDescriptor;
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
@@ -155,6 +158,8 @@ public static partial class IServiceCollectionExtensions
         TryAddErrorObjectJsonOptions( services );
     }
 
+    // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/DependencyInjection/RoutingServiceCollectionExtensions.cs#L96
+    // REF: https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L292
     private static ServiceDescriptor WithLinkGeneratorDecorator( IServiceCollection services )
     {
         var descriptor = services.FirstOrDefault( sd => sd.ServiceType == typeof( LinkGenerator ) );
@@ -166,37 +171,8 @@ public static partial class IServiceCollectionExtensions
         }
 
         var lifetime = descriptor.Lifetime;
-        var factory = descriptor.ImplementationFactory;
 
-        if ( factory == null )
-        {
-            // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/DependencyInjection/RoutingServiceCollectionExtensions.cs#L96
-            // REF: https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.DependencyInjection.Abstractions/src/ServiceDescriptor.cs#L292
-            var decoratedType = descriptor switch
-            {
-                { ImplementationType: var type } when type is not null => type,
-                { ImplementationInstance: var instance } when instance is not null => instance.GetType(),
-                _ => throw new InvalidOperationException(),
-            };
-
-            services.Replace( Describe( decoratedType, decoratedType, lifetime ) );
-
-            LinkGenerator NewFactory( IServiceProvider serviceProvider )
-            {
-                var instance = (LinkGenerator) serviceProvider.GetRequiredService( decoratedType! );
-                var source = serviceProvider.GetRequiredService<IApiVersionParameterSource>();
-
-                if ( source.VersionsByUrl() )
-                {
-                    instance = new ApiVersionLinkGenerator( instance );
-                }
-
-                return instance;
-            }
-
-            return Describe( typeof( LinkGenerator ), NewFactory, lifetime );
-        }
-        else
+        if ( descriptor.ImplementationFactory is { } factory )
         {
             LinkGenerator NewFactory( IServiceProvider serviceProvider )
             {
@@ -212,6 +188,50 @@ public static partial class IServiceCollectionExtensions
             }
 
             return Describe( typeof( LinkGenerator ), NewFactory, lifetime );
+        }
+        else
+        {
+            if ( descriptor.ImplementationType is { } decoratedType )
+            {
+                services.Replace( Describe( decoratedType, decoratedType, lifetime ) );
+
+                LinkGenerator NewFactory( IServiceProvider serviceProvider )
+                {
+                    var instance = (LinkGenerator) serviceProvider.GetRequiredService( decoratedType );
+                    var source = serviceProvider.GetRequiredService<IApiVersionParameterSource>();
+
+                    if ( source.VersionsByUrl() )
+                    {
+                        instance = new ApiVersionLinkGenerator( instance );
+                    }
+
+                    return instance;
+                }
+
+                factory = NewFactory;
+            }
+            else if ( descriptor.ImplementationInstance is LinkGenerator instance )
+            {
+                LinkGenerator NewFactory( IServiceProvider serviceProvider )
+                {
+                    var source = serviceProvider.GetRequiredService<IApiVersionParameterSource>();
+
+                    if ( source.VersionsByUrl() )
+                    {
+                        instance = new ApiVersionLinkGenerator( instance );
+                    }
+
+                    return instance;
+                }
+
+                factory = NewFactory;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
+            return Describe( typeof( LinkGenerator ), factory, lifetime );
         }
     }
 

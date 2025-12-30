@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Net.Http;
 
 using Asp.Versioning;
@@ -189,11 +191,11 @@ public static class HttpResponseMessageExtensions
                 urls[key] = link.LinkTarget;
             }
 
-            urls ??= new( capacity: 0 );
+            urls ??= [];
         }
         else
         {
-            urls = new( capacity: 0 );
+            urls = [];
         }
 
         return urls;

@@ -22,8 +22,8 @@ public class when_using_a_media_type : AcceptanceTest, IClassFixture<MediaTypeFi
         };
 
         // act
-        var response = await Client.SendAsync( request );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var response = await Client.SendAsync( request, CancellationToken );
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( UnsupportedMediaType );

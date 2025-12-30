@@ -11,7 +11,6 @@ using static Microsoft.Extensions.Logging.LogLevel;
 
 internal static partial class ILoggerExtensions
 {
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     internal static void ApiVersionDeprecated(
         this ILogger logger,
         Uri requestUrl,
@@ -19,6 +18,11 @@ internal static partial class ILoggerExtensions
         SunsetPolicy sunsetPolicy,
         DeprecationPolicy deprecationPolicy )
     {
+        if ( !logger.IsEnabled( Warning ) )
+        {
+            return;
+        }
+
         var sunsetDate = FormatDate( sunsetPolicy.Date );
         var deprecationDate = FormatDate( deprecationPolicy.Date );
 
@@ -27,6 +31,9 @@ internal static partial class ILoggerExtensions
 
         var additionalInfo = additionalInfoDeprecation.Concat( additionalInfoSunset ).ToArray();
 
+#pragma warning disable IDE0079
+#pragma warning disable CA1873
+
         ApiVersionDeprecated(
             logger,
             apiVersion.ToString(),
@@ -34,6 +41,9 @@ internal static partial class ILoggerExtensions
             sunsetDate,
             deprecationDate,
             additionalInfo );
+
+#pragma warning restore CA1873
+#pragma warning restore IDE0079
     }
 
     [LoggerMessage( EventId = 1, Level = Warning, Message = "API version {apiVersion} for {requestUrl} has been deprecated since {deprecationDate} and will sunset on {sunsetDate}. Additional information: {links}" )]
@@ -45,7 +55,6 @@ internal static partial class ILoggerExtensions
         string deprecationDate,
         string[] links );
 
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     internal static void NewApiVersionAvailable(
         this ILogger logger,
         Uri requestUrl,
@@ -53,8 +62,16 @@ internal static partial class ILoggerExtensions
         ApiVersion newApiVersion,
         SunsetPolicy sunsetPolicy )
     {
+        if ( !logger.IsEnabled( Information ) )
+        {
+            return;
+        }
+
         var sunsetDate = FormatDate( sunsetPolicy.Date );
         var additionalInfo = FormatLinks( sunsetPolicy );
+
+#pragma warning disable IDE0079
+#pragma warning disable CA1873
 
         NewApiVersionAvailable(
             logger,
@@ -63,10 +80,13 @@ internal static partial class ILoggerExtensions
             currentApiVersion.ToString(),
             sunsetDate,
             additionalInfo );
+
+#pragma warning restore CA1873
+#pragma warning restore IDE0079
     }
 
     [LoggerMessage( EventId = 2, Level = Information, Message = "API version {newApiVersion} is now available for {requestUrl} ({currentApiVersion}) until {sunsetDate}. Additional information: {links}" )]
-    static partial void NewApiVersionAvailable(
+    private static partial void NewApiVersionAvailable(
         ILogger logger,
         string newApiVersion,
         string requestUrl,

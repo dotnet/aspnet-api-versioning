@@ -33,8 +33,8 @@ public class ApiInformation
 
     private ApiInformation()
     {
-        SupportedApiVersions = Array.Empty<ApiVersion>();
-        DeprecatedApiVersions = Array.Empty<ApiVersion>();
+        SupportedApiVersions = [];
+        DeprecatedApiVersions = [];
         SunsetPolicy = new();
         DeprecationPolicy = new();
         OpenApiDocumentUrls = new Dictionary<ApiVersion, Uri>( capacity: 0 );

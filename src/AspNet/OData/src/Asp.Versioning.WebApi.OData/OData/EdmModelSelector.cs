@@ -66,7 +66,7 @@ public class EdmModelSelector : IEdmModelSelector
 
         versions.Sort();
         maxVersion = versions.Count == 0 ? ApiVersion.Default : versions[versions.Count - 1];
-        ApiVersions = versions.ToArray();
+        ApiVersions = [.. versions];
         Models = collection;
     }
 
@@ -117,7 +117,7 @@ public class EdmModelSelector : IEdmModelSelector
 
         if ( version is null )
         {
-            var model = new ApiVersionModel( ApiVersions, Enumerable.Empty<ApiVersion>() );
+            var model = new ApiVersionModel( ApiVersions, [] );
 
             if ( ( version = selector.SelectVersion( request, model ) ) is null )
             {

@@ -32,11 +32,11 @@ public class ApiVersioningApplicationModelProviderTest
         var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), Type.EmptyTypes );
         var controller = new ControllerModel( type.GetTypeInfo(), attributes )
         {
-            Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) },
+            Actions = { new ActionModel( actionMethod, [] ) },
         };
-        var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+        var context = new ApplicationModelProviderContext( [controller.ControllerType] );
         var provider = new ApiVersioningApplicationModelProvider(
-            new DefaultApiControllerFilter( Array.Empty<IApiControllerSpecification>() ),
+            new DefaultApiControllerFilter( [] ),
             ControllerNameConvention.Default,
             Options.Create( new ApiVersioningOptions() ),
             Options.Create( new MvcApiVersioningOptions() ) );
@@ -77,9 +77,9 @@ public class ApiVersioningApplicationModelProviderTest
         var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), Type.EmptyTypes );
         var controller = new ControllerModel( type.GetTypeInfo(), attributes )
         {
-            Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) },
+            Actions = { new ActionModel( actionMethod, [] ) },
         };
-        var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+        var context = new ApplicationModelProviderContext( [controller.ControllerType] );
         var provider = new ApiVersioningApplicationModelProvider(
             new NoControllerFilter(),
             ControllerNameConvention.Default,
@@ -114,9 +114,9 @@ public class ApiVersioningApplicationModelProviderTest
         var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), Type.EmptyTypes );
         var controller = new ControllerModel( type.GetTypeInfo(), attributes )
         {
-            Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) },
+            Actions = { new ActionModel( actionMethod, [] ) },
         };
-        var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+        var context = new ApplicationModelProviderContext( [controller.ControllerType] );
         var provider = new ApiVersioningApplicationModelProvider(
             new NoControllerFilter(),
             ControllerNameConvention.Default,
@@ -159,11 +159,11 @@ public class ApiVersioningApplicationModelProviderTest
         var v1 = new ApiVersion( 1, 0 );
         var controller = new ControllerModel( type.GetTypeInfo(), attributes )
         {
-            Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) },
+            Actions = { new ActionModel( actionMethod, [] ) },
         };
-        var context = new ApplicationModelProviderContext( new[] { controller.ControllerType } );
+        var context = new ApplicationModelProviderContext( [controller.ControllerType] );
         var provider = new ApiVersioningApplicationModelProvider(
-            new DefaultApiControllerFilter( Array.Empty<IApiControllerSpecification>() ),
+            new DefaultApiControllerFilter( [] ),
             ControllerNameConvention.Default,
             Options.Create( new ApiVersioningOptions() { DefaultApiVersion = v1 } ),
             Options.Create( new MvcApiVersioningOptions() ) );
@@ -201,17 +201,17 @@ public class ApiVersioningApplicationModelProviderTest
         var actionMethod = type.GetRuntimeMethod( nameof( object.ToString ), Type.EmptyTypes );
         var apiController = new ControllerModel( type.GetTypeInfo(), attributes )
         {
-            Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) },
+            Actions = { new ActionModel( actionMethod, [] ) },
         };
-        var uiController = new ControllerModel( type.GetTypeInfo(), Array.Empty<object>() )
+        var uiController = new ControllerModel( type.GetTypeInfo(), [] )
         {
-            Actions = { new ActionModel( actionMethod, Array.Empty<object>() ) },
+            Actions = { new ActionModel( actionMethod, [] ) },
         };
         var controllers = new[] { apiController, uiController };
         var controllerTypes = new[] { apiController.ControllerType, uiController.ControllerType };
         var context = new ApplicationModelProviderContext( controllerTypes );
         var provider = new ApiVersioningApplicationModelProvider(
-            new DefaultApiControllerFilter( new[] { new ApiBehaviorSpecification() } ),
+            new DefaultApiControllerFilter( [new ApiBehaviorSpecification()] ),
             ControllerNameConvention.Default,
             Options.Create( new ApiVersioningOptions() ),
             Options.Create( new MvcApiVersioningOptions() ) );
@@ -258,7 +258,7 @@ public class ApiVersioningApplicationModelProviderTest
         var controllerTypes = new[] { controller.ControllerType };
         var context = new ApplicationModelProviderContext( controllerTypes );
         var provider = new ApiVersioningApplicationModelProvider(
-            new DefaultApiControllerFilter( new[] { new ApiBehaviorSpecification() } ),
+            new DefaultApiControllerFilter( [new ApiBehaviorSpecification()] ),
             ControllerNameConvention.Default,
             Options.Create( new ApiVersioningOptions() ),
             Options.Create( new MvcApiVersioningOptions() ) );

@@ -35,7 +35,7 @@ public partial class AmbiguousApiVersionException : Exception
     /// <param name="message">The associated error message.</param>
     /// <param name="apiVersions">The <see cref="IEnumerable{T}">sequence</see> of ambiguous API versions.</param>
     public AmbiguousApiVersionException( string message, IEnumerable<string> apiVersions )
-        : base( message ) => this.apiVersions = apiVersions.ToArray();
+        : base( message ) => this.apiVersions = [.. apiVersions];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AmbiguousApiVersionException"/> class.
@@ -44,7 +44,7 @@ public partial class AmbiguousApiVersionException : Exception
     /// <param name="apiVersions">The <see cref="IEnumerable{T}">sequence</see> of ambiguous API versions.</param>
     /// <param name="innerException">The inner <see cref="Exception">exception</see> that caused the current exception, if any.</param>
     public AmbiguousApiVersionException( string message, IEnumerable<string> apiVersions, Exception innerException )
-        : base( message, innerException ) => this.apiVersions = apiVersions.ToArray();
+        : base( message, innerException ) => this.apiVersions = [.. apiVersions];
 
     /// <summary>
     /// Gets a read-only list of the ambiguous API versions.

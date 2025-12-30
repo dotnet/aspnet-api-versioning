@@ -104,7 +104,7 @@ public class ApiVersionMetadata
                         implemented.Add( deprecated[i] );
                     }
 
-                    mergedModel = new( apiModel, implemented.ToArray(), supported, deprecated );
+                    mergedModel = new( apiModel, [.. implemented], supported, deprecated );
                 }
 
                 return mergedModel;

@@ -50,7 +50,7 @@ public class VersionedMetadataRoutingConvention : IODataRoutingConvention
         {
             var modelSelector = request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();
             var versionSelector = request.GetApiVersioningOptions().ApiVersionSelector;
-            var model = new ApiVersionModel( modelSelector.ApiVersions, Enumerable.Empty<ApiVersion>() );
+            var model = new ApiVersionModel( modelSelector.ApiVersions, [] );
 
             properties.RequestedApiVersion = versionSelector.SelectVersion( request, model );
         }

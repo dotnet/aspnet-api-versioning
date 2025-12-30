@@ -71,14 +71,14 @@ internal sealed class ODataRouteBuilder
     {
         if ( IsNullOrEmpty( template ) )
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var token = Concat( "{", NavigationProperty, "}" );
 
         if ( template.IndexOf( token, OrdinalIgnoreCase ) < 0 )
         {
-            return new[] { template };
+            return [template];
         }
 
         IEdmEntityType entity;
@@ -92,7 +92,7 @@ internal sealed class ODataRouteBuilder
                 entity = Context.Singleton.EntityType();
                 break;
             default:
-                return Array.Empty<string>();
+                return [];
         }
 
         var properties = entity.NavigationProperties().ToArray();

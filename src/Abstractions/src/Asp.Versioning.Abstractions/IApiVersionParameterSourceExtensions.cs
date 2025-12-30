@@ -136,7 +136,7 @@ public static class IApiVersionParameterSourceExtensions
             {
                 if ( parameterNames == null )
                 {
-                    return Array.Empty<string>();
+                    return [];
                 }
 
                 return parameterNames;

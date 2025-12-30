@@ -68,8 +68,8 @@ public class AcmeController : ODataController
         {
             Id = 42,
             Name = "Acme",
-            Products = new List<Product>()
-            {
+            Products =
+            [
                 new()
                 {
                     Id = 42,
@@ -78,6 +78,6 @@ public class AcmeController : ODataController
                     Price = 42,
                     SupplierId = 42,
                 },
-            },
+            ],
         };
 }

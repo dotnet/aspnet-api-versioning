@@ -33,19 +33,13 @@ public partial class GroupedControllerNameConventionTest
         name.Should().Be( "Values" );
     }
 
-    public static IEnumerable<object[]> NormalizeNameData
+    public static TheoryData<string> NormalizeNameData => new()
     {
-        get
-        {
-            return new object[][]
-            {
-                ["Values"],
+        { "Values" },
 #if NETFRAMEWORK
-                ["ValuesController2"],
+        { "ValuesController2" },
 #else
-                ["Values2"],
+        { "Values2" },
 #endif
-            };
-        }
-    }
+    };
 }

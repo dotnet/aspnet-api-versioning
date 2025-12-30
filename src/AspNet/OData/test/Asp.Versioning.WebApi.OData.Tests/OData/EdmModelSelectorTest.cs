@@ -15,7 +15,7 @@ public class EdmModelSelectorTest
         var model = NewEdm( new ApiVersion( 2.0 ) );
 
         // act
-        var selector = new EdmModelSelector( new[] { model }, Mock.Of<IApiVersionSelector>() );
+        var selector = new EdmModelSelector( [model], Mock.Of<IApiVersionSelector>() );
 
         // assert
         selector.ApiVersions.Single().Should().Be( new ApiVersion( 2.0 ) );
@@ -30,7 +30,7 @@ public class EdmModelSelectorTest
         var model = NewEdm( new ApiVersion( 2.0 ) );
 
         // act
-        var selector = new EdmModelSelector( new[] { model }, Mock.Of<IApiVersionSelector>() );
+        var selector = new EdmModelSelector( [model], Mock.Of<IApiVersionSelector>() );
 
         // assert
         selector.Contains( new ApiVersion( version ) ).Should().Be( expected );
@@ -41,7 +41,7 @@ public class EdmModelSelectorTest
     {
         // arrange
         var model = NewEdm( new ApiVersion( 2.0 ) );
-        var selector = new EdmModelSelector( new[] { model }, Mock.Of<IApiVersionSelector>() );
+        var selector = new EdmModelSelector( [model], Mock.Of<IApiVersionSelector>() );
 
         // act
         var result = selector.SelectModel( new ApiVersion( 2.0 ) );
@@ -55,7 +55,7 @@ public class EdmModelSelectorTest
     {
         // arrange
         var model = NewEdm( new ApiVersion( 2.0 ) );
-        var selector = new EdmModelSelector( new[] { model }, Mock.Of<IApiVersionSelector>() );
+        var selector = new EdmModelSelector( [model], Mock.Of<IApiVersionSelector>() );
 
         // act
         var result = selector.SelectModel( new ApiVersion( 1.0 ) );
@@ -69,7 +69,7 @@ public class EdmModelSelectorTest
     {
         // arrange
         var model = NewEdm( new ApiVersion( 2.0 ) );
-        var selector = new EdmModelSelector( new[] { model }, Mock.Of<IApiVersionSelector>() );
+        var selector = new EdmModelSelector( [model], Mock.Of<IApiVersionSelector>() );
 
         // act
         var result = selector.SelectModel( Mock.Of<IServiceProvider>() );
@@ -85,7 +85,7 @@ public class EdmModelSelectorTest
         var model = NewEdm( new ApiVersion( 2.0 ) );
         var serviceProvider = NewServiceProvider( new ApiVersion( 2.0 ) );
         var selector = new EdmModelSelector(
-            new[] { NewEdm( new ApiVersion( 1.0 ) ), model },
+            [NewEdm( new ApiVersion( 1.0 ) ), model],
             Mock.Of<IApiVersionSelector>() );
 
         // act
@@ -102,7 +102,7 @@ public class EdmModelSelectorTest
         var model = NewEdm( new ApiVersion( 1.0 ) );
         var serviceProvider = NewServiceProvider();
         var selector = new EdmModelSelector(
-            new[] { NewEdm( new ApiVersion( 2.0 ) ), model },
+            [NewEdm( new ApiVersion( 2.0 ) ), model],
             new LowestImplementedApiVersionSelector( new() ) );
 
         // act

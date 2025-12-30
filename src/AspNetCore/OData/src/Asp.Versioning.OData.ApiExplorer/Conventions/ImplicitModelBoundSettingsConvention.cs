@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Conventions;
 
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using System.Diagnostics.CodeAnalysis;
 
 /// <content>
 /// Provides additional implementation specific to ASP.NET Core.
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 public partial class ImplicitModelBoundSettingsConvention
 {
     /// <inheritdoc />
+    [RequiresUnreferencedCode( "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
     public void ApplyTo( ApiDescription apiDescription )
     {
         ArgumentNullException.ThrowIfNull( apiDescription );

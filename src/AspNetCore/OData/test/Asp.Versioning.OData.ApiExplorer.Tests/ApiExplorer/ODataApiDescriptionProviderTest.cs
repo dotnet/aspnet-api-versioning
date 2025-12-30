@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using System.Buffers;
 
 public class ODataApiDescriptionProviderTest
@@ -17,28 +18,31 @@ public class ODataApiDescriptionProviderTest
     public void odata_api_explorer_should_group_and_order_descriptions_on_providers_executed()
     {
         // arrange
-        var builder = new WebHostBuilder()
-            .ConfigureServices(
-                services =>
-                {
-                    services.AddControllers()
-                            .AddOData(
-                                options =>
-                                {
-                                    options.Count().Select().OrderBy();
-                                    options.RouteOptions.EnableKeyInParenthesis = false;
-                                    options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
-                                    options.RouteOptions.EnableQualifiedOperationCall = false;
-                                    options.RouteOptions.EnableUnqualifiedOperationCall = true;
-                                } );
+        var builder = Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults( server =>
+            {
+                server.ConfigureServices(
+                    services =>
+                    {
+                        services.AddControllers()
+                                .AddOData(
+                                    options =>
+                                    {
+                                        options.Count().Select().OrderBy();
+                                        options.RouteOptions.EnableKeyInParenthesis = false;
+                                        options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
+                                        options.RouteOptions.EnableQualifiedOperationCall = false;
+                                        options.RouteOptions.EnableUnqualifiedOperationCall = true;
+                                    } );
 
-                    services.AddApiVersioning()
-                            .AddOData( options => options.AddRouteComponents( "api" ) )
-                            .AddODataApiExplorer( options => options.GroupNameFormat = "'v'VVV" );
+                        services.AddApiVersioning()
+                                .AddOData( options => options.AddRouteComponents( "api" ) )
+                                .AddODataApiExplorer( options => options.GroupNameFormat = "'v'VVV" );
 
-                    services.TryAddEnumerable( ServiceDescriptor.Transient<IApplicationModelProvider, TestApiExplorerApplicationModelProvider>() );
-                } )
-            .Configure( app => app.UseRouting().UseEndpoints( endpoints => endpoints.MapControllers() ) );
+                        services.TryAddEnumerable( ServiceDescriptor.Transient<IApplicationModelProvider, TestApiExplorerApplicationModelProvider>() );
+                    } )
+                .Configure( app => app.UseRouting().UseEndpoints( endpoints => endpoints.MapControllers() ) );
+            } );
         var host = builder.Build();
         var serviceProvider = host.Services;
 
@@ -64,28 +68,31 @@ public class ODataApiDescriptionProviderTest
     public void odata_api_explorer_should_explore_metadata_routes( ODataMetadataOptions metadataOptions )
     {
         // arrange
-        var builder = new WebHostBuilder()
-            .ConfigureServices(
-                services =>
-                {
-                    services.AddControllers()
-                            .AddOData(
-                                options =>
-                                {
-                                    options.Count().Select().OrderBy();
-                                    options.RouteOptions.EnableKeyInParenthesis = false;
-                                    options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
-                                    options.RouteOptions.EnableQualifiedOperationCall = false;
-                                    options.RouteOptions.EnableUnqualifiedOperationCall = true;
-                                } );
+        var builder = Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults( server =>
+            {
+                server.ConfigureServices(
+                    services =>
+                    {
+                        services.AddControllers()
+                                .AddOData(
+                                    options =>
+                                    {
+                                        options.Count().Select().OrderBy();
+                                        options.RouteOptions.EnableKeyInParenthesis = false;
+                                        options.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
+                                        options.RouteOptions.EnableQualifiedOperationCall = false;
+                                        options.RouteOptions.EnableUnqualifiedOperationCall = true;
+                                    } );
 
-                    services.AddApiVersioning()
-                            .AddOData( options => options.AddRouteComponents( "api" ) )
-                            .AddODataApiExplorer( options => options.MetadataOptions = metadataOptions );
+                        services.AddApiVersioning()
+                                .AddOData( options => options.AddRouteComponents( "api" ) )
+                                .AddODataApiExplorer( options => options.MetadataOptions = metadataOptions );
 
-                    services.TryAddEnumerable( ServiceDescriptor.Transient<IApplicationModelProvider, TestApiExplorerApplicationModelProvider>() );
-                } )
-            .Configure( app => app.UseRouting().UseEndpoints( endpoints => endpoints.MapControllers() ) );
+                        services.TryAddEnumerable( ServiceDescriptor.Transient<IApplicationModelProvider, TestApiExplorerApplicationModelProvider>() );
+                    } )
+                .Configure( app => app.UseRouting().UseEndpoints( endpoints => endpoints.MapControllers() ) );
+            } );
         var host = builder.Build();
         var serviceProvider = host.Services;
 

@@ -9,7 +9,7 @@ public class ControllerTypeCollection : Collection<Type>, IHttpControllerTypeRes
 {
     public ControllerTypeCollection() { }
 
-    public ControllerTypeCollection( params Type[] controllerTypes ) : base( controllerTypes.ToList() ) { }
+    public ControllerTypeCollection( params Type[] controllerTypes ) : base( [.. controllerTypes] ) { }
 
     public ICollection<Type> GetControllerTypes( IAssembliesResolver assembliesResolver ) => this;
 }

@@ -19,7 +19,7 @@ internal static class HttpContentExtensions
     {
         SupportedMediaTypes = { new( ProblemDetailsDefaults.MediaType.Json ) },
     };
-    private static readonly IEnumerable<MediaTypeFormatter> MediaTypeFormatters = new[] { ProblemDetailsMediaTypeFormatter };
+    private static readonly IEnumerable<MediaTypeFormatter> MediaTypeFormatters = [ProblemDetailsMediaTypeFormatter];
 #endif
 
     public static Task<ProblemDetails> ReadAsProblemDetailsAsync(

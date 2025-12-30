@@ -27,9 +27,9 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
         };
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
         var body = response.EnsureSuccessStatusCode().Content;
-        var content = await body.ReadAsExampleAsync( example );
+        var content = await body.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
@@ -54,8 +54,8 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
         };
 
         // act
-        var response = await Client.SendAsync( request );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var response = await Client.SendAsync( request, CancellationToken );
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( NotAcceptable );
@@ -72,8 +72,8 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
         };
 
         // act
-        var response = await Client.SendAsync( request );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var response = await Client.SendAsync( request, CancellationToken );
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( UnsupportedMediaType );
@@ -90,7 +90,7 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
         };
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( UnsupportedMediaType );
@@ -107,7 +107,7 @@ public class when_using_media_type_negotiation : AcceptanceTest, IClassFixture<M
         // act
         var response = await GetAsync( requestUrl );
         var body = response.EnsureSuccessStatusCode().Content;
-        var content = await body.ReadAsExampleAsync( example );
+        var content = await body.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         body.Headers.ContentType.Parameters.Single( p => p.Name == "v" ).Value.Should().Be( apiVersion );

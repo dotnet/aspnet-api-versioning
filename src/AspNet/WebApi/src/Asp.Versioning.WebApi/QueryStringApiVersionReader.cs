@@ -16,7 +16,7 @@ public partial class QueryStringApiVersionReader
 
         if ( count == 0 )
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var version = default( string );
@@ -62,6 +62,6 @@ public partial class QueryStringApiVersionReader
             return version == null ? [] : [version];
         }
 
-        return versions.ToArray();
+        return [.. versions];
     }
 }

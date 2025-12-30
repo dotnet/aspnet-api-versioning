@@ -26,6 +26,9 @@ internal sealed class ODataControllerQueryOptionConvention : IODataQueryOptionsC
         this.settings = settings;
     }
 
+#if !NETFRAMEWORK
+    [RequiresUnreferencedCode( "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
+#endif
     public void ApplyTo( ApiDescription apiDescription )
     {
         if ( apiDescription.ActionDescriptor is not ControllerActionDescriptor action )

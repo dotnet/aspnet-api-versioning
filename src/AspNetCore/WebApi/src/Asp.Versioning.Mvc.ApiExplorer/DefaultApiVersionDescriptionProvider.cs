@@ -76,7 +76,7 @@ public class DefaultApiVersionDescriptionProvider : IApiVersionDescriptionProvid
             return DescriptionProvider.Describe( groupedMetadata, SunsetPolicyManager, DeprecationPolicyManager, Options );
         }
 
-        return Array.Empty<ApiVersionDescription>();
+        return [];
     }
 
     private sealed class GroupedApiVersionMetadata :

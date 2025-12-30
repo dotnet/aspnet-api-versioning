@@ -18,7 +18,7 @@ public class ApiVersionHandlerTest
         using var invoker = new HttpMessageInvoker( handler );
 
         // act
-        await invoker.SendAsync( request, default );
+        await invoker.SendAsync( request, TestContext.Current.CancellationToken );
 
         // assert
         Mock.Get( writer ).Verify( w => w.Write( request, version ) );
@@ -57,6 +57,7 @@ public class ApiVersionHandlerTest
         var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
         var response = new HttpResponseMessage();
         var version = new ApiVersion( 1.0 );
+        var cancellationToken = TestContext.Current.CancellationToken;
         using var handler = new ApiVersionHandler( writer, version, notification )
         {
             InnerHandler = new TestServer( response ),
@@ -67,11 +68,11 @@ public class ApiVersionHandlerTest
         response.Headers.Add( "api-deprecated-versions", "1.0" );
 
         // act
-        await invoker.SendAsync( request, default );
+        await invoker.SendAsync( request, cancellationToken );
 
         // assert
         Mock.Get( notification )
-            .Verify( n => n.OnApiDeprecatedAsync( It.IsAny<ApiNotificationContext>(), default ) );
+            .Verify( n => n.OnApiDeprecatedAsync( It.IsAny<ApiNotificationContext>(), cancellationToken ) );
     }
 
     [Fact]
@@ -109,19 +110,20 @@ public class ApiVersionHandlerTest
         var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
         var response = new HttpResponseMessage();
         var version = new ApiVersion( 1.0 );
+        var cancellationToken = TestContext.Current.CancellationToken;
         using var handler = new ApiVersionHandler( writer, version, notification )
         {
             InnerHandler = new TestServer( response ),
         };
         using var invoker = new HttpMessageInvoker( handler );
 
-        response.Headers.Add( "api-supported-versions", new[] { "1.0", "2.0" } );
+        response.Headers.Add( "api-supported-versions", ["1.0", "2.0"] );
 
         // act
-        await invoker.SendAsync( request, default );
+        await invoker.SendAsync( request, cancellationToken );
 
         // assert
         Mock.Get( notification )
-            .Verify( n => n.OnNewApiAvailableAsync( It.IsAny<ApiNotificationContext>(), default ) );
+            .Verify( n => n.OnNewApiAvailableAsync( It.IsAny<ApiNotificationContext>(), cancellationToken ) );
     }
 }

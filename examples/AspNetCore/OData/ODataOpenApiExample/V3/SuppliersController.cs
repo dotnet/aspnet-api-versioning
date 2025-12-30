@@ -190,8 +190,8 @@ public class SuppliersController : ODataController
         {
             Id = id,
             Name = "Supplier " + id.ToString(),
-            Products = new List<Product>()
-            {
+            Products =
+            [
                 new()
                 {
                     Id = id,
@@ -200,6 +200,6 @@ public class SuppliersController : ODataController
                     Price = id,
                     SupplierId = id,
                 },
-            },
+            ],
         };
 }

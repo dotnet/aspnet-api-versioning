@@ -31,7 +31,7 @@ public partial class ODataQueryOptionsConventionBuilderTest
         builder.Add( convention.Object );
 
         // act
-        builder.ApplyTo( new[] { description }, settings );
+        builder.ApplyTo( [description], settings );
 
         // assert
         convention.Verify( c => c.ApplyTo( description ), Times.Once() );

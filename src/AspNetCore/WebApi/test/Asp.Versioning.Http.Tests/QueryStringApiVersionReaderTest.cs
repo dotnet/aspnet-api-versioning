@@ -64,9 +64,10 @@ public class QueryStringApiVersionReaderTest
 
     [Theory]
     [MemberData( nameof( AmbiguousQueryCollection ) )]
-    public void read_should_return_ambiguous_api_versions( IQueryCollection query )
+    public void read_should_return_ambiguous_api_versions( string[] names, string[] values )
     {
         // arrange
+        var query = ToQueryStringParameter( names, values );
         var request = new Mock<HttpRequest>();
         var reader = new QueryStringApiVersionReader( "api-version", "version" );
 
@@ -81,9 +82,10 @@ public class QueryStringApiVersionReaderTest
 
     [Theory]
     [MemberData( nameof( DuplicateQueryCollection ) )]
-    public void read_should_not_throw_exception_when_duplicate_api_versions_are_requested( IQueryCollection query )
+    public void read_should_not_throw_exception_when_duplicate_api_versions_are_requested( string[] names, string[] values )
     {
         // arrange
+        var query = ToQueryStringParameter( names, values );
         var request = new Mock<HttpRequest>();
         var reader = new QueryStringApiVersionReader( "api-version", "version" );
 
@@ -96,41 +98,39 @@ public class QueryStringApiVersionReaderTest
         versions.Single().Should().Be( "1.0" );
     }
 
-    public static IEnumerable<object[]> AmbiguousQueryCollection
+    private static IQueryCollection ToQueryStringParameter( string[] names, string[] values )
     {
-        get
+        var query = new Mock<IQueryCollection>();
+
+        if ( names.Length == values.Length )
         {
-            var query = new Mock<IQueryCollection>();
-            query.SetupGet( q => q["api-version"] ).Returns( new StringValues( new[] { "1.0", "2.0" } ) );
-            yield return new object[] { query.Object };
-
-            query = new Mock<IQueryCollection>();
-            query.SetupGet( q => q["version"] ).Returns( new StringValues( new[] { "1.0", "2.0" } ) );
-            yield return new object[] { query.Object };
-
-            query = new Mock<IQueryCollection>();
-            query.SetupGet( q => q["api-version"] ).Returns( new StringValues( "1.0" ) );
-            query.SetupGet( q => q["version"] ).Returns( new StringValues( "2.0" ) );
-            yield return new object[] { query.Object };
+            for ( var i = 0; i < names.Length; i++ )
+            {
+                query.SetupGet( q => q[names[i]] ).Returns( new StringValues( values[i] ) );
+            }
         }
+        else
+        {
+            foreach ( var name in names )
+            {
+                query.SetupGet( q => q[name] ).Returns( new StringValues( values ) );
+            }
+        }
+
+        return query.Object;
     }
 
-    public static IEnumerable<object[]> DuplicateQueryCollection
+    public static TheoryData<string[], string[]> AmbiguousQueryCollection => new()
     {
-        get
-        {
-            var query = new Mock<IQueryCollection>();
-            query.SetupGet( q => q["api-version"] ).Returns( new StringValues( new[] { "1.0", "1.0" } ) );
-            yield return new object[] { query.Object };
+        { ["api-version"], ["1.0", "2.0"] },
+        { ["version"], ["1.0", "2.0"] },
+        { ["api-version", "version"], ["1.0", "2.0"] },
+    };
 
-            query = new Mock<IQueryCollection>();
-            query.SetupGet( q => q["version"] ).Returns( new StringValues( new[] { "1.0", "1.0" } ) );
-            yield return new object[] { query.Object };
-
-            query = new Mock<IQueryCollection>();
-            query.SetupGet( q => q["api-version"] ).Returns( new StringValues( "1.0" ) );
-            query.SetupGet( q => q["version"] ).Returns( new StringValues( "1.0" ) );
-            yield return new object[] { query.Object };
-        }
-    }
+    public static TheoryData<string[], string[]> DuplicateQueryCollection => new()
+    {
+        { ["api-version"], ["1.0", "1.0"] },
+        { ["version"], ["1.0", "1.0"] },
+        { ["api-version", "version"], ["1.0", "1.0"] },
+    };
 }

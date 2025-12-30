@@ -36,7 +36,7 @@ public class ApiVersioningMvcOptionsSetupTest
         setup.PostConfigure( default, mvcOptions );
 
         // assert
-        mvcOptions.Filters.OfType<ServiceFilterAttribute>().Single().ServiceType.Should().Be( typeof( ReportApiVersionsAttribute ) );
+        mvcOptions.Filters.OfType<ServiceFilterAttribute>().Single().ServiceType.Should().Be<ReportApiVersionsAttribute>();
     }
 
     [Fact]
@@ -55,6 +55,6 @@ public class ApiVersioningMvcOptionsSetupTest
         setup.PostConfigure( default, mvcOptions );
 
         // assert
-        mvcOptions.ModelBinderProviders.First().GetBinder( context.Object ).Should().BeOfType( typeof( ApiVersionModelBinder ) );
+        mvcOptions.ModelBinderProviders.First().GetBinder( context.Object ).Should().BeOfType<ApiVersionModelBinder>();
     }
 }

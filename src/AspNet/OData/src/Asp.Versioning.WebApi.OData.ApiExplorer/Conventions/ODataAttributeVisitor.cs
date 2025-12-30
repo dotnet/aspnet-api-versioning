@@ -13,6 +13,6 @@ internal sealed partial class ODataAttributeVisitor
         var attributes = new List<EnableQueryAttribute>( controller.GetCustomAttributes<EnableQueryAttribute>( inherit: true ) );
 
         attributes.AddRange( action.GetCustomAttributes<EnableQueryAttribute>( inherit: true ) );
-        VisitEnableQuery( attributes.ToArray() );
+        VisitEnableQuery( [.. attributes] );
     }
 }

@@ -16,9 +16,9 @@ public partial class ActionApiVersionConventionBuilderTest
         var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
         var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
         var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
-        var actionModel = new ActionModel( method, Array.Empty<object>() )
+        var actionModel = new ActionModel( method, [] )
         {
-            Controller = new( typeof( ControllerBase ).GetTypeInfo(), Array.Empty<object>() ),
+            Controller = new( typeof( ControllerBase ).GetTypeInfo(), [] ),
         };
 
         // act
@@ -52,7 +52,7 @@ public partial class ActionApiVersionConventionBuilderTest
         var attributes = new object[] { new MapToApiVersionAttribute( "2.0" ) };
         var actionModel = new ActionModel( method, attributes )
         {
-            Controller = new( typeof( ControllerBase ).GetTypeInfo(), Array.Empty<object>() ),
+            Controller = new( typeof( ControllerBase ).GetTypeInfo(), [] ),
         };
 
         actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) );
@@ -88,7 +88,7 @@ public partial class ActionApiVersionConventionBuilderTest
         var attributes = method.GetCustomAttributes().Cast<object>().ToArray();
         var actionModel = new ActionModel( method, attributes )
         {
-            Controller = new( typeof( ControllerBase ).GetTypeInfo(), Array.Empty<object>() ),
+            Controller = new( typeof( ControllerBase ).GetTypeInfo(), [] ),
         };
 
         actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) )

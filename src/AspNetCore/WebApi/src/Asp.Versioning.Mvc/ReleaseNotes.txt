@@ -1,1 +1,1 @@
-﻿Enable trimming support ([#1094](https://github.com/dotnet/aspnet-api-versioning/issues/1094))
+﻿

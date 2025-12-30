@@ -35,7 +35,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
 
         // act
         var response = await GetAsync( "api/people?api-version=4.0" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -65,7 +65,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
 
         // act
         var response = await PatchAsync( requestUrl, person );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( MethodNotAllowed );
@@ -80,7 +80,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
 
         // act
         var response = await PatchAsync( "api/people/42?api-version=4.0", person );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -95,7 +95,7 @@ public class when_using_a_query_string_and_split_into_two_types : ConventionsAcc
 
         // act
         var response = await GetAsync( "api/people" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

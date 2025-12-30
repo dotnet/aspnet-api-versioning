@@ -36,7 +36,7 @@ public class ODataApiExplorerOptionsFactory : ApiExplorerOptionsFactory<ODataApi
         IEnumerable<IPostConfigureOptions<ODataApiExplorerOptions>> postConfigures )
         : base( options, setups, postConfigures )
     {
-        this.providers = ( providers ?? throw new ArgumentNullException( nameof( providers ) ) ).ToArray();
+        this.providers = [.. providers ?? throw new ArgumentNullException( nameof( providers ) )];
         this.modelConfigurations = modelConfigurations ?? throw new ArgumentNullException( nameof( modelConfigurations ) );
     }
 
@@ -64,7 +64,7 @@ public class ODataApiExplorerOptionsFactory : ApiExplorerOptionsFactory<ODataApi
         IEnumerable<IValidateOptions<ODataApiExplorerOptions>> validations )
         : base( options, setups, postConfigures, validations )
     {
-        this.providers = ( providers ?? throw new ArgumentNullException( nameof( providers ) ) ).ToArray();
+        this.providers = [.. providers ?? throw new ArgumentNullException( nameof( providers ) )];
         this.modelConfigurations = modelConfigurations ?? throw new ArgumentNullException( nameof( modelConfigurations ) );
     }
 
@@ -106,7 +106,7 @@ public class ODataApiExplorerOptionsFactory : ApiExplorerOptionsFactory<ODataApi
             versions.Add( options.DefaultApiVersion );
         }
 
-        return new() { ApiVersions = versions.ToArray() };
+        return new() { ApiVersions = [.. versions] };
     }
 
     private sealed class ODataApiVersionCollectionProvider : IODataApiVersionCollectionProvider

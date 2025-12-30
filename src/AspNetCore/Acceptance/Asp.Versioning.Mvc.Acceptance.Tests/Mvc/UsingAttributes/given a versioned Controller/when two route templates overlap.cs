@@ -14,11 +14,11 @@ public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<Ov
     {
         // arrange
         var response = await GetAsync( "api/v1/values/42/children" );
-        var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // act
         response = await GetAsync( "api/v1/values/42/abc" );
-        var result2 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result2 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // assert
         result1.Should().Be( "{\"id\":42}" );
@@ -30,11 +30,11 @@ public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<Ov
     {
         // arrange
         var response = await GetAsync( "api/v1/values/42/abc" );
-        var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // act
         response = await GetAsync( "api/v1/values/42/children" );
-        var result2 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result2 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // assert
         result1.Should().Be( "{\"id\":42,\"childId\":\"abc\"}" );
@@ -46,7 +46,7 @@ public class when_two_route_templates_overlap : AcceptanceTest, IClassFixture<Ov
     {
         // arrange
         var response = await GetAsync( "api/v1/values/42/abc" );
-        var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result1 = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // act
         Func<Task> act = async () => await GetAsync( "api/v1/values/42/ambiguous" );

@@ -16,6 +16,7 @@ using static System.Linq.Expressions.Expression;
 
 internal sealed class ODataMultiModelApplicationModelProvider : IApplicationModelProvider
 {
+    [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors )]
     internal static readonly Type ODataRoutingApplicationModelProviderType = GetDefaultApplicationModelProviderType();
     private static readonly Func<IOptions<ODataOptions>, IApplicationModelProvider> NewODataApplicationModelProvider = CreateActivator( ODataRoutingApplicationModelProviderType );
     private readonly IODataApiVersionCollectionProvider apiVersionCollectionProvider;
@@ -128,11 +129,11 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    [return: DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors )]
     private static Type GetDefaultApplicationModelProviderType()
     {
-        const string TypeName = "Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider";
-        var assemblyName = typeof( ODataOptions ).Assembly.GetName().Name;
-        return Type.GetType( $"{TypeName}, {assemblyName}", throwOnError: true, ignoreCase: false )!;
+        const string TypeName = "Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider, Microsoft.AspNetCore.OData";
+        return Type.GetType( TypeName, throwOnError: true, ignoreCase: false )!;
     }
 
     private static Func<IOptions<ODataOptions>, IApplicationModelProvider> CreateActivator(

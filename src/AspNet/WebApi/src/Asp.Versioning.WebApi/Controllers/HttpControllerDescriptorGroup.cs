@@ -93,7 +93,7 @@ public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnly
             attributes.UnionWith( descriptors[i].GetCustomAttributes<T>( inherit ) );
         }
 
-        return new( attributes.ToList() );
+        return new( [.. attributes] );
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnly
             filters.UnionWith( descriptors[i].GetFilters() );
         }
 
-        return new( filters.ToList() );
+        return new( [.. filters] );
     }
 
     /// <summary>

@@ -51,10 +51,10 @@ public class ApiVersionConventionBuilderBaseTest
             new AdvertiseApiVersionsAttribute( "2.0-Beta" ) { Deprecated = true },
         };
         var expected = new ApiVersionModel(
-            new ApiVersion[] { new( 1.0 ) },
-            new ApiVersion[] { new( 0.9 ) },
-            new ApiVersion[] { new( 2.0 ) },
-            new ApiVersion[] { new( 2.0, "Beta" ) } );
+            [new( 1.0 )],
+            [new( 0.9 )],
+            [new( 2.0 )],
+            [new( 2.0, "Beta" )] );
         var builder = new TestApiVersionConventionBuilder();
 
         // act

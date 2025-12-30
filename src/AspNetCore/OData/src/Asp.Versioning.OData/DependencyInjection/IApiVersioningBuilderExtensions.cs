@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
@@ -15,7 +17,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using static Asp.Versioning.OData.ODataMultiModelApplicationModelProvider;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
@@ -55,6 +56,8 @@ public static class IApiVersioningBuilderExtensions
 
     private static void AddServices( IServiceCollection services )
     {
+        const string DefaultODataTemplateTranslator = "Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator, Microsoft.AspNetCore.OData";
+
         services.TryRemoveODataService( typeof( IApplicationModelProvider ), ODataRoutingApplicationModelProviderType );
 
         var partManager = services.GetOrCreateApplicationPartManager();
@@ -64,7 +67,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddSingleton<VersionedODataOptions>();
         services.TryReplaceODataService(
             Singleton<IODataTemplateTranslator, VersionedODataTemplateTranslator>(),
-            "Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator" );
+            Type.GetType( DefaultODataTemplateTranslator, throwOnError: true, ignoreCase: false )! );
         services.Replace( Singleton<IOptions<ODataOptions>>( sp => sp.GetRequiredService<VersionedODataOptions>() ) );
         services.Replace( WithHttpContextFactoryDecorator( services ) );
         services.TryAddTransient<VersionedODataModelBuilder>();
@@ -80,13 +83,6 @@ public static class IApiVersioningBuilderExtensions
         {
             services.AddModelConfigurationsAsServices( partManager );
         }
-    }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static Type GetODataType( string typeName )
-    {
-        var assemblyName = typeof( ODataOptions ).Assembly.GetName().Name;
-        return Type.GetType( $"{typeName}, {assemblyName}", throwOnError: true, ignoreCase: false )!;
     }
 
     private static void TryRemoveODataService( this IServiceCollection services, Type serviceType, Type implementationType )
@@ -115,10 +111,9 @@ public static class IApiVersioningBuilderExtensions
     private static void TryReplaceODataService(
         this IServiceCollection services,
         ServiceDescriptor replacement,
-        string implementationTypeName )
+        [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.None )] Type implementationType )
     {
         var serviceType = replacement.ServiceType;
-        var implementationType = GetODataType( implementationTypeName );
 
         for ( var i = 0; i < services.Count; i++ )
         {

@@ -46,7 +46,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
 
         // act
         var response = await GetAsync( "api?api-version=4.0" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -60,7 +60,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         Client.DefaultRequestHeaders.Clear();
 
         // act
-        var response = await Client.GetAsync( "api/$metadata" );
+        var response = await Client.GetAsync( "api/$metadata", CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( OK );
@@ -78,7 +78,7 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         Client.DefaultRequestHeaders.Clear();
 
         // act
-        var response = await Client.GetAsync( requestUrl );
+        var response = await Client.GetAsync( requestUrl, CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( OK );
@@ -91,8 +91,8 @@ public abstract class ODataAcceptanceTest : AcceptanceTest
         Client.DefaultRequestHeaders.Clear();
 
         // act
-        var response = await Client.GetAsync( "api/$metadata?api-version=4.0" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var response = await Client.GetAsync( "api/$metadata?api-version=4.0", CancellationToken );
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

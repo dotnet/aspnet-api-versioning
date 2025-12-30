@@ -32,7 +32,7 @@ public class HeaderApiVersionReaderTest
         var request = new HttpRequestMessage();
         var reader = new HeaderApiVersionReader( "api-version" );
 
-        request.Headers.TryAddWithoutValidation( "api-version", new[] { "1.0", "2.0" } );
+        request.Headers.TryAddWithoutValidation( "api-version", ["1.0", "2.0"] );
 
         // act
         var versions = reader.Read( request );

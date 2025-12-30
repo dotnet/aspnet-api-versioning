@@ -19,7 +19,7 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( $"api/{apiVersion}/hello" );
-        var result = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // assert
         result.Should().Be( expected );
@@ -35,7 +35,7 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( $"api/{apiVersion}/hello/Hi" );
-        var result = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+        var result = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync( CancellationToken );
 
         // assert
         result.Should().Be( expected );
@@ -50,7 +50,7 @@ public class when_using_a_url_segment : AcceptanceTest
         using var request = new HttpRequestMessage( Post, $"api/{apiVersion}/hello" );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.IsSuccessStatusCode.Should().BeTrue();
@@ -63,7 +63,7 @@ public class when_using_a_url_segment : AcceptanceTest
         using var request = new HttpRequestMessage( Post, "api/v1/hello" );
 
         // act
-        var response = await Client.SendAsync( request );
+        var response = await Client.SendAsync( request, CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Should().Equal( "1.0, 2.0" );

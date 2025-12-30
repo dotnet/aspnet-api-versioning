@@ -3,7 +3,6 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
@@ -19,7 +18,10 @@ internal sealed class AmbiguousApiVersionEndpoint : Endpoint
     {
         var apiVersions = context.ApiVersioningFeature().RawRequestedApiVersions;
 
+#pragma warning disable CA1873
         logger.ApiVersionAmbiguous( [.. apiVersions] );
+#pragma warning restore CA1873
+
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
         if ( !context.TryGetProblemDetailsService( out var problemDetails ) )

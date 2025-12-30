@@ -20,5 +20,8 @@ public interface IODataQueryOptionsConvention
     /// Applies the convention to the specified API description.
     /// </summary>
     /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to apply the convention to.</param>
+#if !NETFRAMEWORK
+    [RequiresUnreferencedCode( "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
+#endif
     void ApplyTo( ApiDescription apiDescription );
 }

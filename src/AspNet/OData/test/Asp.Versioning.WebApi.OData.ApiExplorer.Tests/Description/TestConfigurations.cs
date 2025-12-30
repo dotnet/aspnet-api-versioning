@@ -7,19 +7,38 @@ using Asp.Versioning.Conventions;
 using Asp.Versioning.OData;
 using Asp.Versioning.Simulators.Configuration;
 using Asp.Versioning.Simulators.Models;
-using System.Collections;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
+using static Asp.Versioning.Description.TestConfigurations;
 
-public class TestConfigurations : IEnumerable<object[]>
+public class TestConfigurations : TheoryData<EdmKind>
 {
-    public IEnumerator<object[]> GetEnumerator()
+    public enum EdmKind
     {
-        yield return new object[] { NewOrdersConfiguration() };
-        yield return new object[] { NewPeopleConfiguration() };
+        /// <summary>
+        /// Indicates the Orders EDM.
+        /// </summary>
+        Orders,
+
+        /// <summary>
+        /// Indicates the People EDM.
+        /// </summary>
+        People,
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public TestConfigurations()
+    {
+        Add( EdmKind.Orders );
+        Add( EdmKind.People );
+    }
+
+    public static HttpConfiguration Get( EdmKind kind ) =>
+        kind switch
+        {
+            EdmKind.Orders => NewOrdersConfiguration(),
+            EdmKind.People => NewPeopleConfiguration(),
+            _ => throw new ArgumentOutOfRangeException( nameof( kind ) ),
+        };
 
     public static HttpConfiguration NewOrdersConfiguration()
     {

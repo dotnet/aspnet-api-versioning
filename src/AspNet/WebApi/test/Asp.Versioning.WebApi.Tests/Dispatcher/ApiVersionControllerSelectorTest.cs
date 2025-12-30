@@ -24,11 +24,17 @@ using static System.Web.Http.RouteParameter;
 
 public partial class ApiVersionControllerSelectorTest
 {
-    [Theory]
-    [MemberData( nameof( ControllerNameData ) )]
-    public void get_controller_name_should_return_expected_value( HttpRequestMessage request, string expected )
+    [Fact]
+    public void get_controller_name_should_return_expected_value()
     {
         // arrange
+        var expected = "Test";
+        var request = new HttpRequestMessage();
+        var routeData = new HttpRouteData( new HttpRoute() );
+
+        routeData.Values.Add( "controller", expected );
+        request.SetRouteData( routeData );
+
         var configuration = new HttpConfiguration();
         var options = new ApiVersioningOptions();
         var selector = new ApiVersionControllerSelector( configuration, options );
@@ -190,7 +196,7 @@ public partial class ApiVersionControllerSelectorTest
 
         // act
         var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
-        var content = await response.Content.ReadAsProblemDetailsAsync();
+        var content = await response.Content.ReadAsProblemDetailsAsync( TestContext.Current.CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -237,7 +243,7 @@ public partial class ApiVersionControllerSelectorTest
 
         // act
         var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
-        var content = await response.Content.ReadAsProblemDetailsAsync();
+        var content = await response.Content.ReadAsProblemDetailsAsync( TestContext.Current.CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -283,7 +289,7 @@ public partial class ApiVersionControllerSelectorTest
 
         // act
         var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
-        var content = await response.Content.ReadAsProblemDetailsAsync();
+        var content = await response.Content.ReadAsProblemDetailsAsync( TestContext.Current.CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -331,7 +337,7 @@ public partial class ApiVersionControllerSelectorTest
 
         // act
         var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
-        var content = await response.Content.ReadAsProblemDetailsAsync();
+        var content = await response.Content.ReadAsProblemDetailsAsync( TestContext.Current.CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );
@@ -379,7 +385,7 @@ public partial class ApiVersionControllerSelectorTest
 
         // act
         var response = selectController.Should().Throw<HttpResponseException>().Subject.Single().Response;
-        var content = await response.Content.ReadAsAsync<HttpError>();
+        var content = await response.Content.ReadAsAsync<HttpError>( TestContext.Current.CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( NotFound );
@@ -917,7 +923,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
     public void select_controller_should_return_correct_controller_for_versioned_url( string versionSegment, Type controllerType, string actionName, string declaredVersionsValue, ApiVersionMapping mapping )
     {
         // arrange
-        var declared = string.IsNullOrEmpty( declaredVersionsValue ) ? Array.Empty<ApiVersion>() : declaredVersionsValue.Split( ',' ).Select( v => ApiVersionParser.Default.Parse( v ) );
+        var declared = string.IsNullOrEmpty( declaredVersionsValue ) ? [] : declaredVersionsValue.Split( ',' ).Select( v => ApiVersionParser.Default.Parse( v ) );
         var supported = new[] { new ApiVersion( 1, 0 ), new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ), new ApiVersion( 5, 0 ) };
         var deprecated = new[] { new ApiVersion( 4, 0 ) };
         var implemented = supported.Union( deprecated ).OrderBy( v => v ).ToArray();
@@ -1040,7 +1046,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
 
         var server = new HttpServer( configuration );
         var client = new HttpClient( server );
-        var response = await client.SendAsync( request );
+        var response = await client.SendAsync( request, TestContext.Current.CancellationToken );
 
         response.StatusCode.Should().Be( OK );
     }
@@ -1167,22 +1173,6 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
                 DeprecatedApiVersions = Array.Empty<ApiVersion>(),
                 ImplementedApiVersions = new ApiVersion[] { new( 1, 0 ), new( 2, 0 ), new( 3, 0 ) },
             } );
-    }
-
-    public static IEnumerable<object[]> ControllerNameData
-    {
-        get
-        {
-            yield return new object[] { new HttpRequestMessage(), null };
-
-            var request = new HttpRequestMessage();
-            var routeData = new HttpRouteData( new HttpRoute() );
-
-            routeData.Values.Add( "controller", "Test" );
-            request.SetRouteData( routeData );
-
-            yield return new object[] { request, "Test" };
-        }
     }
 
     private static HttpConfiguration AttributeRoutingEnabledConfiguration

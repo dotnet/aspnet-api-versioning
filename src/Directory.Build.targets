@@ -26,7 +26,7 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
-  <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="1.0.3" PrivateAssets="All" />
+  <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="1.0.*" PrivateAssets="All" />
  </ItemGroup>
 
  <Target Name="GetTargetPath" Outputs="$(TargetPath)" />

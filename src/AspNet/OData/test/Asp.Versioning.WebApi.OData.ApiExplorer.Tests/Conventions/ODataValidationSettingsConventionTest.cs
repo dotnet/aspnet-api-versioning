@@ -311,9 +311,10 @@ public class ODataValidationSettingsConventionTest
 
     [Theory]
     [MemberData( nameof( EnableQueryAttributeData ) )]
-    public void apply_to_should_use_enable_query_attribute( ApiDescription description )
+    public void apply_to_should_use_enable_query_attribute( Type controllerType )
     {
         // arrange
+        var description = NewApiDescription( controllerType );
         var validationSettings = new ODataValidationSettings()
         {
             AllowedQueryOptions = AllowedQueryOptions.None,
@@ -329,8 +330,7 @@ public class ODataValidationSettingsConventionTest
 
         // assert
         description.ParameterDescriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     Name = "$select",
@@ -373,7 +373,7 @@ public class ODataValidationSettingsConventionTest
                         DefaultValue = default( object ),
                     },
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -402,8 +402,7 @@ public class ODataValidationSettingsConventionTest
 
         // assert
         description.ParameterDescriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     Name = "$select",
@@ -460,7 +459,7 @@ public class ODataValidationSettingsConventionTest
                         DefaultValue = (object) false,
                     },
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -505,13 +504,12 @@ public class ODataValidationSettingsConventionTest
                .AllowOrderBy( "title", "published" );
 
         // act
-        builder.ApplyTo( new[] { description }, settings );
+        builder.ApplyTo( [description], settings );
 
         // assert
         description.ParameterDescriptions.RemoveAt( 0 );
         description.ParameterDescriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     Name = "$select",
@@ -551,18 +549,12 @@ public class ODataValidationSettingsConventionTest
                         DefaultValue = (object) false,
                     },
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
-    public static IEnumerable<object[]> EnableQueryAttributeData
-    {
-        get
-        {
-            yield return new object[] { NewApiDescription( typeof( SinglePartController ) ) };
-            yield return new object[] { NewApiDescription( typeof( MultipartController ) ) };
-        }
-    }
+    public static TheoryData<Type> EnableQueryAttributeData =>
+        new( typeof( SinglePartController ), typeof( MultipartController ) );
 
     private static ApiDescription NewApiDescription( string method = "GET", bool singleResult = default )
     {

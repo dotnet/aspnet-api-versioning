@@ -11,9 +11,10 @@ public class ApiVersionCollatorTest
 {
     [Theory]
     [MemberData( nameof( ActionDescriptorProviderContexts ) )]
-    public void on_providers_executed_should_aggregate_api_version_models_by_controller( ActionDescriptorProviderContext context )
+    public void on_providers_executed_should_aggregate_api_version_models_by_controller( ContextKind kind )
     {
         // arrange
+        var context = NewContext( kind );
         var collator = new ApiVersionCollator( ControllerNameConvention.Default );
         var expected = new ApiVersion[] { new( 1, 0 ), new( 2, 0 ), new( 3, 0 ) };
 
@@ -26,14 +27,28 @@ public class ApiVersionCollatorTest
         actions.All( a => a.GetApiVersionMetadata().Map( Explicit ).SupportedApiVersions.SequenceEqual( expected ) ).Should().BeTrue();
     }
 
-    public static IEnumerable<object[]> ActionDescriptorProviderContexts
+    public enum ContextKind
     {
-        get
-        {
-            yield return new object[] { ActionsWithRouteValues };
-            yield return new object[] { ActionsByControllerName };
-        }
+        /// <summary>
+        /// Gets an action context with route values.
+        /// </summary>
+        WithRouteValues,
+
+        /// <summary>
+        /// Gets an action context by controller name.
+        /// </summary>
+        ByControllerName,
     }
+
+    private static ActionDescriptorProviderContext NewContext( ContextKind kind ) => kind switch
+    {
+        ContextKind.WithRouteValues => ActionsWithRouteValues,
+        ContextKind.ByControllerName => ActionsByControllerName,
+        _ => throw new ArgumentOutOfRangeException( nameof( kind ) ),
+    };
+
+    public static TheoryData<ContextKind> ActionDescriptorProviderContexts =>
+        new( ContextKind.WithRouteValues, ContextKind.ByControllerName );
 
     private static ApiVersionMetadata NewApiVersionMetadata( double version )
     {
@@ -53,7 +68,7 @@ public class ApiVersionCollatorTest
                         ["controller"] = "Values",
                         ["action"] = "Get",
                     },
-                    EndpointMetadata = new[] { NewApiVersionMetadata( 1.0 ) },
+                    EndpointMetadata = [NewApiVersionMetadata( 1.0 )],
                 },
                 new()
                 {
@@ -69,7 +84,7 @@ public class ApiVersionCollatorTest
                         ["controller"] = "Values",
                         ["action"] = "Get",
                     },
-                    EndpointMetadata = new[] { NewApiVersionMetadata( 2.0 ) },
+                    EndpointMetadata = [NewApiVersionMetadata( 2.0 )],
                 },
                 new()
                 {
@@ -78,7 +93,7 @@ public class ApiVersionCollatorTest
                         ["controller"] = "Values",
                         ["action"] = "Get",
                     },
-                    EndpointMetadata = new[] { NewApiVersionMetadata( 3.0 ) },
+                    EndpointMetadata = [NewApiVersionMetadata( 3.0 )],
                 },
             },
         };
@@ -95,7 +110,7 @@ public class ApiVersionCollatorTest
                     {
                         ["action"] = "Get",
                     },
-                    EndpointMetadata = new[] { NewApiVersionMetadata( 1.0 ) },
+                    EndpointMetadata = [NewApiVersionMetadata( 1.0 )],
                 },
                 new ActionDescriptor()
                 {
@@ -111,7 +126,7 @@ public class ApiVersionCollatorTest
                     {
                         ["action"] = "Get",
                     },
-                    EndpointMetadata = new[] { NewApiVersionMetadata( 2.0 ) },
+                    EndpointMetadata = [NewApiVersionMetadata( 2.0 )],
                 },
                 new ControllerActionDescriptor()
                 {
@@ -120,7 +135,7 @@ public class ApiVersionCollatorTest
                     {
                         ["action"] = "Get",
                     },
-                    EndpointMetadata = new[] { NewApiVersionMetadata( 3.0 ) },
+                    EndpointMetadata = [NewApiVersionMetadata( 3.0 )],
                 },
             },
         };

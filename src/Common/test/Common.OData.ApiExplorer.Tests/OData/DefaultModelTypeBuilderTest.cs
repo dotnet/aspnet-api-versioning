@@ -50,7 +50,7 @@ public class DefaultModelTypeBuilderTest
         var substitutedType = originalType.SubstituteIfNecessary( context );
 
         // assert
-        substitutedType.Should().Be( typeof( Contact ) );
+        substitutedType.Should().Be<Contact>();
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class DefaultModelTypeBuilderTest
 
         // assert
         substitutedType.Should().NotBe( originalType );
-        substitutedType.Should().NotBe( typeof( Contact ) );
+        substitutedType.Should().NotBe<Contact>();
         substitutedType.GetRuntimeProperties().Should().HaveCount( 3 );
         substitutedType.Should().HaveProperty<int>( nameof( Contact.ContactId ) );
         substitutedType.Should().HaveProperty<string>( nameof( Contact.FirstName ) );
@@ -426,46 +426,25 @@ public class DefaultModelTypeBuilderTest
 
         // assert
         substitutedType.Should().NotBe( addressType );
-#if NET452
-        substitutedType.GetRuntimeProperties().Should().HaveCount( 5 );
-
-        foreach ( var substitutedProperty in substitutedType.GetRuntimeProperties() )
-        {
-            substitutedProperty.Should().NotBeNull();
-            substitutedProperty.GetSetMethod( true ).Should().NotBeNull()
-                .And.Match( p => p.ReturnType == typeof( void ) )
-                .And.Match( p => p.GetParameters().Length == 1 );
-        }
-#else
         substitutedType.GetRuntimeProperties().Should().HaveCount( 5 )
             .And.AllSatisfy( prop => prop.GetSetMethod( true ).Should()
                 .NotBeNull()
                 .And.ReturnVoid()
                 .And.Match( setter => setter.GetParameters().Length == 1 ) );
-#endif
     }
 
-    public static IEnumerable<object[]> SubstitutionNotRequiredData
+    public static TheoryData<Type> SubstitutionNotRequiredData => new()
     {
-        get
-        {
-            yield return new object[] { typeof( IEnumerable<string> ) };
-            yield return new object[] { typeof( IEnumerable<Contact> ) };
-            yield return new object[] { typeof( ODataValue<IEnumerable<Contact>> ) };
-        }
-    }
+        { typeof( IEnumerable<string> ) },
+        { typeof( IEnumerable<Contact> ) },
+        { typeof( ODataValue<IEnumerable<Contact>> ) },
+    };
 
-    public static IEnumerable<object[]> SubstitutionData
+    public static TheoryData<Type> SubstitutionData => new()
     {
-        get
-        {
-            yield return new object[] { typeof( IEnumerable<Contact> ) };
-            yield return new object[] { typeof( ODataValue<Contact> ) };
-        }
-    }
+        { typeof( IEnumerable<Contact> ) },
+        { typeof( ODataValue<Contact> ) },
+    };
 
-    private static TypeSubstitutionContext NewContext( IEdmModel model )
-    {
-        return new TypeSubstitutionContext( model, new DefaultModelTypeBuilder() );
-    }
+    private static TypeSubstitutionContext NewContext( IEdmModel model ) => new( model, new DefaultModelTypeBuilder() );
 }

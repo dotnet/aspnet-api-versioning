@@ -58,7 +58,7 @@ public class VersionedMetadataController : MetadataController
             },
         };
 
-        response.Content.Headers.Add( "Allow", new[] { "GET", "OPTIONS" } );
+        response.Content.Headers.Add( "Allow", ["GET", "OPTIONS"] );
         response.Headers.Add(
             ODataConstants.ODataVersionHeader,
             ODataUtils.ODataVersionToString( ODataVersion.V4 ) );

@@ -239,6 +239,6 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
             return [.. deprecated];
         }
 
-        return supported.Union( deprecated ).ToArray();
+        return [.. supported.Union( deprecated )];
     }
 }

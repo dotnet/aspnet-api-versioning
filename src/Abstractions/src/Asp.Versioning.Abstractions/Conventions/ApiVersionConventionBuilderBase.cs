@@ -64,7 +64,7 @@ public abstract class ApiVersionConventionBuilderBase
     /// </summary>
     /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of attributes to merge.</param>
     protected virtual void MergeAttributesWithConventions( IEnumerable<object> attributes ) =>
-        MergeAttributesWithConventions( ( attributes as IReadOnlyList<object> ) ?? attributes.ToArray() );
+        MergeAttributesWithConventions( ( attributes as IReadOnlyList<object> ) ?? [.. attributes] );
 
     /// <summary>
     /// Merges API version information from the specified attributes with the current conventions.

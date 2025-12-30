@@ -2,7 +2,9 @@
 
 namespace Asp.Versioning;
 
+using System;
 using System.Reflection;
+using System.Xml.Linq;
 #if NETFRAMEWORK
 using DateOnly = System.DateTime;
 #endif
@@ -11,10 +13,11 @@ public class NamespaceParserTest
 {
     [Theory]
     [MemberData( nameof( NamespaceWithOneVersion ) )]
-    public void parse_should_return_single_version( Type type, ApiVersion expected )
+    public void parse_should_return_single_version( string @namespace, string version )
     {
         // arrange
-
+        var type = new TestType( @namespace );
+        var expected = ApiVersionParser.Default.Parse( version );
 
         // act
         var result = NamespaceParser.Default.Parse( type );
@@ -25,10 +28,11 @@ public class NamespaceParserTest
 
     [Theory]
     [MemberData( nameof( NamespaceWithMultipleVersions ) )]
-    public void parse_should_return_multiple_versions( Type type, ApiVersion[] expected )
+    public void parse_should_return_multiple_versions( string @namespace, string[] versions )
     {
         // arrange
-
+        var type = new TestType( @namespace );
+        var expected = versions.Select( static v => ApiVersionParser.Default.Parse( v ) ).ToArray();
 
         // act
         var result = NamespaceParser.Default.Parse( type );
@@ -50,42 +54,39 @@ public class NamespaceParserTest
         result.Should().BeEmpty();
     }
 
-    public static IEnumerable<object[]> NamespaceWithOneVersion
+    public static TheoryData<string, string> NamespaceWithOneVersion => new()
     {
-        get
-        {
-            yield return new object[] { new TestType( "v1" ), new ApiVersion( 1 ) };
-            yield return new object[] { new TestType( "v1RC" ), new ApiVersion( 1, 0, "RC" ) };
-            yield return new object[] { new TestType( "v20180401" ), new ApiVersion( new DateOnly( 2018, 4, 1 ) ) };
-            yield return new object[] { new TestType( "v20180401_Beta" ), new ApiVersion( new DateOnly( 2018, 4, 1 ), "Beta" ) };
-            yield return new object[] { new TestType( "v20180401Beta" ), new ApiVersion( new DateOnly( 2018, 4, 1 ), "Beta" ) };
-            yield return new object[] { new TestType( "Contoso.Api.v1.Controllers" ), new ApiVersion( 1 ) };
-            yield return new object[] { new TestType( "Contoso.Api.v1_1.Controllers" ), new ApiVersion( 1, 1 ) };
-            yield return new object[] { new TestType( "Contoso.Api.v0_9_Beta.Controllers" ), new ApiVersion( 0, 9, "Beta" ) };
-            yield return new object[] { new TestType( "Contoso.Api.v20180401.Controllers" ), new ApiVersion( new DateOnly( 2018, 4, 1 ) ) };
-            yield return new object[] { new TestType( "Contoso.Api.v2018_04_01.Controllers" ), new ApiVersion( new DateOnly( 2018, 4, 1 ) ) };
-            yield return new object[] { new TestType( "Contoso.Api.v20180401_Beta.Controllers" ), new ApiVersion( new DateOnly( 2018, 4, 1 ), "Beta" ) };
-            yield return new object[] { new TestType( "Contoso.Api.v2018_04_01_Beta.Controllers" ), new ApiVersion( new DateOnly( 2018, 4, 1 ), "Beta" ) };
-            yield return new object[] { new TestType( "Contoso.Api.v2018_04_01_1_0_Beta.Controllers" ), new ApiVersion( new DateOnly( 2018, 4, 1 ), 1, 0, "Beta" ) };
-            yield return new object[] { new TestType( "MyRestaurant.Vegetarian.Food.v1_1.Controllers" ), new ApiVersion( 1, 1 ) };
-            yield return new object[] { new TestType( "VersioningSample.V5.Controllers" ), new ApiVersion( 5, 0 ) };
-        }
-    }
+        { "v1", "1" },
+        { "v1RC", "1.0-RC" },
+        { "v20180401", "2018-04-01" },
+        { "v20180401_Beta", "2018-04-01-Beta" },
+        { "v20180401Beta", "2018-04-01-Beta" },
+        { "Contoso.Api.v1.Controllers", "1" },
+        { "Contoso.Api.v1_1.Controllers", "1.1" },
+        { "Contoso.Api.v0_9_Beta.Controllers", "0.9-Beta" },
+        { "Contoso.Api.v20180401.Controllers", "2018-04-01" },
+        { "Contoso.Api.v2018_04_01.Controllers", "2018-04-01" },
+        { "Contoso.Api.v20180401_Beta.Controllers", "2018-04-01-Beta" },
+        { "Contoso.Api.v2018_04_01_Beta.Controllers", "2018-04-01-Beta" },
+        { "Contoso.Api.v2018_04_01_1_0_Beta.Controllers", "2018-04-01.1.0-Beta" },
+        { "MyRestaurant.Vegetarian.Food.v1_1.Controllers", "1.1" },
+        { "VersioningSample.V5.Controllers", "5.0" },
+    };
 
-    public static IEnumerable<object[]> NamespaceWithMultipleVersions
+    public static TheoryData<string, string[]> NamespaceWithMultipleVersions => new()
     {
-        get
-        {
-            yield return new object[] { new TestType( "Contoso.Api.v1.Controllers.v1" ), new ApiVersion[] { new( 1 ), new( 1 ) } };
-            yield return new object[] { new TestType( "Contoso.Api.v1_1.Controllers.v1" ), new ApiVersion[] { new( 1, 1 ), new( 1 ) } };
-            yield return new object[] { new TestType( "Contoso.Api.v2_0.Controllers.v2" ), new ApiVersion[] { new( 2, 0 ), new( 2 ) } };
-            yield return new object[] { new TestType( "Contoso.Api.v20180401.Controllers.v1" ), new ApiVersion[] { new( new DateOnly( 2018, 4, 1 ) ), new( 1 ) } };
-            yield return new object[] { new TestType( "Contoso.Api.v2018_04_01.Controllers.v2_0_Beta" ), new ApiVersion[] { new( new DateOnly( 2018, 4, 1 ) ), new( 2, 0, "Beta" ) } };
-            yield return new object[] { new TestType( "v2018_04_01.Controllers.v2_0_RC" ), new ApiVersion[] { new( new DateOnly( 2018, 4, 1 ) ), new( 2, 0, "RC" ) } };
-        }
-    }
+        { "Contoso.Api.v1.Controllers.v1", ["1", "1"] },
+        { "Contoso.Api.v1_1.Controllers.v1", ["1.1", "1"] },
+        { "Contoso.Api.v2_0.Controllers.v2", ["2.0", "2"] },
+        { "Contoso.Api.v20180401.Controllers.v1", ["2018-04-01", "1"] },
+        { "Contoso.Api.v2018_04_01.Controllers.v2_0_Beta", ["2018-04-01", "2.0-Beta"] },
+        { "v2018_04_01.Controllers.v2_0_RC", ["2018-04-01", "2.0-RC"] },
+    };
 
-    private sealed class TestType : TypeDelegator
+#pragma warning disable IDE0079
+#pragma warning disable CA1034
+
+    public sealed class TestType : TypeDelegator
     {
         public TestType( string @namespace ) : base( typeof( object ) ) => Namespace = @namespace;
 

@@ -50,7 +50,7 @@ public class when_using_a_url_segment_and_split_into_two_types : BasicAcceptance
 
         // act
         var response = await PatchAsync( requestUrl, person );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

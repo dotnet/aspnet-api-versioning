@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.AspNetCore.Mvc.Abstractions;
 
 using Asp.Versioning;
@@ -56,7 +58,7 @@ public static class ActionDescriptorExtensions
 
             if ( endpointMetadata.IsReadOnly )
             {
-                action.EndpointMetadata = endpointMetadata = endpointMetadata.ToList();
+                action.EndpointMetadata = endpointMetadata = [.. endpointMetadata];
             }
 
             endpointMetadata[i] = value;

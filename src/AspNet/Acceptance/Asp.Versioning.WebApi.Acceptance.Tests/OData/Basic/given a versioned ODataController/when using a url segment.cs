@@ -31,7 +31,7 @@ public class when_using_a_url_segment : BasicAcceptanceTest
 
         // act
         var response = await GetAsync( "v2/orders" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( NotFound );

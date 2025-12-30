@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Web.Http;
 
 using Asp.Versioning;
@@ -123,7 +125,7 @@ internal static class MediaTypeFormatterAdapterFactory
         internal static void Initialize( MediaTypeFormatter instance )
         {
             var list = new List<MediaTypeHeaderValue>();
-            var collection = newCollection.Invoke( new object[] { list } );
+            var collection = newCollection.Invoke( [list] );
 
             // the _supportedMediaTypes field is "readonly", which is why we must use Reflection instead of compiling an expression;
             // interestingly, the Reflection API lets us break rules that expression compilation does not
@@ -131,7 +133,7 @@ internal static class MediaTypeFormatterAdapterFactory
 
             // since the value for the SupportedMediaTypes property comes from the backing field, we must do this here, even
             // though it's possible to set this property with a compiled expression
-            property.SetMethod.Invoke( instance, new object[] { collection } );
+            property.SetMethod.Invoke( instance, [collection] );
         }
     }
 }

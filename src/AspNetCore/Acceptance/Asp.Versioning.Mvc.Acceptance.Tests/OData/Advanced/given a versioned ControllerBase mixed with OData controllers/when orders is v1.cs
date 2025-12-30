@@ -15,10 +15,10 @@ public class when_orders_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders" );
-        var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
-        orders.Should().BeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v1.0" } } );
+        orders.Should().BeEquivalentTo( [new { Id = 1, Customer = "Customer v1.0" }] );
     }
 
     [Fact]
@@ -29,10 +29,10 @@ public class when_orders_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders?api-version=1.0" );
-        var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var orders = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
-        orders.Should().BeEquivalentTo( new[] { new { Id = 1, Customer = "Customer v1.0" } } );
+        orders.Should().BeEquivalentTo( [new { Id = 1, Customer = "Customer v1.0" }] );
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class when_orders_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders/42" );
-        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );
@@ -57,7 +57,7 @@ public class when_orders_is_v1 : AdvancedAcceptanceTest
 
         // act
         var response = await GetAsync( "api/orders/42?api-version=1.0" );
-        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var order = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         order.Should().BeEquivalentTo( new { Id = 42, Customer = "Customer v1.0" } );

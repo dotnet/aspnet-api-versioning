@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Net.Http;
 
 using Asp.Versioning;
@@ -16,7 +18,10 @@ public static class HttpRequestMessageExtensions
     private const string RoutingContextKey = "MS_RoutingContext";
     private const string ApiVersionPropertiesKey = "MS_" + nameof( ApiVersionRequestProperties );
 
-    private static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, Func<bool, HttpError> errorCreator )
+    private static HttpResponseMessage CreateErrorResponse(
+        this HttpRequestMessage request,
+        HttpStatusCode statusCode,
+        Func<bool, HttpError> errorCreator )
     {
         var configuration = request.GetConfiguration();
         var error = errorCreator( request.ShouldIncludeErrorDetail() );
@@ -31,7 +36,11 @@ public static class HttpRequestMessageExtensions
         return request.CreateResponse( statusCode, error, configuration );
     }
 
-    internal static HttpResponseMessage CreateErrorResponse( this HttpRequestMessage request, HttpStatusCode statusCode, string message, string messageDetail )
+    internal static HttpResponseMessage CreateErrorResponse(
+        this HttpRequestMessage request,
+        HttpStatusCode statusCode,
+        string message,
+        string messageDetail )
     {
         return request.CreateErrorResponse(
             statusCode,

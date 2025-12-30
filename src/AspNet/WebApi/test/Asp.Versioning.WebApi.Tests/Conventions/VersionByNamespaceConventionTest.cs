@@ -101,6 +101,6 @@ public partial class VersionByNamespaceConventionTest
             this.attributes = attributes;
         }
 
-        public override Collection<T> GetCustomAttributes<T>( bool inherit ) => new( attributes.OfType<T>().ToArray() );
+        public override Collection<T> GetCustomAttributes<T>( bool inherit ) => new( [.. attributes.OfType<T>()] );
     }
 }

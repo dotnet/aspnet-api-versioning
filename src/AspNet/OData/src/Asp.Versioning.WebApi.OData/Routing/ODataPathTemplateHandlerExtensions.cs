@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.AspNet.OData.Routing;
 
 using Microsoft.AspNet.OData.Routing.Template;

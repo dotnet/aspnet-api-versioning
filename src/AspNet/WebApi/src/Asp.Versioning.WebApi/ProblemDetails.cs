@@ -24,7 +24,8 @@ public class ProblemDetails
     /// </summary>
     /// <param name="extensions">A dictionary of additional extension data.</param>
     [JsonConstructor]
-    public ProblemDetails( IDictionary<string, object?> extensions ) => this.extensions = extensions;
+    public ProblemDetails( IDictionary<string, object?>? extensions ) =>
+        this.extensions = extensions ?? new Dictionary<string, object?>( StringComparer.Ordinal );
 
     /// <summary>
     /// Gets or sets a URI reference [RFC3986] that identifies the problem type. This specification encourages that, when

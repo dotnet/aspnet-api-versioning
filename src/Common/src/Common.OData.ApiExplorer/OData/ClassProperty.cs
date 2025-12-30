@@ -18,7 +18,7 @@ internal readonly struct ClassProperty
     {
         Name = clrProperty.Name;
         Type = propertyType;
-        Attributes = clrProperty.DeclaredAttributes().ToArray();
+        Attributes = [.. clrProperty.DeclaredAttributes()];
     }
 
 #if !NETFRAMEWORK
@@ -43,7 +43,7 @@ internal readonly struct ClassProperty
             Type = parameterType.SubstituteIfNecessary( context );
         }
 
-        Attributes = AttributesFromOperationParameter( parameter ).ToArray();
+        Attributes = [.. AttributesFromOperationParameter( parameter )];
     }
 
     internal IReadOnlyList<CustomAttributeBuilder> Attributes { get; }

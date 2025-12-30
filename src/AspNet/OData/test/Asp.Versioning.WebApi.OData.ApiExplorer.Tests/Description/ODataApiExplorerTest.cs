@@ -16,9 +16,10 @@ public class ODataApiExplorerTest
 {
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_collate_expected_versions( HttpConfiguration configuration )
+    public void api_descriptions_should_collate_expected_versions( TestConfigurations.EdmKind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new ODataApiExplorer( configuration );
 
         // act
@@ -34,9 +35,10 @@ public class ODataApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_group_versioned_controllers( HttpConfiguration configuration )
+    public void api_descriptions_should_group_versioned_controllers( TestConfigurations.EdmKind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var assembliesResolver = configuration.Services.GetAssembliesResolver();
         var controllerTypes = configuration.Services
                                            .GetHttpControllerTypeResolver()
@@ -57,9 +59,10 @@ public class ODataApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_flatten_versioned_controllers( HttpConfiguration configuration )
+    public void api_descriptions_should_flatten_versioned_controllers( TestConfigurations.EdmKind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var assembliesResolver = configuration.Services.GetAssembliesResolver();
         var controllerTypes = configuration.Services
                                             .GetHttpControllerTypeResolver()
@@ -80,9 +83,10 @@ public class ODataApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_descriptions_should_not_contain_metadata_controllers( HttpConfiguration configuration )
+    public void api_descriptions_should_not_contain_metadata_controllers( TestConfigurations.EdmKind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiExplorer = new ODataApiExplorer( configuration );
 
         // act
@@ -129,9 +133,10 @@ public class ODataApiExplorerTest
 
     [Theory]
     [ClassData( typeof( TestConfigurations ) )]
-    public void api_description_group_should_explore_v3_actions( HttpConfiguration configuration )
+    public void api_description_group_should_explore_v3_actions( TestConfigurations.EdmKind kind )
     {
         // arrange
+        var configuration = TestConfigurations.Get( kind );
         var apiVersion = new ApiVersion( 3, 0 );
         var apiExplorer = new ODataApiExplorer( configuration );
         var descriptionGroup = apiExplorer.ApiDescriptions[apiVersion];
@@ -142,8 +147,7 @@ public class ODataApiExplorerTest
 
         // assert
         descriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     ID = $"GET{relativePaths[0]}",
@@ -172,7 +176,7 @@ public class ODataApiExplorerTest
                     RelativePath = relativePaths[3],
                     Version = apiVersion,
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -190,8 +194,7 @@ public class ODataApiExplorerTest
 
         // assert
         descriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new { HttpMethod = Get, version, RelativePath = "api/Products" },
                 new { HttpMethod = Get, version, RelativePath = "api/Suppliers" },
                 new { HttpMethod = Get, version, RelativePath = "api/Products/{key}" },
@@ -211,7 +214,7 @@ public class ODataApiExplorerTest
                 new { HttpMethod = Delete, version, RelativePath = "api/Suppliers/{key}" },
                 new { HttpMethod = Delete, version, RelativePath = "api/Products/{key}/supplier/$ref" },
                 new { HttpMethod = Delete, version, RelativePath = "api/Suppliers/{key}/Products/$ref?$id={$id}" },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 

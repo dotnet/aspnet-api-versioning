@@ -26,7 +26,7 @@ public class when_using_a_query_string : AcceptanceTest
 
         // act
         var response = await GetAsync( $"api/agreements/42?api-version={apiVersion}" );
-        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1, 2, 3" );
@@ -54,7 +54,7 @@ public class when_using_a_query_string : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/agreements/42" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( BadRequest );

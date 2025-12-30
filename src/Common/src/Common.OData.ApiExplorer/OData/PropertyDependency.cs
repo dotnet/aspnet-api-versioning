@@ -14,7 +14,7 @@ internal sealed class PropertyDependency
     {
         DependentOnTypeKey = dependentOnTypeKey;
         PropertyName = propertyName;
-        CustomAttributes = customAttributes.ToArray();
+        CustomAttributes = [.. customAttributes];
         IsCollection = isCollection;
     }
 

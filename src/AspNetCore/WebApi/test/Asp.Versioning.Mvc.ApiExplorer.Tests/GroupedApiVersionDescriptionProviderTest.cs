@@ -14,8 +14,7 @@ public class GroupedApiVersionDescriptionProviderTest
     {
         // arrange
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
-            new IApiVersionMetadataCollationProvider[]
-            {
+            [
                 new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
@@ -42,7 +41,7 @@ public class GroupedApiVersionDescriptionProviderTest
     {
         // arrange
         var provider = new TestActionDescriptorCollectionProvider();
-        using var source = new CompositeEndpointDataSource( Enumerable.Empty<EndpointDataSource>() );
+        using var source = new CompositeEndpointDataSource( [] );
         var data = new ApiDescriptionActionData() { GroupName = "Test" };
 
         foreach ( var descriptor in provider.ActionDescriptors.Items )
@@ -51,11 +50,10 @@ public class GroupedApiVersionDescriptionProviderTest
         }
 
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
-            new IApiVersionMetadataCollationProvider[]
-            {
+            [
                 new EndpointApiVersionMetadataCollationProvider( source ),
                 new ActionApiVersionMetadataCollationProvider( provider ),
-            },
+            ],
             Mock.Of<IPolicyManager<SunsetPolicy>>(),
             Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             Options.Create(
@@ -90,11 +88,10 @@ public class GroupedApiVersionDescriptionProviderTest
         policyManager.Setup( pm => pm.TryGetPolicy( default, apiVersion, out expected ) ).Returns( true );
 
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
-            new IApiVersionMetadataCollationProvider[]
-            {
+            [
                 new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
-            },
+            ],
             policyManager.Object,
             Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );

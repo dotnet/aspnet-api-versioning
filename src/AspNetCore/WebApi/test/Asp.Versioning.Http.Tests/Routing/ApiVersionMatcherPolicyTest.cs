@@ -52,20 +52,20 @@ public class ApiVersionMatcherPolicyTest
         // arrange
         var feature = new Mock<IApiVersioningFeature>();
 
-        feature.SetupProperty( f => f.RawRequestedApiVersions, new[] { "1.0", "2.0" } );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0", "2.0"] );
 
         var options = new ApiVersioningOptions()
         {
             ApiVersionReader = new QueryStringApiVersionReader(),
         };
         var policy = NewApiVersionMatcherPolicy( options );
-        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( new[] { "1.0", "2.0" } ) } );
+        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( ["1.0", "2.0"] ) } );
         var model = new ApiVersionModel(
-            declaredVersions: new ApiVersion[] { new( 1, 0 ), new( 2, 0 ) },
-            supportedVersions: new ApiVersion[] { new( 1, 0 ), new( 2, 0 ) },
-            deprecatedVersions: Enumerable.Empty<ApiVersion>(),
-            advertisedVersions: Enumerable.Empty<ApiVersion>(),
-            deprecatedAdvertisedVersions: Enumerable.Empty<ApiVersion>() );
+            declaredVersions: [new( 1, 0 ), new( 2, 0 )],
+            supportedVersions: [new( 1, 0 ), new( 2, 0 )],
+            deprecatedVersions: [],
+            advertisedVersions: [],
+            deprecatedAdvertisedVersions: [] );
         var routePattern = RoutePatternFactory.Parse( "api/values" );
         var builder = new RouteEndpointBuilder( Limbo, routePattern, 0 )
         {
@@ -97,7 +97,7 @@ public class ApiVersionMatcherPolicyTest
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), default );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
         var policy = NewApiVersionMatcherPolicy();
 
         feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
@@ -118,14 +118,14 @@ public class ApiVersionMatcherPolicyTest
         var feature = new Mock<IApiVersioningFeature>();
 
         feature.SetupProperty( f => f.RawRequestedApiVersion, "2.0" );
-        feature.SetupProperty( f => f.RawRequestedApiVersions, new[] { "2.0" } );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["2.0"] );
         feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 2, 0 ) );
 
         var policy = NewApiVersionMatcherPolicy();
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), default );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
         var httpContext = NewHttpContext( feature );
 
         // act
@@ -141,20 +141,20 @@ public class ApiVersionMatcherPolicyTest
         // arrange
         var feature = new Mock<IApiVersioningFeature>();
 
-        feature.SetupProperty( f => f.RawRequestedApiVersions, new[] { "blah" } );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["blah"] );
 
         var options = new ApiVersioningOptions()
         {
             ApiVersionReader = new QueryStringApiVersionReader(),
         };
         var policy = NewApiVersionMatcherPolicy( options );
-        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( new[] { "blah" } ) } );
+        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( ["blah"] ) } );
         var model = new ApiVersionModel(
-            declaredVersions: new ApiVersion[] { new( 1, 0 ) },
-            supportedVersions: new ApiVersion[] { new( 1, 0 ) },
-            deprecatedVersions: Enumerable.Empty<ApiVersion>(),
-            advertisedVersions: Enumerable.Empty<ApiVersion>(),
-            deprecatedAdvertisedVersions: Enumerable.Empty<ApiVersion>() );
+            declaredVersions: [new( 1, 0 )],
+            supportedVersions: [new( 1, 0 )],
+            deprecatedVersions: [],
+            advertisedVersions: [],
+            deprecatedAdvertisedVersions: [] );
         var routePattern = RoutePatternFactory.Parse( "api/values" );
         var builder = new RouteEndpointBuilder( Limbo, routePattern, 0 )
         {
@@ -185,14 +185,14 @@ public class ApiVersionMatcherPolicyTest
         var feature = new Mock<IApiVersioningFeature>();
 
         feature.SetupProperty( f => f.RawRequestedApiVersion, default );
-        feature.SetupProperty( f => f.RawRequestedApiVersions, Array.Empty<string>() );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, [] );
         feature.SetupProperty( f => f.RequestedApiVersion, default );
 
         var policy = NewApiVersionMatcherPolicy();
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), "Test" );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
         var httpContext = NewHttpContext( feature );
 
         // act
@@ -210,7 +210,7 @@ public class ApiVersionMatcherPolicyTest
         var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
         var items = new object[] { new ApiVersionMetadata( model, model ) };
         var endpoint = new Endpoint( Limbo, new( items ), default );
-        var candidates = new CandidateSet( new[] { endpoint }, new[] { new RouteValueDictionary() }, [0] );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
         var options = new ApiVersioningOptions() { AssumeDefaultVersionWhenUnspecified = true };
         var policy = NewApiVersionMatcherPolicy( options );
 
@@ -232,7 +232,7 @@ public class ApiVersionMatcherPolicyTest
     private static ApiVersionMatcherPolicy NewApiVersionMatcherPolicy( ApiVersioningOptions options = default ) =>
         new(
             ApiVersionParser.Default,
-            Enumerable.Empty<IApiVersionMetadataCollationProvider>(),
+            [],
             Options.Create( options ?? new() ),
             Mock.Of<ILogger<ApiVersionMatcherPolicy>>() );
 

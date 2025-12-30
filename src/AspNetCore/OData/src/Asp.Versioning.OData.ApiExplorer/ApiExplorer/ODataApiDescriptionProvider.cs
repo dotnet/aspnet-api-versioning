@@ -167,6 +167,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
     /// Explores the OData query options for the specified API descriptions.
     /// </summary>
     /// <param name="apiDescriptions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiDescription">API descriptions</see> to explore.</param>
+    [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
     protected virtual void ExploreQueryOptions( IEnumerable<ApiDescription> apiDescriptions )
     {
         var localODataOptions = ODataOptions;
@@ -175,7 +176,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         {
             NoDollarPrefix = localODataOptions.EnableNoDollarQueryOptions,
             DescriptionProvider = localQueryOptions.DescriptionProvider,
-            DefaultQuerySettings = localODataOptions.QuerySettings,
+            QueryConfigurations = localODataOptions.QueryConfigurations,
             ModelMetadataProvider = ModelMetadataProvider,
         };
 
@@ -314,10 +315,10 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
             switch ( template[i] )
             {
                 case EntitySetSegmentTemplate segment:
-                    entity = segment.EntitySet.EntityType();
+                    entity = segment.EntitySet.EntityType;
                     break;
                 case SingletonSegmentTemplate segment:
-                    entity = segment.Singleton.EntityType();
+                    entity = segment.Singleton.EntityType;
                     break;
             }
         }

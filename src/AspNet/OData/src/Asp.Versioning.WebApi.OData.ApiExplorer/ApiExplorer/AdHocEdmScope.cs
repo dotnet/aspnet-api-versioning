@@ -50,7 +50,7 @@ internal sealed class AdHocEdmScope : IDisposable
     {
         if ( conventions.Count == 0 )
         {
-            return Array.Empty<VersionedApiDescription>();
+            return [];
         }
 
         var results = default( List<VersionedApiDescription> );

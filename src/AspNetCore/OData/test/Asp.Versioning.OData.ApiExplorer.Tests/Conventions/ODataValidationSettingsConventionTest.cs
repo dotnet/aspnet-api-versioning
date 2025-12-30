@@ -301,7 +301,7 @@ public class ODataValidationSettingsConventionTest
     {
         // arrange
         var description = NewApiDescription();
-        var defaultQuerySettings = new DefaultQuerySettings()
+        var queryConfigurations = new DefaultQueryConfigurations()
         {
             EnableCount = true,
             EnableExpand = true,
@@ -310,7 +310,7 @@ public class ODataValidationSettingsConventionTest
             EnableSelect = true,
         };
         var validationSettings = new ODataValidationSettings() { AllowedQueryOptions = AllowedQueryOptions.None };
-        var settings = new TestODataQueryOptionSettings( typeof( object ), defaultQuerySettings );
+        var settings = new TestODataQueryOptionSettings( typeof( object ), queryConfigurations );
         var convention = new ODataValidationSettingsConvention( validationSettings, settings );
 
         // act
@@ -322,9 +322,10 @@ public class ODataValidationSettingsConventionTest
 
     [Theory]
     [MemberData( nameof( EnableQueryAttributeData ) )]
-    public void apply_to_should_use_enable_query_attribute( ApiDescription description )
+    public void apply_to_should_use_enable_query_attribute( Type controllerType )
     {
         // arrange
+        var description = NewApiDescription( controllerType );
         var validationSettings = new ODataValidationSettings()
         {
             AllowedQueryOptions = AllowedQueryOptions.None,
@@ -340,8 +341,7 @@ public class ODataValidationSettingsConventionTest
 
         // assert
         description.ParameterDescriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                     new
                     {
                         Name = "$select",
@@ -384,7 +384,7 @@ public class ODataValidationSettingsConventionTest
                             ParameterType = typeof( string ),
                         },
                     },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -413,8 +413,7 @@ public class ODataValidationSettingsConventionTest
 
         // assert
         description.ParameterDescriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     Name = "$select",
@@ -471,7 +470,7 @@ public class ODataValidationSettingsConventionTest
                         ParameterType = typeof( bool ),
                     },
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
@@ -533,14 +532,14 @@ public class ODataValidationSettingsConventionTest
             {
                 ControllerTypeInfo = controllerType.GetTypeInfo(),
                 MethodInfo = action,
-                Parameters = new ParameterDescriptor[]
-                {
+                Parameters =
+                [
                     new()
                     {
                         Name = parameter.Name,
                         ParameterType = parameter.ParameterType,
                     },
-                },
+                ],
             },
             HttpMethod = "GET",
             SupportedResponseTypes =
@@ -557,7 +556,6 @@ public class ODataValidationSettingsConventionTest
         var settings = new ODataQueryOptionSettings()
         {
             DescriptionProvider = builder.DescriptionProvider,
-            DefaultQuerySettings = new(),
             ModelMetadataProvider = Mock.Of<IModelMetadataProvider>(),
         };
 
@@ -567,12 +565,11 @@ public class ODataValidationSettingsConventionTest
                .AllowOrderBy( "title", "published" );
 
         // act
-        builder.ApplyTo( new[] { description }, settings );
+        builder.ApplyTo( [description], settings );
 
         // assert
         description.ParameterDescriptions.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 new
                 {
                     Name = "$select",
@@ -612,18 +609,12 @@ public class ODataValidationSettingsConventionTest
                         ParameterType = typeof( bool ),
                     },
                 },
-            },
+            ],
             options => options.ExcludingMissingMembers() );
     }
 
-    public static IEnumerable<object[]> EnableQueryAttributeData
-    {
-        get
-        {
-            yield return new object[] { NewApiDescription( typeof( SinglePartController ) ) };
-            yield return new object[] { NewApiDescription( typeof( MultipartController ) ) };
-        }
-    }
+    public static TheoryData<Type> EnableQueryAttributeData =>
+        new( typeof( SinglePartController ), typeof( MultipartController ) );
 
     private static ApiDescription NewApiDescription( string method = "GET", bool singleResult = default )
     {
@@ -637,10 +628,10 @@ public class ODataValidationSettingsConventionTest
             {
                 ControllerTypeInfo = typeof( ControllerBase ).GetTypeInfo(),
                 MethodInfo = typeof( ControllerBase ).GetRuntimeMethod( nameof( ControllerBase.Ok ), Type.EmptyTypes ),
-                EndpointMetadata = new object[]
-                {
+                EndpointMetadata =
+                [
                     new ODataRoutingMetadata( string.Empty, model, [] ),
-                },
+                ],
             },
             HttpMethod = method,
             SupportedResponseTypes =
@@ -668,10 +659,10 @@ public class ODataValidationSettingsConventionTest
             {
                 ControllerTypeInfo = controllerType.GetTypeInfo(),
                 MethodInfo = controllerType.GetRuntimeMethods().Single( m => m.Name == "Get" ),
-                EndpointMetadata = new object[]
-                {
+                EndpointMetadata =
+                [
                     new ODataRoutingMetadata( string.Empty, model, [] ),
-                },
+                ],
             },
             HttpMethod = "GET",
             SupportedResponseTypes =
@@ -759,12 +750,12 @@ public class ODataValidationSettingsConventionTest
     private sealed class TestODataQueryOptionSettings : ODataQueryOptionSettings
     {
         internal TestODataQueryOptionSettings( Type type, bool dollarPrefix = true ) :
-            this( type, new DefaultQuerySettings(), dollarPrefix )
+            this( type, new(), dollarPrefix )
         { }
 
         internal TestODataQueryOptionSettings(
             Type type,
-            DefaultQuerySettings defaultQuerySettings,
+            DefaultQueryConfigurations queryConfigurations,
             bool dollarPrefix = true )
         {
             MockDescriptionProvider = new Mock<IODataQueryOptionDescriptionProvider>();
@@ -775,7 +766,7 @@ public class ODataValidationSettingsConventionTest
             NoDollarPrefix = !dollarPrefix;
             DescriptionProvider = MockDescriptionProvider.Object;
             ModelMetadataProvider = NewModelMetadataProvider( type );
-            DefaultQuerySettings = defaultQuerySettings;
+            QueryConfigurations = queryConfigurations;
         }
 
         internal Mock<IODataQueryOptionDescriptionProvider> MockDescriptionProvider { get; }

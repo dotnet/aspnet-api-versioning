@@ -16,8 +16,8 @@ public class MvcApiVersioningOptionsFactoryTest
         var postConfigure = Mock.Of<IPostConfigureOptions<MvcApiVersioningOptions>>();
         var factory = new MvcApiVersioningOptionsFactory<MvcApiVersioningOptions>(
             conventionBuilder,
-            new[] { configure },
-            new[] { postConfigure } );
+            [configure],
+            [postConfigure] );
 
         // act
         var options = factory.Create( Options.DefaultName );

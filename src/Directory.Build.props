@@ -2,8 +2,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
-  <DefaultTargetFramework>net8.0</DefaultTargetFramework>
-  <DotNetReleaseBasePackageVersion>8.0</DotNetReleaseBasePackageVersion>
+  <DefaultTargetFramework>net10.0</DefaultTargetFramework>
+  <DotNetReleaseBasePackageVersion>10.0</DotNetReleaseBasePackageVersion>
   <DotNetReleasePackageVersion>$(DotNetReleaseBasePackageVersion).0</DotNetReleasePackageVersion>
   <CurrentTfmFolder>.net</CurrentTfmFolder>
   <RootDir>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), .gitignore))))</RootDir>

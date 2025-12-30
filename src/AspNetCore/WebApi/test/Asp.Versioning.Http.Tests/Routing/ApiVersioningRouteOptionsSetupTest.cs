@@ -19,7 +19,7 @@ public class ApiVersioningRouteOptionsSetupTest
         setup.PostConfigure( default, routeOptions );
 
         // assert
-        routeOptions.ConstraintMap["apiVersion"].Should().Be( typeof( ApiVersionRouteConstraint ) );
+        routeOptions.ConstraintMap["apiVersion"].Should().Be<ApiVersionRouteConstraint>();
     }
 
     [Fact]
@@ -35,6 +35,6 @@ public class ApiVersioningRouteOptionsSetupTest
         setup.PostConfigure( default, routeOptions );
 
         // assert
-        routeOptions.ConstraintMap[key].Should().Be( typeof( ApiVersionRouteConstraint ) );
+        routeOptions.ConstraintMap[key].Should().Be<ApiVersionRouteConstraint>();
     }
 }

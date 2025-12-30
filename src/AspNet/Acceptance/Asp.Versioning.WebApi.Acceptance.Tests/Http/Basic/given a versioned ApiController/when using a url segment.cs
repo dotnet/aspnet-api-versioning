@@ -30,7 +30,9 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var content = await response.EnsureSuccessStatusCode().Content.ReadAsAsync<IDictionary<string, string>>();
+        var content = await response.EnsureSuccessStatusCode()
+                                    .Content
+                                    .ReadAsAsync<IDictionary<string, string>>( CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0" );
@@ -59,7 +61,7 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( "api/v2/helloworld" );
-        var problem = await response.Content.ReadAsProblemDetailsAsync();
+        var problem = await response.Content.ReadAsProblemDetailsAsync( CancellationToken );
 
         // assert
         response.StatusCode.Should().Be( NotFound );

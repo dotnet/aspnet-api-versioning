@@ -21,7 +21,7 @@ public class VersionedMetadataRoutingConventionTest
         var context = new ODataControllerActionContext(
             string.Empty,
             EdmCoreModel.Instance,
-            new ControllerModel( controllerType.GetTypeInfo(), Array.Empty<object>() ) );
+            new ControllerModel( controllerType.GetTypeInfo(), [] ) );
         var convention = new VersionedMetadataRoutingConvention();
 
         // act
@@ -35,9 +35,9 @@ public class VersionedMetadataRoutingConventionTest
     public void applied_to_action_should_return_true()
     {
         // arrange
-        var controller = new ControllerModel( typeof( VersionedMetadataController ).GetTypeInfo(), Array.Empty<object>() );
+        var controller = new ControllerModel( typeof( VersionedMetadataController ).GetTypeInfo(), [] );
         var method = controller.ControllerType.GetRuntimeMethod( nameof( VersionedMetadataController.GetOptions ), Type.EmptyTypes );
-        var action = new ActionModel( method, Array.Empty<object>() ) { Controller = controller };
+        var action = new ActionModel( method, [] ) { Controller = controller };
 
         controller.Actions.Add( action );
 

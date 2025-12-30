@@ -20,7 +20,7 @@ internal static partial class CollectionExtensions
         return false;
     }
 
-    internal static List<T> AsList<T>( this IEnumerable<T> sequence ) => ( sequence as List<T> ) ?? sequence.ToList();
+    internal static List<T> AsList<T>( this IEnumerable<T> sequence ) => ( sequence as List<T> ) ?? [.. sequence];
 
     internal static void AddRange<T>( this ICollection<T> collection, IEnumerable<T> items )
     {

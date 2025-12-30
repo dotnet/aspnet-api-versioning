@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace Microsoft.OData;
 
 using Asp.Versioning.OData;
@@ -41,7 +43,7 @@ public static class IContainerBuilderExtensions
         IEnumerable<IODataRoutingConvention> routingConventions ) =>
         builder.AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
                .AddService( Singleton, sp => NewEdmModelSelector( sp, models ) )
-               .AddService( Singleton, sp => AddOrUpdate( routingConventions.ToList() ).AsEnumerable() );
+               .AddService( Singleton, sp => AddOrUpdate( [.. routingConventions] ).AsEnumerable() );
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static IEnumerable<IODataRoutingConvention> NewRoutingConventions( IServiceProvider serviceProvider, string routeName ) =>

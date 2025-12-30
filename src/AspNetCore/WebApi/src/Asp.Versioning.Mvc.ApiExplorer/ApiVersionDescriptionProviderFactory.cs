@@ -2,10 +2,9 @@
 
 #pragma warning disable CA1812 // Avoid uninstantiated internal classes
 
-namespace Microsoft.AspNetCore.Builder;
+namespace Asp.Versioning.ApiExplorer;
 
 using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 
@@ -26,7 +25,7 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
     {
         this.sunsetPolicyManager = sunsetPolicyManager;
         this.deprecationPolicyManager = deprecationPolicyManager;
-        this.providers = providers.ToArray();
+        this.providers = [.. providers];
         this.endpointInspector = endpointInspector;
         this.options = options;
     }

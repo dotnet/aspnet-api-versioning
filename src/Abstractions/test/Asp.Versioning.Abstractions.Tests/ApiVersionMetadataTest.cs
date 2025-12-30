@@ -43,14 +43,14 @@ public class ApiVersionMetadataTest
     {
         // arrange
         var apiModel = new ApiVersionModel( new ApiVersion( 1.0 ) );
-        var endpointModel = new ApiVersionModel( new ApiVersion[] { new( 1.0 ) }, new ApiVersion[] { new( 0.9 ) } );
+        var endpointModel = new ApiVersionModel( [new( 1.0 )], [new( 0.9 )] );
         var metadata = new ApiVersionMetadata( apiModel, endpointModel );
         var expected = new ApiVersionModel(
-            new ApiVersion[] { new( 1.0 ) },
-            new ApiVersion[] { new( 1.0 ) },
-            new ApiVersion[] { new( 0.9 ) },
-            Enumerable.Empty<ApiVersion>(),
-            Enumerable.Empty<ApiVersion>() );
+            [new( 1.0 )],
+            [new( 1.0 )],
+            [new( 0.9 )],
+            [],
+            [] );
 
         // act
         var result = metadata.Map( Explicit | Implicit );

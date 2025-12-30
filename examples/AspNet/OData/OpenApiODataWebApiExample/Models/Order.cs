@@ -48,5 +48,5 @@ public class Order
     /// </summary>
     /// <value>The <see cref="IList{T}">list</see> of order <see cref="LineItem">line items</see>.</value>
     [Contained]
-    public virtual IList<LineItem> LineItems { get; } = new List<LineItem>();
+    public virtual IList<LineItem> LineItems { get; } = [];
 }

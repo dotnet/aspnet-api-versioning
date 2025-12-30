@@ -51,14 +51,14 @@ public class ApiDescriptionExtensionsTest
         var metadata = new ApiVersionMetadata(
             ApiVersionModel.Empty,
             new ApiVersionModel(
-                declaredVersions: new ApiVersion[] { new( 0, 9 ), new( 1, 0 ) },
-                supportedVersions: new[] { new ApiVersion( 1, 0 ) },
-                deprecatedVersions: new[] { new ApiVersion( 0, 9 ) },
-                advertisedVersions: Array.Empty<ApiVersion>(),
-                deprecatedAdvertisedVersions: Array.Empty<ApiVersion>() ) );
+                declaredVersions: [new( 0, 9 ), new( 1, 0 )],
+                supportedVersions: [new ApiVersion( 1, 0 )],
+                deprecatedVersions: [new ApiVersion( 0, 9 )],
+                advertisedVersions: [],
+                deprecatedAdvertisedVersions: [] ) );
         var description = new ApiDescription()
         {
-            ActionDescriptor = new() { EndpointMetadata = new[] { metadata } },
+            ActionDescriptor = new() { EndpointMetadata = [metadata] },
             Properties = { [typeof( ApiVersion )] = apiVersion },
         };
 
@@ -76,7 +76,7 @@ public class ApiDescriptionExtensionsTest
         var metadata = ApiVersionMetadata.Neutral;
         var description = new ApiDescription()
         {
-            ActionDescriptor = new() { EndpointMetadata = new[] { metadata } },
+            ActionDescriptor = new() { EndpointMetadata = [metadata] },
         };
 
         // act

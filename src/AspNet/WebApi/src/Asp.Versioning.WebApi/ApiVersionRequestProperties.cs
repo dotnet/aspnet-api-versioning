@@ -38,7 +38,7 @@ public class ApiVersionRequestProperties
     public IReadOnlyList<string> RawRequestedApiVersions
     {
         get => rawApiVersions ??= request.GetApiVersioningOptions().ApiVersionReader.Read( request );
-        set => rawApiVersions = value.ToArray();
+        set => rawApiVersions = [.. value];
     }
 
     /// <summary>

@@ -121,6 +121,9 @@ public partial class ODataQueryOptionsConventionBuilder
     /// <param name="apiDescriptions">The <see cref="IEnumerable{T}">sequence</see> of <see cref="ApiDescription">API descriptions</see>
     /// to apply configured conventions to.</param>
     /// <param name="queryOptionSettings">The <see cref="ODataQueryOptionSettings">settings</see> used to apply OData query option conventions.</param>
+#if !NETFRAMEWORK
+    [RequiresUnreferencedCode( "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
+#endif
     public virtual void ApplyTo( IEnumerable<ApiDescription> apiDescriptions, ODataQueryOptionSettings queryOptionSettings )
     {
         ArgumentNullException.ThrowIfNull( apiDescriptions );

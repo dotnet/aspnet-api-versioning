@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+ <PropertyGroup>
+  <TargetFramework>net10.0</TargetFramework>
+ </PropertyGroup>
+
  <ItemGroup>
-   <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
+  <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Mvc\Asp.Versioning.Mvc.csproj" />
  </ItemGroup>
 
 </Project>

@@ -118,11 +118,11 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
 
         if ( edges is null || lowestApiVersion is null )
         {
-            return Array.Empty<PolicyNodeEdge>();
+            return [];
         }
 
         var state = (lowestApiVersion, routePatterns?.ToArray() ?? []);
-        return new PolicyNodeEdge[] { new( state, edges ) };
+        return [new( state, edges )];
     }
 
     /// <inheritdoc />
@@ -147,7 +147,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
     private static int ApiVersioningPolicy() =>
         new ApiVersionMatcherPolicy(
             ApiVersionParser.Default,
-            Enumerable.Empty<IApiVersionMetadataCollationProvider>(),
+            [],
             Options.Create( new ApiVersioningOptions() ),
             new NullLogger<ApiVersionMatcherPolicy>() ).Order;
 

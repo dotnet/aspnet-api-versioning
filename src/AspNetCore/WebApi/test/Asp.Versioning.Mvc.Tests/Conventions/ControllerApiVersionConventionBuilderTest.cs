@@ -91,7 +91,7 @@ public partial class ControllerApiVersionConventionBuilderTest
         var controllerType = typeof( DecoratedController );
         var action = controllerType.GetRuntimeMethod( nameof( DecoratedController.Get ), Type.EmptyTypes );
         var attributes = controllerType.GetTypeInfo().GetCustomAttributes().Cast<object>().ToArray();
-        var actionModel = new ActionModel( action, Array.Empty<object>() );
+        var actionModel = new ActionModel( action, [] );
         var controllerModel = new ControllerModel( controllerType.GetTypeInfo(), attributes ) { Actions = { actionModel } };
         var controllerBuilder = new ControllerApiVersionConventionBuilder( controllerType );
 

@@ -5,6 +5,7 @@ namespace Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.ModelBuilder.Config;
 using System.Reflection;
 
@@ -30,7 +31,7 @@ public partial class ODataQueryOptionsConventionBuilderTest
         var settings = new ODataQueryOptionSettings()
         {
             DescriptionProvider = builder.DescriptionProvider,
-            DefaultQuerySettings = new DefaultQuerySettings(),
+            QueryConfigurations = new DefaultQueryConfigurations(),
             ModelMetadataProvider = Mock.Of<IModelMetadataProvider>(),
         };
         var convention = new Mock<IODataQueryOptionsConvention>();
@@ -39,7 +40,7 @@ public partial class ODataQueryOptionsConventionBuilderTest
         builder.Add( convention.Object );
 
         // act
-        builder.ApplyTo( new[] { description }, settings );
+        builder.ApplyTo( [description], settings );
 
         // assert
         convention.Verify( c => c.ApplyTo( description ), Times.Once() );

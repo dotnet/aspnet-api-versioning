@@ -20,7 +20,7 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
@@ -37,7 +37,7 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( requestUrl );
-        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );
@@ -110,7 +110,7 @@ public class when_using_a_url_segment : AcceptanceTest
 
         // act
         var response = await GetAsync( $"api/v{apiVersion}/helloworld/search?query=Foo" );
-        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example );
+        var content = await response.EnsureSuccessStatusCode().Content.ReadAsExampleAsync( example, CancellationToken );
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0, 2.0" );

@@ -4,9 +4,6 @@
 
 # ASP.NET API Versioning
 
-| :mega: Check out the [announcement](../../discussions/807) regarding upcoming changes |
-|-|
-
 <img align="right" width="100px" src="logo.svg" />
 
 The _"Asp"_ project, more formally known as ASP.NET API Versioning, gives you a powerful, but easy-to-use method for

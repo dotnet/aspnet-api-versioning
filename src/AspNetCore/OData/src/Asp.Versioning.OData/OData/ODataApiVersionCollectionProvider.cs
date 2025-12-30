@@ -11,7 +11,7 @@ internal sealed class ODataApiVersionCollectionProvider : IODataApiVersionCollec
 
     public IReadOnlyList<ApiVersion> ApiVersions
     {
-        get => apiVersions ?? Array.Empty<ApiVersion>();
+        get => apiVersions ?? [];
         set => apiVersions = value;
     }
 }

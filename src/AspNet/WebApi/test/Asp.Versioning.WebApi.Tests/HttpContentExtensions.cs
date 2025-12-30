@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+#pragma warning disable IDE0130
+
 namespace System.Net.Http;
 
 using Asp.Versioning;
@@ -11,7 +13,7 @@ internal static class HttpContentExtensions
     {
         SupportedMediaTypes = { new( ProblemDetailsDefaults.MediaType.Json ) },
     };
-    private static readonly IEnumerable<MediaTypeFormatter> MediaTypeFormatters = new[] { ProblemDetailsMediaTypeFormatter };
+    private static readonly IEnumerable<MediaTypeFormatter> MediaTypeFormatters = [ProblemDetailsMediaTypeFormatter];
 
     public static Task<ProblemDetails> ReadAsProblemDetailsAsync(
         this HttpContent content,

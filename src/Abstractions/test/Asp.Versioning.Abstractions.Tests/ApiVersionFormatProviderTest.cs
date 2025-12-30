@@ -8,7 +8,6 @@ using System.Globalization;
 using DateOnly = System.DateTime;
 #endif
 using static System.Globalization.CultureInfo;
-using static System.String;
 
 public class ApiVersionFormatProviderTest
 {
@@ -43,14 +42,19 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_allow_null_or_empty_format_string( ApiVersionFormatProvider provider )
+    public void format_should_allow_null_or_empty_format_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( 1, 0 );
         var expected = new[] { apiVersion.ToString(), apiVersion.ToString() };
 
         // act
-        var actual = new[] { provider.Format( null, apiVersion, CurrentCulture ), provider.Format( Empty, apiVersion, CurrentCulture ) };
+        var actual = new[]
+        {
+            provider.Format( null, apiVersion, CurrentCulture ),
+            provider.Format( string.Empty, apiVersion, CurrentCulture ),
+        };
 
         // assert
         actual.Should().Equal( expected );
@@ -59,9 +63,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_full_formatted_string_without_optional_components( ApiVersionFormatProvider provider )
+    public void format_should_return_full_formatted_string_without_optional_components( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = ApiVersionParser.Default.Parse( "2017-05-01.1-Beta" );
 
         // act
@@ -74,9 +79,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_full_formatted_string_with_optional_components( ApiVersionFormatProvider provider )
+    public void format_should_return_full_formatted_string_with_optional_components( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = ApiVersionParser.Default.Parse( "2017-05-01.1-Beta" );
 
         // act
@@ -89,9 +95,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_original_string_format_when_argument_cannot_be_formatted( ApiVersionFormatProvider provider )
+    public void format_should_return_original_string_format_when_argument_cannot_be_formatted( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var value = new object();
         var expected = new string[] { "d", value.ToString() };
 
@@ -104,9 +111,10 @@ public class ApiVersionFormatProviderTest
 
     [Theory]
     [MemberData( nameof( MalformedLiteralStringsData ) )]
-    public void format_should_not_allow_malformed_literal_string( ApiVersionFormatProvider provider, string malformedFormat )
+    public void format_should_not_allow_malformed_literal_string( FormatProviderKind kind, string malformedFormat )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( new DateOnly( 2017, 5, 1 ) );
 
         // act
@@ -119,9 +127,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( GroupVersionFormatData ) )]
-    public void format_should_return_formatted_group_version_string( ApiVersionFormatProvider provider, string format )
+    public void format_should_return_formatted_group_version_string( FormatProviderKind kind, string format )
     {
         // arrange
+        var provider = GetProvider( kind );
         var groupVersion = new DateOnly( 2017, 5, 1 );
         var apiVersion = new ApiVersion( groupVersion );
         var expected = groupVersion.ToString( format, CurrentCulture );
@@ -136,9 +145,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_formatted_minor_version_string( ApiVersionFormatProvider provider )
+    public void format_should_return_formatted_minor_version_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( 2, 5 );
 
         // act
@@ -151,9 +161,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_formatted_major_version_string( ApiVersionFormatProvider provider )
+    public void format_should_return_formatted_major_version_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( 2, 5 );
 
         // act
@@ -166,9 +177,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_formatted_major_and_minor_version_string( ApiVersionFormatProvider provider )
+    public void format_should_return_formatted_major_and_minor_version_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( 2, 0 );
 
         // act
@@ -181,9 +193,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_formatted_short_version_string( ApiVersionFormatProvider provider )
+    public void format_should_return_formatted_short_version_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( 2, 0 );
 
         // act
@@ -196,9 +209,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_formatted_long_version_string( ApiVersionFormatProvider provider )
+    public void format_should_return_formatted_long_version_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = ApiVersionParser.Default.Parse( "1-RC" );
 
         // act
@@ -211,9 +225,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( FormatProvidersData ) )]
-    public void format_should_return_formatted_status_string( ApiVersionFormatProvider provider )
+    public void format_should_return_formatted_status_string( FormatProviderKind kind )
     {
         // arrange
+        var provider = GetProvider( kind );
         var apiVersion = new ApiVersion( 2, 5, "Beta" );
 
         // act
@@ -226,9 +241,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( PaddedMinorVersionFormatData ) )]
-    public void format_should_return_formatted_minor_version_with_padding_string( ApiVersionFormatProvider provider, string format )
+    public void format_should_return_formatted_minor_version_with_padding_string( FormatProviderKind kind, string format )
     {
         // arrange
+        var provider = GetProvider( kind );
         var numberFormat = format.Replace( "p", "D" );
         var apiVersion = new ApiVersion( 2, 5 );
 
@@ -247,9 +263,10 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( PaddedMajorVersionFormatData ) )]
-    public void format_should_return_formatted_major_version_with_padding_string( ApiVersionFormatProvider provider, string format )
+    public void format_should_return_formatted_major_version_with_padding_string( FormatProviderKind kind, string format )
     {
         // arrange
+        var provider = GetProvider( kind );
         var numberFormat = format.Replace( "P", "D" );
         var apiVersion = new ApiVersion( 2, 5 );
 
@@ -268,14 +285,15 @@ public class ApiVersionFormatProviderTest
     [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( CustomFormatData ) )]
-    public void format_should_return_custom_format_string( Func<ApiVersion, string> format, string expected )
+    public void format_should_return_custom_format_string( FormatProviderKind kind, string format, string expected )
     {
         // arrange
+        var provider = GetProvider( kind );
         var groupVersion = new DateOnly( 2017, 5, 1 );
         var apiVersion = new ApiVersion( groupVersion, 1, 0, "Beta" );
 
         // act
-        var actual = format( apiVersion );
+        var actual = provider.Format( format, apiVersion, CurrentCulture );
 
         // assert
         actual.Should().Be( expected );
@@ -283,20 +301,49 @@ public class ApiVersionFormatProviderTest
 
     [Theory]
     [AssumeCulture( "en-us" )]
-    [MemberData( nameof( MultipleFormatParameterData ) )]
-    public void format_should_return_formatted_string_with_multiple_parameters( ApiVersionFormatProvider provider, string format, object secondArgument, string expected )
+    [MemberData( nameof( StringCustomFormatData ) )]
+    public void string_format_should_return_custom_format_string(
+        FormatProviderKind kind,
+        string format,
+        string expected )
     {
         // arrange
+        var provider = GetProvider( kind );
+        var groupVersion = new DateOnly( 2017, 5, 1 );
+        var apiVersion = new ApiVersion( groupVersion, 1, 0, "Beta" );
+
+        // act
+        var actual = string.Format( provider, format, apiVersion );
+
+        // assert
+        actual.Should().Be( expected );
+    }
+
+#pragma warning disable xUnit1045
+
+    [Theory]
+    [AssumeCulture( "en-us" )]
+    [MemberData( nameof( MultipleFormatParameterData ) )]
+    public void format_should_return_formatted_string_with_multiple_parameters(
+        FormatProviderKind kind,
+        string format,
+        object secondArgument,
+        string expected )
+    {
+        // arrange
+        var provider = GetProvider( kind );
         var groupVersion = new DateOnly( 2017, 5, 1 );
         var apiVersion = new ApiVersion( groupVersion, 1, 0, "Beta" );
         var args = new object[] { apiVersion, secondArgument };
 
         // act
-        var status = Format( provider, format, args );
+        var status = string.Format( provider, format, args );
 
         // assert
         status.Should().Be( expected );
     }
+
+#pragma warning restore xUnit1045
 
     [Fact]
     [AssumeCulture( "en-us" )]
@@ -314,116 +361,183 @@ public class ApiVersionFormatProviderTest
         result.Should().Be( "1.0 ('17)" );
     }
 
-    public static IEnumerable<object[]> FormatProvidersData
+    /// <summary>
+    /// Represents the supported test format providers.
+    /// </summary>
+    public enum FormatProviderKind
     {
-        get
-        {
-            yield return new object[] { new ApiVersionFormatProvider() };
-            yield return new object[] { new ApiVersionFormatProvider( DateTimeFormatInfo.CurrentInfo ) };
-            yield return new object[] { new ApiVersionFormatProvider( new GregorianCalendar() ) };
-            yield return new object[] { new ApiVersionFormatProvider( DateTimeFormatInfo.CurrentInfo, new GregorianCalendar() ) };
-        }
+        /// <summary>
+        /// <see cref="ApiVersionFormatProvider"/>.
+        /// </summary>
+        Default,
+
+        /// <summary>
+        /// <see cref="ApiVersionFormatProvider(DateTimeFormatInfo)"/>.
+        /// </summary>
+        DateTime,
+
+        /// <summary>
+        /// <see cref="ApiVersionFormatProvider(Calendar)"/>.
+        /// </summary>
+        Calendar,
+
+        /// <summary>
+        /// <see cref="ApiVersionFormatProvider(DateTimeFormatInfo, Calendar)"/>.
+        /// </summary>
+        DateTimeAndCalendar,
     }
 
-    public static IEnumerable<object[]> MalformedLiteralStringsData
+    private static ApiVersionFormatProvider GetProvider( FormatProviderKind provider ) =>
+        provider switch
+        {
+            FormatProviderKind.DateTime => new( DateTimeFormatInfo.CurrentInfo ),
+            FormatProviderKind.Calendar => new( new GregorianCalendar() ),
+            FormatProviderKind.DateTimeAndCalendar => new( DateTimeFormatInfo.CurrentInfo, new GregorianCalendar() ),
+            _ => new ApiVersionFormatProvider(),
+        };
+
+    public static TheoryData<FormatProviderKind> FormatProvidersData =>
+        [
+            FormatProviderKind.Default,
+            FormatProviderKind.DateTime,
+            FormatProviderKind.Calendar,
+            FormatProviderKind.DateTimeAndCalendar,
+        ];
+
+    public static TheoryData<FormatProviderKind, string> MalformedLiteralStringsData
     {
         get
         {
-            foreach ( var provider in FormatProvidersData.Select( d => d[0] ).Cast<ApiVersionFormatProvider>() )
+            var data = new TheoryData<FormatProviderKind, string>();
+
+            foreach ( var provider in FormatProvidersData )
             {
-                yield return new object[] { provider, "'MM-dd-yyyy" };
-                yield return new object[] { provider, "MM-dd-yyyy'" };
-                yield return new object[] { provider, "\"MM-dd-yyyy" };
-                yield return new object[] { provider, "MM-dd-yyyy\"" };
+                data.Add( provider, "'MM-dd-yyyy" );
+                data.Add( provider, "MM-dd-yyyy'" );
+                data.Add( provider, "\"MM-dd-yyyy" );
+                data.Add( provider, "MM-dd-yyyy\"" );
             }
+
+            return data;
         }
     }
 
-    public static IEnumerable<object[]> GroupVersionFormatData
+    public static TheoryData<FormatProviderKind, string> GroupVersionFormatData
     {
         get
         {
+            var data = new TheoryData<FormatProviderKind, string>();
             var formats = new[] { "%d", "dd", "ddd", "dddd", "%M", "MM", "MMM", "MMMM", "%y", "yy", "yyy", "yyyy" };
 
-            foreach ( var provider in FormatProvidersData.Select( d => d[0] ).Cast<ApiVersionFormatProvider>() )
+            foreach ( var provider in FormatProvidersData )
             {
                 foreach ( var format in formats )
                 {
-                    yield return new object[] { provider, format };
+                    data.Add( provider, format );
                 }
             }
+
+            return data;
         }
     }
 
-    public static IEnumerable<object[]> PaddedMinorVersionFormatData
+    public static TheoryData<FormatProviderKind, string> PaddedMinorVersionFormatData
     {
         get
         {
+            var data = new TheoryData<FormatProviderKind, string>();
             var formats = new[] { "p", "p0", "p1", "p2", "p3" };
 
-            foreach ( var provider in FormatProvidersData.Select( d => d[0] ).Cast<ApiVersionFormatProvider>() )
+            foreach ( var provider in FormatProvidersData )
             {
                 foreach ( var format in formats )
                 {
-                    yield return new object[] { provider, format };
+                    data.Add( provider, format );
                 }
             }
+
+            return data;
         }
     }
 
-    public static IEnumerable<object[]> PaddedMajorVersionFormatData
+    public static TheoryData<FormatProviderKind, string> PaddedMajorVersionFormatData
     {
         get
         {
+            var data = new TheoryData<FormatProviderKind, string>();
             var formats = new[] { "P", "P0", "P1", "P2", "P3" };
 
-            foreach ( var provider in FormatProvidersData.Select( d => d[0] ).Cast<ApiVersionFormatProvider>() )
+            foreach ( var provider in FormatProvidersData )
             {
                 foreach ( var format in formats )
                 {
-                    yield return new object[] { provider, format };
+                    data.Add( provider, format );
                 }
             }
+
+            return data;
         }
     }
 
-    public static IEnumerable<object[]> CustomFormatData
+    public static TheoryData<FormatProviderKind, string, string> CustomFormatData
     {
         get
         {
-            foreach ( var provider in FormatProvidersData.Select( d => d[0] ).Cast<ApiVersionFormatProvider>() )
+            var data = new TheoryData<FormatProviderKind, string, string>();
+
+            foreach ( var provider in FormatProvidersData )
             {
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "'v'F", v, CurrentCulture ) ), "v2017-05-01.1.0-Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "'v'FF", v, CurrentCulture ) ), "v2017-05-01.1.0-Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "v{0:F}", v ) ), "v2017-05-01.1.0-Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "v{0:FF}", v ) ), "v2017-05-01.1.0-Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "'v'V", v, CurrentCulture ) ), "v1" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "'v'VV", v, CurrentCulture ) ), "v1.0" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "v{0:V}", v ) ), "v1" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "v{0:VV}", v ) ), "v1.0" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "V'.'v", v, CurrentCulture ) ), "1.0" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "{0:V}.{0:v}", v ) ), "1.0" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "P.p", v, CurrentCulture ) ), "01.00" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "{0:P3}.{0:p3}", v ) ), "001.000" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "'Group:' G, 'Version:' V.v, 'Status:' S", v, CurrentCulture ) ), "Group: 2017-05-01, Version: 1.0, Status: Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => provider.Format( "'Group:' yyyy-MM-dd, 'Version:' V.v, 'Status:' S", v, CurrentCulture ) ), "Group: 2017-05-01, Version: 1.0, Status: Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "{0:\"Group:\" G, \"Version:\" V.v, \"Status:\" S}", v ) ), "Group: 2017-05-01, Version: 1.0, Status: Beta" };
-                yield return new object[] { new Func<ApiVersion, string>( v => Format( provider, "{0:\"Group:\" yyyy-MM-dd, \"Version:\" V.v, \"Status:\" S}", v ) ), "Group: 2017-05-01, Version: 1.0, Status: Beta" };
+                data.Add( provider, "'v'F", "v2017-05-01.1.0-Beta" );
+                data.Add( provider, "'v'FF", "v2017-05-01.1.0-Beta" );
+                data.Add( provider, "'v'V", "v1" );
+                data.Add( provider, "'v'VV", "v1.0" );
+                data.Add( provider, "V'.'v", "1.0" );
+                data.Add( provider, "P.p", "01.00" );
+                data.Add( provider, "'Group:' G, 'Version:' V.v, 'Status:' S", "Group: 2017-05-01, Version: 1.0, Status: Beta" );
+                data.Add( provider, "'Group:' yyyy-MM-dd, 'Version:' V.v, 'Status:' S", "Group: 2017-05-01, Version: 1.0, Status: Beta" );
             }
+
+            return data;
         }
     }
 
-    public static IEnumerable<object[]> MultipleFormatParameterData
+    public static TheoryData<FormatProviderKind, string, string> StringCustomFormatData
     {
         get
         {
-            foreach ( var provider in FormatProvidersData.Select( d => d[0] ).Cast<ApiVersionFormatProvider>() )
+            var data = new TheoryData<FormatProviderKind, string, string>();
+
+            foreach ( var provider in FormatProvidersData )
             {
-                yield return new object[] { provider, "{0:yyyy}->{0:MM}->{0:dd} ({1})", "Group", "2017->05->01 (Group)" };
-                yield return new object[] { provider, "{0:'v'VV}, Deprecated = {1}", false, "v1.0, Deprecated = False" };
-                yield return new object[] { provider, "Major = {0:V}, Minor = {0:v}, Iteration = {1:N1}", 1, "Major = 1, Minor = 0, Iteration = 1.0" };
-                yield return new object[] { provider, "Major\t| Minor\t| Iteration\n{0:P}\t\t| {0:p}\t| {1:N1}", 1, "Major\t| Minor\t| Iteration\n01\t\t| 00\t| 1.0" };
+                data.Add( provider, "v{0:F}", "v2017-05-01.1.0-Beta" );
+                data.Add( provider, "v{0:FF}", "v2017-05-01.1.0-Beta" );
+                data.Add( provider, "v{0:V}", "v1" );
+                data.Add( provider, "v{0:VV}", "v1.0" );
+                data.Add( provider, "{0:V}.{0:v}", "1.0" );
+                data.Add( provider, "{0:P3}.{0:p3}", "001.000" );
+                data.Add( provider, "{0:\"Group:\" G, \"Version:\" V.v, \"Status:\" S}", "Group: 2017-05-01, Version: 1.0, Status: Beta" );
+                data.Add( provider, "{0:\"Group:\" yyyy-MM-dd, \"Version:\" V.v, \"Status:\" S}", "Group: 2017-05-01, Version: 1.0, Status: Beta" );
             }
+
+            return data;
+        }
+    }
+
+    public static TheoryData<FormatProviderKind, string, object, string> MultipleFormatParameterData
+    {
+        get
+        {
+            var data = new TheoryData<FormatProviderKind, string, object, string>();
+
+            foreach ( var provider in FormatProvidersData )
+            {
+                data.Add( provider, "{0:yyyy}->{0:MM}->{0:dd} ({1})", "Group", "2017->05->01 (Group)" );
+                data.Add( provider, "{0:'v'VV}, Deprecated = {1}", false, "v1.0, Deprecated = False" );
+                data.Add( provider, "Major = {0:V}, Minor = {0:v}, Iteration = {1:N1}", 1, "Major = 1, Minor = 0, Iteration = 1.0" );
+                data.Add( provider, "Major\t| Minor\t| Iteration\n{0:P}\t\t| {0:p}\t| {1:N1}", 1, "Major\t| Minor\t| Iteration\n01\t\t| 00\t| 1.0" );
+            }
+
+            return data;
         }
     }
 }

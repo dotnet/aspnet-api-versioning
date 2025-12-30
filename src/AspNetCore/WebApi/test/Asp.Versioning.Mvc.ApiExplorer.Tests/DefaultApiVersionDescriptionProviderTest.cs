@@ -11,8 +11,7 @@ public class DefaultApiVersionDescriptionProviderTest
     {
         // arrange
         var descriptionProvider = new DefaultApiVersionDescriptionProvider(
-            new IApiVersionMetadataCollationProvider[]
-            {
+            [
                 new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
@@ -45,11 +44,10 @@ public class DefaultApiVersionDescriptionProviderTest
         policyManager.Setup( pm => pm.TryGetPolicy( default, apiVersion, out expected ) ).Returns( true );
 
         var descriptionProvider = new DefaultApiVersionDescriptionProvider(
-            new IApiVersionMetadataCollationProvider[]
-            {
+            [
                 new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
-            },
+            ],
             policyManager.Object,
             Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );

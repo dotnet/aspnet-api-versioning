@@ -118,7 +118,7 @@ public static class ApiVersionReader
                 return version == null ? [] : [version];
             }
 
-            return versions.ToArray();
+            return [.. versions];
         }
 
         public void AddParameters( IApiVersionParameterDescriptionContext context )
