@@ -128,9 +128,6 @@ public static partial class IServiceCollectionExtensions
         services.TryAddEnumerable( Singleton<IProblemDetailsWriter, TWriter>() );
         services.Configure( setup ?? DefaultErrorObjectJsonConfig );
 
-        // TODO: remove with TryAddErrorObjectJsonOptions in 9.0+
-        services.AddTransient<ErrorObjectsAdded>();
-
         return services;
     }
 
@@ -154,8 +151,6 @@ public static partial class IServiceCollectionExtensions
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, EndpointApiVersionMetadataCollationProvider>() );
         services.TryAddTransient<IEndpointInspector, DefaultEndpointInspector>();
         services.Replace( WithLinkGeneratorDecorator( services ) );
-        TryAddProblemDetailsRfc7231Compliance( services );
-        TryAddErrorObjectJsonOptions( services );
     }
 
     // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Http/Routing/src/DependencyInjection/RoutingServiceCollectionExtensions.cs#L96
@@ -234,75 +229,4 @@ public static partial class IServiceCollectionExtensions
             return Describe( typeof( LinkGenerator ), factory, lifetime );
         }
     }
-
-    // TODO: Fixed and released; remove in .NET 10.0
-    // BUG: https://github.com/dotnet/aspnetcore/issues/52577
-    private static void TryAddProblemDetailsRfc7231Compliance( IServiceCollection services )
-    {
-        var descriptor = services.FirstOrDefault( IsDefaultProblemDetailsWriter );
-
-        if ( descriptor == null )
-        {
-            return;
-        }
-
-        var index = services.IndexOf( descriptor );
-        var decoratedType = descriptor.ImplementationType!;
-        var lifetime = descriptor.Lifetime;
-
-        services[index] = Describe( typeof( IProblemDetailsWriter ), sp => NewProblemDetailsWriter( sp, decoratedType ), lifetime );
-        services.Add( Describe( decoratedType, decoratedType, lifetime ) );
-
-        static bool IsDefaultProblemDetailsWriter( ServiceDescriptor serviceDescriptor ) =>
-            serviceDescriptor.ServiceType == typeof( IProblemDetailsWriter ) &&
-            serviceDescriptor.ImplementationType?.FullName == "Microsoft.AspNetCore.Http.DefaultProblemDetailsWriter";
-
-        static Rfc7231ProblemDetailsWriter NewProblemDetailsWriter( IServiceProvider serviceProvider, Type decoratedType ) =>
-            new( (IProblemDetailsWriter) serviceProvider.GetRequiredService( decoratedType ) );
-    }
-
-    // TODO: retain for 8.1.x back-compat, but remove in 9.0+ in favor of AddErrorObjects for perf
-    private static void TryAddErrorObjectJsonOptions( IServiceCollection services )
-    {
-        var serviceType = typeof( IProblemDetailsWriter );
-        var implementationType = typeof( ErrorObjectWriter );
-        var markerType = typeof( ErrorObjectsAdded );
-        var hasErrorObjects = false;
-        var hasErrorObjectsJsonConfig = false;
-
-        for ( var i = 0; i < services.Count; i++ )
-        {
-            var service = services[i];
-
-            if ( !hasErrorObjects &&
-                 service.ServiceType == serviceType &&
-                 implementationType.IsAssignableFrom( service.ImplementationType ) )
-            {
-                hasErrorObjects = true;
-
-                if ( hasErrorObjectsJsonConfig )
-                {
-                    break;
-                }
-            }
-            else if ( service.ServiceType == markerType )
-            {
-                hasErrorObjectsJsonConfig = true;
-
-                if ( hasErrorObjects )
-                {
-                    break;
-                }
-            }
-        }
-
-        if ( hasErrorObjects && !hasErrorObjectsJsonConfig )
-        {
-            services.Configure<JsonOptions>( DefaultErrorObjectJsonConfig );
-        }
-    }
-
-    // TEMP: this is a marker class to test whether Error Objects have been explicitly added. remove in 9.0+
-#pragma warning disable CA1812 // Avoid uninstantiated internal classes
-    private sealed class ErrorObjectsAdded { }
 }
