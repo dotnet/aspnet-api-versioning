@@ -43,7 +43,7 @@ public sealed class ApiVersionRouteConstraint : IRouteConstraint
         ArgumentNullException.ThrowIfNull( httpContext );
 
         var parser = httpContext.RequestServices.GetRequiredService<IApiVersionParser>();
-        var feature = httpContext.ApiVersioningFeature();
+        var feature = httpContext.ApiVersioningFeature;
 
         feature.RouteParameter = routeKey;
         feature.RawRequestedApiVersion = value;

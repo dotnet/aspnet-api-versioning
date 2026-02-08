@@ -7,15 +7,18 @@ namespace Asp.Versioning;
 /// </summary>
 public static class ILinkBuilderExtensions
 {
-    /// <summary>
-    /// Creates and returns a new link builder.
-    /// </summary>
     /// <param name="builder">The extended <see cref="ILinkBuilder">link builder</see>.</param>
-    /// <param name="linkTarget">The link target URL.</param>
-    /// <returns>A new <see cref="ILinkBuilder">link builder</see>.</returns>
-    public static ILinkBuilder Link( this ILinkBuilder builder, string linkTarget )
+    extension( ILinkBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Link( new Uri( linkTarget, UriKind.RelativeOrAbsolute ) );
+        /// <summary>
+        /// Creates and returns a new link builder.
+        /// </summary>
+        /// <param name="linkTarget">The link target URL.</param>
+        /// <returns>A new <see cref="ILinkBuilder">link builder</see>.</returns>
+        public ILinkBuilder Link( string linkTarget )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Link( new Uri( linkTarget, UriKind.RelativeOrAbsolute ) );
+        }
     }
 }

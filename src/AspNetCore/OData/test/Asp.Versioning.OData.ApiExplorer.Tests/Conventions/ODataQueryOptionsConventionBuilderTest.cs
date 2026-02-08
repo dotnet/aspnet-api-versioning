@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.OData.ModelBuilder.Config;
 using System.Reflection;
 
 public partial class ODataQueryOptionsConventionBuilderTest

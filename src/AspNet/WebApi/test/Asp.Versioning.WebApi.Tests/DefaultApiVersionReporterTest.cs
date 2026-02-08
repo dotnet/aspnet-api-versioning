@@ -34,7 +34,7 @@ public class DefaultApiVersionReporterTest
         var metadata = new ApiVersionMetadata( apiModel, endpointModel, "Test" );
 
         request.SetConfiguration( configuration );
-        request.ApiVersionProperties().RequestedApiVersion = new ApiVersion( 1.0 );
+        request.ApiVersionProperties.RequestedApiVersion = new ApiVersion( 1.0 );
         request.Properties["MS_HttpActionDescriptor"] =
             new ReflectedHttpActionDescriptor(
                 new HttpControllerDescriptor( configuration, "Test", typeof( TestController ) ),

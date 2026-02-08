@@ -7,63 +7,65 @@ using System.Collections;
 /// </summary>
 public static class EnumerableExtensions
 {
-    /// <summary>
-    /// Returns the first element from the specified sequence.
-    /// </summary>
     /// <param name="enumerable">The <see cref="IEnumerable">sequence</see> to take an element from.</param>
-    /// <returns>The first element in the sequence or <c>null</c>.</returns>
-    public static object FirstOrDefault( this IEnumerable enumerable )
+    extension( IEnumerable enumerable )
     {
-        var iterator = enumerable.GetEnumerator();
-
-        try
+        /// <summary>
+        /// Returns the first element from the specified sequence.
+        /// </summary>
+        /// <returns>The first element in the sequence or <c>null</c>.</returns>
+        public object FirstOrDefault()
         {
-            if ( iterator.MoveNext() )
+            var iterator = enumerable.GetEnumerator();
+
+            try
             {
-                return iterator.Current;
-            }
-        }
-        finally
-        {
-            if ( iterator is IDisposable disposable )
-            {
-                disposable.Dispose();
-            }
-        }
-
-        return default;
-    }
-
-    /// <summary>
-    /// Returns a single element from the specified sequence.
-    /// </summary>
-    /// <param name="enumerable">The <see cref="IEnumerable">sequence</see> to take an element from.</param>
-    /// <returns>The single element in the sequence or <c>null</c>.</returns>
-    public static object SingleOrDefault( this IEnumerable enumerable )
-    {
-        var iterator = enumerable.GetEnumerator();
-        var result = default( object );
-
-        try
-        {
-            if ( iterator.MoveNext() )
-            {
-                result = iterator.Current;
-
                 if ( iterator.MoveNext() )
                 {
-                    throw new InvalidOperationException( "The sequence contains more than one element." );
+                    return iterator.Current;
                 }
             }
-        }
-        finally
-        {
-            if ( iterator is IDisposable disposable )
+            finally
             {
-                disposable.Dispose();
+                if ( iterator is IDisposable disposable )
+                {
+                    disposable.Dispose();
+                }
             }
+
+            return default;
         }
 
-        return result;
+        /// <summary>
+        /// Returns a single element from the specified sequence.
+        /// </summary>
+        /// <returns>The single element in the sequence or <c>null</c>.</returns>
+        public object SingleOrDefault()
+        {
+            var iterator = enumerable.GetEnumerator();
+            var result = default( object );
+
+            try
+            {
+                if ( iterator.MoveNext() )
+                {
+                    result = iterator.Current;
+
+                    if ( iterator.MoveNext() )
+                    {
+                        throw new InvalidOperationException( "The sequence contains more than one element." );
+                    }
+                }
+            }
+            finally
+            {
+                if ( iterator is IDisposable disposable )
+                {
+                    disposable.Dispose();
+                }
+            }
+
+            return result;
+        }
     }
 }

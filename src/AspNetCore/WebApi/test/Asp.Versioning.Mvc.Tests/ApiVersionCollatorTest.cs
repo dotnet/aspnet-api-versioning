@@ -24,7 +24,7 @@ public class ApiVersionCollatorTest
         // assert
         var actions = context.Results.Where( a => a.GetProperty<ApiVersionModel>() != null );
 
-        actions.All( a => a.GetApiVersionMetadata().Map( Explicit ).SupportedApiVersions.SequenceEqual( expected ) ).Should().BeTrue();
+        actions.All( a => a.ApiVersionMetadata.Map( Explicit ).SupportedApiVersions.SequenceEqual( expected ) ).Should().BeTrue();
     }
 
     public enum ContextKind

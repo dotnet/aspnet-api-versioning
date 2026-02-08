@@ -18,13 +18,13 @@ public partial class Startup
         configuration.AddApiVersioning(
             options =>
             {
-                    // reporting api versions will return the headers
-                    // "api-supported-versions" and "api-deprecated-versions"
-                    options.ReportApiVersions = true;
+                // reporting api versions will return the headers
+                // "api-supported-versions" and "api-deprecated-versions"
+                options.ReportApiVersions = true;
 
-                    // apply api versions using conventions rather than attributes
-                    options.Conventions.Controller<OrdersController>()
-                                   .HasApiVersion( 1, 0 );
+                // apply api versions using conventions rather than attributes
+                options.Conventions.Controller<OrdersController>()
+                               .HasApiVersion( 1, 0 );
 
                 options.Conventions.Controller<PeopleController>()
                                    .HasApiVersion( 1, 0 )

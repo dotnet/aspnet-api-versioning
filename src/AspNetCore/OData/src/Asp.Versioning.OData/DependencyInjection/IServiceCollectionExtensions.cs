@@ -7,7 +7,6 @@ namespace Microsoft.Extensions.DependencyInjection;
 using Asp.Versioning.OData;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Runtime.CompilerServices;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
@@ -15,62 +14,65 @@ using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 /// </summary>
 public static class IServiceCollectionExtensions
 {
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    internal static T GetService<T>( this IServiceCollection services ) =>
-        (T) services.LastOrDefault( d => d.ServiceType == typeof( T ) )?.ImplementationInstance!;
-
-    internal static ApplicationPartManager GetOrCreateApplicationPartManager( this IServiceCollection services )
+    extension( IServiceCollection services )
     {
-        var partManager = services.GetService<ApplicationPartManager>();
+        internal T GetService<T>() => (T) services.LastOrDefault( d => d.ServiceType == typeof( T ) )?.ImplementationInstance!;
 
-        if ( partManager == null )
+        internal ApplicationPartManager GetOrCreateApplicationPartManager()
         {
-            partManager = new ApplicationPartManager();
-            services.TryAddSingleton( partManager );
+            var partManager = services.GetService<ApplicationPartManager>();
+
+            if ( partManager == null )
+            {
+                partManager = new ApplicationPartManager();
+                services.TryAddSingleton( partManager );
+            }
+
+            partManager.ApplicationParts.Add( new AssemblyPart( typeof( ODataApiVersioningOptions ).Assembly ) );
+            return partManager;
         }
 
-        partManager.ApplicationParts.Add( new AssemblyPart( typeof( ODataApiVersioningOptions ).Assembly ) );
-        return partManager;
-    }
-
-    [UnconditionalSuppressMessage( "ILLink", "IL2072", Justification = "Model configuration types are never trimmed" )]
-    internal static void AddModelConfigurationsAsServices( this IServiceCollection services, ApplicationPartManager partManager )
-    {
-        var feature = new ModelConfigurationFeature();
-        var modelConfigurationType = typeof( IModelConfiguration );
-
-        partManager.PopulateFeature( feature );
-
-        foreach ( var modelConfiguration in feature.ModelConfigurations )
+        [UnconditionalSuppressMessage( "ILLink", "IL2072", Justification = "Model configuration types are never trimmed" )]
+        internal void AddModelConfigurationsAsServices( ApplicationPartManager partManager )
         {
-            services.TryAddEnumerable( Transient( modelConfigurationType, modelConfiguration ) );
+            var feature = new ModelConfigurationFeature();
+            var modelConfigurationType = typeof( IModelConfiguration );
+
+            partManager.PopulateFeature( feature );
+
+            foreach ( var modelConfiguration in feature.ModelConfigurations )
+            {
+                services.TryAddEnumerable( Transient( modelConfigurationType, modelConfiguration ) );
+            }
+        }
+
+        /// <summary>
+        /// Registers discovered <see cref="IModelConfiguration">model configurations</see> as services in the <see cref="IServiceCollection"/>.
+        /// </summary>
+        public void AddModelConfigurationsAsServices()
+        {
+            ArgumentNullException.ThrowIfNull( services );
+
+            var partManager = services.GetOrCreateApplicationPartManager();
+
+            if ( partManager.ConfigureDefaultFeatureProviders() )
+            {
+                services.AddModelConfigurationsAsServices( partManager );
+            }
         }
     }
 
-    internal static bool ConfigureDefaultFeatureProviders( this ApplicationPartManager partManager )
+    extension( ApplicationPartManager partManager )
     {
-        if ( partManager.FeatureProviders.OfType<ModelConfigurationFeatureProvider>().Any() )
+        internal bool ConfigureDefaultFeatureProviders()
         {
-            return false;
-        }
+            if ( partManager.FeatureProviders.OfType<ModelConfigurationFeatureProvider>().Any() )
+            {
+                return false;
+            }
 
-        partManager.FeatureProviders.Add( new ModelConfigurationFeatureProvider() );
-        return true;
-    }
-
-    /// <summary>
-    /// Registers discovered <see cref="IModelConfiguration">model configurations</see> as services in the <see cref="IServiceCollection"/>.
-    /// </summary>
-    /// <param name="services">The extended <see cref="IServiceCollection"/>.</param>
-    public static void AddModelConfigurationsAsServices( this IServiceCollection services )
-    {
-        ArgumentNullException.ThrowIfNull( services );
-
-        var partManager = services.GetOrCreateApplicationPartManager();
-
-        if ( ConfigureDefaultFeatureProviders( partManager ) )
-        {
-            services.AddModelConfigurationsAsServices( partManager );
+            partManager.FeatureProviders.Add( new ModelConfigurationFeatureProvider() );
+            return true;
         }
     }
 }

@@ -66,7 +66,7 @@ public class OrdersController : ODataController
     [MapToApiVersion( "1.0" )]
     [ResponseType( typeof( Order ) )]
     [EnableQuery( AllowedQueryOptions = Select )]
-    public SingleResult<Order> MostExpensive() => 
+    public SingleResult<Order> MostExpensive() =>
         SingleResult.Create( new[] { new Order() { Id = 42, Customer = "Bill Mei" } }.AsQueryable() );
 
     /// <summary>

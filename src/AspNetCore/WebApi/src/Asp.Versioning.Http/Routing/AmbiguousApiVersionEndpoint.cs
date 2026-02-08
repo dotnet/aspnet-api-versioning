@@ -16,7 +16,7 @@ internal sealed class AmbiguousApiVersionEndpoint : Endpoint
 
     private static Task OnExecute( HttpContext context, ILogger logger )
     {
-        var apiVersions = context.ApiVersioningFeature().RawRequestedApiVersions;
+        var apiVersions = context.ApiVersioningFeature.RawRequestedApiVersions;
 
 #pragma warning disable CA1873
         logger.ApiVersionAmbiguous( [.. apiVersions] );

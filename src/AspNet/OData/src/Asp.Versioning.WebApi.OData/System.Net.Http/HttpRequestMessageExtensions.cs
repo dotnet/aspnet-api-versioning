@@ -11,21 +11,24 @@ using static System.Net.HttpStatusCode;
 
 internal static class HttpRequestMessageExtensions
 {
-    internal static ApiVersion? GetRequestedApiVersionOrReturnBadRequest( this HttpRequestMessage request )
+    extension( HttpRequestMessage request )
     {
-        var properties = request.ApiVersionProperties();
-
-        if ( properties.RawRequestedApiVersions.Count < 2 )
+        internal ApiVersion? GetRequestedApiVersionOrReturnBadRequest()
         {
-            return properties.RequestedApiVersion;
+            var properties = request.ApiVersionProperties;
+
+            if ( properties.RawRequestedApiVersions.Count < 2 )
+            {
+                return properties.RequestedApiVersion;
+            }
+
+            var error = new ODataError()
+            {
+                ErrorCode = ProblemDetailsDefaults.Ambiguous.Code,
+                Message = new AmbiguousApiVersionException().Message,
+            };
+
+            throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
         }
-
-        var error = new ODataError()
-        {
-            ErrorCode = ProblemDetailsDefaults.Ambiguous.Code,
-            Message = new AmbiguousApiVersionException().Message,
-        };
-
-        throw new HttpResponseException( request.CreateResponse( BadRequest, error ) );
     }
 }

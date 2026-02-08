@@ -24,34 +24,73 @@ using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 /// </summary>
 public static class IApiVersioningBuilderExtensions
 {
-    /// <summary>
-    /// Adds ASP.NET Core MVC support for API versioning.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    public static IApiVersioningBuilder AddMvc( this IApiVersioningBuilder builder )
+    extension( IApiVersioningBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        AddServices( builder.Services );
-        return builder;
+        /// <summary>
+        /// Adds ASP.NET Core MVC support for API versioning.
+        /// </summary>
+        public IApiVersioningBuilder AddMvc()
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            AddServices( builder.Services );
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds ASP.NET Core MVC support for API versioning.
+        /// </summary>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
+        public IApiVersioningBuilder AddMvc( Action<MvcApiVersioningOptions> setupAction )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+
+            var services = builder.Services;
+
+            AddServices( services );
+            services.Configure( setupAction );
+
+            return builder;
+        }
     }
 
-    /// <summary>
-    /// Adds ASP.NET Core MVC support for API versioning.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
-    /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static IApiVersioningBuilder AddMvc( this IApiVersioningBuilder builder, Action<MvcApiVersioningOptions> setupAction )
+    extension( IServiceCollection services )
     {
-        ArgumentNullException.ThrowIfNull( builder );
+        private void TryReplace<TService, TImplementation, [DynamicallyAccessedMembers( NonPublicConstructors | PublicConstructors )] TReplacement>()
+        {
+            var serviceType = typeof( TService );
+            var implementationType = typeof( TImplementation );
 
-        var services = builder.Services;
+            for ( var i = services.Count - 1; i >= 0; i-- )
+            {
+                var service = services[i];
 
-        AddServices( services );
-        services.Configure( setupAction );
+                if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
+                {
+                    services[i] = Describe( serviceType, typeof( TReplacement ), service.Lifetime );
+                    break;
+                }
+            }
+        }
+    }
 
-        return builder;
+    extension( IServiceProvider services )
+    {
+        private object CreateInstance( ServiceDescriptor descriptor )
+        {
+            if ( descriptor.ImplementationInstance != null )
+            {
+                return descriptor.ImplementationInstance;
+            }
+
+            if ( descriptor.ImplementationFactory != null )
+            {
+                return descriptor.ImplementationFactory( services );
+            }
+
+            return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
+        }
     }
 
     private static void AddServices( IServiceCollection services )
@@ -70,42 +109,6 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, ActionApiVersionMetadataCollationProvider>() );
         services.Replace( WithUrlHelperFactoryDecorator( services ) );
         services.TryReplace<IEndpointInspector, DefaultEndpointInspector, MvcEndpointInspector>();
-    }
-
-    private static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
-    {
-        if ( descriptor.ImplementationInstance != null )
-        {
-            return descriptor.ImplementationInstance;
-        }
-
-        if ( descriptor.ImplementationFactory != null )
-        {
-            return descriptor.ImplementationFactory( services );
-        }
-
-        return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
-    }
-
-    private static void TryReplace<
-        TService,
-        TImplementation,
-        [DynamicallyAccessedMembers( NonPublicConstructors | PublicConstructors )]
-        TReplacement>( this IServiceCollection services )
-    {
-        var serviceType = typeof( TService );
-        var implementationType = typeof( TImplementation );
-
-        for ( var i = services.Count - 1; i >= 0; i-- )
-        {
-            var service = services[i];
-
-            if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
-            {
-                services[i] = Describe( serviceType, typeof( TReplacement ), service.Lifetime );
-                break;
-            }
-        }
     }
 
     [SkipLocalsInit]

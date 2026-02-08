@@ -51,7 +51,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     /// Gets a value indicating whether the current API is version-neutral.
     /// </summary>
     /// <value>True if the current API is version-neutral; otherwise, false.</value>
-    protected bool IsApiVersionNeutral => ApiDescription.ActionDescriptor.GetApiVersionMetadata().IsApiVersionNeutral;
+    protected bool IsApiVersionNeutral => ApiDescription.ActionDescriptor.ApiVersionMetadata.IsApiVersionNeutral;
 
     /// <summary>
     /// Gets the options associated with the API explorer.
@@ -254,7 +254,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         }
 
         var mapping = ApiVersionMapping.Explicit | ApiVersionMapping.Implicit;
-        var model = apiDescription.ActionDescriptor.GetApiVersionMetadata().Map( mapping );
+        var model = apiDescription.ActionDescriptor.ApiVersionMetadata.Map( mapping );
         var defaultApiVersion = options.ApiVersionSelector.SelectVersion( model );
 
         return apiVersion == defaultApiVersion;

@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Controllers;
 
-using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;

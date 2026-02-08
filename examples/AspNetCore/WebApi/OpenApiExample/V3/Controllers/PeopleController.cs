@@ -1,8 +1,8 @@
 ﻿namespace ApiVersioning.Examples.V3.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
 using ApiVersioning.Examples.V3.Models;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
 /// Represents a RESTful people service.

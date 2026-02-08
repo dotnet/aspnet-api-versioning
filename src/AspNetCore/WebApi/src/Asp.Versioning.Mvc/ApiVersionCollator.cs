@@ -41,7 +41,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
             for ( var i = 0; i < actions.Count; i++ )
             {
                 var action = actions[i];
-                var metadata = action.GetApiVersionMetadata();
+                var metadata = action.ApiVersionMetadata;
 
                 if ( metadata.IsApiVersionNeutral )
                 {
@@ -90,7 +90,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
     }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool IsUnversioned( ActionDescriptor action ) => action.GetApiVersionMetadata() == ApiVersionMetadata.Empty;
+    private static bool IsUnversioned( ActionDescriptor action ) => action.ApiVersionMetadata == ApiVersionMetadata.Empty;
 
     private IEnumerable<IReadOnlyList<ActionDescriptor>> GroupActionsByController( IList<ActionDescriptor> actions )
     {
@@ -128,5 +128,5 @@ public class ApiVersionCollator : IActionDescriptorProvider
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static ApiVersionModel CollateModel( IEnumerable<ActionDescriptor> actions ) =>
-        actions.Select( a => a.GetApiVersionMetadata().Map( Explicit ) ).Aggregate();
+        actions.Select( a => a.ApiVersionMetadata.Map( Explicit ) ).Aggregate();
 }

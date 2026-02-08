@@ -5,7 +5,7 @@ namespace Asp.Versioning.Conventions;
 public partial class GroupedControllerNameConventionTest
 {
     [Theory]
-    [MemberData(nameof(NormalizeNameData))]
+    [MemberData( nameof( NormalizeNameData ) )]
     public void normalize_name_should_not_trim_suffix( string controllerName )
     {
         // arrange

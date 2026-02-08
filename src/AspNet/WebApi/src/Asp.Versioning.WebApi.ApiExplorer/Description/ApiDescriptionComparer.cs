@@ -99,13 +99,13 @@ public class ApiDescriptionComparer :
                 return Equals( x1, y1 );
             }
 
-            id1 = x1.GetUniqueID();
+            id1 = x1.UniqueID;
             id2 = y.ID;
         }
         else if ( y is VersionedApiDescription y1 )
         {
             id1 = x.ID;
-            id2 = y1.GetUniqueID();
+            id2 = y1.UniqueID;
         }
         else
         {

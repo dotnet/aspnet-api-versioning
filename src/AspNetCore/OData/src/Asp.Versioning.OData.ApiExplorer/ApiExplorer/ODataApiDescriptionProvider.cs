@@ -208,7 +208,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         IODataRoutingMetadata[] items,
         [NotNullWhen( true )] out IODataRoutingMetadata? metadata )
     {
-        if ( description.GetApiVersion() is not ApiVersion apiVersion )
+        if ( description.ApiVersion is not ApiVersion apiVersion )
         {
             // this should only happen if an odata endpoint is registered outside of api versioning:
             //
@@ -225,7 +225,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = 0; i < items.Length; i++ )
         {
             var item = items[i];
-            var otherApiVersion = item.Model.GetApiVersion();
+            var otherApiVersion = item.Model.ApiVersion;
 
             if ( apiVersion.Equals( otherApiVersion ) )
             {
@@ -288,7 +288,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
 
         for ( var i = 0; i < parameters.Count; i++ )
         {
-            if ( parameters[i].Type.IsODataQueryOptions() )
+            if ( parameters[i].Type.IsODataQueryOptions )
             {
                 parameters.RemoveAt( i );
                 break;
@@ -418,14 +418,14 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
                 continue;
             }
 
-            if ( type.IsODataQueryOptions() || type.IsODataPath() )
+            if ( type.IsODataQueryOptions || type.IsODataPath )
             {
                 // don't explore ODataQueryOptions or ODataPath
                 parameters.RemoveAt( i );
                 continue;
             }
 
-            if ( type.IsODataActionParameters() )
+            if ( type.IsODataActionParameters )
             {
                 var action = metadata.Template[^1] switch
                 {
@@ -433,7 +433,7 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
                     ActionImportSegmentTemplate segment => segment.ActionImport.Action,
                     _ => default,
                 };
-                var apiVersion = description.GetApiVersion()!;
+                var apiVersion = description.ApiVersion!;
                 var controllerName = ( (ControllerActionDescriptor) description.ActionDescriptor ).ControllerName;
 
                 type = ModelTypeBuilder.NewActionParameters( metadata.Model, action!, controllerName, apiVersion );

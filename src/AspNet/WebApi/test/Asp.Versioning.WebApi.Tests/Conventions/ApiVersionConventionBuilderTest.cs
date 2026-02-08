@@ -25,6 +25,6 @@ public partial class ApiVersionConventionBuilderTest
         conventionBuilder.ApplyTo( controllerDescriptor );
 
         // assert
-        actionDescriptor.GetApiVersionMetadata().MappingTo( new ApiVersion( 2, 0 ) ).Should().Be( Implicit );
+        actionDescriptor.ApiVersionMetadata.MappingTo( new ApiVersion( 2, 0 ) ).Should().Be( Implicit );
     }
 }

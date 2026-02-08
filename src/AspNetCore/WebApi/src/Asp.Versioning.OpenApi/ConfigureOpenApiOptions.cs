@@ -51,7 +51,7 @@ internal sealed class ConfigureOpenApiOptions(
                 continue;
             }
 
-            var apiExplorer = new ApiExplorerTransformer(description);
+            var apiExplorer = new ApiExplorerTransformer( description );
 
             options.SetDocumentName( description.GroupName );
             options.AddDocumentTransformer( apiExplorer );

@@ -289,7 +289,7 @@ internal sealed class ODataRouteBuilder
             default:
                 var action = Context.ActionDescriptor;
 
-                if ( action.ControllerDescriptor.ControllerType.IsMetadataController() )
+                if ( action.ControllerDescriptor.ControllerType.IsMetadataController )
                 {
                     if ( action.ActionName == nameof( MetadataController.GetServiceDocument ) )
                     {

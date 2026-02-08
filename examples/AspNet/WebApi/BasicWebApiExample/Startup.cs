@@ -12,7 +12,7 @@ public partial class Startup
         // we only need to change the default constraint resolver for services
         // that want urls with versioning like: ~/v{apiVersion}/{controller}
         var constraintResolver = new DefaultInlineConstraintResolver()
-        { 
+        {
             ConstraintMap = { ["apiVersion"] = typeof( ApiVersionRouteConstraint ) },
         };
         var configuration = new HttpConfiguration();

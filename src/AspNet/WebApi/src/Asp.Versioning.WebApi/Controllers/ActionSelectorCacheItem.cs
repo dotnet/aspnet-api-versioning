@@ -51,8 +51,8 @@ internal sealed class ActionSelectorCacheItem
                 [.. actionDescriptor.ActionBinding
                                 .ParameterBindings
                                 .Where( binding => !binding.Descriptor.IsOptional &&
-                                                   binding.Descriptor.ParameterType.CanConvertFromString() &&
-                                                   binding.WillReadUri() )
+                                                   binding.Descriptor.ParameterType.CanConvertFromString &&
+                                                   binding.WillReadUri )
                                 .Select( binding => binding.Descriptor.Prefix ??
                                                     binding.Descriptor.ParameterName )] );
         }
@@ -74,7 +74,7 @@ internal sealed class ActionSelectorCacheItem
 
         var selectionCache = new StandardActionSelectionCache();
 
-        if ( controllerDescriptor.IsAttributeRouted() )
+        if ( controllerDescriptor.IsAttributeRouted )
         {
             selectionCache.StandardCandidateActions = [];
         }
@@ -88,7 +88,7 @@ internal sealed class ActionSelectorCacheItem
                 var action = (ReflectedHttpActionDescriptor) candidate.ActionDescriptor;
 
                 if ( action.MethodInfo.DeclaringType != controllerDescriptor.ControllerType ||
-                     !candidate.ActionDescriptor.IsAttributeRouted() )
+                     !candidate.ActionDescriptor.IsAttributeRouted )
                 {
                     standardCandidateActions.Add( candidate );
                 }
@@ -166,7 +166,7 @@ internal sealed class ActionSelectorCacheItem
         }
 
         var ambiguityList = CreateAmbiguousMatchList( selectedCandidates );
-        var message = string.Format( CultureInfo.CurrentCulture, SR.ApiControllerActionSelector_AmbiguousMatch, ambiguityList );
+        var message = string.Format( CultureInfo.CurrentCulture, BackportSR.ApiControllerActionSelector_AmbiguousMatch, ambiguityList );
 
         return new( new InvalidOperationException( message ) );
     }
@@ -232,14 +232,14 @@ internal sealed class ActionSelectorCacheItem
     private IEnumerable<HttpMethod> GetAllowedMethods( HttpControllerContext controllerContext )
     {
         var request = controllerContext.Request;
-        var apiModel = controllerContext.ControllerDescriptor.GetApiVersionModel();
-        var version = apiModel.IsApiVersionNeutral ? ApiVersion.Neutral : request.ApiVersionProperties().RequestedApiVersion!;
+        var apiModel = controllerContext.ControllerDescriptor.ApiVersionModel;
+        var version = apiModel.IsApiVersionNeutral ? ApiVersion.Neutral : request.ApiVersionProperties.RequestedApiVersion!;
         var httpMethods = new HashSet<HttpMethod>();
 
         for ( var i = 0; i < combinedCandidateActions.Length; i++ )
         {
             var actionDescriptor = combinedCandidateActions[i].ActionDescriptor;
-            var endpointModel = actionDescriptor.GetApiVersionMetadata().Map( Explicit );
+            var endpointModel = actionDescriptor.ApiVersionMetadata.Map( Explicit );
 
             if ( endpointModel.IsApiVersionNeutral || endpointModel.ImplementedApiVersions.Contains( version ) )
             {
@@ -259,7 +259,7 @@ internal sealed class ActionSelectorCacheItem
             return CreateActionNotFoundResponse( controllerContext );
         }
 
-        var apiModel = controllerContext.ControllerDescriptor.GetApiVersionModel();
+        var apiModel = controllerContext.ControllerDescriptor.ApiVersionModel;
         var httpMethods = GetAllowedMethods( controllerContext );
         var exceptionFactory = new HttpResponseExceptionFactory( controllerContext.Request, apiModel );
 
@@ -269,8 +269,8 @@ internal sealed class ActionSelectorCacheItem
     private HttpResponseMessage CreateActionNotFoundResponse( HttpControllerContext controllerContext )
     {
         var culture = CultureInfo.CurrentCulture;
-        var message = string.Format( culture, SR.ResourceNotFound, controllerContext.Request.RequestUri );
-        var messageDetail = string.Format( culture, SR.ApiControllerActionSelector_ActionNotFound, controllerDescriptor.ControllerName );
+        var message = string.Format( culture, BackportSR.ResourceNotFound, controllerContext.Request.RequestUri );
+        var messageDetail = string.Format( culture, BackportSR.ApiControllerActionSelector_ActionNotFound, controllerDescriptor.ControllerName );
         return controllerContext.Request.CreateErrorResponse( NotFound, message, messageDetail );
     }
 
@@ -293,7 +293,7 @@ internal sealed class ActionSelectorCacheItem
         foreach ( var subRouteData in subRoutes )
         {
             var combinedParameterNames = GetCombinedParameterNames( queryNameValuePairs, subRouteData.Values );
-            var candidates = subRouteData.Route.GetDirectRouteCandidates();
+            var candidates = subRouteData.Route.DirectRouteCandidates;
 
             if ( candidates == null )
             {
@@ -337,7 +337,7 @@ internal sealed class ActionSelectorCacheItem
 
             if ( actionsFoundByName.Length == 0 )
             {
-                var apiModel = controllerContext.ControllerDescriptor.GetApiVersionModel();
+                var apiModel = controllerContext.ControllerDescriptor.ApiVersionModel;
                 var exceptionFactory = new HttpResponseExceptionFactory( controllerContext.Request, apiModel );
                 var httpMethods = GetAllowedMethods( controllerContext );
 
@@ -512,7 +512,7 @@ internal sealed class ActionSelectorCacheItem
             exceptionMessageBuilder.AppendLine();
             exceptionMessageBuilder.AppendFormat(
                 CultureInfo.CurrentCulture,
-                SR.ActionSelector_AmbiguousMatchType,
+                BackportSR.ActionSelector_AmbiguousMatchType,
                 descriptor.ActionName,
                 controllerTypeName );
         }

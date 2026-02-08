@@ -21,32 +21,33 @@ public static class IApiVersioningBuilderExtensions
 {
     private const string TrimmingMessage = "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming";
 
-    /// <summary>
-    /// Adds the API versioning extensions for the API Explorer with OData.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    [RequiresUnreferencedCode( TrimmingMessage )]
-    public static IApiVersioningBuilder AddODataApiExplorer( this IApiVersioningBuilder builder )
+    extension( IApiVersioningBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        AddApiExplorerServices( builder );
-        return builder;
-    }
+        /// <summary>
+        /// Adds the API versioning extensions for the API Explorer with OData.
+        /// </summary>
+        [RequiresUnreferencedCode( TrimmingMessage )]
+        public IApiVersioningBuilder AddODataApiExplorer()
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            AddApiExplorerServices( builder );
+            return builder;
+        }
 
-    /// <summary>
-    /// Adds the API versioning extensions for the API Explorer with OData.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
-    /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    [RequiresUnreferencedCode( TrimmingMessage )]
-    public static IApiVersioningBuilder AddODataApiExplorer( this IApiVersioningBuilder builder, Action<ODataApiExplorerOptions> setupAction )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        AddApiExplorerServices( builder );
-        builder.Services.Configure( setupAction );
-        return builder;
+        /// <summary>
+        /// Adds the API versioning extensions for the API Explorer with OData.
+        /// </summary>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
+        [RequiresUnreferencedCode( TrimmingMessage )]
+        public IApiVersioningBuilder AddODataApiExplorer( Action<ODataApiExplorerOptions> setupAction )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            AddApiExplorerServices( builder );
+            builder.Services.Configure( setupAction );
+            return builder;
+        }
     }
 
     [RequiresUnreferencedCode( TrimmingMessage )]

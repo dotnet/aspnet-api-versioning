@@ -10,16 +10,19 @@ using System.Web.Http.Routing;
 
 internal static class HttpActionDescriptorExtensions
 {
-    internal static IList<HttpMethod> GetHttpMethods( this HttpActionDescriptor actionDescriptor, IHttpRoute route )
+    extension( HttpActionDescriptor actionDescriptor )
     {
-        IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
-        var httpMethodConstraint = route.Constraints.Values.OfType<HttpMethodConstraint>().FirstOrDefault();
-
-        if ( httpMethodConstraint == null )
+        internal IList<HttpMethod> GetHttpMethods( IHttpRoute route )
         {
-            return actionHttpMethods;
-        }
+            IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
+            var httpMethodConstraint = route.Constraints.Values.OfType<HttpMethodConstraint>().FirstOrDefault();
 
-        return [.. httpMethodConstraint.AllowedMethods.Intersect( actionHttpMethods )];
+            if ( httpMethodConstraint == null )
+            {
+                return actionHttpMethods;
+            }
+
+            return [.. httpMethodConstraint.AllowedMethods.Intersect( actionHttpMethods )];
+        }
     }
 }

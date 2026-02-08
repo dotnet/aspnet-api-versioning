@@ -36,7 +36,7 @@ public sealed class ActionApiVersionMetadataCollationProvider : IApiVersionMetad
         for ( var i = 0; i < actions.Count; i++ )
         {
             var action = actions[i];
-            var item = action.GetApiVersionMetadata();
+            var item = action.ApiVersionMetadata;
             var groupName = GetGroupName( action );
 
             context.Results.Add( item, groupName );

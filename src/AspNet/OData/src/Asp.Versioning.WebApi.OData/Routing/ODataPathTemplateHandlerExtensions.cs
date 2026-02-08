@@ -9,21 +9,21 @@ using Microsoft.OData;
 
 internal static class ODataPathTemplateHandlerExtensions
 {
-    internal static ODataPathTemplate? SafeParseTemplate(
-        this IODataPathTemplateHandler handler,
-        string pathTemplate,
-        IServiceProvider serviceProvider )
+    extension( IODataPathTemplateHandler handler )
     {
-        try
+        internal ODataPathTemplate? SafeParseTemplate( string pathTemplate, IServiceProvider serviceProvider )
         {
-            return handler.ParseTemplate( pathTemplate, serviceProvider );
-        }
-        catch ( ODataException )
-        {
-            // this 'should' mean the controller does not map to the current edm model. there's no way to know this without
-            // forcing a developer to explicitly map it. while it could be a mistake, simply yield null. this results in the
-            // template being skipped and will ultimately result in a 4xx if requested, which is acceptable.
-            return default;
+            try
+            {
+                return handler.ParseTemplate( pathTemplate, serviceProvider );
+            }
+            catch ( ODataException )
+            {
+                // this 'should' mean the controller does not map to the current edm model. there's no way to know this without
+                // forcing a developer to explicitly map it. while it could be a mistake, simply yield null. this results in the
+                // template being skipped and will ultimately result in a 4xx if requested, which is acceptable.
+                return default;
+            }
         }
     }
 }

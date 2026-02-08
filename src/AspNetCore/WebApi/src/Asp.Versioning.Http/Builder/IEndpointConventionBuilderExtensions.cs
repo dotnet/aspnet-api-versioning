@@ -9,7 +9,6 @@ using Asp.Versioning.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Collections;
 using System.Globalization;
-using System.Runtime.Serialization;
 using static Asp.Versioning.ApiVersionProviderOptions;
 
 /// <summary>
@@ -18,379 +17,291 @@ using static Asp.Versioning.ApiVersionProviderOptions;
 [CLSCompliant( false )]
 public static class IEndpointConventionBuilderExtensions
 {
-    /// <summary>
-    /// Applies the specified API version set to the endpoint.
-    /// </summary>
     /// <typeparam name="TBuilder">The type of builder.</typeparam>
-    /// <param name="builder">The extended builder.</param>
-    /// <param name="apiVersionSet">The <see cref="ApiVersionSet">API version set</see> the endpoint will use.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder WithApiVersionSet<TBuilder>(
-        this TBuilder builder,
-        ApiVersionSet apiVersionSet )
-        where TBuilder : notnull, IEndpointConventionBuilder
+    extension<TBuilder>( TBuilder builder ) where TBuilder : notnull, IEndpointConventionBuilder
     {
-        ArgumentNullException.ThrowIfNull( apiVersionSet );
+        /// <summary>
+        /// Applies the specified API version set to the endpoint.
+        /// </summary>
+        /// <param name="apiVersionSet">The <see cref="ApiVersionSet">API version set</see> the endpoint will use.</param>
+        public TBuilder WithApiVersionSet( ApiVersionSet apiVersionSet )
+        {
+            ArgumentNullException.ThrowIfNull( apiVersionSet );
 
-        builder.Add( endpoint => AddMetadata( endpoint, apiVersionSet ) );
-        builder.Finally( EndpointBuilderFinalizer.FinalizeEndpoints );
+            builder.Add( endpoint => AddMetadata( endpoint, apiVersionSet ) );
+            builder.Finally( EndpointBuilderFinalizer.FinalizeEndpoints );
 
-        return builder;
-    }
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the specified API version is mapped to the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder MapToApiVersion<TBuilder>( this TBuilder builder, int majorVersion, int? minorVersion = default, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.MapToApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is mapped to the configured endpoint.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder MapToApiVersion( int majorVersion, int? minorVersion = default, string? status = default ) =>
+            builder.MapToApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is mapped to the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder MapToApiVersion<TBuilder>( this TBuilder builder, double version, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.MapToApiVersion( new ApiVersion( version, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is mapped to the configured endpoint.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder MapToApiVersion( double version, string? status = default ) =>
+            builder.MapToApiVersion( new ApiVersion( version, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is mapped to the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder MapToApiVersion<TBuilder>( this TBuilder builder, int year, int month, int day, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.MapToApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
+        /// <summary>
+        /// Indicates that the specified API version is mapped to the configured endpoint.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder MapToApiVersion( int year, int month, int day, string? status = default ) =>
+            builder.MapToApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is mapped to the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder MapToApiVersion<TBuilder>( this TBuilder builder, DateOnly groupVersion, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.MapToApiVersion( new ApiVersion( groupVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is mapped to the configured endpoint.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder MapToApiVersion( DateOnly groupVersion, string? status = default ) =>
+            builder.MapToApiVersion( new ApiVersion( groupVersion, status ) );
 
-    /// <summary>
-    /// Maps the specified API version to the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to map to the endpoint.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder MapToApiVersion<TBuilder>( this TBuilder builder, ApiVersion apiVersion )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add( endpoint => AddMetadata( endpoint, Convention.MapToApiVersion( apiVersion ) ) );
-        return builder;
-    }
+        /// <summary>
+        /// Maps the specified API version to the configured endpoint.
+        /// </summary>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> to map to the endpoint.</param>
+        public TBuilder MapToApiVersion( ApiVersion apiVersion )
+        {
+            builder.Add( endpoint => AddMetadata( endpoint, Convention.MapToApiVersion( apiVersion ) ) );
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the endpoint is API version-neutral.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder IsApiVersionNeutral<TBuilder>( this TBuilder builder )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add( endpoint => AddMetadata( endpoint, new ApiVersionNeutralAttribute() ) );
-        return builder;
-    }
+        /// <summary>
+        /// Indicates that the endpoint is API version-neutral.
+        /// </summary>
+        public TBuilder IsApiVersionNeutral()
+        {
+            builder.Add( endpoint => AddMetadata( endpoint, new ApiVersionNeutralAttribute() ) );
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the specified API version is supported by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasApiVersion<TBuilder>( this TBuilder builder, int majorVersion, int? minorVersion = default, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is supported by the configured endpoint.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasApiVersion( int majorVersion, int? minorVersion = default, string? status = default ) =>
+            builder.HasApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is supported by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasApiVersion<TBuilder>( this TBuilder builder, double version, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasApiVersion( new ApiVersion( version, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is supported by the configured endpoint.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasApiVersion( double version, string? status = default ) =>
+            builder.HasApiVersion( new ApiVersion( version, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is supported by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasApiVersion<TBuilder>( this TBuilder builder, int year, int month, int day, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
+        /// <summary>
+        /// Indicates that the specified API version is supported by the configured endpoint.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasApiVersion( int year, int month, int day, string? status = default ) =>
+            builder.HasApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is supported by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasApiVersion<TBuilder>( this TBuilder builder, DateOnly groupVersion, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasApiVersion( new ApiVersion( groupVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is supported by the configured endpoint.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasApiVersion( DateOnly groupVersion, string? status = default ) =>
+            builder.HasApiVersion( new ApiVersion( groupVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is supported by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="apiVersion">The supported <see cref="ApiVersion">API version</see> implemented by the endpoint.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasApiVersion<TBuilder>( this TBuilder builder, ApiVersion apiVersion )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add(
-            endpoint =>
-            {
-                AddMetadata( endpoint, Convention.HasApiVersion( apiVersion ) );
-                AdvertiseInApiVersionSet( endpoint.Metadata, apiVersion );
-            } );
+        /// <summary>
+        /// Indicates that the specified API version is supported by the configured endpoint.
+        /// </summary>
+        /// <param name="apiVersion">The supported <see cref="ApiVersion">API version</see> implemented by the endpoint.</param>
+        public TBuilder HasApiVersion( ApiVersion apiVersion )
+        {
+            builder.Add(
+                endpoint =>
+                {
+                    AddMetadata( endpoint, Convention.HasApiVersion( apiVersion ) );
+                    AdvertiseInApiVersionSet( endpoint.Metadata, apiVersion );
+                } );
 
-        return builder;
-    }
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the specified API version is deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasDeprecatedApiVersion<TBuilder>( this TBuilder builder, int majorVersion, int? minorVersion = default, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasDeprecatedApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasDeprecatedApiVersion( int majorVersion, int? minorVersion = default, string? status = default ) =>
+            builder.HasDeprecatedApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasDeprecatedApiVersion<TBuilder>( this TBuilder builder, double version, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasDeprecatedApiVersion( new ApiVersion( version, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasDeprecatedApiVersion( double version, string? status = default ) =>
+            builder.HasDeprecatedApiVersion( new ApiVersion( version, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasDeprecatedApiVersion<TBuilder>( this TBuilder builder, int year, int month, int day, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasDeprecatedApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
+        /// <summary>
+        /// Indicates that the specified API version is deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasDeprecatedApiVersion( int year, int month, int day, string? status = default ) =>
+            builder.HasDeprecatedApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasDeprecatedApiVersion<TBuilder>( this TBuilder builder, DateOnly groupVersion, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.HasDeprecatedApiVersion( new ApiVersion( groupVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder HasDeprecatedApiVersion( DateOnly groupVersion, string? status = default ) =>
+            builder.HasDeprecatedApiVersion( new ApiVersion( groupVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="apiVersion">The deprecated <see cref="ApiVersion">API version</see> implemented by the endpoint.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder HasDeprecatedApiVersion<TBuilder>( this TBuilder builder, ApiVersion apiVersion )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add(
-            endpoint =>
-            {
-                AddMetadata( endpoint, Convention.HasDeprecatedApiVersion( apiVersion ) );
-                AdvertiseDeprecatedInApiVersionSet( endpoint.Metadata, apiVersion );
-            } );
+        /// <summary>
+        /// Indicates that the specified API version is deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="apiVersion">The deprecated <see cref="ApiVersion">API version</see> implemented by the endpoint.</param>
+        public TBuilder HasDeprecatedApiVersion( ApiVersion apiVersion )
+        {
+            builder.Add(
+                endpoint =>
+                {
+                    AddMetadata( endpoint, Convention.HasDeprecatedApiVersion( apiVersion ) );
+                    AdvertiseDeprecatedInApiVersionSet( endpoint.Metadata, apiVersion );
+                } );
 
-        return builder;
-    }
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesApiVersion<TBuilder>( this TBuilder builder, int majorVersion, int? minorVersion = default, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised by the configured endpoint.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesApiVersion( int majorVersion, int? minorVersion = default, string? status = default ) =>
+            builder.AdvertisesApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesApiVersion<TBuilder>( this TBuilder builder, double version, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesApiVersion( new ApiVersion( version, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised by the configured endpoint.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesApiVersion( double version, string? status = default )
+            => builder.AdvertisesApiVersion( new ApiVersion( version, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesApiVersion<TBuilder>( this TBuilder builder, int year, int month, int day, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised by the configured endpoint.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesApiVersion( int year, int month, int day, string? status = default ) =>
+            builder.AdvertisesApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesApiVersion<TBuilder>( this TBuilder builder, DateOnly groupVersion, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesApiVersion( new ApiVersion( groupVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised by the configured endpoint.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesApiVersion( DateOnly groupVersion, string? status = default ) =>
+            builder.AdvertisesApiVersion( new ApiVersion( groupVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="apiVersion">The advertised <see cref="ApiVersion">API version</see> not directly implemented by the endpoint.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesApiVersion<TBuilder>( this TBuilder builder, ApiVersion apiVersion )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add(
-            endpoint =>
-            {
-                AddMetadata( endpoint, Convention.AdvertisesApiVersion( apiVersion ) );
-                AdvertiseInApiVersionSet( endpoint.Metadata, apiVersion );
-            } );
+        /// <summary>
+        /// Indicates that the specified API version is advertised by the configured endpoint.
+        /// </summary>
+        /// <param name="apiVersion">The advertised <see cref="ApiVersion">API version</see> not directly implemented by the endpoint.</param>
+        public TBuilder AdvertisesApiVersion( ApiVersion apiVersion )
+        {
+            builder.Add(
+                endpoint =>
+                {
+                    AddMetadata( endpoint, Convention.AdvertisesApiVersion( apiVersion ) );
+                    AdvertiseInApiVersionSet( endpoint.Metadata, apiVersion );
+                } );
 
-        return builder;
-    }
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesDeprecatedApiVersion<TBuilder>( this TBuilder builder, int majorVersion, int? minorVersion = default, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesDeprecatedApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesDeprecatedApiVersion( int majorVersion, int? minorVersion = default, string? status = default ) =>
+            builder.AdvertisesDeprecatedApiVersion( new ApiVersion( majorVersion, minorVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesDeprecatedApiVersion<TBuilder>( this TBuilder builder, double version, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesDeprecatedApiVersion( new ApiVersion( version, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesDeprecatedApiVersion( double version, string? status = default ) =>
+            builder.AdvertisesDeprecatedApiVersion( new ApiVersion( version, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesDeprecatedApiVersion<TBuilder>( this TBuilder builder, int year, int month, int day, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesDeprecatedApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The version status.</param>
+        public TBuilder AdvertisesDeprecatedApiVersion( int year, int month, int day, string? status = default ) =>
+            builder.AdvertisesDeprecatedApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesDeprecatedApiVersion<TBuilder>( this TBuilder builder, DateOnly groupVersion, string? status = default )
-        where TBuilder : notnull, IEndpointConventionBuilder => builder.AdvertisesDeprecatedApiVersion( new ApiVersion( groupVersion, status ) );
+        /// <summary>
+        /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        public TBuilder AdvertisesDeprecatedApiVersion( DateOnly groupVersion, string? status = default ) =>
+            builder.AdvertisesDeprecatedApiVersion( new ApiVersion( groupVersion, status ) );
 
-    /// <summary>
-    /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <param name="apiVersion">The advertised, but deprecated <see cref="ApiVersion">API version</see> not directly implemented by the endpoint.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder AdvertisesDeprecatedApiVersion<TBuilder>( this TBuilder builder, ApiVersion apiVersion )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add(
-            endpoint =>
-            {
-                AddMetadata( endpoint, Convention.AdvertisesDeprecatedApiVersion( apiVersion ) );
-                AdvertiseDeprecatedInApiVersionSet( endpoint.Metadata, apiVersion );
-            } );
+        /// <summary>
+        /// Indicates that the specified API version is advertised and deprecated by the configured endpoint.
+        /// </summary>
+        /// <param name="apiVersion">The advertised, but deprecated <see cref="ApiVersion">API version</see> not
+        /// directly implemented by the endpoint.</param>
+        public TBuilder AdvertisesDeprecatedApiVersion( ApiVersion apiVersion )
+        {
+            builder.Add(
+                endpoint =>
+                {
+                    AddMetadata( endpoint, Convention.AdvertisesDeprecatedApiVersion( apiVersion ) );
+                    AdvertiseDeprecatedInApiVersionSet( endpoint.Metadata, apiVersion );
+                } );
 
-        return builder;
-    }
+            return builder;
+        }
 
-    /// <summary>
-    /// Indicates that the endpoint will report its API versions.
-    /// </summary>
-    /// <typeparam name="TBuilder">The extended type.</typeparam>
-    /// <param name="builder">The extended endpoint convention builder.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static TBuilder ReportApiVersions<TBuilder>( this TBuilder builder )
-        where TBuilder : notnull, IEndpointConventionBuilder
-    {
-        builder.Add( endpoint => AddMetadata( endpoint, Convention.ReportApiVersions ) );
-        return builder;
+        /// <summary>
+        /// Indicates that the endpoint will report its API versions.
+        /// </summary>
+        public TBuilder ReportApiVersions()
+        {
+            builder.Add( endpoint => AddMetadata( endpoint, Convention.ReportApiVersions ) );
+            return builder;
+        }
     }
 
     private static void AddMetadata( EndpointBuilder builder, ApiVersionSet versionSet )

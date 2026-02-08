@@ -15,73 +15,77 @@ using RoutePattern = Microsoft.AspNetCore.Routing.Patterns.RoutePattern;
 [CLSCompliant( false )]
 public static class HttpRequestExtensions
 {
-    /// <summary>
-    /// Attempts to get the API version from current request path using the provided patterns.
-    /// </summary>
-    /// <typeparam name="TList">The type of <see cref="IReadOnlyList{T}">read-only list</see>.</typeparam>
     /// <param name="request">The current <see cref="HttpRequest">HTTP request</see>.</param>
-    /// <param name="routePatterns">The <see cref="IReadOnlyList{T}">read-only list</see> of
-    /// <see cref="RoutePattern">patterns</see> to evaluate.</param>
-    /// <param name="constraintName">The name of the API version route constraint.</param>
-    /// <param name="apiVersion">The raw API version, if retrieved.</param>
-    /// <returns>True if the raw API version was retrieved; otherwise, false.</returns>
-    [EditorBrowsable( EditorBrowsableState.Never )]
-    public static bool TryGetApiVersionFromPath<TList>(
-        this HttpRequest request,
-        TList routePatterns,
-        string constraintName,
-        [NotNullWhen( true )] out string? apiVersion )
-        where TList : IReadOnlyList<RoutePattern>
+    extension( HttpRequest request )
     {
-        ArgumentNullException.ThrowIfNull( routePatterns );
-
-        if ( string.IsNullOrEmpty( constraintName ) || routePatterns.Count == 0 )
+        /// <summary>
+        /// Attempts to get the API version from current request path using the provided patterns.
+        /// </summary>
+        /// <typeparam name="TList">The type of <see cref="IReadOnlyList{T}">read-only list</see>.</typeparam>
+        /// <param name="routePatterns">The <see cref="IReadOnlyList{T}">read-only list</see> of
+        /// <see cref="RoutePattern">patterns</see> to evaluate.</param>
+        /// <param name="constraintName">The name of the API version route constraint.</param>
+        /// <param name="apiVersion">The raw API version, if retrieved.</param>
+        /// <returns>True if the raw API version was retrieved; otherwise, false.</returns>
+        [EditorBrowsable( EditorBrowsableState.Never )]
+        public bool TryGetApiVersionFromPath<TList>(
+            TList routePatterns,
+            string constraintName,
+            [NotNullWhen( true )] out string? apiVersion )
+            where TList : IReadOnlyList<RoutePattern>
         {
-            apiVersion = default;
-            return false;
-        }
+            ArgumentNullException.ThrowIfNull( routePatterns );
 
-        var path = ( request ?? throw new ArgumentNullException( nameof( request ) ) ).Path;
-        var values = new RouteValueDictionary();
-
-        // this only applies when versioning by url segment. route values have not been processed
-        // since no candidates exist yet. we do know the name of the route constraint though. there
-        // is only one constraint that applies to the api version so we can use that to extract
-        // the api version from any suitable route template. we're not matching the route template,
-        // just the raw api version since we don't have a collection of route values to work with.
-        for ( var i = 0; i < routePatterns.Count; i++ )
-        {
-            var routePattern = routePatterns[i];
-            var defaults = new RouteValueDictionary( routePattern.RequiredValues );
-            var matcher = new TemplateMatcher( new( routePattern ), defaults );
-
-            values.Clear();
-
-            if ( !matcher.TryMatch( path, values ) )
+            if ( string.IsNullOrEmpty( constraintName ) || routePatterns.Count == 0 )
             {
-                continue;
+                apiVersion = default;
+                return false;
             }
 
-            var parameters = routePattern.Parameters;
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+            var path = ( request ?? throw new ArgumentNullException( nameof( request ) ) ).Path;
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+            var values = new RouteValueDictionary();
 
-            for ( var j = 0; j < parameters.Count; j++ )
+            // this only applies when versioning by url segment. route values have not been processed
+            // since no candidates exist yet. we do know the name of the route constraint though. there
+            // is only one constraint that applies to the api version so we can use that to extract
+            // the api version from any suitable route template. we're not matching the route template,
+            // just the raw api version since we don't have a collection of route values to work with.
+            for ( var i = 0; i < routePatterns.Count; i++ )
             {
-                var parameter = parameters[j];
-                var policies = parameter.ParameterPolicies;
+                var routePattern = routePatterns[i];
+                var defaults = new RouteValueDictionary( routePattern.RequiredValues );
+                var matcher = new TemplateMatcher( new( routePattern ), defaults );
 
-                for ( var k = 0; k < policies.Count; k++ )
+                values.Clear();
+
+                if ( !matcher.TryMatch( path, values ) )
                 {
-                    if ( constraintName.Equals( policies[k].Content, StringComparison.Ordinal ) &&
-                         values.TryGetValue( parameter.Name, out apiVersion ) &&
-                         !string.IsNullOrEmpty( apiVersion ) )
+                    continue;
+                }
+
+                var parameters = routePattern.Parameters;
+
+                for ( var j = 0; j < parameters.Count; j++ )
+                {
+                    var parameter = parameters[j];
+                    var policies = parameter.ParameterPolicies;
+
+                    for ( var k = 0; k < policies.Count; k++ )
                     {
-                        return true;
+                        if ( constraintName.Equals( policies[k].Content, StringComparison.Ordinal ) &&
+                             values.TryGetValue( parameter.Name, out apiVersion ) &&
+                             !string.IsNullOrEmpty( apiVersion ) )
+                        {
+                            return true;
+                        }
                     }
                 }
             }
-        }
 
-        apiVersion = default;
-        return false;
+            apiVersion = default;
+            return false;
+        }
     }
 }

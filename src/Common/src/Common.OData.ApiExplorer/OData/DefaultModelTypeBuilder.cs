@@ -26,9 +26,9 @@ using static System.Reflection.Emit.AssemblyBuilderAccess;
 /// Represents the default model type builder.
 /// </summary>
 #if !NETFRAMEWORK
-[UnconditionalSuppressMessage( "ILLink", "IL2055")]
-[UnconditionalSuppressMessage( "ILLink", "IL2070")]
-[UnconditionalSuppressMessage( "ILLink", "IL2073")]
+[UnconditionalSuppressMessage( "ILLink", "IL2055" )]
+[UnconditionalSuppressMessage( "ILLink", "IL2070" )]
+[UnconditionalSuppressMessage( "ILLink", "IL2073" )]
 #endif
 public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
 {
@@ -81,7 +81,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     {
         ArgumentNullException.ThrowIfNull( model );
 
-        if ( model.IsAdHoc() )
+        if ( model.IsAdHoc )
         {
             if ( excludeAdHocModels )
             {
@@ -113,7 +113,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
     {
         ArgumentNullException.ThrowIfNull( model );
 
-        if ( !adHoc && model.IsAdHoc() )
+        if ( !adHoc && model.IsAdHoc )
         {
             adHocBuilder ??= new( excludeAdHocModels, adHoc: true );
             return adHocBuilder.NewActionParameters( model, action, controllerName, apiVersion );
@@ -260,7 +260,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
                     {
                         clrTypeMatchesEdmType = false;
                         hasUnfinishedTypes = true;
-                        dependentProperties.Add( new PropertyDependency( elementKey, true, property.Name, property.DeclaredAttributes() ) );
+                        dependentProperties.Add( new PropertyDependency( elementKey, true, property.Name, property.DeclaredAttributes ) );
                         continue;
                     }
 
@@ -293,7 +293,7 @@ public sealed class DefaultModelTypeBuilder : IModelTypeBuilder
                 {
                     clrTypeMatchesEdmType = false;
                     hasUnfinishedTypes = true;
-                    dependentProperties.Add( new PropertyDependency( propertyTypeKey, false, property.Name, property.DeclaredAttributes() ) );
+                    dependentProperties.Add( new PropertyDependency( propertyTypeKey, false, property.Name, property.DeclaredAttributes ) );
                     continue;
                 }
             }

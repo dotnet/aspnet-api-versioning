@@ -8,16 +8,19 @@ using System.Web.Http.Routing;
 
 internal static class HttpRouteCollectionExtensions
 {
-    internal static string? GetRouteName( this HttpRouteCollection routes, IHttpRoute route )
+    extension( HttpRouteCollection routes )
     {
-        foreach ( var item in routes.ToDictionary() )
+        internal string? GetRouteName( IHttpRoute route )
         {
-            if ( Equals( item.Value, route ) )
+            foreach ( var item in routes.ToDictionary() )
             {
-                return item.Key;
+                if ( Equals( item.Value, route ) )
+                {
+                    return item.Key;
+                }
             }
-        }
 
-        return default;
+            return default;
+        }
     }
 }

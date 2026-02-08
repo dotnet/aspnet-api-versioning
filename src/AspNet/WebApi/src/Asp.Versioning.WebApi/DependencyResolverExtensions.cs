@@ -9,37 +9,41 @@ using System.Web.Http.Dependencies;
 
 internal static class DependencyResolverExtensions
 {
-    internal static TService? GetService<TService>( this IDependencyResolver resolver ) =>
-        (TService) resolver.GetService( typeof( TService ) );
-
-    internal static TService GetRequiredService<TService>( this IDependencyResolver resolver )
+    extension( IDependencyResolver resolver )
     {
-        var service = resolver.GetService<TService>();
-        var message = string.Format( CultureInfo.CurrentCulture, SR.NoServiceRegistered, typeof( TService ) );
-        return service ?? throw new InvalidOperationException( message );
+        internal TService? GetService<TService>() => (TService) resolver.GetService( typeof( TService ) );
+
+        internal TService GetRequiredService<TService>()
+        {
+            var service = resolver.GetService<TService>();
+            var message = string.Format( CultureInfo.CurrentCulture, BackportSR.NoServiceRegistered, typeof( TService ) );
+            return service ?? throw new InvalidOperationException( message );
+        }
     }
 
-    internal static IApiVersionParser GetApiVersionParser( this HttpConfiguration configuration ) =>
-        configuration.DependencyResolver.GetService<IApiVersionParser>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IApiVersionParser>();
+    extension( HttpConfiguration configuration )
+    {
+        internal IApiVersionParser ApiVersionParser =>
+            configuration.DependencyResolver.GetService<IApiVersionParser>() ??
+            configuration.ApiVersioningServices.GetRequiredService<IApiVersionParser>();
 
-    internal static IReportApiVersions GetApiVersionReporter( this HttpConfiguration configuration ) =>
-        configuration.DependencyResolver.GetService<IReportApiVersions>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IReportApiVersions>();
+        internal IReportApiVersions ApiVersionReporter =>
+            configuration.DependencyResolver.GetService<IReportApiVersions>() ??
+            configuration.ApiVersioningServices.GetRequiredService<IReportApiVersions>();
 
-    internal static IControllerNameConvention GetControllerNameConvention( this HttpConfiguration configuration ) =>
-        configuration.DependencyResolver.GetService<IControllerNameConvention>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IControllerNameConvention>();
+        internal IControllerNameConvention ControllerNameConvention =>
+            configuration.DependencyResolver.GetService<IControllerNameConvention>() ??
+            configuration.ApiVersioningServices.GetRequiredService<IControllerNameConvention>();
 
-    internal static IProblemDetailsFactory GetProblemDetailsFactory( this HttpConfiguration configuration ) =>
-        configuration.DependencyResolver.GetService<IProblemDetailsFactory>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IProblemDetailsFactory>();
+        internal IProblemDetailsFactory ProblemDetailsFactory =>
+            configuration.DependencyResolver.GetService<IProblemDetailsFactory>() ??
+            configuration.ApiVersioningServices.GetRequiredService<IProblemDetailsFactory>();
 
-    internal static IPolicyManager<SunsetPolicy> GetSunsetPolicyManager( this HttpConfiguration configuration ) =>
+    internal static IPolicyManager<SunsetPolicy> SunsetPolicyManager =>
         configuration.DependencyResolver.GetService<IPolicyManager<SunsetPolicy>>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IPolicyManager<SunsetPolicy>>();
+        configuration.ApiVersioningServices.GetRequiredService<IPolicyManager<SunsetPolicy>>();
 
-    internal static IPolicyManager<DeprecationPolicy> GetDeprecationPolicyManager( this HttpConfiguration configuration ) =>
+    internal static IPolicyManager<DeprecationPolicy> DeprecationPolicyManager =>
         configuration.DependencyResolver.GetService<IPolicyManager<DeprecationPolicy>>() ??
-        configuration.ApiVersioningServices().GetRequiredService<IPolicyManager<DeprecationPolicy>>();
+        configuration.ApiVersioningServices.GetRequiredService<IPolicyManager<DeprecationPolicy>>();
 }

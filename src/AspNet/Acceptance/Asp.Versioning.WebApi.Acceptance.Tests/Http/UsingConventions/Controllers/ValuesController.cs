@@ -8,8 +8,8 @@ using System.Web.Http;
 public class ValuesController : ApiController
 {
     [Route]
-    public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+    public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.RequestedApiVersion.ToString() } );
 
     [Route( "{id:int}" )]
-    public IHttpActionResult Get( int id ) => Ok( new { controller = GetType().Name, id, version = Request.GetRequestedApiVersion().ToString() } );
+    public IHttpActionResult Get( int id ) => Ok( new { controller = GetType().Name, id, version = Request.RequestedApiVersion.ToString() } );
 }

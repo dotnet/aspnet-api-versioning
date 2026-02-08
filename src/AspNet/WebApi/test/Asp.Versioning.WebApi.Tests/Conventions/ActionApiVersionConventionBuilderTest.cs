@@ -23,7 +23,7 @@ public partial class ActionApiVersionConventionBuilderTest
         actionBuilder.ApplyTo( actionDescriptor.Object );
 
         // assert
-        actionDescriptor.Object.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        actionDescriptor.Object.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,
@@ -50,7 +50,7 @@ public partial class ActionApiVersionConventionBuilderTest
         actionBuilder.ApplyTo( actionDescriptor.Object );
 
         // assert
-        actionDescriptor.Object.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        actionDescriptor.Object.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,
@@ -78,7 +78,7 @@ public partial class ActionApiVersionConventionBuilderTest
         actionBuilder.ApplyTo( actionDescriptor );
 
         // assert
-        actionDescriptor.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        actionDescriptor.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,

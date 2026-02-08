@@ -25,7 +25,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
         ApiVersionMetadata metadata;
         var name = NamingConvention.GroupName( item.ControllerDescriptor.ControllerName );
 
-        if ( VersionNeutral || ( apiModel = item.ControllerDescriptor.GetApiVersionModel() ).IsApiVersionNeutral )
+        if ( VersionNeutral || ( apiModel = item.ControllerDescriptor.ApiVersionModel ).IsApiVersionNeutral )
         {
             metadata = string.IsNullOrEmpty( name )
                 ? ApiVersionMetadata.Neutral
@@ -80,6 +80,6 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             metadata = new( apiModel, endpointModel, name );
         }
 
-        item.SetApiVersionMetadata( metadata );
+        item.ApiVersionMetadata = metadata;
     }
 }

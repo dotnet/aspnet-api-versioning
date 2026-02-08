@@ -4,7 +4,6 @@
 
 namespace Asp.Versioning.Controllers;
 
-using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -119,7 +118,7 @@ public class HttpControllerDescriptorGroupTest
         var group = new HttpControllerDescriptorGroup( descriptor.Object );
         var request = new HttpRequestMessage();
 
-        request.ApiVersionProperties().SelectedController = descriptor.Object;
+        request.ApiVersionProperties.SelectedController = descriptor.Object;
 
         // act
         var controller = group.CreateController( request );
@@ -157,7 +156,7 @@ public class HttpControllerDescriptorGroupTest
         var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object );
         var request = new HttpRequestMessage();
 
-        request.ApiVersionProperties().SelectedController = descriptor1.Object;
+        request.ApiVersionProperties.SelectedController = descriptor1.Object;
 
         // act
         var controller = group.CreateController( request );
@@ -197,7 +196,7 @@ public class HttpControllerDescriptorGroupTest
         var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object ) { Configuration = configuration };
         var request = new HttpRequestMessage( HttpMethod.Get, "http://localhost/api/test?api-version=1.0" );
 
-        request.ApiVersionProperties().SelectedController = descriptor2.Object;
+        request.ApiVersionProperties.SelectedController = descriptor2.Object;
 
         // act
         var controller = group.CreateController( request );
@@ -237,7 +236,7 @@ public class HttpControllerDescriptorGroupTest
         var group = new HttpControllerDescriptorGroup( descriptor1.Object, descriptor2.Object ) { Configuration = configuration };
         var request = new HttpRequestMessage( HttpMethod.Get, "http://localhost/api/test?api-version=3.0" );
 
-        request.ApiVersionProperties().SelectedController = descriptor1.Object;
+        request.ApiVersionProperties.SelectedController = descriptor1.Object;
 
         // act
         var controller = group.CreateController( request );

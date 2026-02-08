@@ -25,135 +25,141 @@ using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 /// </summary>
 public static class IApiVersioningBuilderExtensions
 {
-    /// <summary>
-    /// Adds ASP.NET Core OData support for API versioning.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    public static IApiVersioningBuilder AddOData( this IApiVersioningBuilder builder )
+    extension( IApiVersioningBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        AddServices( builder.AddMvc().Services );
-        return builder;
-    }
-
-    /// <summary>
-    /// Adds ASP.NET Core OData support for API versioning.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
-    /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    [CLSCompliant( false )]
-    public static IApiVersioningBuilder AddOData( this IApiVersioningBuilder builder, Action<ODataApiVersioningOptions> setupAction )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-
-        var services = builder.AddMvc().Services;
-        AddServices( services );
-        services.Configure( setupAction );
-        return builder;
-    }
-
-    private static void AddServices( IServiceCollection services )
-    {
-        const string DefaultODataTemplateTranslator = "Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator, Microsoft.AspNetCore.OData";
-
-        services.TryRemoveODataService( typeof( IApplicationModelProvider ), ODataRoutingApplicationModelProviderType );
-
-        var partManager = services.GetOrCreateApplicationPartManager();
-        var configured = partManager.ConfigureDefaultFeatureProviders();
-
-        services.AddHttpContextAccessor();
-        services.TryAddSingleton<VersionedODataOptions>();
-        services.TryReplaceODataService(
-            Singleton<IODataTemplateTranslator, VersionedODataTemplateTranslator>(),
-            Type.GetType( DefaultODataTemplateTranslator, throwOnError: true, ignoreCase: false )! );
-        services.Replace( Singleton<IOptions<ODataOptions>>( sp => sp.GetRequiredService<VersionedODataOptions>() ) );
-        services.Replace( WithHttpContextFactoryDecorator( services ) );
-        services.TryAddTransient<VersionedODataModelBuilder>();
-        services.TryAddSingleton<IOptionsFactory<ODataApiVersioningOptions>, ODataApiVersioningOptionsFactory>();
-        services.TryAddSingleton<IODataApiVersionCollectionProvider, ODataApiVersionCollectionProvider>();
-        services.TryAddEnumerable( Transient<IApiControllerSpecification, ODataControllerSpecification>() );
-        services.TryAddEnumerable( Transient<IPostConfigureOptions<ODataOptions>, ODataOptionsPostSetup>() );
-        services.TryAddEnumerable( Singleton<MatcherPolicy, DefaultMetadataMatcherPolicy>() );
-        services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataApplicationModelProvider>() );
-        services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataMultiModelApplicationModelProvider>() );
-
-        if ( configured )
+        /// <summary>
+        /// Adds ASP.NET Core OData support for API versioning.
+        /// </summary>
+        public IApiVersioningBuilder AddOData()
         {
-            services.AddModelConfigurationsAsServices( partManager );
+            ArgumentNullException.ThrowIfNull( builder );
+            builder.AddMvc().Services.AddODataServices();
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds ASP.NET Core OData support for API versioning.
+        /// </summary>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
+        [CLSCompliant( false )]
+        public IApiVersioningBuilder AddOData( Action<ODataApiVersioningOptions> setupAction )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+
+            var services = builder.AddMvc().Services;
+            services.AddODataServices();
+            services.Configure( setupAction );
+            return builder;
         }
     }
 
-    private static void TryRemoveODataService( this IServiceCollection services, Type serviceType, Type implementationType )
+    extension( IServiceCollection services )
     {
-        for ( var i = 0; i < services.Count; i++ )
+        private void AddODataServices()
         {
-            var service = services[i];
+            const string DefaultODataTemplateTranslator = "Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator, Microsoft.AspNetCore.OData";
 
-            if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
+            services.TryRemoveODataService( typeof( IApplicationModelProvider ), ODataRoutingApplicationModelProviderType );
+
+            var partManager = services.GetOrCreateApplicationPartManager();
+            var configured = partManager.ConfigureDefaultFeatureProviders();
+
+            services.AddHttpContextAccessor();
+            services.TryAddSingleton<VersionedODataOptions>();
+            services.TryReplaceODataService(
+                Singleton<IODataTemplateTranslator, VersionedODataTemplateTranslator>(),
+                Type.GetType( DefaultODataTemplateTranslator, throwOnError: true, ignoreCase: false )! );
+            services.Replace( Singleton<IOptions<ODataOptions>>( sp => sp.GetRequiredService<VersionedODataOptions>() ) );
+            services.Replace( services.WithHttpContextFactoryDecorator() );
+            services.TryAddTransient<VersionedODataModelBuilder>();
+            services.TryAddSingleton<IOptionsFactory<ODataApiVersioningOptions>, ODataApiVersioningOptionsFactory>();
+            services.TryAddSingleton<IODataApiVersionCollectionProvider, ODataApiVersionCollectionProvider>();
+            services.TryAddEnumerable( Transient<IApiControllerSpecification, ODataControllerSpecification>() );
+            services.TryAddEnumerable( Transient<IPostConfigureOptions<ODataOptions>, ODataOptionsPostSetup>() );
+            services.TryAddEnumerable( Singleton<MatcherPolicy, DefaultMetadataMatcherPolicy>() );
+            services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataApplicationModelProvider>() );
+            services.TryAddEnumerable( Transient<IApplicationModelProvider, ODataMultiModelApplicationModelProvider>() );
+
+            if ( configured )
             {
-                services.RemoveAt( i );
-                return;
+                services.AddModelConfigurationsAsServices( partManager );
             }
         }
 
-        var message = string.Format(
-            CultureInfo.CurrentCulture,
-            Format.UnableToFindServices,
-            nameof( IMvcBuilder ),
-            "AddOData",
-            "ConfigureServices(...)" );
-
-        throw new InvalidOperationException( message );
-    }
-
-    private static void TryReplaceODataService(
-        this IServiceCollection services,
-        ServiceDescriptor replacement,
-        [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.None )] Type implementationType )
-    {
-        var serviceType = replacement.ServiceType;
-
-        for ( var i = 0; i < services.Count; i++ )
+        private void TryRemoveODataService( Type serviceType, Type implementationType )
         {
-            var service = services[i];
-
-            if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
+            for ( var i = 0; i < services.Count; i++ )
             {
-                services[i] = replacement;
-                break;
+                var service = services[i];
+
+                if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
+                {
+                    services.RemoveAt( i );
+                    return;
+                }
+            }
+
+            var message = string.Format(
+                CultureInfo.CurrentCulture,
+                Format.UnableToFindServices,
+                nameof( IMvcBuilder ),
+                "AddOData",
+                "ConfigureServices(...)" );
+
+            throw new InvalidOperationException( message );
+        }
+
+        private void TryReplaceODataService(
+            ServiceDescriptor replacement,
+            [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.None )] Type implementationType )
+        {
+            var serviceType = replacement.ServiceType;
+
+            for ( var i = 0; i < services.Count; i++ )
+            {
+                var service = services[i];
+
+                if ( service.ServiceType == serviceType && service.ImplementationType == implementationType )
+                {
+                    services[i] = replacement;
+                    break;
+                }
             }
         }
+
+        private ServiceDescriptor WithHttpContextFactoryDecorator()
+        {
+            var descriptor = services.First( sd => sd.ServiceType == typeof( IHttpContextFactory ) );
+            var lifetime = descriptor.Lifetime;
+
+            IHttpContextFactory NewFactory( IServiceProvider serviceProvider )
+            {
+                var decorated = (IHttpContextFactory) serviceProvider.CreateInstance( descriptor );
+                return new HttpContextFactoryDecorator( decorated );
+            }
+
+            return Describe( typeof( IHttpContextFactory ), NewFactory, lifetime );
+        }
     }
 
-    private static object CreateInstance( this IServiceProvider services, ServiceDescriptor descriptor )
+    extension( IServiceProvider services )
     {
-        if ( descriptor.ImplementationInstance != null )
+        private object CreateInstance( ServiceDescriptor descriptor )
         {
-            return descriptor.ImplementationInstance;
+            if ( descriptor.ImplementationInstance != null )
+            {
+                return descriptor.ImplementationInstance;
+            }
+
+            if ( descriptor.ImplementationFactory != null )
+            {
+                return descriptor.ImplementationFactory( services );
+            }
+
+            return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
         }
-
-        if ( descriptor.ImplementationFactory != null )
-        {
-            return descriptor.ImplementationFactory( services );
-        }
-
-        return ActivatorUtilities.GetServiceOrCreateInstance( services, descriptor.ImplementationType! );
-    }
-
-    private static ServiceDescriptor WithHttpContextFactoryDecorator( IServiceCollection services )
-    {
-        var descriptor = services.First( sd => sd.ServiceType == typeof( IHttpContextFactory ) );
-        var lifetime = descriptor.Lifetime;
-
-        IHttpContextFactory NewFactory( IServiceProvider serviceProvider )
-        {
-            var decorated = (IHttpContextFactory) serviceProvider.CreateInstance( descriptor );
-            return new HttpContextFactoryDecorator( decorated );
-        }
-
-        return Describe( typeof( IHttpContextFactory ), NewFactory, lifetime );
     }
 
     private sealed class HttpContextFactoryDecorator( IHttpContextFactory decorated ) : IHttpContextFactory

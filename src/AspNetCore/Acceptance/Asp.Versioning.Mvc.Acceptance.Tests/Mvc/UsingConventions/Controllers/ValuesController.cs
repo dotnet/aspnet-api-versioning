@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 public class ValuesController : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok( new { Controller = nameof( ValuesController ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get() => Ok( new { Controller = nameof( ValuesController ), Version = HttpContext.RequestedApiVersion.ToString() } );
 
     [HttpGet( "{id:int}" )]
-    public IActionResult Get( int id ) => Ok( new { Controller = nameof( ValuesController ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get( int id ) => Ok( new { Controller = nameof( ValuesController ), Id = id, Version = HttpContext.RequestedApiVersion.ToString() } );
 }

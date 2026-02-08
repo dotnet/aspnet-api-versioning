@@ -32,7 +32,7 @@ internal sealed class ApplyContentTypeVersionActionFilter : ActionFilterAttribut
             return;
         }
 
-        var apiVersion = actionExecutedContext.Request.GetRequestedApiVersion();
+        var apiVersion = actionExecutedContext.Request.RequestedApiVersion;
 
         if ( apiVersion == null )
         {

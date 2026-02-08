@@ -49,7 +49,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         {
             if ( initializing )
             {
-                throw new InvalidOperationException( SR.ControllerSelectorMappingCycle );
+                throw new InvalidOperationException( BackportSR.ControllerSelectorMappingCycle );
             }
 
             initializing = true;
@@ -81,7 +81,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             if ( conventionRouteResult.Succeeded )
             {
                 EnsureUrlHelper( request );
-                return request.ApiVersionProperties().SelectedController = conventionRouteResult.Controller;
+                return request.ApiVersionProperties.SelectedController = conventionRouteResult.Controller;
             }
 
             exceptionFactory = new( request, context );
@@ -94,7 +94,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         if ( directRouteResult.Succeeded )
         {
             EnsureUrlHelper( request );
-            return request.ApiVersionProperties().SelectedController = directRouteResult.Controller;
+            return request.ApiVersionProperties.SelectedController = directRouteResult.Controller;
         }
 
         conventionRouteResult = conventionRouteSelector.SelectController( context );
@@ -102,7 +102,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         if ( conventionRouteResult.Succeeded )
         {
             EnsureUrlHelper( request );
-            return request.ApiVersionProperties().SelectedController = conventionRouteResult.Controller;
+            return request.ApiVersionProperties.SelectedController = conventionRouteResult.Controller;
         }
 
         exceptionFactory = new( request, context );
@@ -211,7 +211,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
 
     private static void ApplyImplicitConventions( HttpControllerDescriptor controller, IHttpActionSelector actionSelector, ApiVersionModel implicitVersionModel )
     {
-        controller.SetApiVersionModel( implicitVersionModel );
+        controller.ApiVersionModel = implicitVersionModel;
 
         var mapping = actionSelector.GetActionMapping( controller );
 
@@ -221,13 +221,13 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         }
 
         var actions = mapping.SelectMany( g => g );
-        var namingConvention = controller.Configuration.GetControllerNameConvention();
+        var namingConvention = controller.Configuration.ControllerNameConvention;
         var name = namingConvention.GroupName( controller.ControllerName );
         var metadata = new ApiVersionMetadata( implicitVersionModel, implicitVersionModel, name );
 
         foreach ( var action in actions )
         {
-            action.SetApiVersionMetadata( metadata );
+            action.ApiVersionMetadata = metadata;
         }
     }
 
@@ -272,7 +272,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         for ( var i = 0; i < controllers.Count; i++ )
         {
             var controller = controllers[i];
-            var model = controller.GetApiVersionModel();
+            var model = controller.ApiVersionModel;
 
             if ( model.IsApiVersionNeutral )
             {
@@ -296,7 +296,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
 
         foreach ( var action in actions )
         {
-            var metadata = action.GetApiVersionMetadata();
+            var metadata = action.ApiVersionMetadata;
 
             if ( metadata.IsApiVersionNeutral )
             {
@@ -336,7 +336,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         for ( var i = 0; i < visitedControllers.Count; i++ )
         {
             var (controller, model) = visitedControllers[i];
-            controller.SetApiVersionModel( model.Aggregate( collatedModel ) );
+            controller.ApiVersionModel = model.Aggregate( collatedModel );
         }
     }
 
@@ -344,14 +344,14 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
         HttpConfiguration configuration,
         List<Tuple<HttpControllerDescriptor, HttpActionDescriptor, ApiVersionModel>> visitedActions )
     {
-        var namingConvention = configuration.GetControllerNameConvention();
+        var namingConvention = configuration.ControllerNameConvention;
 
         for ( var i = 0; i < visitedActions.Count; i++ )
         {
             var (controller, action, endpointModel) = visitedActions[i];
-            var apiModel = controller.GetApiVersionModel();
+            var apiModel = controller.ApiVersionModel;
             var name = namingConvention.GroupName( controller.ControllerName );
-            action.SetApiVersionMetadata( new ApiVersionMetadata( apiModel, endpointModel, name ) );
+            action.ApiVersionMetadata = new( apiModel, endpointModel, name );
         }
     }
 
@@ -364,7 +364,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
             return;
         }
 
-        var options = request.GetApiVersioningOptions();
+        var options = request.ApiVersioningOptions;
 
         if ( options.ApiVersionReader.VersionsByUrl() )
         {
@@ -374,7 +374,7 @@ public class ApiVersionControllerSelector : IHttpControllerSelector
 
     private ControllerSelectionContext NewSelectionContext( HttpRequestMessage request )
     {
-        var properties = request.ApiVersionProperties();
+        var properties = request.ApiVersionProperties;
         var context = new ControllerSelectionContext( request, GetControllerName, controllerInfoCache );
         HttpResponseExceptionFactory factory;
         HttpResponseMessage response;

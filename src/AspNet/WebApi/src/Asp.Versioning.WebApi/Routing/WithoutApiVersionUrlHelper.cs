@@ -12,7 +12,7 @@ internal sealed class WithoutApiVersionUrlHelper : UrlHelper
 
     public WithoutApiVersionUrlHelper( UrlHelper decorated ) => this.decorated = decorated;
 
-    private ApiVersionRequestProperties Properties => decorated.Request.ApiVersionProperties();
+    private ApiVersionRequestProperties Properties => decorated.Request.ApiVersionProperties;
 
     public override string Content( string path )
     {

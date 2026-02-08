@@ -220,7 +220,7 @@ internal sealed partial class ODataAttributeVisitor
 
     private void VisitMaxTop( ModelBoundQuerySettings querySettings )
     {
-        if ( querySettings.MaxTop.Unset() )
+        if ( querySettings.MaxTop.Unset )
         {
             return;
         }

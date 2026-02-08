@@ -13,7 +13,7 @@ using System.Web.Http.Description;
 public partial class ODataQueryOptionDescriptionContext
 {
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static IEdmModel? ResolveModel( ApiDescription description ) => description.EdmModel();
+    private static IEdmModel? ResolveModel( ApiDescription description ) => description.EdmModel;
 
     private static bool HasSingleResult( ApiDescription description, out Type? resultType )
     {

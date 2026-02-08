@@ -69,7 +69,7 @@ public class ODataApiExplorer : VersionedApiExplorer
     /// </summary>
     /// <value>The associated <see cref="IModelTypeBuilder">mode type builder</see>.</value>
     protected virtual IModelTypeBuilder ModelTypeBuilder =>
-        modelTypeBuilder ??= Configuration.DependencyResolver.GetModelTypeBuilder();
+        modelTypeBuilder ??= Configuration.DependencyResolver.ModelTypeBuilder;
 
     /// <inheritdoc />
     protected override bool ShouldExploreAction(
@@ -85,7 +85,7 @@ public class ODataApiExplorer : VersionedApiExplorer
             return base.ShouldExploreAction( actionRouteParameterValue, actionDescriptor, route, apiVersion );
         }
 
-        if ( actionDescriptor.ControllerDescriptor.ControllerType.IsMetadataController() )
+        if ( actionDescriptor.ControllerDescriptor.ControllerType.IsMetadataController )
         {
             if ( actionDescriptor.ActionName == nameof( MetadataController.GetServiceDocument ) )
             {
@@ -113,7 +113,7 @@ public class ODataApiExplorer : VersionedApiExplorer
             }
         }
 
-        return actionDescriptor.GetApiVersionMetadata().IsMappedTo( apiVersion );
+        return actionDescriptor.ApiVersionMetadata.IsMappedTo( apiVersion );
     }
 
     /// <inheritdoc />
@@ -126,7 +126,7 @@ public class ODataApiExplorer : VersionedApiExplorer
         ArgumentNullException.ThrowIfNull( controllerDescriptor );
         ArgumentNullException.ThrowIfNull( route );
 
-        if ( controllerDescriptor.ControllerType.IsMetadataController() )
+        if ( controllerDescriptor.ControllerType.IsMetadataController )
         {
             controllerDescriptor.ControllerName = "OData";
             return Options.MetadataOptions > ODataMetadataOptions.None;
@@ -546,7 +546,7 @@ public class ODataApiExplorer : VersionedApiExplorer
         var requestFormatters = new List<MediaTypeFormatter>();
         var responseFormatters = new List<MediaTypeFormatter>();
         var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
-        var metadata = actionDescriptor.GetApiVersionMetadata();
+        var metadata = actionDescriptor.ApiVersionMetadata;
         var model = metadata.Map( ApiVersionMapping.Explicit );
         var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
 

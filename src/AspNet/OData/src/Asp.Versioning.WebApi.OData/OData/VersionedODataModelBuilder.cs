@@ -32,7 +32,7 @@ public partial class VersionedODataModelBuilder
     /// Gets the API versioning options associated with the builder.
     /// </summary>
     /// <value>The configured <see cref="ApiVersioningOptions">API versioning options</see>.</value>
-    protected ApiVersioningOptions Options => Configuration.GetApiVersioningOptions();
+    protected ApiVersioningOptions Options => Configuration.ApiVersioningOptions;
 
     /// <summary>
     /// Gets the API versions for all known OData routes.
@@ -57,7 +57,7 @@ public partial class VersionedODataModelBuilder
         {
             var controllerType = controllerTypes[i];
 
-            if ( !controllerType.IsODataController() )
+            if ( !controllerType.IsODataController )
             {
                 continue;
             }
@@ -73,7 +73,7 @@ public partial class VersionedODataModelBuilder
 
             foreach ( var action in actions )
             {
-                var model = action.GetApiVersionMetadata().Map( ApiVersionMapping.Explicit );
+                var model = action.ApiVersionMetadata.Map( ApiVersionMapping.Explicit );
                 var versions = model.SupportedApiVersions;
 
                 if ( versions.Count > 0 && supported == null )

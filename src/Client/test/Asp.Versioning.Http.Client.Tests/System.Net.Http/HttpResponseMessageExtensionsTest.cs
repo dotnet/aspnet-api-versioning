@@ -20,7 +20,7 @@ public class HttpResponseMessageExtensionsTest
         response.Headers.Add( "link", "<policy>; rel=\"sunset\"; type=\"text/html\"" );
 
         // act
-        var policy = response.ReadSunsetPolicy();
+        var policy = response.SunsetPolicy;
 
         // assert
         policy.Date.Value.ToLocalTime().Should().BeCloseTo( date, TimeSpan.FromMinutes( 1d ) );
@@ -51,7 +51,7 @@ public class HttpResponseMessageExtensionsTest
             ] );
 
         // act
-        var policy = response.ReadSunsetPolicy();
+        var policy = response.SunsetPolicy;
 
         // assert
         policy.Date.Value.ToLocalTime().Should().BeCloseTo( expected, TimeSpan.FromMinutes( 1d ) );
@@ -74,7 +74,7 @@ public class HttpResponseMessageExtensionsTest
             ] );
 
         // act
-        var policy = response.ReadSunsetPolicy();
+        var policy = response.SunsetPolicy;
 
         // assert
         policy.Date.Should().BeNull();

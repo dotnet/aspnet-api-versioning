@@ -10,8 +10,8 @@ public class ValuesController : ApiController
     // GET api/values?api-version=1.0
     public IHttpActionResult Get( ApiVersion apiVersion ) =>
         Ok( new
-        { 
-            controller = GetType().Name, 
+        {
+            controller = GetType().Name,
             version = apiVersion.ToString(),
         } );
 }

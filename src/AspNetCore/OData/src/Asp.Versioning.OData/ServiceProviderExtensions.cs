@@ -6,14 +6,13 @@ namespace System;
 
 internal static class ServiceProviderExtensions
 {
-    internal static IServiceProvider WithParent( this IServiceProvider serviceProvider, IServiceProvider parent ) =>
-        new CompositeServiceProvider( serviceProvider, parent );
+    extension( IServiceProvider serviceProvider )
+    {
+        internal IServiceProvider WithParent( IServiceProvider parent ) => new CompositeServiceProvider( serviceProvider, parent );
 
-    internal static TService WithParent<TService>(
-        this IServiceProvider serviceProvider,
-        IServiceProvider parent,
-        Func<IServiceProvider, TService> implementationFactory ) =>
-        implementationFactory( serviceProvider.WithParent( parent ) );
+        internal TService WithParent<TService>( IServiceProvider parent, Func<IServiceProvider, TService> implementationFactory ) =>
+            implementationFactory( serviceProvider.WithParent( parent ) );
+    }
 
     private sealed class CompositeServiceProvider : IServiceProvider
     {

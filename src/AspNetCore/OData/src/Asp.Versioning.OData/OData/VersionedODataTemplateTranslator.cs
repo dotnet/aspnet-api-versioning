@@ -20,7 +20,7 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
         ArgumentNullException.ThrowIfNull( path );
         ArgumentNullException.ThrowIfNull( context );
 
-        var apiVersion = context.HttpContext.GetRequestedApiVersion();
+        var apiVersion = context.HttpContext.RequestedApiVersion;
 
         if ( apiVersion == null )
         {
@@ -32,7 +32,7 @@ public sealed class VersionedODataTemplateTranslator : IODataTemplateTranslator
         else
         {
             var model = context.Model;
-            var otherApiVersion = model.GetApiVersion();
+            var otherApiVersion = model.ApiVersion;
 
             // HACK: a version-neutral endpoint can fail to match here because odata tries to match the
             // first endpoint metadata when there could be multiple. such an endpoint is expected to be

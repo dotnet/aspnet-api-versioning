@@ -26,7 +26,7 @@ public class ApiVersionParameterBinding : HttpParameterBinding
         CancellationToken cancellationToken )
     {
         ArgumentNullException.ThrowIfNull( actionContext );
-        var value = actionContext.Request.ApiVersionProperties().RequestedApiVersion;
+        var value = actionContext.Request.ApiVersionProperties.RequestedApiVersion;
         SetValue( actionContext, value );
         return CompletedTask;
     }

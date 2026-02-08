@@ -64,15 +64,15 @@ public class HttpControllerDescriptorGroup : HttpControllerDescriptor, IReadOnly
     /// the <see cref="IHttpController">controller</see> is created using the first item in the group.</remarks>
     public override IHttpController CreateController( HttpRequestMessage request )
     {
-        var properties = request.ApiVersionProperties();
+        var properties = request.ApiVersionProperties;
 
         if ( properties.SelectedController is HttpControllerDescriptor descriptor )
         {
             return descriptor.CreateController( request );
         }
 
-        var url = request.RequestUri.SafeFullPath();
-        var message = string.Format( CultureInfo.CurrentCulture, SR.NoControllerSelected, url, properties.RawRequestedApiVersion );
+        var url = request.RequestUri.SafePath;
+        var message = string.Format( CultureInfo.CurrentCulture, BackportSR.NoControllerSelected, url, properties.RawRequestedApiVersion );
         throw new InvalidOperationException( message );
     }
 

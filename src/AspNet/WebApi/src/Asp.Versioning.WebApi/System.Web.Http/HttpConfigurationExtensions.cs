@@ -22,85 +22,115 @@ public static class HttpConfigurationExtensions
 {
     private const string ApiVersioningServicesKey = "MS_ApiVersioningServices";
 
-    /// <summary>
-    /// Gets the current API versioning options.
-    /// </summary>
     /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
-    /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
-    public static ApiVersioningOptions GetApiVersioningOptions( this HttpConfiguration configuration )
+    extension( HttpConfiguration configuration )
     {
-        ArgumentNullException.ThrowIfNull( configuration );
-        return configuration.ApiVersioningServices().ApiVersioningOptions;
-    }
-
-    /// <summary>
-    /// Converts problem details into error objects.
-    /// </summary>
-    /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see>.</param>
-    /// <remarks>This enables backward compatibility by converting <see cref="ProblemDetails"/> into Error Objects that
-    /// conform to the <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
-    /// in the Microsoft REST API Guidelines and
-    /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.</remarks>
-    public static void ConvertProblemDetailsToErrorObject( this HttpConfiguration configuration )
-    {
-        ArgumentNullException.ThrowIfNull( configuration );
-        configuration.Initializer += EnableErrorObjectResponses;
-    }
-
-    /// <summary>
-    /// Adds service API versioning to the specified services collection.
-    /// </summary>
-    /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use service versioning.</param>
-    public static void AddApiVersioning( this HttpConfiguration configuration )
-    {
-        ArgumentNullException.ThrowIfNull( configuration );
-        configuration.AddApiVersioning( new ApiVersioningOptions() );
-    }
-
-    /// <summary>
-    /// Adds service API versioning to the specified services collection.
-    /// </summary>
-    /// <param name="configuration">The <see cref="HttpConfiguration">configuration</see> that will use service versioning.</param>
-    /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-    public static void AddApiVersioning( this HttpConfiguration configuration, Action<ApiVersioningOptions> setupAction )
-    {
-        ArgumentNullException.ThrowIfNull( configuration );
-        ArgumentNullException.ThrowIfNull( setupAction );
-
-        var options = new ApiVersioningOptions();
-
-        setupAction( options );
-        ValidateApiVersioningOptions( options );
-        configuration.AddApiVersioning( options );
-    }
-
-    private static void AddApiVersioning( this HttpConfiguration configuration, ApiVersioningOptions options )
-    {
-        var services = configuration.Services;
-
-        services.Replace( typeof( IHttpControllerSelector ), new ApiVersionControllerSelector( configuration, options ) );
-        services.Replace( typeof( IHttpActionSelector ), new ApiVersionActionSelector() );
-
-        if ( options.ReportApiVersions )
+        /// <summary>
+        /// Gets the current API versioning options.
+        /// </summary>
+        /// <returns>The current <see cref="ApiVersioningOptions">API versioning options</see>.</returns>
+        public ApiVersioningOptions ApiVersioningOptions
         {
-            configuration.Filters.Add( new ReportApiVersionsAttribute() );
-        }
-
-        var reader = options.ApiVersionReader;
-
-        if ( reader.VersionsByMediaType() )
-        {
-            var parameterName = reader.GetParameterName( MediaTypeParameter );
-
-            if ( !string.IsNullOrEmpty( parameterName ) )
+            get
             {
-                configuration.Filters.Add( new ApplyContentTypeVersionActionFilter( reader ) );
+                ArgumentNullException.ThrowIfNull( configuration );
+                return configuration.ApiVersioningServices.ApiVersioningOptions;
             }
         }
 
-        configuration.ApiVersioningServices().ApiVersioningOptions = options;
-        configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
-        configuration.Formatters.Insert( 0, new ProblemDetailsMediaTypeFormatter( configuration.Formatters.JsonFormatter ?? new() ) );
+        /// <summary>
+        /// Converts problem details into error objects.
+        /// </summary>
+        /// <remarks>This enables backward compatibility by converting <see cref="ProblemDetails"/> into Error Objects that
+        /// conform to the <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
+        /// in the Microsoft REST API Guidelines and
+        /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.</remarks>
+        public void ConvertProblemDetailsToErrorObject()
+        {
+            ArgumentNullException.ThrowIfNull( configuration );
+            configuration.Initializer += EnableErrorObjectResponses;
+        }
+
+        /// <summary>
+        /// Adds service API versioning to the specified services collection.
+        /// </summary>
+        public void AddApiVersioning()
+        {
+            ArgumentNullException.ThrowIfNull( configuration );
+            configuration.AddApiVersioning( new ApiVersioningOptions() );
+        }
+
+        /// <summary>
+        /// Adds service API versioning to the specified services collection.
+        /// </summary>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
+        public void AddApiVersioning( Action<ApiVersioningOptions> setupAction )
+        {
+            ArgumentNullException.ThrowIfNull( configuration );
+            ArgumentNullException.ThrowIfNull( setupAction );
+
+            var options = new ApiVersioningOptions();
+
+            setupAction( options );
+            ValidateApiVersioningOptions( options );
+            configuration.AddApiVersioning( options );
+        }
+
+        private void AddApiVersioning( ApiVersioningOptions options )
+        {
+            var services = configuration.Services;
+
+            services.Replace( typeof( IHttpControllerSelector ), new ApiVersionControllerSelector( configuration, options ) );
+            services.Replace( typeof( IHttpActionSelector ), new ApiVersionActionSelector() );
+
+            if ( options.ReportApiVersions )
+            {
+                configuration.Filters.Add( new ReportApiVersionsAttribute() );
+            }
+
+            var reader = options.ApiVersionReader;
+
+            if ( reader.VersionsByMediaType() )
+            {
+                var parameterName = reader.GetParameterName( MediaTypeParameter );
+
+                if ( !string.IsNullOrEmpty( parameterName ) )
+                {
+                    configuration.Filters.Add( new ApplyContentTypeVersionActionFilter( reader ) );
+                }
+            }
+
+            configuration.ApiVersioningServices.ApiVersioningOptions = options;
+            configuration.ParameterBindingRules.Add( typeof( ApiVersion ), ApiVersionParameterBinding.Create );
+            configuration.Formatters.Insert( 0, new ProblemDetailsMediaTypeFormatter( configuration.Formatters.JsonFormatter ?? new() ) );
+        }
+
+        private void EnableErrorObjectResponses()
+        {
+            configuration.ApiVersioningServices.Replace(
+                typeof( IProblemDetailsFactory ),
+                static ( sc, t ) => new ErrorObjectFactory() );
+
+            var formatters = configuration.Formatters;
+            var problemDetails = ProblemDetailsMediaTypeFormatter.DefaultMediaType;
+
+            for ( var i = 0; i < formatters.Count; i++ )
+            {
+                var mediaTypes = formatters[i].SupportedMediaTypes;
+
+                for ( var j = 0; j < mediaTypes.Count; j++ )
+                {
+                    if ( mediaTypes[j].Equals( problemDetails ) )
+                    {
+                        formatters.RemoveAt( i );
+                        return;
+                    }
+                }
+            }
+        }
+
+        internal DefaultContainer ApiVersioningServices =>
+            (DefaultContainer) configuration.Properties.GetOrAdd( ApiVersioningServicesKey, key => new DefaultContainer() );
     }
 
     // ApiVersion.Neutral does not have the same meaning as IApiVersionNeutral. setting
@@ -116,41 +146,14 @@ public static class HttpConfigurationExtensions
         {
             var message = string.Format(
                 CultureInfo.CurrentCulture,
-                SR.InvalidDefaultApiVersion,
+                BackportSR.InvalidDefaultApiVersion,
                 nameof( ApiVersion ),
                 nameof( ApiVersion.Neutral ),
-                nameof( ApiVersioningOptions ),
-                nameof( ApiVersioningOptions.DefaultApiVersion ),
+                nameof( Asp.Versioning.ApiVersioningOptions ),
+                nameof( Asp.Versioning.ApiVersioningOptions.DefaultApiVersion ),
                 nameof( IApiVersionNeutral ) );
 
             throw new InvalidOperationException( message );
         }
     }
-
-    private static void EnableErrorObjectResponses( HttpConfiguration configuration )
-    {
-        configuration.ApiVersioningServices().Replace(
-            typeof( IProblemDetailsFactory ),
-            static ( sc, t ) => new ErrorObjectFactory() );
-
-        var formatters = configuration.Formatters;
-        var problemDetails = ProblemDetailsMediaTypeFormatter.DefaultMediaType;
-
-        for ( var i = 0; i < formatters.Count; i++ )
-        {
-            var mediaTypes = formatters[i].SupportedMediaTypes;
-
-            for ( var j = 0; j < mediaTypes.Count; j++ )
-            {
-                if ( mediaTypes[j].Equals( problemDetails ) )
-                {
-                    formatters.RemoveAt( i );
-                    return;
-                }
-            }
-        }
-    }
-
-    internal static DefaultContainer ApiVersioningServices( this HttpConfiguration configuration ) =>
-        (DefaultContainer) configuration.Properties.GetOrAdd( ApiVersioningServicesKey, key => new DefaultContainer() );
 }

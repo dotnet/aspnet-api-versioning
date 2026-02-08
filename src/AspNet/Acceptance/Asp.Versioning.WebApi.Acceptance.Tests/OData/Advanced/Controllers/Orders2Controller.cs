@@ -17,9 +17,9 @@ public class Orders2Controller : ODataController
 {
     [ODataRoute]
     public IHttpActionResult Get( ODataQueryOptions<Order> options ) =>
-        Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } } );
+        Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.RequestedApiVersion}" } } );
 
     [ODataRoute( "{key}" )]
     public IHttpActionResult Get( int key, ODataQueryOptions<Order> options ) =>
-        Ok( new Order() { Id = key, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } );
+        Ok( new Order() { Id = key, Customer = $"Customer v{Request.RequestedApiVersion}" } );
 }

@@ -15,104 +15,99 @@ using DateOnly = System.DateTime;
 /// </summary>
 public static class IHttpClientBuilderExtensions
 {
-    /// <summary>
-    /// Adds the specified API version to the corresponding HTTP client.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IHttpClientBuilder">HTTP client builder</see>.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
-    /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
-    public static IHttpClientBuilder AddApiVersion(
-        this IHttpClientBuilder builder,
-        int majorVersion,
-        int? minorVersion = default,
-        string? status = default,
-        IApiVersionWriter? apiVersionWriter = default ) =>
-        builder.AddApiVersion( new ApiVersion( majorVersion, minorVersion, status ), apiVersionWriter );
-
-    /// <summary>
-    /// Adds the specified API version to the corresponding HTTP client.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IHttpClientBuilder">HTTP client builder</see>.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
-    /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
-    public static IHttpClientBuilder AddApiVersion(
-        this IHttpClientBuilder builder,
-        double version,
-        string? status = default,
-        IApiVersionWriter? apiVersionWriter = default ) =>
-        builder.AddApiVersion( new ApiVersion( version, status ), apiVersionWriter );
-
-    /// <summary>
-    /// Adds the specified API version to the corresponding HTTP client.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IHttpClientBuilder">HTTP client builder</see>.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
-    /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
-    public static IHttpClientBuilder AddApiVersion(
-        this IHttpClientBuilder builder,
-        int year,
-        int month,
-        int day,
-        string? status = default,
-        IApiVersionWriter? apiVersionWriter = default ) =>
-        builder.AddApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ), apiVersionWriter );
-
-    /// <summary>
-    /// Adds the specified API version to the corresponding HTTP client.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IHttpClientBuilder">HTTP client builder</see>.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
-    /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
-    public static IHttpClientBuilder AddApiVersion(
-        this IHttpClientBuilder builder,
-        DateOnly groupVersion,
-        string? status = default,
-        IApiVersionWriter? apiVersionWriter = default ) =>
-        builder.AddApiVersion( new ApiVersion( groupVersion, status ), apiVersionWriter );
-
-    /// <summary>
-    /// Adds the specified API version to the corresponding HTTP client.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IHttpClientBuilder">HTTP client builder</see>.</param>
-    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> added to requests.</param>
-    /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
-    /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
-    public static IHttpClientBuilder AddApiVersion(
-        this IHttpClientBuilder builder,
-        ApiVersion apiVersion,
-        IApiVersionWriter? apiVersionWriter = default )
+    extension( IHttpClientBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
+        /// <summary>
+        /// Adds the specified API version to the corresponding HTTP client.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
+        /// <returns>The original builder.</returns>
+        /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
+        /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
+        public IHttpClientBuilder AddApiVersion(
+            int majorVersion,
+            int? minorVersion = default,
+            string? status = default,
+            IApiVersionWriter? apiVersionWriter = default ) =>
+            builder.AddApiVersion( new ApiVersion( majorVersion, minorVersion, status ), apiVersionWriter );
 
-        var services = builder.Services;
+        /// <summary>
+        /// Adds the specified API version to the corresponding HTTP client.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
+        /// <returns>The original builder.</returns>
+        /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
+        /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
+        public IHttpClientBuilder AddApiVersion(
+            double version,
+            string? status = default,
+            IApiVersionWriter? apiVersionWriter = default ) =>
+            builder.AddApiVersion( new ApiVersion( version, status ), apiVersionWriter );
 
-        services.TryAddSingleton<IApiVersionWriter, QueryStringApiVersionWriter>();
-        services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
-        services.TryAddTransient<ApiVersionHeaderEnumerable>();
-        builder.AddHttpMessageHandler( sp => NewApiVersionHandler( sp, apiVersion, apiVersionWriter ) );
+        /// <summary>
+        /// Adds the specified API version to the corresponding HTTP client.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
+        /// <returns>The original builder.</returns>
+        /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
+        /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
+        public IHttpClientBuilder AddApiVersion(
+            int year,
+            int month,
+            int day,
+            string? status = default,
+            IApiVersionWriter? apiVersionWriter = default ) =>
+            builder.AddApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ), apiVersionWriter );
 
-        return builder;
+        /// <summary>
+        /// Adds the specified API version to the corresponding HTTP client.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
+        /// <returns>The original builder.</returns>
+        /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
+        /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
+        public IHttpClientBuilder AddApiVersion(
+            DateOnly groupVersion,
+            string? status = default,
+            IApiVersionWriter? apiVersionWriter = default ) =>
+            builder.AddApiVersion( new ApiVersion( groupVersion, status ), apiVersionWriter );
+
+        /// <summary>
+        /// Adds the specified API version to the corresponding HTTP client.
+        /// </summary>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> added to requests.</param>
+        /// <param name="apiVersionWriter">The optional <see cref="IApiVersionWriter">API writer</see>.</param>
+        /// <returns>The original builder.</returns>
+        /// <remarks>If <paramref name="apiVersionWriter"/> is not provided, then an instance will be
+        /// resolved from the associated <see cref="IServiceCollection"/>.</remarks>
+        public IHttpClientBuilder AddApiVersion(
+            ApiVersion apiVersion,
+            IApiVersionWriter? apiVersionWriter = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+
+            var services = builder.Services;
+
+            services.TryAddSingleton<IApiVersionWriter, QueryStringApiVersionWriter>();
+            services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
+            services.TryAddTransient<ApiVersionHeaderEnumerable>();
+            builder.AddHttpMessageHandler( sp => NewApiVersionHandler( sp, apiVersion, apiVersionWriter ) );
+
+            return builder;
+        }
     }
 
     private static ApiVersionHandler NewApiVersionHandler(

@@ -23,12 +23,12 @@ internal sealed class ControllerSelectionContext
         Lazy<IDictionary<string, HttpControllerDescriptor>> controllerInfoCache )
     {
         Request = request;
-        requestProperties = request.ApiVersionProperties();
+        requestProperties = request.ApiVersionProperties;
         this.controllerName = new Lazy<string?>( () => controllerName( Request ) );
         this.controllerInfoCache = controllerInfoCache;
         RouteData = request.GetRouteData();
         conventionRouteCandidates = new Lazy<CandidateAction[]?>( GetConventionRouteCandidates );
-        directRouteCandidates = new Lazy<CandidateAction[]?>( () => RouteData?.GetDirectRouteCandidates() );
+        directRouteCandidates = new Lazy<CandidateAction[]?>( () => RouteData?.DirectRouteCandidates );
         allVersions = new Lazy<ApiVersionModel>( CreateAggregatedModel );
     }
 
@@ -99,7 +99,7 @@ internal sealed class ControllerSelectionContext
     {
         for ( var i = 0; i < candidates.Length; i++ )
         {
-            yield return candidates[i].ActionDescriptor.GetApiVersionMetadata().Map( Explicit );
+            yield return candidates[i].ActionDescriptor.ApiVersionMetadata.Map( Explicit );
         }
     }
 }

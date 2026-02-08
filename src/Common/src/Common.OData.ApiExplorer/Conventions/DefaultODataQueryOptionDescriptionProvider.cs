@@ -206,7 +206,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     {
         ArgumentNullException.ThrowIfNull( context );
 
-        if ( context.MaxTop.NoLimitOrNone() )
+        if ( context.MaxTop.NoLimitOrNone )
         {
             return ODataExpSR.TopQueryOptionDesc;
         }
@@ -227,7 +227,7 @@ public class DefaultODataQueryOptionDescriptionProvider : IODataQueryOptionDescr
     {
         ArgumentNullException.ThrowIfNull( context );
 
-        if ( context.MaxSkip.NoLimitOrNone() )
+        if ( context.MaxSkip.NoLimitOrNone )
         {
             return ODataExpSR.SkipQueryOptionDesc;
         }

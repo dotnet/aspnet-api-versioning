@@ -18,7 +18,7 @@ internal readonly struct ClassProperty
     {
         Name = clrProperty.Name;
         Type = propertyType;
-        Attributes = [.. clrProperty.DeclaredAttributes()];
+        Attributes = [.. clrProperty.DeclaredAttributes];
     }
 
 #if !NETFRAMEWORK

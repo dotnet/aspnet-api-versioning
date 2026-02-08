@@ -10,7 +10,7 @@ public class OrdersController : ApiController
 {
     // GET ~/api/orders
     // GET ~/api/orders?api-version=1.0
-    public IHttpActionResult Get( ApiVersion version ) => 
+    public IHttpActionResult Get( ApiVersion version ) =>
         Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{version}" } } );
 
     // GET ~/api/orders/{id}

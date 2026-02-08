@@ -24,7 +24,7 @@ public class ApiVersionUrlHelper : IUrlHelper
     {
         ActionContext = actionContext ?? throw new ArgumentNullException( nameof( actionContext ) );
         Url = url;
-        feature = actionContext.HttpContext.ApiVersioningFeature();
+        feature = actionContext.HttpContext.ApiVersioningFeature;
     }
 
     /// <summary>

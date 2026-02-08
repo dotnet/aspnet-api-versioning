@@ -9,8 +9,8 @@ using System.Web.Http;
 public sealed class Conventions2Controller : ApiController
 {
     [Route]
-    public Task<IHttpActionResult> Get() => Task.FromResult<IHttpActionResult>( Ok( $"Test ({Request.GetRequestedApiVersion()})" ) );
+    public Task<IHttpActionResult> Get() => Task.FromResult<IHttpActionResult>( Ok( $"Test ({Request.RequestedApiVersion})" ) );
 
     [Route( "{id:int}" )]
-    public Task<IHttpActionResult> Get( int id ) => Task.FromResult<IHttpActionResult>( Ok( $"Test {id} ({Request.GetRequestedApiVersion()})" ) );
+    public Task<IHttpActionResult> Get( int id ) => Task.FromResult<IHttpActionResult>( Ok( $"Test {id} ({Request.RequestedApiVersion})" ) );
 }

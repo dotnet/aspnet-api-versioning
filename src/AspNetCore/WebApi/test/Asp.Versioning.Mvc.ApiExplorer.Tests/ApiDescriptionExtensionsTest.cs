@@ -19,7 +19,7 @@ public class ApiDescriptionExtensionsTest
         description.Properties[typeof( ApiVersion )] = version;
 
         // act
-        var value = description.GetApiVersion();
+        var value = description.ApiVersion;
 
         // assert
         value.Should().Be( version );
@@ -32,7 +32,7 @@ public class ApiDescriptionExtensionsTest
         var version = new ApiVersion( 42, 0 );
         var description = new ApiDescription();
 
-        description.SetApiVersion( version );
+        description.ApiVersion = version;
 
         // act
         var value = (ApiVersion) description.Properties[typeof( ApiVersion )];
@@ -63,7 +63,7 @@ public class ApiDescriptionExtensionsTest
         };
 
         // act
-        var deprecated = description.IsDeprecated();
+        var deprecated = description.IsDeprecated;
 
         // assert
         deprecated.Should().Be( expected );
@@ -80,7 +80,7 @@ public class ApiDescriptionExtensionsTest
         };
 
         // act
-        var deprecated = description.IsDeprecated();
+        var deprecated = description.IsDeprecated;
 
         // assert
         deprecated.Should().BeFalse();

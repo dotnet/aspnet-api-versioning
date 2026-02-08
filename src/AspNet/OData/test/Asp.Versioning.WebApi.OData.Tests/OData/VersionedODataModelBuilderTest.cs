@@ -34,7 +34,7 @@ public class VersionedODataModelBuilderTest
         var model = builder.GetEdmModels().Single();
 
         // assert
-        model.GetApiVersion().Should().Be( apiVersion );
+        model.ApiVersion.Should().Be( apiVersion );
         modelCreated.Verify( f => f( It.IsAny<ODataModelBuilder>(), model ), Times.Once() );
     }
 

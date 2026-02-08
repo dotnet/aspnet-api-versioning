@@ -63,8 +63,8 @@ internal static class EndpointProblem
             var detail = string.Format(
                 CultureInfo.CurrentCulture,
                 Format.VersionedResourceNotSupported,
-                new Uri( context.Request.GetDisplayUrl() ).SafeFullPath(),
-                context.ApiVersioningFeature().RawRequestedApiVersion );
+                new Uri( context.Request.GetDisplayUrl() ).SafePath,
+                context.ApiVersioningFeature.RawRequestedApiVersion );
 
             return problemDetails.TryWriteAsync( New( context, Unsupported, detail ) ).AsTask();
         }

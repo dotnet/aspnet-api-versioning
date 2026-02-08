@@ -49,7 +49,7 @@ public class OrdersController : ODataController
     [ODataRoute( "{key}" )]
     [ResponseType( typeof( Order ) )]
     [EnableQuery( AllowedQueryOptions = Select )]
-    public SingleResult<Order> Get( int key ) => 
+    public SingleResult<Order> Get( int key ) =>
         SingleResult.Create( new[] { new Order() { Id = key, Customer = "John Doe" } }.AsQueryable() );
 
     /// <summary>

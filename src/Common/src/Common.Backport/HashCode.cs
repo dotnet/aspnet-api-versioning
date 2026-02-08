@@ -58,7 +58,6 @@ https://raw.githubusercontent.com/Cyan4973/xxHash/5c174cfa4e45a42f94082dc0d4539b
 
 */
 
-using System.Collections.Generic;
 #pragma warning restore IDE0079 // Remove unnecessary suppression
 using System.ComponentModel;
 using System.Numerics;
@@ -93,8 +92,8 @@ namespace System
             // System.Security.Cryptography.RandomNumberGenerator is available
             // in .NET Standard 1.0 or 1.1. the goal of this backport is functional
             // parity with HashCode and does not need to be cryptographically secure
-            var epoch = new DateTime(2000, 1, 1);
-            var seed = (int) Math.Ceiling(DateTime.Now.Subtract( epoch ).TotalSeconds);
+            var epoch = new DateTime( 2000, 1, 1 );
+            var seed = (int) Math.Ceiling( DateTime.Now.Subtract( epoch ).TotalSeconds );
             var random = new Random( seed );
             random.NextBytes( data );
 #endif

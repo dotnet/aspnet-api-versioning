@@ -7,31 +7,30 @@ namespace Asp.Versioning;
 /// </summary>
 public static class IApiVersionParserExtensions
 {
-    /// <summary>
-    /// Parses the specified text.
-    /// </summary>
     /// <param name="parser">The extended parser.</param>
-    /// <param name="text">The text to parse as an API version.</param>
-    /// <returns>The parsed API version.</returns>
-    public static ApiVersion Parse( this IApiVersionParser parser, string? text )
+    extension( IApiVersionParser parser )
     {
-        ArgumentNullException.ThrowIfNull( parser );
-        return parser.Parse( text == null ? default : text.AsSpan() );
-    }
+        /// <summary>
+        /// Parses the specified text.
+        /// </summary>
+        /// <param name="text">The text to parse as an API version.</param>
+        /// <returns>The parsed API version.</returns>
+        public ApiVersion Parse( string? text )
+        {
+            ArgumentNullException.ThrowIfNull( parser );
+            return parser.Parse( text == null ? default : text.AsSpan() );
+        }
 
-    /// <summary>
-    /// Attempts to parse the specified text.
-    /// </summary>
-    /// <param name="parser">The extended parser.</param>
-    /// <param name="text">The text to parse as an API version.</param>
-    /// <param name="apiVersion">The parsed API version or null.</param>
-    /// <returns>True if the parsing was successful; otherwise false.</returns>
-    public static bool TryParse(
-        this IApiVersionParser parser,
-        string? text,
-        [MaybeNullWhen( false )] out ApiVersion apiVersion )
-    {
-        ArgumentNullException.ThrowIfNull( parser );
-        return parser.TryParse( text == null ? default : text.AsSpan(), out apiVersion );
+        /// <summary>
+        /// Attempts to parse the specified text.
+        /// </summary>
+        /// <param name="text">The text to parse as an API version.</param>
+        /// <param name="apiVersion">The parsed API version or null.</param>
+        /// <returns>True if the parsing was successful; otherwise false.</returns>
+        public bool TryParse( string? text, [MaybeNullWhen( false )] out ApiVersion apiVersion )
+        {
+            ArgumentNullException.ThrowIfNull( parser );
+            return parser.TryParse( text == null ? default : text.AsSpan(), out apiVersion );
+        }
     }
 }

@@ -9,111 +9,109 @@ using static ApiVersionParameterLocation;
 /// </summary>
 public static class IApiVersionParameterSourceExtensions
 {
-    /// <summary>
-    /// Determines whether the specified parameter source versions by query string.
-    /// </summary>
     /// <param name="source">The extended parameter source.</param>
-    /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
-    /// False if the API version can only appear in a query string parameter. The default value is true.</param>
-    /// <returns>True if the parameter source versions by query string; otherwise, false.</returns>
-    public static bool VersionsByQueryString( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
+    extension( IApiVersionParameterSource source )
     {
-        ArgumentNullException.ThrowIfNull( source );
+        /// <summary>
+        /// Determines whether the specified parameter source versions by query string.
+        /// </summary>
+        /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
+        /// False if the API version can only appear in a query string parameter. The default value is true.</param>
+        /// <returns>True if the parameter source versions by query string; otherwise, false.</returns>
+        public bool VersionsByQueryString( bool allowMultipleLocations = true )
+        {
+            ArgumentNullException.ThrowIfNull( source );
 
-        var context = new DescriptionContext( Query );
+            var context = new DescriptionContext( Query );
 
-        source.AddParameters( context );
+            source.AddParameters( context );
 
-        return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
-    }
+            return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
+        }
 
-    /// <summary>
-    /// Determines whether the specified parameter source versions by HTTP header.
-    /// </summary>
-    /// <param name="source">The extended parameter source.</param>
-    /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
-    /// False if the API version can only appear in a HTTP header. The default value is true.</param>
-    /// <returns>True if the parameter source versions by HTTP header; otherwise, false.</returns>
-    public static bool VersionsByHeader( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
-    {
-        ArgumentNullException.ThrowIfNull( source );
+        /// <summary>
+        /// Determines whether the specified parameter source versions by HTTP header.
+        /// </summary>
+        /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
+        /// False if the API version can only appear in a HTTP header. The default value is true.</param>
+        /// <returns>True if the parameter source versions by HTTP header; otherwise, false.</returns>
+        public bool VersionsByHeader( bool allowMultipleLocations = true )
+        {
+            ArgumentNullException.ThrowIfNull( source );
 
-        var context = new DescriptionContext( Header );
+            var context = new DescriptionContext( Header );
 
-        source.AddParameters( context );
+            source.AddParameters( context );
 
-        return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
-    }
+            return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
+        }
 
-    /// <summary>
-    /// Determines whether the specified parameter source versions by URL path segment.
-    /// </summary>
-    /// <param name="source">The extended parameter source.</param>
-    /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
-    /// False if the API version can only appear in a URL path segment. The default value is true.</param>
-    /// <returns>True if the parameter source versions by URL path segment; otherwise, false.</returns>
-    public static bool VersionsByUrl( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
-    {
-        ArgumentNullException.ThrowIfNull( source );
+        /// <summary>
+        /// Determines whether the specified parameter source versions by URL path segment.
+        /// </summary>
+        /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
+        /// False if the API version can only appear in a URL path segment. The default value is true.</param>
+        /// <returns>True if the parameter source versions by URL path segment; otherwise, false.</returns>
+        public bool VersionsByUrl( bool allowMultipleLocations = true )
+        {
+            ArgumentNullException.ThrowIfNull( source );
 
-        var context = new DescriptionContext( Path );
+            var context = new DescriptionContext( Path );
 
-        source.AddParameters( context );
+            source.AddParameters( context );
 
-        return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
-    }
+            return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
+        }
 
-    /// <summary>
-    /// Determines whether the specified parameter source versions by media type.
-    /// </summary>
-    /// <param name="source">The extended parameter source.</param>
-    /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
-    /// False if the API version can only appear as a media type. The default value is true.</param>
-    /// <returns>True if the parameter source versions by media type; otherwise, false.</returns>
-    public static bool VersionsByMediaType( this IApiVersionParameterSource source, bool allowMultipleLocations = true )
-    {
-        ArgumentNullException.ThrowIfNull( source );
+        /// <summary>
+        /// Determines whether the specified parameter source versions by media type.
+        /// </summary>
+        /// <param name="allowMultipleLocations">True if multiple API version locations are allowed.
+        /// False if the API version can only appear as a media type. The default value is true.</param>
+        /// <returns>True if the parameter source versions by media type; otherwise, false.</returns>
+        public bool VersionsByMediaType( bool allowMultipleLocations = true )
+        {
+            ArgumentNullException.ThrowIfNull( source );
 
-        var context = new DescriptionContext( MediaTypeParameter );
+            var context = new DescriptionContext( MediaTypeParameter );
 
-        source.AddParameters( context );
+            source.AddParameters( context );
 
-        return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
-    }
+            return context.IsMatch && ( allowMultipleLocations || context.Locations == 1 );
+        }
 
-    /// <summary>
-    /// Gets the name of the parameter associated with the parameter source, if any.
-    /// </summary>
-    /// <param name="source">The extended parameter source.</param>
-    /// <param name="location">The location to get the parameter name for.</param>
-    /// <returns>The name of the first parameter defined by the parameter source for the specified
-    /// <paramref name="location"/> or <c>null</c>.</returns>
-    public static string GetParameterName( this IApiVersionParameterSource source, ApiVersionParameterLocation location )
-    {
-        ArgumentNullException.ThrowIfNull( source );
+        /// <summary>
+        /// Gets the name of the parameter associated with the parameter source, if any.
+        /// </summary>
+        /// <param name="location">The location to get the parameter name for.</param>
+        /// <returns>The name of the first parameter defined by the parameter source for the specified
+        /// <paramref name="location"/> or <c>null</c>.</returns>
+        public string GetParameterName( ApiVersionParameterLocation location )
+        {
+            ArgumentNullException.ThrowIfNull( source );
 
-        var context = new DescriptionContext( location );
+            var context = new DescriptionContext( location );
 
-        source.AddParameters( context );
+            source.AddParameters( context );
 
-        return context.ParameterName;
-    }
+            return context.ParameterName;
+        }
 
-    /// <summary>
-    /// Gets the name of the parameters associated with the parameter source.
-    /// </summary>
-    /// <param name="source">The extended parameter source.</param>
-    /// <param name="location">The location to get the parameter names for.</param>
-    /// <returns>The names of the parameters defined by the parameter source for the specified <paramref name="location"/>.</returns>
-    public static IReadOnlyList<string> GetParameterNames( this IApiVersionParameterSource source, ApiVersionParameterLocation location )
-    {
-        ArgumentNullException.ThrowIfNull( source );
+        /// <summary>
+        /// Gets the name of the parameters associated with the parameter source.
+        /// </summary>
+        /// <param name="location">The location to get the parameter names for.</param>
+        /// <returns>The names of the parameters defined by the parameter source for the specified <paramref name="location"/>.</returns>
+        public IReadOnlyList<string> GetParameterNames( ApiVersionParameterLocation location )
+        {
+            ArgumentNullException.ThrowIfNull( source );
 
-        var context = new DescriptionContext( location );
+            var context = new DescriptionContext( location );
 
-        source.AddParameters( context );
+            source.AddParameters( context );
 
-        return context.ParameterNames;
+            return context.ParameterNames;
+        }
     }
 
     private sealed class DescriptionContext : IApiVersionParameterDescriptionContext

@@ -868,7 +868,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
 
         // assert
         controller.ControllerType.Should().Be( controllerType );
-        request.GetRequestedApiVersion().Should().Be( currentVersion );
+        request.RequestedApiVersion.Should().Be( currentVersion );
     }
 
     [Fact]
@@ -910,7 +910,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
 
         // assert
         controller.ControllerType.Should().Be( controllerType );
-        request.GetRequestedApiVersion().Should().Be( currentVersion );
+        request.RequestedApiVersion.Should().Be( currentVersion );
     }
 
     [Theory]
@@ -957,7 +957,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
         // assert
         controller.ControllerType.Should().Be( controllerType );
         action.ActionName.Should().Be( actionName );
-        action.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        action.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,
@@ -966,7 +966,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
                 SupportedApiVersions = supported,
                 DeprecatedApiVersions = deprecated,
             } );
-        action.GetApiVersionMetadata().MappingTo( request.ApiVersionProperties().RequestedApiVersion ).Should().Be( mapping );
+        action.ApiVersionMetadata.MappingTo( request.ApiVersionProperties.RequestedApiVersion ).Should().Be( mapping );
     }
 
     [Fact]
@@ -1164,7 +1164,7 @@ Asp.Versioning.Dispatcher.ApiVersionControllerSelectorTest+AmbiguousNeutralContr
         var action = configuration.Services.GetActionSelector().SelectAction( context );
 
         // assert
-        action.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        action.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,

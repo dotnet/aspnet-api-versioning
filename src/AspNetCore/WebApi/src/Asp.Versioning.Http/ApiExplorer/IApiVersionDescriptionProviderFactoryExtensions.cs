@@ -12,15 +12,18 @@ using Microsoft.Extensions.Primitives;
 [CLSCompliant( false )]
 public static class IApiVersionDescriptionProviderFactoryExtensions
 {
-    /// <summary>
-    /// Creates and returns an API version description provider.
-    /// </summary>
     /// <param name="factory">The extended <see cref="IApiVersionDescriptionProviderFactory"/>.</param>
-    /// <returns>A new <see cref="IApiVersionDescriptionProvider">API version description provider</see>.</returns>
-    public static IApiVersionDescriptionProvider Create( this IApiVersionDescriptionProviderFactory factory )
+    extension( IApiVersionDescriptionProviderFactory factory )
     {
-        ArgumentNullException.ThrowIfNull( factory );
-        return factory.Create( new EmptyEndpointDataSource() );
+        /// <summary>
+        /// Creates and returns an API version description provider.
+        /// </summary>
+        /// <returns>A new <see cref="IApiVersionDescriptionProvider">API version description provider</see>.</returns>
+        public IApiVersionDescriptionProvider Create()
+        {
+            ArgumentNullException.ThrowIfNull( factory );
+            return factory.Create( new EmptyEndpointDataSource() );
+        }
     }
 
     private sealed class EmptyEndpointDataSource : EndpointDataSource

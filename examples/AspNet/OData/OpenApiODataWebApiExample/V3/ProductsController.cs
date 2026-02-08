@@ -37,7 +37,7 @@ public class ProductsController : ODataController
     /// <response code="404">The product does not exist.</response>
     [EnableQuery]
     [ResponseType( typeof( Product ) )]
-    public SingleResult<Product> Get( [FromODataUri] int key ) => 
+    public SingleResult<Product> Get( [FromODataUri] int key ) =>
         SingleResult.Create( products.Where( p => p.Id == key ) );
 
     /// <summary>

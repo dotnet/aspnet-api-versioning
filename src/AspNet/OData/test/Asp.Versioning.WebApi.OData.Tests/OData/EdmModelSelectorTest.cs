@@ -115,7 +115,7 @@ public class EdmModelSelectorTest
     private static IServiceProvider NewServiceProvider( ApiVersion apiVersion = default )
     {
         var request = new HttpRequestMessage();
-        var properties = request.ApiVersionProperties();
+        var properties = request.ApiVersionProperties;
 
         properties.RequestedApiVersion = apiVersion;
 

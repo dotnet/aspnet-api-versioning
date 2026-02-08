@@ -71,9 +71,9 @@ internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
             return problemDetails;
         }
 
-        var safeUrl = request.RequestUri.SafeFullPath();
-        var requestedVersion = request.ApiVersionProperties().RawRequestedApiVersion;
-        var message = string.Format( CurrentCulture, SR.VersionedControllerNameNotFound, safeUrl, requestedVersion );
+        var safeUrl = request.RequestUri.SafePath;
+        var requestedVersion = request.ApiVersionProperties.RawRequestedApiVersion;
+        var message = string.Format( CurrentCulture, BackportSR.VersionedControllerNameNotFound, safeUrl, requestedVersion );
 
         applyMessage( problemDetails, message );
 
@@ -97,18 +97,18 @@ internal sealed class ProblemDetailsFactory : IProblemDetailsFactory
         {
             case 400:
             case 404:
-                messageFormat = SR.VersionedControllerNameNotFound;
+                messageFormat = BackportSR.VersionedControllerNameNotFound;
                 break;
             case 405:
-                messageFormat = SR.VersionedActionNameNotFound;
+                messageFormat = BackportSR.VersionedActionNameNotFound;
                 break;
             default:
                 return problemDetails;
         }
 
-        var safeUrl = request.RequestUri.SafeFullPath();
+        var safeUrl = request.RequestUri.SafePath;
         var requestedMethod = request.Method;
-        var version = request.ApiVersionProperties().RawRequestedApiVersion ?? "(null)";
+        var version = request.ApiVersionProperties.RawRequestedApiVersion ?? "(null)";
         var message = string.Format( CurrentCulture, messageFormat, safeUrl, version, requestedMethod );
 
         applyMessage( problemDetails, message );

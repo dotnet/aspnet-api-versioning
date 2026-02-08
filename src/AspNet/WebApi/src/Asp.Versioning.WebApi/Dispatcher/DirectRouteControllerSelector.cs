@@ -57,7 +57,7 @@ internal sealed class DirectRouteControllerSelector : ControllerSelector
             builder.Append( type.FullName );
         }
 
-        var message = string.Format( CultureInfo.CurrentCulture, SR.DirectRoute_AmbiguousController, builder, NewLine );
+        var message = string.Format( CultureInfo.CurrentCulture, BackportSR.DirectRoute_AmbiguousController, builder, NewLine );
 
         return new InvalidOperationException( message );
     }

@@ -76,7 +76,7 @@ public class ApiVersionLinkGenerator : LinkGenerator
         ArgumentNullException.ThrowIfNull( httpContext );
         ArgumentNullException.ThrowIfNull( values );
 
-        var feature = httpContext.ApiVersioningFeature();
+        var feature = httpContext.ApiVersioningFeature;
         var key = feature.RouteParameter;
 
         if ( string.IsNullOrEmpty( key ) )

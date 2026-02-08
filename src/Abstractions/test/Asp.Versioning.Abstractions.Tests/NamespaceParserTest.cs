@@ -4,7 +4,6 @@ namespace Asp.Versioning;
 
 using System;
 using System.Reflection;
-using System.Xml.Linq;
 #if NETFRAMEWORK
 using DateOnly = System.DateTime;
 #endif

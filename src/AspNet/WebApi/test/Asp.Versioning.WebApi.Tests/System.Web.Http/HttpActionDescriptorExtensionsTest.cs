@@ -22,7 +22,7 @@ public class HttpActionDescriptorExtensionsTest
         actionDescriptor.Properties.Clear();
 
         // act
-        var model = actionDescriptor.GetApiVersionMetadata();
+        var model = actionDescriptor.ApiVersionMetadata;
 
         // assert
         model.Should().NotBeNull();
@@ -41,7 +41,7 @@ public class HttpActionDescriptorExtensionsTest
         actionDescriptor.Properties[typeof( ApiVersionMetadata )] = new ApiVersionMetadata( ApiVersionModel.Empty, endpointModel );
 
         // act
-        var model = actionDescriptor.GetApiVersionMetadata().Map( Explicit );
+        var model = actionDescriptor.ApiVersionMetadata.Map( Explicit );
 
         // assert
         model.Should().Be( endpointModel );
@@ -56,7 +56,7 @@ public class HttpActionDescriptorExtensionsTest
         var actionDescriptor = new Mock<HttpActionDescriptor>( controllerDescriptor ) { CallBase = true }.Object;
 
         // act
-        var versionNeutral = actionDescriptor.GetApiVersionMetadata().IsApiVersionNeutral;
+        var versionNeutral = actionDescriptor.ApiVersionMetadata.IsApiVersionNeutral;
 
         // assert
         versionNeutral.Should().BeFalse();
@@ -73,7 +73,7 @@ public class HttpActionDescriptorExtensionsTest
         actionDescriptor.Properties[typeof( ApiVersionMetadata )] = ApiVersionMetadata.Neutral;
 
         // act
-        var versionNeutral = actionDescriptor.GetApiVersionMetadata().IsApiVersionNeutral;
+        var versionNeutral = actionDescriptor.ApiVersionMetadata.IsApiVersionNeutral;
 
         // assert
         versionNeutral.Should().BeTrue();
@@ -87,7 +87,7 @@ public class HttpActionDescriptorExtensionsTest
         var actionDescriptor = NewAction( controllerType, actionName, expectedVersions );
 
         // act
-        var declaredVersions = actionDescriptor.GetApiVersionMetadata().Map( Explicit ).DeclaredApiVersions;
+        var declaredVersions = actionDescriptor.ApiVersionMetadata.Map( Explicit ).DeclaredApiVersions;
 
         // assert
         declaredVersions.Should().BeEquivalentTo( expectedVersions );

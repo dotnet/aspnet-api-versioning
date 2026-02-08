@@ -15,7 +15,7 @@ public class GroupedApiVersionDescriptionProviderTest
         // arrange
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
             [
-                new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
+                new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource(), new DefaultEndpointInspector() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             },
             Mock.Of<IPolicyManager<SunsetPolicy>>(),
@@ -51,7 +51,7 @@ public class GroupedApiVersionDescriptionProviderTest
 
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
             [
-                new EndpointApiVersionMetadataCollationProvider( source ),
+                new EndpointApiVersionMetadataCollationProvider( source, new DefaultEndpointInspector() ),
                 new ActionApiVersionMetadataCollationProvider( provider ),
             ],
             Mock.Of<IPolicyManager<SunsetPolicy>>(),
@@ -89,7 +89,7 @@ public class GroupedApiVersionDescriptionProviderTest
 
         var descriptionProvider = new GroupedApiVersionDescriptionProvider(
             [
-                new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource() ),
+                new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource(), new DefaultEndpointInspector() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
             ],
             policyManager.Object,

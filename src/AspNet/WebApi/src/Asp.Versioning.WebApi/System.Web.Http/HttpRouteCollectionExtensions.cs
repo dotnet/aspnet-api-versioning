@@ -14,67 +14,73 @@ using static System.Reflection.BindingFlags;
 /// </summary>
 public static class HttpRouteCollectionExtensions
 {
-    /// <summary>
-    /// Returns the route collection as a read-only dictionary mapping configured names to routes.
-    /// </summary>
     /// <param name="routes">The <see cref="HttpRouteCollection">route collection</see> to convert.</param>
-    /// <returns>A new <see cref="IReadOnlyDictionary{TKey, TValue}">read-only dictionary</see> of
-    /// <see cref="IHttpRoute">routes</see> mapped to their name.</returns>
-    public static IReadOnlyDictionary<string, IHttpRoute> ToDictionary( this HttpRouteCollection routes )
+    extension( HttpRouteCollection routes )
     {
-        ArgumentNullException.ThrowIfNull( routes );
-
-        const string HostedHttpRouteCollection = "System.Web.Http.WebHost.Routing.HostedHttpRouteCollection";
-
-        try
+        /// <summary>
+        /// Returns the route collection as a read-only dictionary mapping configured names to routes.
+        /// </summary>
+        /// <returns>A new <see cref="IReadOnlyDictionary{TKey, TValue}">read-only dictionary</see> of
+        /// <see cref="IHttpRoute">routes</see> mapped to their name.</returns>
+        public IReadOnlyDictionary<string, IHttpRoute> ToDictionary()
         {
-            return routes.CopyToDictionary();
-        }
-        catch ( NotSupportedException ) when ( routes.GetType().FullName == HostedHttpRouteCollection )
-        {
-            return routes.BuildDictionaryFromKeys();
-        }
-    }
+            ArgumentNullException.ThrowIfNull( routes );
 
-    private static IReadOnlyDictionary<string, IHttpRoute> CopyToDictionary( this HttpRouteCollection routes )
-    {
-        var items = new KeyValuePair<string, IHttpRoute>[routes.Count];
+            const string HostedHttpRouteCollection = "System.Web.Http.WebHost.Routing.HostedHttpRouteCollection";
 
-        routes.CopyTo( items, 0 );
-
-        var dictionary = new Dictionary<string, IHttpRoute>( routes.Count, StringComparer.OrdinalIgnoreCase );
-
-        for ( var i = 0; i < items.Length; i++ )
-        {
-            var item = items[i];
-            dictionary[item.Key] = item.Value;
+            try
+            {
+                return routes.CopyToDictionary();
+            }
+            catch ( NotSupportedException ) when ( routes.GetType().FullName == HostedHttpRouteCollection )
+            {
+                return routes.BuildDictionaryFromKeys();
+            }
         }
 
-        return dictionary;
-    }
-
-    private static IReadOnlyDictionary<string, IHttpRoute> BuildDictionaryFromKeys( this HttpRouteCollection routes )
-    {
-        var keys = routes.Keys();
-        var dictionary = new Dictionary<string, IHttpRoute>( routes.Count, StringComparer.OrdinalIgnoreCase );
-
-        for ( var i = 0; i < keys.Count; i++ )
+        private IReadOnlyDictionary<string, IHttpRoute> CopyToDictionary()
         {
-            var key = keys[i];
-            dictionary[key] = routes[key];
+            var items = new KeyValuePair<string, IHttpRoute>[routes.Count];
+
+            routes.CopyTo( items, 0 );
+
+            var dictionary = new Dictionary<string, IHttpRoute>( routes.Count, StringComparer.OrdinalIgnoreCase );
+
+            for ( var i = 0; i < items.Length; i++ )
+            {
+                var item = items[i];
+                dictionary[item.Key] = item.Value;
+            }
+
+            return dictionary;
         }
 
-        return dictionary;
-    }
+        private IReadOnlyDictionary<string, IHttpRoute> BuildDictionaryFromKeys()
+        {
+            var keys = routes.Keys;
+            var dictionary = new Dictionary<string, IHttpRoute>( routes.Count, StringComparer.OrdinalIgnoreCase );
 
-    private static IReadOnlyList<string> Keys( this HttpRouteCollection routes )
-    {
-        var collection = GetDictionaryKeys( routes );
-        var keys = new string[collection.Count];
+            for ( var i = 0; i < keys.Count; i++ )
+            {
+                var key = keys[i];
+                dictionary[key] = routes[key];
+            }
 
-        collection.CopyTo( keys, 0 );
+            return dictionary;
+        }
 
-        return keys;
+        private IReadOnlyList<string> Keys
+        {
+            get
+            {
+                var collection = GetDictionaryKeys( routes );
+                var keys = new string[collection.Count];
+
+                collection.CopyTo( keys, 0 );
+
+                return keys;
+            }
+        }
     }
 
     private static ICollection<string> GetDictionaryKeys( HttpRouteCollection routes )

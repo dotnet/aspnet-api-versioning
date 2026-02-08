@@ -9,35 +9,38 @@ using static System.Reflection.BindingFlags;
 
 internal static class TypeExtensions
 {
-    internal static Type[]? GetTypeArgumentsIfMatch( this Type closedType, Type matchingOpenType )
+    extension( Type type )
     {
-        if ( !closedType.IsGenericType )
+        internal Type[]? GetTypeArgumentsIfMatch( Type matchingOpenType )
         {
-            return null;
+            if ( !type.IsGenericType )
+            {
+                return null;
+            }
+
+            var openType = type.GetGenericTypeDefinition();
+
+            return ( matchingOpenType == openType ) ? type.GetGenericArguments() : null;
         }
 
-        var openType = closedType.GetGenericTypeDefinition();
+        internal IEnumerable<PropertyInfo> BindableProperties =>
+            type.GetProperties( Instance | Public ).Where( p => p.GetGetMethod() != null && p.GetSetMethod() != null );
 
-        return ( matchingOpenType == openType ) ? closedType.GetGenericArguments() : null;
-    }
-
-    internal static IEnumerable<PropertyInfo> GetBindableProperties( this Type type ) =>
-        type.GetProperties( Instance | Public ).Where( p => p.GetGetMethod() != null && p.GetSetMethod() != null );
-
-    internal static Type[]? GetGenericBinderTypeArgs( this Type supportedInterfaceType, Type modelType )
-    {
-        if ( !modelType.IsGenericType || modelType.IsGenericTypeDefinition )
+        internal Type[]? GetGenericBinderTypeArgs( Type modelType )
         {
-            return null;
+            if ( !modelType.IsGenericType || modelType.IsGenericTypeDefinition )
+            {
+                return null;
+            }
+
+            var modelTypeArguments = modelType.GetGenericArguments();
+
+            if ( modelTypeArguments.Length != type.GetGenericArguments().Length )
+            {
+                return null;
+            }
+
+            return modelTypeArguments;
         }
-
-        var modelTypeArguments = modelType.GetGenericArguments();
-
-        if ( modelTypeArguments.Length != supportedInterfaceType.GetGenericArguments().Length )
-        {
-            return null;
-        }
-
-        return modelTypeArguments;
     }
 }

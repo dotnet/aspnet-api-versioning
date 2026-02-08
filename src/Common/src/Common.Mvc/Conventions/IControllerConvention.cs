@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 /// Defines the behavior of a controller convention.
 /// </summary>
 #if !NETFRAMEWORK
-[CLSCompliant(false)]
+[CLSCompliant( false )]
 #endif
 public interface IControllerConvention
 {

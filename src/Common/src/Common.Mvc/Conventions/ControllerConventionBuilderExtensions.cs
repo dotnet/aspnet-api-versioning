@@ -19,67 +19,62 @@ using System.Web.Http.Controllers;
 #endif
 public static class ControllerConventionBuilderExtensions
 {
-    /// <summary>
-    /// Gets or creates the convention builder for the specified controller action method.
-    /// </summary>
     /// <typeparam name="TController">The type of controller.</typeparam>
     /// <param name="builder">The extended <see cref="IControllerConventionBuilder{T}"/>.</param>
-    /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
-    /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
-    public static IActionConventionBuilder<TController> Action<TController>(
-        this IControllerConventionBuilder<TController> builder,
-        Expression<Action<TController>> actionExpression )
+    extension<TController>( IControllerConventionBuilder<TController> builder )
 #if NETFRAMEWORK
         where TController : notnull, IHttpController
 #else
         where TController : notnull
 #endif
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( actionExpression );
-        return builder.Action( actionExpression.ExtractMethod() );
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller action method.
+        /// </summary>
+        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
+        /// <returns>A new or existing <see cref="IActionConventionBuilder{T}"/>.</returns>
+        public IActionConventionBuilder<TController> Action( Expression<Action<TController>> actionExpression )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            ArgumentNullException.ThrowIfNull( actionExpression );
+            return builder.Action( actionExpression.ExtractMethod() );
+        }
+
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller action method.
+        /// </summary>
+        /// <typeparam name="TResult">The type of action result.</typeparam>
+        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
+        /// <returns>A new or existing <see cref="IActionConventionBuilder{T}"/>.</returns>
+        public IActionConventionBuilder<TController> Action<TResult>( Expression<Func<TController, TResult>> actionExpression )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            ArgumentNullException.ThrowIfNull( actionExpression );
+            return builder.Action( actionExpression.ExtractMethod() );
+        }
     }
 
-    /// <summary>
-    /// Gets or creates the convention builder for the specified controller action method.
-    /// </summary>
-    /// <typeparam name="TController">The type of controller.</typeparam>
-    /// <typeparam name="TResult">The type of action result.</typeparam>
-    /// <param name="builder">The extended <see cref="ControllerApiVersionConventionBuilder{T}"/>.</param>
-    /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
-    /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder{T}"/>.</returns>
-    public static IActionConventionBuilder<TController> Action<TController, TResult>(
-        this IControllerConventionBuilder<TController> builder,
-        Expression<Func<TController, TResult>> actionExpression )
-#if NETFRAMEWORK
-        where TController : notnull, IHttpController
-#else
-        where TController : notnull
-#endif
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( actionExpression );
-        return builder.Action( actionExpression.ExtractMethod() );
-    }
-
-    /// <summary>
-    /// Gets or creates the convention builder for the specified controller action method.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IActionConventionBuilder"/>.</param>
-    /// <param name="methodName">The name of the action method.</param>
-    /// <param name="argumentTypes">The optional array of action method argument types.</param>
-    /// <returns>A new or existing <see cref="ActionApiVersionConventionBuilder"/>.</returns>
-    /// <remarks>The specified <paramref name="methodName">method name</paramref> must refer to a public, non-static action method.
-    /// If there is only one corresponding match found, then the <paramref name="argumentTypes">argument types</paramref> are ignored;
-    /// otherwise, the <paramref name="argumentTypes">argument types</paramref> are used for method overload resolution. Action
-    /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
-#if !NETFRAMEWORK
-    [UnconditionalSuppressMessage( "ILLink", "IL2072", Justification = "Controller types are never trimmed" )]
-#endif
-    public static IActionConventionBuilder Action( this IControllerConventionBuilder builder, string methodName, params Type[] argumentTypes )
+    extension( IControllerConventionBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        var method = ActionMethodResolver.Resolve( builder.ControllerType, methodName, argumentTypes );
-        return builder.Action( method );
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller action method.
+        /// </summary>
+        /// <param name="methodName">The name of the action method.</param>
+        /// <param name="argumentTypes">The optional array of action method argument types.</param>
+        /// <returns>A new or existing <see cref="IActionConventionBuilder"/>.</returns>
+        /// <remarks>The specified <paramref name="methodName">method name</paramref> must refer to a public, non-static action method.
+        /// If there is only one corresponding match found, then the <paramref name="argumentTypes">argument types</paramref> are ignored;
+        /// otherwise, the <paramref name="argumentTypes">argument types</paramref> are used for method overload resolution. Action
+        /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
+#if !NETFRAMEWORK
+        [UnconditionalSuppressMessage( "ILLink", "IL2072", Justification = "Controller types are never trimmed" )]
+#endif
+        public IActionConventionBuilder Action( string methodName, params Type[] argumentTypes )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            var method = ActionMethodResolver.Resolve( builder.ControllerType, methodName, argumentTypes );
+            return builder.Action( method );
+        }
     }
 }

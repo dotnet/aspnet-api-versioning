@@ -16,5 +16,6 @@ internal sealed class UnsupportedMediaTypeEndpoint : Endpoint
                 options,
                 StatusCodes.Status415UnsupportedMediaType ),
             Empty,
-            Name ) { }
+            Name )
+    { }
 }

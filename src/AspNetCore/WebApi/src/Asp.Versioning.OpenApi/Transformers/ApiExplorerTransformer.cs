@@ -64,7 +64,7 @@ internal sealed class ApiExplorerTransformer( ApiVersionDescription apiVersionDe
         ArgumentNullException.ThrowIfNull( operation );
         ArgumentNullException.ThrowIfNull( context );
 
-        operation.Deprecated |= context.Description.IsDeprecated();
+        operation.Deprecated |= context.Description.IsDeprecated;
 
         if ( operation.Parameters is not { } parameters )
         {

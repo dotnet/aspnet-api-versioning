@@ -113,7 +113,7 @@ public class EdmModelSelector : IEdmModelSelector
             return Models[maxVersion];
         }
 
-        var version = request.GetRequestedApiVersion();
+        var version = request.RequestedApiVersion;
 
         if ( version is null )
         {
@@ -130,7 +130,7 @@ public class EdmModelSelector : IEdmModelSelector
 
     private static void AddVersionFromModel( IEdmModel model, IList<ApiVersion> versions, IDictionary<ApiVersion, IEdmModel> collection )
     {
-        if ( model.GetApiVersion() is not ApiVersion version )
+        if ( model.ApiVersion is not ApiVersion version )
         {
             var message = string.Format( CultureInfo.CurrentCulture, SR.MissingAnnotation, typeof( ApiVersionAnnotation ).Name );
             throw new ArgumentException( message );

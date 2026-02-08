@@ -59,7 +59,7 @@ internal sealed class AdHocEdmScope : IDisposable
         {
             var apiDescription = apiDescriptions[i];
 
-            if ( apiDescription.EdmModel() != null || !apiDescription.IsODataLike() )
+            if ( apiDescription.EdmModel != null || !apiDescription.IsODataLike )
             {
                 continue;
             }
@@ -83,12 +83,12 @@ internal sealed class AdHocEdmScope : IDisposable
         for ( var i = 0; i < models.Count; i++ )
         {
             var model = models[i];
-            var version = model.GetApiVersion();
+            var version = model.ApiVersion;
 
             for ( var j = 0; j < results.Count; j++ )
             {
                 var result = results[j];
-                var metadata = result.ActionDescriptor.GetApiVersionMetadata();
+                var metadata = result.ActionDescriptor.ApiVersionMetadata;
 
                 if ( metadata.IsMappedTo( version ) )
                 {

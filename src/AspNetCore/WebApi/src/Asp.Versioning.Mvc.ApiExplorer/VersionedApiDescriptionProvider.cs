@@ -100,8 +100,11 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
     /// <param name="actionDescriptor">The <see cref="ActionDescriptor">action</see> to evaluate.</param>
     /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> for action being explored.</param>
     /// <returns>True if the action should be explored; otherwise, false.</returns>
-    protected virtual bool ShouldExploreAction( ActionDescriptor actionDescriptor, ApiVersion apiVersion ) =>
-        actionDescriptor.GetApiVersionMetadata().IsMappedTo( apiVersion );
+    protected virtual bool ShouldExploreAction( ActionDescriptor actionDescriptor, ApiVersion apiVersion )
+    {
+        ArgumentNullException.ThrowIfNull( actionDescriptor );
+        return actionDescriptor.ApiVersionMetadata.IsMappedTo( apiVersion );
+    }
 
     /// <summary>
     /// Populates the API version parameters for the specified API description.
@@ -170,7 +173,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                 TryUpdateControllerRouteValueForMinimalApi( result );
 
                 var groupResult = result.Clone();
-                var metadata = action.GetApiVersionMetadata();
+                var metadata = action.ApiVersionMetadata;
 
                 if ( string.IsNullOrEmpty( groupResult.GroupName ) )
                 {
@@ -183,15 +186,15 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
 
                 if ( SunsetPolicyManager.TryResolvePolicy( metadata.Name, version, out var sunsetPolicy ) )
                 {
-                    groupResult.SetSunsetPolicy( sunsetPolicy );
+                    groupResult.SunsetPolicy = sunsetPolicy;
                 }
 
                 if ( DeprecationPolicyManager.TryResolvePolicy( metadata.Name, version, out var deprecationPolicy ) )
                 {
-                    groupResult.SetDeprecationPolicy( deprecationPolicy );
+                    groupResult.DeprecationPolicy = deprecationPolicy;
                 }
 
-                groupResult.SetApiVersion( version );
+                groupResult.ApiVersion = version;
                 PopulateApiVersionParameters( groupResult, version );
                 AddOrUpdateResult( groupResults, groupResult, metadata, version );
             }
@@ -258,7 +261,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
             return;
         }
 
-        var metadata = action.GetApiVersionMetadata();
+        var metadata = action.ApiVersionMetadata;
 
         if ( !string.IsNullOrEmpty( metadata.Name ) )
         {
@@ -282,7 +285,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
                  comparer.Equals( result.RelativePath, other.RelativePath ) &&
                  comparer.Equals( result.HttpMethod, other.HttpMethod ) )
             {
-                var mapping = other.ActionDescriptor.GetApiVersionMetadata().MappingTo( version );
+                var mapping = other.ActionDescriptor.ApiVersionMetadata.MappingTo( version );
 
                 switch ( metadata.MappingTo( version ) )
                 {
@@ -314,7 +317,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = 0; i < descriptions.Count; i++ )
         {
             var action = descriptions[i].ActionDescriptor;
-            var model = action.GetApiVersionMetadata().Map( Explicit | Implicit );
+            var model = action.ApiVersionMetadata.Map( Explicit | Implicit );
             var declaredVersions = model.DeclaredApiVersions;
 
             if ( versions is null && declaredVersions.Count > 0 )

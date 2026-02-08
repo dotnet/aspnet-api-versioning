@@ -85,7 +85,7 @@ public class HttpContextExtensionsTest
         httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
 
         // act
-        var result = httpContext.Object.GetRequestedApiVersion();
+        var result = httpContext.Object.RequestedApiVersion;
 
         // assert
         result.Should().Be( version );
@@ -111,7 +111,7 @@ public class HttpContextExtensionsTest
         httpContext.SetupProperty( c => c.RequestServices, serviceProvider.Object );
 
         // act
-        var result = httpContext.Object.GetRequestedApiVersion();
+        var result = httpContext.Object.RequestedApiVersion;
 
         // assert
         result.Should().BeNull();

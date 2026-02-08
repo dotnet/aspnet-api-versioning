@@ -32,7 +32,7 @@ public class TestConfigurations : TheoryData<Kind>
         Add( Kind.DirectRouteBased );
     }
 
-    public static HttpConfiguration Get(Kind kind) =>
+    public static HttpConfiguration Get( Kind kind ) =>
         kind switch
         {
             Kind.ConventionBased => NewConventionRouteConfiguration(),

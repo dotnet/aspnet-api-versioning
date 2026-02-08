@@ -4,5 +4,8 @@ namespace Asp.Versioning;
 
 internal static class UriExtensions
 {
-    internal static string SafeFullPath( this Uri uri ) => uri.GetLeftPart( UriPartial.Path );
+    extension( Uri uri )
+    {
+        internal string SafePath => uri.GetLeftPart( UriPartial.Path );
+    }
 }

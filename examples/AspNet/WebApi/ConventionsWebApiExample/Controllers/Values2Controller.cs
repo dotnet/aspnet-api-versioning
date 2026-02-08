@@ -12,7 +12,7 @@ public class Values2Controller : ApiController
         Ok( new
         {
             controller = GetType().Name,
-            version = Request.GetRequestedApiVersion().ToString(),
+            version = Request.RequestedApiVersion.ToString(),
         } );
 
     // GET api/values/{id}?api-version=2.0
@@ -22,7 +22,7 @@ public class Values2Controller : ApiController
         {
             controller = GetType().Name,
             id,
-            version = Request.GetRequestedApiVersion().ToString(),
+            version = Request.RequestedApiVersion.ToString(),
         } );
 
     // GET api/values?api-version=3.0
@@ -31,7 +31,7 @@ public class Values2Controller : ApiController
         Ok( new
         {
             controller = GetType().Name,
-            version = Request.GetRequestedApiVersion().ToString(),
+            version = Request.RequestedApiVersion.ToString(),
         } );
 
     // GET api/values/{id}?api-version=3.0
@@ -41,6 +41,6 @@ public class Values2Controller : ApiController
         {
             controller = GetType().Name,
             id,
-            version = Request.GetRequestedApiVersion().ToString(),
+            version = Request.RequestedApiVersion.ToString(),
         } );
 }

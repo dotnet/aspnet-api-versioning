@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 /// <summary>
 /// Represents the default <see cref="IEndpointInspector">endpoint inspector</see>.
 /// </summary>
-[CLSCompliant(false)]
+[CLSCompliant( false )]
 public sealed class DefaultEndpointInspector : IEndpointInspector
 {
     /// <inheritdoc />

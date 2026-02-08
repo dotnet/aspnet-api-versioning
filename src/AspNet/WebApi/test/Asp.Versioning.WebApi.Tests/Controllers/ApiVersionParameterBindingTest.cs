@@ -50,7 +50,7 @@ public class ApiVersionParameterBindingTest
         var actionContext = new HttpActionContext() { ControllerContext = controllerContext };
 
         request.SetConfiguration( configuration );
-        request.ApiVersionProperties().RequestedApiVersion = apiVersion;
+        request.ApiVersionProperties.RequestedApiVersion = apiVersion;
 
         return actionContext;
     }

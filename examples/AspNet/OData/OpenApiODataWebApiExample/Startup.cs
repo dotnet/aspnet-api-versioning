@@ -107,7 +107,7 @@ public partial class Startup
             {
                 // build a swagger document and endpoint for each discovered API version
                 swagger.MultipleApiVersions(
-                ( apiDescription, version ) => apiDescription.GetGroupName() == version,
+                ( apiDescription, version ) => apiDescription.GroupName == version,
                 info =>
                 {
                     foreach ( var group in apiExplorer.ApiDescriptions )

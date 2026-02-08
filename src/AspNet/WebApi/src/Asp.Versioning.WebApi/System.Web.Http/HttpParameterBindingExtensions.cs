@@ -10,20 +10,26 @@ using System.Web.Http.ValueProviders;
 
 internal static class HttpParameterBindingExtensions
 {
-    internal static bool WillReadUri( this HttpParameterBinding parameterBinding )
+    extension( HttpParameterBinding parameterBinding )
     {
-        if ( parameterBinding is not IValueProviderParameterBinding valueProviderParameterBinding )
+        internal bool WillReadUri
         {
-            return false;
+            get
+            {
+                if ( parameterBinding is not IValueProviderParameterBinding valueProviderParameterBinding )
+                {
+                    return false;
+                }
+
+                var valueProviderFactories = valueProviderParameterBinding.ValueProviderFactories;
+
+                if ( valueProviderFactories.Any() && valueProviderFactories.All( factory => factory is IUriValueProviderFactory ) )
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
-
-        var valueProviderFactories = valueProviderParameterBinding.ValueProviderFactories;
-
-        if ( valueProviderFactories.Any() && valueProviderFactories.All( factory => factory is IUriValueProviderFactory ) )
-        {
-            return true;
-        }
-
-        return false;
     }
 }

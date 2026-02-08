@@ -12,66 +12,72 @@ using Asp.Versioning;
 [CLSCompliant( false )]
 public static class ActionDescriptorExtensions
 {
-    /// <summary>
-    /// Gets the API version information associated with an action.
-    /// </summary>
     /// <param name="action">The extended <see cref="ActionDescriptor">action</see>.</param>
-    /// <returns>The <see cref="ApiVersionMetadata">API version information</see> for the action.</returns>
-    public static ApiVersionMetadata GetApiVersionMetadata( this ActionDescriptor action )
+    extension( ActionDescriptor action )
     {
-        ArgumentNullException.ThrowIfNull( action );
-
-        var endpointMetadata = action.EndpointMetadata;
-
-        if ( endpointMetadata == null )
+        /// <summary>
+        /// Gets the API version information associated with an action.
+        /// </summary>
+        /// <returns>The <see cref="ApiVersionMetadata">API version information</see> for the action.</returns>
+        public ApiVersionMetadata ApiVersionMetadata
         {
-            return ApiVersionMetadata.Empty;
-        }
-
-        for ( var i = 0; i < endpointMetadata.Count; i++ )
-        {
-            if ( endpointMetadata[i] is ApiVersionMetadata metadata )
+            get
             {
-                return metadata;
+                ArgumentNullException.ThrowIfNull( action );
+
+                var endpointMetadata = action.EndpointMetadata;
+
+                if ( endpointMetadata == null )
+                {
+                    return Asp.Versioning.ApiVersionMetadata.Empty;
+                }
+
+                for ( var i = 0; i < endpointMetadata.Count; i++ )
+                {
+                    if ( endpointMetadata[i] is ApiVersionMetadata metadata )
+                    {
+                        return metadata;
+                    }
+                }
+
+                return ApiVersionMetadata.Empty;
             }
         }
 
-        return ApiVersionMetadata.Empty;
-    }
-
-    internal static void AddOrReplaceApiVersionMetadata( this ActionDescriptor action, ApiVersionMetadata value )
-    {
-        var endpointMetadata = action.EndpointMetadata;
-
-        if ( endpointMetadata == null )
+        internal void AddOrReplaceApiVersionMetadata( ApiVersionMetadata value )
         {
-            action.EndpointMetadata = [value];
-            return;
-        }
+            var endpointMetadata = action.EndpointMetadata;
 
-        for ( var i = 0; i < endpointMetadata.Count; i++ )
-        {
-            if ( endpointMetadata[i] is not ApiVersionMetadata )
+            if ( endpointMetadata == null )
             {
-                continue;
+                action.EndpointMetadata = [value];
+                return;
+            }
+
+            for ( var i = 0; i < endpointMetadata.Count; i++ )
+            {
+                if ( endpointMetadata[i] is not Asp.Versioning.ApiVersionMetadata )
+                {
+                    continue;
+                }
+
+                if ( endpointMetadata.IsReadOnly )
+                {
+                    action.EndpointMetadata = endpointMetadata = [.. endpointMetadata];
+                }
+
+                endpointMetadata[i] = value;
+                return;
             }
 
             if ( endpointMetadata.IsReadOnly )
             {
-                action.EndpointMetadata = endpointMetadata = [.. endpointMetadata];
+                action.EndpointMetadata = [value];
             }
-
-            endpointMetadata[i] = value;
-            return;
-        }
-
-        if ( endpointMetadata.IsReadOnly )
-        {
-            action.EndpointMetadata = [value];
-        }
-        else
-        {
-            endpointMetadata.Add( value );
+            else
+            {
+                endpointMetadata.Add( value );
+            }
         }
     }
 }

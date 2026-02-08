@@ -51,11 +51,11 @@ public class ApiNotificationContext
     /// Gets the API sunset policy reported in the response.
     /// </summary>
     /// <value>The reported API <see cref="SunsetPolicy">sunset policy</see>.</value>
-    public SunsetPolicy SunsetPolicy => sunsetPolicy ??= Response.ReadSunsetPolicy();
+    public SunsetPolicy SunsetPolicy => sunsetPolicy ??= Response.SunsetPolicy;
 
     /// <summary>
     /// Gets the API deprecation policy reported in the response.
     /// </summary>
     /// <value>The reported API <see cref="DeprecationPolicy">deprecation policy</see>.</value>
-    public DeprecationPolicy DeprecationPolicy => deprecationPolicy ??= Response.ReadDeprecationPolicy();
+    public DeprecationPolicy DeprecationPolicy => deprecationPolicy ??= Response.DeprecationPolicy;
 }

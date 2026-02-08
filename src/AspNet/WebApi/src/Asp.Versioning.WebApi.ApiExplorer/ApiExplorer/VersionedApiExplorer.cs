@@ -102,7 +102,7 @@ public class VersionedApiExplorer : IApiExplorer
     /// <value>The configured <see cref="IPolicyManager{TPolicy}">sunset policy manager</see>.</value>
     protected IPolicyManager<SunsetPolicy> SunsetPolicyManager
     {
-        get => sunsetPolicyManager ??= Configuration.GetSunsetPolicyManager();
+        get => sunsetPolicyManager ??= DependencyResolverExtensions.get_SunsetPolicyManager( Configuration );
         set => sunsetPolicyManager = value;
     }
 
@@ -112,7 +112,7 @@ public class VersionedApiExplorer : IApiExplorer
     /// <value>The configured <see cref="IPolicyManager{TPolicy}">deprecation policy manager</see>.</value>
     protected IPolicyManager<DeprecationPolicy> DeprecationPolicyManager
     {
-        get => deprecationPolicyManager ??= Configuration.GetDeprecationPolicyManager();
+        get => deprecationPolicyManager ??= DependencyResolverExtensions.get_DeprecationPolicyManager( Configuration );
         set => deprecationPolicyManager = value;
     }
 
@@ -167,7 +167,7 @@ public class VersionedApiExplorer : IApiExplorer
 
         if ( ( setting == null || !setting.IgnoreApi ) && MatchRegexConstraint( route, RouteValueKeys.Action, actionRouteParameterValue ) )
         {
-            return actionDescriptor.GetApiVersionMetadata().IsMappedTo( apiVersion );
+            return actionDescriptor.ApiVersionMetadata.IsMappedTo( apiVersion );
         }
 
         return false;
@@ -247,7 +247,7 @@ public class VersionedApiExplorer : IApiExplorer
             for ( var i = 0; i < routes.Length; i++ )
             {
                 var route = routes[i];
-                var directRouteCandidates = route.GetDirectRouteCandidates();
+                var directRouteCandidates = HttpRouteExtensions.get_DirectRouteCandidates( route );
                 var directRouteController = GetDirectRouteController( directRouteCandidates, apiVersion );
                 var apiDescriptionGroup = newApiDescriptions.GetOrAdd( apiVersion, GetGroupName );
                 var descriptionsFromRoute = ( directRouteController != null && directRouteCandidates != null ) ?
@@ -276,7 +276,7 @@ public class VersionedApiExplorer : IApiExplorer
                     }
                     else
                     {
-                        var overrideImplicitlyMappedApiDescription = description.ActionDescriptor.GetApiVersionMetadata().MappingTo( apiVersion ) == Explicit;
+                        var overrideImplicitlyMappedApiDescription = description.ActionDescriptor.ApiVersionMetadata.MappingTo( apiVersion ) == Explicit;
 
                         if ( overrideImplicitlyMappedApiDescription )
                         {
@@ -399,7 +399,7 @@ public class VersionedApiExplorer : IApiExplorer
                         // model build parameter based on route constraint like "api/v{version:apiVersion}"
                         AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
                     }
-                    else if ( parameterType.CanConvertFromString() )
+                    else if ( TypeExtensions.get_CanConvertFromString( parameterType ) )
                     {
                         // Simple type generates query string like "?name={name}"
                         AddPlaceholder( parameterValuesForRoute, parameterDescription.Name );
@@ -408,7 +408,7 @@ public class VersionedApiExplorer : IApiExplorer
                     {
                         var parameterName = parameterDescription.ParameterDescriptor.ParameterName;
                         var innerType = GetCollectionElementType( parameterType );
-                        var innerTypeProperties = innerType.GetBindableProperties().ToArray();
+                        var innerTypeProperties = innerType.BindableProperties.ToArray();
 
                         if ( innerTypeProperties.Any() )
                         {
@@ -440,7 +440,7 @@ public class VersionedApiExplorer : IApiExplorer
                         AddPlaceholder( parameterValuesForRoute, parameterName + "[1].key" );
                         AddPlaceholder( parameterValuesForRoute, parameterName + "[1].value" );
                     }
-                    else if ( parameterDescription.CanConvertPropertiesFromString() )
+                    else if ( parameterDescription.CanConvertPropertiesFromString )
                     {
                         if ( emitPrefixes )
                         {
@@ -449,7 +449,7 @@ public class VersionedApiExplorer : IApiExplorer
 
                         // Inserting the individual properties of the object in the query string as all the complex object can not be converted from string,
                         // but all its individual properties can.
-                        AddPlaceholderForProperties( parameterValuesForRoute, parameterDescription.GetBindableProperties(), prefix );
+                        AddPlaceholderForProperties( parameterValuesForRoute, parameterDescription.BindableProperties, prefix );
                     }
 
                     break;
@@ -525,7 +525,7 @@ public class VersionedApiExplorer : IApiExplorer
                 continue;
             }
 
-            var model = controller.GetApiVersionModel();
+            var model = controller.ApiVersionModel;
             var actions = actionSelector.GetActionMapping( controller ).SelectMany( g => g );
 
             for ( var i = 0; i < model.DeclaredApiVersions.Count; i++ )
@@ -535,7 +535,7 @@ public class VersionedApiExplorer : IApiExplorer
 
             foreach ( var action in actions )
             {
-                model = action.GetApiVersionMetadata().Map( Explicit );
+                model = action.ApiVersionMetadata.Map( Explicit );
 
                 for ( var i = 0; i < model.DeclaredApiVersions.Count; i++ )
                 {
@@ -566,7 +566,7 @@ public class VersionedApiExplorer : IApiExplorer
 
         if ( supported.Count == 0 )
         {
-            supported.Add( Configuration.GetApiVersioningOptions().DefaultApiVersion );
+            supported.Add( Configuration.ApiVersioningOptions.DefaultApiVersion );
         }
 
         return supported;
@@ -612,7 +612,7 @@ public class VersionedApiExplorer : IApiExplorer
         {
             var action = candidates[i].ActionDescriptor;
 
-            switch ( action.GetApiVersionMetadata().MappingTo( apiVersion ) )
+            switch ( action.ApiVersionMetadata.MappingTo( apiVersion ) )
             {
                 case Explicit:
                     bestMatch = action;
@@ -630,7 +630,7 @@ public class VersionedApiExplorer : IApiExplorer
                 bestMatches.UnionWith( implicitMatches );
                 break;
             case 1:
-                if ( bestMatch!.GetApiVersionMetadata().IsApiVersionNeutral )
+                if ( bestMatch!.ApiVersionMetadata.IsApiVersionNeutral )
                 {
                     bestMatches.UnionWith( implicitMatches );
                 }
@@ -781,7 +781,7 @@ public class VersionedApiExplorer : IApiExplorer
         Collection<VersionedApiDescription> apiDescriptions,
         ApiVersion apiVersion )
     {
-        if ( controllerDescriptor.IsAttributeRouted() )
+        if ( HttpControllerDescriptorExtensions.get_IsAttributeRouted( controllerDescriptor ) )
         {
             return;
         }
@@ -832,7 +832,8 @@ public class VersionedApiExplorer : IApiExplorer
     {
         foreach ( var actionDescriptor in actionDescriptors )
         {
-            if ( ShouldExploreAction( actionVariableValue ?? string.Empty, actionDescriptor, route, apiVersion ) && !actionDescriptor.IsAttributeRouted() )
+            if ( ShouldExploreAction( actionVariableValue ?? string.Empty, actionDescriptor, route, apiVersion ) &&
+                !System.Web.Http.HttpActionDescriptorExtensions.get_IsAttributeRouted( actionDescriptor ) )
             {
                 PopulateActionDescriptions( actionDescriptor, route, localPath, apiDescriptions, apiVersion );
             }
@@ -873,7 +874,7 @@ public class VersionedApiExplorer : IApiExplorer
         supportedResponseFormatters = GetInnerFormatters( supportedResponseFormatters );
 
         var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
-        var metadata = actionDescriptor.GetApiVersionMetadata();
+        var metadata = actionDescriptor.ApiVersionMetadata;
         var model = metadata.Map( Explicit );
         var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
 
@@ -944,8 +945,8 @@ public class VersionedApiExplorer : IApiExplorer
         return parameterDescriptions.Count( parameter =>
                      parameter.Source == FromUri &&
                      parameter.ParameterDescriptor != null &&
-                     !parameter.ParameterDescriptor.ParameterType.CanConvertFromString() &&
-                     parameter.CanConvertPropertiesFromString() ) > 1;
+                     !TypeExtensions.get_CanConvertFromString( parameter.ParameterDescriptor.ParameterType ) &&
+                     parameter.CanConvertPropertiesFromString ) > 1;
     }
 
     private static Type GetCollectionElementType( Type collectionType ) =>
@@ -1083,7 +1084,7 @@ public class VersionedApiExplorer : IApiExplorer
         {
             parameterDescription.Source = FromBody;
         }
-        else if ( parameterBinding.WillReadUri() )
+        else if ( HttpParameterBindingExtensions.get_WillReadUri( parameterBinding ) )
         {
             parameterDescription.Source = FromUri;
         }
@@ -1100,11 +1101,11 @@ public class VersionedApiExplorer : IApiExplorer
         for ( var i = 0; i < apiDescriptions.Count; i++ )
         {
             var description = apiDescriptions[i];
-            var apiDescriptionId = description.GetUniqueID();
+            var apiDescriptionId = description.UniqueID;
 
             if ( filteredDescriptions.ContainsKey( apiDescriptionId ) )
             {
-                if ( description.ActionDescriptor.GetApiVersionMetadata().MappingTo( apiVersion ) == Explicit )
+                if ( description.ActionDescriptor.ApiVersionMetadata.MappingTo( apiVersion ) == Explicit )
                 {
                     filteredDescriptions[apiDescriptionId] = description;
                 }

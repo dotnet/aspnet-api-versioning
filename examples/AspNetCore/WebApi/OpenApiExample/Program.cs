@@ -3,7 +3,7 @@ using Scalar.AspNetCore;
 using System.Reflection;
 
 [assembly: Microsoft.AspNetCore.Mvc.ApiController]
-[assembly: AssemblyDescription("An example API")]
+[assembly: AssemblyDescription( "An example API" )]
 
 var builder = WebApplication.CreateBuilder( args );
 

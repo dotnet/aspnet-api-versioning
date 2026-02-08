@@ -89,7 +89,7 @@ public class VersionedApiDescriptionProviderTest
         // assert
         context.Results
                .Where( api => api.GroupName == "v0.9" )
-               .Select( api => api.GetSunsetPolicy() )
+               .Select( api => api.SunsetPolicy )
                .All( policy => policy == expected )
                .Should()
                .BeTrue();

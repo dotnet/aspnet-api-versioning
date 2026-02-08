@@ -11,11 +11,11 @@ public class Values2Controller : ApiController
 {
     [Route]
     public IHttpActionResult Get() =>
-        Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+        Ok( new { controller = GetType().Name, version = Request.RequestedApiVersion.ToString() } );
 
     [Route( "{id}", Name = "GetByIdV2" )]
     public IHttpActionResult Get( string id ) =>
-        Ok( new { controller = GetType().Name, Id = id, version = Request.GetRequestedApiVersion().ToString() } );
+        Ok( new { controller = GetType().Name, Id = id, version = Request.RequestedApiVersion.ToString() } );
 
     public IHttpActionResult Post( [FromBody] JToken json ) =>
         CreatedAtRoute( "GetByIdV2", new { id = "42" }, json );

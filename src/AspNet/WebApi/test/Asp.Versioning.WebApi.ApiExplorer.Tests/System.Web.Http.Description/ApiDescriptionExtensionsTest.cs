@@ -16,7 +16,7 @@ public class ApiDescriptionExtensionsTest
         var description = new ApiDescription();
 
         // act
-        var apiVersion = description.GetApiVersion();
+        var apiVersion = description.ApiVersion;
 
         // assert
         apiVersion.Should().BeNull();
@@ -30,7 +30,7 @@ public class ApiDescriptionExtensionsTest
         var description = new VersionedApiDescription() { ApiVersion = apiVersion };
 
         // act
-        var result = description.GetApiVersion();
+        var result = description.ApiVersion;
 
         // assert
         result.Should().Be( apiVersion );
@@ -43,7 +43,7 @@ public class ApiDescriptionExtensionsTest
         var description = new ApiDescription();
 
         // act
-        var deprecated = description.IsDeprecated();
+        var deprecated = description.IsDeprecated;
 
         // assert
         deprecated.Should().BeFalse();
@@ -56,7 +56,7 @@ public class ApiDescriptionExtensionsTest
         var description = new VersionedApiDescription() { IsDeprecated = true };
 
         // act
-        var deprecated = description.IsDeprecated();
+        var deprecated = description.IsDeprecated;
 
         // assert
         deprecated.Should().BeTrue();
@@ -69,7 +69,7 @@ public class ApiDescriptionExtensionsTest
         var description = new ApiDescription();
 
         // act
-        var groupName = description.GetGroupName();
+        var groupName = description.GroupName;
 
         // assert
         groupName.Should().BeNull();
@@ -82,7 +82,7 @@ public class ApiDescriptionExtensionsTest
         var description = new VersionedApiDescription() { GroupName = "v1" };
 
         // act
-        var groupName = description.GetGroupName();
+        var groupName = description.GroupName;
 
         // assert
         groupName.Should().Be( "v1" );

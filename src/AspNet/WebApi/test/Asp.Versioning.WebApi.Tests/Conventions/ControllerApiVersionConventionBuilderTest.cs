@@ -35,7 +35,7 @@ public partial class ControllerApiVersionConventionBuilderTest
         controllerBuilder.ApplyTo( controllerDescriptor );
 
         // assert
-        actionDescriptor.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        actionDescriptor.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,
@@ -71,7 +71,7 @@ public partial class ControllerApiVersionConventionBuilderTest
         controllerBuilder.ApplyTo( controllerDescriptor );
 
         // assert
-        actionDescriptor.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        actionDescriptor.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = true,
@@ -105,7 +105,7 @@ public partial class ControllerApiVersionConventionBuilderTest
         controllerBuilder.ApplyTo( controllerDescriptor );
 
         // assert
-        actionDescriptor.GetApiVersionMetadata().Map( Explicit ).Should().BeEquivalentTo(
+        actionDescriptor.ApiVersionMetadata.Map( Explicit ).Should().BeEquivalentTo(
             new
             {
                 IsApiVersionNeutral = false,

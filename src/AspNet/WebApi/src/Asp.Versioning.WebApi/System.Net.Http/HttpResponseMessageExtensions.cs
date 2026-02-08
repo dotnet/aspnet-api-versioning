@@ -18,24 +18,27 @@ public static class HttpResponseMessageExtensions
     private const string Deprecation = nameof( Deprecation );
     private const string Link = nameof( Link );
 
-    /// <summary>
-    /// Writes the sunset policy to the specified HTTP response.
-    /// </summary>
     /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to write to.</param>
-    /// <param name="sunsetPolicy">The <see cref="SunsetPolicy">sunset policy</see> to write.</param>
-    public static void WriteSunsetPolicy( this HttpResponseMessage response, SunsetPolicy sunsetPolicy )
+    extension( HttpResponseMessage response )
     {
-        ArgumentNullException.ThrowIfNull( response );
-        ArgumentNullException.ThrowIfNull( sunsetPolicy );
-
-        var headers = response.Headers;
-
-        if ( sunsetPolicy.Date.HasValue )
+        /// <summary>
+        /// Writes the sunset policy to the specified HTTP response.
+        /// </summary>
+        /// <param name="sunsetPolicy">The <see cref="SunsetPolicy">sunset policy</see> to write.</param>
+        public void WriteSunsetPolicy( SunsetPolicy sunsetPolicy )
         {
-            headers.Add( Sunset, sunsetPolicy.Date.Value.ToString( "r" ) );
-        }
+            ArgumentNullException.ThrowIfNull( response );
+            ArgumentNullException.ThrowIfNull( sunsetPolicy );
 
-        AddLinkHeaders( headers, sunsetPolicy.Links );
+            var headers = response.Headers;
+
+            if ( sunsetPolicy.Date.HasValue )
+            {
+                headers.Add( Sunset, sunsetPolicy.Date.Value.ToString( "r" ) );
+            }
+
+            AddLinkHeaders( headers, sunsetPolicy.Links );
+        }
     }
 
     /// <summary>

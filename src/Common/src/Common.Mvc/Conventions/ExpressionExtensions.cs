@@ -8,14 +8,17 @@ using System.Reflection;
 
 internal static class ExpressionExtensions
 {
-    internal static MethodInfo ExtractMethod<TDelegate>( this Expression<TDelegate> expression )
+    extension<TDelegate>( Expression<TDelegate> expression )
     {
-        if ( expression.Body is MethodCallExpression methodCall )
+        internal MethodInfo ExtractMethod()
         {
-            return methodCall.Method;
-        }
+            if ( expression.Body is MethodCallExpression methodCall )
+            {
+                return methodCall.Method;
+            }
 
-        var message = string.Format( CultureInfo.CurrentCulture, MvcFormat.InvalidActionMethodExpression, expression );
-        throw new InvalidOperationException( message );
+            var message = string.Format( CultureInfo.CurrentCulture, MvcFormat.InvalidActionMethodExpression, expression );
+            throw new InvalidOperationException( message );
+        }
     }
 }

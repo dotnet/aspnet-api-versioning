@@ -11,151 +11,139 @@ using DateOnly = System.DateTime;
 /// </summary>
 public static class IApiVersioningPolicyBuilderExtensions
 {
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="name">The name of the API the policy is for.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name )
+    extension( IApiVersioningPolicyBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( name, default );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="name">The name of the API the policy is for.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( string name )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( name, default );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="name">The name of the API the policy is for.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset(
-        this IApiVersioningPolicyBuilder builder,
-        string name,
-        int majorVersion,
-        int? minorVersion = default,
-        string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( name, new ApiVersion( majorVersion, minorVersion, status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="name">The name of the API the policy is for.</param>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( string name, int majorVersion, int? minorVersion = default, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( name, new ApiVersion( majorVersion, minorVersion, status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="name">The name of the API the policy is for.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name, double version, string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( name, new ApiVersion( version, status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="name">The name of the API the policy is for.</param>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( string name, double version, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( name, new ApiVersion( version, status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="name">The name of the API the policy is for.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name, int year, int month, int day, string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( name, new ApiVersion( new DateOnly( year, month, day ), status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="name">The name of the API the policy is for.</param>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( string name, int year, int month, int day, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( name, new ApiVersion( new DateOnly( year, month, day ), status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="name">The name of the API the policy is for.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, string name, DateOnly groupVersion, string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( name, new ApiVersion( groupVersion, status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="name">The name of the API the policy is for.</param>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( string name, DateOnly groupVersion, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( name, new ApiVersion( groupVersion, status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the policy is for.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, ApiVersion apiVersion )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( default, apiVersion );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the policy is for.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( ApiVersion apiVersion )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( default, apiVersion );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="majorVersion">The major version number.</param>
-    /// <param name="minorVersion">The optional minor version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset(
-        this IApiVersioningPolicyBuilder builder,
-        int majorVersion,
-        int? minorVersion = default,
-        string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( default, new ApiVersion( majorVersion, minorVersion, status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset(
+            int majorVersion,
+            int? minorVersion = default,
+            string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( default, new ApiVersion( majorVersion, minorVersion, status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="version">The version number.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, double version, string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( default, new ApiVersion( version, status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( double version, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( default, new ApiVersion( version, status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="year">The version year.</param>
-    /// <param name="month">The version month.</param>
-    /// <param name="day">The version day.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, int year, int month, int day, string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( default, new ApiVersion( new DateOnly( year, month, day ), status ) );
-    }
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( int year, int month, int day, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( default, new ApiVersion( new DateOnly( year, month, day ), status ) );
+        }
 
-    /// <summary>
-    /// Creates and returns a new sunset policy builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningPolicyBuilder">API versioning policy builder</see>.</param>
-    /// <param name="groupVersion">The group version.</param>
-    /// <param name="status">The optional version status.</param>
-    /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
-    public static ISunsetPolicyBuilder Sunset( this IApiVersioningPolicyBuilder builder, DateOnly groupVersion, string? status = default )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.Sunset( default, new ApiVersion( groupVersion, status ) );
+        /// <summary>
+        /// Creates and returns a new sunset policy builder.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <returns>A new <see cref="ISunsetPolicyBuilder">sunset policy builder</see>.</returns>
+        public ISunsetPolicyBuilder Sunset( DateOnly groupVersion, string? status = default )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.Sunset( default, new ApiVersion( groupVersion, status ) );
+        }
     }
 
     /// <summary>

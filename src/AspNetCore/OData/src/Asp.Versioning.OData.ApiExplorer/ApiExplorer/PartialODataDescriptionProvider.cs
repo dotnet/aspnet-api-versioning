@@ -102,7 +102,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
         for ( var i = 0; i < models.Count; i++ )
         {
             var model = models[i];
-            var version = model.GetApiVersion();
+            var version = model.ApiVersion;
             var odata = odataOptionsFactory.Create( Opts.DefaultName );
 
             odata.AddRouteComponents( model );
@@ -110,7 +110,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
             for ( var j = 0; j < results.Length; j++ )
             {
                 var result = results[j];
-                var metadata = result.ActionDescriptor.GetApiVersionMetadata();
+                var metadata = result.ActionDescriptor.ApiVersionMetadata;
 
                 if ( metadata.IsMappedTo( version ) )
                 {
@@ -133,7 +133,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
 
             for ( var j = metadata.Count - 1; j >= 0; j-- )
             {
-                if ( metadata[j] is IODataRoutingMetadata routing && routing.Model.IsAdHoc() )
+                if ( metadata[j] is IODataRoutingMetadata routing && routing.Model.IsAdHoc )
                 {
                     metadata.Remove( j );
                 }
@@ -177,7 +177,7 @@ public class PartialODataDescriptionProvider : IApiDescriptionProvider
                 }
             }
 
-            if ( odata || !result.IsODataLike() )
+            if ( odata || !result.IsODataLike )
             {
                 continue;
             }

@@ -18,7 +18,7 @@ public class SwaggerDefaultValues : IOperationFilter
     /// <param name="apiDescription">The API description being filtered.</param>
     public void Apply( Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription )
     {
-        operation.deprecated |= apiDescription.IsDeprecated();
+        operation.deprecated |= apiDescription.IsDeprecated;
 
         if ( operation.parameters == null )
         {

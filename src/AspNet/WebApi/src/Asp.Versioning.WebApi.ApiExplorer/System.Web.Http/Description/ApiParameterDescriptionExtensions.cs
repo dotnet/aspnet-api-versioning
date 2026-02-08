@@ -9,9 +9,12 @@ using System.Reflection;
 
 internal static class ApiParameterDescriptionExtensions
 {
-    internal static IEnumerable<PropertyInfo> GetBindableProperties( this ApiParameterDescription description ) =>
-        description.ParameterDescriptor.ParameterType.GetBindableProperties();
+    extension( ApiParameterDescription description )
+    {
+        internal IEnumerable<PropertyInfo> BindableProperties =>
+            description.ParameterDescriptor.ParameterType.BindableProperties;
 
-    internal static bool CanConvertPropertiesFromString( this ApiParameterDescription description ) =>
-        description.GetBindableProperties().All( p => p.PropertyType.CanConvertFromString() );
+        internal bool CanConvertPropertiesFromString =>
+            description.BindableProperties.All( p => TypeExtensions.get_CanConvertFromString( p.PropertyType ) );
+    }
 }

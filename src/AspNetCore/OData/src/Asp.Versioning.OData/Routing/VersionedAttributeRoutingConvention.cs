@@ -51,7 +51,7 @@ public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
             return false;
         }
 
-        var apiVersion = edm.GetApiVersion();
+        var apiVersion = edm.ApiVersion;
 
         if ( apiVersion == null || !metadata.IsMappedTo( apiVersion ) )
         {

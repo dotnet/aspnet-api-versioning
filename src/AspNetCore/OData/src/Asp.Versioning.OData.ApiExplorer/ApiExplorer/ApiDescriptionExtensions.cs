@@ -6,18 +6,24 @@ namespace Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 internal static class ApiDescriptionExtensions
 {
-    internal static bool IsODataLike( this ApiDescription description )
+    extension( ApiDescription description )
     {
-        var parameters = description.ActionDescriptor.Parameters;
-
-        for ( var i = 0; i < parameters.Count; i++ )
+        internal bool IsODataLike
         {
-            if ( parameters[i].ParameterType.IsODataQueryOptions() )
+            get
             {
-                return true;
+                var parameters = description.ActionDescriptor.Parameters;
+
+                for ( var i = 0; i < parameters.Count; i++ )
+                {
+                    if ( parameters[i].ParameterType.IsODataQueryOptions )
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
-
-        return false;
     }
 }

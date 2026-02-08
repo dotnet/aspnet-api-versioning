@@ -65,22 +65,17 @@ public abstract class ControllerApiVersionConventionBuilderBase : ApiVersionConv
                            ApiVersionMetadata.Neutral :
                            new ApiVersionMetadata( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
 
-            controller.SetApiVersionModel( ApiVersionModel.Neutral );
+            controller.ApiVersionModel = ApiVersionModel.Neutral;
 
             for ( var i = 0; i < actions.Length; i++ )
             {
-                actions[i].SetApiVersionMetadata( metadata );
+                actions[i].ApiVersionMetadata = metadata;
             }
 
             return;
         }
 
-        controller.SetApiVersionModel(
-            new ApiVersionModel(
-                SupportedVersions,
-                DeprecatedVersions,
-                AdvertisedVersions,
-                DeprecatedAdvertisedVersions ) );
+        controller.ApiVersionModel = new( SupportedVersions, DeprecatedVersions, AdvertisedVersions, DeprecatedAdvertisedVersions );
 
         var controllerBuilder = new ControllerApiVersionConventionBuilder( controller.ControllerType );
 

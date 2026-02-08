@@ -18,7 +18,6 @@ using Microsoft.OData.UriParser;
 using ODataRoutingAttribute = Microsoft.AspNetCore.OData.Routing.Attributes.ODataAttributeRoutingAttribute;
 #endif
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 internal static partial class TypeExtensions
 {
@@ -29,42 +28,65 @@ internal static partial class TypeExtensions
     private static Type? odataQueryOptions;
     private static Type? odataActionParameters;
 
-    internal static bool IsODataController( this Type controllerType ) => controllerType.UsingOData();
-
-    internal static bool IsMetadataController( this Type controllerType )
+    extension( Type type )
     {
-        metadataController ??= typeof( MetadataController );
-        return metadataController.IsAssignableFrom( controllerType );
+        internal bool IsODataController => type.UsingOData;
+
+        internal bool IsMetadataController
+        {
+            get
+            {
+                metadataController ??= typeof( MetadataController );
+                return metadataController.IsAssignableFrom( type );
+            }
+        }
+
+        internal bool IsODataPath
+        {
+            get
+            {
+                odataPath ??= typeof( ODataPath );
+                return odataPath.IsAssignableFrom( type );
+            }
+        }
+
+        internal bool IsODataQueryOptions
+        {
+            get
+            {
+                odataQueryOptions ??= typeof( ODataQueryOptions );
+                return odataQueryOptions.IsAssignableFrom( type );
+            }
+        }
+
+        internal bool IsODataActionParameters
+        {
+            get
+            {
+                odataActionParameters ??= typeof( ODataActionParameters );
+                return odataActionParameters.IsAssignableFrom( type );
+            }
+        }
+
+        internal bool IsDelta
+        {
+            get
+            {
+                delta ??= typeof( IDelta );
+                return delta.IsAssignableFrom( type );
+            }
+        }
     }
 
-    internal static bool IsODataPath( this Type type )
+    extension( MemberInfo member )
     {
-        odataPath ??= typeof( ODataPath );
-        return odataPath.IsAssignableFrom( type );
-    }
-
-    internal static bool IsODataQueryOptions( this Type type )
-    {
-        odataQueryOptions ??= typeof( ODataQueryOptions );
-        return odataQueryOptions.IsAssignableFrom( type );
-    }
-
-    internal static bool IsODataActionParameters( this Type type )
-    {
-        odataActionParameters ??= typeof( ODataActionParameters );
-        return odataActionParameters.IsAssignableFrom( type );
-    }
-
-    internal static bool IsDelta( this Type type )
-    {
-        delta ??= typeof( IDelta );
-        return delta.IsAssignableFrom( type );
-    }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool UsingOData( this MemberInfo member )
-    {
-        odataRoutingAttributeType ??= typeof( ODataRoutingAttribute );
-        return Attribute.IsDefined( member, odataRoutingAttributeType );
+        private bool UsingOData
+        {
+            get
+            {
+                odataRoutingAttributeType ??= typeof( ODataRoutingAttribute );
+                return Attribute.IsDefined( member, odataRoutingAttributeType );
+            }
+        }
     }
 }

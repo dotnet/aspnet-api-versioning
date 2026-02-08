@@ -51,7 +51,7 @@ public class PeopleController : ODataController
     [MapToApiVersion( "1.0" )]
     [ResponseType( typeof( Person ) )]
     [EnableQuery( AllowedQueryOptions = Select )]
-    public SingleResult<Person> MostExpensive( ODataQueryOptions<Person> options, CancellationToken ct ) => 
+    public SingleResult<Person> MostExpensive( ODataQueryOptions<Person> options, CancellationToken ct ) =>
         SingleResult.Create( new[] { new Person() { Id = 42, FirstName = "Elon", LastName = "Musk" } }.AsQueryable() );
 
     /// <summary>

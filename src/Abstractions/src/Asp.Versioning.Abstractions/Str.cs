@@ -100,10 +100,10 @@ internal static class Str
 
 #if NETSTANDARD2_0
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    internal static ReadOnlySpan<char> AsSpan( string text ) => text.AsSpan();
+    internal static Text AsSpan( string text ) => text.AsSpan();
 #elif !NETSTANDARD
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    internal static ReadOnlySpan<char> AsSpan( string text ) => text;
+    internal static Text AsSpan( string text ) => text;
 #endif
 
 #if NETSTANDARD2_0
@@ -111,7 +111,7 @@ internal static class Str
         T value,
         Span<char> destination,
         out int charsWritten,
-        ReadOnlySpan<char> format = default,
+        Text format = default,
         IFormatProvider? provider = default )
         where T : IFormattable
     {
@@ -135,7 +135,7 @@ internal static class Str
         T value,
         Span<char> destination,
         out int charsWritten,
-        ReadOnlySpan<char> format = default,
+        Text format = default,
         IFormatProvider? provider = default )
         where T : ISpanFormattable =>
         value.TryFormat( destination, out charsWritten, format, provider );

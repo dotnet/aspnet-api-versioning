@@ -25,7 +25,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
         ApiVersionModel apiModel;
         ApiVersionMetadata metadata;
 
-        if ( VersionNeutral || ( apiModel = controller.GetApiVersionModel() ).IsApiVersionNeutral )
+        if ( VersionNeutral || ( apiModel = controller.ApiVersionModel ).IsApiVersionNeutral )
         {
             metadata = string.IsNullOrEmpty( name )
                        ? ApiVersionMetadata.Neutral

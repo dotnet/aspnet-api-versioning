@@ -44,7 +44,7 @@ internal sealed class ODataRouteBuilderContext
         ParameterDescriptions = parameterDescriptions;
         Options = options;
         UrlKeyDelimiter = UrlKeyDelimiterOrDefault(
-            configuration.GetUrlKeyDelimiter() ??
+            configuration.UrlKeyDelimiter ??
             Services.GetService<IODataPathHandler>()?.UrlKeyDelimiter );
 
         var selector = Services.GetRequiredService<IEdmModelSelector>();
@@ -67,7 +67,7 @@ internal sealed class ODataRouteBuilderContext
         Operation = ResolveOperation( container, actionDescriptor );
         ActionType = GetActionType( actionDescriptor );
         IsRouteExcluded = ActionType == ODataRouteActionType.Unknown &&
-                         !actionDescriptor.ControllerDescriptor.ControllerType.IsMetadataController();
+                         !actionDescriptor.ControllerDescriptor.ControllerType.IsMetadataController;
 
         if ( Operation?.IsAction() == true )
         {
@@ -100,7 +100,7 @@ internal sealed class ODataRouteBuilderContext
             var description = ParameterDescriptions[i];
             var parameter = description.ParameterDescriptor;
 
-            if ( parameter != null && parameter.ParameterType.IsODataActionParameters() )
+            if ( parameter != null && parameter.ParameterType.IsODataActionParameters )
             {
                 var selector = Services.GetRequiredService<IEdmModelSelector>();
                 var model = selector.SelectModel( ApiVersion )!;
@@ -120,9 +120,9 @@ internal sealed class ODataRouteBuilderContext
         {
             var type = parameters[i].ParameterType;
 
-            if ( type.IsODataQueryOptions() ||
-                 type.IsODataActionParameters() ||
-                 type.IsODataPath() ||
+            if ( type.IsODataQueryOptions ||
+                 type.IsODataActionParameters ||
+                 type.IsODataPath ||
                  type.Equals( cancellationToken ) )
             {
                 parameters.RemoveAt( i );

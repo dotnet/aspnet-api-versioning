@@ -2,25 +2,17 @@
 
 namespace Asp.Versioning;
 
-#if NETFRAMEWORK
-using HttpRequest = System.Net.Http.HttpRequestMessage;
-#else
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-#endif
+using System.Net.Http;
 
 /// <summary>
 /// Defines the behavior of a factory to produce <see cref="ProblemDetails">problem details</see>.
 /// </summary>
-#if !NETFRAMEWORK
-[CLSCompliant( false )]
-#endif
 public interface IProblemDetailsFactory
 {
     /// <summary>
     /// Creates and returns a new problem details instance.
     /// </summary>
-    /// <param name="request">The current <see cref="HttpRequest">HTTP request</see>.</param>
+    /// <param name="request">The current <see cref="HttpRequestMessage">HTTP request</see>.</param>
     /// <param name="statusCode">The value for <see cref="ProblemDetails.Status"/>.</param>
     /// <param name="title">The value for <see cref="ProblemDetails.Title" />.</param>
     /// <param name="type">The value for <see cref="ProblemDetails.Type" />.</param>
@@ -28,7 +20,7 @@ public interface IProblemDetailsFactory
     /// <param name="instance">The value for <see cref="ProblemDetails.Instance" />.</param>
     /// <returns>A new <see cref="ProblemDetails"/> instance.</returns>
     ProblemDetails CreateProblemDetails(
-        HttpRequest request,
+        HttpRequestMessage request,
         int? statusCode = null,
         string? title = null,
         string? type = null,

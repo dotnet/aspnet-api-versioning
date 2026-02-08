@@ -156,7 +156,7 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         {
             var model = models[i];
 
-            if ( model.GetApiVersion() is not ApiVersion version )
+            if ( model.ApiVersion is not ApiVersion version )
             {
                 continue;
             }

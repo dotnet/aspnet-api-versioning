@@ -5,7 +5,6 @@ namespace given_a_versioned_Controller_per_namespace;
 using Asp.Versioning;
 using Asp.Versioning.Mvc.UsingNamespace;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
 using static System.Net.HttpStatusCode;
 using AgreementsControllerV1 = Asp.Versioning.Mvc.UsingNamespace.Controllers.V1.AgreementsController;
 using AgreementsControllerV2 = Asp.Versioning.Mvc.UsingNamespace.Controllers.V2.AgreementsController;

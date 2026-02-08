@@ -70,7 +70,7 @@ if ( app.Environment.IsDevelopment() )
     options =>
        {
            var descriptions = app.DescribeApiVersions();
-       
+
            // build a swagger endpoint for each discovered API version
            foreach ( var description in descriptions )
            {

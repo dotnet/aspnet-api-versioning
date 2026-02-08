@@ -11,11 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 public class Values2Controller : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok( new { Controller = nameof( Values2Controller ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get() => Ok( new { Controller = nameof( Values2Controller ), Version = HttpContext.RequestedApiVersion.ToString() } );
 
     [HttpGet( "{id:int}" )]
-    public IActionResult Get( int id ) => Ok( new { Controller = nameof( Values2Controller ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get( int id ) => Ok( new { Controller = nameof( Values2Controller ), Id = id, Version = HttpContext.RequestedApiVersion.ToString() } );
 
     [HttpGet( "search" )]
-    public IActionResult Search( string query ) => Ok( new { Controller = nameof( Values2Controller ), Query = query, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Search( string query ) => Ok( new { Controller = nameof( Values2Controller ), Query = query, Version = HttpContext.RequestedApiVersion.ToString() } );
 }

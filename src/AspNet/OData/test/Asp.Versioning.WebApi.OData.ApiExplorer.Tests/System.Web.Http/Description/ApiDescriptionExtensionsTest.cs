@@ -23,7 +23,7 @@ public class ApiDescriptionExtensionsTest
         var apiDescription = CreateApiDescription( model );
 
         // act
-        var result = apiDescription.EdmModel();
+        var result = apiDescription.EdmModel;
 
         // assert
         result.Should().BeSameAs( model );
@@ -38,7 +38,7 @@ public class ApiDescriptionExtensionsTest
         var apiDescription = CreateApiDescription( model );
 
         // act
-        var result = apiDescription.EntitySet();
+        var result = apiDescription.EntitySet;
 
         // assert
         result.Should().BeSameAs( entitySet );
@@ -53,7 +53,7 @@ public class ApiDescriptionExtensionsTest
         var apiDescription = CreateApiDescription( model );
 
         // act
-        var result = apiDescription.EntityType();
+        var result = apiDescription.EntityType;
 
         // assert
         result.Should().BeSameAs( entityType );

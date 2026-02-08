@@ -15,7 +15,7 @@ public partial class ODataQueryOptionDescriptionContext
 {
     private static IEdmModel? ResolveModel( ApiDescription description )
     {
-        var version = description.GetApiVersion();
+        var version = description.ApiVersion;
 
         if ( version == null )
         {
@@ -34,7 +34,7 @@ public partial class ODataQueryOptionDescriptionContext
         foreach ( var item in items )
         {
             var model = item.Model;
-            var otherVersion = model.GetApiVersion();
+            var otherVersion = model.ApiVersion;
 
             if ( version.Equals( otherVersion ) )
             {

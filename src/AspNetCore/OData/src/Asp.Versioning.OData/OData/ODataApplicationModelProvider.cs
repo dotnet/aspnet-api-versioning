@@ -88,7 +88,7 @@ public class ODataApplicationModelProvider : IApplicationModelProvider
         {
             var controller = controllers[i];
 
-            if ( controller.ControllerType.IsMetadataController() )
+            if ( controller.ControllerType.IsMetadataController )
             {
                 metadataControllers ??= [];
                 metadataControllers.Add( controller );

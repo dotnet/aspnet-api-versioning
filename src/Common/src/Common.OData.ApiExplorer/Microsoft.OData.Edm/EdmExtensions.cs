@@ -7,32 +7,34 @@ using Microsoft.AspNet.OData;
 #else
 using Microsoft.OData.ModelBuilder;
 #endif
-using System.Runtime.CompilerServices;
 
 internal static class EdmExtensions
 {
-    internal static Type? GetClrType( this IEdmType edmType, IEdmModel edmModel )
+    extension( IEdmType edmType )
     {
-        if ( edmType is not IEdmSchemaType schemaType )
+        internal Type? GetClrType( IEdmModel edmModel )
         {
+            if ( edmType is not IEdmSchemaType schemaType )
+            {
+                return null;
+            }
+
+            var typeName = schemaType.FullName();
+
+            if ( DeriveFromWellKnowPrimitive( typeName ) is Type type )
+            {
+                return type;
+            }
+
+            var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>( schemaType );
+
+            if ( annotationValue != null )
+            {
+                return annotationValue.ClrType;
+            }
+
             return null;
         }
-
-        var typeName = schemaType.FullName();
-
-        if ( DeriveFromWellKnowPrimitive( typeName ) is Type type )
-        {
-            return type;
-        }
-
-        var annotationValue = edmModel.GetAnnotationValue<ClrTypeAnnotation>( schemaType );
-
-        if ( annotationValue != null )
-        {
-            return annotationValue.ClrType;
-        }
-
-        return null;
     }
 
     private static Type? DeriveFromWellKnowPrimitive( string edmFullName ) => edmFullName switch
@@ -52,11 +54,11 @@ internal static class EdmExtensions
         "Edm.Guid" => typeof( Guid ),
         "Edm.Duration" => typeof( TimeSpan ),
         "Edm.Binary" => typeof( byte[] ),
-        "Edm.Geography" => typeof( Microsoft.Spatial.Geography ),
-        "Edm.Geometry" => typeof( Microsoft.Spatial.Geometry ),
+        "Edm.Geography" => typeof( Spatial.Geography ),
+        "Edm.Geometry" => typeof( Spatial.Geometry ),
 #if NETFRAMEWORK
-        "Edm.Date" => typeof( Microsoft.OData.Edm.Date ),
-        "Edm.TimeOfDay" => typeof( Microsoft.OData.Edm.TimeOfDay ),
+        "Edm.Date" => typeof( Date ),
+        "Edm.TimeOfDay" => typeof( TimeOfDay ),
 #else
         "Edm.Date" => typeof( DateOnly ),
         "Edm.TimeOfDay" => typeof( TimeSpan ),

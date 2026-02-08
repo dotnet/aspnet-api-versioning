@@ -22,32 +22,33 @@ public static class IApiVersioningBuilderExtensions
 {
     private const string TrimmingMessage = "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming";
 
-    /// <summary>
-    /// Adds the API versioning extensions for the API Explorer.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    [RequiresUnreferencedCode( TrimmingMessage )]
-    public static IApiVersioningBuilder AddApiExplorer( this IApiVersioningBuilder builder )
+    extension( IApiVersioningBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        AddApiExplorerServices( builder );
-        return builder;
-    }
+        /// <summary>
+        /// Adds the API versioning extensions for the API Explorer.
+        /// </summary>
+        [RequiresUnreferencedCode( TrimmingMessage )]
+        public IApiVersioningBuilder AddApiExplorer()
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            AddApiExplorerServices( builder );
+            return builder;
+        }
 
-    /// <summary>
-    /// Adds the API versioning extensions for the API Explorer.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
-    /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    [RequiresUnreferencedCode( TrimmingMessage )]
-    public static IApiVersioningBuilder AddApiExplorer( this IApiVersioningBuilder builder, Action<ApiExplorerOptions> setupAction )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        AddApiExplorerServices( builder );
-        builder.Services.Configure( setupAction );
-        return builder;
+        /// <summary>
+        /// Adds the API versioning extensions for the API Explorer.
+        /// </summary>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
+        [RequiresUnreferencedCode( TrimmingMessage )]
+        public IApiVersioningBuilder AddApiExplorer( Action<ApiExplorerOptions> setupAction )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            AddApiExplorerServices( builder );
+            builder.Services.Configure( setupAction );
+            return builder;
+        }
     }
 
     [RequiresUnreferencedCode( TrimmingMessage )]

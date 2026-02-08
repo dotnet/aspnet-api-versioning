@@ -18,182 +18,184 @@ using static Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource;
 [CLSCompliant( false )]
 public static class ApiDescriptionExtensions
 {
-    /// <summary>
-    /// Gets the API version associated with the API description, if any.
-    /// </summary>
     /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the API version for.</param>
-    /// <returns>The associated <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
-    public static ApiVersion? GetApiVersion( this ApiDescription apiDescription ) => apiDescription.GetProperty<ApiVersion>();
-
-    /// <summary>
-    /// Gets the API sunset policy associated with the API description, if any.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the sunset policy for.</param>
-    /// <returns>The defined sunset policy defined for the API or <c>null</c>.</returns>
-    public static SunsetPolicy? GetSunsetPolicy( this ApiDescription apiDescription ) => apiDescription.GetProperty<SunsetPolicy>();
-
-    /// <summary>
-    /// Gets the API deprecation policy associated with the API description, if any.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to get the deprecation policy for.</param>
-    /// <returns>The defined deprecation policy defined for the API or <c>null</c>.</returns>
-    public static DeprecationPolicy? GetDeprecationPolicy( this ApiDescription apiDescription ) => apiDescription.GetProperty<DeprecationPolicy>();
-
-    /// <summary>
-    /// Gets a value indicating whether the associated API description is deprecated.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to evaluate.</param>
-    /// <returns><c>True</c> if the <see cref="ApiDescription">API description</see> is deprecated; otherwise, <c>false</c>.</returns>
-    public static bool IsDeprecated( this ApiDescription apiDescription )
+    extension( ApiDescription apiDescription )
     {
-        ArgumentNullException.ThrowIfNull( apiDescription );
-
-        var metatadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
-
-        if ( metatadata.IsApiVersionNeutral )
+        /// <summary>
+        /// Gets or sets the API version associated with the API description, if any.
+        /// </summary>
+        /// <returns>The associated <see cref="ApiVersion">API version</see> or <c>null</c>.</returns>
+        /// <remarks>Setting this property is meant for infrastructure and should not be used by application code.</remarks>
+        public ApiVersion? ApiVersion
         {
-            return false;
+            get => apiDescription.GetProperty<ApiVersion>();
+
+            [EditorBrowsable( EditorBrowsableState.Never )]
+            set => apiDescription.SetProperty( value );
         }
 
-        var apiVersion = apiDescription.GetApiVersion();
-        var model = metatadata.Map( Explicit | Implicit );
+        /// <summary>
+        /// Gets or sets the API sunset policy associated with the API description, if any.
+        /// </summary>
+        /// <returns>The defined sunset policy defined for the API or <c>null</c>.</returns>
+        /// <remarks>Setting this property is meant for infrastructure and should not be used by application code.</remarks>
+        public SunsetPolicy? SunsetPolicy
+        {
+            get => apiDescription.GetProperty<SunsetPolicy>();
 
-        return model.DeprecatedApiVersions.Contains( apiVersion );
+            [EditorBrowsable( EditorBrowsableState.Never )]
+            set => apiDescription.SetProperty( value );
+        }
+
+        /// <summary>
+        /// Gets or sets the API deprecation policy associated with the API description, if any.
+        /// </summary>
+        /// <returns>The defined deprecation policy defined for the API or <c>null</c>.</returns>
+        /// <remarks>Setting this property is meant for infrastructure and should not be used by application code.</remarks>
+        public DeprecationPolicy DeprecationPolicy
+        {
+            get => apiDescription.GetProperty<DeprecationPolicy>();
+
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            set => apiDescription.SetProperty(value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the associated API description is deprecated.
+        /// </summary>
+        /// <returns><c>True</c> if the <see cref="ApiDescription">API description</see> is deprecated; otherwise, <c>false</c>.</returns>
+        public bool IsDeprecated
+        {
+            get
+            {
+                ArgumentNullException.ThrowIfNull( apiDescription );
+
+                var metatadata = apiDescription.ActionDescriptor.ApiVersionMetadata;
+
+                if ( metatadata.IsApiVersionNeutral )
+                {
+                    return false;
+                }
+
+                var apiVersion = apiDescription.ApiVersion;
+                var model = metatadata.Map( Explicit | Implicit );
+
+                return model.DeprecatedApiVersions.Contains( apiVersion );
+            }
+        }
+
+        /// <summary>
+        /// Attempts to update the relate path of the specified API description and remove the corresponding parameter according to the specified options.
+        /// </summary>
+        /// <param name="options">The current <see cref="ApiExplorerOptions">API Explorer options</see>.</param>
+        /// <returns>True if the API description was updated; otherwise, false.</returns>
+        public bool TryUpdateRelativePathAndRemoveApiVersionParameter( ApiExplorerOptions options )
+        {
+            ArgumentNullException.ThrowIfNull( apiDescription );
+            ArgumentNullException.ThrowIfNull( options );
+
+            if ( !options.SubstituteApiVersionInUrl )
+            {
+                return false;
+            }
+
+            var relativePath = apiDescription.RelativePath;
+
+            if ( string.IsNullOrEmpty( relativePath ) )
+            {
+                return false;
+            }
+
+            if ( apiDescription.ApiVersion is not { } apiVersion )
+            {
+                return false;
+            }
+
+            var parameters = apiDescription.ParameterDescriptions;
+            var parameter = parameters.FirstOrDefault( pd => pd.Source == Path && pd.ModelMetadata?.DataTypeName == nameof( ApiVersion ) );
+
+            if ( parameter == null )
+            {
+                return false;
+            }
+
+            Span<char> token = stackalloc char[parameter.Name.Length + 2];
+
+            token[0] = '{';
+            token[^1] = '}';
+            parameter.Name.AsSpan().CopyTo( token.Slice( 1, parameter.Name.Length ) );
+
+            var value = apiVersion.ToString( options.SubstitutionFormat, CultureInfo.InvariantCulture );
+            var newRelativePath = relativePath.Replace( token.ToString(), value, StringComparison.Ordinal );
+
+            if ( relativePath == newRelativePath )
+            {
+                return false;
+            }
+
+            apiDescription.RelativePath = newRelativePath;
+            parameters.Remove( parameter );
+            return true;
+        }
+
+        /// <summary>
+        /// Creates a shallow copy of the current API description.
+        /// </summary>
+        /// <returns>A new <see cref="ApiDescription">API description</see>.</returns>
+        public ApiDescription Clone()
+        {
+            ArgumentNullException.ThrowIfNull( apiDescription );
+
+            var clone = new ApiDescription()
+            {
+                ActionDescriptor = apiDescription.ActionDescriptor,
+                GroupName = apiDescription.GroupName,
+                HttpMethod = apiDescription.HttpMethod,
+                RelativePath = apiDescription.RelativePath,
+            };
+
+            foreach ( var property in apiDescription.Properties )
+            {
+                clone.Properties.Add( property );
+            }
+
+            CloneList( apiDescription.ParameterDescriptions, clone.ParameterDescriptions, Clone );
+            CloneList( apiDescription.SupportedRequestFormats, clone.SupportedRequestFormats, Clone );
+            CloneList( apiDescription.SupportedResponseTypes, clone.SupportedResponseTypes, Clone );
+
+            return clone;
+        }
     }
 
-    /// <summary>
-    /// Sets the API version associated with the API description.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to set the API version for.</param>
-    /// <param name="apiVersion">The associated <see cref="ApiVersion">API version</see>.</param>
-    /// <remarks>This API is meant for infrastructure and should not be used by application code.</remarks>
-    [EditorBrowsable( EditorBrowsableState.Never )]
-    public static void SetApiVersion( this ApiDescription apiDescription, ApiVersion apiVersion ) => apiDescription.SetProperty( apiVersion );
-
-    /// <summary>
-    /// Sets the API sunset policy associated with the API description.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to set the sunset policy for.</param>
-    /// <param name="sunsetPolicy">The associated <see cref="SunsetPolicy">sunset policy</see>.</param>
-    /// <remarks>This API is meant for infrastructure and should not be used by application code.</remarks>
-    [EditorBrowsable( EditorBrowsableState.Never )]
-    public static void SetSunsetPolicy( this ApiDescription apiDescription, SunsetPolicy sunsetPolicy ) => apiDescription.SetProperty( sunsetPolicy );
-
-    /// <summary>
-    /// Sets the API deprecation policy associated with the API description.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to set the sunset policy for.</param>
-    /// <param name="deprecationPolicy">The associated <see cref="DeprecationPolicy">deprecation policy</see>.</param>
-    /// <remarks>This API is meant for infrastructure and should not be used by application code.</remarks>
-    [EditorBrowsable( EditorBrowsableState.Never )]
-    public static void SetDeprecationPolicy( this ApiDescription apiDescription, DeprecationPolicy deprecationPolicy ) => apiDescription.SetProperty( deprecationPolicy );
-
-    /// <summary>
-    /// Attempts to update the relate path of the specified API description and remove the corresponding parameter according to the specified options.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to attempt to update.</param>
-    /// <param name="options">The current <see cref="ApiExplorerOptions">API Explorer options</see>.</param>
-    /// <returns>True if the <paramref name="apiDescription">API description</paramref> was updated; otherwise, false.</returns>
-    public static bool TryUpdateRelativePathAndRemoveApiVersionParameter( this ApiDescription apiDescription, ApiExplorerOptions options )
+    extension( ApiRequestFormat requestFormat )
     {
-        ArgumentNullException.ThrowIfNull( apiDescription );
-        ArgumentNullException.ThrowIfNull( options );
-
-        if ( !options.SubstituteApiVersionInUrl )
+        internal ApiRequestFormat Clone()
         {
-            return false;
+            return new()
+            {
+                Formatter = requestFormat.Formatter,
+                MediaType = requestFormat.MediaType,
+            };
         }
-
-        var relativePath = apiDescription.RelativePath;
-
-        if ( string.IsNullOrEmpty( relativePath ) )
-        {
-            return false;
-        }
-
-        if ( apiDescription.GetApiVersion() is not ApiVersion apiVersion )
-        {
-            return false;
-        }
-
-        var parameters = apiDescription.ParameterDescriptions;
-        var parameter = parameters.FirstOrDefault( pd => pd.Source == Path && pd.ModelMetadata?.DataTypeName == nameof( ApiVersion ) );
-
-        if ( parameter == null )
-        {
-            return false;
-        }
-
-        Span<char> token = stackalloc char[parameter.Name.Length + 2];
-
-        token[0] = '{';
-        token[^1] = '}';
-        parameter.Name.AsSpan().CopyTo( token.Slice( 1, parameter.Name.Length ) );
-
-        var value = apiVersion.ToString( options.SubstitutionFormat, CultureInfo.InvariantCulture );
-        var newRelativePath = relativePath.Replace( token.ToString(), value, StringComparison.Ordinal );
-
-        if ( relativePath == newRelativePath )
-        {
-            return false;
-        }
-
-        apiDescription.RelativePath = newRelativePath;
-        parameters.Remove( parameter );
-        return true;
     }
 
-    /// <summary>
-    /// Creates a shallow copy of the current API description.
-    /// </summary>
-    /// <param name="apiDescription">The <see cref="ApiDescription">API description</see> to create a copy of.</param>
-    /// <returns>A new <see cref="ApiDescription">API description</see>.</returns>
-    public static ApiDescription Clone( this ApiDescription apiDescription )
+    extension( ApiResponseType responseType )
     {
-        ArgumentNullException.ThrowIfNull( apiDescription );
 
-        var clone = new ApiDescription()
+        internal ApiResponseType Clone()
         {
-            ActionDescriptor = apiDescription.ActionDescriptor,
-            GroupName = apiDescription.GroupName,
-            HttpMethod = apiDescription.HttpMethod,
-            RelativePath = apiDescription.RelativePath,
-        };
+            var clone = new ApiResponseType()
+            {
+                IsDefaultResponse = responseType.IsDefaultResponse,
+                ModelMetadata = responseType.ModelMetadata,
+                StatusCode = responseType.StatusCode,
+                Type = responseType.Type,
+            };
 
-        foreach ( var property in apiDescription.Properties )
-        {
-            clone.Properties.Add( property );
+            CloneList( responseType.ApiResponseFormats, clone.ApiResponseFormats, Clone );
+
+            return clone;
         }
-
-        CloneList( apiDescription.ParameterDescriptions, clone.ParameterDescriptions, Clone );
-        CloneList( apiDescription.SupportedRequestFormats, clone.SupportedRequestFormats, Clone );
-        CloneList( apiDescription.SupportedResponseTypes, clone.SupportedResponseTypes, Clone );
-
-        return clone;
-    }
-
-    internal static ApiRequestFormat Clone( this ApiRequestFormat requestFormat )
-    {
-        return new()
-        {
-            Formatter = requestFormat.Formatter,
-            MediaType = requestFormat.MediaType,
-        };
-    }
-
-    internal static ApiResponseType Clone( this ApiResponseType responseType )
-    {
-        var clone = new ApiResponseType()
-        {
-            IsDefaultResponse = responseType.IsDefaultResponse,
-            ModelMetadata = responseType.ModelMetadata,
-            StatusCode = responseType.StatusCode,
-            Type = responseType.Type,
-        };
-
-        CloneList( responseType.ApiResponseFormats, clone.ApiResponseFormats, Clone );
-
-        return clone;
     }
 
     private static ApiParameterDescription Clone( ApiParameterDescription parameterDescription )

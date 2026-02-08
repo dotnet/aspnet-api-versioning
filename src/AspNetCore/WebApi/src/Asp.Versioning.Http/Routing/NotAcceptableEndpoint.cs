@@ -16,5 +16,6 @@ internal sealed class NotAcceptableEndpoint : Endpoint
                 options,
                 StatusCodes.Status406NotAcceptable ),
             Empty,
-            Name ) { }
+            Name )
+    { }
 }

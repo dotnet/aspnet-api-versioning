@@ -6,20 +6,23 @@ namespace System.Collections.Generic;
 
 internal static class CollectionExtensions
 {
-    internal static int IndexOf<TItem>( this IEnumerable<TItem> sequence, TItem item, IEqualityComparer<TItem> comparer )
+    extension<T>( IEnumerable<T> sequence )
     {
-        var index = 0;
-
-        foreach ( var element in sequence )
+        internal int IndexOf( T item, IEqualityComparer<T> comparer )
         {
-            if ( comparer.Equals( element, item ) )
+            var index = 0;
+
+            foreach ( var element in sequence )
             {
-                return index;
+                if ( comparer.Equals( element, item ) )
+                {
+                    return index;
+                }
+
+                index++;
             }
 
-            index++;
+            return -1;
         }
-
-        return -1;
     }
 }

@@ -17,7 +17,7 @@ public class ApiVersionModelBinder : IModelBinder
     {
         ArgumentNullException.ThrowIfNull( bindingContext );
 
-        var feature = bindingContext.HttpContext.ApiVersioningFeature();
+        var feature = bindingContext.HttpContext.ApiVersioningFeature;
         var model = feature.RequestedApiVersion;
 
         if ( model != null )

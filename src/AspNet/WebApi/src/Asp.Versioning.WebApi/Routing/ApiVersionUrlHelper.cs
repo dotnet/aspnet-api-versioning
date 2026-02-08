@@ -55,7 +55,7 @@ public class ApiVersionUrlHelper : UrlHelper
             return routeValues;
         }
 
-        var properties = Request.ApiVersionProperties();
+        var properties = Request.ApiVersionProperties;
         var key = properties.RouteParameter;
 
         if ( string.IsNullOrEmpty( key ) )

@@ -16,7 +16,7 @@ public partial class ApiExplorerOptions
     /// Initializes a new instance of the <see cref="ApiExplorerOptions"/> class.
     /// </summary>
     /// <param name="configuration">The current <see cref="HttpConfiguration">configuration</see> associated with the options.</param>
-    public ApiExplorerOptions( HttpConfiguration configuration ) => options = new( configuration.GetApiVersioningOptions );
+    public ApiExplorerOptions( HttpConfiguration configuration ) => options = new( () => configuration.ApiVersioningOptions );
 
     /// <summary>
     /// Gets the default API version applied to services that do not have explicit versions.

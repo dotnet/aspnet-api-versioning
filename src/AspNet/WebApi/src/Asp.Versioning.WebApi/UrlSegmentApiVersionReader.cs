@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
 namespace Asp.Versioning;
+
 using System.Web.Http;
 
 /// <content>
@@ -11,7 +12,7 @@ public partial class UrlSegmentApiVersionReader
     /// <inheritdoc />
     public virtual IReadOnlyList<string> Read( HttpRequestMessage request )
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull( request );
 
         if ( reentrant )
         {
@@ -19,7 +20,7 @@ public partial class UrlSegmentApiVersionReader
         }
 
         reentrant = true;
-        var versions = request.ApiVersionProperties().RawRequestedApiVersions;
+        var versions = request.ApiVersionProperties.RawRequestedApiVersions;
         reentrant = false;
 
         return versions;

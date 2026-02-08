@@ -21,12 +21,12 @@ builder.Services.AddApiVersioning(
                         // apply api versions using conventions rather than attributes
                         options.Conventions.Controller<OrdersController>()
                                            .HasApiVersion( 1.0 );
-                
+
                         options.Conventions.Controller<PeopleController>()
                                            .HasApiVersion( 1.0 )
                                            .HasApiVersion( 2.0 )
                                            .Action( c => c.Patch( default, default, default ) ).MapToApiVersion( 2.0 );
-                
+
                         options.Conventions.Controller<People2Controller>()
                                            .HasApiVersion( 3.0 );
                     } )
@@ -38,10 +38,10 @@ builder.Services.AddApiVersioning(
                         // is merely illustrating that they can coexist and allows you
                         // to easily experiment with either configuration. one of these
                         // would be removed in a real application.
-                
+
                         // WHEN VERSIONING BY: query string, header, or media type
                         options.AddRouteComponents( "api" );
-                
+
                         // WHEN VERSIONING BY: url segment
                         options.AddRouteComponents( "api/v{version:apiVersion}" );
                     } );

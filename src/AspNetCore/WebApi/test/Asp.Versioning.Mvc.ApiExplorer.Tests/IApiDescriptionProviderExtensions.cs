@@ -7,13 +7,16 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 internal static class IApiDescriptionProviderExtensions
 {
-    internal static IReadOnlyList<ApiDescription> Execute( this IApiDescriptionProvider apiDescriptionProvider, ActionDescriptor actionDescriptor )
+    extension( IApiDescriptionProvider apiDescriptionProvider )
     {
-        var context = new ApiDescriptionProviderContext( [actionDescriptor] );
+        internal IReadOnlyList<ApiDescription> Execute( ActionDescriptor actionDescriptor )
+        {
+            var context = new ApiDescriptionProviderContext( [actionDescriptor] );
 
-        apiDescriptionProvider.OnProvidersExecuting( context );
-        apiDescriptionProvider.OnProvidersExecuted( context );
+            apiDescriptionProvider.OnProvidersExecuting( context );
+            apiDescriptionProvider.OnProvidersExecuted( context );
 
-        return [.. context.Results];
+            return [.. context.Results];
+        }
     }
 }

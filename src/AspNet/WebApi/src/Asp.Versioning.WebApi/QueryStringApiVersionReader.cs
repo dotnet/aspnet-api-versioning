@@ -10,7 +10,7 @@ public partial class QueryStringApiVersionReader
     /// <inheritdoc />
     public virtual IReadOnlyList<string> Read( HttpRequestMessage request )
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull( request );
 
         var count = ParameterNames.Count;
 

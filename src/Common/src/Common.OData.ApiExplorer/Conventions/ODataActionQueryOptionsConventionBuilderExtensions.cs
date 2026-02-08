@@ -27,203 +27,169 @@ using static System.Reflection.BindingFlags;
 #endif
 public static class ODataActionQueryOptionsConventionBuilderExtensions
 {
-    /// <summary>
-    /// Allows the $orderby query option.
-    /// </summary>
     /// <param name="builder">The extended convention builder.</param>
-    /// <param name="maxNodeCount">The maximum number of expressions in the $orderby query option or zero to indicate the default.</param>
-    /// <param name="properties">The array of property names that can appear in the $orderby query option.
-    /// An empty array indicates that any property can appear in the $orderby query option.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder AllowOrderBy(
-        this ODataActionQueryOptionsConventionBuilder builder,
-        int maxNodeCount,
-        params string[] properties )
+    extension( ODataActionQueryOptionsConventionBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
+        /// <summary>
+        /// Allows the $orderby query option.
+        /// </summary>
+        /// <param name="maxNodeCount">The maximum number of expressions in the $orderby query option or zero to indicate the default.</param>
+        /// <param name="properties">The array of property names that can appear in the $orderby query option.
+        /// An empty array indicates that any property can appear in the $orderby query option.</param>
+        public ODataActionQueryOptionsConventionBuilder AllowOrderBy( int maxNodeCount, params string[] properties )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
+        }
+
+        /// <summary>
+        /// Allows the $orderby query option.
+        /// </summary>
+        /// <param name="properties">The <see cref="IEnumerable{T}">sequence</see> of property names that can appear in the $orderby query option.
+        /// An empty sequence indicates that any property can appear in the $orderby query option.</param>
+        public ODataActionQueryOptionsConventionBuilder AllowOrderBy( IEnumerable<string> properties )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.AllowOrderBy( default, properties );
+        }
+
+        /// <summary>
+        /// Allows the $orderby query option.
+        /// </summary>
+        /// <param name="properties">The array of property names that can appear in the $orderby query option.
+        /// An empty array indicates that any property can appear in the $orderby query option.</param>
+        public ODataActionQueryOptionsConventionBuilder AllowOrderBy( params string[] properties )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.AllowOrderBy( default, properties.AsEnumerable() );
+        }
     }
 
-    /// <summary>
-    /// Allows the $orderby query option.
-    /// </summary>
-    /// <param name="builder">The extended convention builder.</param>
-    /// <param name="properties">The <see cref="IEnumerable{T}">sequence</see> of property names that can appear in the $orderby query option.
-    /// An empty sequence indicates that any property can appear in the $orderby query option.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder AllowOrderBy(
-        this ODataActionQueryOptionsConventionBuilder builder,
-        IEnumerable<string> properties )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.AllowOrderBy( default, properties );
-    }
-
-    /// <summary>
-    /// Allows the $orderby query option.
-    /// </summary>
-    /// <param name="builder">The extended convention builder.</param>
-    /// <param name="properties">The array of property names that can appear in the $orderby query option.
-    /// An empty array indicates that any property can appear in the $orderby query option.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder AllowOrderBy(
-        this ODataActionQueryOptionsConventionBuilder builder,
-        params string[] properties )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.AllowOrderBy( default, properties.AsEnumerable() );
-    }
-
-    /// <summary>
-    /// Allows the $orderby query option.
-    /// </summary>
     /// <typeparam name="T">The type of controller.</typeparam>
     /// <param name="builder">The extended convention builder.</param>
-    /// <param name="maxNodeCount">The maximum number of expressions in the $orderby query option or zero to indicate the default.</param>
-    /// <param name="properties">The array of property names that can appear in the $orderby query option.
-    /// An empty array indicates that any property can appear in the $orderby query option.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy<T>(
-        this ODataActionQueryOptionsConventionBuilder<T> builder,
-        int maxNodeCount,
-        params string[] properties )
+    extension<T>( ODataActionQueryOptionsConventionBuilder<T> builder )
         where T : notnull
 #if NETFRAMEWORK
-        , IHttpController
+            , IHttpController
 #endif
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
+        /// <summary>
+        /// Allows the $orderby query option.
+        /// </summary>
+        /// <param name="maxNodeCount">The maximum number of expressions in the $orderby query option or zero to indicate the default.</param>
+        /// <param name="properties">The array of property names that can appear in the $orderby query option.
+        /// An empty array indicates that any property can appear in the $orderby query option.</param>
+        public ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy( int maxNodeCount, params string[] properties )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.AllowOrderBy( maxNodeCount, properties.AsEnumerable() );
+        }
+
+        /// <summary>
+        /// Allows the $orderby query option.
+        /// </summary>
+        /// <param name="properties">The <see cref="IEnumerable{T}">sequence</see> of property names that can appear in the $orderby query option.
+        /// An empty sequence indicates that any property can appear in the $orderby query option.</param>
+        public ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy( IEnumerable<string> properties )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.AllowOrderBy( default, properties );
+        }
+
+        /// <summary>
+        /// Allows the $orderby query option.
+        /// </summary>
+        /// <param name="properties">The array of property names that can appear in the $orderby query option.
+        /// An empty array indicates that any property can appear in the $orderby query option.</param>
+        public ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy( params string[] properties )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            return builder.AllowOrderBy( default, properties.AsEnumerable() );
+        }
     }
 
-    /// <summary>
-    /// Allows the $orderby query option.
-    /// </summary>
-    /// <typeparam name="T">The type of controller.</typeparam>
-    /// <param name="builder">The extended convention builder.</param>
-    /// <param name="properties">The <see cref="IEnumerable{T}">sequence</see> of property names that can appear in the $orderby query option.
-    /// An empty sequence indicates that any property can appear in the $orderby query option.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy<T>(
-        this ODataActionQueryOptionsConventionBuilder<T> builder,
-        IEnumerable<string> properties )
-        where T : notnull
-#if NETFRAMEWORK
-        , IHttpController
-#endif
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.AllowOrderBy( default, properties );
-    }
-
-    /// <summary>
-    /// Allows the $orderby query option.
-    /// </summary>
-    /// <typeparam name="T">The type of controller.</typeparam>
-    /// <param name="builder">The extended convention builder.</param>
-    /// <param name="properties">The array of property names that can appear in the $orderby query option.
-    /// An empty array indicates that any property can appear in the $orderby query option.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder<T> AllowOrderBy<T>(
-        this ODataActionQueryOptionsConventionBuilder<T> builder,
-        params string[] properties )
-        where T : notnull
-#if NETFRAMEWORK
-        , IHttpController
-#endif
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        return builder.AllowOrderBy( default, properties.AsEnumerable() );
-    }
-
-    /// <summary>
-    /// Gets or creates the convention builder for the specified controller action method.
-    /// </summary>
     /// <typeparam name="TController">The type of controller.</typeparam>
     /// <param name="builder">The extended <see cref="IODataActionQueryOptionsConventionBuilder{T}"/>.</param>
-    /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
-    /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder<TController> Action<TController>(
-        this IODataActionQueryOptionsConventionBuilder<TController> builder,
-        Expression<Action<TController>> actionExpression )
+    extension<TController>( IODataActionQueryOptionsConventionBuilder<TController> builder )
         where TController : notnull
 #if NETFRAMEWORK
        , IHttpController
 #endif
     {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( actionExpression );
-        return builder.Action( actionExpression.ExtractMethod() );
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller action method.
+        /// </summary>
+        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
+        /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
+        public ODataActionQueryOptionsConventionBuilder<TController> Action( Expression<Action<TController>> actionExpression )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            ArgumentNullException.ThrowIfNull( actionExpression );
+            return builder.Action( actionExpression.ExtractMethod() );
+        }
+
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller action method.
+        /// </summary>
+        /// <typeparam name="TResult">The type of action result.</typeparam>
+        /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
+        /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
+        public ODataActionQueryOptionsConventionBuilder<TController> Action<TResult>( Expression<Func<TController, TResult>> actionExpression )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+            ArgumentNullException.ThrowIfNull( actionExpression );
+            return builder.Action( actionExpression.ExtractMethod() );
+        }
     }
 
-    /// <summary>
-    /// Gets or creates the convention builder for the specified controller action method.
-    /// </summary>
-    /// <typeparam name="TController">The type of controller.</typeparam>
-    /// <typeparam name="TResult">The type of action result.</typeparam>
-    /// <param name="builder">The extended <see cref="IODataActionQueryOptionsConventionBuilder{T}"/>.</param>
-    /// <param name="actionExpression">The <see cref="Expression{TDelegate}">expression</see> representing the controller action method.</param>
-    /// <returns>A new or existing <see cref="ODataActionQueryOptionsConventionBuilder{T}"/>.</returns>
-    public static ODataActionQueryOptionsConventionBuilder<TController> Action<TController, TResult>(
-        this IODataActionQueryOptionsConventionBuilder<TController> builder,
-        Expression<Func<TController, TResult>> actionExpression )
-        where TController : notnull
-#if NETFRAMEWORK
-       , IHttpController
-#endif
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( actionExpression );
-        return builder.Action( actionExpression.ExtractMethod() );
-    }
-
-    /// <summary>
-    /// Gets or creates the convention builder for the specified controller action method.
-    /// </summary>
     /// <param name="builder">The extended convention builder.</param>
-    /// <param name="methodName">The name of the action method.</param>
-    /// <param name="argumentTypes">The optional array of action method argument types.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    /// <remarks>The specified <paramref name="methodName">method name</paramref> must refer to a public, non-static action method.
-    /// If there is only one corresponding match found, then the <paramref name="argumentTypes">argument types</paramref> are ignored;
-    /// otherwise, the <paramref name="argumentTypes">argument types</paramref> are used for method overload resolution. Action
-    /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
+    extension( IODataActionQueryOptionsConventionBuilder builder )
+    {
+        /// <summary>
+        /// Gets or creates the convention builder for the specified controller action method.
+        /// </summary>
+        /// <param name="methodName">The name of the action method.</param>
+        /// <param name="argumentTypes">The optional array of action method argument types.</param>
+        /// <remarks>The specified <paramref name="methodName">method name</paramref> must refer to a public, non-action method.
+        /// If there is only one corresponding match found, then the <paramref name="argumentTypes">argument types</paramref> are ignored;
+        /// otherwise, the <paramref name="argumentTypes">argument types</paramref> are used for method overload resolution. Action
+        /// methods that have the <see cref="NonActionAttribute"/> applied will also be ignored.</remarks>
 #if !NETFRAMEWORK
-    [UnconditionalSuppressMessage( "ILLink", "IL2075", Justification = "Controller types and actions are never trimmed" )]
+        [UnconditionalSuppressMessage( "ILLink", "IL2075", Justification = "Controller types and actions are never trimmed" )]
 #endif
-    public static ODataActionQueryOptionsConventionBuilder Action(
-        this IODataActionQueryOptionsConventionBuilder builder,
-        string methodName,
-        params Type[] argumentTypes )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( argumentTypes );
-
-        string message;
-        var methods = builder.ControllerType
-                             .GetMethods( Instance | Public )
-                             .Where( m => m.Name == methodName && IsAction( m ) )
-                             .ToArray();
-
-        switch ( methods.Length )
+        public ODataActionQueryOptionsConventionBuilder Action( string methodName, params Type[] argumentTypes )
         {
-            case 0:
-                message = string.Format( CultureInfo.CurrentCulture, Format.ActionMethodNotFound, methodName );
-                throw new MissingMethodException( message );
-            case 1:
+            ArgumentNullException.ThrowIfNull( builder );
+            ArgumentNullException.ThrowIfNull( argumentTypes );
+
+            string message;
+            var methods = builder.ControllerType
+                                 .GetMethods( Instance | Public )
+                                 .Where( m => m.Name == methodName && IsAction( m ) )
+                                 .ToArray();
+
+            switch ( methods.Length )
+            {
+                case 0:
+                    message = string.Format( CultureInfo.CurrentCulture, Format.ActionMethodNotFound, methodName );
+                    throw new MissingMethodException( message );
+                case 1:
+                    return builder.Action( methods[0] );
+            }
+
+            // perf: stop if there are 2+ matches; it's ambiguous
+            methods = [.. methods.Where( m => SignatureMatches( m, argumentTypes ) ).Take( 2 )];
+
+            if ( methods.Length == 1 )
+            {
                 return builder.Action( methods[0] );
+            }
+
+            message = string.Format( CultureInfo.CurrentCulture, Format.AmbiguousActionMethod, methodName );
+            throw new AmbiguousMatchException( message );
         }
-
-        // perf: stop if there are 2+ matches; it's ambiguous
-        methods = [.. methods.Where( m => SignatureMatches( m, argumentTypes ) ).Take( 2 )];
-
-        if ( methods.Length == 1 )
-        {
-            return builder.Action( methods[0] );
-        }
-
-        message = string.Format( CultureInfo.CurrentCulture, Format.AmbiguousActionMethod, methodName );
-        throw new AmbiguousMatchException( message );
     }
 
     private static bool IsAction( MethodInfo method )

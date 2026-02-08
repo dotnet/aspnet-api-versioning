@@ -8,6 +8,8 @@ using System.Net.Http.Formatting;
 
 internal static class MediaTypeFormatterExtensions
 {
-    internal static MediaTypeFormatter Clone( this MediaTypeFormatter formatter ) =>
-        MediaTypeFormatterAdapterFactory.GetOrCreateCloneFunction( formatter )( formatter );
+    extension( MediaTypeFormatter formatter )
+    {
+        internal MediaTypeFormatter Clone() => MediaTypeFormatterAdapterFactory.GetOrCreateCloneFunction( formatter )( formatter );
+    }
 }

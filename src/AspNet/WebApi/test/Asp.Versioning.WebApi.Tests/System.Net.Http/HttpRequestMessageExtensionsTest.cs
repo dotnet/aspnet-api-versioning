@@ -24,7 +24,7 @@ public class HttpRequestMessageExtensionsTest
         request.SetConfiguration( configuration );
 
         // act
-        var version = request.GetRequestedApiVersion();
+        var version = request.RequestedApiVersion;
 
         // assert
         version.Should().BeNull();
@@ -55,7 +55,7 @@ public class HttpRequestMessageExtensionsTest
         }
 
         // act
-        var version = request.GetRequestedApiVersion();
+        var version = request.RequestedApiVersion;
 
         // assert
         version.Should().BeNull();
@@ -73,11 +73,11 @@ public class HttpRequestMessageExtensionsTest
         request.SetConfiguration( configuration );
 
         // act
-        var version = request.GetRequestedApiVersion();
+        var version = request.RequestedApiVersion;
 
         // assert
         version.Should().Be( requestedVersion );
-        request.ApiVersionProperties().RequestedApiVersion.Should().Be( requestedVersion );
+        request.ApiVersionProperties.RequestedApiVersion.Should().Be( requestedVersion );
     }
 
     [Theory]
@@ -98,10 +98,10 @@ public class HttpRequestMessageExtensionsTest
         request.Headers.Add( headerName, requestedVersion.ToString() );
 
         // act
-        var version = request.GetRequestedApiVersion();
+        var version = request.RequestedApiVersion;
 
         // assert
         version.Should().Be( requestedVersion );
-        request.ApiVersionProperties().RequestedApiVersion.Should().Be( requestedVersion );
+        request.ApiVersionProperties.RequestedApiVersion.Should().Be( requestedVersion );
     }
 }

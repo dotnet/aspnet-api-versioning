@@ -82,7 +82,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         ArgumentNullException.ThrowIfNull( httpContext );
         ArgumentNullException.ThrowIfNull( candidates );
 
-        var feature = httpContext.ApiVersioningFeature();
+        var feature = httpContext.ApiVersioningFeature;
         var apiVersion = feature.RequestedApiVersion;
 
         if ( apiVersion == null && Options.AssumeDefaultVersionWhenUnspecified )

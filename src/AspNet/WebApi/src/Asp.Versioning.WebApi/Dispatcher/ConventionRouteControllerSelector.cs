@@ -66,7 +66,7 @@ internal sealed class ConventionRouteControllerSelector : ControllerSelector
 
         var message = string.Format(
             CultureInfo.CurrentCulture,
-            SR.DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate,
+            BackportSR.DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate,
             controllerName,
             route.RouteTemplate,
             builder,

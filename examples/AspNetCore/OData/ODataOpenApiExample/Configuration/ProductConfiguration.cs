@@ -19,7 +19,7 @@ public class ProductConfiguration : IModelConfiguration
         }
 
         var product = builder.EntitySet<Product>( "Products" ).EntityType;
-        
+
         product.HasKey( p => p.Id );
         product.Page( maxTopValue: 100, pageSizeValue: default );
     }

@@ -10,9 +10,9 @@ public class ValuesController : ApiController
 {
     [Route]
     public IHttpActionResult Get() =>
-        Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+        Ok( new { controller = GetType().Name, version = Request.RequestedApiVersion.ToString() } );
 
     [Route( "{id}" )]
     public IHttpActionResult Get( string id ) =>
-        Ok( new { controller = GetType().Name, Id = id, version = Request.GetRequestedApiVersion().ToString() } );
+        Ok( new { controller = GetType().Name, Id = id, version = Request.RequestedApiVersion.ToString() } );
 }

@@ -37,7 +37,7 @@ public class ApiVersionRequestProperties
     /// <value>The unparsed API version values for the current request.</value>
     public IReadOnlyList<string> RawRequestedApiVersions
     {
-        get => rawApiVersions ??= request.GetApiVersioningOptions().ApiVersionReader.Read( request );
+        get => rawApiVersions ??= request.ApiVersioningOptions.ApiVersionReader.Read( request );
         set => rawApiVersions = [.. value];
     }
 
@@ -56,7 +56,7 @@ public class ApiVersionRequestProperties
                 0 => default,
                 1 => values[0],
                 _ => throw new AmbiguousApiVersionException(
-                        string.Format( CultureInfo.CurrentCulture, CommonSR.MultipleDifferentApiVersionsRequested, string.Join( ", ", values ) ),
+                        string.Format( CultureInfo.CurrentCulture, Format.MultipleDifferentApiVersionsRequested, string.Join( ", ", values ) ),
                         values ),
             };
         }
@@ -88,7 +88,7 @@ public class ApiVersionRequestProperties
                 return apiVersion;
             }
 
-            var parser = request.GetConfiguration().GetApiVersionParser();
+            var parser = request.GetConfiguration().ApiVersionParser;
 
             try
             {

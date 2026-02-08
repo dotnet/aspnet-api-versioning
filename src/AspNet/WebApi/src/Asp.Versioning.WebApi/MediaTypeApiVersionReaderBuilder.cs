@@ -34,7 +34,7 @@ public partial class MediaTypeApiVersionReaderBuilder
 
             if ( segments.Count() > 1 )
             {
-                var message = string.Format( CultureInfo.CurrentCulture, CommonSR.InvalidMediaTypeTemplate, template );
+                var message = string.Format( CultureInfo.CurrentCulture, Format.InvalidMediaTypeTemplate, template );
                 throw new System.ArgumentException( message, nameof( template ) );
             }
         }

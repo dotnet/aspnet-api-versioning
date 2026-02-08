@@ -16,9 +16,9 @@ public class PeopleController : ODataController
     [ODataRoute]
     public IHttpActionResult Get( ODataQueryOptions<Person> options ) =>
         Ok( new Person[]
-        { 
+        {
             new()
-            { 
+            {
                 Id = 1,
                 FirstName = "Bill",
                 LastName = "Mei",
@@ -30,11 +30,11 @@ public class PeopleController : ODataController
     // GET ~/api/people/{id}?api-version=[1.0|2.0]
     [ODataRoute( "{id}" )]
     public IHttpActionResult Get( int id, ODataQueryOptions<Person> options ) =>
-        Ok( new Person() 
-        { 
-            Id = id, 
-            FirstName = "Bill", 
-            LastName = "Mei", 
+        Ok( new Person()
+        {
+            Id = id,
+            FirstName = "Bill",
+            LastName = "Mei",
             Email = "bill.mei@somewhere.com",
             Phone = "555-555-5555",
         } );
@@ -50,11 +50,11 @@ public class PeopleController : ODataController
         }
 
         var person = new Person()
-        { 
-            Id = id, 
-            FirstName = "Bill", 
-            LastName = "Mei", 
-            Email = "bill.mei@somewhere.com", 
+        {
+            Id = id,
+            FirstName = "Bill",
+            LastName = "Mei",
+            Email = "bill.mei@somewhere.com",
             Phone = "555-555-5555",
         };
 

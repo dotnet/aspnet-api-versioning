@@ -7,5 +7,5 @@ using System.Web.Http;
 
 public class AgreementsController : ApiController
 {
-    public IHttpActionResult Get( string accountId ) => Ok( new Agreement( GetType().FullName, accountId, Request.GetRequestedApiVersion().ToString() ) );
+    public IHttpActionResult Get( string accountId ) => Ok( new Agreement( GetType().FullName, accountId, Request.RequestedApiVersion.ToString() ) );
 }

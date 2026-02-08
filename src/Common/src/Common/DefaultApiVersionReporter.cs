@@ -37,7 +37,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
     /// <param name="deprecatedHeaderName">THe HTTP header name used for deprecated API versions.
     /// The default value is "api-deprecated-versions".</param>
     /// <param name="mapping">One or more of API versioning mappings. The default value is
-    /// <see cref="ApiVersionMapping.Explicit"/> and <see cref="ApiVersionMapping.Implicit"/>.</param>
+    /// <see cref="Explicit"/> and <see cref="Implicit"/>.</param>
     public DefaultApiVersionReporter(
         IPolicyManager<SunsetPolicy> sunsetPolicyManager,
         IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
@@ -77,12 +77,12 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 
 #if NETFRAMEWORK
         if ( response.RequestMessage is not HttpRequestMessage request ||
-             request.GetActionDescriptor()?.GetApiVersionMetadata() is not ApiVersionMetadata metadata )
+             request.GetActionDescriptor()?.ApiVersionMetadata is not ApiVersionMetadata metadata )
         {
             return;
         }
 
-        var version = request.GetRequestedApiVersion();
+        var version = request.RequestedApiVersion;
 #else
         var context = response.HttpContext;
 
@@ -91,7 +91,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
             return;
         }
 
-        var version = context.GetRequestedApiVersion();
+        var version = context.RequestedApiVersion;
 #endif
         var name = metadata.Name;
         DateTimeOffset? sunsetDate = null;

@@ -14,21 +14,25 @@ using Microsoft.Extensions.DependencyInjection;
 [CLSCompliant( false )]
 public static class IEndpointRouteBuilderExtensions
 {
-    /// <summary>
-    /// Returns a read-only list of API version descriptions.
-    /// </summary>
-    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder">endpoints</see> to build the
-    /// API version descriptions from.</param>
-    /// <returns>A new <see cref="IReadOnlyList{T}">read-only list</see> of<see cref="ApiVersionDescription">API version descriptions</see>.</returns>
-    public static IReadOnlyList<ApiVersionDescription> DescribeApiVersions( this IEndpointRouteBuilder endpoints )
+    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder">endpoints</see> to build the API version
+    /// descriptions from.</param>
+    extension( IEndpointRouteBuilder endpoints )
     {
-        ArgumentNullException.ThrowIfNull( endpoints );
+        /// <summary>
+        /// Returns a read-only list of API version descriptions.
+        /// </summary>
+        /// <returns>A new <see cref="IReadOnlyList{T}">read-only list</see> of<see cref="ApiVersionDescription">API
+        /// version descriptions</see>.</returns>
+        public IReadOnlyList<ApiVersionDescription> DescribeApiVersions()
+        {
+            ArgumentNullException.ThrowIfNull( endpoints );
 
-        var services = endpoints.ServiceProvider;
-        var factory = services.GetRequiredService<IApiVersionDescriptionProviderFactory>();
-        using var source = new CompositeEndpointDataSource( endpoints.DataSources );
-        var provider = factory.Create( source );
+            var services = endpoints.ServiceProvider;
+            var factory = services.GetRequiredService<IApiVersionDescriptionProviderFactory>();
+            using var source = new CompositeEndpointDataSource( endpoints.DataSources );
+            var provider = factory.Create( source );
 
-        return provider.ApiVersionDescriptions;
+            return provider.ApiVersionDescriptions;
+        }
     }
 }

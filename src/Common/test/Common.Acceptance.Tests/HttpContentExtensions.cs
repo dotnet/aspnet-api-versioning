@@ -22,22 +22,20 @@ internal static class HttpContentExtensions
     private static readonly IEnumerable<MediaTypeFormatter> MediaTypeFormatters = [ProblemDetailsMediaTypeFormatter];
 #endif
 
-    public static Task<ProblemDetails> ReadAsProblemDetailsAsync(
-        this HttpContent content,
-        CancellationToken cancellationToken = default ) =>
+    extension( HttpContent content )
+    {
+        public Task<ProblemDetails> ReadAsProblemDetailsAsync( CancellationToken cancellationToken = default ) =>
 #if NETFRAMEWORK
-        content.ReadAsAsync<ProblemDetails>( MediaTypeFormatters, cancellationToken );
+            content.ReadAsAsync<ProblemDetails>( MediaTypeFormatters, cancellationToken );
 #else
-        content.ReadFromJsonAsync<ProblemDetails>( cancellationToken );
+            content.ReadFromJsonAsync<ProblemDetails>( cancellationToken );
 #endif
 
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable IDE0079 // Remove unnecessary suppression
-    public static Task<T> ReadAsExampleAsync<T>(
-        this HttpContent content,
-        T example,
-        CancellationToken cancellationToken = default ) =>
-        content.ReadAsAsync<T>( cancellationToken );
+        public Task<T> ReadAsExampleAsync<T>( T example, CancellationToken cancellationToken = default ) =>
+            content.ReadAsAsync<T>( cancellationToken );
 #pragma warning restore IDE0060 // Remove unused parameter
 #pragma warning restore IDE0079 // Remove unnecessary suppression
+    }
 }

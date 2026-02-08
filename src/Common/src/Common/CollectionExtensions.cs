@@ -4,49 +4,54 @@ namespace System.Collections.Generic;
 
 internal static partial class CollectionExtensions
 {
-    internal static bool TryGetValue<TKey, TValue>(
-        this IDictionary<TKey, object?> dictionary,
-        TKey key,
-        [MaybeNullWhen( false )] out TValue value )
-        where TKey : notnull
+    extension<TKey>( IDictionary<TKey, object?> dictionary ) where TKey : notnull
     {
-        if ( dictionary.TryGetValue( key, out var val ) && val is TValue v )
+        internal bool TryGetValue<TValue>( TKey key, [MaybeNullWhen( false )] out TValue value )
         {
-            value = v;
-            return true;
-        }
+            if ( dictionary.TryGetValue( key, out var val ) && val is TValue v )
+            {
+                value = v;
+                return true;
+            }
 
-        value = default!;
-        return false;
+            value = default!;
+            return false;
+        }
     }
 
-    internal static List<T> AsList<T>( this IEnumerable<T> sequence ) => ( sequence as List<T> ) ?? [.. sequence];
-
-    internal static void AddRange<T>( this ICollection<T> collection, IEnumerable<T> items )
+    extension<T>( IEnumerable<T> sequence )
     {
-        switch ( items )
+        internal List<T> AsList() => ( sequence as List<T> ) ?? [.. sequence];
+    }
+
+    extension<T>( ICollection<T> collection )
+    {
+        internal void AddRange( IEnumerable<T> items )
         {
-            case IList<T> list:
-                for ( var i = 0; i < list.Count; i++ )
-                {
-                    collection.Add( list[i] );
-                }
+            switch ( items )
+            {
+                case IList<T> list:
+                    for ( var i = 0; i < list.Count; i++ )
+                    {
+                        collection.Add( list[i] );
+                    }
 
-                break;
-            case IReadOnlyList<T> list:
-                for ( var i = 0; i < list.Count; i++ )
-                {
-                    collection.Add( list[i] );
-                }
+                    break;
+                case IReadOnlyList<T> list:
+                    for ( var i = 0; i < list.Count; i++ )
+                    {
+                        collection.Add( list[i] );
+                    }
 
-                break;
-            default:
-                foreach ( var item in items )
-                {
-                    collection.Add( item );
-                }
+                    break;
+                default:
+                    foreach ( var item in items )
+                    {
+                        collection.Add( item );
+                    }
 
-                break;
+                    break;
+            }
         }
     }
 }

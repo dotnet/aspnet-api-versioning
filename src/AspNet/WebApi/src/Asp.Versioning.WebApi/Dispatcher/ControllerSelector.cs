@@ -23,7 +23,7 @@ internal abstract class ControllerSelector
         for ( var i = 0; i < candidates.Count; i++ )
         {
             var action = candidates[i].ActionDescriptor;
-            var metadata = action.GetApiVersionMetadata();
+            var metadata = action.ApiVersionMetadata;
 
             switch ( metadata.MappingTo( apiVersion ) )
             {
@@ -43,7 +43,7 @@ internal abstract class ControllerSelector
                 bestMatches.UnionWith( implicitMatches );
                 break;
             case 1:
-                if ( bestMatch!.GetApiVersionMetadata().IsApiVersionNeutral )
+                if ( bestMatch!.ApiVersionMetadata.IsApiVersionNeutral )
                 {
                     bestMatches.UnionWith( implicitMatches );
                 }

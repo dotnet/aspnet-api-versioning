@@ -58,7 +58,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
 
         if ( pathTemplateHandler is IODataPathHandler pathHandler && pathHandler.UrlKeyDelimiter == null )
         {
-            pathHandler.UrlKeyDelimiter = configuration.GetUrlKeyDelimiter();
+            pathHandler.UrlKeyDelimiter = configuration.UrlKeyDelimiter;
         }
     }
 
@@ -88,7 +88,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
             throw new ArgumentNullException( nameof( controller ) );
         }
 
-        var model = controller.GetApiVersionModel();
+        var model = controller.ApiVersionModel;
         return model.IsApiVersionNeutral || model.DeclaredApiVersions.Contains( apiVersion );
     }
 
@@ -107,7 +107,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
             throw new ArgumentNullException( nameof( action ) );
         }
 
-        return action.GetApiVersionMetadata().IsMappedTo( apiVersion );
+        return action.ApiVersionMetadata.IsMappedTo( apiVersion );
     }
 
     /// <summary>
@@ -221,7 +221,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
             return version;
         }
 
-        var options = request.GetApiVersioningOptions();
+        var options = request.ApiVersioningOptions;
 
         if ( !options.AssumeDefaultVersionWhenUnspecified )
         {
@@ -229,7 +229,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
         }
 
         var modelSelector = request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();
-        var versionSelector = request.GetApiVersioningOptions().ApiVersionSelector;
+        var versionSelector = request.ApiVersioningOptions.ApiVersionSelector;
         var model = new ApiVersionModel( modelSelector.ApiVersions, [] );
 
         return versionSelector.SelectVersion( request, model );
@@ -327,7 +327,7 @@ public class VersionedAttributeRoutingConvention : IODataRoutingConvention
         {
             foreach ( var controller in controllers[i].AsEnumerable() )
             {
-                if ( !controller.ControllerType.IsODataController() || !ShouldMapController( controller, version ) )
+                if ( !controller.ControllerType.IsODataController || !ShouldMapController( controller, version ) )
                 {
                     continue;
                 }

@@ -196,7 +196,7 @@ public class DefaultMetadataMatcherPolicy : MatcherPolicy, INodeBuilderPolicy
             // we don't want to set an implicit api version if it exists in the path
             // because the normal routing process will handle it. it isn't available
             // from the feature because route constraints haven't been evaluated yet
-            var feature = httpContext.ApiVersioningFeature();
+            var feature = httpContext.ApiVersioningFeature;
             var needsImplicitApiVersion =
                 feature.RawRequestedApiVersions.Count == 0 &&
                 ( !versionsByUrl ||

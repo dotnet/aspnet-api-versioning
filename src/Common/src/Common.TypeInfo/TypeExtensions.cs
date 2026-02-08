@@ -6,39 +6,47 @@ using System.ComponentModel;
 
 internal static partial class TypeExtensions
 {
-    internal static bool IsSimpleType( this Type type )
+    extension( Type type )
     {
-#if NETFRAMEWORK
-        return type.IsPrimitive ||
-#else
-        return type.IsPrimitive() ||
-#endif
-        type.Equals( typeof( string ) ) ||
-        type.Equals( typeof( decimal ) ) ||
-        type.Equals( typeof( DateTime ) ) ||
-        type.Equals( typeof( TimeSpan ) ) ||
-        type.Equals( typeof( DateTimeOffset ) ) ||
-#if !NETFRAMEWORK
-        type.Equals( typeof( DateOnly ) ) ||
-        type.Equals( typeof( TimeOnly ) ) ||
-#endif
-        type.Equals( typeof( Guid ) );
-    }
-
-    internal static bool IsSimpleUnderlyingType( this Type type )
-    {
-        var underlyingType = Nullable.GetUnderlyingType( type );
-
-        if ( underlyingType != null )
+        internal bool IsSimpleType
         {
-            type = underlyingType;
+            get
+            {
+#if NETFRAMEWORK
+                return type.IsPrimitive ||
+#else
+                return type.IsPrimitive() ||
+#endif
+                type.Equals( typeof( string ) ) ||
+                type.Equals( typeof( decimal ) ) ||
+                type.Equals( typeof( DateTime ) ) ||
+                type.Equals( typeof( TimeSpan ) ) ||
+                type.Equals( typeof( DateTimeOffset ) ) ||
+#if !NETFRAMEWORK
+                type.Equals( typeof( DateOnly ) ) ||
+                type.Equals( typeof( TimeOnly ) ) ||
+#endif
+                type.Equals( typeof( Guid ) );
+            }
         }
 
-        return type.IsSimpleType();
+        internal bool IsSimpleUnderlyingType
+        {
+            get
+            {
+                var underlyingType = Nullable.GetUnderlyingType( type );
+
+                if ( underlyingType != null )
+                {
+                    type = underlyingType;
+                }
+
+                return type.IsSimpleType;
+            }
+        }
+
+        internal bool HasStringConverter => TypeDescriptor.GetConverter( type ).CanConvertFrom( typeof( string ) );
+
+        internal bool CanConvertFromString => type.IsSimpleUnderlyingType || type.HasStringConverter;
     }
-
-    internal static bool HasStringConverter( this Type type ) =>
-        TypeDescriptor.GetConverter( type ).CanConvertFrom( typeof( string ) );
-
-    internal static bool CanConvertFromString( this Type type ) => type.IsSimpleUnderlyingType() || type.HasStringConverter();
 }

@@ -22,113 +22,113 @@ using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 [CLSCompliant( false )]
 public static partial class IServiceCollectionExtensions
 {
-    /// <summary>
-    /// Adds service API versioning to the specified services collection.
-    /// </summary>
     /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
-    /// <returns>The <see cref="IApiVersioningBuilder">builder</see> used to configure API versioning.</returns>
-    public static IApiVersioningBuilder AddApiVersioning( this IServiceCollection services )
+    extension( IServiceCollection services )
     {
-        AddApiVersioningServices( services );
-        return new ApiVersioningBuilder( services );
+        /// <summary>
+        /// Adds service API versioning to the specified services collection.
+        /// </summary>
+        /// <returns>The <see cref="IApiVersioningBuilder">builder</see> used to configure API versioning.</returns>
+        public IApiVersioningBuilder AddApiVersioning()
+        {
+            AddApiVersioningServices( services );
+            return new ApiVersioningBuilder( services );
+        }
+
+        /// <summary>
+        /// Adds service API versioning to the specified services collection.
+        /// </summary>
+        /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
+        /// <returns>The <see cref="IApiVersioningBuilder">builder</see> used to configure API versioning.</returns>
+        public IApiVersioningBuilder AddApiVersioning( Action<ApiVersioningOptions> setupAction )
+        {
+            AddApiVersioningServices( services );
+            services.Configure( setupAction );
+            return new ApiVersioningBuilder( services );
+        }
+
+        /// <summary>
+        /// Adds error object support in problem details.
+        /// </summary>
+        /// <param name="setup">The <see cref="JsonOptions">JSON options</see> setup <see cref="Action{T}"/> to perform, if any.</param>
+        /// <remarks>
+        /// <para>
+        /// This method is only intended to provide backward compatibility with previous library versions by converting
+        /// <see cref="AspNetCore.Mvc.ProblemDetails"/> into Error Objects that conform to the
+        /// <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
+        /// in the Microsoft REST API Guidelines and
+        /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.
+        /// </para>
+        /// <para>
+        /// This method should be called before <see cref="ProblemDetailsServiceCollectionExtensions.AddProblemDetails(IServiceCollection)"/>.
+        /// </para>
+        /// </remarks>
+        public IServiceCollection AddErrorObjects( Action<JsonOptions>? setup = default ) =>
+            AddErrorObjects<ErrorObjectWriter>( services, setup );
+
+        /// <summary>
+        /// Adds error object support in problem details.
+        /// </summary>
+        /// <typeparam name="TWriter">The type of <see cref="ErrorObjectWriter"/>.</typeparam>
+        /// <param name="setup">The <see cref="JsonOptions">JSON options</see> setup <see cref="Action{T}"/> to perform, if any.</param>
+        /// <remarks>
+        /// <para>
+        /// This method is only intended to provide backward compatibility with previous library versions by converting
+        /// <see cref="AspNetCore.Mvc.ProblemDetails"/> into Error Objects that conform to the
+        /// <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
+        /// in the Microsoft REST API Guidelines and
+        /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.
+        /// </para>
+        /// <para>
+        /// This method should be called before <see cref="ProblemDetailsServiceCollectionExtensions.AddProblemDetails(IServiceCollection)"/>.
+        /// </para>
+        /// </remarks>
+        public IServiceCollection AddErrorObjects<[DynamicallyAccessedMembers( PublicConstructors )] TWriter>(
+            Action<JsonOptions>? setup = default )
+            where TWriter : ErrorObjectWriter
+        {
+            ArgumentNullException.ThrowIfNull( services );
+
+            services.TryAddEnumerable( Singleton<IProblemDetailsWriter, TWriter>() );
+            services.Configure( setup ?? DefaultErrorObjectJsonConfig );
+
+            return services;
+        }
     }
 
-    /// <summary>
-    /// Adds service API versioning to the specified services collection.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
-    /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
-    /// <returns>The <see cref="IApiVersioningBuilder">builder</see> used to configure API versioning.</returns>
-    public static IApiVersioningBuilder AddApiVersioning( this IServiceCollection services, Action<ApiVersioningOptions> setupAction )
-    {
-        AddApiVersioningServices( services );
-        services.Configure( setupAction );
-        return new ApiVersioningBuilder( services );
-    }
-
-    /// <summary>
-    /// Enables binding the <see cref="ApiVersion"/> type in Minimal API parameters..
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
+    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">builder</see>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    public static IApiVersioningBuilder EnableApiVersionBinding( this IApiVersioningBuilder builder )
+    extension( IApiVersioningBuilder builder )
     {
-        ArgumentNullException.ThrowIfNull( builder );
+        /// <summary>
+        /// Enables binding the <see cref="ApiVersion"/> type in Minimal API parameters..
+        /// </summary>
+        public IApiVersioningBuilder EnableApiVersionBinding()
+        {
+            ArgumentNullException.ThrowIfNull( builder );
 
-        // currently required because there is no other hook.
-        // 1. TryParse does not work because:
-        //    a. Parsing is delegated to IApiVersionParser.TryParse
-        //    b. The result can come from multiple locations
-        //    c. There can be multiple results
-        // 2. BindAsync does not work because:
-        //    a. It is static and must be on the ApiVersion type
-        //    b. It is specific to ASP.NET Core
-        builder.Services.AddHttpContextAccessor();
+            // currently required because there is no other hook.
+            // 1. TryParse does not work because:
+            //    a. Parsing is delegated to IApiVersionParser.TryParse
+            //    b. The result can come from multiple locations
+            //    c. There can be multiple results
+            // 2. BindAsync does not work because:
+            //    a. It is static and must be on the ApiVersion type
+            //    b. It is specific to ASP.NET Core
+            builder.Services.AddHttpContextAccessor();
 
-        // this registration is 'truthy'. it is possible for the requested API version to be null; however, but the time this is
-        // resolved for a request delegate it can only be null if the API is version-neutral and no API version was requested. this
-        // should be a rare and nonsensical scenario. declaring the parameter as ApiVersion? should be expect and solve the issue
-        //
-        // it should also be noted that this registration allows resolving the requested API version from virtually any context.
-        // that is not intended, which is why this extension is not named something more general such as AddApiVersionAsService.
-        // if/when a better parameter binding mechanism becomes available, this method is expected to become obsolete, no-op, and
-        // eventually go away.
-        builder.Services.AddTransient( sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetRequestedApiVersion()! );
+            // this registration is 'truthy'. it is possible for the requested API version to be null; however, but the time this is
+            // resolved for a request delegate it can only be null if the API is version-neutral and no API version was requested. this
+            // should be a rare and nonsensical scenario. declaring the parameter as ApiVersion? should be expect and solve the issue
+            //
+            // it should also be noted that this registration allows resolving the requested API version from virtually any context.
+            // that is not intended, which is why this extension is not named something more general such as AddApiVersionAsService.
+            // if/when a better parameter binding mechanism becomes available, this method is expected to become obsolete, no-op, and
+            // eventually go away.
+            builder.Services.AddTransient( sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.RequestedApiVersion! );
 
-        return builder;
-    }
-
-    /// <summary>
-    /// Adds error object support in problem details.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
-    /// <param name="setup">The <see cref="JsonOptions">JSON options</see> setup <see cref="Action{T}"/> to perform, if any.</param>
-    /// <returns>The original <paramref name="services"/>.</returns>
-    /// <remarks>
-    /// <para>
-    /// This method is only intended to provide backward compatibility with previous library versions by converting
-    /// <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/> into Error Objects that conform to the
-    /// <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
-    /// in the Microsoft REST API Guidelines and
-    /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.
-    /// </para>
-    /// <para>
-    /// This method should be called before <see cref="ProblemDetailsServiceCollectionExtensions.AddProblemDetails(IServiceCollection)"/>.
-    /// </para>
-    /// </remarks>
-    public static IServiceCollection AddErrorObjects( this IServiceCollection services, Action<JsonOptions>? setup = default ) =>
-        AddErrorObjects<ErrorObjectWriter>( services, setup );
-
-    /// <summary>
-    /// Adds error object support in problem details.
-    /// </summary>
-    /// <typeparam name="TWriter">The type of <see cref="ErrorObjectWriter"/>.</typeparam>
-    /// <param name="services">The <see cref="IServiceCollection">services</see> available in the application.</param>
-    /// <param name="setup">The <see cref="JsonOptions">JSON options</see> setup <see cref="Action{T}"/> to perform, if any.</param>
-    /// <returns>The original <paramref name="services"/>.</returns>
-    /// <remarks>
-    /// <para>
-    /// This method is only intended to provide backward compatibility with previous library versions by converting
-    /// <see cref="Microsoft.AspNetCore.Mvc.ProblemDetails"/> into Error Objects that conform to the
-    /// <a ref="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses">Error Responses</a>
-    /// in the Microsoft REST API Guidelines and
-    /// <a ref="https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793">OData Error Responses</a>.
-    /// </para>
-    /// <para>
-    /// This method should be called before <see cref="ProblemDetailsServiceCollectionExtensions.AddProblemDetails(IServiceCollection)"/>.
-    /// </para>
-    /// </remarks>
-    public static IServiceCollection AddErrorObjects<[DynamicallyAccessedMembers( PublicConstructors )] TWriter>(
-        this IServiceCollection services,
-        Action<JsonOptions>? setup = default )
-        where TWriter : ErrorObjectWriter
-    {
-        ArgumentNullException.ThrowIfNull( services );
-
-        services.TryAddEnumerable( Singleton<IProblemDetailsWriter, TWriter>() );
-        services.Configure( setup ?? DefaultErrorObjectJsonConfig );
-
-        return services;
+            return builder;
+        }
     }
 
     private static void DefaultErrorObjectJsonConfig( JsonOptions options ) =>

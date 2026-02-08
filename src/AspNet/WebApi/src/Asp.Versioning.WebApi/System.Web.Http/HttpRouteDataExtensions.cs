@@ -9,32 +9,38 @@ using System.Web.Http.Routing;
 
 internal static class HttpRouteDataExtensions
 {
-    internal static CandidateAction[]? GetDirectRouteCandidates( this IHttpRouteData routeData )
+    extension( IHttpRouteData routeData )
     {
-        var subRoutes = routeData.GetSubRoutes();
-
-        if ( subRoutes == null )
+        internal CandidateAction[]? DirectRouteCandidates
         {
-            if ( routeData.Route == null )
+            get
             {
-                return null;
+                var subRoutes = routeData.GetSubRoutes();
+
+                if ( subRoutes == null )
+                {
+                    if ( routeData.Route == null )
+                    {
+                        return null;
+                    }
+
+                    return routeData.Route.DirectRouteCandidates;
+                }
+
+                var list = new List<CandidateAction>();
+
+                foreach ( var data in subRoutes )
+                {
+                    var directRouteCandidates = data.Route.DirectRouteCandidates;
+
+                    if ( directRouteCandidates != null )
+                    {
+                        list.AddRange( directRouteCandidates );
+                    }
+                }
+
+                return [.. list];
             }
-
-            return routeData.Route.GetDirectRouteCandidates();
         }
-
-        var list = new List<CandidateAction>();
-
-        foreach ( var data in subRoutes )
-        {
-            var directRouteCandidates = data.Route.GetDirectRouteCandidates();
-
-            if ( directRouteCandidates != null )
-            {
-                list.AddRange( directRouteCandidates );
-            }
-        }
-
-        return [.. list];
     }
 }

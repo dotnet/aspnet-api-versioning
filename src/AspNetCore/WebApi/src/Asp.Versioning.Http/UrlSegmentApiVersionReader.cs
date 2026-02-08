@@ -21,7 +21,7 @@ public partial class UrlSegmentApiVersionReader
         }
 
         reentrant = true;
-        var feature = request.HttpContext.ApiVersioningFeature();
+        var feature = request.HttpContext.ApiVersioningFeature;
         var versions = feature.RawRequestedApiVersions;
         reentrant = false;
 

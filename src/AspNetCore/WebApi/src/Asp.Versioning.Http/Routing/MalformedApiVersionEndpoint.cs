@@ -17,7 +17,7 @@ internal sealed class MalformedApiVersionEndpoint : Endpoint
 
     private static Task OnExecute( HttpContext context, ApiVersioningOptions options, ILogger logger )
     {
-        var requestedVersion = context.ApiVersioningFeature().RawRequestedApiVersion;
+        var requestedVersion = context.ApiVersioningFeature.RawRequestedApiVersion;
 
         logger.ApiVersionInvalid( requestedVersion );
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -32,7 +32,7 @@ internal sealed class MalformedApiVersionEndpoint : Endpoint
         var detail = string.Format(
             CultureInfo.CurrentCulture,
             Format.VersionedResourceNotSupported,
-            new Uri( context.Request.GetDisplayUrl() ).SafeFullPath(),
+            new Uri( context.Request.GetDisplayUrl() ).SafePath,
             requestedVersion );
 
         return problemDetails.TryWriteAsync(

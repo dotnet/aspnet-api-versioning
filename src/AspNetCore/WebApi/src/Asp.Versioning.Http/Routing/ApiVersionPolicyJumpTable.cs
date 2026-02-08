@@ -44,7 +44,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
     public override int GetDestination( HttpContext httpContext )
     {
         var request = httpContext.Request;
-        var feature = httpContext.ApiVersioningFeature();
+        var feature = httpContext.ApiVersioningFeature;
         var apiVersions = new List<string>( capacity: feature.RawRequestedApiVersions.Count + 1 );
         var addedFromUrl = false;
 

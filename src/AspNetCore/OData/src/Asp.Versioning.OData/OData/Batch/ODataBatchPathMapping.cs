@@ -88,7 +88,7 @@ internal sealed class ODataBatchPathMapping
         Dictionary<ApiVersion, int> candidates )
     {
         var path = context.Request.Path;
-        var feature = context.ApiVersioningFeature();
+        var feature = context.ApiVersioningFeature;
         var unspecified = feature.RawRequestedApiVersions.Count == 0;
 
         for ( var i = 0; i < count; i++ )
@@ -144,7 +144,7 @@ internal sealed class ODataBatchPathMapping
 
         // it's important that the resolved api version be set here to ensure the correct
         // ODataOptions are resolved by ODataBatchHandler when executed
-        context.ApiVersioningFeature().RequestedApiVersion = version;
+        context.ApiVersioningFeature.RequestedApiVersion = version;
 
         return handler;
     }

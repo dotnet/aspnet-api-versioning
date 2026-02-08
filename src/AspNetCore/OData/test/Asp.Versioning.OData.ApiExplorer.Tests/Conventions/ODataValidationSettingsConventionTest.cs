@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.ModelBuilder.Config;
 using System.Reflection;
 using Xunit;
 using static Microsoft.AspNetCore.Http.StatusCodes;

@@ -73,7 +73,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         {
             if ( !versionNeutral.HasValue )
             {
-                versionNeutral = ApiDescription.ActionDescriptor.GetApiVersionMetadata().IsApiVersionNeutral;
+                versionNeutral = ApiDescription.ActionDescriptor.ApiVersionMetadata.IsApiVersionNeutral;
             }
 
             return versionNeutral.Value;
@@ -458,7 +458,7 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
         }
 
         var mapping = ApiVersionMapping.Explicit | ApiVersionMapping.Implicit;
-        var model = apiDescription.ActionDescriptor.GetApiVersionMetadata().Map( mapping );
+        var model = apiDescription.ActionDescriptor.ApiVersionMetadata.Map( mapping );
         var defaultApiVersion = options.ApiVersionSelector.SelectVersion( model );
 
         return apiVersion == defaultApiVersion;

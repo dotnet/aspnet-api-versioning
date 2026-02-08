@@ -34,13 +34,13 @@ internal sealed class HttpResponseExceptionFactory
 
     private ApiVersionModel AllApiVersions => apiVersionModel ??= context!.AllVersions;
 
-    private ApiVersioningOptions Options => configuration.GetApiVersioningOptions();
+    private ApiVersioningOptions Options => configuration.ApiVersioningOptions;
 
-    private IProblemDetailsFactory ProblemDetails => configuration.GetProblemDetailsFactory();
+    private IProblemDetailsFactory ProblemDetails => configuration.ProblemDetailsFactory;
 
     private ITraceWriter TraceWriter => configuration.Services.GetTraceWriter() ?? NullTraceWriter.Instance;
 
-    private IReportApiVersions ApiVersionReporter => configuration.GetApiVersionReporter();
+    private IReportApiVersions ApiVersionReporter => configuration.ApiVersionReporter;
 
     internal HttpResponseException NewUnmatchedException(
         ControllerSelectionResult conventionRouteResult,
@@ -52,7 +52,7 @@ internal sealed class HttpResponseExceptionFactory
 
         if ( couldMatch )
         {
-            properties = request.ApiVersionProperties();
+            properties = request.ApiVersionProperties;
 
             if ( properties.RawRequestedApiVersions.Count == 0 )
             {
@@ -73,7 +73,7 @@ internal sealed class HttpResponseExceptionFactory
         {
             if ( couldMatch )
             {
-                properties ??= request.ApiVersionProperties();
+                properties ??= request.ApiVersionProperties;
 
                 if ( properties.RequestedApiVersion is ApiVersion apiVersion )
                 {
@@ -113,9 +113,9 @@ internal sealed class HttpResponseExceptionFactory
 
     internal HttpResponseMessage CreateBadRequestForInvalidApiVersion()
     {
-        var requestedVersion = request.ApiVersionProperties().RawRequestedApiVersion;
-        var safeUrl = request.RequestUri.SafeFullPath();
-        var detail = string.Format( CultureInfo.CurrentCulture, SR.VersionedResourceNotSupported, safeUrl, requestedVersion );
+        var requestedVersion = request.ApiVersionProperties.RawRequestedApiVersion;
+        var safeUrl = request.RequestUri.SafePath;
+        var detail = string.Format( CultureInfo.CurrentCulture, BackportSR.VersionedResourceNotSupported, safeUrl, requestedVersion );
 
         TraceWriter.Info( request, ControllerSelectorCategory, detail );
 
@@ -130,7 +130,7 @@ internal sealed class HttpResponseExceptionFactory
     {
         var detail = string.Format(
             CultureInfo.InvariantCulture,
-            CommonSR.MultipleDifferentApiVersionsRequested,
+            Format.MultipleDifferentApiVersionsRequested,
             string.Join( ", ", apiVersions ) );
 
         TraceWriter.Info( request, ProblemDetailsDefaults.Ambiguous.Code, detail );
@@ -159,7 +159,7 @@ internal sealed class HttpResponseExceptionFactory
 
     private HttpResponseMessage CreateBadRequestForUnspecifiedApiVersion()
     {
-        var detail = SR.ApiVersionUnspecified;
+        var detail = BackportSR.ApiVersionUnspecified;
 
         TraceWriter.Info( request, ControllerSelectorCategory, detail );
 
@@ -172,8 +172,8 @@ internal sealed class HttpResponseExceptionFactory
 
     private HttpResponseMessage CreateResponseForUnsupportedApiVersion( ApiVersion requestedVersion, HttpStatusCode statusCode )
     {
-        var safeUrl = request.RequestUri.SafeFullPath();
-        var detail = string.Format( CultureInfo.CurrentCulture, SR.VersionedResourceNotSupported, safeUrl, requestedVersion );
+        var safeUrl = request.RequestUri.SafePath;
+        var detail = string.Format( CultureInfo.CurrentCulture, BackportSR.VersionedResourceNotSupported, safeUrl, requestedVersion );
 
         TraceWriter.Info( request, ControllerSelectorCategory, detail );
 
@@ -187,8 +187,8 @@ internal sealed class HttpResponseExceptionFactory
     internal HttpResponseMessage CreateMethodNotAllowedResponse( IEnumerable<HttpMethod> allowedMethods )
     {
         var requestedMethod = request.Method;
-        var version = request.GetRequestedApiVersion()?.ToString() ?? "(null)";
-        var detail = string.Format( CultureInfo.CurrentCulture, SR.VersionedMethodNotSupported, version, requestedMethod );
+        var version = request.RequestedApiVersion?.ToString() ?? "(null)";
+        var detail = string.Format( CultureInfo.CurrentCulture, BackportSR.VersionedMethodNotSupported, version, requestedMethod );
 
         TraceWriter.Info( request, ControllerSelectorCategory, detail );
 
@@ -213,13 +213,13 @@ internal sealed class HttpResponseExceptionFactory
 
     private HttpResponseMessage CreateNotFound( ControllerSelectionResult conventionRouteResult )
     {
-        var safeUrl = request.RequestUri.SafeFullPath();
+        var safeUrl = request.RequestUri.SafePath;
         var culture = CultureInfo.CurrentCulture;
-        var message = string.Format( culture, SR.ResourceNotFound, safeUrl );
+        var message = string.Format( culture, BackportSR.ResourceNotFound, safeUrl );
         var controllerName = conventionRouteResult.ControllerName;
         var messageDetail = string.IsNullOrEmpty( controllerName )
-            ? string.Format( culture, SR.ControllerNameNotFound, safeUrl )
-            : string.Format( culture, SR.DefaultControllerFactory_ControllerNameNotFound, controllerName );
+            ? string.Format( culture, BackportSR.ControllerNameNotFound, safeUrl )
+            : string.Format( culture, BackportSR.DefaultControllerFactory_ControllerNameNotFound, controllerName );
 
         TraceWriter.Info( request, ControllerSelectorCategory, message );
 
@@ -230,8 +230,8 @@ internal sealed class HttpResponseExceptionFactory
     {
         var content = request.Content;
         var statusCode = content != null && content.Headers.ContentType != null ? UnsupportedMediaType : NotAcceptable;
-        var version = request.GetRequestedApiVersion()?.ToString() ?? "(null)";
-        var detail = string.Format( CultureInfo.CurrentCulture, SR.VersionedMediaTypeNotSupported, version );
+        var version = request.RequestedApiVersion?.ToString() ?? "(null)";
+        var detail = string.Format( CultureInfo.CurrentCulture, BackportSR.VersionedMediaTypeNotSupported, version );
 
         TraceWriter.Info( request, ControllerSelectorCategory, detail );
 

@@ -16,7 +16,7 @@ public class when_using_a_url_segment : BasicAcceptanceTest
 
 
         // act
-        var response = (await GetAsync( requestUrl )).EnsureSuccessStatusCode();
+        var response = ( await GetAsync( requestUrl ) ).EnsureSuccessStatusCode();
 
         // assert
         response.Headers.GetValues( "api-supported-versions" ).Single().Should().Be( "1.0" );

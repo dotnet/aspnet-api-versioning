@@ -18,32 +18,34 @@ using static Microsoft.OData.ServiceLifetime;
 /// </summary>
 public static class IContainerBuilderExtensions
 {
-    /// <summary>
-    /// Adds service API versioning to the specified container builder.
-    /// </summary>
     /// <param name="builder">The extended <see cref="IContainerBuilder">container builder</see>.</param>
-    /// <param name="routeName">The name of the route to add API versioning to.</param>
-    /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see> to use for parsing OData paths.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
-    public static IContainerBuilder AddApiVersioning( this IContainerBuilder builder, string routeName, IEnumerable<IEdmModel> models ) =>
-        builder.AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
-               .AddService( Singleton, sp => NewEdmModelSelector( sp, models ) )
-               .AddService( Singleton, sp => NewRoutingConventions( sp, routeName ) );
+    extension( IContainerBuilder builder )
+    {
+        /// <summary>
+        /// Adds service API versioning to the specified container builder.
+        /// </summary>
+        /// <param name="routeName">The name of the route to add API versioning to.</param>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>
+        /// to use for parsing OData paths.</param>
+        public IContainerBuilder AddApiVersioning( string routeName, IEnumerable<IEdmModel> models ) =>
+            builder.AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
+                   .AddService( Singleton, sp => NewEdmModelSelector( sp, models ) )
+                   .AddService( Singleton, sp => NewRoutingConventions( sp, routeName ) );
 
-    /// <summary>
-    /// Adds service API versioning to the specified container builder.
-    /// </summary>
-    /// <param name="builder">The extended <see cref="IContainerBuilder">container builder</see>.</param>
-    /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see> to use for parsing OData paths.</param>
-    /// <param name="routingConventions">The OData routing conventions to use for controller and action selection.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    public static IContainerBuilder AddApiVersioning(
-        this IContainerBuilder builder,
-        IEnumerable<IEdmModel> models,
-        IEnumerable<IODataRoutingConvention> routingConventions ) =>
-        builder.AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
-               .AddService( Singleton, sp => NewEdmModelSelector( sp, models ) )
-               .AddService( Singleton, sp => AddOrUpdate( [.. routingConventions] ).AsEnumerable() );
+        /// <summary>
+        /// Adds service API versioning to the specified container builder.
+        /// </summary>
+        /// <param name="models">The <see cref="IEnumerable{T}">sequence</see> of <see cref="IEdmModel">EDM models</see>
+        /// to use for parsing OData paths.</param>
+        /// <param name="routingConventions">The OData routing conventions to use for controller and action selection.</param>
+        public IContainerBuilder AddApiVersioning(
+            IEnumerable<IEdmModel> models,
+            IEnumerable<IODataRoutingConvention> routingConventions ) =>
+            builder.AddService( Transient, sp => sp.GetRequiredService<IEdmModelSelector>().SelectModel( sp ) )
+                   .AddService( Singleton, sp => NewEdmModelSelector( sp, models ) )
+                   .AddService( Singleton, sp => AddOrUpdate( [.. routingConventions] ).AsEnumerable() );
+    }
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static IEnumerable<IODataRoutingConvention> NewRoutingConventions( IServiceProvider serviceProvider, string routeName ) =>
@@ -52,7 +54,7 @@ public static class IContainerBuilderExtensions
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static IEdmModelSelector NewEdmModelSelector( IServiceProvider serviceProvider, IEnumerable<IEdmModel> models )
     {
-        var options = serviceProvider.GetRequiredService<HttpConfiguration>().GetApiVersioningOptions();
+        var options = serviceProvider.GetRequiredService<HttpConfiguration>().ApiVersioningOptions;
         return new EdmModelSelector( models, options.ApiVersionSelector );
     }
 }

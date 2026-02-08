@@ -134,7 +134,7 @@ public partial class ODataQueryOptionsConventionBuilder
         {
             var controller = GetController( description );
 
-            if ( !controller.IsODataController() && !description.IsODataLike() )
+            if ( !controller.IsODataController && !description.IsODataLike )
             {
                 continue;
             }

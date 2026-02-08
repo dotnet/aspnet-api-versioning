@@ -13,6 +13,6 @@ public class Values2Controller : ApiController
         Ok( new
         {
             controller = GetType().Name,
-            version = Request.GetRequestedApiVersion().ToString(),
+            version = Request.RequestedApiVersion.ToString(),
         } );
 }

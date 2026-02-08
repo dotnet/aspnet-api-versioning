@@ -41,7 +41,7 @@ public class VersionedMetadataRoutingConvention : IODataRoutingConvention
             return null;
         }
 
-        var properties = request.ApiVersionProperties();
+        var properties = request.ApiVersionProperties;
 
         // the service document and metadata endpoints are special, but they are not neutral. if the client doesn't
         // specify a version, they may not know to. assume a default version by policy, but it's always allowed.
@@ -49,7 +49,7 @@ public class VersionedMetadataRoutingConvention : IODataRoutingConvention
         if ( properties.RawRequestedApiVersions.Count == 0 )
         {
             var modelSelector = request.GetRequestContainer().GetRequiredService<IEdmModelSelector>();
-            var versionSelector = request.GetApiVersioningOptions().ApiVersionSelector;
+            var versionSelector = request.ApiVersioningOptions.ApiVersionSelector;
             var model = new ApiVersionModel( modelSelector.ApiVersions, [] );
 
             properties.RequestedApiVersion = versionSelector.SelectVersion( request, model );

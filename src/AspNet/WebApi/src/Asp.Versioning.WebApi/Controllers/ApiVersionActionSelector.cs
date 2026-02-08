@@ -67,12 +67,12 @@ public class ApiVersionActionSelector : IHttpActionSelector
         }
 
         var request = controllerContext.Request;
-        var requestedVersion = request.GetRequestedApiVersion();
+        var requestedVersion = request.RequestedApiVersion;
 
         if ( candidateActions.Count == 1 )
         {
             var action = candidateActions[0];
-            var metadata = action.GetApiVersionMetadata();
+            var metadata = action.ApiVersionMetadata;
 
             return metadata.MappingTo( requestedVersion ) != None ? action : null;
         }
@@ -83,7 +83,7 @@ public class ApiVersionActionSelector : IHttpActionSelector
         for ( var i = 0; i < candidateActions.Count; i++ )
         {
             var action = candidateActions[i];
-            var metadata = action.GetApiVersionMetadata();
+            var metadata = action.ApiVersionMetadata;
 
             switch ( metadata.MappingTo( requestedVersion ) )
             {
@@ -112,7 +112,7 @@ public class ApiVersionActionSelector : IHttpActionSelector
     private static Exception CreateAmbiguousActionException( IEnumerable<HttpActionDescriptor> matches )
     {
         var ambiguityList = ActionSelectorCacheItem.CreateAmbiguousMatchList( matches );
-        var message = string.Format( CultureInfo.CurrentCulture, SR.ApiControllerActionSelector_AmbiguousMatch, ambiguityList );
+        var message = string.Format( CultureInfo.CurrentCulture, BackportSR.ApiControllerActionSelector_AmbiguousMatch, ambiguityList );
         return new InvalidOperationException( message );
     }
 

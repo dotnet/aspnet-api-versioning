@@ -19,7 +19,7 @@ internal sealed class ClassSignature : IEquatable<ClassSignature>
             new( newOriginalType, [originalType] ),
         };
 
-        attributeBuilders.AddRange( originalType.DeclaredAttributes() );
+        attributeBuilders.AddRange( originalType.DeclaredAttributes );
 
         Name = name;
         Attributes = [.. attributeBuilders];

@@ -10,14 +10,14 @@ using Microsoft.AspNetCore.Mvc;
 public class HelloWorld2Controller : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get() => Ok( new { Controller = nameof( HelloWorld2Controller ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get() => Ok( new { Controller = nameof( HelloWorld2Controller ), Version = HttpContext.RequestedApiVersion.ToString() } );
 
     [HttpGet( "{id:int}" )]
-    public IActionResult Get( int id ) => Ok( new { Controller = nameof( HelloWorld2Controller ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult Get( int id ) => Ok( new { Controller = nameof( HelloWorld2Controller ), Id = id, Version = HttpContext.RequestedApiVersion.ToString() } );
 
     [HttpGet]
-    public IActionResult GetV3() => Ok( new { Controller = nameof( HelloWorld2Controller ), Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult GetV3() => Ok( new { Controller = nameof( HelloWorld2Controller ), Version = HttpContext.RequestedApiVersion.ToString() } );
 
     [HttpGet( "{id:int}" )]
-    public IActionResult GetV3( int id ) => Ok( new { Controller = nameof( HelloWorld2Controller ), Id = id, Version = HttpContext.GetRequestedApiVersion().ToString() } );
+    public IActionResult GetV3( int id ) => Ok( new { Controller = nameof( HelloWorld2Controller ), Id = id, Version = HttpContext.RequestedApiVersion.ToString() } );
 }

@@ -135,7 +135,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
             return false;
         }
 
-        var apiVersion = context.GetRequestedApiVersion();
+        var apiVersion = context.RequestedApiVersion;
 
         if ( apiVersion == null )
         {
@@ -166,7 +166,7 @@ public class VersionedODataOptions : IOptions<ODataOptions>
             return default;
         }
 
-        var apiVersion = context.GetRequestedApiVersion();
+        var apiVersion = context.RequestedApiVersion;
 
         if ( apiVersion == null )
         {

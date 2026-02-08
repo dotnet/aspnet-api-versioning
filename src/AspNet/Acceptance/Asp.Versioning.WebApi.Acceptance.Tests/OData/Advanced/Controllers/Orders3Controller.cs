@@ -9,7 +9,7 @@ using System.Web.Http;
 [ControllerName( "Orders" )]
 public class Orders3Controller : ApiController
 {
-    public IHttpActionResult Get() => Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } } );
+    public IHttpActionResult Get() => Ok( new[] { new Order() { Id = 1, Customer = $"Customer v{Request.RequestedApiVersion}" } } );
 
-    public IHttpActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = $"Customer v{Request.GetRequestedApiVersion()}" } );
+    public IHttpActionResult Get( int key ) => Ok( new Order() { Id = key, Customer = $"Customer v{Request.RequestedApiVersion}" } );
 }

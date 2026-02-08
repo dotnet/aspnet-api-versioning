@@ -13,7 +13,6 @@ using Microsoft.OData.Edm;
 #endif
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 #if NETFRAMEWORK
 using IActionResult = System.Web.Http.IHttpActionResult;
 #else
@@ -36,131 +35,234 @@ public static partial class TypeExtensions
     private static readonly Type ActionResultOfT = typeof( ActionResult<> );
 #endif
 
-    /// <summary>
-    /// Substitutes the specified type, if required.
-    /// </summary>
     /// <param name="type">The <see cref="Type">type</see> to be evaluated.</param>
-    /// <param name="context">The current <see cref="TypeSubstitutionContext">type substitution context</see>.</param>
-    /// <returns>The original <paramref name="type"/> or a substitution <see cref="Type">type</see> based on the
-    /// provided <paramref name="context"/>.</returns>
-#if !NETFRAMEWORK
-    [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
-    [UnconditionalSuppressMessage( "ILLink", "IL2073" )]
-    [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
-#endif
-    public static Type SubstituteIfNecessary(
+    extension(
 #if !NETFRAMEWORK
         [DynamicallyAccessedMembers( Interfaces | PublicProperties )]
 #endif
-        this Type type,
-        TypeSubstitutionContext context )
+        Type type )
     {
-        ArgumentNullException.ThrowIfNull( type );
-        ArgumentNullException.ThrowIfNull( context );
-
-        var openTypes = new Stack<Type>();
-        var apiVersion = context.ApiVersion;
-        var resolver = new StructuredTypeResolver( context.Model );
-        IEdmStructuredType? structuredType;
-
-        if ( IsSubstitutableGeneric( type, openTypes, out var innerType ) )
+        /// <summary>
+        /// Substitutes the specified type, if required.
+        /// </summary>
+        /// <param name="context">The current <see cref="TypeSubstitutionContext">type substitution context</see>.</param>
+        /// <returns>The original <see cref="Type">type</see> or a substitution <see cref="Type">type</see> based on the
+        /// provided <paramref name="context"/>.</returns>
+#if !NETFRAMEWORK
+        [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
+        [UnconditionalSuppressMessage( "ILLink", "IL2073" )]
+        [return: DynamicallyAccessedMembers( Interfaces | PublicProperties )]
+#endif
+        public Type SubstituteIfNecessary( TypeSubstitutionContext context )
         {
-            if ( ( structuredType = resolver.GetStructuredType( innerType! ) ) == null )
+            ArgumentNullException.ThrowIfNull( type );
+            ArgumentNullException.ThrowIfNull( context );
+
+            var openTypes = new Stack<Type>();
+            var apiVersion = context.ApiVersion;
+            var resolver = new StructuredTypeResolver( context.Model );
+            IEdmStructuredType? structuredType;
+
+            if ( IsSubstitutableGeneric( type, openTypes, out var innerType ) )
+            {
+                if ( ( structuredType = resolver.GetStructuredType( innerType! ) ) == null )
+                {
+                    return type;
+                }
+
+                var newType = context.ModelTypeBuilder.NewStructuredType( context.Model, structuredType, innerType!, apiVersion );
+
+                if ( innerType!.Equals( newType ) )
+                {
+                    return type.ShouldExtractInnerType ? innerType : type;
+                }
+
+                return CloseGeneric( openTypes, newType );
+            }
+
+            if ( type.CanBeSubstituted && ( structuredType = resolver.GetStructuredType( type ) ) != null )
+            {
+                type = context.ModelTypeBuilder.NewStructuredType( context.Model, structuredType, type, apiVersion );
+            }
+
+            return type;
+        }
+    }
+
+    extension( Type type )
+    {
+        private bool Is( Type typeDefinition ) => type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeDefinition );
+
+        private bool ShouldExtractInnerType =>
+            type.IsDelta ||
+#if !NETFRAMEWORK
+            type.IsActionResult ||
+#endif
+            type.IsSingleResult;
+
+        private bool CanBeSubstituted =>
+            Type.GetTypeCode( type ) == TypeCode.Object &&
+            !type.IsValueType &&
+            !type.Equals( ActionResultType ) &&
+#if NETFRAMEWORK
+            !type.Equals( HttpResponseType ) &&
+#endif
+            !type.IsODataActionParameters;
+
+        private bool IsSingleResult => type.Is( SingleResultOfT );
+
+#if !NETFRAMEWORK
+        private bool IsActionResult => type.Is( ActionResultOfT );
+#endif
+
+#if !NETFRAMEWORK
+        [UnconditionalSuppressMessage( "ILLink", "IL2070" )]
+#endif
+        internal bool IsEnumerable( [NotNullWhen( true )] out Type? itemType )
+        {
+            var types = new Queue<Type>();
+
+            types.Enqueue( type );
+
+            while ( types.Count > 0 )
+            {
+                type = types.Dequeue();
+
+                if ( type.IsGenericType )
+                {
+                    var typeDef = type.GetGenericTypeDefinition();
+
+                    if ( typeDef.Equals( IEnumerableOfT )
+#if !NETFRAMEWORK
+                        || typeDef.Equals( IAsyncEnumerableOfT )
+#endif
+                       )
+                    {
+                        itemType = type.GetGenericArguments()[0];
+                        return true;
+                    }
+                }
+
+                var interfaces = type.GetInterfaces();
+
+                for ( var i = 0; i < interfaces.Length; i++ )
+                {
+                    types.Enqueue( interfaces[i] );
+                }
+            }
+
+            itemType = default;
+            return false;
+        }
+
+        internal Type ExtractInnerType()
+        {
+            if ( !type.IsGenericType )
             {
                 return type;
             }
 
-            var newType = context.ModelTypeBuilder.NewStructuredType( context.Model, structuredType, innerType!, apiVersion );
+            var typeDef = type.GetGenericTypeDefinition();
+            var typeArgs = type.GetGenericArguments();
 
-            if ( innerType!.Equals( newType ) )
+            if ( typeArgs.Length != 1 )
             {
-                return type.ShouldExtractInnerType() ? innerType : type;
+                return type;
             }
 
-            return CloseGeneric( openTypes, newType );
-        }
-
-        if ( CanBeSubstituted( type ) && ( structuredType = resolver.GetStructuredType( type ) ) != null )
-        {
-            type = context.ModelTypeBuilder.NewStructuredType( context.Model, structuredType, type, apiVersion );
-        }
-
-        return type;
-    }
-
-    internal static IEnumerable<CustomAttributeBuilder> DeclaredAttributes( this MemberInfo member )
-    {
-        foreach ( var attribute in member.CustomAttributes )
-        {
-            var ctor = attribute.Constructor;
-            var ctorArgs = attribute.ConstructorArguments.Select( a => a.Value ).ToArray();
-            var namedProperties = new List<PropertyInfo>( attribute.NamedArguments.Count );
-            var propertyValues = new List<object>( attribute.NamedArguments.Count );
-            var namedFields = new List<FieldInfo>( attribute.NamedArguments.Count );
-            var fieldValues = new List<object>( attribute.NamedArguments.Count );
-
-            for ( var i = 0; i < attribute.NamedArguments.Count; i++ )
-            {
-                var argument = attribute.NamedArguments[i];
-
-                if ( argument.IsField )
-                {
-                    namedFields.Add( (FieldInfo) argument.MemberInfo );
-                    fieldValues.Add( argument.TypedValue.Value! );
-                }
-                else
-                {
-                    namedProperties.Add( (PropertyInfo) argument.MemberInfo );
-                    propertyValues.Add( argument.TypedValue.Value! );
-                }
-            }
-
-            for ( var i = 0; i < ctorArgs.Length; i++ )
-            {
-                if ( ctorArgs[i] is IReadOnlyCollection<CustomAttributeTypedArgument> paramsList )
-                {
-                    ctorArgs[i] = paramsList.Select( a => a.Value ).ToArray();
-                }
-            }
-
-            yield return new CustomAttributeBuilder(
-                ctor,
-                ctorArgs,
-                [.. namedProperties],
-                [.. propertyValues],
-                [.. namedFields],
-                [.. fieldValues] );
-        }
-    }
-
-    internal static Type ExtractInnerType( this Type type )
-    {
-        if ( !type.IsGenericType )
-        {
-            return type;
-        }
-
-        var typeDef = type.GetGenericTypeDefinition();
-        var typeArgs = type.GetGenericArguments();
-
-        if ( typeArgs.Length != 1 )
-        {
-            return type;
-        }
-
-        var generic = typeDef.IsDelta() ||
-                      typeDef.IsODataValue() ||
+            var generic = typeDef.IsDelta ||
+                          typeDef.IsODataValue ||
 #if !NETFRAMEWORK
-                      typeDef.IsActionResult() ||
+                          typeDef.IsActionResult ||
 #endif
-                      typeDef.IsSingleResult();
+                          typeDef.IsSingleResult;
 
-        if ( generic )
-        {
-            return typeArgs[0];
+            if ( generic )
+            {
+                return typeArgs[0];
+            }
+
+            return type;
         }
+    }
 
-        return type;
+    extension( Type? type )
+    {
+        private bool IsODataValue
+        {
+            get
+            {
+                while ( type != null )
+                {
+                    if ( !type.IsGenericType )
+                    {
+                        return false;
+                    }
+
+                    var typeDef = type.GetGenericTypeDefinition();
+
+                    if ( typeDef.Equals( ODataValueOfT ) )
+                    {
+                        return true;
+                    }
+
+                    type = type.BaseType;
+                }
+
+                return false;
+            }
+        }
+    }
+
+    extension( MemberInfo member )
+    {
+        internal IEnumerable<CustomAttributeBuilder> DeclaredAttributes
+        {
+            get
+            {
+                foreach ( var attribute in member.CustomAttributes )
+                {
+                    var ctor = attribute.Constructor;
+                    var ctorArgs = attribute.ConstructorArguments.Select( a => a.Value ).ToArray();
+                    var namedProperties = new List<PropertyInfo>( attribute.NamedArguments.Count );
+                    var propertyValues = new List<object>( attribute.NamedArguments.Count );
+                    var namedFields = new List<FieldInfo>( attribute.NamedArguments.Count );
+                    var fieldValues = new List<object>( attribute.NamedArguments.Count );
+
+                    for ( var i = 0; i < attribute.NamedArguments.Count; i++ )
+                    {
+                        var argument = attribute.NamedArguments[i];
+
+                        if ( argument.IsField )
+                        {
+                            namedFields.Add( (FieldInfo) argument.MemberInfo );
+                            fieldValues.Add( argument.TypedValue.Value! );
+                        }
+                        else
+                        {
+                            namedProperties.Add( (PropertyInfo) argument.MemberInfo );
+                            propertyValues.Add( argument.TypedValue.Value! );
+                        }
+                    }
+
+                    for ( var i = 0; i < ctorArgs.Length; i++ )
+                    {
+                        if ( ctorArgs[i] is IReadOnlyCollection<CustomAttributeTypedArgument> paramsList )
+                        {
+                            ctorArgs[i] = paramsList.Select( a => a.Value ).ToArray();
+                        }
+                    }
+
+                    yield return new CustomAttributeBuilder(
+                        ctor,
+                        ctorArgs,
+                        [.. namedProperties],
+                        [.. propertyValues],
+                        [.. namedFields],
+                        [.. fieldValues] );
+                }
+            }
+        }
     }
 
     private static bool IsSubstitutableGeneric(
@@ -190,13 +292,13 @@ public static partial class TypeExtensions
 
         var typeArg = typeArgs[0];
         var generic = typeDef.Equals( IEnumerableOfT ) ||
-                      typeDef.IsDelta() ||
-                      typeDef.IsODataValue() ||
+                      typeDef.IsDelta ||
+                      typeDef.IsODataValue ||
 #if !NETFRAMEWORK
                       typeDef.Equals( IAsyncEnumerableOfT ) ||
-                      typeDef.IsActionResult() ||
+                      typeDef.IsActionResult ||
 #endif
-                      typeDef.IsSingleResult();
+                      typeDef.IsSingleResult;
 
         if ( generic )
         {
@@ -238,7 +340,7 @@ public static partial class TypeExtensions
     {
         var type = openTypes.Pop();
 
-        if ( type.ShouldExtractInnerType() )
+        if ( type.ShouldExtractInnerType )
         {
             return innerType;
         }
@@ -252,96 +354,4 @@ public static partial class TypeExtensions
 
         return type;
     }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool CanBeSubstituted( Type type ) =>
-        Type.GetTypeCode( type ) == TypeCode.Object &&
-        !type.IsValueType &&
-        !type.Equals( ActionResultType ) &&
-#if NETFRAMEWORK
-        !type.Equals( HttpResponseType ) &&
-#endif
-        !type.IsODataActionParameters();
-
-#if !NETFRAMEWORK
-    [UnconditionalSuppressMessage( "ILLink", "IL2070" )]
-#endif
-    internal static bool IsEnumerable(this Type type, [NotNullWhen( true )] out Type? itemType )
-    {
-        var types = new Queue<Type>();
-
-        types.Enqueue( type );
-
-        while ( types.Count > 0 )
-        {
-            type = types.Dequeue();
-
-            if ( type.IsGenericType )
-            {
-                var typeDef = type.GetGenericTypeDefinition();
-
-                if ( typeDef.Equals( IEnumerableOfT )
-#if !NETFRAMEWORK
-                     || typeDef.Equals( IAsyncEnumerableOfT )
-#endif
-                   )
-                {
-                    itemType = type.GetGenericArguments()[0];
-                    return true;
-                }
-            }
-
-            var interfaces = type.GetInterfaces();
-
-            for ( var i = 0; i < interfaces.Length; i++ )
-            {
-                types.Enqueue( interfaces[i] );
-            }
-        }
-
-        itemType = default;
-        return false;
-    }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool IsSingleResult( this Type type ) => type.Is( SingleResultOfT );
-
-    private static bool IsODataValue( this Type? type )
-    {
-        while ( type != null )
-        {
-            if ( !type.IsGenericType )
-            {
-                return false;
-            }
-
-            var typeDef = type.GetGenericTypeDefinition();
-
-            if ( typeDef.Equals( ODataValueOfT ) )
-            {
-                return true;
-            }
-
-            type = type.BaseType;
-        }
-
-        return false;
-    }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool Is( this Type type, Type typeDefinition ) =>
-        type.IsGenericType && type.GetGenericTypeDefinition().Equals( typeDefinition );
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool ShouldExtractInnerType( this Type type ) =>
-        type.IsDelta() ||
-#if !NETFRAMEWORK
-        type.IsActionResult() ||
-#endif
-        type.IsSingleResult();
-
-#if !NETFRAMEWORK
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static bool IsActionResult( this Type type ) => type.Is( ActionResultOfT );
-#endif
 }

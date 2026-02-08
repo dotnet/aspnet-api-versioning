@@ -29,8 +29,8 @@ public sealed partial class ReportApiVersionsAttribute
 
         var context = actionExecutedContext.ActionContext;
         var action = context.ActionDescriptor;
-        var reporter = reportApiVersions ?? context.ControllerContext.Configuration.GetApiVersionReporter();
-        var model = action.GetApiVersionMetadata().Map( reporter.Mapping );
+        var reporter = reportApiVersions ?? context.ControllerContext.Configuration.ApiVersionReporter;
+        var model = action.ApiVersionMetadata.Map( reporter.Mapping );
 
         response.RequestMessage ??= actionExecutedContext.Request;
         reporter.Report( response, model );

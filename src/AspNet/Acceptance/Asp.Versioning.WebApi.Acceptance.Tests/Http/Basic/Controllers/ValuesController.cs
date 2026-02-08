@@ -8,5 +8,5 @@ using System.Web.Http;
 [Route( "api/values" )]
 public class ValuesController : ApiController
 {
-    public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.GetRequestedApiVersion().ToString() } );
+    public IHttpActionResult Get() => Ok( new { controller = GetType().Name, version = Request.RequestedApiVersion.ToString() } );
 }
