@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 internal sealed class ConfigureOpenApiOptions(
     IHostEnvironment environment,
     IApiVersionDescriptionProviderFactory factory,
+    IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions,
     [FromKeyedServices( typeof( ApiVersion ) )] Action<ApiVersionDescription, OpenApiOptions> configure )
     : IConfigureNamedOptions<OpenApiOptions>
 {
@@ -51,7 +52,7 @@ internal sealed class ConfigureOpenApiOptions(
                 continue;
             }
 
-            var apiExplorer = new ApiExplorerTransformer( description );
+            var apiExplorer = new ApiExplorerTransformer( description, descriptionOptions );
 
             options.SetDocumentName( description.GroupName );
             options.AddDocumentTransformer( apiExplorer );

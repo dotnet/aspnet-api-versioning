@@ -20,7 +20,7 @@
  </ItemGroup>
 
  <ItemGroup>
-   <ProjectReference Include="..\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
+  <ProjectReference Include="..\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
  </ItemGroup>
 
 </Project>

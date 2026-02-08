@@ -53,10 +53,53 @@ public static class IApiVersioningBuilderExtensions
 
             return builder;
         }
+
+        /// <summary>
+        /// Adds OpenAPI support for API versioning.
+        /// </summary>
+        /// <param name="descriptionOptions">The function used to configure the target
+        /// <see cref="OpenApiDocumentDescriptionOptions">title options</see>.</param>
+        /// <returns>The original <see cref="IApiVersioningBuilder">builder</see>.</returns>
+        public IApiVersioningBuilder AddOpenApi( Action<OpenApiDocumentDescriptionOptions> descriptionOptions )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+
+            var services = builder.Services;
+
+            AddOpenApiServices( services );
+            services.Configure( descriptionOptions );
+            services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds OpenAPI support for API versioning.
+        /// </summary>
+        /// <param name="configureOptions">The function used to configure the target
+        /// <see cref="OpenApiOptions">OpenAPI options</see>.</param>
+        /// <param name="descriptionOptions">The function used to configure the target
+        /// <see cref="OpenApiDocumentDescriptionOptions">title options</see>.</param>
+        /// <returns>The original <see cref="IApiVersioningBuilder">builder</see>.</returns>
+        public IApiVersioningBuilder AddOpenApi(
+            Action<ApiVersionDescription, OpenApiOptions> configureOptions,
+            Action<OpenApiDocumentDescriptionOptions> descriptionOptions )
+        {
+            ArgumentNullException.ThrowIfNull( builder );
+
+            var services = builder.Services;
+
+            AddOpenApiServices( services );
+            services.Configure( descriptionOptions );
+            services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
+
+            return builder;
+        }
     }
 
     private static void AddOpenApiServices( IServiceCollection services )
     {
+        services.AddOptions<OpenApiDocumentDescriptionOptions>();
         services.Add( Singleton<ConfigureOpenApiOptions, ConfigureOpenApiOptions>() );
         services.TryAddEnumerable( Singleton<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>( static sp => sp.GetRequiredService<ConfigureOpenApiOptions>() ) );
 
