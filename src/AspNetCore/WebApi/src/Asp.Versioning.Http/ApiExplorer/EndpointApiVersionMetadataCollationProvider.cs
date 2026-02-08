@@ -19,14 +19,6 @@ public sealed class EndpointApiVersionMetadataCollationProvider : IApiVersionMet
     /// Initializes a new instance of the <see cref="EndpointApiVersionMetadataCollationProvider"/> class.
     /// </summary>
     /// <param name="endpointDataSource">The underlying <see cref="endpointDataSource">endpoint data source</see>.</param>
-    [Obsolete( "Use the constructor that accepts IEndpointInspector. This constructor will be removed in a future version." )]
-    public EndpointApiVersionMetadataCollationProvider( EndpointDataSource endpointDataSource )
-        : this( endpointDataSource, new DefaultEndpointInspector() ) { }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EndpointApiVersionMetadataCollationProvider"/> class.
-    /// </summary>
-    /// <param name="endpointDataSource">The underlying <see cref="endpointDataSource">endpoint data source</see>.</param>
     /// <param name="endpointInspector">The <see cref="IEndpointInspector">endpoint inspector</see> used to inspect endpoints.</param>
     public EndpointApiVersionMetadataCollationProvider( EndpointDataSource endpointDataSource, IEndpointInspector endpointInspector )
     {
