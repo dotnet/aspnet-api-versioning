@@ -1,7 +1,6 @@
-using ApiVersioning.Examples;
 using Asp.Versioning;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Scalar.AspNetCore;
+using System.Reflection;
 using OrderV1 = ApiVersioning.Examples.Models.V1.Order;
 using OrderV2 = ApiVersioning.Examples.Models.V2.Order;
 using OrderV3 = ApiVersioning.Examples.Models.V3.Order;
@@ -9,10 +8,11 @@ using PersonV1 = ApiVersioning.Examples.Models.V1.Person;
 using PersonV2 = ApiVersioning.Examples.Models.V2.Person;
 using PersonV3 = ApiVersioning.Examples.Models.V3.Person;
 
+[assembly: AssemblyDescription( "An example API" )]
+
 var builder = WebApplication.CreateBuilder( args );
 var services = builder.Services;
 
-// Add services to the container.
 services.AddProblemDetails();
 services.AddEndpointsApiExplorer();
 services.AddApiVersioning(
@@ -39,13 +39,11 @@ services.AddApiVersioning(
                 // can also be used to control the format of the API version in route templates
                 options.SubstituteApiVersionInUrl = true;
             } )
+        .AddOpenApi( ( _, options ) => options.AddScalarTransformers() )
         // this enables binding ApiVersion as a endpoint callback parameter. if you don't use it, then
         // you should remove this configuration.
         .EnableApiVersionBinding();
-services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>() );
 
-// Configure the HTTP request pipeline.
 var app = builder.Build();
 var orders = app.NewVersionedApi( "Orders" );
 var people = app.NewVersionedApi( "People" );
@@ -56,6 +54,8 @@ var ordersV1 = orders.MapGroup( "/api/orders" )
                      .HasApiVersion( 1.0 );
 
 ordersV1.MapGet( "/{id:int}", ( int id ) => new OrderV1() { Id = id, Customer = "John Doe" } )
+        .WithSummary( "Get Order" )
+        .WithDescription( "Gets a single order." )
         .Produces<OrderV1>()
         .Produces( 404 );
 
@@ -67,12 +67,16 @@ ordersV1.MapPost( "/", ( HttpRequest request, OrderV1 order ) =>
              var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
              return Results.Created( location, order );
          } )
+        .WithSummary( "Place Order" )
+        .WithDescription( "Places a new order." )
         .Accepts<OrderV1>( "application/json" )
         .Produces<OrderV1>( 201 )
         .Produces( 400 )
         .MapToApiVersion( 1.0 );
 
 ordersV1.MapPatch( "/{id:int}", ( int id, OrderV1 order ) => Results.NoContent() )
+        .WithSummary( "Update Order" )
+        .WithDescription( "Updates an order." )
         .Accepts<OrderV1>( "application/json" )
         .Produces( 204 )
         .Produces( 400 )
@@ -90,10 +94,14 @@ ordersV2.MapGet( "/", () =>
              new(){ Id = 2, Customer = "Bob Smith" },
              new(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTimeOffset.UtcNow.AddDays( 7d ) },
          } )
+        .WithSummary( "Get Orders" )
+        .WithDescription( "Retrieves all orders." )
         .Produces<IEnumerable<OrderV2>>()
         .Produces( 404 );
 
 ordersV2.MapGet( "/{id:int}", ( int id ) => new OrderV2() { Id = id, Customer = "John Doe" } )
+        .WithSummary( "Get Order" )
+        .WithDescription( "Gets a single order." )
         .Produces<OrderV2>()
         .Produces( 404 );
 
@@ -105,12 +113,16 @@ ordersV2.MapPost( "/", ( HttpRequest request, OrderV2 order ) =>
              var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
              return Results.Created( location, order );
          } )
+        .WithSummary( "Place Order" )
+        .WithDescription( "Places a new order." )
         .Accepts<OrderV2>( "application/json" )
         .Produces<OrderV2>( 201 )
         .Produces( 400 );
 
 
 ordersV2.MapPatch( "/{id:int}", ( int id, OrderV2 order ) => Results.NoContent() )
+        .WithSummary( "Update Order" )
+        .WithDescription( "Updates an order." )
         .Accepts<OrderV2>( "application/json" )
         .Produces( 204 )
         .Produces( 400 )
@@ -127,9 +139,13 @@ ordersV3.MapGet( "/", () =>
              new(){ Id = 2, Customer = "Bob Smith" },
              new(){ Id = 3, Customer = "Jane Doe", EffectiveDate = DateTimeOffset.UtcNow.AddDays( 7d ) },
          } )
+        .WithSummary( "Get Orders" )
+        .WithDescription( "Retrieves all orders." )
         .Produces<IEnumerable<OrderV3>>();
 
 ordersV3.MapGet( "/{id:int}", ( int id ) => new OrderV3() { Id = id, Customer = "John Doe" } )
+        .WithSummary( "Get Order" )
+        .WithDescription( "Gets a single order." )
         .Produces<OrderV3>()
         .Produces( 404 );
 
@@ -141,11 +157,15 @@ ordersV3.MapPost( "/", ( HttpRequest request, OrderV3 order ) =>
              var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/api/orders/{order.Id}" );
              return Results.Created( location, order );
          } )
+        .WithSummary( "Place Order" )
+        .WithDescription( "Places a new order." )
         .Accepts<OrderV3>( "application/json" )
         .Produces<OrderV3>( 201 )
         .Produces( 400 );
 
 ordersV3.MapDelete( "/{id:int}", ( int id ) => Results.NoContent() )
+        .WithSummary( "Cancel Order" )
+        .WithDescription( "Cancels an order." )
         .Produces( 204 );
 
 // 1.0
@@ -160,6 +180,8 @@ peopleV1.MapGet( "/{id:int}", ( int id ) =>
              FirstName = "John",
              LastName = "Doe",
          } )
+        .WithSummary( "Get Person" )
+        .WithDescription( "Gets a single person." )
         .Produces<PersonV1>()
         .Produces( 404 );
 
@@ -192,6 +214,8 @@ peopleV2.MapGet( "/", () =>
                  Email = "jane.doe@somewhere.com",
              },
          } )
+        .WithSummary( "Get People" )
+        .WithDescription( "Gets all people." )
         .Produces<IEnumerable<PersonV2>>();
 
 peopleV2.MapGet( "/{id:int}", ( int id ) =>
@@ -202,6 +226,8 @@ peopleV2.MapGet( "/{id:int}", ( int id ) =>
              LastName = "Doe",
              Email = "john.doe@somewhere.com",
          } )
+        .WithSummary( "Get Person" )
+        .WithDescription( "Gets a single person." )
         .Produces<PersonV2>()
         .Produces( 404 );
 
@@ -237,6 +263,8 @@ peopleV3.MapGet( "/", () =>
                  Phone = "555-789-3456",
              },
          } )
+        .WithSummary( "Get People" )
+        .WithDescription( "Gets all people." )
         .Produces<IEnumerable<PersonV3>>();
 
 peopleV3.MapGet( "/{id:int}", ( int id ) =>
@@ -248,6 +276,8 @@ peopleV3.MapGet( "/{id:int}", ( int id ) =>
              Email = "john.doe@somewhere.com",
              Phone = "555-987-1234",
          } )
+        .WithSummary( "Get Person" )
+        .WithDescription( "Gets a single person." )
         .Produces<PersonV3>()
         .Produces( 404 );
 
@@ -259,25 +289,28 @@ peopleV3.MapPost( "/", ( HttpRequest request, ApiVersion version, PersonV3 perso
              var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/people/{person.Id}" );
              return Results.Created( location, person );
          } )
+        .WithSummary( "Add Person" )
+        .WithDescription( "Adds a new person." )
         .Accepts<PersonV3>( "application/json" )
         .Produces<PersonV3>( 201 )
         .Produces( 400 );
 
-app.UseSwagger();
 if ( app.Environment.IsDevelopment() )
 {
-    app.UseSwaggerUI(
+    app.IncludeVersionedEndpoints().MapOpenApi().WithDocumentPerVersion();
+    app.MapScalarApiReference(
         options =>
         {
             var descriptions = app.DescribeApiVersions();
 
-            // build a swagger endpoint for each discovered API version
-            foreach ( var description in descriptions )
+            for ( var i = 0; i < descriptions.Count; i++ )
             {
-                var url = $"/swagger/{description.GroupName}/swagger.json";
-                var name = description.GroupName.ToUpperInvariant();
-                options.SwaggerEndpoint( url, name );
+                var description = descriptions[i];
+                var isDefault = i == descriptions.Count - 1;
+
+                options.AddDocument( description.GroupName, description.GroupName, isDefault: isDefault );
             }
         } );
 }
+
 app.Run();

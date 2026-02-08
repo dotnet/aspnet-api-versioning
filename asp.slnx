@@ -115,6 +115,7 @@
     <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Http/Asp.Versioning.Http.csproj" />
     <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Mvc.ApiExplorer/Asp.Versioning.Mvc.ApiExplorer.csproj" />
     <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Mvc/Asp.Versioning.Mvc.csproj" />
+    <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.OpenApi/Asp.Versioning.OpenApi.csproj" />
   </Folder>
   <Folder Name="/src/AspNetCore/test/">
     <Project Path="src/AspNetCore/Acceptance/Asp.Versioning.Mvc.Acceptance.Tests/Asp.Versioning.Mvc.Acceptance.Tests.csproj" />

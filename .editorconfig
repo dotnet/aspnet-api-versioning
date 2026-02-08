@@ -120,6 +120,11 @@ dotnet_diagnostic.SA1010.severity = none # Opening square brackets should be spa
 dotnet_diagnostic.ASP0022.severity = none # Route conflict detected between route handlers
 dotnet_diagnostic.ASP0023.severity = none # Route conflict detected between route handlers
 
+# TEMP: temporary suppression for false positives
+# BUG: https://github.com/dotnet/sdk/issues/51681
+[*Extensions.cs]
+dotnet_diagnostic.CA1034.severity = none
+
 # test settings
 
 # Default severity for analyzer diagnostics with category 'Reliability'

@@ -13,8 +13,9 @@ using static Microsoft.AspNetCore.Http.StatusCodes;
 public class OrdersController : ControllerBase
 {
     /// <summary>
-    /// Retrieves all orders.
+    /// Get Orders
     /// </summary>
+    /// <remarks>Retrieves all orders.</remarks>
     /// <returns>All available orders.</returns>
     /// <response code="200">The successfully retrieved orders.</response>
     [HttpGet]
@@ -33,8 +34,9 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single order.
+    /// Get Order
     /// </summary>
+    /// <remarks>Gets a single order.</remarks>
     /// <param name="id">The requested order identifier.</param>
     /// <returns>The requested order.</returns>
     /// <response code="200">The order was successfully retrieved.</response>
@@ -46,8 +48,9 @@ public class OrdersController : ControllerBase
     public IActionResult Get( int id ) => Ok( new Order() { Id = id, Customer = "John Doe" } );
 
     /// <summary>
-    /// Places a new order.
+    /// Place Order
     /// </summary>
+    /// <remarks>Places a new order.</remarks>
     /// <param name="order">The order to place.</param>
     /// <returns>The created order.</returns>
     /// <response code="201">The order was successfully placed.</response>
@@ -64,8 +67,9 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
-    /// Updates an existing order.
+    /// Update Order
     /// </summary>
+    /// <remarks>Updates an existing order.</remarks>
     /// <param name="id">The requested order identifier.</param>
     /// <param name="order">The order to update.</param>
     /// <returns>None.</returns>

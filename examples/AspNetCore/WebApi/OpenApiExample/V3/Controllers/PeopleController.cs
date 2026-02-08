@@ -12,8 +12,9 @@ using Asp.Versioning;
 public class PeopleController : ControllerBase
 {
     /// <summary>
-    /// Gets all people.
+    /// Get People
     /// </summary>
+    /// <remarks>Gets all people.</remarks>
     /// <returns>All available people.</returns>
     /// <response code="200">The successfully retrieved people.</response>
     [HttpGet]
@@ -53,8 +54,9 @@ public class PeopleController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single person.
+    /// Get Person
     /// </summary>
+    /// <remarks>Gets a single person.</remarks>
     /// <param name="id">The requested person identifier.</param>
     /// <returns>The requested person.</returns>
     /// <response code="200">The person was successfully retrieved.</response>
@@ -74,8 +76,9 @@ public class PeopleController : ControllerBase
         } );
 
     /// <summary>
-    /// Creates a new person.
+    /// Add Person
     /// </summary>
+    /// <remarks>Adds a new person.</remarks>
     /// <param name="person">The person to create.</param>
     /// <param name="apiVersion">The requested API version.</param>
     /// <returns>The created person.</returns>

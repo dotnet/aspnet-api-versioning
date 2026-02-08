@@ -1,13 +1,11 @@
-﻿using ApiVersioning.Examples;
-using Asp.Versioning;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
+﻿using Asp.Versioning;
+using Scalar.AspNetCore;
+using System.Reflection;
 
 [assembly: Microsoft.AspNetCore.Mvc.ApiController]
+[assembly: AssemblyDescription("An example API")]
 
 var builder = WebApplication.CreateBuilder( args );
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
@@ -35,43 +33,27 @@ builder.Services.AddApiVersioning(
                         // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
                         // can also be used to control the format of the API version in route templates
                         options.SubstituteApiVersionInUrl = true;
-                    } );
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-builder.Services.AddSwaggerGen(
-    options =>
-    {
-        // add a custom operation filter which sets default values
-        options.OperationFilter<SwaggerDefaultValues>();
-
-        var fileName = typeof( Program ).Assembly.GetName().Name + ".xml";
-        var filePath = Path.Combine( AppContext.BaseDirectory, fileName );
-
-        // integrate xml comments
-        options.IncludeXmlComments( filePath );
-    } );
+                    } )
+                .AddOpenApi( ( _, options ) => options.AddScalarTransformers() );
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
-app.UseSwagger();
 if ( app.Environment.IsDevelopment() )
 {
-    app.UseSwaggerUI(
-       options =>
-       {
-           var descriptions = app.DescribeApiVersions();
-       
-           // build a swagger endpoint for each discovered API version
-           foreach ( var description in descriptions )
-           {
-               var url = $"/swagger/{description.GroupName}/swagger.json";
-               var name = description.GroupName.ToUpperInvariant();
-               options.SwaggerEndpoint( url, name );
-           }
-       } );
+    app.MapOpenApi().WithDocumentPerVersion();
+    app.MapScalarApiReference(
+        options =>
+        {
+            var descriptions = app.DescribeApiVersions();
+
+            for ( var i = 0; i < descriptions.Count; i++ )
+            {
+                var description = descriptions[i];
+                var isDefault = i == descriptions.Count - 1;
+
+                options.AddDocument( description.GroupName, description.GroupName, isDefault: isDefault );
+            }
+        } );
 }
 
 app.UseHttpsRedirection();

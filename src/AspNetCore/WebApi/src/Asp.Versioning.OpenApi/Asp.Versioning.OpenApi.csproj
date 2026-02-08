@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <VersionPrefix>10.0.0</VersionPrefix>
+  <AssemblyVersion>10.0.0.0</AssemblyVersion>
+  <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+  <RootNamespace>Asp.Versioning.OpenApi</RootNamespace>
+  <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>
+  <Description>The OpenAPI extensions for ASP.NET Core API Versioning.</Description>
+  <PackageTags>Asp;AspNet;AspNetCore;Versioning;OpenAPI</PackageTags>
+  <IsAotCompatible>true</IsAotCompatible>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.*" />
+ </ItemGroup>
+
+ <ItemGroup>
+   <ProjectReference Include="..\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
+ </ItemGroup>
+
+</Project>
