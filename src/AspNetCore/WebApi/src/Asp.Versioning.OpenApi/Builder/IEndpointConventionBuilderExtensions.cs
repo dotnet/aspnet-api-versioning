@@ -2,7 +2,7 @@
 
 #pragma warning disable IDE0130
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Microsoft.AspNetCore.Builder;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
@@ -11,8 +11,8 @@ using Asp.Versioning.OpenApi.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
-using static Microsoft.Extensions.DependencyInjection.IEndpointRouteBuilderExtensions;
 
 /// <summary>
 /// Provides extension methods for <see cref="IEndpointConventionBuilder"/>.
