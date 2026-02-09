@@ -26,7 +26,7 @@ public static class IEndpointConventionBuilderExtensions
         /// Enables generating one OpenAPI document per APi Version for the associated endpoint builder.
         /// </summary>
         /// <remarks>
-        /// This method is only intended to apply API Versioning conventions the the OpenAPI endpoint. Applying this
+        /// This method is only intended to apply API Versioning conventions the OpenAPI endpoint. Applying this
         /// method to other endpoints may have unintended effects.
         /// </remarks>
         /// <returns>The original <see cref="IEndpointConventionBuilder">endpoint convention builder</see>.</returns>

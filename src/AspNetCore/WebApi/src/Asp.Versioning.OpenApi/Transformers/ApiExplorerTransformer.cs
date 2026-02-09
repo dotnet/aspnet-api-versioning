@@ -14,18 +14,48 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-internal sealed class ApiExplorerTransformer(
-    ApiVersionDescription apiVersionDescription,
-    IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions ) :
+/// <summary>
+/// Represents a <see cref="IOpenApiDocumentTransformer">transformer</see> used to apply API Explorer metadata to an
+/// OpenAPI document.
+/// </summary>
+[CLSCompliant( false )]
+public class ApiExplorerTransformer :
     IOpenApiSchemaTransformer,
     IOpenApiDocumentTransformer,
     IOpenApiOperationTransformer
 {
+    private readonly ApiVersionDescription apiVersionDescription;
+    private readonly IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiExplorerTransformer"/> class.
+    /// </summary>
+    /// <param name="apiVersionDescription">The <see cref="ApiVersionDescription">metadata</see> to apply.</param>
+    /// <param name="descriptionOptions">The <see cref="OpenApiDocumentDescriptionOptions">options</see> applied
+    /// to OpenAPI document descriptions.</param>
+    public ApiExplorerTransformer(
+        ApiVersionDescription apiVersionDescription,
+        IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions )
+    {
+        this.apiVersionDescription = apiVersionDescription;
+        this.descriptionOptions = descriptionOptions;
+    }
+
+    /// <summary>
+    /// Gets or sets the OpenApi extension name.
+    /// </summary>
+    /// <value>The OpenAPI extension name. The default value is <c>x-api-versioning</c>.</value>
+    protected string ExtensionName { get; set; } = "x-api-versioning";
+
+    /// <inheritdoc />
     public Task TransformAsync(
         OpenApiSchema schema,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken )
     {
+        ArgumentNullException.ThrowIfNull( schema );
+        ArgumentNullException.ThrowIfNull( context );
+
         if ( schema.Default is null
              && context.ParameterDescription?.DefaultValue is string value )
         {
@@ -35,11 +65,15 @@ internal sealed class ApiExplorerTransformer(
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public Task TransformAsync(
         OpenApiDocument document,
         OpenApiDocumentTransformerContext context,
         CancellationToken cancellationToken )
     {
+        ArgumentNullException.ThrowIfNull( document );
+        ArgumentNullException.ThrowIfNull( context );
+
         var options = descriptionOptions.Value;
 
         UpdateFromAssemblyInfo( document, apiVersionDescription );
@@ -52,6 +86,7 @@ internal sealed class ApiExplorerTransformer(
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public Task TransformAsync(
         OpenApiOperation operation,
         OpenApiOperationTransformerContext context,
@@ -115,7 +150,7 @@ internal sealed class ApiExplorerTransformer(
         }
     }
 
-    private static void UpdateDescriptionToMarkdown(
+    private void UpdateDescriptionToMarkdown(
         OpenApiDocument document,
         ApiVersionDescription api,
         OpenApiDocumentDescriptionOptions options )
@@ -170,48 +205,68 @@ internal sealed class ApiExplorerTransformer(
         document.Info.Description = description.ToString();
     }
 
-    private static bool IsHtml( LinkHeaderValue link ) =>
-        StringSegmentComparer.OrdinalIgnoreCase.Equals( link.Type, "text/html" );
+    /// <summary>
+    /// Determines if the specified link should be rendered.
+    /// </summary>
+    /// <param name="link">The <see cref="LinkHeaderValue">link</see> to evaluate.</param>
+    /// <returns>True if the link should be rendered; otherwise, false.</returns>
+    /// <remarks>The default implementation only renders <c>text/html</c> links.</remarks>
+    protected virtual bool ShouldRenderLink( LinkHeaderValue link )
+    {
+        ArgumentNullException.ThrowIfNull( link );
+        return StringSegmentComparer.OrdinalIgnoreCase.Equals( link.Type, "text/html" );
+    }
 
-    private static void AddMarkdownLinks( StringBuilder markdown, IList<LinkHeaderValue> links )
+    /// <summary>
+    /// Renders the specified link as markdown.
+    /// </summary>
+    /// <param name="markdown">The <see cref="StringBuilder">builder</see> to render the Markdown into.</param>
+    /// <param name="link">The <see cref="LinkHeaderValue">link</see> to render.</param>
+    protected virtual void RenderLink( StringBuilder markdown, LinkHeaderValue link )
+    {
+        ArgumentNullException.ThrowIfNull( markdown );
+        ArgumentNullException.ThrowIfNull( link );
+
+        if ( StringSegment.IsNullOrEmpty( link.Title ) )
+        {
+            if ( link.LinkTarget.IsAbsoluteUri )
+            {
+                markdown.Append( "- " ).AppendLine( link.LinkTarget.OriginalString );
+            }
+            else
+            {
+                markdown.Append( "- <a href=\"" )
+                        .Append( link.LinkTarget.OriginalString )
+                        .Append( "\">" )
+                        .Append( link.LinkTarget.OriginalString )
+                        .AppendLine( "</a>" );
+            }
+        }
+        else
+        {
+            markdown.Append( "- [" )
+                    .Append( link.Title.ToString() )
+                    .Append( "](" )
+                    .Append( link.LinkTarget.OriginalString )
+                    .Append( ')' )
+                    .AppendLine();
+        }
+    }
+
+    private void AddMarkdownLinks( StringBuilder markdown, IList<LinkHeaderValue> links )
     {
         for ( var i = 0; i < links.Count; i++ )
         {
             var link = links[i];
 
-            if ( !IsHtml( link ) )
+            if ( ShouldRenderLink( link ) )
             {
-                continue;
-            }
-
-            if ( StringSegment.IsNullOrEmpty( link.Title ) )
-            {
-                if ( link.LinkTarget.IsAbsoluteUri )
-                {
-                    markdown.Append( "- " ).AppendLine( link.LinkTarget.OriginalString );
-                }
-                else
-                {
-                    markdown.Append( "- <a href=\"" )
-                            .Append( link.LinkTarget.OriginalString )
-                            .Append( "\">" )
-                            .Append( link.LinkTarget.OriginalString )
-                            .AppendLine( "</a>" );
-                }
-            }
-            else
-            {
-                markdown.Append( "- [" )
-                        .Append( link.Title.ToString() )
-                        .Append( "](" )
-                        .Append( link.LinkTarget.OriginalString )
-                        .Append( ')' )
-                        .AppendLine();
+                RenderLink( markdown, link );
             }
         }
     }
 
-    private static void AddLinkExtensions( OpenApiDocument document, ApiVersionDescription api )
+    private void AddLinkExtensions( OpenApiDocument document, ApiVersionDescription api )
     {
         var array = new JsonArray();
 
@@ -223,22 +278,29 @@ internal sealed class ApiExplorerTransformer(
         if ( array.Count > 0 )
         {
             var extensions = document.Extensions ??= new Dictionary<string, IOpenApiExtension>();
-            extensions["x-api-versioning"] = new JsonNodeExtension( array );
+            extensions[ExtensionName] = new JsonNodeExtension( array );
         }
     }
 
     [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
     [UnconditionalSuppressMessage( "ILLink", "IL3050" )]
-    private static void AddLinks( JsonArray array, IList<LinkHeaderValue> links )
+    private void AddLinks( JsonArray array, IList<LinkHeaderValue> links )
     {
         for ( var i = 0; i < links.Count; i++ )
         {
-            array.Add( LinkToJson( links[i] ) );
+            array.Add( ToJson( links[i] ) );
         }
     }
 
-    private static JsonObject LinkToJson( LinkHeaderValue link )
+    /// <summary>
+    /// Converts the specified link into JSON as an OpenAPI extension.
+    /// </summary>
+    /// <param name="link">The <see cref="LinkHeaderValue">link</see> to convert.</param>
+    /// <returns>The OpenAPI extension <see cref="JsonObject">JSON</see> node.</returns>
+    protected virtual JsonObject ToJson( LinkHeaderValue link )
     {
+        ArgumentNullException.ThrowIfNull( link );
+
         var obj = new JsonObject();
 
         if ( link.Title.HasValue )

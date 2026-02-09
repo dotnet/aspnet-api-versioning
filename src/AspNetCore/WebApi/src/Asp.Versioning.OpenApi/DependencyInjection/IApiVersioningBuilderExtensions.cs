@@ -29,10 +29,8 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            var services = builder.Services;
-
-            AddOpenApiServices( services );
-            services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
+            AddOpenApiServices( builder );
+            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
 
             return builder;
         }
@@ -46,10 +44,8 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            var services = builder.Services;
-
-            AddOpenApiServices( services );
-            services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
+            AddOpenApiServices( builder );
+            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
 
             return builder;
         }
@@ -64,11 +60,9 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            var services = builder.Services;
-
-            AddOpenApiServices( services );
-            services.Configure( descriptionOptions );
-            services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
+            AddOpenApiServices( builder );
+            builder.Services.Configure( descriptionOptions );
+            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
 
             return builder;
         }
@@ -87,18 +81,21 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            var services = builder.Services;
-
-            AddOpenApiServices( services );
-            services.Configure( descriptionOptions );
-            services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
+            AddOpenApiServices( builder );
+            builder.Services.Configure( descriptionOptions );
+            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
 
             return builder;
         }
     }
 
-    private static void AddOpenApiServices( IServiceCollection services )
+    [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
+    private static void AddOpenApiServices( IApiVersioningBuilder builder )
     {
+        builder.AddApiExplorer();
+
+        var services = builder.Services;
+
         services.AddOptions<OpenApiDocumentDescriptionOptions>();
         services.Add( Singleton<ConfigureOpenApiOptions, ConfigureOpenApiOptions>() );
         services.TryAddEnumerable( Singleton<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>( static sp => sp.GetRequiredService<ConfigureOpenApiOptions>() ) );
