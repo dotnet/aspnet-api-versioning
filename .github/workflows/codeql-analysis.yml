@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         queries: security-and-quality
         languages: csharp
@@ -43,7 +43,7 @@ jobs:
       shell: pwsh
       run: |
         $start = (Get-Location).Path.Length + 1
-        $sln = Join-Path '..' 'asp.sln'
+        $sln = Join-Path '..' 'asp.slnx'
         $projects = Get-ChildItem src -Include src -Recurse | `
                     ForEach-Object { Get-ChildItem $_.FullName -Filter *.csproj -Recurse } | `
                     ForEach-Object { $_.FullName.Substring($start) }
@@ -54,4 +54,4 @@ jobs:
         dotnet build $slnf.FullName --configuration Release
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
