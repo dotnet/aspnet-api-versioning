@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+ <PropertyGroup>
+  <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+  <RootNamespace>Asp.Versioning.OpenApi</RootNamespace>
+ </PropertyGroup>
+
+ <ItemGroup>
+   <ProjectReference Include="..\..\src\Asp.Versioning.OpenApi\Asp.Versioning.OpenApi.csproj" />
+ </ItemGroup>
+
+</Project>
