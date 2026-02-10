@@ -33,6 +33,7 @@
   <Compile Include="$(BackportDir)CallerArgumentExpressionAttribute.cs" Visible="false" />
   <Compile Include="$(BackportDir)NullableAttributes.cs" Visible="false" />
   <Compile Include="$(BackportDir)StringExtensions.cs" Visible="false" />
+  <Compile Include="$(BackportDir)DateTimeOffsetExtensions.cs" Visible="false" />
  </ItemGroup>
 
  <ItemGroup>

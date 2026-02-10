@@ -2,7 +2,7 @@
 
 namespace Asp.Versioning;
 
-public class ISunsetPolicyBuilderExtensionsTest
+public class IPolicyBuilderExtensionsTest
 {
     [Fact]
     public void link_should_build_url_from_string()
@@ -11,10 +11,10 @@ public class ISunsetPolicyBuilderExtensionsTest
         var builder = Mock.Of<ISunsetPolicyBuilder>();
 
         // act
-        builder.Link( "http://tempuri.org" );
+        builder.Link("http://tempuri.org");
 
         // assert
-        Mock.Get( builder ).Verify( b => b.Link( new Uri( "http://tempuri.org" ) ) );
+        Mock.Get(builder).Verify(b => b.Link(new Uri("http://tempuri.org")));
     }
 
     [Fact]
@@ -22,12 +22,12 @@ public class ISunsetPolicyBuilderExtensionsTest
     {
         // arrange
         var builder = Mock.Of<ISunsetPolicyBuilder>();
-        var date = new DateTime( 2022, 2, 1 );
+        var date = new DateTime(2022, 2, 1);
 
         // act
-        builder.Effective( 2022, 2, 1 );
+        builder.Effective(2022, 2, 1);
 
         // assert
-        Mock.Get( builder ).Verify( b => b.Effective( new( date ) ) );
+        Mock.Get(builder).Verify(b => b.SetEffectiveDate(new(date)));
     }
 }

@@ -69,6 +69,13 @@ public class ApiVersionHandler : DelegatingHandler
     {
         ArgumentNullException.ThrowIfNull( response );
 
+        var deprecationPolicy = response.ReadDeprecationPolicy();
+
+        if ( deprecationPolicy.Date.HasValue && deprecationPolicy.Date <= DateTimeOffset.UtcNow )
+        {
+            return true;
+        }
+
         foreach ( var reportedApiVersion in enumerable.Deprecated( response, parser ) )
         {
             // don't use '==' operator because a derived type may not overload it

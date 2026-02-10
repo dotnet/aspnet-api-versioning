@@ -88,6 +88,87 @@ public class HttpResponseMessageExtensionsTest
     }
 
     [Fact]
+    public void read_deprecation_policy_should_parse_response()
+    {
+        // arrange
+        var date = DateTimeOffset.Now;
+        var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
+        var response = new HttpResponseMessage() { RequestMessage = request };
+
+        response.Headers.Add( "deprecation", date.ToDeprecationHeaderValue() );
+        response.Headers.Add( "link", "<policy>; rel=\"deprecation\"; type=\"text/html\"" );
+
+        // act
+        var policy = response.ReadDeprecationPolicy();
+
+        // assert
+        policy.Date.Value.ToLocalTime().Should().BeCloseTo( date, TimeSpan.FromSeconds( 2d ) );
+        policy.Links.Single().Should().BeEquivalentTo(
+            new LinkHeaderValue(
+                new Uri( "http://tempuri.org/policy" ),
+                "deprecation" )
+            {
+                Type = "text/html",
+            } );
+    }
+
+    [Fact]
+    public void read_deprecation_policy_should_use_smallest_date()
+    {
+        // arrange
+        var date = DateTimeOffset.Now;
+        var expected = date.Subtract( TimeSpan.FromDays( 14 ) );
+        var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
+        var response = new HttpResponseMessage() { RequestMessage = request };
+
+        response.Headers.Add(
+            "deprecation",
+            new string[]
+            {
+                date.ToDeprecationHeaderValue(),
+                expected.ToDeprecationHeaderValue(),
+                expected.AddDays( 3 ).ToDeprecationHeaderValue(),
+            } );
+
+        // act
+        var policy = response.ReadDeprecationPolicy();
+
+        // assert
+        policy.Date.Value.ToLocalTime().Should().BeCloseTo( expected, TimeSpan.FromSeconds( 2d ) );
+        policy.HasLinks.Should().BeFalse();
+    }
+
+    [Fact]
+    public void read_deprecation_policy_should_ignore_unrelated_links()
+    {
+        // arrange
+        var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
+        var response = new HttpResponseMessage() { RequestMessage = request };
+
+        response.Headers.Add(
+            "link",
+            new[]
+            {
+                "<swagger.json>; rel=\"openapi\"; type=\"application/json\" title=\"OpenAPI\"",
+                "<policy>; rel=\"deprecation\"; type=\"text/html\"",
+                "<docs>; rel=\"info\"; type=\"text/html\" title=\"Documentation\"",
+            } );
+
+        // act
+        var policy = response.ReadDeprecationPolicy();
+
+        // assert
+        policy.Date.Should().BeNull();
+        policy.Links.Single().Should().BeEquivalentTo(
+            new LinkHeaderValue(
+                new Uri( "http://tempuri.org/policy" ),
+                "deprecation" )
+            {
+                Type = "text/html",
+            } );
+    }
+
+    [Fact]
     public void get_open_api_document_urls_should_return_expected_values()
     {
         // arrange

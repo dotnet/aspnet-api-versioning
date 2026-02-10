@@ -42,7 +42,7 @@ public sealed class ApiVersionHeaderEnumerable
         new( response, apiSupportedVersionsName, parser );
 
     /// <summary>
-    /// Creates and returns an enumerator for deprecated API versions.
+    /// Creates and returns an enumerator for deprecated API versions, as read from the api-deprecated-versions header.
     /// </summary>
     /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to evaluate.</param>
     /// <param name="parser">The optional <see cref="IApiVersionParser">API version parser</see>.</param>

@@ -75,6 +75,17 @@ public static class HttpResponseMessageExtensions
     }
 
     /// <summary>
+    /// Formats the <paramref name="deprecationDate"/> as required for a Deprecation header.
+    /// </summary>
+    /// <param name="deprecationDate">The date when the api is deprecated.</param>
+    /// <returns>A formatted string as required for a Deprecation header.</returns>
+    public static string ToDeprecationHeaderValue( this DateTimeOffset deprecationDate )
+    {
+        var unixTimestamp = deprecationDate.ToUnixTimeSeconds();
+        return unixTimestamp.ToString( "'@'0", CultureInfo.CurrentCulture );
+    }
+
+    /// <summary>
     /// Gets an API deprecation policy from the HTTP response.
     /// </summary>
     /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to read from.</param>
@@ -90,6 +101,7 @@ public static class HttpResponseMessageExtensions
         if ( headers.TryGetValues( Deprecation, out var values ) )
         {
             var culture = CultureInfo.CurrentCulture;
+            var style = NumberStyles.Integer;
 
             foreach ( var value in values )
             {
@@ -99,9 +111,9 @@ public static class HttpResponseMessageExtensions
                 }
 
 #if NETSTANDARD
-                if ( long.TryParse( value.Substring( 1 ), out var unixTimestamp ) )
+                if ( long.TryParse( value.Substring( 1 ), style, culture, out var unixTimestamp ) )
 #else
-                if ( long.TryParse( value.AsSpan()[1..], out var unixTimestamp ) )
+                if ( long.TryParse( value.AsSpan()[1..], style, culture, out var unixTimestamp ) )
 #endif
                 {
                     DateTimeOffset parsed;
@@ -111,7 +123,7 @@ public static class HttpResponseMessageExtensions
                     parsed = DateTimeOffset.FromUnixTimeSeconds( unixTimestamp );
 #endif
 
-                    if ( date == default || date < parsed )
+                    if ( date == default || date > parsed )
                     {
                         date = parsed;
                     }
