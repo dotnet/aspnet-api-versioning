@@ -297,7 +297,7 @@ peopleV3.MapPost( "/", ( HttpRequest request, ApiVersion version, PersonV3 perso
 
 if ( app.Environment.IsDevelopment() )
 {
-    app.IncludeVersionedEndpoints().MapOpenApi().WithDocumentPerVersion();
+    app.MapOpenApi().WithDocumentPerVersion();
     app.MapScalarApiReference(
         options =>
         {

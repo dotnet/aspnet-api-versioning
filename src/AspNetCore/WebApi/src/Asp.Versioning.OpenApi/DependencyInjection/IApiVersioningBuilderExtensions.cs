@@ -7,6 +7,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.OpenApi;
+using Asp.Versioning.OpenApi.Internal;
+using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -96,8 +98,10 @@ public static class IApiVersioningBuilderExtensions
 
         var services = builder.Services;
 
+        services.AddTransient( NewRequestServices );
+        services.Add( Singleton( Type.IDocumentProvider, ResolveDocumentProvider ) );
         services.AddOptions<OpenApiDocumentDescriptionOptions>();
-        services.Add( Singleton<ConfigureOpenApiOptions, ConfigureOpenApiOptions>() );
+        services.Add( Transient<ConfigureOpenApiOptions, ConfigureOpenApiOptions>() );
         services.TryAddEnumerable( Singleton<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>( static sp => sp.GetRequiredService<ConfigureOpenApiOptions>() ) );
 
         if ( GetJsonConfiguration() is { } descriptor )
@@ -118,4 +122,42 @@ public static class IApiVersioningBuilderExtensions
 #pragma warning disable IDE0060
 
     private static Action<ApiVersionDescription, OpenApiOptions> NoOptions( IServiceProvider provider, object key ) => static ( _, _ ) => { };
+
+    private static object ResolveDocumentProvider( IServiceProvider provider ) =>
+        provider.GetRequiredService<KeyedServiceContainer>().GetRequiredService( Type.IDocumentProvider );
+
+    [UnconditionalSuppressMessage( "ILLink", "IL3050" )]
+    private static KeyedServiceContainer NewRequestServices( IServiceProvider services )
+    {
+        var configure = services.GetRequiredKeyedService<Action<ApiVersionDescription, OpenApiOptions>>( typeof( ApiVersion ) );
+        var provider = services.GetRequiredService<IApiVersionDescriptionProvider>();
+        var keyedServices = new KeyedServiceContainer( services );
+        var names = new List<string>();
+
+        foreach ( var description in provider.ApiVersionDescriptions )
+        {
+            names.Add( description.GroupName );
+            keyedServices.Add( Type.OpenApiSchemaService, description.GroupName, Class.OpenApiSchemaService.New );
+            keyedServices.Add( Type.OpenApiDocumentService, description.GroupName, Class.OpenApiDocumentService.New );
+            keyedServices.Add(
+                typeof( IOpenApiDocumentProvider ),
+                description.GroupName,
+                ( sp, k ) => sp.GetRequiredKeyedService( Type.OpenApiDocumentService, k ) );
+        }
+
+        if ( names.Count > 0 )
+        {
+            var array = Array.CreateInstance( Type.NamedService, names.Count );
+
+            for ( var i = 0; i < names.Count; i++ )
+            {
+                array.SetValue( Class.NamedService.New( names[i] ), i );
+            }
+
+            keyedServices.Add( Type.IDocumentProvider, Class.OpenApiDocumentProvider.New );
+            keyedServices.Add( Type.IEnumerableOfNamedService, array );
+        }
+
+        return keyedServices;
+    }
 }
