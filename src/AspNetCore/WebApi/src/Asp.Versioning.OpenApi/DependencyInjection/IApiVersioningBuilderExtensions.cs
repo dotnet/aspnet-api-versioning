@@ -7,6 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.OpenApi;
+using Asp.Versioning.OpenApi.Configuration;
 using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.Http.Json;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
+using EM = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions;
 
 /// <summary>
 /// Provides OpenAPI specific extension methods for <see cref="IApiVersioningBuilder"/>.
@@ -34,7 +36,6 @@ public static class IApiVersioningBuilderExtensions
             ArgumentNullException.ThrowIfNull( builder );
 
             AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
-            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
 
             return builder;
         }
@@ -42,52 +43,15 @@ public static class IApiVersioningBuilderExtensions
         /// <summary>
         /// Adds OpenAPI support for API versioning.
         /// </summary>
-        /// <param name="configureOptions">The function used to configure the target <see cref="OpenApiOptions">options</see>.</param>
+        /// <param name="configureOptions">The function used to configure the
+        /// <see cref="VersionedOpenApiOptions">versioned OpenAPI options</see>.</param>
         /// <returns>The original <see cref="IApiVersioningBuilder">builder</see>.</returns>
-        public IApiVersioningBuilder AddOpenApi( Action<ApiVersionDescription, OpenApiOptions> configureOptions )
+        public IApiVersioningBuilder AddOpenApi( Action<VersionedOpenApiOptions> configureOptions )
         {
             ArgumentNullException.ThrowIfNull( builder );
 
             AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
-            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds OpenAPI support for API versioning.
-        /// </summary>
-        /// <param name="descriptionOptions">The function used to configure the target
-        /// <see cref="OpenApiDocumentDescriptionOptions">title options</see>.</param>
-        /// <returns>The original <see cref="IApiVersioningBuilder">builder</see>.</returns>
-        public IApiVersioningBuilder AddOpenApi( Action<OpenApiDocumentDescriptionOptions> descriptionOptions )
-        {
-            ArgumentNullException.ThrowIfNull( builder );
-
-            AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
-            builder.Services.Configure( descriptionOptions );
-            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds OpenAPI support for API versioning.
-        /// </summary>
-        /// <param name="configureOptions">The function used to configure the target
-        /// <see cref="OpenApiOptions">OpenAPI options</see>.</param>
-        /// <param name="descriptionOptions">The function used to configure the target
-        /// <see cref="OpenApiDocumentDescriptionOptions">title options</see>.</param>
-        /// <returns>The original <see cref="IApiVersioningBuilder">builder</see>.</returns>
-        public IApiVersioningBuilder AddOpenApi(
-            Action<ApiVersionDescription, OpenApiOptions> configureOptions,
-            Action<OpenApiDocumentDescriptionOptions> descriptionOptions )
-        {
-            ArgumentNullException.ThrowIfNull( builder );
-
-            AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
-            builder.Services.Configure( descriptionOptions );
-            builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
+            builder.Services.Configure( configureOptions );
 
             return builder;
         }
@@ -102,9 +66,9 @@ public static class IApiVersioningBuilderExtensions
 
         services.AddTransient( NewRequestServices );
         services.Add( Singleton( Type.IDocumentProvider, ResolveDocumentProvider ) );
-        services.AddOptions<OpenApiDocumentDescriptionOptions>();
-        services.Add( Transient<ConfigureOpenApiOptions, ConfigureOpenApiOptions>() );
-        services.TryAddEnumerable( Singleton<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>( static sp => sp.GetRequiredService<ConfigureOpenApiOptions>() ) );
+        services.AddSingleton<VersionedOpenApiOptionsFactory>();
+        services.TryAddEnumerable( Transient<IPostConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>() );
+        services.TryAdd( Singleton<IOptionsFactory<VersionedOpenApiOptions>>( EM.GetRequiredService<VersionedOpenApiOptionsFactory> ) );
         builder.Services.AddSingleton( sp => new XmlCommentsFile( assemblies, sp.GetRequiredService<IHostEnvironment>() ) );
 
         if ( GetJsonConfiguration() is { } descriptor )
@@ -138,17 +102,12 @@ public static class IApiVersioningBuilderExtensions
         return services.SingleOrDefault( sd => sd.ServiceType == typeof( IConfigureOptions<JsonOptions> ) );
     }
 
-#pragma warning disable IDE0060
-
-    private static Action<ApiVersionDescription, OpenApiOptions> NoOptions( IServiceProvider provider, object key ) => static ( _, _ ) => { };
-
     private static object ResolveDocumentProvider( IServiceProvider provider ) =>
         provider.GetRequiredService<KeyedServiceContainer>().GetRequiredService( Type.IDocumentProvider );
 
     [UnconditionalSuppressMessage( "ILLink", "IL3050" )]
     private static KeyedServiceContainer NewRequestServices( IServiceProvider services )
     {
-        var configure = services.GetRequiredKeyedService<Action<ApiVersionDescription, OpenApiOptions>>( typeof( ApiVersion ) );
         var provider = services.GetRequiredService<IApiVersionDescriptionProvider>();
         var keyedServices = new KeyedServiceContainer( services );
         var names = new List<string>();

@@ -5,6 +5,7 @@
 namespace Asp.Versioning.OpenApi;
 
 using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.OpenApi.Configuration;
 using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.OpenApi;
@@ -14,11 +15,10 @@ using Microsoft.Extensions.Options;
 internal sealed class ConfigureOpenApiOptions(
     XmlCommentsFile file,
     IApiVersionDescriptionProvider provider,
-    IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions,
-    [FromKeyedServices( typeof( ApiVersion ) )] Action<ApiVersionDescription, OpenApiOptions> configure )
-    : IConfigureNamedOptions<OpenApiOptions>
+    VersionedOpenApiOptionsFactory factory )
+    : IPostConfigureOptions<OpenApiOptions>
 {
-    public void Configure( string? name, OpenApiOptions options )
+    public void PostConfigure( string? name, OpenApiOptions options )
     {
         var comparer = StringComparer.OrdinalIgnoreCase;
         var descriptions = provider.ApiVersionDescriptions;
@@ -33,26 +33,33 @@ internal sealed class ConfigureOpenApiOptions(
                 continue;
             }
 
-            var apiExplorer = new ApiExplorerTransformer( description, descriptionOptions );
-
-            options.SetDocumentName( description.GroupName );
-            options.AddDocumentTransformer( apiExplorer );
-            options.AddSchemaTransformer( apiExplorer );
-            options.AddOperationTransformer( apiExplorer );
-
-            if ( !xmlComments.IsEmpty )
+            var context = new VersionedOpenApiOptionsFactory.Context()
             {
-                options.AddSchemaTransformer( xmlComments );
-                options.AddOperationTransformer( xmlComments );
-            }
+                Name = name,
+                Description = description,
+                Options = options,
+                OnCreated = versionedOptions => Configure( versionedOptions, xmlComments ),
+            };
 
-            configure( description, options );
+            factory.CreateAndConfigure( context );
             break;
         }
     }
 
-    public void Configure( OpenApiOptions options )
+    private static void Configure( VersionedOpenApiOptions versionedOptions, XmlCommentsTransformer xmlComments )
     {
-        // intentionally empty; all options must be named
+        var options = versionedOptions.Document;
+        var apiExplorer = new ApiExplorerTransformer( versionedOptions );
+
+        options.SetDocumentName( versionedOptions.Description.GroupName );
+        options.AddDocumentTransformer( apiExplorer );
+        options.AddSchemaTransformer( apiExplorer );
+        options.AddOperationTransformer( apiExplorer );
+
+        if ( !xmlComments.IsEmpty )
+        {
+            options.AddSchemaTransformer( xmlComments );
+            options.AddOperationTransformer( xmlComments );
+        }
     }
 }

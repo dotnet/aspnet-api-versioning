@@ -34,7 +34,7 @@ services.AddApiVersioning(
                 // can also be used to control the format of the API version in route templates
                 options.SubstituteApiVersionInUrl = true;
             } )
-        .AddOpenApi( ( _, options ) => options.AddScalarTransformers() )
+        .AddOpenApi( options => options.Document.AddScalarTransformers() )
         // this enables binding ApiVersion as a endpoint callback parameter. if you don't use it, then
         // you should remove this configuration.
         .EnableApiVersionBinding();

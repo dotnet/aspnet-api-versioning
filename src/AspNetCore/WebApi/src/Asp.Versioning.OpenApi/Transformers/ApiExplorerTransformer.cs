@@ -5,7 +5,6 @@ namespace Asp.Versioning.OpenApi.Transformers;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi;
 using System.Reflection;
@@ -24,22 +23,18 @@ public class ApiExplorerTransformer :
     IOpenApiDocumentTransformer,
     IOpenApiOperationTransformer
 {
-    private readonly ApiVersionDescription apiVersionDescription;
-    private readonly IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiExplorerTransformer"/> class.
     /// </summary>
-    /// <param name="apiVersionDescription">The <see cref="ApiVersionDescription">metadata</see> to apply.</param>
-    /// <param name="descriptionOptions">The <see cref="OpenApiDocumentDescriptionOptions">options</see> applied
+    /// <param name="options">The <see cref="VersionedOpenApiOptions">options</see> applied
     /// to OpenAPI document descriptions.</param>
-    public ApiExplorerTransformer(
-        ApiVersionDescription apiVersionDescription,
-        IOptions<OpenApiDocumentDescriptionOptions> descriptionOptions )
-    {
-        this.apiVersionDescription = apiVersionDescription;
-        this.descriptionOptions = descriptionOptions;
-    }
+    public ApiExplorerTransformer( VersionedOpenApiOptions options ) => Options = options;
+
+    /// <summary>
+    /// Gets the associated, versioned OpenAPI options.
+    /// </summary>
+    /// <value>The associated <see cref="VersionedOpenApiOptions">options</see>.</value>
+    protected VersionedOpenApiOptions Options { get; }
 
     /// <summary>
     /// Gets or sets the OpenApi extension name.
@@ -74,14 +69,12 @@ public class ApiExplorerTransformer :
         ArgumentNullException.ThrowIfNull( document );
         ArgumentNullException.ThrowIfNull( context );
 
-        var options = descriptionOptions.Value;
+        UpdateFromAssemblyInfo( document, Options.Description );
 
-        UpdateFromAssemblyInfo( document, apiVersionDescription );
+        document.Info.Version = Options.Description.ApiVersion.ToString();
 
-        document.Info.Version = apiVersionDescription.ApiVersion.ToString();
-
-        UpdateDescriptionToMarkdown( document, apiVersionDescription, options );
-        AddLinkExtensions( document, apiVersionDescription );
+        UpdateDescriptionToMarkdown( document, Options.Description, Options.DocumentDescription );
+        AddLinkExtensions( document, Options.Description );
 
         return Task.CompletedTask;
     }

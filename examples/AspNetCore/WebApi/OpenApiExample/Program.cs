@@ -34,7 +34,7 @@ builder.Services.AddApiVersioning(
                         // can also be used to control the format of the API version in route templates
                         options.SubstituteApiVersionInUrl = true;
                     } )
-                .AddOpenApi( ( _, options ) => options.AddScalarTransformers() );
+                .AddOpenApi( options => options.Document.AddScalarTransformers() );
 
 var app = builder.Build();
 
