@@ -169,23 +169,20 @@ public static class ApiDescriptionExtensions
 
     extension( ApiRequestFormat requestFormat )
     {
-        internal ApiRequestFormat Clone()
+        internal ApiRequestFormat Clone() => new()
         {
-            return new()
-            {
-                Formatter = requestFormat.Formatter,
-                MediaType = requestFormat.MediaType,
-            };
-        }
+            Formatter = requestFormat.Formatter,
+            MediaType = requestFormat.MediaType,
+        };
     }
 
     extension( ApiResponseType responseType )
     {
-
         internal ApiResponseType Clone()
         {
             var clone = new ApiResponseType()
             {
+                Description = responseType.Description,
                 IsDefaultResponse = responseType.IsDefaultResponse,
                 ModelMetadata = responseType.ModelMetadata,
                 StatusCode = responseType.StatusCode,
@@ -198,30 +195,24 @@ public static class ApiDescriptionExtensions
         }
     }
 
-    private static ApiParameterDescription Clone( ApiParameterDescription parameterDescription )
+    private static ApiParameterDescription Clone( ApiParameterDescription parameterDescription ) => new()
     {
-        return new()
-        {
-            BindingInfo = parameterDescription.BindingInfo,
-            IsRequired = parameterDescription.IsRequired,
-            DefaultValue = parameterDescription.DefaultValue,
-            ModelMetadata = parameterDescription.ModelMetadata,
-            Name = parameterDescription.Name,
-            ParameterDescriptor = parameterDescription.ParameterDescriptor,
-            RouteInfo = parameterDescription.RouteInfo,
-            Source = parameterDescription.Source,
-            Type = parameterDescription.Type,
-        };
-    }
+        BindingInfo = parameterDescription.BindingInfo,
+        IsRequired = parameterDescription.IsRequired,
+        DefaultValue = parameterDescription.DefaultValue,
+        ModelMetadata = parameterDescription.ModelMetadata,
+        Name = parameterDescription.Name,
+        ParameterDescriptor = parameterDescription.ParameterDescriptor,
+        RouteInfo = parameterDescription.RouteInfo,
+        Source = parameterDescription.Source,
+        Type = parameterDescription.Type,
+    };
 
-    private static ApiResponseFormat Clone( ApiResponseFormat responseFormat )
+    private static ApiResponseFormat Clone( ApiResponseFormat responseFormat ) => new()
     {
-        return new()
-        {
-            Formatter = responseFormat.Formatter,
-            MediaType = responseFormat.MediaType,
-        };
-    }
+        Formatter = responseFormat.Formatter,
+        MediaType = responseFormat.MediaType,
+    };
 
     private static void CloneList<T>( IList<T> source, IList<T> destintation, Func<T, T> clone )
     {
