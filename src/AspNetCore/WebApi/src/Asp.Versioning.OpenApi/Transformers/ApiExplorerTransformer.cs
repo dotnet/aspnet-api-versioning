@@ -157,7 +157,7 @@ public class ApiExplorerTransformer :
 
             if ( !string.IsNullOrEmpty( notice ) )
             {
-                if ( description[^1] != '.' )
+                if ( description.Length > 0 && description[^1] != '.' )
                 {
                     description.Append( '.' );
                 }
@@ -172,7 +172,7 @@ public class ApiExplorerTransformer :
 
             if ( !string.IsNullOrEmpty( notice ) )
             {
-                if ( description[^1] != '.' )
+                if ( description.Length > 0 && description[^1] != '.' )
                 {
                     description.Append( '.' );
                 }

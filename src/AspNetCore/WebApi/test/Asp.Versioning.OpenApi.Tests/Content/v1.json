@@ -1,0 +1,99 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Test API | v1",
+    "description": " The API will be sunset on 2/10/2026.\r\n\r\n### Links\r\n\r\n- [Versioning Policy](policy.html)\r\n",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost/"
+    }
+  ],
+  "paths": {
+    "/Test": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The requested API version",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "1.0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "pattern": "^-?(?:0|[1-9]\\d*)$",
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "pattern": "^-?(?:0|[1-9]\\d*)$",
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "pattern": "^-?(?:0|[1-9]\\d*)$",
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Test"
+    }
+  ],
+  "x-api-versioning": [
+    {
+      "title": "Versioning Policy",
+      "type": "text/html",
+      "rel": "sunset",
+      "url": "policy.html"
+    }
+  ]
+}
