@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.OpenApi.Internal;
+namespace Asp.Versioning.OpenApi.Reflection;
 
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Json;

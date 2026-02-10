@@ -5,7 +5,7 @@
 namespace Asp.Versioning.OpenApi;
 
 using Asp.Versioning.ApiExplorer;
-using Asp.Versioning.OpenApi.Internal;
+using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;

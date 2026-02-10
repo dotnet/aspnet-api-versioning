@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.OpenApi.Internal;
+namespace Asp.Versioning.OpenApi.Reflection;
 
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 

@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.Builder;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using Asp.Versioning.OpenApi.Internal;
+using Asp.Versioning.OpenApi.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
