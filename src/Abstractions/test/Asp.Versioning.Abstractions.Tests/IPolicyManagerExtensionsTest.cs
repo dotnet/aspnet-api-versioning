@@ -2,7 +2,7 @@
 
 namespace Asp.Versioning;
 
-public class ISunsetPolicyManagerExtensionsTest
+public class IPolicyManagerExtensionsTest
 {
     [Fact]
     public void try_get_policy_should_get_global_policy_by_version()

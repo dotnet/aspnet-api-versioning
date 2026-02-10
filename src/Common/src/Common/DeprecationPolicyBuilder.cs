@@ -20,10 +20,9 @@ public class DeprecationPolicyBuilder : PolicyBuilder<DeprecationPolicy>, IDepre
         : base( name, apiVersion ) { }
 
     /// <inheritdoc />
-    public virtual IDeprecationPolicyBuilder Effective( DateTimeOffset deprecationDate )
+    public virtual void SetEffectiveDate( DateTimeOffset effectiveDate )
     {
-        date = deprecationDate;
-        return this;
+        date = effectiveDate;
     }
 
     /// <inheritdoc />

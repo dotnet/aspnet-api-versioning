@@ -20,10 +20,9 @@ public class SunsetPolicyBuilder : PolicyBuilder<SunsetPolicy>, ISunsetPolicyBui
         : base( name, apiVersion ) { }
 
     /// <inheritdoc />
-    public virtual ISunsetPolicyBuilder Effective( DateTimeOffset sunsetDate )
+    public virtual void SetEffectiveDate( DateTimeOffset effectiveDate )
     {
-        date = sunsetDate;
-        return this;
+        date = effectiveDate;
     }
 
     /// <inheritdoc />
