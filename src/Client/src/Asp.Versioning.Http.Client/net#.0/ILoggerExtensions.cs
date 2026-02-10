@@ -16,25 +16,33 @@ internal static partial class ILoggerExtensions
         this ILogger logger,
         Uri requestUrl,
         ApiVersion apiVersion,
-        SunsetPolicy sunsetPolicy )
+        SunsetPolicy sunsetPolicy,
+        DeprecationPolicy deprecationPolicy )
     {
         var sunsetDate = FormatDate( sunsetPolicy.Date );
-        var additionalInfo = FormatLinks( sunsetPolicy );
+        var deprecationDate = FormatDate( deprecationPolicy.Date );
+
+        var additionalInfoSunset = FormatLinks( sunsetPolicy );
+        var additionalInfoDeprecation = FormatLinks( deprecationPolicy );
+
+        var additionalInfo = additionalInfoDeprecation.Concat( additionalInfoSunset ).ToArray();
 
         ApiVersionDeprecated(
             logger,
             apiVersion.ToString(),
             requestUrl.OriginalString,
             sunsetDate,
+            deprecationDate,
             additionalInfo );
     }
 
-    [LoggerMessage( EventId = 1, Level = Warning, Message = "API version {apiVersion} for {requestUrl} has been deprecated and will sunset on {sunsetDate}. Additional information: {links}" )]
+    [LoggerMessage( EventId = 1, Level = Warning, Message = "API version {apiVersion} for {requestUrl} has been deprecated since {deprecationDate} and will sunset on {sunsetDate}. Additional information: {links}" )]
     static partial void ApiVersionDeprecated(
         ILogger logger,
         string apiVersion,
         string requestUrl,
         string sunsetDate,
+        string deprecationDate,
         string[] links );
 
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -78,6 +86,16 @@ internal static partial class ILoggerExtensions
         }
 
         return FormatLinks( sunsetPolicy.Links );
+    }
+
+    private static string[] FormatLinks( DeprecationPolicy deprecationPolicy )
+    {
+        if ( !deprecationPolicy.HasLinks )
+        {
+            return [];
+        }
+
+        return FormatLinks( deprecationPolicy.Links );
     }
 
     private static string[] FormatLinks( IList<LinkHeaderValue> links )

@@ -36,8 +36,9 @@ public class ApiVersionHandlerLogger<T> : ApiNotification
         var requestUrl = context.Response.RequestMessage!.RequestUri!;
         var apiVersion = context.ApiVersion;
         var sunsetPolicy = context.SunsetPolicy;
+        var deprecationPolicy = context.DeprecationPolicy;
 
-        logger.ApiVersionDeprecated( requestUrl, apiVersion, sunsetPolicy );
+        logger.ApiVersionDeprecated( requestUrl, apiVersion, sunsetPolicy, deprecationPolicy );
     }
 
     /// <inheritdoc />

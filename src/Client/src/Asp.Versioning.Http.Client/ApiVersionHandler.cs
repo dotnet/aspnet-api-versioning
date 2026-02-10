@@ -46,10 +46,10 @@ public class ApiVersionHandler : DelegatingHandler
 
         var response = await base.SendAsync( request, cancellationToken ).ConfigureAwait( false );
 
-        if ( IsDeprecatedApi( response ) )
+        if ( IsDeprecatedApi( response, out var deprecationPolicy ) )
         {
             response.RequestMessage ??= request;
-            await notification.OnApiDeprecatedAsync( new( response, apiVersion ), cancellationToken ).ConfigureAwait( false );
+            await notification.OnApiDeprecatedAsync( new( response, apiVersion, deprecationPolicy: deprecationPolicy ), cancellationToken ).ConfigureAwait( false );
         }
         else if ( IsNewApiAvailable( response ) )
         {
@@ -64,12 +64,13 @@ public class ApiVersionHandler : DelegatingHandler
     /// Determines whether the requested API is deprecated.
     /// </summary>
     /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> from the requested API.</param>
+    /// <param name="deprecationPolicy">The deprecation policy read from the <paramref name="response"/>.</param>
     /// <returns>True if the requested API has been deprecated; otherwise, false.</returns>
-    protected virtual bool IsDeprecatedApi( HttpResponseMessage response )
+    protected virtual bool IsDeprecatedApi( HttpResponseMessage response, out DeprecationPolicy deprecationPolicy )
     {
         ArgumentNullException.ThrowIfNull( response );
 
-        var deprecationPolicy = response.ReadDeprecationPolicy();
+        deprecationPolicy = response.ReadDeprecationPolicy();
 
         if ( deprecationPolicy.Date.HasValue && deprecationPolicy.Date <= DateTimeOffset.UtcNow )
         {

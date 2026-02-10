@@ -21,7 +21,7 @@ public class ApiVersionHandlerLoggerTTest
         };
         var context = new ApiNotificationContext( response, new ApiVersion( 1.0 ) );
         var date = DateTimeOffset.Now;
-        var expected = "API version 1.0 for http://tempuri.org has been deprecated and will " +
+        var expected = "API version 1.0 for http://tempuri.org has been deprecated since <unspecified> and will " +
                       $"sunset on {date.ToUniversalTime()}. Additional information: " +
                       "API Policy (en): http://tempuri.org/policy/en, " +
                       "API Política (es): http://tempuri.org/policy/es";

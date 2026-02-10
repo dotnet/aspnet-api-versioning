@@ -8,5 +8,5 @@ namespace Asp.Versioning;
 /// <remarks>
 /// This class serves as a type alias to hide the generic arguments of <see cref="PolicyManager{TPolicy, TPolicyBuilder}"/>.
 /// </remarks>
-public partial class DeprecationPolicyManager : PolicyManager<DeprecationPolicy, DeprecationPolicyBuilder>
+public partial class DeprecationPolicyManager : PolicyManager<DeprecationPolicy, IDeprecationPolicyBuilder>
 { }
