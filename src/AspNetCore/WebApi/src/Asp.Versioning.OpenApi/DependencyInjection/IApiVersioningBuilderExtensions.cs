@@ -12,7 +12,9 @@ using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
@@ -31,7 +33,7 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            AddOpenApiServices( builder );
+            AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
             builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
 
             return builder;
@@ -46,7 +48,7 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            AddOpenApiServices( builder );
+            AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
             builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
 
             return builder;
@@ -62,7 +64,7 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            AddOpenApiServices( builder );
+            AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
             builder.Services.Configure( descriptionOptions );
             builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), NoOptions );
 
@@ -83,7 +85,7 @@ public static class IApiVersioningBuilderExtensions
         {
             ArgumentNullException.ThrowIfNull( builder );
 
-            AddOpenApiServices( builder );
+            AddOpenApiServices( builder, GetAssemblies( Assembly.GetCallingAssembly() ) );
             builder.Services.Configure( descriptionOptions );
             builder.Services.TryAddKeyedTransient( typeof( ApiVersion ), ( _, _ ) => configureOptions );
 
@@ -92,7 +94,7 @@ public static class IApiVersioningBuilderExtensions
     }
 
     [UnconditionalSuppressMessage( "ILLink", "IL2026" )]
-    private static void AddOpenApiServices( IApiVersioningBuilder builder )
+    private static void AddOpenApiServices( IApiVersioningBuilder builder, Assembly[] assemblies )
     {
         builder.AddApiExplorer();
 
@@ -103,11 +105,28 @@ public static class IApiVersioningBuilderExtensions
         services.AddOptions<OpenApiDocumentDescriptionOptions>();
         services.Add( Transient<ConfigureOpenApiOptions, ConfigureOpenApiOptions>() );
         services.TryAddEnumerable( Singleton<IConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>( static sp => sp.GetRequiredService<ConfigureOpenApiOptions>() ) );
+        builder.Services.AddSingleton( sp => new XmlCommentsFile( assemblies, sp.GetRequiredService<IHostEnvironment>() ) );
 
         if ( GetJsonConfiguration() is { } descriptor )
         {
             services.TryAddEnumerable( descriptor );
         }
+    }
+
+    // NOTE: The calling assembly must be captured at the call site that invokes AddOpenApi. In 99% of the cases that
+    // should be the entry point to the application. It is technically possible to be invoked from some other assembly -
+    // perhaps another extension library. If that were to happen, that library must resolve the path on its own and
+    // register another XmlCommentsTransformer with the resolved path
+    private static Assembly[] GetAssemblies( Assembly callingAssembly )
+    {
+        var assemblies = new List<Assembly>( capacity: 2 ) { callingAssembly };
+
+        if ( Assembly.GetEntryAssembly() is { } entryAssembly && assemblies[0] != callingAssembly )
+        {
+            assemblies.Add( entryAssembly );
+        }
+
+        return [.. assemblies];
     }
 
     // HACK: the json configuration is internal; this approach negates the use of reflection

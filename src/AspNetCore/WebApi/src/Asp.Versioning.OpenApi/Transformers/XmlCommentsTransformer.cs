@@ -2,11 +2,11 @@
 
 namespace Asp.Versioning.OpenApi.Transformers;
 
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
-using System.IO;
+using System;
 using System.Reflection;
 using System.Threading;
 using static System.Reflection.BindingFlags;
@@ -18,12 +18,8 @@ using static System.Reflection.BindingFlags;
 [CLSCompliant( false )]
 public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperationTransformer
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="XmlCommentsTransformer"/> class.
-    /// </summary>
-    /// <param name="environment">The current <see cref="IHostEnvironment">hosting environment</see>.</param>
-    public XmlCommentsTransformer( IHostEnvironment environment ) :
-        this( ResolvePath( environment ) )
+    internal XmlCommentsTransformer( XmlCommentsFile file ) :
+        this( file.Path )
     {
     }
 
@@ -31,14 +27,14 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
     /// Initializes a new instance of the <see cref="XmlCommentsTransformer"/> class.
     /// </summary>
     /// <param name="path">The file path of the XML commands file.</param>
-    public XmlCommentsTransformer( string path ) => Documentation = XmlDocumentation.FromFile( path );
+    public XmlCommentsTransformer( string path ) => Documentation = XmlComments.FromFile( path );
 
     internal bool IsEmpty => Documentation.IsEmpty;
 
     /// <summary>
     /// Gets the documentation associated with the transformer.
     /// </summary>
-    protected XmlDocumentation Documentation { get; }
+    protected XmlComments Documentation { get; }
 
     /// <inheritdoc />
     public virtual Task TransformAsync(
@@ -82,12 +78,10 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         ArgumentNullException.ThrowIfNull( operation );
         ArgumentNullException.ThrowIfNull( context );
 
-        if ( context.Description.ActionDescriptor is not ControllerActionDescriptor controller )
+        if ( !TryResolveMethod( context.Description.ActionDescriptor, out var method ) )
         {
             return Task.CompletedTask;
         }
-
-        var method = controller.MethodInfo;
 
         if ( string.IsNullOrEmpty( operation.Summary ) )
         {
@@ -96,7 +90,7 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
 
         if ( string.IsNullOrEmpty( operation.Description ) )
         {
-            operation.Description = Documentation.GetRemarks( method );
+            operation.Description = Documentation.GetDescription( method );
         }
 
         if ( operation.Responses is { } responses )
@@ -142,26 +136,27 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         return Task.CompletedTask;
     }
 
-    private static string ResolvePath( IHostEnvironment environment )
+    private static bool TryResolveMethod( ActionDescriptor action, [MaybeNullWhen( false )] out MethodInfo method )
     {
-        ArgumentNullException.ThrowIfNull( environment );
-
-        if ( Assembly.GetEntryAssembly() is { } assembly )
+        if ( action is ControllerActionDescriptor controller )
         {
-            var fileName = $"{assembly.GetName().Name}.xml";
-            var paths = new[] { environment.ContentRootPath, AppContext.BaseDirectory };
+            method = controller.MethodInfo;
+            return true;
+        }
+        else
+        {
+            var metadata = action.EndpointMetadata;
 
-            for ( var i = 0; i < paths.Length; i++ )
+            for ( var i = 0; i < metadata.Count; i++ )
             {
-                var path = Path.Combine( paths[i], fileName );
-
-                if ( File.Exists( path ) )
+                if ( ( method = metadata[i] as MethodInfo ) is not null )
                 {
-                    return path;
+                    return true;
                 }
             }
         }
 
-        return string.Empty;
+        method = default;
+        return false;
     }
 }

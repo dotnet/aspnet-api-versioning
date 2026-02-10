@@ -14,7 +14,7 @@ public class PeopleController : ControllerBase
     /// <summary>
     /// Get People
     /// </summary>
-    /// <remarks>Gets all people.</remarks>
+    /// <description>Gets all people.</description>
     /// <returns>All available people.</returns>
     /// <response code="200">The successfully retrieved people.</response>
     [HttpGet]
@@ -53,7 +53,7 @@ public class PeopleController : ControllerBase
     /// <summary>
     /// Get Person
     /// </summary>
-    /// <remarks>Gets a single person.</remarks>
+    /// <description>Gets a single person.</description>
     /// <param name="id">The requested person identifier.</param>
     /// <returns>The requested person.</returns>
     /// <response code="200">The person was successfully retrieved.</response>

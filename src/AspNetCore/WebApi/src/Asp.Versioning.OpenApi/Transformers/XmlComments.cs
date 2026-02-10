@@ -13,15 +13,15 @@ using System.Xml.Linq;
 /// Provides access to XML documentation comments, which enables the retrieval of summaries, remarks, return values,
 /// examples, and parameter descriptions.
 /// </summary>
-public class XmlDocumentation
+public class XmlComments
 {
     private readonly ConcurrentDictionary<string, XElement?> members = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="XmlDocumentation"/> class.
+    /// Initializes a new instance of the <see cref="XmlComments"/> class.
     /// </summary>
     /// <param name="path">The file path of the XML comments to read.</param>
-    protected XmlDocumentation( string path )
+    protected XmlComments( string path )
     {
         if ( File.Exists( path ) )
         {
@@ -34,11 +34,11 @@ public class XmlDocumentation
     }
 
     /// <summary>
-    /// Creates and returns new <see cref="XmlDocumentation"/> from the specified file.
+    /// Creates and returns new <see cref="XmlComments"/> from the specified file.
     /// </summary>
     /// <param name="path">The file path of the XML comments to read.</param>
-    /// <returns>New <see cref="XmlDocumentation"/>.</returns>
-    public static XmlDocumentation FromFile( string path ) => new( path );
+    /// <returns>New <see cref="XmlComments"/>.</returns>
+    public static XmlComments FromFile( string path ) => new( path );
 
     internal bool IsEmpty => Xml.Root is null;
 
@@ -55,6 +55,14 @@ public class XmlDocumentation
     /// <returns>The corresponding summary or an empty string.</returns>
     public string GetSummary( MemberInfo member )
         => GetMember( member )?.Element( "summary" )?.Value.Trim() ?? string.Empty;
+
+    /// <summary>
+    /// Gets the <c>description</c> from the specified member, if any.
+    /// </summary>
+    /// <param name="member">The member to get the description from.</param>
+    /// <returns>The corresponding description or an empty string.</returns>
+    public string GetDescription( MemberInfo member )
+        => GetMember( member )?.Element( "description" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
     /// Gets the <c>remarks</c> from the specified member, if any.
@@ -133,7 +141,7 @@ public class XmlDocumentation
     /// <param name="member">The member to get the information for.</param>
     /// <returns>The <see cref="XElement"/> representing the matching <c>member</c> element or <c>null</c>.</returns>
     protected XElement? GetMember( MemberInfo member ) =>
-        GetMemberById( XmlDocumentationProvider.GetDocumentationMemberId( member ) );
+        GetMemberById( XmlCommentsProvider.GetDocumentationMemberId( member ) );
 
     private static XElement? FindMember( XDocument xml, string key ) =>
         xml.Descendants( "member" ).FirstOrDefault( member => member.Attribute( "name" )?.Value == key );

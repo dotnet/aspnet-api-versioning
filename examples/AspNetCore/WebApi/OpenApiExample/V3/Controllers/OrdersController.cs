@@ -14,7 +14,7 @@ public class OrdersController : ControllerBase
     /// <summary>
     /// Get Orders
     /// </summary>
-    /// <remarks>Retrieves all orders.</remarks>
+    /// <description>Retrieves all orders.</description>
     /// <returns>All available orders.</returns>
     /// <response code="200">Orders successfully retrieved.</response>
     [HttpGet]
@@ -35,7 +35,7 @@ public class OrdersController : ControllerBase
     /// <summary>
     /// Get Order
     /// </summary>
-    /// <remarks>Gets a single order.</remarks>
+    /// <description>Gets a single order.</description>
     /// <param name="id">The requested order identifier.</param>
     /// <returns>The requested order.</returns>
     /// <response code="200">The order was successfully retrieved.</response>
@@ -49,7 +49,7 @@ public class OrdersController : ControllerBase
     /// <summary>
     /// Place Order
     /// </summary>
-    /// <remarks>Places a new order.</remarks>
+    /// <description>Places a new order.</description>
     /// <param name="order">The order to place.</param>
     /// <returns>The created order.</returns>
     /// <response code="201">The order was successfully placed.</response>
@@ -68,9 +68,11 @@ public class OrdersController : ControllerBase
     /// <summary>
     /// Cancel Order
     /// </summary>
-    /// <remarks>Cancels an order.</remarks>
+    /// <description>Cancels an order.</description>
     /// <param name="id">The order to cancel.</param>
     /// <returns>None</returns>
+    /// <response code="204">The order was successfully canceled.</response>
+    /// <response code="404">The order does not exist.</response>
     [HttpDelete( "{id:int}" )]
     [ProducesResponseType( 204 )]
     public IActionResult Delete( int id ) => NoContent();

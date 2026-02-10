@@ -5,7 +5,7 @@ namespace Asp.Versioning.OpenApi.Transformers;
 using System.Reflection;
 using System.Text;
 
-internal static class XmlDocumentationProvider
+internal static class XmlCommentsProvider
 {
     public static string GetDocumentationMemberId( MemberInfo member )
     {
