@@ -104,6 +104,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 
         if ( deprecationPolicyManager.TryResolvePolicy( name, version, out var deprecationPolicy ) )
         {
+            // Only emit a deprecation header if the deprecation policy becomes effective before the sunset date.
             if ( deprecationPolicy.IsEffective( sunsetDate ) )
             {
                 response.WriteDeprecationPolicy( deprecationPolicy );

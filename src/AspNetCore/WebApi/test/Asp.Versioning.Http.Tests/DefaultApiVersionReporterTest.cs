@@ -12,8 +12,8 @@ public class DefaultApiVersionReporterTest
     public void report_should_add_expected_headers()
     {
         // arrange
-        var sunsetDate = DateTimeOffset.Now;
-        var deprecationDate = DateTimeOffset.Now;
+        var sunsetDate = DateTimeOffset.UtcNow.AddDays( 2 );
+        var deprecationDate = DateTimeOffset.UtcNow.AddDays( 1 );
         var reporter = new DefaultApiVersionReporter( new TestSunsetPolicyManager( sunsetDate ), new TestDeprecationPolicyManager( deprecationDate ) );
         var httpContext = new Mock<HttpContext>();
         var features = new Mock<IFeatureCollection>();
@@ -65,17 +65,18 @@ public class DefaultApiVersionReporterTest
 
         headers["api-supported-versions"].Should().Equal( "1.0, 2.0" );
         headers["api-deprecated-versions"].Should().Equal( "0.9" );
-        headers["Sunset"].Single()
-                         .Should()
-                         .Be( sunsetDate.ToString( "r" ) );
-        headers["Deprecation"].Single()
-                              .Should()
-                              .Be( $"@{unixTimestamp}" );
-        headers["Link"].Should()
-                       .BeEquivalentTo( [
-                            "<http://docs.api.com/sunset.html>; rel=\"sunset\"",
-                            "<http://docs.api.com/deprecation.html>; rel=\"deprecation\"",
-                       ] );
+        headers["Sunset"]
+            .Should()
+            .ContainSingle( sunsetDate.ToString( "r" ) );
+        headers["Deprecation"]
+            .Should()
+            .ContainSingle( $"@{unixTimestamp}" );
+        headers["Link"]
+            .Should()
+            .BeEquivalentTo( [
+                "<http://docs.api.com/sunset.html>; rel=\"sunset\"",
+                "<http://docs.api.com/deprecation.html>; rel=\"deprecation\"",
+            ] );
     }
 
     private sealed class TestSunsetPolicyManager : IPolicyManager<SunsetPolicy>

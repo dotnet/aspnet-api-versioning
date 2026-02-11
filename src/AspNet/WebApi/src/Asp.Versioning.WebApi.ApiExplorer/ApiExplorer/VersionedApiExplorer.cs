@@ -238,13 +238,11 @@ public class VersionedApiExplorer : IApiExplorer
         }
 
         var routes = FlattenRoutes( Configuration.Routes ).ToArray();
-        var sunsetPolicyManager = Configuration.GetSunsetPolicyManager();
-        var deprecationPolicyManager = Configuration.GetDeprecationPolicyManager();
 
         foreach ( var apiVersion in FlattenApiVersions( controllerMappings ) )
         {
-            sunsetPolicyManager.TryGetPolicy( apiVersion, out var sunsetPolicy );
-            deprecationPolicyManager.TryGetPolicy( apiVersion, out var deprecationPolicy );
+            SunsetPolicyManager.TryGetPolicy( apiVersion, out var sunsetPolicy );
+            DeprecationPolicyManager.TryGetPolicy( apiVersion, out var deprecationPolicy );
 
             for ( var i = 0; i < routes.Length; i++ )
             {

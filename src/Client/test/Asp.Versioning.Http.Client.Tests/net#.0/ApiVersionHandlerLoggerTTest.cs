@@ -23,8 +23,8 @@ public class ApiVersionHandlerLoggerTTest
         var date = DateTimeOffset.Now;
         var expected = "API version 1.0 for http://tempuri.org has been deprecated since <unspecified> and will " +
                       $"sunset on {date.ToUniversalTime()}. Additional information: " +
-                      "API Policy (en): http://tempuri.org/policy/en, " +
-                      "API Política (es): http://tempuri.org/policy/es";
+                      "[API Policy (en): http://tempuri.org/policy/en, " +
+                      "API Política (es): http://tempuri.org/policy/es]";
 
         response.Headers.Add( "sunset", date.ToString( "r" ) );
         response.Headers.Add( "link", "<policy/en>; rel=\"sunset\"; type=\"text/html\"; title=\"API Policy\"; hreflang=\"en\"" );

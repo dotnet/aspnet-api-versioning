@@ -19,7 +19,7 @@ public static class HttpResponseMessageExtensions
     private const string Link = nameof( Link );
 
 #if NETSTANDARD1_1
-    private static readonly DateTime UnixEpoch = new DateTime( 1970, 1, 1 );
+    private static readonly DateTime UnixEpoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
 #endif
 
     /// <summary>
@@ -82,7 +82,7 @@ public static class HttpResponseMessageExtensions
     public static string ToDeprecationHeaderValue( this DateTimeOffset deprecationDate )
     {
         var unixTimestamp = deprecationDate.ToUnixTimeSeconds();
-        return unixTimestamp.ToString( "'@'0", CultureInfo.CurrentCulture );
+        return unixTimestamp.ToString( "'@'0", CultureInfo.InvariantCulture );
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public static class HttpResponseMessageExtensions
 
         if ( headers.TryGetValues( Deprecation, out var values ) )
         {
-            var culture = CultureInfo.CurrentCulture;
+            var culture = CultureInfo.InvariantCulture;
             var style = NumberStyles.Integer;
 
             foreach ( var value in values )

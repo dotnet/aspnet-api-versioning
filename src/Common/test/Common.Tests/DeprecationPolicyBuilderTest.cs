@@ -51,7 +51,7 @@ public class DeprecationPolicyBuilderTest
     }
 
     [Fact]
-    public void build_should_construct_sunset_policy()
+    public void build_should_construct_deprecation_policy()
     {
         // arrange
         var builder = new DeprecationPolicyBuilder( default, ApiVersion.Default );
@@ -66,6 +66,6 @@ public class DeprecationPolicyBuilderTest
         policy.Should().BeEquivalentTo(
             new DeprecationPolicy(
                 new DateTimeOffset( new DateTime( 2022, 2, 1 ) ),
-                new LinkHeaderValue( new Uri( "http://tempuri.org" ), "sunset" ) ) );
+                new LinkHeaderValue( new Uri( "http://tempuri.org" ), "deprecation" ) ) );
     }
 }

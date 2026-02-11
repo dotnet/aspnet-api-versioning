@@ -73,6 +73,6 @@ public class DeprecationPolicy
             return true;
         }
 
-        return date < when;
+        return date <= when;
     }
 }

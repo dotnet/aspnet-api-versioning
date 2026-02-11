@@ -10,7 +10,7 @@ public class HttpResponseMessageExtensionsTest
     public void read_sunset_policy_should_parse_response()
     {
         // arrange
-        var date = DateTimeOffset.Now;
+        var date = DateTimeOffset.UtcNow;
         var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
         var response = new HttpResponseMessage() { RequestMessage = request };
 
@@ -35,7 +35,7 @@ public class HttpResponseMessageExtensionsTest
     public void read_sunset_policy_should_use_greatest_date()
     {
         // arrange
-        var date = DateTimeOffset.Now;
+        var date = DateTimeOffset.UtcNow;
         var expected = date.AddDays( 14 );
         var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
         var response = new HttpResponseMessage() { RequestMessage = request };
@@ -91,7 +91,7 @@ public class HttpResponseMessageExtensionsTest
     public void read_deprecation_policy_should_parse_response()
     {
         // arrange
-        var date = DateTimeOffset.Now;
+        var date = DateTimeOffset.UtcNow;
         var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
         var response = new HttpResponseMessage() { RequestMessage = request };
 
@@ -116,7 +116,7 @@ public class HttpResponseMessageExtensionsTest
     public void read_deprecation_policy_should_use_smallest_date()
     {
         // arrange
-        var date = DateTimeOffset.Now;
+        var date = DateTimeOffset.UtcNow;
         var expected = date.Subtract( TimeSpan.FromDays( 14 ) );
         var request = new HttpRequestMessage( HttpMethod.Get, "http://tempuri.org" );
         var response = new HttpResponseMessage() { RequestMessage = request };
