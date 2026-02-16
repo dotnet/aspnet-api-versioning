@@ -115,7 +115,6 @@ public partial class VersionedODataModelBuilder
 
             const int EntityContainerOnly = 1;
             var model = builder.GetEdmModel();
-            var container = model.EntityContainer;
             var empty = model.SchemaElements.Count() == EntityContainerOnly;
 
             if ( empty )
