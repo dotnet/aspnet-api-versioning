@@ -17,10 +17,16 @@ services.AddApiVersioning(
                 // "api-supported-versions" and "api-deprecated-versions"
                 options.ReportApiVersions = true;
 
+                options.Policies.Deprecate( 0.9 )
+                                .Effective( DateTimeOffset.Now )
+                                .Link( "policy.html" )
+                                    .Title( "Version Deprecation Policy" )
+                                    .Type( "text/html" );
+
                 options.Policies.Sunset( 0.9 )
                                 .Effective( DateTimeOffset.Now.AddDays( 60 ) )
                                 .Link( "policy.html" )
-                                    .Title( "Versioning Policy" )
+                                    .Title( "Version Sunset Policy" )
                                     .Type( "text/html" );
             } )
         .AddApiExplorer(
@@ -34,10 +40,7 @@ services.AddApiVersioning(
                 // can also be used to control the format of the API version in route templates
                 options.SubstituteApiVersionInUrl = true;
             } )
-        .AddOpenApi( options => options.Document.AddScalarTransformers() )
-        // this enables binding ApiVersion as a endpoint callback parameter. if you don't use it, then
-        // you should remove this configuration.
-        .EnableApiVersionBinding();
+        .AddOpenApi( options => options.Document.AddScalarTransformers() );
 
 var app = builder.Build();
 

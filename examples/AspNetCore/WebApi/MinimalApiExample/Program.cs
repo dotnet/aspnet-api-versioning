@@ -1,3 +1,5 @@
+using Asp.Versioning;
+
 var builder = WebApplication.CreateBuilder( args );
 
 // Add services to the container.
@@ -36,7 +38,7 @@ forecast.MapGet( "/weatherforecast", () =>
 var v2 = forecast.MapGroup( "/weatherforecast" )
                  .HasApiVersion( 2.0 );
 
-v2.MapGet( "/", () =>
+v2.MapGet( "/", ( ApiVersion version ) =>
    {
        return Enumerable.Range( 0, summaries.Length ).Select( index =>
            new WeatherForecast

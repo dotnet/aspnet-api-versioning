@@ -16,10 +16,16 @@ builder.Services.AddApiVersioning(
                         // "api-supported-versions" and "api-deprecated-versions"
                         options.ReportApiVersions = true;
 
+                        options.Policies.Deprecate( 0.9 )
+                                        .Effective( DateTimeOffset.Now )
+                                        .Link( "policy.html" )
+                                            .Title( "Version Deprecation Policy" )
+                                            .Type( "text/html" );
+
                         options.Policies.Sunset( 0.9 )
                                         .Effective( DateTimeOffset.Now.AddDays( 60 ) )
                                         .Link( "policy.html" )
-                                            .Title( "Versioning Policy" )
+                                            .Title( "Version Sunset Policy" )
                                             .Type( "text/html" );
                     } )
                 .AddMvc()

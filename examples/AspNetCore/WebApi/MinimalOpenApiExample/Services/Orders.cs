@@ -1,4 +1,6 @@
-﻿namespace ApiVersioning.Examples.Services;
+﻿using Asp.Versioning;
+
+namespace ApiVersioning.Examples.Services;
 
 /// <summary>
 /// Provides the endpoint extensions for the Orders service.
@@ -95,7 +97,7 @@ public static class Orders
 
             api.MapPost( "/", V3.Post )
                .Accepts( orders.ModelType, "application/json" )
-               .Produces( 201 , orders.ModelType )
+               .Produces( 201, orders.ModelType )
                .Produces( 400 );
 
             api.MapDelete( "/{id:int}", V3.Delete )
@@ -158,9 +160,10 @@ public static class Orders
         /// Get Orders
         /// </summary>
         /// <description>Retrieves all orders.</description>
+        /// <param name="version"></param>
         /// <returns>All available orders.</returns>
         /// <response code="200">The successfully retrieved orders.</response>
-        public static Models.V2.Order[] GetAll() =>
+        public static Models.V2.Order[] GetAll( ApiVersion version ) =>
         [
             new (){ Id = 1, Customer = "John Doe" },
             new (){ Id = 2, Customer = "Bob Smith" },
@@ -172,10 +175,11 @@ public static class Orders
         /// </summary>
         /// <description>Gets a single order.</description>
         /// <param name="id">The requested order identifier.</param>
+        /// <param name="version"></param>
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        public static Models.V2.Order GetById( int id ) => new() { Id = id, Customer = "John Doe" };
+        public static Models.V2.Order GetById( int id, ApiVersion version ) => new() { Id = id, Customer = "John Doe" };
 
         /// <summary>
         /// Place Order
