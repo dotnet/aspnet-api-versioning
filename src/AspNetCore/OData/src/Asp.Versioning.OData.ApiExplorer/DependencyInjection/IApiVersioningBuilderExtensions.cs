@@ -8,7 +8,9 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Conventions;
 using Asp.Versioning.OData;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
@@ -59,6 +61,7 @@ public static class IApiVersioningBuilderExtensions
         builder.Services.AddModelConfigurationsAsServices();
         services.TryAddSingleton<IModelTypeBuilder, DefaultModelTypeBuilder>();
         services.TryAddSingleton<IOptionsFactory<ODataApiExplorerOptions>, ODataApiExplorerOptionsFactory>();
+        services.TryAddEnumerable( Transient<IApplicationModelProvider, Asp.Versioning.ApiExplorer.ODataApplicationModelProvider>() );
         services.TryAddEnumerable( Transient<IApiDescriptionProvider, PartialODataDescriptionProvider>() );
         services.TryAddEnumerable( Transient<IApiDescriptionProvider, ODataApiDescriptionProvider>() );
         services.TryAddEnumerable( Transient<IModelConfiguration, ImplicitModelBoundSettingsConvention>() );

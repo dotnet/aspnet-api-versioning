@@ -97,6 +97,12 @@ public class ODataApiDescriptionProvider : IApiDescriptionProvider
         ArgumentNullException.ThrowIfNull( context );
 
         var results = context.Results;
+
+        if ( results.Count == 0 )
+        {
+            return;
+        }
+
         var visited = new HashSet<ApiDescription>( capacity: results.Count, new ApiDescriptionComparer() );
 
         for ( var i = results.Count - 1; i >= 0; i-- )
