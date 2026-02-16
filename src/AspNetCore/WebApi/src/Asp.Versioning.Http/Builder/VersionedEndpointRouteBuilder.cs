@@ -55,8 +55,7 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
     public virtual ICollection<EndpointDataSource> DataSources => dataSources;
 
     /// <inheritdoc />
-    public virtual void Add( Action<EndpointBuilder> convention ) =>
-        conventionBuilder.Add( convention );
+    public virtual void Add( Action<EndpointBuilder> convention ) => conventionBuilder.Add( convention );
 
     private sealed class ServiceProviderDecorator(
         IServiceProvider decorated,

@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using static Asp.Versioning.ApiVersionParameterLocation;
 using static Asp.Versioning.ApiVersionProviderOptions;
 
@@ -47,16 +46,20 @@ internal static class EndpointBuilderFinalizer
 
         endpointBuilder.Metadata.Add( metadata );
 
-        var requestDelegate = default( RequestDelegate );
+        var requestDelegate =
+            endpointBuilder.RequestDelegate
+            ?? throw new InvalidOperationException(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Format.UnsetRequestDelegate,
+                    nameof( RequestDelegate ),
+                    nameof( RouteEndpoint ) ) );
 
         if ( reportApiVersions )
         {
-            requestDelegate = EnsureRequestDelegate( requestDelegate, endpointBuilder.RequestDelegate );
-
             var reporter = services.GetRequiredService<IReportApiVersions>();
 
             requestDelegate = new ReportApiVersionsDecorator( requestDelegate, reporter, metadata );
-            endpointBuilder.RequestDelegate = requestDelegate;
         }
 
         var parameterSource = services.GetRequiredService<IApiVersionParameterSource>();
@@ -67,11 +70,15 @@ internal static class EndpointBuilderFinalizer
 
             if ( !string.IsNullOrEmpty( parameterName ) )
             {
-                requestDelegate = EnsureRequestDelegate( requestDelegate, endpointBuilder.RequestDelegate );
                 requestDelegate = new ContentTypeApiVersionDecorator( requestDelegate, parameterName );
-                endpointBuilder.RequestDelegate = requestDelegate;
             }
         }
+
+        endpointBuilder.RequestDelegate = context =>
+        {
+            context.RequestServices = new InjectApiVersion( context );
+            return requestDelegate( context );
+        };
     }
 
     private static bool IsApiVersionNeutral( IList<object> metadata )
@@ -261,16 +268,6 @@ internal static class EndpointBuilderFinalizer
         return new( apiModel, endpointModel, name );
     }
 
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    private static RequestDelegate EnsureRequestDelegate( RequestDelegate? current, RequestDelegate? original ) =>
-        ( current ?? original ) ??
-        throw new InvalidOperationException(
-            string.Format(
-                CultureInfo.CurrentCulture,
-                Format.UnsetRequestDelegate,
-                nameof( RequestDelegate ),
-                nameof( RouteEndpoint ) ) );
-
     private record struct ApiVersionBuckets(
         IReadOnlyList<ApiVersion> Mapped,
         IReadOnlyList<ApiVersion> Supported,
@@ -283,5 +280,29 @@ internal static class EndpointBuilderFinalizer
                                           && Deprecated.Count == 0
                                           && Advertised.Count == 0
                                           && AdvertisedDeprecated.Count == 0;
+    }
+
+    private sealed class InjectApiVersion : IServiceProvider
+    {
+        private static readonly Type ApiVersionType = typeof( ApiVersion );
+        private readonly IServiceProvider provider;
+        private readonly HttpContext context;
+
+        public InjectApiVersion( HttpContext context )
+        {
+            this.context = context;
+            provider = context.RequestServices;
+            context.RequestServices = this;
+        }
+
+        public object? GetService( Type serviceType )
+        {
+            if ( serviceType.IsAssignableFrom( ApiVersionType ) )
+            {
+                return context.RequestedApiVersion;
+            }
+
+            return provider.GetService( serviceType );
+        }
     }
 }

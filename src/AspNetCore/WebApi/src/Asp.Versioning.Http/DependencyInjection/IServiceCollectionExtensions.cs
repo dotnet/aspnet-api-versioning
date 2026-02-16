@@ -96,48 +96,45 @@ public static partial class IServiceCollectionExtensions
         }
     }
 
-    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">builder</see>.</param>
-    /// <returns>The original <paramref name="builder"/>.</returns>
-    extension( IApiVersioningBuilder builder )
-    {
-        /// <summary>
-        /// Enables binding the <see cref="ApiVersion"/> type in Minimal API parameters..
-        /// </summary>
-        public IApiVersioningBuilder EnableApiVersionBinding()
-        {
-            ArgumentNullException.ThrowIfNull( builder );
-
-            // currently required because there is no other hook.
-            // 1. TryParse does not work because:
-            //    a. Parsing is delegated to IApiVersionParser.TryParse
-            //    b. The result can come from multiple locations
-            //    c. There can be multiple results
-            // 2. BindAsync does not work because:
-            //    a. It is static and must be on the ApiVersion type
-            //    b. It is specific to ASP.NET Core
-            builder.Services.AddHttpContextAccessor();
-
-            // this registration is 'truthy'. it is possible for the requested API version to be null; however, but the time this is
-            // resolved for a request delegate it can only be null if the API is version-neutral and no API version was requested. this
-            // should be a rare and nonsensical scenario. declaring the parameter as ApiVersion? should be expect and solve the issue
-            //
-            // it should also be noted that this registration allows resolving the requested API version from virtually any context.
-            // that is not intended, which is why this extension is not named something more general such as AddApiVersionAsService.
-            // if/when a better parameter binding mechanism becomes available, this method is expected to become obsolete, no-op, and
-            // eventually go away.
-            builder.Services.AddTransient( sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.RequestedApiVersion! );
-
-            return builder;
-        }
-    }
-
     private static void DefaultErrorObjectJsonConfig( JsonOptions options ) =>
         options.SerializerOptions.TypeInfoResolverChain.Insert( 0, ErrorObjectWriter.ErrorObjectJsonContext.Default );
+
+    // HACK: convince DI that ApiVersion can be resolved as a service. this enables ApiVersion to be used as a
+    // a parameter without explicitly specifying [FromServices]. DI is not actually expected to resolve ApiVersion
+    // because it requires the current HttpContext. an interceptor is inserted in EndpointBuilderFinalizer.Finalize.
+    // resolving ApiVersion from DI allows it to be resolved from nearly any context, which is not intended. by the time
+    // an endpoint action is invoked, the ApiVersion will be available in the current HttpContext unless the API is
+    // version-neutral. in those situations, the parameter can be declared as ApiVersion? instead. this function makes
+    // a best effort to be honor DI by resolving the ApiVersion through IHttpContextAccessor if it's available.
+    //
+    // ultimately, this is required because there is no other hook. if/when a better parameter binding mechanism becomes
+    // available, this is expected to go away.
+    //
+    // 1. TryParse does not work because:
+    //    a. Parsing is delegated to IApiVersionParser.TryParse
+    //    b. The result can come from multiple locations
+    //    c. There can be multiple results
+    // 2. BindAsync does not work because:
+    //    a. It is static and must be on the ApiVersion type
+    //    b. It requires HttpContext, which is specific to ASP.NET Core
+    //
+    // REF: https://github.com/dotnet/aspnetcore/issues/35489
+    // REF: https://github.com/dotnet/aspnetcore/issues/50672
+    private static ApiVersion ApiVersionAsService( IServiceProvider provider )
+    {
+        if ( provider.GetService<IHttpContextAccessor>() is { } accessor && accessor.HttpContext is { } context )
+        {
+            return context.RequestedApiVersion!;
+        }
+
+        return default!;
+    }
 
     private static void AddApiVersioningServices( IServiceCollection services )
     {
         ArgumentNullException.ThrowIfNull( services );
 
+        services.AddTransient( ApiVersionAsService );
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
         services.AddSingleton( static sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
         services.AddSingleton( static sp => (IApiVersionParameterSource) sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
