@@ -15,10 +15,11 @@ using static Microsoft.AspNetCore.Http.StatusCodes;
 public class AcmeController : ODataController
 {
     /// <summary>
-    /// Retrieves the ACME supplier.
+    /// Get ACME Supplier
     /// </summary>
+    /// <description>Retrieves the ACME supplier.</description>
     /// <returns>All available suppliers.</returns>
-    /// <response code="200">The supplier successfully retrieved.</response>
+    /// <response code="200">The supplier was successfully retrieved.</response>
     [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
@@ -26,58 +27,59 @@ public class AcmeController : ODataController
     public IActionResult Get() => Ok( NewSupplier() );
 
     /// <summary>
-    /// Gets the products associated with the supplier.
+    /// Get Products
     /// </summary>
+    /// <description>Gets the products associated with the supplier.</description>
     /// <returns>The associated supplier products.</returns>
+    /// <response code="200">The products were successfully retrieved.</response>
     [HttpGet]
     [EnableQuery]
+    [Produces( "application/json" )]
+    [ProducesResponseType( typeof( ODataValue<IEnumerable<Product>> ), Status200OK )]
     public IQueryable<Product> GetProducts() => NewSupplier().Products.AsQueryable();
 
     /// <summary>
-    /// Links a product to a supplier.
+    /// Link Product
     /// </summary>
+    /// <description>Links a product to a supplier.</description>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="link">The related entity identifier.</param>
     /// <returns>None</returns>
+    /// <response code="204">The product was successfully linked.</response>
     [HttpPut]
     [ProducesResponseType( Status204NoContent )]
-    [ProducesResponseType( Status404NotFound )]
-    public IActionResult CreateRef(
-        string navigationProperty,
-        [FromBody] Uri link )
+    public IActionResult CreateRef( string navigationProperty, [FromBody] Uri link )
     {
         var relatedKey = this.GetRelatedKey( link );
         return NoContent();
     }
 
     /// <summary>
-    /// Unlinks a product from a supplier.
+    /// Unlink Product
     /// </summary>
+    /// <description>Unlinks a product from a supplier.</description>
     /// <param name="relatedKey">The related entity identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <returns>None</returns>
+    /// <response code="204">The product was successfully unlinked.</response>
     [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
-    [ProducesResponseType( Status404NotFound )]
-    public IActionResult DeleteRef(
-        int relatedKey,
-        string navigationProperty ) => NoContent();
+    public IActionResult DeleteRef( int relatedKey, string navigationProperty ) => NoContent();
 
-    private static Supplier NewSupplier() =>
-        new()
-        {
-            Id = 42,
-            Name = "Acme",
-            Products =
-            [
-                new()
-                {
-                    Id = 42,
-                    Name = "Product 42",
-                    Category = "Test",
-                    Price = 42,
-                    SupplierId = 42,
-                },
-            ],
-        };
+    private static Supplier NewSupplier() => new()
+    {
+        Id = 42,
+        Name = "Acme",
+        Products =
+        [
+            new()
+            {
+                Id = 42,
+                Name = "Product 42",
+                Category = "Test",
+                Price = 42,
+                SupplierId = 42,
+            },
+        ],
+    };
 }

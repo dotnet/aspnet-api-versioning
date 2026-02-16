@@ -26,8 +26,9 @@ public class ProductsController : ODataController
     }.AsQueryable();
 
     /// <summary>
-    /// Retrieves all products.
+    /// Get Products
     /// </summary>
+    /// <description>Retrieves all products.</description>
     /// <returns>All available products.</returns>
     /// <response code="200">Products successfully retrieved.</response>
     [HttpGet]
@@ -37,8 +38,9 @@ public class ProductsController : ODataController
     public IQueryable<Product> Get() => products;
 
     /// <summary>
-    /// Gets a single product.
+    /// Get Product
     /// </summary>
+    /// <description>Gets a single product.</description>
     /// <param name="key">The requested product identifier.</param>
     /// <returns>The requested product.</returns>
     /// <response code="200">The product was successfully retrieved.</response>
@@ -52,12 +54,13 @@ public class ProductsController : ODataController
         SingleResult.Create( products.Where( p => p.Id == key ) );
 
     /// <summary>
-    /// Creates a new product.
+    /// Add Product
     /// </summary>
-    /// <param name="product">The product to create.</param>
-    /// <returns>The created product.</returns>
-    /// <response code="201">The product was successfully created.</response>
-    /// <response code="204">The product was successfully created.</response>
+    /// <description>Adds a new product.</description>
+    /// <param name="product">The product to add.</param>
+    /// <returns>The added product.</returns>
+    /// <response code="201">The product was successfully added.</response>
+    /// <response code="204">The product was successfully added.</response>
     /// <response code="400">The product is invalid.</response>
     [HttpPost]
     [Produces( "application/json" )]
@@ -77,8 +80,9 @@ public class ProductsController : ODataController
     }
 
     /// <summary>
-    /// Updates an existing product.
+    /// Update Product (Partial)
     /// </summary>
+    /// <description>Updates an existing product.</description>
     /// <param name="key">The requested product identifier.</param>
     /// <param name="delta">The partial product to update.</param>
     /// <returns>The updated product.</returns>
@@ -107,8 +111,9 @@ public class ProductsController : ODataController
     }
 
     /// <summary>
-    /// Updates an existing product.
+    /// Update Product
     /// </summary>
+    /// <description>Updates an existing product.</description>
     /// <param name="key">The requested product identifier.</param>
     /// <param name="update">The product to update.</param>
     /// <returns>The updated product.</returns>
@@ -133,22 +138,24 @@ public class ProductsController : ODataController
     }
 
     /// <summary>
-    /// Deletes a product.
+    /// Remove Product
     /// </summary>
-    /// <param name="key">The product to delete.</param>
+    /// <description>Removes a product.</description>
+    /// <param name="key">The product to remove.</param>
     /// <returns>None</returns>
-    /// <response code="204">The product was successfully deleted.</response>
+    /// <response code="204">The product was successfully removed.</response>
     [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
-    [ProducesResponseType( Status404NotFound )]
     public IActionResult Delete( int key ) => NoContent();
 
     /// <summary>
-    /// Gets the supplier associated with the product.
+    /// Get Supplier
     /// </summary>
+    /// <description>Gets the supplier associated with the product.</description>
     /// <param name="key">The product identifier.</param>
-    /// <returns>The supplier</returns>
     /// <returns>The requested supplier.</returns>
+    /// <response code="200">The supplier was successfully retrieved.</response>
+    /// <response code="404">The supplier was not found.</response>
     [HttpGet]
     [EnableQuery]
     [Produces( "application/json" )]
@@ -158,11 +165,14 @@ public class ProductsController : ODataController
         SingleResult.Create( products.Where( p => p.Id == key ).Select( p => p.Supplier ) );
 
     /// <summary>
-    /// Gets the link to the associated supplier, if any.
+    /// Get Supplier Reference
     /// </summary>
+    /// <description>Gets the reference link to the associated supplier, if any.</description>
     /// <param name="key">The product identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <returns>The supplier link.</returns>
+    /// <response code="200">The supplier reference was successfully retrieved.</response>
+    /// <response code="404">A supplier reference was not found.</response>
     [HttpGet]
     [Produces( "application/json" )]
     [ProducesResponseType( typeof( ODataId ), Status200OK )]
@@ -181,47 +191,46 @@ public class ProductsController : ODataController
     }
 
     /// <summary>
-    /// Links a supplier to a product.
+    /// Link Supplier
     /// </summary>
+    /// <description>Links a supplier to a product.</description>
     /// <param name="key">The product identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="link">The related entity identifier.</param>
     /// <returns>None</returns>
+    /// <response code="200">The supplier was successfully linked.</response>
+    /// <response code="404">The product or supplier was not found.</response>
     [HttpPut]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
-    public IActionResult CreateRef(
-        int key,
-        string navigationProperty,
-        [FromBody] Uri link )
+    public IActionResult CreateRef( int key, string navigationProperty, [FromBody] Uri link )
     {
         var relatedKey = this.GetRelatedKey( link );
         return NoContent();
     }
 
     /// <summary>
-    /// Unlinks a supplier from a product.
+    /// Unlink Supplier
     /// </summary>
+    /// <description>Unlinks a supplier from a product.</description>
     /// <param name="key">The product identifier.</param>
     /// <param name="navigationProperty">The name of the related navigation property.</param>
     /// <param name="relatedKey">The related entity identifier.</param>
     /// <returns>None</returns>
+    /// <response code="200">The supplier was successfully linked.</response>
+    /// <response code="404">The product or supplier was not found.</response>
     [HttpDelete]
     [ProducesResponseType( Status204NoContent )]
     [ProducesResponseType( Status404NotFound )]
-    public IActionResult DeleteRef(
-        int key,
-        string navigationProperty,
-        int relatedKey ) => NoContent();
+    public IActionResult DeleteRef( int key, string navigationProperty, int relatedKey ) => NoContent();
 
-    private static Product NewProduct( int id ) =>
-        new()
-        {
-            Id = id,
-            Category = "Test",
-            Name = "Product " + id.ToString(),
-            Price = id,
-            Supplier = new Supplier() { Id = id, Name = "Supplier " + id.ToString() },
-            SupplierId = id,
-        };
+    private static Product NewProduct( int id ) => new()
+    {
+        Id = id,
+        Category = "Test",
+        Name = "Product " + id.ToString(),
+        Price = id,
+        Supplier = new Supplier() { Id = id, Name = "Supplier " + id.ToString() },
+        SupplierId = id,
+    };
 }

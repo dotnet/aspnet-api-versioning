@@ -3,14 +3,14 @@ using Asp.Versioning;
 using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Scalar.AspNetCore;
+using System.Reflection;
 using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 using static System.Text.Json.JsonNamingPolicy;
 
-var builder = WebApplication.CreateBuilder( args );
+[assembly: AssemblyDescription( "An example API" )]
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder( args );
 
 // note: this example application intentionally only illustrates the
 // bare minimum configuration for OpenAPI with partial OData support.
@@ -42,44 +42,29 @@ builder.Services.AddApiVersioning()
                                                 .Allow( Skip | Count )
                                                 .AllowTop( 100 )
                                                 .AllowOrderBy( "title", "published" );
-                    } );
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-builder.Services.AddSwaggerGen(
-    options =>
-    {
-        // add a custom operation filter which sets default values
-        options.OperationFilter<SwaggerDefaultValues>();
-
-        var fileName = typeof( Program ).Assembly.GetName().Name + ".xml";
-        var filePath = Path.Combine( AppContext.BaseDirectory, fileName );
-
-        // integrate xml comments
-        options.IncludeXmlComments( filePath );
-    } );
+                    } )
+                .AddOpenApi( options => options.Document.AddScalarTransformers() );
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
-app.UseSwagger();
 if ( app.Environment.IsDevelopment() )
 {
-    app.UseSwaggerUI(
-    options =>
-       {
-           var descriptions = app.DescribeApiVersions();
+    app.MapOpenApi().WithDocumentPerVersion();
+    app.MapScalarApiReference(
+        options =>
+        {
+            var descriptions = app.DescribeApiVersions();
 
-           // build a swagger endpoint for each discovered API version
-           foreach ( var description in descriptions )
-           {
-               var url = $"/swagger/{description.GroupName}/swagger.json";
-               var name = description.GroupName.ToUpperInvariant();
-               options.SwaggerEndpoint( url, name );
-           }
-       } );
+            for ( var i = 0; i < descriptions.Count; i++ )
+            {
+                var description = descriptions[i];
+                var isDefault = i == descriptions.Count - 1;
+
+                options.AddDocument( description.GroupName, description.GroupName, isDefault: isDefault );
+            }
+        } );
 }
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

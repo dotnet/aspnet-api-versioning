@@ -17,8 +17,9 @@ using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 public class PeopleController : ODataController
 {
     /// <summary>
-    /// Gets a single person.
+    /// Get Person
     /// </summary>
+    /// <description>Gets a single person.</description>
     /// <param name="key">The requested person identifier.</param>
     /// <param name="options">The current OData query options.</param>
     /// <returns>The requested person.</returns>
@@ -51,8 +52,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Gets the most expensive person.
+    /// Most Expensive Person
     /// </summary>
+    /// <description>Gets the most expensive person.</description>
     /// <returns>The most expensive person.</returns>
     /// <response code="200">The person was successfully retrieved.</response>
     /// <response code="404">No people exist.</response>
@@ -75,8 +77,9 @@ public class PeopleController : ODataController
                 }.AsQueryable() );
 
     /// <summary>
-    /// Gets the most expensive person.
+    /// Most Expensive Person By ID
     /// </summary>
+    /// <description>Gets the most expensive person.</description>
     /// <returns>The most expensive person.</returns>
     /// <response code="200">The person was successfully retrieved.</response>
     /// <response code="404">The person does not exist.</response>

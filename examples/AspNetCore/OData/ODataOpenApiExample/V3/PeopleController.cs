@@ -19,8 +19,9 @@ using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 public class PeopleController : ODataController
 {
     /// <summary>
-    /// Gets all people.
+    /// Get People
     /// </summary>
+    /// <description>Gets all people.</description>
     /// <param name="options">The current OData query options.</param>
     /// <returns>All available people.</returns>
     /// <response code="200">The successfully retrieved people.</response>
@@ -81,8 +82,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Gets a single person.
+    /// Get Person
     /// </summary>
+    /// <description>Gets a single person.</description>
     /// <param name="key">The requested person identifier.</param>
     /// <param name="options">The current OData query options.</param>
     /// <returns>The requested person.</returns>
@@ -117,8 +119,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Creates a new person.
+    /// Add Person
     /// </summary>
+    /// <description>Adds a new person.</description>
     /// <param name="person">The person to create.</param>
     /// <returns>The created person.</returns>
     /// <response code="201">The person was successfully created.</response>
@@ -140,8 +143,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Gets the new hires since the specified date.
+    /// Get New Hires
     /// </summary>
+    /// <description>Gets the new hires since the specified date.</description>
     /// <param name="since">The date and time since people were hired.</param>
     /// <param name="options">The current OData query options.</param>
     /// <returns>The matching new hires.</returns>
@@ -152,8 +156,9 @@ public class PeopleController : ODataController
     public IActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
 
     /// <summary>
-    /// Promotes a person.
+    /// Promote Person
     /// </summary>
+    /// <description>Promotes a person.</description>
     /// <param name="key">The identifier of the person to promote.</param>
     /// <param name="parameters">The action parameters.</param>
     /// <returns>None</returns>
@@ -176,8 +181,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Gets the home address of a person.
+    /// Get Home Address
     /// </summary>
+    /// <description>Gets the home address of a person.</description>
     /// <param name="key">The person identifier.</param>
     /// <returns>The person's home address.</returns>
     /// <response code="200">The home address was successfully retrieved.</response>
@@ -197,8 +203,9 @@ public class PeopleController : ODataController
         } );
 
     /// <summary>
-    /// Gets the work address of a person.
+    /// Get Work Address
     /// </summary>
+    /// <description>Gets the work address of a person.</description>
     /// <param name="key">The person identifier.</param>
     /// <returns>The person's work address.</returns>
     /// <response code="200">The work address was successfully retrieved.</response>

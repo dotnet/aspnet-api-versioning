@@ -19,8 +19,9 @@ using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 public class OrdersController : ODataController
 {
     /// <summary>
-    /// Retrieves all orders.
+    /// Get Orders
     /// </summary>
+    /// <description>Retrieves all orders.</description>
     /// <returns>All available orders.</returns>
     /// <response code="200">The successfully retrieved orders.</response>
     [HttpGet]
@@ -40,8 +41,9 @@ public class OrdersController : ODataController
     }
 
     /// <summary>
-    /// Gets a single order.
+    /// Get Order
     /// </summary>
+    /// <description>Gets a single order.</description>
     /// <param name="key">The requested order identifier.</param>
     /// <returns>The requested order.</returns>
     /// <response code="200">The order was successfully retrieved.</response>
@@ -55,8 +57,9 @@ public class OrdersController : ODataController
         SingleResult.Create( new[] { new Order() { Id = key, Customer = "John Doe" } }.AsQueryable() );
 
     /// <summary>
-    /// Places a new order.
+    /// Place Order
     /// </summary>
+    /// <description>Places a new order.</description>
     /// <param name="order">The order to place.</param>
     /// <returns>The created order.</returns>
     /// <response code="201">The order was successfully placed.</response>
@@ -78,8 +81,9 @@ public class OrdersController : ODataController
     }
 
     /// <summary>
-    /// Updates an existing order.
+    /// Update Order
     /// </summary>
+    /// <description>Updates an existing order.</description>
     /// <param name="key">The requested order identifier.</param>
     /// <param name="delta">The partial order to update.</param>
     /// <returns>The created order.</returns>
@@ -107,8 +111,9 @@ public class OrdersController : ODataController
     }
 
     /// <summary>
-    /// Gets the most expensive order.
+    /// Get Most Expensive Order
     /// </summary>
+    /// <description>Gets the most expensive order.</description>
     /// <returns>The most expensive order.</returns>
     /// <response code="200">The order was successfully retrieved.</response>
     /// <response code="404">The no orders exist.</response>
@@ -121,8 +126,9 @@ public class OrdersController : ODataController
         SingleResult.Create( new[] { new Order() { Id = 42, Customer = "Bill Mei" } }.AsQueryable() );
 
     /// <summary>
-    /// Rates an order.
+    /// Rate Order
     /// </summary>
+    /// <description>Rates an order.</description>
     /// <param name="key">The requested order identifier.</param>
     /// <param name="parameters">The action parameters.</param>
     /// <returns>None</returns>
@@ -145,8 +151,9 @@ public class OrdersController : ODataController
     }
 
     /// <summary>
-    /// Gets the line items for the specified order.
+    /// Get Line Items
     /// </summary>
+    /// <description>Gets the line items for the specified order.</description>
     /// <param name="key">The order identifier.</param>
     /// <returns>The order line items.</returns>
     /// <response code="200">The line items were successfully retrieved.</response>

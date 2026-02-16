@@ -18,8 +18,9 @@ using static Microsoft.AspNetCore.OData.Query.AllowedQueryOptions;
 public class PeopleController : ODataController
 {
     /// <summary>
-    /// Gets all people.
+    /// Get People
     /// </summary>
+    /// <description>Gets all people.</description>
     /// <param name="options">The current OData query options.</param>
     /// <returns>All available people.</returns>
     /// <response code="200">The successfully retrieved people.</response>
@@ -77,8 +78,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Gets a single person.
+    /// Get Person
     /// </summary>
+    /// <description>Gets a single person.</description>
     /// <param name="key">The requested person identifier.</param>
     /// <param name="options">The current OData query options.</param>
     /// <returns>The requested person.</returns>
@@ -112,8 +114,9 @@ public class PeopleController : ODataController
     }
 
     /// <summary>
-    /// Gets the new hires since the specified date.
+    /// Get New Hires
     /// </summary>
+    /// <description>Gets the new hires since the specified date.</description>
     /// <param name="since">The date and time since people were hired.</param>
     /// <param name="options">The current OData query options.</param>
     /// <returns>The matching new hires.</returns>
@@ -124,8 +127,9 @@ public class PeopleController : ODataController
     public IActionResult NewHires( DateTime since, ODataQueryOptions<Person> options ) => Get( options );
 
     /// <summary>
-    /// Gets the home address of a person.
+    /// Get Home Address
     /// </summary>
+    /// <description>Gets the home address of a person.</description>
     /// <param name="key">The person identifier.</param>
     /// <returns>The person's home address.</returns>
     /// <response code="200">The home address was successfully retrieved.</response>

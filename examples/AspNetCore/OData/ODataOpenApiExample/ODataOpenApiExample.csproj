@@ -2,15 +2,22 @@
 
  <PropertyGroup>
   <TargetFramework>net10.0</TargetFramework>
+  <AssemblyTitle>Example API</AssemblyTitle>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
  </PropertyGroup>
 
  <ItemGroup>
-  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0-*" />
+  <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.*">
+   <PrivateAssets>all</PrivateAssets>
+   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="Scalar.AspNetCore" Version="2.12.*" />
+  <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.12.*" />
  </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\..\..\src\AspNetCore\OData\src\Asp.Versioning.OData.ApiExplorer\Asp.Versioning.OData.ApiExplorer.csproj" />
+  <ProjectReference Include="..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.OpenApi\Asp.Versioning.OpenApi.csproj" />
  </ItemGroup>
 
 </Project>

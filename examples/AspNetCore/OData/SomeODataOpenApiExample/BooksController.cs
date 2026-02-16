@@ -24,8 +24,9 @@ public class BooksController : ControllerBase
     ];
 
     /// <summary>
-    /// Gets all books.
+    /// Get Books
     /// </summary>
+    /// <description>Gets all books.</description>
     /// <param name="options">The current OData query options.</param>
     /// <returns>All available books.</returns>
     /// <response code="200">The successfully retrieved books.</response>
@@ -36,8 +37,9 @@ public class BooksController : ControllerBase
         Ok( options.ApplyTo( books.AsQueryable() ) );
 
     /// <summary>
-    /// Gets a single book.
+    /// Get Book
     /// </summary>
+    /// <description>Gets a single book.</description>
     /// <param name="id">The requested book identifier.</param>
     /// <param name="options">The current OData query options.</param>
     /// <returns>The requested book.</returns>
