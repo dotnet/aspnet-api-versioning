@@ -27,7 +27,6 @@ internal static class Class
             var constructor = Type.OpenApiDocumentService.GetConstructors().Single();
             var serviceProvider = Parameter( typeof( IServiceProvider ), "serviceProvider" );
             var documentName = Parameter( typeof( string ), "documentName" );
-            var getService = typeof( IServiceProvider ).GetMethod( nameof( IServiceProvider.GetService ), [typeof( System.Type )] )!;
             var getRequiredService = typeof( ServiceProviderServiceExtensions ).GetMethod(
                 nameof( ServiceProviderServiceExtensions.GetRequiredService ),
                 [typeof( IServiceProvider ), typeof( System.Type )] )!;
@@ -60,7 +59,6 @@ internal static class Class
             var constructor = Type.OpenApiSchemaService.GetConstructors().Single();
             var serviceProvider = Parameter( typeof( IServiceProvider ), "serviceProvider" );
             var documentName = Parameter( typeof( string ), "documentName" );
-            var getService = typeof( IServiceProvider ).GetMethod( nameof( IServiceProvider.GetService ), [typeof( System.Type )] )!;
             var getRequiredService = typeof( ServiceProviderServiceExtensions ).GetMethod(
                 nameof( ServiceProviderServiceExtensions.GetRequiredService ),
                 [typeof( IServiceProvider ), typeof( System.Type )] )!;
@@ -87,10 +85,6 @@ internal static class Class
         {
             var constructor = Type.OpenApiDocumentProvider.GetConstructors().Single();
             var serviceProvider = Parameter( typeof( IServiceProvider ), "serviceProvider" );
-            var getService = typeof( IServiceProvider ).GetMethod( nameof( IServiceProvider.GetService ), [typeof( System.Type )] )!;
-            var getRequiredService = typeof( ServiceProviderServiceExtensions ).GetMethod(
-                nameof( ServiceProviderServiceExtensions.GetRequiredService ),
-                [typeof( IServiceProvider ), typeof( System.Type )] )!;
             var body = Expression.New( constructor, serviceProvider );
             var lambda = Lambda<Func<IServiceProvider, object>>( body, serviceProvider );
 

@@ -73,7 +73,7 @@ internal sealed class HttpResponseExceptionFactory
         {
             if ( couldMatch )
             {
-                properties ??= request.ApiVersionProperties;
+                properties = request.ApiVersionProperties;
 
                 if ( properties.RequestedApiVersion is ApiVersion apiVersion )
                 {

@@ -549,16 +549,9 @@ public class ODataApiExplorer : VersionedApiExplorer
         var metadata = actionDescriptor.ApiVersionMetadata;
         var model = metadata.Map( ApiVersionMapping.Explicit );
         var deprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion );
-        bool deprecated;
-
-        if ( model.IsApiVersionNeutral )
-        {
-            deprecated = deprecationPolicy != null && deprecationPolicy.IsEffective( DateTimeOffset.Now );
-        }
-        else
-        {
-            deprecated = model.DeprecatedApiVersions.Contains( apiVersion );
-        }
+        var deprecated = model.IsApiVersionNeutral
+            ? deprecationPolicy != null && deprecationPolicy.IsEffective( DateTimeOffset.Now )
+            : model.DeprecatedApiVersions.Contains( apiVersion );
 
         PopulateMediaTypeFormatters( actionDescriptor, routeBuilderContext.ParameterDescriptions, route, responseType, requestFormatters, responseFormatters );
 

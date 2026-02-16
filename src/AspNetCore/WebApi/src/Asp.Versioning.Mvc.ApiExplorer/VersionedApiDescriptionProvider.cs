@@ -317,8 +317,7 @@ public class VersionedApiDescriptionProvider : IApiDescriptionProvider
         for ( var i = 0; i < descriptions.Count; i++ )
         {
             var action = descriptions[i].ActionDescriptor;
-            var model = action.ApiVersionMetadata.Map( Explicit | Implicit );
-            var declaredVersions = model.DeclaredApiVersions;
+            var declaredVersions = action.ApiVersionMetadata.Map( Explicit | Implicit ).DeclaredApiVersions;
 
             if ( versions is null && declaredVersions.Count > 0 )
             {

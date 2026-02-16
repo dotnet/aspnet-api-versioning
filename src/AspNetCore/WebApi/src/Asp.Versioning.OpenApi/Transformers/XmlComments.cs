@@ -21,17 +21,7 @@ public class XmlComments
     /// Initializes a new instance of the <see cref="XmlComments"/> class.
     /// </summary>
     /// <param name="path">The file path of the XML comments to read.</param>
-    protected XmlComments( string path )
-    {
-        if ( File.Exists( path ) )
-        {
-            Xml = XDocument.Load( path );
-        }
-        else
-        {
-            Xml = new XDocument();
-        }
-    }
+    protected XmlComments( string path ) => Xml = File.Exists( path ) ? XDocument.Load( path ) : new();
 
     /// <summary>
     /// Creates and returns new <see cref="XmlComments"/> from the specified file.

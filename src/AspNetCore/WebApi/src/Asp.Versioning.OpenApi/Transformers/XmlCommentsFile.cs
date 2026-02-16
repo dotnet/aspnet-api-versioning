@@ -52,7 +52,7 @@ internal sealed class XmlCommentsFile
 
             for ( var j = start; j < paths.Count; j++ )
             {
-                var path = FilePath.Combine( paths[j], fileName );
+                var path = FilePath.Join( paths[j], fileName );
 
                 if ( File.Exists( path ) )
                 {

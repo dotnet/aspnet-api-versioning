@@ -877,16 +877,9 @@ public class VersionedApiExplorer : IApiExplorer
         var metadata = actionDescriptor.ApiVersionMetadata;
         var model = metadata.Map( Explicit );
         var deprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion );
-        bool deprecated;
-
-        if ( model.IsApiVersionNeutral )
-        {
-            deprecated = deprecationPolicy != null && deprecationPolicy.IsEffective( DateTimeOffset.Now );
-        }
-        else
-        {
-            deprecated = model.DeprecatedApiVersions.Contains( apiVersion );
-        }
+        var deprecated = model.IsApiVersionNeutral
+            ? deprecationPolicy != null && deprecationPolicy.IsEffective( DateTimeOffset.Now )
+            : model.DeprecatedApiVersions.Contains( apiVersion );
 
         for ( var i = 0; i < supportedMethods.Count; i++ )
         {

@@ -61,5 +61,5 @@ public class DeprecationPolicy
     /// </summary>
     /// <param name="dateTime">The <see cref="DateTimeOffset">date and time</see> to evaluate.</param>
     /// <returns>True if the policy is effective; otherwise, false.</returns>
-    public bool IsEffective( DateTimeOffset dateTime ) => Date is { } date ? date <= dateTime : true;
+    public bool IsEffective( DateTimeOffset dateTime ) => Date is null || Date <= dateTime;
 }
