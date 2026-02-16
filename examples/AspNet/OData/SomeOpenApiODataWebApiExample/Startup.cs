@@ -85,65 +85,12 @@ public partial class Startup
                 {
                     foreach ( var group in apiExplorer.ApiDescriptions )
                     {
-                        var description = new StringBuilder( "A sample application with some OData, OpenAPI, Swashbuckle, and API versioning." );
+                        var description = new StringBuilder( "A sample application with some OData, OpenAPI, Swashbuckle, and API versioning." )
+                            .AppendLine()    
+                            .AppendLine( "<br/><br/>" )
+                            .AppendLine( "**Additional Information**" )
+                            .AppendLine( "<br/>" );
 
-                        if ( group.IsDeprecated )
-                        {
-                            description.Append( " This API version has been deprecated." );
-                        }
-
-                        if ( group.SunsetPolicy is { } policy )
-                        {
-                            if ( policy.Date is { } when )
-                            {
-                                description.Append( " The API will be sunset on " )
-                                           .Append( when.Date.ToShortDateString() )
-                                           .Append( '.' );
-                            }
-
-                            if ( policy.HasLinks )
-                            {
-                                description.AppendLine();
-
-                                var rendered = false;
-
-                                for ( var i = 0; i < policy.Links.Count; i++ )
-                                {
-                                    var link = policy.Links[i];
-
-                                    if ( link.Type == "text/html" )
-                                    {
-                                        if ( !rendered )
-                                        {
-                                            description.AppendLine();
-                                            description.Append( "**Links**" );
-                                            description.AppendLine();
-                                            rendered = true;
-                                        }
-
-                                        if ( StringSegment.IsNullOrEmpty( link.Title ) )
-                                        {
-                                            if ( link.LinkTarget.IsAbsoluteUri )
-                                            {
-                                                description.AppendLine( $"- {link.LinkTarget.OriginalString}" );
-                                            }
-                                            else
-                                            {
-                                                description.AppendFormat( "- <a href=\"{0}\">{0}</a>", link.LinkTarget.OriginalString );
-                                                description.AppendLine();
-                                            }
-                                        }
-                                        else
-                                        {
-                                            description.AppendLine( $"- [{link.Title}]({link.LinkTarget.OriginalString})" );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        description.AppendLine();
-                        description.AppendLine( "**Additional Information**" );
                         info.Version( group.Name, $"Sample API {group.ApiVersion}" )
                             .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
                             .Description( description.ToString() )

@@ -37,10 +37,16 @@ public partial class Startup
             // "api-supported-versions" and "api-deprecated-versions"
             options.ReportApiVersions = true;
 
+            options.Policies.Deprecate( 0.9 )
+                            .Effective( DateTimeOffset.Now )
+                            .Link( "policy.html" )
+                                .Title( "Version Deprecation Policy" )
+                                .Type( "text/html" );
+
             options.Policies.Sunset( 0.9 )
                             .Effective( DateTimeOffset.Now.AddDays( 60 ) )
                             .Link( "policy.html" )
-                                .Title( "Versioning Policy" )
+                                .Title( "Version Sunset Policy" )
                                 .Type( "text/html" );
         } );
 
@@ -113,64 +119,92 @@ public partial class Startup
                     foreach ( var group in apiExplorer.ApiDescriptions )
                     {
                         var description = new StringBuilder( "A sample application with OData, OpenAPI, Swashbuckle, and API versioning." );
+                        var links = new List<LinkHeaderValue>();
 
                         if ( group.IsDeprecated )
                         {
-                            description.Append( " This API version has been deprecated." );
+                            description.Append( " The API " );
+
+                            if ( group.DeprecationPolicy?.Date is { } when )
+                            {
+                                description.Append( when < DateTimeOffset.Now ? "will be" : "was" )
+                                           .Append( " deprecated on " )
+                                           .Append( when.Date.ToShortDateString() );
+                            }
+                            else
+                            {
+                                description.Append( "has been deprecated" );
+                            }
+
+                            description.Append( '.' );
+
+                            if ( group.DeprecationPolicy is { } deprecation && deprecation.HasLinks )
+                            {
+                                links.AddRange( deprecation.Links );
+                            }
                         }
 
-                        if ( group.SunsetPolicy is { } policy )
+                        if ( group.SunsetPolicy is { } sunset )
                         {
-                            if ( policy.Date is { } when )
+                            if ( sunset.Date is { } when )
                             {
-                                description.Append( " The API will be sunset on " )
+                                description.Append( " The API " )
+                                           .Append( when < DateTimeOffset.Now ? "will be" : "was" )
+                                           .Append( " sunset on " )
                                            .Append( when.Date.ToShortDateString() )
                                            .Append( '.' );
                             }
 
-                            if ( policy.HasLinks )
+                            if ( sunset.HasLinks )
                             {
-                                description.AppendLine();
-
-                                var rendered = false;
-
-                                for ( var i = 0; i < policy.Links.Count; i++ )
-                                {
-                                    var link = policy.Links[i];
-
-                                    if ( link.Type == "text/html" )
-                                    {
-                                        if ( !rendered )
-                                        {
-                                            description.AppendLine();
-                                            description.Append( "**Links**" );
-                                            description.AppendLine();
-                                            rendered = true;
-                                        }
-
-                                        if ( StringSegment.IsNullOrEmpty( link.Title ) )
-                                        {
-                                            if ( link.LinkTarget.IsAbsoluteUri )
-                                            {
-                                                description.AppendLine( $"- {link.LinkTarget.OriginalString}" );
-                                            }
-                                            else
-                                            {
-                                                description.AppendFormat( "- <a href=\"{0}\">{0}</a>", link.LinkTarget.OriginalString );
-                                                description.AppendLine();
-                                            }
-                                        }
-                                        else
-                                        {
-                                            description.AppendLine( $"- [{link.Title}]({link.LinkTarget.OriginalString})" );
-                                        }
-                                    }
-                                }
+                                links.AddRange( sunset.Links );
                             }
                         }
 
                         description.AppendLine();
-                        description.AppendLine( "**Additional Information**" );
+
+                        if ( links.Count > 0 )
+                        {
+                            var rendered = false;
+
+                            for ( var i = 0; i < links.Count; i++ )
+                            {
+                                var link = links[i];
+
+                                if ( link.Type != "text/html" )
+                                {
+                                    continue;
+                                }
+
+                                if ( !rendered )
+                                {
+                                    description.Append( "<br/><br/>" );
+                                    description.Append( "**Links**" );
+                                    description.AppendLine( "<br/>" );
+                                    rendered = true;
+                                }
+
+                                if ( StringSegment.IsNullOrEmpty( link.Title ) )
+                                {
+                                    if ( link.LinkTarget.IsAbsoluteUri )
+                                    {
+                                        description.AppendLine( $"- {link.LinkTarget.OriginalString}" );
+                                    }
+                                    else
+                                    {
+                                        description.AppendFormat( "- <a href=\"{0}\">{0}</a>", link.LinkTarget.OriginalString );
+                                        description.AppendLine();
+                                    }
+                                }
+                                else
+                                {
+                                    description.AppendLine( $"- [{link.Title}]({link.LinkTarget.OriginalString})" );
+                                }
+                            }
+                        }
+
+                        description.AppendLine().AppendLine( "<br/>" );
+                        description.AppendLine( "**Additional Information**<br/>" );
                         info.Version( group.Name, $"Sample API {group.ApiVersion}" )
                             .Contact( c => c.Name( "Bill Mei" ).Email( "bill.mei@somewhere.com" ) )
                             .Description( description.ToString() )
