@@ -876,7 +876,17 @@ public class VersionedApiExplorer : IApiExplorer
         var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
         var metadata = actionDescriptor.ApiVersionMetadata;
         var model = metadata.Map( Explicit );
-        var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
+        var deprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion );
+        bool deprecated;
+
+        if ( model.IsApiVersionNeutral )
+        {
+            deprecated = deprecationPolicy != null && deprecationPolicy.IsEffective( DateTimeOffset.Now );
+        }
+        else
+        {
+            deprecated = model.DeprecatedApiVersions.Contains( apiVersion );
+        }
 
         for ( var i = 0; i < supportedMethods.Count; i++ )
         {
@@ -891,7 +901,7 @@ public class VersionedApiExplorer : IApiExplorer
                 ApiVersion = apiVersion,
                 IsDeprecated = deprecated,
                 SunsetPolicy = SunsetPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
-                DeprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
+                DeprecationPolicy = deprecationPolicy,
             };
 
             foreach ( var supportedResponseFormatter in supportedResponseFormatters )

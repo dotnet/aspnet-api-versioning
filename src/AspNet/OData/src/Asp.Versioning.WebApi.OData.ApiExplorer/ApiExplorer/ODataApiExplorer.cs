@@ -548,7 +548,17 @@ public class ODataApiExplorer : VersionedApiExplorer
         var supportedMethods = GetHttpMethodsSupportedByAction( route, actionDescriptor );
         var metadata = actionDescriptor.ApiVersionMetadata;
         var model = metadata.Map( ApiVersionMapping.Explicit );
-        var deprecated = !model.IsApiVersionNeutral && model.DeprecatedApiVersions.Contains( apiVersion );
+        var deprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion );
+        bool deprecated;
+
+        if ( model.IsApiVersionNeutral )
+        {
+            deprecated = deprecationPolicy != null && deprecationPolicy.IsEffective( DateTimeOffset.Now );
+        }
+        else
+        {
+            deprecated = model.DeprecatedApiVersions.Contains( apiVersion );
+        }
 
         PopulateMediaTypeFormatters( actionDescriptor, routeBuilderContext.ParameterDescriptions, route, responseType, requestFormatters, responseFormatters );
 
@@ -566,7 +576,7 @@ public class ODataApiExplorer : VersionedApiExplorer
                 ApiVersion = apiVersion,
                 IsDeprecated = deprecated,
                 SunsetPolicy = SunsetPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
-                DeprecationPolicy = DeprecationPolicyManager.ResolvePolicyOrDefault( metadata.Name, apiVersion ),
+                DeprecationPolicy = deprecationPolicy,
                 Properties = { [typeof( IEdmModel )] = routeBuilderContext.EdmModel },
             };
 
