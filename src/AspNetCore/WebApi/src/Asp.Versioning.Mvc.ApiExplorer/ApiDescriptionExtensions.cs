@@ -52,12 +52,12 @@ public static class ApiDescriptionExtensions
         /// </summary>
         /// <returns>The defined deprecation policy defined for the API or <c>null</c>.</returns>
         /// <remarks>Setting this property is meant for infrastructure and should not be used by application code.</remarks>
-        public DeprecationPolicy DeprecationPolicy
+        public DeprecationPolicy? DeprecationPolicy
         {
             get => apiDescription.GetProperty<DeprecationPolicy>();
 
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            set => apiDescription.SetProperty(value);
+            [EditorBrowsable( EditorBrowsableState.Never )]
+            set => apiDescription.SetProperty( value );
         }
 
         /// <summary>
@@ -74,6 +74,11 @@ public static class ApiDescriptionExtensions
 
                 if ( metatadata.IsApiVersionNeutral )
                 {
+                    if ( apiDescription.DeprecationPolicy is { } policy )
+                    {
+                        return policy.IsEffective( DateTimeOffset.Now );
+                    }
+
                     return false;
                 }
 

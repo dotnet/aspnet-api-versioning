@@ -61,20 +61,47 @@ namespace Asp.Versioning.OpenApi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This API version has been deprecated..
+        ///   Looks up a localized string similar to The API is deprecated..
         /// </summary>
-        internal static string DeprecationNoticeFormat {
+        internal static string DeprecatedNotice {
             get {
-                return ResourceManager.GetString("DeprecationNoticeFormat", resourceCulture);
+                return ResourceManager.GetString("DeprecatedNotice", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The API will be sunset on {0:d}..
+        ///   Looks up a localized string similar to The API {0} deprecated on {1:d}..
+        /// </summary>
+        internal static string DeprecatedNoticeFormat {
+            get {
+                return ResourceManager.GetString("DeprecatedNoticeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The API {0} sunset on {1:d}..
         /// </summary>
         internal static string SunsetNoticeFormat {
             get {
                 return ResourceManager.GetString("SunsetNoticeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to was.
+        /// </summary>
+        internal static string Was {
+            get {
+                return ResourceManager.GetString("Was", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to will be.
+        /// </summary>
+        internal static string WillBe {
+            get {
+                return ResourceManager.GetString("WillBe", resourceCulture);
             }
         }
     }

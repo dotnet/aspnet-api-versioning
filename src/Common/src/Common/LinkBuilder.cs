@@ -2,20 +2,16 @@
 
 namespace Asp.Versioning;
 
-internal abstract class LinkBuilder : ILinkBuilder
+internal abstract class LinkBuilder( Uri linkTarget, string relationType ) : ILinkBuilder
 {
-    protected abstract string RelationType { get; }
     private string? language;
     private List<string>? languages;
     private string? title;
     private string? type;
 
-    public LinkBuilder( Uri linkTarget )
-    {
-        LinkTarget = linkTarget;
-    }
+    protected string RelationType => relationType;
 
-    public Uri LinkTarget { get; }
+    public Uri LinkTarget => linkTarget;
 
     public ILinkBuilder Language( string value )
     {

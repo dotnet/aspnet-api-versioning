@@ -151,18 +151,27 @@ public class ApiExplorerTransformer :
         var description = new StringBuilder( document.Info.Description );
         var links = new StringBuilder();
 
-        if ( api.IsDeprecated )
+        if ( api.DeprecationPolicy is { } deprecation )
         {
-            var notice = options.DeprecationNotice();
+            var notice = options.DeprecationNotice( deprecation );
 
             if ( !string.IsNullOrEmpty( notice ) )
             {
-                if ( description.Length > 0 && description[^1] != '.' )
-                {
-                    description.Append( '.' );
-                }
+                AddSentence( description, notice );
+            }
 
-                description.Append( ' ' ).Append( notice );
+            if ( !options.HidePolicyLinks && deprecation.HasLinks )
+            {
+                AddMarkdownLinks( links, deprecation.Links );
+            }
+        }
+        else if ( api.IsDeprecated )
+        {
+            var notice = options.DeprecationNotice( new() );
+
+            if ( !string.IsNullOrEmpty( notice ) )
+            {
+                AddSentence( description, notice );
             }
         }
 
@@ -172,12 +181,7 @@ public class ApiExplorerTransformer :
 
             if ( !string.IsNullOrEmpty( notice ) )
             {
-                if ( description.Length > 0 && description[^1] != '.' )
-                {
-                    description.Append( '.' );
-                }
-
-                description.Append( ' ' ).Append( notice );
+                AddSentence( description, notice );
             }
 
             if ( !options.HidePolicyLinks && sunset.HasLinks )
@@ -241,20 +245,42 @@ public class ApiExplorerTransformer :
                     .Append( link.Title.ToString() )
                     .Append( "](" )
                     .Append( link.LinkTarget.OriginalString )
-                    .Append( ')' )
-                    .AppendLine();
+                    .Append( ')' );
         }
+    }
+
+    private static void AddSentence( StringBuilder text, string sentence )
+    {
+        if ( text.Length > 0 )
+        {
+            if ( text[^1] != '.' )
+            {
+                text.Append( '.' );
+            }
+
+            text.Append( ' ' );
+        }
+
+        text.Append( sentence );
     }
 
     private void AddMarkdownLinks( StringBuilder markdown, IList<LinkHeaderValue> links )
     {
+        var appendLine = markdown.Length > 0;
+
         for ( var i = 0; i < links.Count; i++ )
         {
             var link = links[i];
 
             if ( ShouldRenderLink( link ) )
             {
+                if ( appendLine )
+                {
+                    markdown.AppendLine();
+                }
+
                 RenderLink( markdown, link );
+                appendLine = true;
             }
         }
     }
@@ -262,6 +288,11 @@ public class ApiExplorerTransformer :
     private void AddLinkExtensions( OpenApiDocument document, ApiVersionDescription api )
     {
         var array = new JsonArray();
+
+        if ( api.DeprecationPolicy is { } deprecation && deprecation.HasLinks )
+        {
+            AddLinks( array, deprecation.Links );
+        }
 
         if ( api.SunsetPolicy is { } sunset && sunset.HasLinks )
         {

@@ -99,7 +99,7 @@ public class HttpResponseMessageExtensionsTest
         response.Headers.Add( "link", "<policy>; rel=\"deprecation\"; type=\"text/html\"" );
 
         // act
-        var policy = response.ReadDeprecationPolicy();
+        var policy = response.DeprecationPolicy;
 
         // assert
         policy.Date.Value.ToLocalTime().Should().BeCloseTo( date, TimeSpan.FromSeconds( 2d ) );
@@ -123,15 +123,14 @@ public class HttpResponseMessageExtensionsTest
 
         response.Headers.Add(
             "deprecation",
-            new string[]
-            {
+            [
                 date.ToDeprecationHeaderValue(),
                 expected.ToDeprecationHeaderValue(),
                 expected.AddDays( 3 ).ToDeprecationHeaderValue(),
-            } );
+            ] );
 
         // act
-        var policy = response.ReadDeprecationPolicy();
+        var policy = response.DeprecationPolicy;
 
         // assert
         policy.Date.Value.ToLocalTime().Should().BeCloseTo( expected, TimeSpan.FromSeconds( 2d ) );
@@ -147,15 +146,14 @@ public class HttpResponseMessageExtensionsTest
 
         response.Headers.Add(
             "link",
-            new[]
-            {
+            [
                 "<swagger.json>; rel=\"openapi\"; type=\"application/json\" title=\"OpenAPI\"",
                 "<policy>; rel=\"deprecation\"; type=\"text/html\"",
                 "<docs>; rel=\"info\"; type=\"text/html\" title=\"Documentation\"",
-            } );
+            ] );
 
         // act
-        var policy = response.ReadDeprecationPolicy();
+        var policy = response.DeprecationPolicy;
 
         // assert
         policy.Date.Should().BeNull();

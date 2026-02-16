@@ -39,6 +39,6 @@ internal sealed class ApiVersionDescriptionProviderFactory : IApiVersionDescript
 
         collators.AddRange( providers );
 
-        return new DefaultApiVersionDescriptionProvider( collators, sunsetPolicyManager, deprecationPolicyManager, options );
+        return new GroupedApiVersionDescriptionProvider( collators, sunsetPolicyManager, deprecationPolicyManager, options );
     }
 }

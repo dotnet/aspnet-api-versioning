@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Test API | v1",
-    "description": " The API will be sunset on 2/10/2026.\r\n\r\n### Links\r\n\r\n- [Versioning Policy](policy.html)\r\n",
+    "description": "The API was deprecated on 1/1/2026. The API was sunset on 2/10/2026.\r\n\r\n### Links\r\n\r\n- [Version Deprecation Policy](http://my.api.com/policies/versions/deprecated.html)\r\n- [Version Sunset Policy](http://my.api.com/policies/versions/sunset.html)",
     "version": "1.0"
   },
   "servers": [
@@ -90,10 +90,16 @@
   ],
   "x-api-versioning": [
     {
-      "title": "Versioning Policy",
+      "title": "Version Deprecation Policy",
+      "type": "text/html",
+      "rel": "deprecation",
+      "url": "http://my.api.com/policies/versions/deprecated.html"
+    },
+    {
+      "title": "Version Sunset Policy",
       "type": "text/html",
       "rel": "sunset",
-      "url": "policy.html"
+      "url": "http://my.api.com/policies/versions/sunset.html"
     }
   ]
 }

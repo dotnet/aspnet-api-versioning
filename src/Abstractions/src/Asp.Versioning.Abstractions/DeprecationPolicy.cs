@@ -57,22 +57,9 @@ public class DeprecationPolicy
     public DeprecationPolicy( LinkHeaderValue link ) => Links.Add( link );
 
     /// <summary>
-    /// Returns a boolean to indicate if this policy is effective at the given <paramref name="dateTimeOffset"/>.
+    /// Returns a value indicating if this policy is effective for the specified date and time.
     /// </summary>
-    /// <param name="dateTimeOffset">The point in time to serve as a reference.</param>
-    /// <returns>A boolean which indicates if this policy is effective.</returns>
-    public bool IsEffective( DateTimeOffset? dateTimeOffset )
-    {
-        if ( dateTimeOffset is not { } when )
-        {
-            return true;
-        }
-
-        if ( Date is not { } date )
-        {
-            return true;
-        }
-
-        return date <= when;
-    }
+    /// <param name="dateTime">The <see cref="DateTimeOffset">date and time</see> to evaluate.</param>
+    /// <returns>True if the policy is effective; otherwise, false.</returns>
+    public bool IsEffective( DateTimeOffset dateTime ) => Date is { } date ? date <= dateTime : true;
 }

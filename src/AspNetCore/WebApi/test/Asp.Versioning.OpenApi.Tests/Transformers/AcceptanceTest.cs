@@ -22,7 +22,7 @@ public class AcceptanceTest
         builder.WebHost.UseTestServer();
         builder.Services.AddControllers()
                         .AddApplicationPart( GetType().Assembly );
-        builder.Services.AddApiVersioning( options => AddSunsetPolicy( options ) )
+        builder.Services.AddApiVersioning( options => AddPolicies( options ) )
                         .AddMvc()
                         .AddApiExplorer( options => options.GroupNameFormat = "'v'VVV" )
                         .AddOpenApi();
@@ -59,7 +59,7 @@ public class AcceptanceTest
         builder.WebHost.UseTestServer();
         builder.Services.AddControllers()
                         .AddApplicationPart( GetType().Assembly );
-        builder.Services.AddApiVersioning( options => AddSunsetPolicy( options ) )
+        builder.Services.AddApiVersioning( options => AddPolicies( options ) )
                         .AddMvc()
                         .AddApiExplorer( options => options.GroupNameFormat = "'v'VVV" )
                         .AddOpenApi();
@@ -84,12 +84,18 @@ public class AcceptanceTest
         JsonNode.DeepEquals( actual, expected ).Should().BeTrue();
     }
 
-    private static ApiVersioningOptions AddSunsetPolicy( ApiVersioningOptions options )
+    private static ApiVersioningOptions AddPolicies( ApiVersioningOptions options )
     {
+        options.Policies.Deprecate( 1.0 )
+                        .Effective( 2026, 1, 1 )
+                        .Link( "http://my.api.com/policies/versions/deprecated.html" )
+                            .Title( "Version Deprecation Policy" )
+                            .Type( "text/html" );
+
         options.Policies.Sunset( 1.0 )
                         .Effective( 2026, 2, 10 )
-                        .Link( "policy.html" )
-                            .Title( "Versioning Policy" )
+                        .Link( "http://my.api.com/policies/versions/sunset.html" )
+                            .Title( "Version Sunset Policy" )
                             .Type( "text/html" );
 
         return options;

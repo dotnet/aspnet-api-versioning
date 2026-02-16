@@ -5,4 +5,6 @@ namespace Asp.Versioning;
 /// <summary>
 /// Defines the behavior of a sunset policy builder.
 /// </summary>
-public interface ISunsetPolicyBuilder : IPolicyBuilder<SunsetPolicy>, IPolicyWithLink, IPolicyWithEffectiveDate { }
+public interface ISunsetPolicyBuilder : IPolicyBuilder<SunsetPolicy>, IPolicyWithLink, IPolicyWithEffectiveDate
+{
+}

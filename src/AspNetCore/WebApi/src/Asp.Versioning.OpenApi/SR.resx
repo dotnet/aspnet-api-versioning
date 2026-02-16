@@ -117,11 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DeprecationNoticeFormat" xml:space="preserve">
-    <value>This API version has been deprecated.</value>
+  <data name="DeprecatedNoticeFormat" xml:space="preserve">
+    <value>The API {0} deprecated on {1:d}.</value>
+    <comment>0 = participle, 1 = the deprecation date and time</comment>
+  </data>
+  <data name="Was" xml:space="preserve">
+    <value>was</value>
   </data>
   <data name="SunsetNoticeFormat" xml:space="preserve">
-    <value>The API will be sunset on {0:d}.</value>
-    <comment>0 = the sunset date and time</comment>
+    <value>The API {0} sunset on {1:d}.</value>
+    <comment>0 = participle, 1 = the sunset date and time</comment>
+  </data>
+  <data name="WillBe" xml:space="preserve">
+    <value>will be</value>
+  </data>
+  <data name="DeprecatedNotice" xml:space="preserve">
+    <value>The API is deprecated.</value>
   </data>
 </root>

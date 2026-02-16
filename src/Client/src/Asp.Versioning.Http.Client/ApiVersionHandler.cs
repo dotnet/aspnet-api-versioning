@@ -70,7 +70,7 @@ public class ApiVersionHandler : DelegatingHandler
     {
         ArgumentNullException.ThrowIfNull( response );
 
-        deprecationPolicy = response.ReadDeprecationPolicy();
+        deprecationPolicy = response.DeprecationPolicy;
 
         if ( deprecationPolicy.Date.HasValue && deprecationPolicy.Date <= DateTimeOffset.UtcNow )
         {

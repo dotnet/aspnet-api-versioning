@@ -16,14 +16,14 @@ using ArgumentNullException = Backport.ArgumentNullException;
 /// </summary>
 public static class HttpResponseMessageExtensions
 {
-    private const string Sunset = nameof(Sunset);
-    private const string Deprecation = nameof(Deprecation);
-    private const string Link = nameof(Link);
+    private const string Sunset = nameof( Sunset );
+    private const string Deprecation = nameof( Deprecation );
+    private const string Link = nameof( Link );
 #if NETSTANDARD1_1
-    private static readonly DateTime UnixEpoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
+    private static readonly DateTime UnixEpoch = new( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
 #endif
 
-    extension(HttpResponseMessage response)
+    extension( HttpResponseMessage response )
     {
         /// <summary>
         /// Gets an API sunset policy from the HTTP response.
@@ -33,10 +33,10 @@ public static class HttpResponseMessageExtensions
         {
             get
             {
-                ArgumentNullException.ThrowIfNull(response);
+                ArgumentNullException.ThrowIfNull( response );
 
                 var headers = response.Headers;
-                var date = default(DateTimeOffset);
+                var date = default( DateTimeOffset );
                 SunsetPolicy policy;
 
                 if ( headers.TryGetValues( Sunset, out var values ) )
@@ -60,42 +60,17 @@ public static class HttpResponseMessageExtensions
                     policy = new();
                 }
 
-                if ( headers.TryGetValues( Link, out values ) )
-                {
-                    var baseUrl = response.RequestMessage?.RequestUri;
-                    Func<Uri, Uri> resolver = baseUrl is null ? url => url : url => new( baseUrl, url );
-
-                    foreach ( var value in values )
-                    {
-                        if ( LinkHeaderValue.TryParse( value, resolver, out var link ) &&
-                             link.RelationType.Equals( "sunset", OrdinalIgnoreCase ) )
-                        {
-                            policy.Links.Add( link );
-                        }
-                    }
-                }
+                response.AddLinks( policy.Links, "sunset" );
 
                 return policy;
             }
         }
 
         /// <summary>
-        /// Formats the <paramref name="deprecationDate"/> as required for a Deprecation header.
-        /// </summary>
-        /// <param name="deprecationDate">The date when the api is deprecated.</param>
-        /// <returns>A formatted string as required for a Deprecation header.</returns>
-        public static string ToDeprecationHeaderValue( this DateTimeOffset deprecationDate )
-        {
-            var unixTimestamp = deprecationDate.ToUnixTimeSeconds();
-            return unixTimestamp.ToString("'@'0", CultureInfo.InvariantCulture);
-        }
-
-        /// <summary>
         /// Gets an API deprecation policy from the HTTP response.
         /// </summary>
-        /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to read from.</param>
         /// <returns>A new <see cref="DeprecationPolicy">deprecation policy</see>.</returns>
-        public static DeprecationPolicy DeprecationPolicy
+        public DeprecationPolicy DeprecationPolicy
         {
             get
             {
@@ -105,7 +80,7 @@ public static class HttpResponseMessageExtensions
                 var date = default( DateTimeOffset );
                 DeprecationPolicy policy;
 
-                if ( headers.TryGetValues(Deprecation, out var values) )
+                if ( headers.TryGetValues( Deprecation, out var values ) )
                 {
                     var culture = CultureInfo.InvariantCulture;
                     var style = NumberStyles.Integer;
@@ -117,19 +92,18 @@ public static class HttpResponseMessageExtensions
                             continue;
                         }
 
-#if NETS    TANDARD
-                    if ( long.TryParse( value.Substring( 1 ), style, culture, out var unixTimestamp ) )
+#if NETSTANDARD
+                        if ( long.TryParse( value.Substring( 1 ), style, culture, out var seconds ) )
 #else
-                        if ( long.TryParse( value.AsSpan()[1..], style, culture, out var unixTimestamp ) )
+                        if ( long.TryParse( value.AsSpan()[1..], style, culture, out var seconds ) )
 #endif
                         {
                             DateTimeOffset parsed;
-#if NETS    TANDARD1_1
-                            parsed = UnixEpoch + TimeSpan.FromSeconds( unixTimestamp );
+#if NETSTANDARD1_1
+                            parsed = UnixEpoch + TimeSpan.FromSeconds( seconds );
 #else
-                            parsed = DateTimeOffset.FromUnixTimeSeconds( unixTimestamp );
+                            parsed = DateTimeOffset.FromUnixTimeSeconds( seconds );
 #endif
-
                             if ( date == default || date > parsed )
                             {
                                 date = parsed;
@@ -144,20 +118,7 @@ public static class HttpResponseMessageExtensions
                     policy = new();
                 }
 
-                if ( headers.TryGetValues( Link, out values ) )
-                {
-                    var baseUrl = response.RequestMessage?.RequestUri;
-                    Func<Uri, Uri> resolver = baseUrl is null ? url => url : url => new( baseUrl, url );
-
-                    foreach ( var value in values )
-                    {
-                        if ( LinkHeaderValue.TryParse( value, resolver, out var link ) &&
-                             link.RelationType.Equals( "deprecation", OrdinalIgnoreCase ) )
-                        {
-                            policy.Links.Add( link );
-                        }
-                    }
-                }
+                response.AddLinks( policy.Links, "deprecation" );
 
                 return policy;
             }
@@ -166,15 +127,14 @@ public static class HttpResponseMessageExtensions
         /// <summary>
         /// Gets the OpenAPI document URLs from the HTTP response.
         /// </summary>
-        /// <param name="response">The <see cref="HttpResponseMessage">HTTP response</see> to read from.</param>
         /// <param name="parser">The optional <see cref="IApiVersionParser">parser</see> used to parse API versions.</param>
         /// <returns>A new <see cref="IReadOnlyDictionary{TKey, TValue}">read-only dictionary</see> of API version
         /// to URL mappings.</returns>
-        public static IReadOnlyDictionary<ApiVersion, Uri> GetOpenApiDocumentUrls( IApiVersionParser? parser = default)
+        public IReadOnlyDictionary<ApiVersion, Uri> GetOpenApiDocumentUrls( IApiVersionParser? parser = default )
         {
-            ArgumentNullException.ThrowIfNull(response);
+            ArgumentNullException.ThrowIfNull( response );
 
-            var urls = default(Dictionary<ApiVersion, Uri>);
+            var urls = default( Dictionary<ApiVersion, Uri> );
 
             if ( response.Headers.TryGetValues( Link, out var values ) )
             {
@@ -183,7 +143,7 @@ public static class HttpResponseMessageExtensions
 
                 foreach ( var value in values )
                 {
-                    if (!LinkHeaderValue.TryParse( value, resolver, out var link ) ||
+                    if ( !LinkHeaderValue.TryParse( value, resolver, out var link ) ||
                          ( !link.RelationType.Equals( "openapi", OrdinalIgnoreCase ) &&
                            !link.RelationType.Equals( "swagger", OrdinalIgnoreCase ) ) )
                     {
@@ -203,6 +163,26 @@ public static class HttpResponseMessageExtensions
             }
 
             return urls;
+        }
+
+        private void AddLinks( IList<LinkHeaderValue> links, string relationType )
+        {
+            if ( !response.Headers.TryGetValues( Link, out var values ) )
+            {
+                return;
+            }
+
+            var baseUrl = response.RequestMessage?.RequestUri;
+            Func<Uri, Uri> resolver = baseUrl is null ? url => url : url => new( baseUrl, url );
+
+            foreach ( var value in values )
+            {
+                if ( LinkHeaderValue.TryParse( value, resolver, out var link ) &&
+                     link.RelationType.Equals( relationType, OrdinalIgnoreCase ) )
+                {
+                    links.Add( link );
+                }
+            }
         }
     }
 

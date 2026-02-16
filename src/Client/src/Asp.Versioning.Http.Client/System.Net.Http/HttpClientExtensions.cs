@@ -93,11 +93,12 @@ public static class HttpClientExtensions
                 return ApiInformation.None;
             }
 
-        var deprecated = versions.ToArray();
-        var sunsetPolicy = response.SunsetPolicy;
-        var deprecationPolicy = response.DeprecationPolicy;
-        var urls = response.GetOpenApiDocumentUrls( parser );
+            var deprecated = versions.ToArray();
+            var sunsetPolicy = response.SunsetPolicy;
+            var deprecationPolicy = response.DeprecationPolicy;
+            var urls = response.GetOpenApiDocumentUrls( parser );
 
-        return new( supported, deprecated, sunsetPolicy, deprecationPolicy, urls );
+            return new( supported, deprecated, sunsetPolicy, deprecationPolicy, urls );
+        }
     }
 }

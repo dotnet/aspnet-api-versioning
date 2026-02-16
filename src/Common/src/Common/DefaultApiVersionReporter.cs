@@ -94,7 +94,7 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
         var version = context.RequestedApiVersion;
 #endif
         var name = metadata.Name;
-        DateTimeOffset? sunsetDate = null;
+        var sunsetDate = default( DateTimeOffset? );
 
         if ( sunsetPolicyManager.TryResolvePolicy( name, version, out var sunsetPolicy ) )
         {
@@ -104,8 +104,8 @@ public sealed partial class DefaultApiVersionReporter : IReportApiVersions
 
         if ( deprecationPolicyManager.TryResolvePolicy( name, version, out var deprecationPolicy ) )
         {
-            // Only emit a deprecation header if the deprecation policy becomes effective before the sunset date.
-            if ( deprecationPolicy.IsEffective( sunsetDate ) )
+            // only emit a deprecation header if the policy becomes effective before the sunset date
+            if ( !sunsetDate.HasValue || deprecationPolicy.IsEffective( sunsetDate.Value ) )
             {
                 response.WriteDeprecationPolicy( deprecationPolicy );
             }

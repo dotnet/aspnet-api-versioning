@@ -17,7 +17,7 @@ public class GroupedApiVersionDescriptionProviderTest
             [
                 new EndpointApiVersionMetadataCollationProvider( new TestEndpointDataSource(), new DefaultEndpointInspector() ),
                 new ActionApiVersionMetadataCollationProvider( new TestActionDescriptorCollectionProvider() ),
-            },
+            ],
             Mock.Of<IPolicyManager<SunsetPolicy>>(),
             Mock.Of<IPolicyManager<DeprecationPolicy>>(),
             Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );

@@ -41,7 +41,6 @@ public class SunsetPolicy
     /// <param name="date">The date and time when the API version will be sunset.</param>
     /// <param name="link">The optional link which provides information about the sunset policy.</param>
     public SunsetPolicy( DateTimeOffset date, LinkHeaderValue? link = default )
-        : this()
     {
         Date = date;
 

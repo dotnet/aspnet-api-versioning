@@ -20,10 +20,7 @@ public class DeprecationPolicyBuilder : PolicyBuilder<DeprecationPolicy>, IDepre
         : base( name, apiVersion ) { }
 
     /// <inheritdoc />
-    public virtual void SetEffectiveDate( DateTimeOffset effectiveDate )
-    {
-        date = effectiveDate;
-    }
+    public virtual void SetEffectiveDate( DateTimeOffset effectiveDate ) => date = effectiveDate;
 
     /// <inheritdoc />
     public virtual ILinkBuilder Link( Uri linkTarget )
@@ -82,15 +79,9 @@ public class DeprecationPolicyBuilder : PolicyBuilder<DeprecationPolicy>, IDepre
         return policy;
     }
 
-    private sealed class DeprecationLinkBuilder : LinkBuilder, ILinkBuilder
+    private sealed class DeprecationLinkBuilder( DeprecationPolicyBuilder policyBuilder, Uri linkTarget ) :
+        LinkBuilder( linkTarget, "deprecation" ), ILinkBuilder
     {
-        protected override string RelationType => "deprecation";
-
-        private readonly DeprecationPolicyBuilder policyBuilder;
-
-        public DeprecationLinkBuilder( DeprecationPolicyBuilder policy, Uri linkTarget )
-            : base( linkTarget ) => policyBuilder = policy;
-
         public override ILinkBuilder Link( Uri linkTarget ) => policyBuilder.Link( linkTarget );
     }
 }

@@ -10,6 +10,7 @@ using System.Text;
 /// </summary>
 public class OpenApiDocumentDescriptionOptions
 {
+    private static CompositeFormat? deprecatedNoticeFormat;
     private static CompositeFormat? sunsetNoticeFormat;
 
     /// <summary>
@@ -25,7 +26,7 @@ public class OpenApiDocumentDescriptionOptions
     /// </summary>
     /// <value>The <see cref="Func{T, TResult}">function</see> used to generate the deprecation notice.</value>
     /// <remarks>If the function generates a <c>null</c> or empty message, then no notice is displayed.</remarks>
-    public Func<string?> DeprecationNotice { get; set; } = () => SR.DeprecationNoticeFormat;
+    public Func<DeprecationPolicy, string?> DeprecationNotice { get; set; } = DefaultDeprecationNotice;
 
     /// <summary>
     /// Gets or sets the function used to generate the API versioning sunset notice based on the provided policy.
@@ -34,14 +35,27 @@ public class OpenApiDocumentDescriptionOptions
     /// <remarks>If the function generates a <c>null</c> or empty message, then no notice is displayed.</remarks>
     public Func<SunsetPolicy, string?> SunsetNotice { get; set; } = DefaultSunsetNotice;
 
-    private static string? DefaultSunsetNotice( SunsetPolicy policy )
+    private static string? DefaultDeprecationNotice( DeprecationPolicy policy )
     {
-        if ( policy.Date is { } when )
+        if ( policy.Date is not { } when )
         {
-            sunsetNoticeFormat ??= CompositeFormat.Parse( SR.SunsetNoticeFormat );
-            return string.Format( CultureInfo.CurrentCulture, sunsetNoticeFormat, when );
+            return SR.DeprecatedNotice;
         }
 
-        return default;
+        var participle = when < DateTimeOffset.Now ? SR.Was : SR.WillBe;
+        deprecatedNoticeFormat ??= CompositeFormat.Parse( SR.DeprecatedNoticeFormat );
+        return string.Format( CultureInfo.CurrentCulture, deprecatedNoticeFormat, participle, when );
+    }
+
+    private static string? DefaultSunsetNotice( SunsetPolicy policy )
+    {
+        if ( policy.Date is not { } when )
+        {
+            return default;
+        }
+
+        var participle = when < DateTimeOffset.Now ? SR.Was : SR.WillBe;
+        sunsetNoticeFormat ??= CompositeFormat.Parse( SR.SunsetNoticeFormat );
+        return string.Format( CultureInfo.CurrentCulture, sunsetNoticeFormat, participle, when );
     }
 }

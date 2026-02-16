@@ -158,7 +158,7 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
 
                     for ( var i = 0; i < metadata.Length; i++ )
                     {
-                        metadata[i] = new GroupedApiVersionMetadata( context.Results.GroupName( i ), results[i] );
+                        metadata[i] = new( context.Results.GroupName( i ), results[i] );
                     }
 
                     items = describe( metadata );
@@ -219,16 +219,19 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
     {
         internal static ApiVersionDescription[] Describe(
             IReadOnlyList<GroupedApiVersionMetadata> metadata,
-            ISunsetPolicyManager sunsetPolicyManager,
+            IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+            IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
             ApiExplorerOptions options )
         {
+            const bool Supported = false;
+            const bool Deprecated = true;
             var descriptions = new SortedSet<ApiVersionDescription>( new ApiVersionDescriptionComparer() );
             var supported = new HashSet<GroupedApiVersion>();
             var deprecated = new HashSet<GroupedApiVersion>();
 
             BucketizeApiVersions( metadata, supported, deprecated, options );
-            AppendDescriptions( descriptions, supported, sunsetPolicyManager, options, deprecated: false );
-            AppendDescriptions( descriptions, deprecated, sunsetPolicyManager, options, deprecated: true );
+            AppendDescriptions( descriptions, supported, sunsetPolicyManager, deprecationPolicyManager, options, Supported );
+            AppendDescriptions( descriptions, deprecated, sunsetPolicyManager, deprecationPolicyManager, options, Deprecated );
 
             return [.. descriptions];
         }
@@ -288,7 +291,8 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
         private static void AppendDescriptions(
             SortedSet<ApiVersionDescription> descriptions,
             HashSet<GroupedApiVersion> versions,
-            ISunsetPolicyManager sunsetPolicyManager,
+            IPolicyManager<SunsetPolicy> sunsetPolicyManager,
+            IPolicyManager<DeprecationPolicy> deprecationPolicyManager,
             ApiExplorerOptions options,
             bool deprecated )
         {
@@ -308,8 +312,9 @@ public class GroupedApiVersionDescriptionProvider : IApiVersionDescriptionProvid
                     formattedGroupName = formatGroupName( formattedGroupName, version.ToString( format, CurrentCulture ) );
                 }
 
-                var sunsetPolicy = sunsetPolicyManager.TryGetPolicy( version, out var policy ) ? policy : default;
-                descriptions.Add( new( version, formattedGroupName, deprecated, sunsetPolicy ) );
+                sunsetPolicyManager.TryGetPolicy( version, out var sunsetPolicy );
+                deprecationPolicyManager.TryGetPolicy( version, out var deprecationPolicy );
+                descriptions.Add( new( version, formattedGroupName, deprecated, sunsetPolicy, deprecationPolicy ) );
             }
         }
     }

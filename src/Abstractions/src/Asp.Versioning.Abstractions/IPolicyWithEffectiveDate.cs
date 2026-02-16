@@ -3,15 +3,13 @@
 namespace Asp.Versioning;
 
 /// <summary>
-/// A policy which can be configured to only be effective after a particular date.
+/// Defines the behavior of a policy which can be configured to only be effective after a particular date.
 /// </summary>
 public interface IPolicyWithEffectiveDate
 {
     /// <summary>
-    /// Indicates when a policy is applied.
+    /// Sets the effective date when a policy is applied.
     /// </summary>
-    /// <param name="effectiveDate">
-    /// The <see cref="DateTimeOffset">date and time</see> when a policy is applied.
-    /// </param>
+    /// <param name="effectiveDate">The <see cref="DateTimeOffset">date and time</see> when a policy is applied.</param>
     void SetEffectiveDate( DateTimeOffset effectiveDate );
 }
