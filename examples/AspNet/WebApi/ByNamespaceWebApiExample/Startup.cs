@@ -29,7 +29,7 @@ public partial class Startup
         // experiment with either configuration. one of these would be removed in a real application.
         configuration.Routes.MapHttpRoute(
             "VersionedQueryString",
-            "api/{controller}/{accountId}",
+            "{controller}/{accountId}",
             defaults: null );
 
         configuration.Routes.MapHttpRoute(

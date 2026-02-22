@@ -2,10 +2,15 @@
 
  <PropertyGroup>
   <TargetFramework>net48</TargetFramework>
+  <OutputType>Exe</OutputType>
  </PropertyGroup>
 
  <ItemGroup>
   <Reference Include="System.ComponentModel.DataAnnotations" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" />
  </ItemGroup>
 
  <ItemGroup>

@@ -13,7 +13,7 @@ public class OrderModelConfiguration : IModelConfiguration
     {
         var order = builder.EntitySet<Order>( "Orders" ).EntityType;
 
-        order.HasKey( p => p.Id );
+        order.HasKey( p => p.Id ).Select();
 
         return order;
     }

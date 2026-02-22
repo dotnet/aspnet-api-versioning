@@ -1,0 +1,25 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+@baseUrl = http://localhost:5000
+
+### VERSION 1.0
+
+### Weather Forecast - Get All
+GET {{baseUrl}}/weatherforecast?api-version=1.0
+
+### Weather Forecast - Remove (Version-Neutral)
+DELETE {{baseUrl}}/weatherforecast?api-version=1.0
+
+### VERSION 2.0
+
+### Weather Forecast - Get All
+GET {{baseUrl}}/weatherforecast?api-version=2.0
+
+### Weather Forecast - Update
+POST {{baseUrl}}/weatherforecast?api-version=2.0
+content-type: application/json
+
+{"date":"2026-02-22T15:00:00-08:00","temperatureC":12,"temperatureF":54,"summary":"Chilly"}
+
+### Weather Forecast - Remove (Version-Neutral)
+DELETE {{baseUrl}}/weatherforecast?api-version=2.0

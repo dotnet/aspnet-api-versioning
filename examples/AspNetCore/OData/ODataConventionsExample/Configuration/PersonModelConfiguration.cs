@@ -20,7 +20,7 @@ public class PersonModelConfiguration : IModelConfiguration
     {
         var person = builder.EntitySet<Person>( "People" ).EntityType;
 
-        person.HasKey( p => p.Id );
+        person.HasKey( p => p.Id ).Select();
 
         return person;
     }

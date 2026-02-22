@@ -5,6 +5,10 @@
  </PropertyGroup>
 
  <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.OData" />
+ </ItemGroup>
+
+ <ItemGroup>
   <ProjectReference Include="..\..\..\..\src\AspNetCore\OData\src\Asp.Versioning.OData\Asp.Versioning.OData.csproj" />
  </ItemGroup>
 

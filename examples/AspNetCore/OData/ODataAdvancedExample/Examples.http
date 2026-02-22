@@ -1,0 +1,74 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+@baseUrl = http://localhost:5000
+
+### VERSION 1.0
+
+### People - Get All (OData)
+# Note: assumes the version when AssumeDefaultVersionWhenUnspecified = true,
+# which is meant for existing, unversioned apis
+GET {{baseUrl}}/api/people
+
+### People - Get All (OData)
+GET {{baseUrl}}/api/people?api-version=1.0
+
+### People - Get All with $select (OData)
+GET {{baseUrl}}/api/people?api-version=1.0&$select=firstName,lastName
+
+### People - Get by Key (OData)
+GET {{baseUrl}}/api/people/1?api-version=1.0
+
+### Orders - Get All (Standard)
+# Note: assumes the version when AssumeDefaultVersionWhenUnspecified = true,
+# which is meant for existing, unversioned apis
+GET {{baseUrl}}/api/orders
+
+### Orders - Get All (Standard)
+GET {{baseUrl}}/api/orders?api-version=1.0
+
+### Orders - Get by Key (Standard)
+GET {{baseUrl}}/api/orders/1?api-version=1.0
+
+### VERSION 2.0
+
+### People - Get All (OData)
+GET {{baseUrl}}/api/people?api-version=2.0
+
+### People - Get All with $select (OData)
+GET {{baseUrl}}/api/people?api-version=2.0&$select=firstName,lastName,email
+
+### People - Get by Key (OData)
+GET {{baseUrl}}/api/people/1?api-version=2.0
+
+### People - Partial Update (OData)
+PATCH {{baseUrl}}/api/people/1?api-version=2.0
+content-type: application/json
+prefer: return=representation
+
+{"firstName":"John","lastName":"Doe"}
+
+### Orders - Get All (OData)
+GET {{baseUrl}}/api/orders?api-version=2.0
+
+### Orders - Get All with $select (OData)
+GET {{baseUrl}}/api/orders?api-version=2.0&$select=id,customer
+
+### Orders - Get by Key (OData)
+GET {{baseUrl}}/api/orders/1?api-version=2.0
+
+### VERSION 3.0
+
+### People - Get All (OData)
+GET {{baseUrl}}/api/people?api-version=3.0
+
+### People - Get All with $select (OData)
+GET {{baseUrl}}/api/people?api-version=3.0&$select=firstName,lastName,email
+
+### People - Get by Key (OData)
+GET {{baseUrl}}/api/people/1?api-version=3.0
+
+### Orders - Get All (Standard)
+GET {{baseUrl}}/api/orders?api-version=3.0
+
+### Orders - Get by Key (Standard)
+GET {{baseUrl}}/api/orders/1?api-version=3.0

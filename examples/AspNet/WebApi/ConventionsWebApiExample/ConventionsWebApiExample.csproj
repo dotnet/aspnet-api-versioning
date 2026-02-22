@@ -2,7 +2,12 @@
 
  <PropertyGroup>
   <TargetFramework>net48</TargetFramework>
+  <OutputType>Exe</OutputType>
  </PropertyGroup>
+
+ <ItemGroup>
+  <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" />
+ </ItemGroup>
 
  <ItemGroup>
   <ProjectReference Include="..\..\..\..\src\AspNet\WebApi\src\Asp.Versioning.WebApi\Asp.Versioning.WebApi.csproj" />

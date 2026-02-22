@@ -47,7 +47,9 @@ public class PeopleController : ODataController
     public IActionResult Patch( int key, Delta<Person> delta, ODataQueryOptions<Person> options, ApiVersion version )
     {
         if ( !ModelState.IsValid )
+        {
             return BadRequest( ModelState );
+        }
 
         var person = new Person()
         {

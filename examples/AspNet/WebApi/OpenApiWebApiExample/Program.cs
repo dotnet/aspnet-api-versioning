@@ -1,7 +1,10 @@
-﻿namespace ApiVersioning.Examples;
+﻿[assembly: Microsoft.Owin.OwinStartup( typeof( ApiVersioning.Examples.Startup ) )]
+
+namespace ApiVersioning.Examples;
 
 using Microsoft.Owin.Hosting;
 using System.Diagnostics;
+
 
 /// <summary>
 /// Represents the current application.

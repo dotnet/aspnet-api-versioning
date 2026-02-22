@@ -1,0 +1,55 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+@baseUrl = http://localhost:9002
+
+### ------------------------------ BY QUERY STRING ------------------------------
+
+### VERSION 1.0
+
+### Agreements - Get by ID
+GET {{baseUrl}}/agreements/42?api-version=1.0
+
+### Orders - Get by ID
+GET {{baseUrl}}/orders/42?api-version=1.0
+
+### VERSION 2.0
+
+### Agreements - Get by ID
+GET {{baseUrl}}/agreements/42?api-version=2.0
+
+### Orders - Get by ID
+GET {{baseUrl}}/orders/42?api-version=2.0
+
+### VERSION 3.0
+
+### Agreements - Get by ID
+GET {{baseUrl}}/agreements/42?api-version=3.0
+
+### Orders - Get by ID
+GET {{baseUrl}}/orders/42?api-version=3.0
+
+### ------------------------------ BY URL SEGMENT ------------------------------
+
+### VERSION 1.0
+
+### Agreements - Get by ID
+GET {{baseUrl}}/v1/agreements/42
+
+### Orders - Get by ID
+GET {{baseUrl}}/v1/orders/42
+
+### VERSION 2.0
+
+### Agreements - Get by ID
+GET {{baseUrl}}/v2/agreements/42
+
+### Orders - Get by ID
+GET {{baseUrl}}/v2/orders/42
+
+### VERSION 3.0
+
+### Agreements - Get by ID
+GET {{baseUrl}}/v3/agreements/42
+
+### Orders - Get by ID
+GET {{baseUrl}}/v3/orders/42

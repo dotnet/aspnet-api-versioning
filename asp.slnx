@@ -49,6 +49,7 @@
   <Folder Name="/examples/">
     <File Path="examples/.editorconfig" />
     <File Path="examples/Directory.Build.props" />
+    <File Path="examples/Directory.Packages.props" />
   </Folder>
   <Folder Name="/examples/AspNet/">
     <File Path="examples/AspNet/Directory.Build.props" />
@@ -69,7 +70,6 @@
   </Folder>
   <Folder Name="/examples/AspNetCore/" />
   <Folder Name="/examples/AspNetCore/OData/">
-    <File Path="examples/AspNetCore/OData/Directory.Build.props" />
     <Project Path="examples/AspNetCore/OData/ODataAdvancedExample/ODataAdvancedExample.csproj" />
     <Project Path="examples/AspNetCore/OData/ODataBasicExample/ODataBasicExample.csproj" />
     <Project Path="examples/AspNetCore/OData/ODataConventionsExample/ODataConventionsExample.csproj" />

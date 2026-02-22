@@ -1,0 +1,30 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+@baseUrl = http://localhost:5000
+
+### VERSION 1.0
+
+### Values - Get All
+GET {{baseUrl}}/api/values?api-version=1.0
+
+### Hello World - Get
+GET {{baseUrl}}/api/v1/helloworld
+
+### Hello World - Get by ID
+GET {{baseUrl}}/api/v1/helloworld/42
+
+### Hello World - Create
+POST {{baseUrl}}/api/v1/helloworld
+
+### Multi-Versioned - Get
+# note: this controller has a single, version interleaved implementation
+GET {{baseUrl}}/api/v1/multiversioned
+
+### VERSION 2.0
+
+### Values - Get All
+GET {{baseUrl}}/api/values?api-version=2.0
+
+### Multi-Versioned - Get
+# note: this controller has a single, version interleaved implementation
+GET {{baseUrl}}/api/v2/multiversioned

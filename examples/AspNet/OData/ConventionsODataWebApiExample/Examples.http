@@ -1,0 +1,55 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+@baseUrl = http://localhost:9005
+
+### ------------------------------ BY QUERY STRING ------------------------------
+
+### VERSION 1.0
+
+### People - Get All
+GET {{baseUrl}}/api/people?api-version=1.0
+
+### People - Get All with $select
+GET {{baseUrl}}/api/people?api-version=1.0&$select=firstName,lastName
+
+### People - Get by Key
+GET {{baseUrl}}/api/people/1?api-version=1.0
+
+### VERSION 2.0
+
+### People - Get All
+GET {{baseUrl}}/api/people?api-version=2.0
+
+### People - Get All with $select
+GET {{baseUrl}}/api/people?api-version=2.0&$select=firstName,lastName,email
+
+### People - Get by Key
+GET {{baseUrl}}/api/people/1?api-version=2.0
+
+### People - Partial Update
+PATCH {{baseUrl}}/api/people/1?api-version=2.0
+content-type: application/json
+prefer: return=representation
+
+{"firstName":"John","lastName":"Doe"}
+
+### VERSION 3.0
+
+### People - Get All
+GET {{baseUrl}}/api/people?api-version=3.0
+
+### People - Get All with $select
+GET {{baseUrl}}/api/people?api-version=3.0&$select=firstName,lastName,email
+
+### People - Get by Key
+GET {{baseUrl}}/api/people/1?api-version=3.0
+
+### ------------------------------ BY URL SEGMENT ------------------------------
+
+### VERSION 1.0
+
+### Orders - Get All
+GET {{baseUrl}}/api/v1/orders
+
+### Orders - Get by Key
+GET {{baseUrl}}/api/v1/orders/1
