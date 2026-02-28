@@ -26,7 +26,6 @@ public class AcceptanceTest
         var builder = WebApplication.CreateBuilder();
 
         builder.WebHost.UseTestServer();
-        builder.Services.AddProblemDetails();
         builder.Services.AddApiVersioning( options => AddPolicies( options ) )
                         .AddApiExplorer( options => options.GroupNameFormat = "'v'VVV" )
                         .AddOpenApi();
@@ -43,6 +42,9 @@ public class AcceptanceTest
         app.MapOpenApi().WithDocumentPerVersion();
 
         var cancellationToken = TestContext.Current.CancellationToken;
+        using var stream = File.OpenRead( Path.Combine( AppContext.BaseDirectory, "Content", "v1-minimal.json" ) );
+        var expected = await JsonNode.ParseAsync( stream, default, default, cancellationToken );
+
         await app.StartAsync( cancellationToken );
 
         using var client = app.GetTestClient();
@@ -51,18 +53,7 @@ public class AcceptanceTest
         var actual = await client.GetFromJsonAsync<JsonNode>( "/openapi/v1.json", cancellationToken );
 
         // assert
-        actual!["info"]!["version"]!.GetValue<string>().Should().Be( "1.0" );
-
-        var paths = actual["paths"]!.AsObject();
-
-        paths.Select( p => p.Key ).Should().Contain( "/test/{id}" );
-        paths.Select( p => p.Key ).Should().NotContain( "/Test" );
-
-        var operation = paths["/test/{id}"]!["get"]!;
-        var parameters = operation["parameters"]!.AsArray();
-
-        parameters.Should().Contain( p => p!["name"]!.GetValue<string>() == "id" );
-        parameters.Should().Contain( p => p!["name"]!.GetValue<string>() == "api-version" );
+        JsonNode.DeepEquals( actual, expected ).Should().BeTrue();
     }
 
     [Fact]
@@ -124,6 +115,9 @@ public class AcceptanceTest
         app.MapOpenApi().WithDocumentPerVersion();
 
         var cancellationToken = TestContext.Current.CancellationToken;
+        using var stream = File.OpenRead( Path.Combine( AppContext.BaseDirectory, "Content", "v1-mixed.json" ) );
+        var expected = await JsonNode.ParseAsync( stream, default, default, cancellationToken );
+
         await app.StartAsync( cancellationToken );
 
         using var client = app.GetTestClient();
@@ -132,12 +126,7 @@ public class AcceptanceTest
         var actual = await client.GetFromJsonAsync<JsonNode>( "/openapi/v1.json", cancellationToken );
 
         // assert
-        actual!["info"]!["version"]!.GetValue<string>().Should().Be( "1.0" );
-
-        var paths = actual["paths"]!.AsObject();
-
-        paths.Select( p => p.Key ).Should().Contain( "/minimal/{id}" );
-        paths.Select( p => p.Key ).Should().Contain( "/Test" );
+        JsonNode.DeepEquals( actual, expected ).Should().BeTrue();
     }
 
     private static ApiVersioningOptions AddPolicies( ApiVersioningOptions options )
