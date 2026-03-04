@@ -58,7 +58,12 @@ public static class IApiVersioningBuilderExtensions
 
         var services = builder.Services;
 
+        // registers DefaultApiDescriptionProvider, which discovers controller-based endpoints
         services.AddMvcCore().AddApiExplorer();
+
+        // registers EndpointMetadataApiDescriptionProvider, which discovers minimal API endpoints.
+        // both providers are required so that OpenApiDocumentService sees all endpoints.
+        services.AddEndpointsApiExplorer();
         services.TryAddSingleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>();
         services.TryAddTransient<IApiVersionDescriptionProviderFactory, ApiVersionDescriptionProviderFactory>();
         services.TryAddSingleton( static sp => sp.GetRequiredService<IApiVersionDescriptionProviderFactory>().Create() );

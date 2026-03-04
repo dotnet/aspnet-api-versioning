@@ -7,25 +7,33 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 
 public class AcceptanceTest
 {
+    /// <summary>
+    /// Verifies that minimal API endpoints produce a non-empty OpenAPI document.
+    /// <c>AddApiExplorer</c> internally calls <c>AddMvcCore().AddApiExplorer()</c>,
+    /// which auto-discovers controllers from the test assembly. Application parts
+    /// are cleared to isolate the test to minimal API endpoints only.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Fact]
+    [AssumeCulture( "en-US" )]
     public async Task minimal_api_should_generate_expected_open_api_document()
     {
         // arrange
         var builder = WebApplication.CreateBuilder();
-
+        var culture = CultureInfo.CurrentCulture;
         builder.WebHost.UseTestServer();
-        builder.Services.AddControllers()
-                        .AddApplicationPart( GetType().Assembly );
         builder.Services.AddApiVersioning( options => AddPolicies( options ) )
-                        .AddMvc()
                         .AddApiExplorer( options => options.GroupNameFormat = "'v'VVV" )
                         .AddOpenApi();
+        builder.Services.AddMvcCore()
+                        .ConfigureApplicationPartManager(
+                            m => m.ApplicationParts.Clear() );
 
         var app = builder.Build();
         var api = app.NewVersionedApi( "Test" )
@@ -36,7 +44,7 @@ public class AcceptanceTest
         app.MapOpenApi().WithDocumentPerVersion();
 
         var cancellationToken = TestContext.Current.CancellationToken;
-        using var stream = File.OpenRead( Path.Combine( AppContext.BaseDirectory, "Content", "v1.json" ) );
+        using var stream = File.OpenRead( Path.Combine( AppContext.BaseDirectory, "Content", "v1-minimal.json" ) );
         var expected = await JsonNode.ParseAsync( stream, default, default, cancellationToken );
 
         await app.StartAsync( cancellationToken );
@@ -51,6 +59,7 @@ public class AcceptanceTest
     }
 
     [Fact]
+    [AssumeCulture( "en-US" )]
     public async Task controller_should_generate_expected_open_api_document()
     {
         // arrange
@@ -71,6 +80,46 @@ public class AcceptanceTest
 
         var cancellationToken = TestContext.Current.CancellationToken;
         using var stream = File.OpenRead( Path.Combine( AppContext.BaseDirectory, "Content", "v1.json" ) );
+        var expected = await JsonNode.ParseAsync( stream, default, default, cancellationToken );
+
+        await app.StartAsync( cancellationToken );
+
+        using var client = app.GetTestClient();
+
+        // act
+        var actual = await client.GetFromJsonAsync<JsonNode>( "/openapi/v1.json", cancellationToken );
+
+        // assert
+        JsonNode.DeepEquals( actual, expected ).Should().BeTrue();
+    }
+
+    [Fact]
+    [AssumeCulture( "en-US" )]
+    public async Task mixed_api_should_generate_expected_open_api_document()
+    {
+        // arrange
+        var builder = WebApplication.CreateBuilder();
+
+        builder.WebHost.UseTestServer();
+        builder.Services.AddControllers()
+                        .AddApplicationPart( GetType().Assembly );
+        builder.Services.AddApiVersioning( options => AddPolicies( options ) )
+                        .AddMvc()
+                        .AddApiExplorer( options => options.GroupNameFormat = "'v'VVV" )
+                        .AddOpenApi();
+
+        var app = builder.Build();
+
+        app.MapControllers();
+        var api = app.NewVersionedApi( "Test" )
+                     .MapGroup( "/minimal" )
+                     .HasApiVersion( 1.0 );
+
+        api.MapGet( "{id:int}", MinimalApi.Get ).Produces<int>().Produces( 400 );
+        app.MapOpenApi().WithDocumentPerVersion();
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var stream = File.OpenRead( Path.Combine( AppContext.BaseDirectory, "Content", "v1-mixed.json" ) );
         var expected = await JsonNode.ParseAsync( stream, default, default, cancellationToken );
 
         await app.StartAsync( cancellationToken );
