@@ -142,7 +142,9 @@ public class NamespaceParser
     /// <summary>
     /// Attempts to parse an API version from the specified namespace identifier.
     /// </summary>
-    /// <param name="identifier">The namespace identifier to parse.</param>
+    /// <param name="identifier">The namespace identifier to parse. The identifier must start with
+    /// 'v', 'V', or '_' followed by a digit. The '_' prefix supports folder names that start with
+    /// a number, which causes Visual Studio to prepend an underscore to the namespace.</param>
     /// <param name="apiVersion">The parsed <see cref="ApiVersion">API version</see> or <c>null</c>.</param>
     /// <returns>True if parsing is successful; otherwise, false.</returns>
     protected virtual bool TryParse( Text identifier, out ApiVersion? apiVersion )
@@ -164,6 +166,9 @@ public class NamespaceParser
         // - v2_0_Beta
         // - v20180401
         // - v2018_04_01_1_1_Beta
+        // - _1
+        // - _1_1
+        // - _20180401
         // - _2018_04_01
         var ch = identifier[0];
 
