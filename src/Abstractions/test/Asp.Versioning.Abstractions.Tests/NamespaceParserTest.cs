@@ -70,6 +70,16 @@ public class NamespaceParserTest
         { "Contoso.Api.v2018_04_01_1_0_Beta.Controllers", "2018-04-01.1.0-Beta" },
         { "MyRestaurant.Vegetarian.Food.v1_1.Controllers", "1.1" },
         { "VersioningSample.V5.Controllers", "5.0" },
+        { "_1", "1" },
+        { "_1_1", "1.1" },
+        { "_20180401", "2018-04-01" },
+        { "_2018_04_01", "2018-04-01" },
+        { "_2018_04_01_Beta", "2018-04-01-Beta" },
+        { "_2018_04_01_1_0_Beta", "2018-04-01.1.0-Beta" },
+        { "Contoso.Api._2018_04_01.Controllers", "2018-04-01" },
+        { "Contoso.Api._1.Controllers", "1" },
+        { "Contoso.Api._1_1.Controllers", "1.1" },
+        { "Contoso.Api._0_9_Beta.Controllers", "0.9-Beta" },
     };
 
     public static TheoryData<string, string[]> NamespaceWithMultipleVersions => new()
