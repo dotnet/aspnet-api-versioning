@@ -157,16 +157,17 @@ public class NamespaceParser
             return false;
         }
 
-        // 'v' | 'V' : [<year> : ['_'] : <month> : ['_'] : <day>] : ['_'] : [<major> ['_' : <minor>]] : ['_'] : [<status>]
+        // 'v' | 'V' | '_' : [<year> : ['_'] : <month> : ['_'] : <day>] : ['_'] : [<major> ['_' : <minor>]] : ['_'] : [<status>]
         //
         // - v1
         // - v1_1
         // - v2_0_Beta
         // - v20180401
         // - v2018_04_01_1_1_Beta
+        // - _2018_04_01
         var ch = identifier[0];
 
-        if ( ch != 'v' && ch != 'V' )
+        if ( ch != 'v' && ch != 'V' && ch != '_' )
         {
             apiVersion = default;
             return false;
