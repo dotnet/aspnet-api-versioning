@@ -13,7 +13,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <Compile Include="$(SourceFile)" Condition="Exists('$(SourceFile)')" Link="%(Filename)%(Extension)" Visible="false" />
+  <Compile Include="$(RootDir)\src\Abstractions\test\Asp.Versioning.Abstractions.Tests\AssumeCultureAttribute.cs" Link="AssumeCultureAttribute.cs" />
  </ItemGroup>
 
  <ItemGroup>
@@ -35,7 +35,7 @@
   <WriteLinesToFile File="$(SourceFile)" Lines="@(Code)" Overwrite="true" />
 
   <ItemGroup>
-   <Compile Include="$(SourceFile)" Visible="false" />
+   <Compile Include="$(SourceFile)" />
   </ItemGroup>
 
  </Target>
