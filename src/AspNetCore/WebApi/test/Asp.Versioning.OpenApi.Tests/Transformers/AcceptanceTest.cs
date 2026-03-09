@@ -13,13 +13,6 @@ using System.Text.Json.Nodes;
 
 public class AcceptanceTest
 {
-    /// <summary>
-    /// Verifies that minimal API endpoints produce a non-empty OpenAPI document.
-    /// <c>AddApiExplorer</c> internally calls <c>AddMvcCore().AddApiExplorer()</c>,
-    /// which auto-discovers controllers from the test assembly. Application parts
-    /// are cleared to isolate the test to minimal API endpoints only.
-    /// </summary>
-    /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
     [Fact]
     [AssumeCulture( "en-US" )]
     public async Task minimal_api_should_generate_expected_open_api_document()
@@ -31,9 +24,8 @@ public class AcceptanceTest
         builder.Services.AddApiVersioning( options => AddPolicies( options ) )
                         .AddApiExplorer( options => options.GroupNameFormat = "'v'VVV" )
                         .AddOpenApi();
-        builder.Services.AddMvcCore()
-                        .ConfigureApplicationPartManager(
-                            m => m.ApplicationParts.Clear() );
+
+        IsolateMinimalApis( builder.Services );
 
         var app = builder.Build();
         var api = app.NewVersionedApi( "Test" )
@@ -132,6 +124,9 @@ public class AcceptanceTest
         // assert
         JsonNode.DeepEquals( actual, expected ).Should().BeTrue();
     }
+
+    private static void IsolateMinimalApis( IServiceCollection services ) =>
+        services.AddMvcCore().ConfigureApplicationPartManager( m => m.ApplicationParts.Clear() );
 
     private static ApiVersioningOptions AddPolicies( ApiVersioningOptions options )
     {

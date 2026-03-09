@@ -18,9 +18,9 @@ using Text = System.ReadOnlySpan<char>;
 /// Represents API version parser from a type namespace.
 /// </summary>
 /// <remarks>
-/// The namespace identifier can use 'v', 'V', or '_' as a prefix. The '_' prefix is useful when
-/// a folder starts with a number because Visual Studio automatically prefixes it with an underscore.
-/// For example, <c>Contoso.Api._2018_04_01.Controllers</c> is equivalent to <c>Contoso.Api.v2018_04_01.Controllers</c>.
+/// The namespace identifier can use <c>'v'</c>, <c>'V'</c>, or <c>'_'</c> as a prefix. The <c>'_'</c> prefix is useful
+/// when the source folder starts with a number and the editor automatically prefixes it with an underscore. As an
+/// example, <c>Api._2018_04_01.Controllers</c> is equivalent to <c>Api.v2018_04_01.Controllers</c>.
 /// </remarks>
 public class NamespaceParser
 {
