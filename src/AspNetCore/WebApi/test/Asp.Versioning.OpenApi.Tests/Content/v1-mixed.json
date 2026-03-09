@@ -16,13 +16,13 @@
         "tags": [
           "Test"
         ],
-        "summary": "",
-        "description": "",
+        "summary": "Test",
+        "description": "A test API.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "",
+            "description": "A test parameter.",
             "required": true,
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -43,7 +43,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Pass",
             "content": {
               "application/json": {
                 "schema": {
@@ -58,7 +58,7 @@
             }
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Fail"
           }
         }
       }
@@ -68,13 +68,13 @@
         "tags": [
           "Test"
         ],
-        "summary": "",
-        "description": "",
+        "summary": "Test",
+        "description": "A test API.",
         "parameters": [
           {
             "name": "id",
             "in": "query",
-            "description": "",
+            "description": "A test parameter.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -97,7 +97,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Pass",
             "content": {
               "text/plain": {
                 "schema": {

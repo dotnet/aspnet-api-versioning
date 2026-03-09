@@ -24,7 +24,7 @@ internal sealed class XmlCommentsFile
         for ( var i = 0; i < assemblies.Length; i++ )
         {
             var assembly = assemblies[i];
-            var fileName = FilePath.ChangeExtension( assembly.GetName().Name, ".xml" );
+            var fileName = assembly.GetName().Name + ".xml";
 
             if ( string.IsNullOrEmpty( fileName ) )
             {
