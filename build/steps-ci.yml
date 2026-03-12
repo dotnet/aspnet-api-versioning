@@ -14,7 +14,8 @@ steps:
     dotnet test
     --configuration ${{ parameters.configuration }}
     --report-xunit-trx
-    --settings $(System.DefaultWorkingDirectory)/build/mtp.runsettings
+    --coverage
+    --coverage-output-format cobertura
   displayName: Build and Test
 
 - task: PublishTestResults@2

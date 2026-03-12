@@ -1,7 +1,0 @@
-<RunSettings>
-  <MSTest>
-    <Extensions>
-      <Extension Type="Microsoft.Testing.Extensions.CodeCoverage.CodeCoverageExtension" />
-    </Extensions>
-  </MSTest>
-</RunSettings>
