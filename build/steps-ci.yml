@@ -10,7 +10,11 @@ steps:
     packageType: sdk
     version: 10.0.x # https://github.com/dotnet/core/blob/main/release-notes/releases-index.json
 
-- script: dotnet test --configuration ${{ parameters.configuration }} --report-xunit-trx
+- script: >
+    dotnet test
+    --configuration ${{ parameters.configuration }}
+    --report-xunit-trx
+    --settings $(System.DefaultWorkingDirectory)/build/mtp.runsettings
   displayName: Build and Test
 
 - task: PublishTestResults@2
