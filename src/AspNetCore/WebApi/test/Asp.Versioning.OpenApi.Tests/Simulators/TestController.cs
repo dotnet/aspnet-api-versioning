@@ -16,7 +16,7 @@ public class TestController : ControllerBase
     /// Test
     /// </summary>
     /// <description>A test API.</description>
-    /// <param name="id">A test parameter.</param>
+    /// <param name="id" example="42">A test parameter.</param>
     /// <returns>The original identifier.</returns>
     /// <response code="200">Pass</response>
     /// <response code="400">Fail</response>

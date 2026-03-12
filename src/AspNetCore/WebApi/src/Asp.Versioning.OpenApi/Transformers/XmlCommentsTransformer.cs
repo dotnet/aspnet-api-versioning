@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using System;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using static System.Reflection.BindingFlags;
 
@@ -45,24 +47,46 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         ArgumentNullException.ThrowIfNull( schema );
         ArgumentNullException.ThrowIfNull( context );
 
-        if ( schema.Properties is not { } properties
-            || context.JsonTypeInfo?.Type is not Type type )
+        if ( context.JsonTypeInfo?.Type is not Type type )
         {
             return Task.CompletedTask;
         }
 
-        if ( string.IsNullOrEmpty( schema.Description ) )
+        var description = schema.Description;
+
+        if ( string.IsNullOrEmpty( description )
+             && !string.IsNullOrEmpty( description = Documentation.GetSummary( type ) ) )
         {
-            schema.Description = Documentation.GetSummary( type );
+            schema.Description = description;
+        }
+
+        if ( schema.Example is null && ToJson( Documentation.GetExample( type ) ) is { } example )
+        {
+            schema.Example = example;
+        }
+
+        if ( schema.Properties is not { } properties )
+        {
+            return Task.CompletedTask;
         }
 
         foreach ( var (name, prop) in properties )
         {
             if ( prop is not null
-                && string.IsNullOrEmpty( prop.Description )
-                && type.GetProperty( name, IgnoreCase | Instance | Public ) is { } property )
+                 && type.GetProperty( name, IgnoreCase | Instance | Public ) is { } property )
             {
-                prop.Description = Documentation.GetSummary( property );
+                if ( string.IsNullOrEmpty( prop.Description )
+                     && !string.IsNullOrEmpty( description = Documentation.GetSummary( property ) ) )
+                {
+                    prop.Description = description;
+                }
+
+                if ( prop.Example is null
+                     && prop.Examples is not null
+                     && ( example = ToJson( Documentation.GetExample( property ) ) ) is not null )
+                {
+                    prop.Examples.Add( example );
+                }
             }
         }
 
@@ -88,16 +112,19 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
             operation.Summary = Documentation.GetSummary( method );
         }
 
-        if ( string.IsNullOrEmpty( operation.Description ) )
+        var description = operation.Description;
+
+        if ( string.IsNullOrEmpty( description )
+             && !string.IsNullOrEmpty( description = Documentation.GetDescription( method ) ) )
         {
-            operation.Description = Documentation.GetDescription( method );
+            operation.Description = description;
         }
 
         if ( operation.Responses is { } responses )
         {
             foreach ( var (statusCode, response) in responses )
             {
-                var description = Documentation.GetResponseDescription( method, statusCode );
+                description = Documentation.GetResponseDescription( method, statusCode );
 
                 if ( !string.IsNullOrEmpty( description ) )
                 {
@@ -118,18 +145,40 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         {
             var parameter = parameters[i];
 
-            if ( !string.IsNullOrEmpty( parameter.Name ) && string.IsNullOrEmpty( parameter.Description ) )
+            if ( string.IsNullOrEmpty( parameter.Name ) )
             {
-                for ( var j = 0; j < args.Count; j++ )
-                {
-                    var arg = args[i];
+                continue;
+            }
 
-                    if ( arg.Name == parameter.Name )
-                    {
-                        var name = arg.ParameterDescriptor.Name;
-                        parameter.Description = Documentation.GetParameterDescription( method, name );
-                    }
+            for ( var j = 0; j < args.Count; j++ )
+            {
+                var arg = args[j];
+
+                if ( arg.Name != parameter.Name )
+                {
+                    continue;
                 }
+
+                var name = arg.ParameterDescriptor.Name;
+
+                if ( string.IsNullOrEmpty( parameter.Description )
+                     && !string.IsNullOrEmpty( description = Documentation.GetParameterDescription( method, name ) ) )
+                {
+                    parameter.Description = description;
+                }
+
+                if ( parameter is OpenApiParameter param )
+                {
+                    if ( param.Example is null
+                         && ToJson( Documentation.GetParameterExample( method, name ) ) is { } example )
+                    {
+                        param.Example = example;
+                    }
+
+                    param.Deprecated |= Documentation.IsParameterDeprecated( method, name );
+                }
+
+                break;
             }
         }
 
@@ -158,5 +207,22 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
 
         method = default;
         return false;
+    }
+
+    private static JsonNode? ToJson( string? example )
+    {
+        if ( string.IsNullOrEmpty( example ) )
+        {
+            return default;
+        }
+
+        try
+        {
+            return JsonNode.Parse( example );
+        }
+        catch ( JsonException )
+        {
+            return JsonNode.Parse( $"\"{example}\"" );
+        }
     }
 }

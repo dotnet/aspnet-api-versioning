@@ -30,7 +30,8 @@
                 "string"
               ],
               "format": "int32"
-            }
+            },
+            "example": 42
           },
           {
             "name": "api-version",
