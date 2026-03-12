@@ -10,11 +10,19 @@ steps:
     packageType: sdk
     version: 10.0.x # https://github.com/dotnet/core/blob/main/release-notes/releases-index.json
 
-- script: dotnet test --configuration ${{ parameters.configuration }} --report-xunit-trx
+- script: dotnet test --configuration ${{ parameters.configuration }} --report-xunit-trx --collect:"XPlat Code Coverage"
   displayName: Build and Test
 
 - task: PublishTestResults@2
+  displayName: Publish Test Results
   inputs:
     testResultsFormat: VSTest
     testResultsFiles: '**/*.trx'
     failTaskOnFailedTests: true
+
+- task: PublishCodeCoverageResults@2
+  displayName: Publish Code Coverage
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: $(System.DefaultWorkingDirectory)/**/coverage.cobertura.xml
+    reportDirectory: $(System.DefaultWorkingDirectory)

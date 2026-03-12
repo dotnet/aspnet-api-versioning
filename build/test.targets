@@ -2,6 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <ItemGroup Condition=" '$(IsSharedProject)' == 'false' ">
+  <PackageReference Include="coverlet.collector" Version="8.*" />
   <PackageReference Include="FluentAssertions" Version="8.8.*" />
   <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.*" />
   <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.*" />
