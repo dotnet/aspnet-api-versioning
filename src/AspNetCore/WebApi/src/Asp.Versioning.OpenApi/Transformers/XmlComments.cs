@@ -42,7 +42,7 @@ public class XmlComments
     /// Gets the <c>summary</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the summary from.</param>
-    /// <returns>The corresponding summary or an empty string.</returns>
+    /// <returns>The corresponding <c>&lt;summary&gt;</c> or an empty string.</returns>
     public string GetSummary( MemberInfo member )
         => GetMember( member )?.Element( "summary" )?.Value.Trim() ?? string.Empty;
 
@@ -50,7 +50,7 @@ public class XmlComments
     /// Gets the <c>description</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the description from.</param>
-    /// <returns>The corresponding description or an empty string.</returns>
+    /// <returns>The corresponding <c>&lt;description&gt;</c> or an empty string.</returns>
     public string GetDescription( MemberInfo member )
         => GetMember( member )?.Element( "description" )?.Value.Trim() ?? string.Empty;
 
@@ -58,7 +58,7 @@ public class XmlComments
     /// Gets the <c>remarks</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the remarks from.</param>
-    /// <returns>The corresponding remarks or an empty string.</returns>
+    /// <returns>The corresponding <c>&lt;remarks&gt;</c> or an empty string.</returns>
     public string GetRemarks( MemberInfo member )
         => GetMember( member )?.Element( "remarks" )?.Value.Trim() ?? string.Empty;
 
@@ -66,16 +66,24 @@ public class XmlComments
     /// Gets the <c>returns</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the returns from.</param>
-    /// <returns>The corresponding returns or an empty string.</returns>
+    /// <returns>The corresponding <c>&lt;returns&gt;</c> or an empty string.</returns>
     public string GetReturns( MemberInfo member )
         => GetMember( member )?.Element( "returns" )?.Value.Trim() ?? string.Empty;
+
+    /// <summary>
+    /// Gets the <c>example</c> from the specified member, if any.
+    /// </summary>
+    /// <param name="member">The member to get the example from.</param>
+    /// <returns>The corresponding <c>&lt;example&gt;</c> or an empty string.</returns>
+    public string GetExample( MemberInfo member )
+        => GetMember( member )?.Element( "example" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
     /// Gets the <c>param</c> description from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the parameter from.</param>
     /// <param name="name">The name of the parameter.</param>
-    /// <returns>The corresponding returns or an empty string.</returns>
+    /// <returns>The corresponding description or an empty string.</returns>
     public string GetParameterDescription( MemberInfo member, string name )
     {
         if ( GetMember( member ) is { } element )
@@ -87,6 +95,50 @@ public class XmlComments
         }
 
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Gets the parameter <c>example</c> from the specified member, if any.
+    /// </summary>
+    /// <param name="member">The member to get the parameter from.</param>
+    /// <param name="name">The name of the parameter.</param>
+    /// <returns>The corresponding <c>&lt;example&gt;</c> or an empty string.</returns>
+    public string GetParameterExample( MemberInfo member, string name )
+    {
+        if ( GetMember( member ) is { } element )
+        {
+            return element.Elements( "param" )
+                          .FirstOrDefault( x => x.Attribute( "name" )?.Value == name )?
+                          .Attribute( "example" )?
+                          .Value
+                          .Trim() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Gets the <c>deprecated</c> attribute from the specified member, if any.
+    /// </summary>
+    /// <param name="member">The member to get the parameter from.</param>
+    /// <param name="name">The name of the parameter.</param>
+    /// <returns><c>true</c> if the <c>deprecated</c> attribute is present with a value of <c>"true"</c>;
+    /// otherwise <c>false</c>.</returns>
+    public bool IsParameterDeprecated( MemberInfo member, string name )
+    {
+        if ( GetMember( member ) is { } element )
+        {
+            var deprecated = element.Elements( "param" )
+                                    .FirstOrDefault( x => x.Attribute( "name" )?.Value == name )?
+                                    .Attribute( "deprecated" )?.Value;
+
+            if ( deprecated is { } value )
+            {
+                return StringComparer.OrdinalIgnoreCase.Equals( value, bool.TrueString );
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
