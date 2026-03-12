@@ -13,14 +13,15 @@
  </ItemGroup>
 
  <ItemGroup>
+  <Compile Include="$(SourceFile)" Condition="Exists('$(SourceFile)')" Link="%(Filename)%(Extension)" Visible="false" />
   <Compile Include="$(RootDir)\src\Abstractions\test\Asp.Versioning.Abstractions.Tests\AssumeCultureAttribute.cs" Link="AssumeCultureAttribute.cs" />
  </ItemGroup>
 
  <ItemGroup>
-   <None Include="Content\**\*.*" CopyToOutputDirectory="Always" />
+  <None Include="Content\**\*.*" CopyToOutputDirectory="Always" />
  </ItemGroup>
 
- <Target Name="GenerateFilePaths" AfterTargets="BeforeBuild">
+ <Target Name="GenerateFilePaths" BeforeTargets="PrepareForBuild">
 
   <ItemGroup>
    <Code Include="namespace $(RootNamespace)%3B" />
@@ -32,10 +33,15 @@
    <Code Include="}" />
   </ItemGroup>
 
+  <PropertyGroup>
+   <FirstRun>true</FirstRun>
+   <FirstRun Condition="Exists('$(SourceFile)')">false</FirstRun>
+  </PropertyGroup>
+
   <WriteLinesToFile File="$(SourceFile)" Lines="@(Code)" Overwrite="true" />
 
   <ItemGroup>
-   <Compile Include="$(SourceFile)" />
+   <Compile Include="$(SourceFile)" Condition="$(FirstRun)" />
   </ItemGroup>
 
  </Target>
