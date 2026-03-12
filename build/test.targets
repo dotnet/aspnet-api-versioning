@@ -5,7 +5,7 @@
   <PackageReference Include="FluentAssertions" Version="8.8.*" />
   <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.*" />
   <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.*" />
-  <PackageReference Include="Microsoft.Testing.Platform.Extensions.CodeCoverage" Version="1.*" />
+  <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.*" />
   <PackageReference Include="Moq" Version="4.20.69" />
   <PackageReference Include="xunit.v3.mtp-v2" Version="3.*" />
  </ItemGroup>
