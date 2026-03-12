@@ -301,8 +301,11 @@ public class ApiExplorerTransformer :
 
         if ( array.Count > 0 )
         {
+            var obj = new JsonObject();
             var extensions = document.Extensions ??= new Dictionary<string, IOpenApiExtension>();
-            extensions[ExtensionName] = new JsonNodeExtension( array );
+
+            obj["links"] = array;
+            extensions[ExtensionName] = new JsonNodeExtension( obj );
         }
     }
 
@@ -347,7 +350,7 @@ public class ApiExplorerTransformer :
 
         if ( link.Languages.Count > 0 )
         {
-            obj["lang"] = new JsonArray( link.Languages.Select( l => JsonNode.Parse( l.ToString() ) ).ToArray() );
+            obj["lang"] = new JsonArray( [.. link.Languages.Select( l => JsonNode.Parse( l.ToString() ) )] );
         }
 
         foreach ( var (key, value) in link.Extensions )
