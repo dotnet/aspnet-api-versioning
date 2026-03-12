@@ -89,18 +89,20 @@
       "name": "Test"
     }
   ],
-  "x-api-versioning": [
-    {
-      "title": "Version Deprecation Policy",
-      "type": "text/html",
-      "rel": "deprecation",
-      "url": "http://my.api.com/policies/versions/deprecated.html"
-    },
-    {
-      "title": "Version Sunset Policy",
-      "type": "text/html",
-      "rel": "sunset",
-      "url": "http://my.api.com/policies/versions/sunset.html"
-    }
-  ]
+  "x-api-versioning": {
+    "links": [
+      {
+        "title": "Version Deprecation Policy",
+        "type": "text/html",
+        "rel": "deprecation",
+        "url": "http://my.api.com/policies/versions/deprecated.html"
+      },
+      {
+        "title": "Version Sunset Policy",
+        "type": "text/html",
+        "rel": "sunset",
+        "url": "http://my.api.com/policies/versions/sunset.html"
+      }
+    ]
+  }
 }
