@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 
 internal sealed class ConfigureOpenApiOptions(
-    XmlCommentsFile file,
+    XmlCommentsTransformer xmlComments,
     IApiVersionDescriptionProvider provider,
     VersionedOpenApiOptionsFactory factory )
     : IPostConfigureOptions<OpenApiOptions>
@@ -20,7 +20,6 @@ internal sealed class ConfigureOpenApiOptions(
     {
         var comparer = StringComparer.OrdinalIgnoreCase;
         var descriptions = provider.ApiVersionDescriptions;
-        var xmlComments = new XmlCommentsTransformer( file );
 
         for ( var i = 0; i < descriptions.Count; i++ )
         {
