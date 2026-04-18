@@ -110,17 +110,23 @@ public static class IApiVersioningBuilderExtensions
     {
         var provider = services.GetRequiredService<IApiVersionDescriptionProvider>();
         var keyedServices = new KeyedServiceContainer( services );
-        var names = new List<string>();
+        var openApi = typeof( IOpenApiDocumentProvider );
+        var descriptions = provider.ApiVersionDescriptions;
+        var names = new List<string>( descriptions.Count );
 
-        foreach ( var description in provider.ApiVersionDescriptions )
+        for ( var i = 0; i < descriptions.Count; i++ )
         {
-            names.Add( description.GroupName );
-            keyedServices.Add( Type.OpenApiSchemaService, description.GroupName, Class.OpenApiSchemaService.New );
-            keyedServices.Add( Type.OpenApiDocumentService, description.GroupName, Class.OpenApiDocumentService.New );
-            keyedServices.Add(
-                typeof( IOpenApiDocumentProvider ),
-                description.GroupName,
-                ( sp, k ) => sp.GetRequiredKeyedService( Type.OpenApiDocumentService, k ) );
+            var description = descriptions[i];
+
+            // REF: https://github.com/dotnet/aspnetcore/blob/319e87fd950a99f3baae2aa79db3d4fb68783d85/src/OpenApi/src/Extensions/OpenApiServiceCollectionExtensions.cs#L64
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            var key = description.GroupName.ToLowerInvariant();
+#pragma warning restore CA1308
+
+            names.Add( key );
+            keyedServices.Add( Type.OpenApiSchemaService, key, Class.OpenApiSchemaService.New );
+            keyedServices.Add( Type.OpenApiDocumentService, key, Class.OpenApiDocumentService.New );
+            keyedServices.Add( openApi, key, ( sp, k ) => sp.GetRequiredKeyedService( Type.OpenApiDocumentService, k ) );
         }
 
         if ( names.Count > 0 )
