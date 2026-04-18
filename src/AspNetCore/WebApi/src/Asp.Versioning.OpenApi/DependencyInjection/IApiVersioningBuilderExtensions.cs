@@ -85,7 +85,7 @@ public static class IApiVersioningBuilderExtensions
     {
         var assemblies = new List<Assembly>( capacity: 2 ) { callingAssembly };
 
-        if ( Assembly.GetEntryAssembly() is { } entryAssembly && assemblies[0] != callingAssembly )
+        if ( Assembly.GetEntryAssembly() is { } entryAssembly && entryAssembly != callingAssembly )
         {
             assemblies.Add( entryAssembly );
         }
