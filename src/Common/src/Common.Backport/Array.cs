@@ -4,6 +4,7 @@ namespace Asp.Versioning;
 
 using System.Runtime.CompilerServices;
 
+[ExcludeFromCodeCoverage]
 internal static class Array
 {
     [MethodImpl( MethodImplOptions.AggressiveInlining )]

@@ -9,6 +9,7 @@ namespace System.Numerics;
 
 using System.Runtime.CompilerServices;
 
+[ExcludeFromCodeCoverage]
 internal static class BitOperations
 {
     /// <summary>

@@ -11,15 +11,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 namespace System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false )]
 internal sealed class AllowNullAttribute : Attribute { }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false )]
 internal sealed class DisallowNullAttribute : Attribute { }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Method, Inherited = false )]
 internal sealed class DoesNotReturnAttribute : Attribute { }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Parameter )]
 internal sealed class DoesNotReturnIfAttribute : Attribute
 {
@@ -28,12 +32,19 @@ internal sealed class DoesNotReturnIfAttribute : Attribute
     public bool ParameterValue => default;
 }
 
+#if NETSTANDARD1_0 || NETSTANDARD1_1
+
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Event | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct, Inherited = false, AllowMultiple = false )]
 internal sealed class ExcludeFromCodeCoverageAttribute : Attribute { }
 
+#endif
+
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false )]
 internal sealed class MaybeNullAttribute : Attribute { }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Parameter )]
 internal sealed class MaybeNullWhenAttribute : Attribute
 {
@@ -42,9 +53,11 @@ internal sealed class MaybeNullWhenAttribute : Attribute
     public bool ReturnValue => default;
 }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false )]
 internal sealed class NotNullAttribute : Attribute { }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false )]
 internal sealed class NotNullIfNotNullAttribute : Attribute
 {
@@ -53,6 +66,7 @@ internal sealed class NotNullIfNotNullAttribute : Attribute
     public string ParameterName => default!;
 }
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage( AttributeTargets.Parameter )]
 internal sealed class NotNullWhenAttribute : Attribute
 {

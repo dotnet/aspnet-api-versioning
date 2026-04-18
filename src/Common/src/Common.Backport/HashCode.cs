@@ -65,6 +65,7 @@ using System.Runtime.CompilerServices;
 
 namespace System
 {
+    [ExcludeFromCodeCoverage]
     internal struct HashCode
     {
         private static readonly uint s_seed = GenerateGlobalSeed();

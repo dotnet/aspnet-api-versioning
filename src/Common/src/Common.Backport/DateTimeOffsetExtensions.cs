@@ -2,6 +2,7 @@
 
 namespace System;
 
+[ExcludeFromCodeCoverage]
 internal static class DateTimeOffsetExtensions
 {
     private const long UnixEpochSeconds = 62_135_596_800L;

@@ -4,6 +4,7 @@ namespace System;
 
 using System.Text;
 
+[ExcludeFromCodeCoverage]
 internal static class StringExtensions
 {
     extension( string @string )

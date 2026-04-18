@@ -5,6 +5,7 @@ namespace Backport;
 
 using System.Runtime.CompilerServices;
 
+[ExcludeFromCodeCoverage]
 internal static class ArgumentException
 {
     /// <summary>Throws an exception if <paramref name="argument"/> is null or empty.</summary>
