@@ -282,7 +282,7 @@ internal static class EndpointBuilderFinalizer
                                           && AdvertisedDeprecated.Count == 0;
     }
 
-    private sealed class InjectApiVersion : IServiceProvider
+    private sealed class InjectApiVersion : IServiceProvider, IKeyedServiceProvider
     {
         private static readonly Type ApiVersionType = typeof( ApiVersion );
         private readonly IServiceProvider provider;
@@ -294,6 +294,12 @@ internal static class EndpointBuilderFinalizer
             provider = context.RequestServices;
             context.RequestServices = this;
         }
+
+        public object? GetKeyedService( Type serviceType, object? serviceKey ) =>
+            provider.GetKeyedService( serviceType, serviceKey );
+
+        public object GetRequiredKeyedService( Type serviceType, object? serviceKey ) =>
+            provider.GetRequiredKeyedService( serviceType, serviceKey );
 
         public object? GetService( Type serviceType )
         {
