@@ -6,70 +6,35 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 using System.ComponentModel.Design;
 
-internal sealed class KeyedServiceContainer( IServiceProvider parent ) :
-    IServiceProvider,
-    IKeyedServiceProvider,
-    IServiceProviderIsService,
-    IServiceProviderIsKeyedService,
-    IDisposable
+internal sealed class KeyedServiceContainer( IServiceProvider parent ) : ServiceContainer( parent ), IKeyedServiceProvider
 {
-    private readonly ServiceContainer services = new( parent );
+    private readonly IServiceProvider parent = parent;
     private readonly Dictionary<object, ServiceContainer> keyedServices = [];
     private bool disposed;
 
-    public object? GetKeyedService( Type serviceType, object? serviceKey )
+    private object? GetKeyedService( Type serviceType, object? serviceKey )
     {
         if ( serviceKey is not null && keyedServices.TryGetValue( serviceKey, out var container ) )
         {
-            return container.GetService( serviceType );
+            if ( container.GetService( serviceType ) is { } service )
+            {
+                return service;
+            }
         }
 
-        return services.GetKeyedService( serviceType, serviceKey );
+        return default;
     }
 
-    public object GetRequiredKeyedService( Type serviceType, object? serviceKey )
-    {
-        if ( serviceKey is not null && keyedServices.TryGetValue( serviceKey, out var container ) )
-        {
-            return container.GetRequiredService( serviceType );
-        }
+    object? IKeyedServiceProvider.GetKeyedService( Type serviceType, object? serviceKey ) =>
+        GetKeyedService( serviceType, serviceKey ) ?? parent.GetKeyedService( serviceType, serviceKey );
 
-        return services.GetRequiredKeyedService( serviceType, serviceKey );
-    }
+    object IKeyedServiceProvider.GetRequiredKeyedService( Type serviceType, object? serviceKey ) =>
+        GetKeyedService( serviceType, serviceKey ) ?? parent.GetRequiredKeyedService( serviceType, serviceKey );
 
-    public object? GetService( Type serviceType ) => services.GetService( serviceType );
+    public void AddService( Type serviceType, Func<IServiceProvider, object> activator ) =>
+        AddService( serviceType, ( sp, _ ) => activator( sp ) );
 
-    public bool IsKeyedService( Type serviceType, object? serviceKey )
-    {
-        if ( serviceKey is not null && keyedServices.ContainsKey( serviceKey ) )
-        {
-            return true;
-        }
-        else if ( services.GetService<IServiceProviderIsKeyedService>() is { } service )
-        {
-            return service.IsKeyedService( serviceType, serviceKey );
-        }
-
-        return false;
-    }
-
-    public bool IsService( Type serviceType )
-    {
-        if ( services.GetService<IServiceProviderIsService>() is { } service
-             && service.IsService( serviceType ) )
-        {
-            return true;
-        }
-
-        return services.GetService( serviceType ) is not null;
-    }
-
-    public void Add( Type serviceType, object instance ) => services.AddService( serviceType, instance );
-
-    public void Add( Type serviceType, Func<IServiceProvider, object> activator ) =>
-        services.AddService( serviceType, ( _, _ ) => activator( this ) );
-
-    public void Add( Type serviceType, string serviceKey, Func<IServiceProvider, string, object> activator )
+    public void AddService( Type serviceType, string serviceKey, Func<IServiceProvider, string, object> activator )
     {
         if ( !keyedServices.TryGetValue( serviceKey, out var container ) )
         {
@@ -79,8 +44,10 @@ internal sealed class KeyedServiceContainer( IServiceProvider parent ) :
         container.AddService( serviceType, ( _, _ ) => activator( this, serviceKey ) );
     }
 
-    public void Dispose()
+    protected override void Dispose( bool disposing )
     {
+        base.Dispose( disposing );
+
         if ( disposed )
         {
             return;
@@ -92,7 +59,5 @@ internal sealed class KeyedServiceContainer( IServiceProvider parent ) :
         {
             container.Dispose();
         }
-
-        services.Dispose();
     }
 }

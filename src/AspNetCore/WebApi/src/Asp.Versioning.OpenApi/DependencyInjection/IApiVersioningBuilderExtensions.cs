@@ -109,8 +109,8 @@ public static class IApiVersioningBuilderExtensions
     private static KeyedServiceContainer NewRequestServices( IServiceProvider services )
     {
         var provider = services.GetRequiredService<IApiVersionDescriptionProvider>();
-        var keyedServices = new KeyedServiceContainer( services );
-        var openApi = typeof( IOpenApiDocumentProvider );
+        var container = new KeyedServiceContainer( services );
+        var type = typeof( IOpenApiDocumentProvider );
         var descriptions = provider.ApiVersionDescriptions;
         var names = new List<string>( descriptions.Count );
 
@@ -124,9 +124,9 @@ public static class IApiVersioningBuilderExtensions
 #pragma warning restore CA1308
 
             names.Add( key );
-            keyedServices.Add( Type.OpenApiSchemaService, key, Class.OpenApiSchemaService.New );
-            keyedServices.Add( Type.OpenApiDocumentService, key, Class.OpenApiDocumentService.New );
-            keyedServices.Add( openApi, key, ( sp, k ) => sp.GetRequiredKeyedService( Type.OpenApiDocumentService, k ) );
+            container.AddService( Type.OpenApiSchemaService, key, Class.OpenApiSchemaService.New );
+            container.AddService( Type.OpenApiDocumentService, key, Class.OpenApiDocumentService.New );
+            container.AddService( type, key, ( sp, k ) => sp.GetRequiredKeyedService( Type.OpenApiDocumentService, k ) );
         }
 
         if ( names.Count > 0 )
@@ -138,10 +138,10 @@ public static class IApiVersioningBuilderExtensions
                 array.SetValue( Class.NamedService.New( names[i] ), i );
             }
 
-            keyedServices.Add( Type.IDocumentProvider, Class.OpenApiDocumentProvider.New );
-            keyedServices.Add( Type.IEnumerableOfNamedService, array );
+            container.AddService( Type.IDocumentProvider, Class.OpenApiDocumentProvider.New );
+            container.AddService( Type.IEnumerableOfNamedService, array );
         }
 
-        return keyedServices;
+        return container;
     }
 }
