@@ -43,7 +43,7 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the summary from.</param>
     /// <returns>The corresponding <c>&lt;summary&gt;</c> or an empty string.</returns>
-    public string GetSummary( MemberInfo member )
+    public virtual string GetSummary( MemberInfo member )
         => GetMember( member )?.Element( "summary" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
@@ -51,7 +51,7 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the description from.</param>
     /// <returns>The corresponding <c>&lt;description&gt;</c> or an empty string.</returns>
-    public string GetDescription( MemberInfo member )
+    public virtual string GetDescription( MemberInfo member )
         => GetMember( member )?.Element( "description" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
@@ -59,7 +59,7 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the remarks from.</param>
     /// <returns>The corresponding <c>&lt;remarks&gt;</c> or an empty string.</returns>
-    public string GetRemarks( MemberInfo member )
+    public virtual string GetRemarks( MemberInfo member )
         => GetMember( member )?.Element( "remarks" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
@@ -67,7 +67,7 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the returns from.</param>
     /// <returns>The corresponding <c>&lt;returns&gt;</c> or an empty string.</returns>
-    public string GetReturns( MemberInfo member )
+    public virtual string GetReturns( MemberInfo member )
         => GetMember( member )?.Element( "returns" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
@@ -75,7 +75,7 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the example from.</param>
     /// <returns>The corresponding <c>&lt;example&gt;</c> or an empty string.</returns>
-    public string GetExample( MemberInfo member )
+    public virtual string GetExample( MemberInfo member )
         => GetMember( member )?.Element( "example" )?.Value.Trim() ?? string.Empty;
 
     /// <summary>
@@ -84,7 +84,7 @@ public class XmlComments
     /// <param name="member">The member to get the parameter from.</param>
     /// <param name="name">The name of the parameter.</param>
     /// <returns>The corresponding description or an empty string.</returns>
-    public string GetParameterDescription( MemberInfo member, string name )
+    public virtual string GetParameterDescription( MemberInfo member, string name )
     {
         if ( GetMember( member ) is { } element )
         {
@@ -103,7 +103,7 @@ public class XmlComments
     /// <param name="member">The member to get the parameter from.</param>
     /// <param name="name">The name of the parameter.</param>
     /// <returns>The corresponding <c>&lt;example&gt;</c> or an empty string.</returns>
-    public string GetParameterExample( MemberInfo member, string name )
+    public virtual string GetParameterExample( MemberInfo member, string name )
     {
         if ( GetMember( member ) is { } element )
         {
@@ -124,7 +124,7 @@ public class XmlComments
     /// <param name="name">The name of the parameter.</param>
     /// <returns><c>true</c> if the <c>deprecated</c> attribute is present with a value of <c>"true"</c>;
     /// otherwise <c>false</c>.</returns>
-    public bool IsParameterDeprecated( MemberInfo member, string name )
+    public virtual bool IsParameterDeprecated( MemberInfo member, string name )
     {
         if ( GetMember( member ) is { } element )
         {
@@ -151,7 +151,7 @@ public class XmlComments
     /// Swashbuckle; for example, <c>&lt;response code="200"&gt;The operation was successful&lt;/response&gt;</c>. See the
     /// <a href="https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle">tutorial</a>
     /// for more information.</remarks>
-    public string GetResponseDescription( MemberInfo member, int statusCode )
+    public virtual string GetResponseDescription( MemberInfo member, int statusCode )
         => GetResponseDescription( member, statusCode.ToString( CultureInfo.InvariantCulture ) );
 
     /// <summary>
@@ -164,7 +164,7 @@ public class XmlComments
     /// Swashbuckle; for example, <c>&lt;response code="200"&gt;The operation was successful&lt;/response&gt;</c>. See the
     /// <a href="https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle">tutorial</a>
     /// for more information.</remarks>
-    public string GetResponseDescription( MemberInfo member, string statusCode )
+    public virtual string GetResponseDescription( MemberInfo member, string statusCode )
     {
         if ( GetMember( member ) is { } element )
         {
@@ -182,7 +182,7 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the information for.</param>
     /// <returns>The <see cref="XElement"/> representing the matching <c>member</c> element or <c>null</c>.</returns>
-    protected XElement? GetMember( MemberInfo member ) =>
+    protected virtual XElement? GetMember( MemberInfo member ) =>
         GetMemberById( XmlCommentsProvider.GetDocumentationMemberId( member ) );
 
     private static XElement? FindMember( XDocument xml, string key ) =>

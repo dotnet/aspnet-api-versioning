@@ -43,7 +43,7 @@ public class ApiExplorerTransformer :
     protected string ExtensionName { get; set; } = "x-api-versioning";
 
     /// <inheritdoc />
-    public Task TransformAsync(
+    public virtual Task TransformAsync(
         OpenApiSchema schema,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken )
@@ -51,17 +51,17 @@ public class ApiExplorerTransformer :
         ArgumentNullException.ThrowIfNull( schema );
         ArgumentNullException.ThrowIfNull( context );
 
-        if ( schema.Default is null
-             && context.ParameterDescription?.DefaultValue is string value )
+        if ( context.ParameterDescription?.DefaultValue is string value )
         {
-            schema.Default = JsonNode.Parse( $"\"{value}\"" );
+            schema.Enum ??= new List<JsonNode>(1);
+            schema.Enum.Add( JsonNode.Parse( $"\"{value}\"" )! );
         }
 
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public Task TransformAsync(
+    public virtual Task TransformAsync(
         OpenApiDocument document,
         OpenApiDocumentTransformerContext context,
         CancellationToken cancellationToken )
@@ -80,7 +80,7 @@ public class ApiExplorerTransformer :
     }
 
     /// <inheritdoc />
-    public Task TransformAsync(
+    public virtual Task TransformAsync(
         OpenApiOperation operation,
         OpenApiOperationTransformerContext context,
         CancellationToken cancellationToken )
