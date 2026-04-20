@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.OpenApi.Transformers;
+namespace Asp.Versioning.OpenApi;
 
 using System.Text;
 
