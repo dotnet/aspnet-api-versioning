@@ -38,7 +38,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "default": "1.0"
+              "enum": [ "1.0" ]
             }
           }
         ],
