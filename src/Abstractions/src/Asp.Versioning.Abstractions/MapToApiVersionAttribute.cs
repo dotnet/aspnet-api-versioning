@@ -8,6 +8,9 @@
 namespace Asp.Versioning;
 
 using static System.AttributeTargets;
+#if NETSTANDARD
+using DateOnly = System.DateTime;
+#endif
 
 /// <summary>
 /// Represents the metadata that describes the <see cref="ApiVersion">version</see>-specific implementation of an API.
@@ -32,7 +35,19 @@ public class MapToApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionPro
     /// Initializes a new instance of the <see cref="MapToApiVersionAttribute"/> class.
     /// </summary>
     /// <param name="version">A numeric API version.</param>
-    public MapToApiVersionAttribute( double version ) : base( version ) { }
+    /// <param name="status">The status associated with the API version, if any.</param>
+    public MapToApiVersionAttribute( double version, string? status = default )
+        : base( new ApiVersion( version, status ) ) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MapToApiVersionAttribute"/> class.
+    /// </summary>
+    /// <param name="year">The version year.</param>
+    /// <param name="month">The version month.</param>
+    /// <param name="day">The version day.</param>
+    /// <param name="status">The status associated with the API version, if any.</param>
+    public MapToApiVersionAttribute( int year, int month, int day, string? status = default )
+        : base( new ApiVersion( new DateOnly( year, month, day ), status ) ) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MapToApiVersionAttribute"/> class.

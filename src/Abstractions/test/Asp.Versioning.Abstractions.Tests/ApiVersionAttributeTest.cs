@@ -2,6 +2,10 @@
 
 namespace Asp.Versioning;
 
+#if NETFRAMEWORK
+using DateOnly = System.DateTime;
+#endif
+
 public class ApiVersionAttributeTest
 {
     [Theory]
@@ -46,6 +50,32 @@ public class ApiVersionAttributeTest
 
         // act
         var attribute = new ApiVersionAttribute( 2.0, "alpha" );
+
+        // assert
+        attribute.Versions[0].Should().Be( expected );
+    }
+
+    [Fact]
+    public void api_version_attribute_should_initialize_from_date()
+    {
+        // arrange
+        var expected = new ApiVersion( new DateOnly( 2016, 1, 1 ) );
+
+        // act
+        var attribute = new ApiVersionAttribute( 2016, 1, 1 );
+
+        // assert
+        attribute.Versions[0].Should().Be( expected );
+    }
+
+    [Fact]
+    public void api_version_attribute_should_initialize_from_date_with_status()
+    {
+        // arrange
+        var expected = new ApiVersion( new DateOnly( 2016, 1, 1 ), "alpha" );
+
+        // act
+        var attribute = new ApiVersionAttribute( 2016, 1, 1, "alpha" );
 
         // assert
         attribute.Versions[0].Should().Be( expected );

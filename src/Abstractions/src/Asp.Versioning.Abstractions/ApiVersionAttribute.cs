@@ -8,6 +8,9 @@
 namespace Asp.Versioning;
 
 using static System.AttributeTargets;
+#if NETSTANDARD
+using DateOnly = System.DateTime;
+#endif
 
 /// <summary>
 /// Represents the metadata that describes the <see cref="ApiVersion">versions</see> associated with an API.
@@ -37,6 +40,16 @@ public class ApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     /// <param name="version">A numeric API version.</param>
     /// <param name="status">The status associated with the API version, if any.</param>
     public ApiVersionAttribute( double version, string? status = default ) : base( new ApiVersion( version, status ) ) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
+    /// </summary>
+    /// <param name="year">The version year.</param>
+    /// <param name="month">The version month.</param>
+    /// <param name="day">The version day.</param>
+    /// <param name="status">The status associated with the API version, if any.</param>
+    public ApiVersionAttribute( int year, int month, int day, string? status = default )
+        : base( new ApiVersion( new DateOnly( year, month, day ), status ) ) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
