@@ -76,7 +76,11 @@ internal static class EndpointBuilderFinalizer
 
         endpointBuilder.RequestDelegate = context =>
         {
-            context.RequestServices = new InjectApiVersion( context );
+            if ( context.RequestServices is not InjectApiVersion )
+            {
+                context.RequestServices = new InjectApiVersion( context );
+            }
+
             return requestDelegate( context );
         };
     }
@@ -282,11 +286,12 @@ internal static class EndpointBuilderFinalizer
                                           && AdvertisedDeprecated.Count == 0;
     }
 
-    private sealed class InjectApiVersion : IServiceProvider, IKeyedServiceProvider
+    private sealed class InjectApiVersion : IKeyedServiceProvider, IServiceScopeFactory
     {
-        private static readonly Type ApiVersionType = typeof( ApiVersion );
         private readonly IServiceProvider provider;
         private readonly HttpContext context;
+        internal static readonly Type ApiVersionType = typeof( ApiVersion );
+        internal static readonly Type ServiceScopeFactoryType = typeof( IServiceScopeFactory );
 
         public InjectApiVersion( HttpContext context )
         {
@@ -294,6 +299,10 @@ internal static class EndpointBuilderFinalizer
             provider = context.RequestServices;
             context.RequestServices = this;
         }
+
+#pragma warning disable CA2000 // Dispose objects before losing scope
+        public IServiceScope CreateScope() => new ApiVersionScope( context, provider.CreateScope() );
+#pragma warning restore CA2000
 
         public object? GetKeyedService( Type serviceType, object? serviceKey ) =>
             provider.GetKeyedService( serviceType, serviceKey );
@@ -307,8 +316,55 @@ internal static class EndpointBuilderFinalizer
             {
                 return context.RequestedApiVersion;
             }
+            else if ( serviceType.Equals( ServiceScopeFactoryType ) )
+            {
+                return this;
+            }
 
             return provider.GetService( serviceType );
+        }
+    }
+
+    private sealed class ApiVersionScope( HttpContext context, IServiceScope scope )
+        : IKeyedServiceProvider, IServiceScopeFactory, IServiceScope
+    {
+        private bool disposed;
+
+        public IServiceProvider ServiceProvider => this;
+
+#pragma warning disable CA2000 // Dispose objects before losing scope
+        public IServiceScope CreateScope() => new ApiVersionScope( context, scope.ServiceProvider.CreateScope() );
+#pragma warning restore CA2000
+
+        public object? GetKeyedService( Type serviceType, object? serviceKey ) =>
+            scope.ServiceProvider.GetKeyedService( serviceType, serviceKey );
+
+        public object GetRequiredKeyedService( Type serviceType, object? serviceKey ) =>
+            scope.ServiceProvider.GetRequiredKeyedService( serviceType, serviceKey );
+
+        public object? GetService( Type serviceType )
+        {
+            if ( serviceType.IsAssignableFrom( InjectApiVersion.ApiVersionType ) )
+            {
+                return context.RequestedApiVersion;
+            }
+            else if ( serviceType.Equals( InjectApiVersion.ServiceScopeFactoryType ) )
+            {
+                return this;
+            }
+
+            return scope.ServiceProvider.GetService( serviceType );
+        }
+
+        public void Dispose()
+        {
+            if ( disposed )
+            {
+                return;
+            }
+
+            disposed = true;
+            scope.Dispose();
         }
     }
 }
