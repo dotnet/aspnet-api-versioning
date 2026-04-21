@@ -4,10 +4,6 @@
 
 namespace Microsoft.AspNetCore.Builder;
 
-using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
-using Asp.Versioning.OpenApi.Reflection;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -44,9 +40,9 @@ public static class IEndpointConventionBuilderExtensions
 
     private static Task InterceptRequestServices( HttpContext context, RequestDelegate action )
     {
-        if ( context.RequestServices is not KeyedServiceContainer requestServices )
+        if ( context.RequestServices is not KeyedServiceProvider requestServices )
         {
-            requestServices = context.RequestServices.GetRequiredService<KeyedServiceContainer>();
+            requestServices = context.RequestServices.GetRequiredService<KeyedServiceProvider>();
         }
 
         context.RequestServices = requestServices;
