@@ -36,9 +36,12 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
     protected ICollection<ApiVersion> MappedVersions => mapped ??= [];
 
     /// <summary>
-    /// Gets a value indicating whether any explicit API version mappings are configured.
+    /// Gets a value indicating whether any action-level API version constraints (mapped or introduced) are configured.
     /// </summary>
-    /// <value>True if explicit API version mappings are configured; otherwise, false.</value>
+    /// <value>
+    /// True if any <see cref="MapToApiVersionAttribute">mapped</see> or
+    /// <see cref="IntroducedInApiVersionAttribute">introduced</see> versions are configured for the action; otherwise, false.
+    /// </value>
     protected bool HasMappedVersions => ( mapped is not null && mapped.Count > 0 ) || ( introduced is not null && introduced.Count > 0 );
 
     /// <summary>
