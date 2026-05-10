@@ -90,7 +90,10 @@ public class IntroducedInApiVersionAttribute : ApiVersionsBaseAttribute, IIntrod
 
     /// <inheritdoc />
     public override bool Equals( object? obj ) =>
-        obj is IntroducedInApiVersionAttribute other && base.Equals( obj ) && StatusCode == other.StatusCode;
+        obj is IntroducedInApiVersionAttribute other &&
+        GetType() == obj.GetType() &&
+        base.Equals( obj ) &&
+        StatusCode == other.StatusCode;
 
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine( base.GetHashCode(), StatusCode );
