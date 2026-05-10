@@ -82,6 +82,10 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
         }
 
         item.AddEndpointMetadata( metadata );
-        AddIntroducedApiVersionMetadata( item.AddEndpointMetadata );
+
+        if ( !metadata.IsApiVersionNeutral )
+        {
+            AddIntroducedApiVersionMetadata( item.AddEndpointMetadata );
+        }
     }
 }

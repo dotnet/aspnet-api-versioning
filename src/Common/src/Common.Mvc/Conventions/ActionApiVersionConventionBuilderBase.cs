@@ -45,6 +45,7 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
     /// Gets the collection of API versions in which the current action was introduced.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of introduced <see cref="ApiVersion">API versions</see>.</value>
+    /// <remarks>When multiple introduced API versions are configured, the latest version is used as the effective introduction.</remarks>
     protected ICollection<IntroducedApiVersion> IntroducedVersions => introduced ??= [];
 
     /// <summary>
@@ -105,6 +106,8 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
 
         var metadata = new IntroducedInApiVersionMetadata[introduced.Count];
 
+        introduced.Sort( static ( left, right ) => left.Version.CompareTo( right.Version ) );
+
         for ( var i = 0; i < introduced.Count; i++ )
         {
             var item = introduced[i];
@@ -130,17 +133,23 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
 
         var versions = mapped is null ? [] : new HashSet<ApiVersion>( mapped );
 
+        var effectiveIntroduced = introduced[0].Version;
+
+        for ( var i = 1; i < introduced.Count; i++ )
+        {
+            if ( introduced[i].Version > effectiveIntroduced )
+            {
+                effectiveIntroduced = introduced[i].Version;
+            }
+        }
+
         for ( var i = 0; i < declaredVersions.Count; i++ )
         {
             var declaredVersion = declaredVersions[i];
 
-            for ( var j = 0; j < introduced.Count; j++ )
+            if ( declaredVersion >= effectiveIntroduced )
             {
-                if ( declaredVersion >= introduced[j].Version )
-                {
-                    versions.Add( declaredVersion );
-                    break;
-                }
+                versions.Add( declaredVersion );
             }
         }
 

@@ -90,6 +90,38 @@ public class IntroducedInApiVersionConventionTest
         later.Should().Be( Explicit );
     }
 
+    [Fact]
+    public void apply_to_should_use_latest_introduced_version_when_multiple_are_declared()
+    {
+        // arrange
+        var action = ApplyConventions( typeof( MultipleIntroducedController ), nameof( MultipleIntroducedController.Get ) );
+        var metadata = GetApiVersionMetadata( action );
+
+        // act
+        var model = metadata.Map( Explicit );
+        var introduced = action.Selectors.Single().EndpointMetadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
+
+        // assert
+        model.DeclaredApiVersions.Should().Equal( new ApiVersion( 3, 0 ) );
+        introduced.Select( item => item.IntroducedIn ).Should().Equal( new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) );
+    }
+
+    [Fact]
+    public void apply_to_should_ignore_introduced_version_metadata_for_version_neutral_controller()
+    {
+        // arrange
+        var action = ApplyConventions( typeof( NeutralIntroducedController ), nameof( NeutralIntroducedController.Get ) );
+
+        // act
+        var metadata = GetApiVersionMetadata( action );
+        var introduced = action.Selectors.Single().EndpointMetadata.OfType<IntroducedInApiVersionMetadata>();
+
+        // assert
+        metadata.IsApiVersionNeutral.Should().BeTrue();
+        metadata.IntroducedInApiVersions.Should().BeEmpty();
+        introduced.Should().BeEmpty();
+    }
+
     private static ActionModel ApplyConventions( Type controllerType, string actionName )
     {
         var controllerAttributes = controllerType.GetTypeInfo().GetCustomAttributes().Cast<object>().ToArray();
@@ -129,6 +161,44 @@ public class IntroducedInApiVersionConventionTest
 
         [MapToApiVersion( "2026-12-01" )]
         public OkResult GetMapped() => Ok();
+    }
+
+
+    [ApiController]
+    [ApiVersion( 1.0 )]
+    [ApiVersion( 2.0 )]
+    [ApiVersion( 3.0 )]
+    public sealed class MultipleIntroducedController : ControllerBase
+    {
+        [TestIntroducedInApiVersion( 2.0, StatusCode = 409 )]
+        [TestIntroducedInApiVersion( 3.0, StatusCode = 410 )]
+        public OkResult Get() => Ok();
+    }
+
+    [ApiController]
+    [ApiVersionNeutral]
+    public sealed class NeutralIntroducedController : ControllerBase
+    {
+        [IntroducedInApiVersion( "2.0" )]
+        public OkResult Get() => Ok();
+    }
+
+    [AttributeUsage( AttributeTargets.Method, AllowMultiple = true, Inherited = false )]
+    public sealed class TestIntroducedInApiVersionAttribute : Attribute, IIntroducedInApiVersionProvider
+    {
+        public TestIntroducedInApiVersionAttribute( double version )
+        {
+            Version = version;
+            Versions = [new ApiVersion( version )];
+        }
+
+        public double Version { get; }
+
+        public IReadOnlyList<ApiVersion> Versions { get; }
+
+        public int StatusCode { get; set; } = IntroducedInApiVersionAttribute.DefaultStatusCode;
+
+        ApiVersionProviderOptions IApiVersionProvider.Options => ApiVersionProviderOptions.Introduced;
     }
 
 #pragma warning restore CA1034 // Nested types should not be visible
