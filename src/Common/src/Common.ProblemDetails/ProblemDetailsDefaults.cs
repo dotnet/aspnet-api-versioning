@@ -8,6 +8,7 @@ namespace Asp.Versioning;
 public static class ProblemDetailsDefaults
 {
     private static ProblemDetailsInfo? unsupported;
+    private static ProblemDetailsInfo? introduced;
     private static ProblemDetailsInfo? unspecified;
     private static ProblemDetailsInfo? invalid;
     private static ProblemDetailsInfo? ambiguous;
@@ -20,6 +21,15 @@ public static class ProblemDetailsDefaults
             "https://docs.api-versioning.org/problems#unsupported",
             "Unsupported API version",
             "UnsupportedApiVersion" );
+
+    /// <summary>
+    /// Gets the problem details for an API endpoint introduced in a later API version.
+    /// </summary>
+    public static ProblemDetailsInfo Introduced =>
+        introduced ??= new(
+            "https://docs.api-versioning.org/problems#introduced",
+            "API endpoint not yet introduced",
+            "EndpointNotIntroduced" );
 
     /// <summary>
     /// Gets the problem details for an unspecified API version.

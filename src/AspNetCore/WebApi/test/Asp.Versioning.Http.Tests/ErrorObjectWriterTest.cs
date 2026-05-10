@@ -27,6 +27,7 @@ public class ErrorObjectWriterTest
     [InlineData( "https://docs.api-versioning.org/problems#unspecified" )]
     [InlineData( "https://docs.api-versioning.org/problems#invalid" )]
     [InlineData( "https://docs.api-versioning.org/problems#ambiguous" )]
+    [InlineData( "https://docs.api-versioning.org/problems#introduced" )]
     public void can_write_should_be_true_for_api_versioning_problem_types( string type )
     {
         // arrange

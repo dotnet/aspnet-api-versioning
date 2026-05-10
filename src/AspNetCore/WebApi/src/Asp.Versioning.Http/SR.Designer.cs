@@ -149,5 +149,14 @@ namespace Asp.Versioning {
                 return ResourceManager.GetString("VersionedResourceNotSupported", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The HTTP resource that matches the request URI &apos;{0}&apos; was introduced in API version &apos;{1}&apos; and is not available in the requested version &apos;{2}&apos;..
+        /// </summary>
+        internal static string VersionedResourceNotIntroduced {
+            get {
+                return ResourceManager.GetString("VersionedResourceNotIntroduced", resourceCulture);
+            }
+        }
     }
 }

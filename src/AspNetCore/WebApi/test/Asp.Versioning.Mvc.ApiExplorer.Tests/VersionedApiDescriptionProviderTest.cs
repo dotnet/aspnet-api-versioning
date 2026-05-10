@@ -2,11 +2,15 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
+using Asp.Versioning.Conventions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 
 public class VersionedApiDescriptionProviderTest
 {
@@ -120,6 +124,34 @@ public class VersionedApiDescriptionProviderTest
 
         // assert
         context.Results.Single().GroupName.Should().Be( "Test" );
+    }
+
+    [Fact]
+    public void versioned_api_explorer_should_exclude_versions_before_introduced_action()
+    {
+        // arrange
+        var metadata = GetApiVersionMetadata( typeof( IntroducedController ), nameof( IntroducedController.Get ) );
+        var descriptor = new ActionDescriptor() { EndpointMetadata = [metadata] };
+        var actionProvider = new TestActionDescriptorCollectionProvider( descriptor );
+        var context = new ApiDescriptionProviderContext( actionProvider.ActionDescriptors.Items );
+        var apiExplorer = new VersionedApiDescriptionProvider(
+            Mock.Of<IPolicyManager<SunsetPolicy>>(),
+            Mock.Of<IPolicyManager<DeprecationPolicy>>(),
+            NewModelMetadataProvider(),
+            Options.Create( new ApiExplorerOptions() { GroupNameFormat = "'v'VVV" } ) );
+
+        context.Results.Add( new()
+        {
+            ActionDescriptor = descriptor,
+            HttpMethod = "GET",
+            RelativePath = "test",
+        } );
+
+        // act
+        apiExplorer.OnProvidersExecuted( context );
+
+        // assert
+        context.Results.Select( result => result.GroupName ).Should().Equal( "v2", "v3" );
     }
 
     [Fact]
@@ -254,4 +286,37 @@ public class VersionedApiDescriptionProviderTest
 
         return provider.Object;
     }
+
+    private static ApiVersionMetadata GetApiVersionMetadata( Type controllerType, string actionName )
+    {
+        var controllerAttributes = controllerType.GetTypeInfo().GetCustomAttributes().Cast<object>().ToArray();
+        var controller = new ControllerModel( controllerType.GetTypeInfo(), controllerAttributes )
+        {
+            ControllerName = controllerType.Name.Replace( "Controller", string.Empty, StringComparison.Ordinal ),
+        };
+        var method = controllerType.GetMethod( actionName );
+        var action = new ActionModel( method, method.GetCustomAttributes().Cast<object>().ToArray() )
+        {
+            Controller = controller,
+        };
+
+        controller.Actions.Add( action );
+        new ControllerApiVersionConventionBuilder( controllerType ).ApplyTo( controller );
+
+        return action.Selectors.Single().EndpointMetadata.OfType<ApiVersionMetadata>().Single();
+    }
+
+#pragma warning disable CA1034 // Nested types should not be visible
+
+    [ApiController]
+    [ApiVersion( 1.0 )]
+    [ApiVersion( 2.0 )]
+    [ApiVersion( 3.0 )]
+    public sealed class IntroducedController : ControllerBase
+    {
+        [IntroducedInApiVersion( 2.0 )]
+        public OkResult Get() => Ok();
+    }
+
+#pragma warning restore CA1034 // Nested types should not be visible
 }
