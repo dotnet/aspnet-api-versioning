@@ -379,6 +379,107 @@ public class ApiVersionMatcherPolicyTest
         responseContext.Response.StatusCode.Should().Be( 404 );
     }
 
+    [Fact]
+    public async Task apply_should_use_latest_introduced_version_across_candidates()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
+
+        var options = new ApiVersioningOptions()
+        {
+            ReportApiVersions = true,
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+        var first = NewIntroducedEndpoint( [new( v2, 404 )], implementedVersion: v2 );
+        var second = NewIntroducedEndpoint( [new( v3, 410 )], implementedVersion: v3 );
+        var candidates = new CandidateSet( [first, second], [[], []], [0, 0] );
+        var httpContext = NewHttpContext( "1.0", options );
+
+        httpContext.Features.Set( feature.Object );
+
+        // act
+        await policy.ApplyAsync( httpContext, candidates );
+        await httpContext.GetEndpoint().RequestDelegate!( httpContext );
+        await httpContext.Response.CompleteAsync();
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 410, "3.0" );
+    }
+
+    [Fact]
+    public async Task jump_table_should_use_latest_introduced_version_across_candidates()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            ReportApiVersions = true,
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( "1.0", options );
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+        var first = NewIntroducedEndpoint( [new( v2, 404 )], implementedVersion: v2 );
+        var second = NewIntroducedEndpoint( [new( v3, 410 )], implementedVersion: v3 );
+        var edges = policy.GetEdges( [first, second] );
+        var jumpTable = policy.BuildJumpTable( 42, NewJumpTableEdges( edges ) );
+        var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+
+        // act
+        await selected.RequestDelegate!( httpContext );
+        await httpContext.Response.CompleteAsync();
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 410, "3.0" );
+    }
+
+    [Fact]
+    public async Task introduced_endpoint_should_use_same_latest_introduced_version_from_jump_table_and_apply()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            ReportApiVersions = true,
+        };
+        var endpoints = NewIntroducedEndpointCandidates( latestStatusCode: 410, earlierStatusCode: 404 );
+
+        // act
+        var fast = await InvokeJumpTableIntroducedEndpoint( options, endpoints );
+        var slow = await InvokeApplyIntroducedEndpoint( options, endpoints );
+
+        // assert
+        ( await ReadResponseBody( fast ) ).Should().Be( await ReadResponseBody( slow ) );
+        fast.Response.StatusCode.Should().Be( slow.Response.StatusCode );
+        fast.Response.Headers["api-supported-versions"].Should().Equal( slow.Response.Headers["api-supported-versions"] );
+    }
+
+    [Fact]
+    public async Task introduced_endpoint_should_tie_break_latest_introduced_version_by_smallest_status_code()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            ReportApiVersions = true,
+        };
+        var endpoints = NewIntroducedEndpointCandidatesWithLatestTie();
+
+        // act
+        var fast = await InvokeJumpTableIntroducedEndpoint( options, endpoints );
+        var slow = await InvokeApplyIntroducedEndpoint( options, endpoints );
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( fast, 404, "3.0" );
+        await ResponseShouldHaveIntroducedProblemDetails( slow, 404, "3.0" );
+    }
+
     [Theory]
     [InlineData( "1.0" )]
     [InlineData( "2.0" )]
@@ -463,22 +564,26 @@ public class ApiVersionMatcherPolicyTest
         var ctor = keyType!.GetConstructor(
             System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
             binder: null,
-            [typeof( ApiVersion ), typeof( int ), typeof( ApiVersionMetadata ), typeof( HashSet<RoutePattern> )],
+            [typeof( ApiVersion ), typeof( int ), typeof( ApiVersion ), typeof( ApiVersionMetadata ), typeof( HashSet<RoutePattern> )],
             modifiers: null );
         var apiVersion = new ApiVersion( 2.0 );
+        var introducedIn = new ApiVersion( 3.0 );
         var metadata = ApiVersionMetadata.Empty;
         var routePatterns = new HashSet<RoutePattern>();
-        var left = ctor!.Invoke( [apiVersion, 404, metadata, routePatterns] );
-        var same = ctor.Invoke( [apiVersion, 404, metadata, routePatterns] );
-        var differentStatusCode = ctor.Invoke( [apiVersion, 410, metadata, routePatterns] );
+        var left = ctor!.Invoke( [apiVersion, 404, introducedIn, metadata, routePatterns] );
+        var same = ctor.Invoke( [apiVersion, 404, introducedIn, metadata, routePatterns] );
+        var differentStatusCode = ctor.Invoke( [apiVersion, 410, introducedIn, metadata, routePatterns] );
+        var differentIntroducedIn = ctor.Invoke( [apiVersion, 404, new ApiVersion( 4.0 ), metadata, routePatterns] );
 
         // act
         var sameResult = left.Equals( same );
         var differentResult = left.Equals( differentStatusCode );
+        var differentIntroducedInResult = left.Equals( differentIntroducedIn );
 
         // assert
         sameResult.Should().BeTrue();
         differentResult.Should().BeFalse();
+        differentIntroducedInResult.Should().BeFalse();
     }
 
     [Fact]
@@ -659,6 +764,31 @@ public class ApiVersionMatcherPolicyTest
         return (RouteEndpoint) builder.Build();
     }
 
+    private static RouteEndpoint[] NewIntroducedEndpointCandidates( int latestStatusCode, int earlierStatusCode )
+    {
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+
+        return
+        [
+            NewIntroducedEndpoint( [new( v2, earlierStatusCode )], implementedVersion: v2 ),
+            NewIntroducedEndpoint( [new( v3, latestStatusCode )], implementedVersion: v3 ),
+        ];
+    }
+
+    private static RouteEndpoint[] NewIntroducedEndpointCandidatesWithLatestTie()
+    {
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+
+        return
+        [
+            NewIntroducedEndpoint( [new( v2, 400 )], implementedVersion: v2 ),
+            NewIntroducedEndpoint( [new( v3, 410 )], implementedVersion: v3 ),
+            NewIntroducedEndpoint( [new( v3, 404 )], implementedVersion: v3 ),
+        ];
+    }
+
     private static ApiVersionMatcherPolicy NewApiVersionMatcherPolicy( ApiVersioningOptions options = default ) =>
         new(
             ApiVersionParser.Default,
@@ -703,10 +833,16 @@ public class ApiVersionMatcherPolicyTest
 
     private static async Task<DefaultHttpContext> InvokeJumpTableIntroducedEndpoint( ApiVersioningOptions options )
     {
+        return await InvokeJumpTableIntroducedEndpoint( options, [NewIntroducedEndpoint( 404 )] );
+    }
+
+    private static async Task<DefaultHttpContext> InvokeJumpTableIntroducedEndpoint(
+        ApiVersioningOptions options,
+        RouteEndpoint[] endpoints )
+    {
         var policy = NewApiVersionMatcherPolicy( options );
         var httpContext = NewHttpContext( "1.0", options );
-        var endpoint = NewIntroducedEndpoint( 404 );
-        var edges = policy.GetEdges( [endpoint] );
+        var edges = policy.GetEdges( endpoints );
         var tableEdges = NewJumpTableEdges( edges );
         var jumpTable = policy.BuildJumpTable( 42, tableEdges );
         var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
@@ -719,6 +855,13 @@ public class ApiVersionMatcherPolicyTest
 
     private static async Task<DefaultHttpContext> InvokeApplyIntroducedEndpoint( ApiVersioningOptions options )
     {
+        return await InvokeApplyIntroducedEndpoint( options, [NewIntroducedEndpoint( 404 )] );
+    }
+
+    private static async Task<DefaultHttpContext> InvokeApplyIntroducedEndpoint(
+        ApiVersioningOptions options,
+        RouteEndpoint[] endpoints )
+    {
         var feature = new Mock<IApiVersioningFeature>();
 
         feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
@@ -726,8 +869,10 @@ public class ApiVersionMatcherPolicyTest
         feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
 
         var policy = NewApiVersionMatcherPolicy( options );
-        var endpoint = NewIntroducedEndpoint( 404 );
-        var candidates = new CandidateSet( [endpoint], [[]], [0] );
+        var candidates = new CandidateSet(
+            endpoints,
+            endpoints.Select( _ => new RouteValueDictionary() ).ToArray(),
+            endpoints.Select( _ => 0 ).ToArray() );
         var httpContext = NewHttpContext( "1.0", options );
 
         httpContext.Features.Set( feature.Object );
@@ -748,7 +893,10 @@ public class ApiVersionMatcherPolicyTest
         return await reader.ReadToEndAsync();
     }
 
-    private static async Task ResponseShouldHaveIntroducedProblemDetails( DefaultHttpContext context, int statusCode )
+    private static async Task ResponseShouldHaveIntroducedProblemDetails( DefaultHttpContext context, int statusCode ) =>
+        await ResponseShouldHaveIntroducedProblemDetails( context, statusCode, "2.0" );
+
+    private static async Task ResponseShouldHaveIntroducedProblemDetails( DefaultHttpContext context, int statusCode, string introducedIn )
     {
         context.Response.ContentType.Should().Be( "application/problem+json" );
         context.Response.StatusCode.Should().Be( statusCode );
@@ -761,7 +909,7 @@ public class ApiVersionMatcherPolicyTest
         root.GetProperty( "title" ).GetString().Should().Be( "API endpoint not yet introduced" );
         root.GetProperty( "status" ).GetInt32().Should().Be( statusCode );
         root.GetProperty( "detail" ).GetString().Should().Be(
-            "The HTTP resource that matches the request URI 'http://tempuri.org/api/values' was introduced in API version '2.0' and is not available in the requested version '1.0'." );
+            $"The HTTP resource that matches the request URI 'http://tempuri.org/api/values' was introduced in API version '{introducedIn}' and is not available in the requested version '1.0'." );
         root.GetProperty( "code" ).GetString().Should().Be( "EndpointNotIntroduced" );
     }
 

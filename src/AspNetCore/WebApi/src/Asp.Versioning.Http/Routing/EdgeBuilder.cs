@@ -85,7 +85,7 @@ internal sealed class EdgeBuilder
             statusCode = options.UnsupportedApiVersionStatusCode;
         }
 
-        var key = new EdgeKey( apiVersion, statusCode, metadata, routePatterns );
+        var key = new EdgeKey( apiVersion, statusCode, introducedIn, metadata, routePatterns );
 
         Add( ref key, new IntroducedInApiVersionEndpoint( options, statusCode, introducedIn ), endpoint.RoutePattern, once: true );
     }

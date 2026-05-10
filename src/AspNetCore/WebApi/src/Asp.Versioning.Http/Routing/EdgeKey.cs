@@ -13,6 +13,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
     public readonly HashSet<RoutePattern> RoutePatterns;
     public readonly EndpointType EndpointType;
     public readonly int StatusCode;
+    public readonly ApiVersion? IntroducedIn;
 
     private EdgeKey( EndpointType endpointType, HashSet<RoutePattern> routePatterns )
     {
@@ -21,6 +22,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         RoutePatterns = routePatterns;
         EndpointType = endpointType;
         StatusCode = 0;
+        IntroducedIn = default;
     }
 
     internal EdgeKey(
@@ -33,11 +35,13 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         RoutePatterns = routePatterns;
         EndpointType = UserDefined;
         StatusCode = 0;
+        IntroducedIn = default;
     }
 
     internal EdgeKey(
         ApiVersion apiVersion,
         int statusCode,
+        ApiVersion introducedIn,
         ApiVersionMetadata metadata,
         HashSet<RoutePattern> routePatterns )
     {
@@ -46,6 +50,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         RoutePatterns = routePatterns;
         EndpointType = IntroducedLater;
         StatusCode = statusCode;
+        IntroducedIn = introducedIn;
     }
 
     internal static EdgeKey Ambiguous => new( EndpointType.Ambiguous, Set.Empty );
@@ -74,7 +79,8 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
             return false;
         }
 
-        return EndpointType != IntroducedLater || StatusCode == other.StatusCode;
+        return EndpointType != IntroducedLater ||
+               ( StatusCode == other.StatusCode && IntroducedIn == other.IntroducedIn );
     }
 
     public override bool Equals( object? obj ) => obj is EdgeKey other && Equals( other );
@@ -93,6 +99,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         if ( EndpointType == IntroducedLater )
         {
             result.Add( StatusCode );
+            result.Add( IntroducedIn );
         }
 
         return result.ToHashCode();
@@ -112,7 +119,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         }
         else if ( EndpointType == IntroducedLater )
         {
-            value = EndpointType + " " + ApiVersion + " (" + StatusCode + ")";
+            value = EndpointType + " " + ApiVersion + " (" + StatusCode + ", " + IntroducedIn + ")";
         }
         else
         {

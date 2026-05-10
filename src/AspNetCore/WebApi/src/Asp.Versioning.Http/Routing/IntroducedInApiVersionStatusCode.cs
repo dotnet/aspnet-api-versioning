@@ -3,6 +3,7 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing.Matching;
 using System.Diagnostics.CodeAnalysis;
 
 internal static class IntroducedInApiVersionStatusCode
@@ -67,6 +68,52 @@ internal static class IntroducedInApiVersionStatusCode
 
         return GetIntroducedInApiVersions( endpoint.Metadata ) is { Count: > 0 };
     }
+
+    internal static bool TryGetBest(
+        CandidateSet candidates,
+        ApiVersion apiVersion,
+        int unsupportedApiVersionStatusCode,
+        out int statusCode,
+        [NotNullWhen( true )] out ApiVersion? introducedIn )
+    {
+        statusCode = 0;
+        introducedIn = default;
+
+        for ( var i = 0; i < candidates.Count; i++ )
+        {
+            ref readonly var candidate = ref candidates[i];
+            var metadata = candidate.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>();
+
+            if ( metadata is null )
+            {
+                continue;
+            }
+
+            if ( TryGet(
+                candidate.Endpoint,
+                metadata,
+                apiVersion,
+                unsupportedApiVersionStatusCode,
+                out var currentStatusCode,
+                out var currentIntroducedIn ) &&
+                IsBetterMatch( currentStatusCode, currentIntroducedIn, statusCode, introducedIn ) )
+            {
+                statusCode = currentStatusCode;
+                introducedIn = currentIntroducedIn;
+            }
+        }
+
+        return introducedIn is not null;
+    }
+
+    internal static bool IsBetterMatch(
+        int currentStatusCode,
+        ApiVersion currentIntroducedIn,
+        int matchedStatusCode,
+        ApiVersion? matchedIntroducedIn ) =>
+        matchedIntroducedIn is null ||
+        currentIntroducedIn > matchedIntroducedIn ||
+        ( currentIntroducedIn == matchedIntroducedIn && currentStatusCode < matchedStatusCode );
 
     private static bool TryGet(
         IReadOnlyList<IntroducedInApiVersionMetadata> introduced,

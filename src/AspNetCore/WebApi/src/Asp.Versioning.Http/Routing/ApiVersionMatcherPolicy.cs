@@ -114,7 +114,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         var capacity = edges.Count - EdgeBuilder.NumberOfRejectionEndpoints;
         var destinations = new Dictionary<ApiVersion, int>( capacity );
         var introducedLater = default( Dictionary<ApiVersion, int> );
-        var introducedLaterStatusCodes = default( Dictionary<ApiVersion, int> );
+        var introducedLaterMatches = default( Dictionary<ApiVersion, (int StatusCode, ApiVersion IntroducedIn)> );
         var source = ApiVersionSource;
         var supported = default( SortedSet<ApiVersion> );
         var deprecated = default( SortedSet<ApiVersion> );
@@ -156,12 +156,16 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 case EndpointType.IntroducedLater:
                     routePatterns ??= [.. state.RoutePatterns];
                     introducedLater ??= new();
-                    introducedLaterStatusCodes ??= new();
+                    introducedLaterMatches ??= new();
 
-                    if ( !introducedLaterStatusCodes.TryGetValue( state.ApiVersion, out var statusCode ) || state.StatusCode < statusCode )
+                    if ( !introducedLaterMatches.TryGetValue( state.ApiVersion, out var match ) ||
+                         IntroducedInApiVersionStatusCode.IsBetterMatch(
+                             state.StatusCode,
+                             state.IntroducedIn!,
+                             match.StatusCode,
+                             match.IntroducedIn ) )
                     {
-                        // Prefer the smallest status code when multiple actions are introduced in the same later version.
-                        introducedLaterStatusCodes[state.ApiVersion] = state.StatusCode;
+                        introducedLaterMatches[state.ApiVersion] = (state.StatusCode, state.IntroducedIn!);
                         introducedLater[state.ApiVersion] = edge.Destination;
                     }
 

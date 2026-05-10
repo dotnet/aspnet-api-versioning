@@ -52,34 +52,14 @@ internal sealed class ClientErrorEndpointBuilder
             return default;
         }
 
-        var result = 0;
-        var introducedIn = default( ApiVersion );
-
-        for ( var i = 0; i < candidates.Count; i++ )
-        {
-            ref readonly var candidate = ref candidates[i];
-            var metadata = candidate.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>();
-
-            if ( metadata is null )
-            {
-                continue;
-            }
-
-            if ( IntroducedInApiVersionStatusCode.TryGet(
-                candidate.Endpoint,
-                metadata,
-                apiVersion,
-                options.UnsupportedApiVersionStatusCode,
-                out var statusCode,
-                out var currentIntroducedIn ) &&
-                ( result == 0 || statusCode < result ) )
-            {
-                result = statusCode;
-                introducedIn = currentIntroducedIn;
-            }
-        }
-
-        return (result, introducedIn);
+        return IntroducedInApiVersionStatusCode.TryGetBest(
+            candidates,
+            apiVersion,
+            options.UnsupportedApiVersionStatusCode,
+            out var statusCode,
+            out var introducedIn )
+            ? (statusCode, introducedIn)
+            : default;
     }
 
     private static string DisplayName( Endpoint endpoint )
