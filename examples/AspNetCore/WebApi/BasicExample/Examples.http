@@ -20,6 +20,12 @@ POST {{baseUrl}}/api/v1/helloworld
 # note: this controller has a single, version interleaved implementation
 GET {{baseUrl}}/api/v1/multiversioned
 
+### Multi-Versioned - Legacy v2-only (returns 400 — exact-match on v2.0)
+GET {{baseUrl}}/api/v1/multiversioned/legacy
+
+### Multi-Versioned - Modern (returns 404 — introduced in v2.0)
+GET {{baseUrl}}/api/v1/multiversioned/modern
+
 ### VERSION 2.0
 
 ### Values - Get All
@@ -28,3 +34,20 @@ GET {{baseUrl}}/api/values?api-version=2.0
 ### Multi-Versioned - Get
 # note: this controller has a single, version interleaved implementation
 GET {{baseUrl}}/api/v2/multiversioned
+
+### Multi-Versioned - Legacy v2-only (200 — exact match)
+GET {{baseUrl}}/api/v2/multiversioned/legacy
+
+### Multi-Versioned - Modern (200 — introduced in v2.0, reachable from v2.0 onward)
+GET {{baseUrl}}/api/v2/multiversioned/modern
+
+### VERSION 3.0
+
+### Multi-Versioned - Get
+GET {{baseUrl}}/api/v3/multiversioned
+
+### Multi-Versioned - Legacy v2-only (returns 400 — [MapToApiVersion(2.0)] is exact-match, NOT v3)
+GET {{baseUrl}}/api/v3/multiversioned/legacy
+
+### Multi-Versioned - Modern (200 — [IntroducedInApiVersion(2.0)] is "from v2 onward", auto-reaches v3)
+GET {{baseUrl}}/api/v3/multiversioned/modern
