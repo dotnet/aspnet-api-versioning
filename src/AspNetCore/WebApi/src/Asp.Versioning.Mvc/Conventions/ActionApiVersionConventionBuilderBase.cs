@@ -70,10 +70,13 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             else
             {
                 emptyVersions = [];
+                var supportedVersions = HasIntroducedVersions ? inheritedSupported.Intersect( effectiveMapped ) : inheritedSupported;
+                var deprecatedVersions = HasIntroducedVersions ? inheritedDeprecated.Intersect( effectiveMapped ) : inheritedDeprecated;
+
                 endpointModel = new(
                     declaredVersions: effectiveMapped,
-                    supportedVersions: inheritedSupported,
-                    deprecatedVersions: inheritedDeprecated,
+                    supportedVersions: supportedVersions,
+                    deprecatedVersions: deprecatedVersions,
                     advertisedVersions: emptyVersions,
                     deprecatedAdvertisedVersions: emptyVersions );
             }

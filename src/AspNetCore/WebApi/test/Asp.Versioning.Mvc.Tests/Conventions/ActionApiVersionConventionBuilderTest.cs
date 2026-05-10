@@ -142,6 +142,58 @@ public partial class ActionApiVersionConventionBuilderTest
     }
 
     [Fact]
+    public void apply_to_should_intersect_supported_api_versions_with_introduced_convention()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionModel = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+        var version1 = new ApiVersion( 1, 0 );
+        var version2 = new ApiVersion( 2, 0 );
+        var version3 = new ApiVersion( 3, 0 );
+
+        actionModel.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel();
+        actionBuilder.IntroducedInApiVersion( version2 );
+
+        // act
+        actionBuilder.ApplyTo( actionModel );
+
+        // assert
+        var metadata = GetApiVersionMetadata( actionModel );
+        var model = metadata.Map( Explicit | Implicit );
+
+        model.SupportedApiVersions.Should().NotContain( version1 );
+        model.SupportedApiVersions.Should().ContainInOrder( version2, version3 );
+        metadata.MappingTo( version2 ).Should().Be( Explicit );
+        metadata.MappingTo( version3 ).Should().Be( Explicit );
+    }
+
+    [Fact]
+    public void apply_to_should_preserve_inherited_supported_api_versions_with_mapped_convention()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionModel = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+        var version1 = new ApiVersion( 1, 0 );
+        var version2 = new ApiVersion( 2, 0 );
+        var version3 = new ApiVersion( 3, 0 );
+
+        actionModel.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel();
+        actionBuilder.MapToApiVersion( version2 );
+
+        // act
+        actionBuilder.ApplyTo( actionModel );
+
+        // assert
+        GetApiVersionMetadata( actionModel )
+            .Map( Explicit | Implicit )
+            .SupportedApiVersions
+            .Should()
+            .Equal( version1, version2, version3 );
+    }
+
+    [Fact]
     public void introduced_in_api_version_should_support_fluent_overloads()
     {
         // arrange

@@ -45,6 +45,12 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
     protected bool HasMappedVersions => ( mapped is not null && mapped.Count > 0 ) || ( introduced is not null && introduced.Count > 0 );
 
     /// <summary>
+    /// Gets a value indicating whether any introduced API versions are configured for the action.
+    /// </summary>
+    /// <value>True if any introduced versions are configured for the action; otherwise, false.</value>
+    protected bool HasIntroducedVersions => introduced is not null && introduced.Count > 0;
+
+    /// <summary>
     /// Gets the collection of API versions in which the current action was introduced.
     /// </summary>
     /// <value>A <see cref="ICollection{T}">collection</see> of introduced <see cref="ApiVersion">API versions</see>.</value>
