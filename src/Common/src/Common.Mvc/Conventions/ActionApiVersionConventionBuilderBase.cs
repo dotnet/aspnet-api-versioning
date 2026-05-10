@@ -131,7 +131,7 @@ public abstract partial class ActionApiVersionConventionBuilderBase : ApiVersion
             return mapped ?? [];
         }
 
-        var versions = mapped is null ? [] : new HashSet<ApiVersion>( mapped );
+        var versions = mapped is null ? new HashSet<ApiVersion>() : new HashSet<ApiVersion>( mapped );
 
         var effectiveIntroduced = introduced[0].Version;
 

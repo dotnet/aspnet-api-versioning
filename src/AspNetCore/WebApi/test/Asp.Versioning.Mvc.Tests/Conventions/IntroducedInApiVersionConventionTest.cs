@@ -25,6 +25,24 @@ public class IntroducedInApiVersionConventionTest
             new ApiVersion( new DateOnly( 2027, 6, 1 ) ) );
     }
 
+    [Fact]
+    public void apply_to_should_not_throw_when_action_has_only_introduced_version()
+    {
+        // arrange
+        var action = default( ActionModel );
+
+        // act
+        var exception = Record.Exception( () => action = ApplyConventions( typeof( IntroducedController ), nameof( IntroducedController.GetIntroduced ) ) );
+        var metadata = GetApiVersionMetadata( action! );
+        var model = metadata.Map( Explicit );
+
+        // assert
+        exception.Should().BeNull();
+        model.DeclaredApiVersions.Should().Equal(
+            new ApiVersion( new DateOnly( 2026, 12, 1 ) ),
+            new ApiVersion( new DateOnly( 2027, 6, 1 ) ) );
+    }
+
     [Theory]
     [InlineData( "2026-11-12", false )]
     [InlineData( "2026-12-01", true )]
