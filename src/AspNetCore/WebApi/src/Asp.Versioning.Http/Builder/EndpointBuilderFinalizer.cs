@@ -221,16 +221,12 @@ internal static class EndpointBuilderFinalizer
         if ( !TryGetApiVersions( metadata, out var buckets ) ||
             ( apiModel = versionSet.Build( options ) ).IsApiVersionNeutral )
         {
-            var neutralIntroducedInApiVersions = metadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
-
             if ( string.IsNullOrEmpty( name ) )
             {
-                return neutralIntroducedInApiVersions.Length == 0
-                    ? ApiVersionMetadata.Neutral
-                    : new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, introducedInApiVersions: neutralIntroducedInApiVersions );
+                return ApiVersionMetadata.Neutral;
             }
 
-            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name, neutralIntroducedInApiVersions );
+            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
         }
 
         ApiVersionModel endpointModel;

@@ -355,6 +355,36 @@ public class IEndpointConventionBuilderExtensionsTest
     }
 
     [Fact]
+    public void with_api_version_set_should_ignore_introduced_version_for_neutral_endpoint()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .IsApiVersionNeutral()
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .IntroducedInApiVersion( 2.0 );
+
+        // assert
+        var metadata = dataSources.Single()
+                                  .Endpoints
+                                  .Single()
+                                  .Metadata
+                                  .OfType<ApiVersionMetadata>()
+                                  .Single();
+
+        metadata.IntroducedInApiVersions.Should().BeEmpty();
+    }
+
+    [Fact]
     public void has_api_version_should_add_convention()
     {
         // arrange
