@@ -69,85 +69,13 @@ internal sealed class ClientErrorEndpointBuilder
                 continue;
             }
 
-            var introduced = metadata.IntroducedInApiVersions;
-
-            for ( var j = 0; j < introduced.Count; j++ )
+            if ( IntroducedInApiVersionStatusCode.TryGet( candidate.Endpoint, metadata, apiVersion, out var statusCode ) )
             {
-                if ( apiVersion < introduced[j].IntroducedIn )
-                {
-                    return introduced[j].StatusCode;
-                }
-            }
-
-            introduced = candidate.Endpoint.Metadata.GetOrderedMetadata<IntroducedInApiVersionMetadata>();
-
-            for ( var j = 0; j < introduced.Count; j++ )
-            {
-                if ( apiVersion < introduced[j].IntroducedIn )
-                {
-                    return introduced[j].StatusCode;
-                }
-            }
-
-            var reflectedIntroduced = GetIntroducedInApiVersions( candidate.Endpoint.Metadata );
-
-            if ( reflectedIntroduced is null )
-            {
-                continue;
-            }
-
-            for ( var j = 0; j < reflectedIntroduced.Count; j++ )
-            {
-                if ( apiVersion < reflectedIntroduced[j].IntroducedIn )
-                {
-                    return reflectedIntroduced[j].StatusCode;
-                }
+                return statusCode;
             }
         }
 
         return 0;
-    }
-
-    [UnconditionalSuppressMessage( "ReflectionAnalysis", "IL2075", Justification = "The optional MVC action descriptor metadata is discovered by convention when present." )]
-    private static List<IntroducedInApiVersionMetadata>? GetIntroducedInApiVersions( EndpointMetadataCollection metadata )
-    {
-        var introduced = default( List<IntroducedInApiVersionMetadata> );
-
-        for ( var i = 0; i < metadata.Count; i++ )
-        {
-            if ( metadata[i] is IIntroducedInApiVersionProvider provider )
-            {
-                Add( provider, ref introduced );
-                continue;
-            }
-
-            if ( metadata[i].GetType().GetProperty( "MethodInfo" )?.GetValue( metadata[i] ) is not System.Reflection.MethodInfo method )
-            {
-                continue;
-            }
-
-            foreach ( var attribute in method.GetCustomAttributes( inherit: false ) )
-            {
-                if ( attribute is IIntroducedInApiVersionProvider introducedProvider )
-                {
-                    Add( introducedProvider, ref introduced );
-                }
-            }
-        }
-
-        return introduced;
-    }
-
-    private static void Add( IIntroducedInApiVersionProvider provider, ref List<IntroducedInApiVersionMetadata>? introduced )
-    {
-        var versions = provider.Versions;
-
-        introduced ??= [];
-
-        for ( var i = 0; i < versions.Count; i++ )
-        {
-            introduced.Add( new( versions[i], provider.StatusCode ) );
-        }
     }
 
     private static string DisplayName( Endpoint endpoint )

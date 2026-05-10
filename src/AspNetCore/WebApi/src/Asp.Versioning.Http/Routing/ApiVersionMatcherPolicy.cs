@@ -108,6 +108,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         var rejection = new RouteDestination( exitDestination );
         var capacity = edges.Count - EdgeBuilder.NumberOfRejectionEndpoints;
         var destinations = new Dictionary<ApiVersion, int>( capacity );
+        var introducedLater = default( Dictionary<ApiVersion, int> );
         var source = ApiVersionSource;
         var supported = default( SortedSet<ApiVersion> );
         var deprecated = default( SortedSet<ApiVersion> );
@@ -146,6 +147,11 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 case EndpointType.NotAcceptable:
                     rejection.NotAcceptable = edge.Destination;
                     break;
+                case EndpointType.IntroducedLater:
+                    routePatterns ??= [.. state.RoutePatterns];
+                    introducedLater ??= new();
+                    introducedLater.TryAdd( state.ApiVersion, edge.Destination );
+                    break;
                 default:
                     // the route patterns provided to each edge is a
                     // singleton so any edge will do
@@ -153,6 +159,11 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                     destinations.Add( state.ApiVersion, edge.Destination );
                     break;
             }
+        }
+
+        if ( introducedLater is not null )
+        {
+            rejection.IntroducedLater = introducedLater.ToFrozenDictionary( introducedLater.Comparer );
         }
 
         return new ApiVersionPolicyJumpTable(
@@ -198,6 +209,12 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 builder.Add( endpoint );
                 versionedEndpoints[count++] = (endpoint, model, metadata);
                 versions.AddRange( model.DeclaredApiVersions );
+
+                if ( IntroducedInApiVersionStatusCode.HasIntroducedInApiVersion( endpoint, metadata ) )
+                {
+                    metadata.Deconstruct( out var apiModel, out _ );
+                    versions.AddRange( apiModel.DeclaredApiVersions );
+                }
             }
         }
 
@@ -211,6 +228,10 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 if ( mappedWithImplementation )
                 {
                     builder.Add( endpoint, version, metadata );
+                }
+                else if ( IntroducedInApiVersionStatusCode.TryGet( endpoint, metadata, version, out var statusCode ) )
+                {
+                    builder.AddIntroducedLater( endpoint, version, statusCode, metadata );
                 }
             }
         }

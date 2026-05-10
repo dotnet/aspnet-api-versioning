@@ -12,4 +12,5 @@ internal enum EndpointType
     AssumeDefault,
     NotAcceptable,
     Unsupported,
+    IntroducedLater,
 }

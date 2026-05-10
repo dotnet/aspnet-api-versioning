@@ -12,6 +12,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
     public readonly ApiVersionMetadata Metadata;
     public readonly HashSet<RoutePattern> RoutePatterns;
     public readonly EndpointType EndpointType;
+    public readonly int StatusCode;
 
     private EdgeKey( EndpointType endpointType, HashSet<RoutePattern> routePatterns )
     {
@@ -19,6 +20,7 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         Metadata = ApiVersionMetadata.Empty;
         RoutePatterns = routePatterns;
         EndpointType = endpointType;
+        StatusCode = 0;
     }
 
     internal EdgeKey(
@@ -30,6 +32,20 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         Metadata = metadata;
         RoutePatterns = routePatterns;
         EndpointType = UserDefined;
+        StatusCode = 0;
+    }
+
+    internal EdgeKey(
+        ApiVersion apiVersion,
+        int statusCode,
+        ApiVersionMetadata metadata,
+        HashSet<RoutePattern> routePatterns )
+    {
+        ApiVersion = apiVersion;
+        Metadata = metadata;
+        RoutePatterns = routePatterns;
+        EndpointType = IntroducedLater;
+        StatusCode = statusCode;
     }
 
     internal static EdgeKey Ambiguous => new( EndpointType.Ambiguous, Set.Empty );
@@ -56,9 +72,14 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
 
         result.Add( EndpointType );
 
-        if ( EndpointType == UserDefined )
+        if ( EndpointType is UserDefined or IntroducedLater )
         {
             result.Add( ApiVersion );
+        }
+
+        if ( EndpointType == IntroducedLater )
+        {
+            result.Add( StatusCode );
         }
 
         return result.ToHashCode();
@@ -75,6 +96,10 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
         else if ( EndpointType == UserDefined )
         {
             value = ApiVersion.ToString();
+        }
+        else if ( EndpointType == IntroducedLater )
+        {
+            value = EndpointType + " " + ApiVersion + " (" + StatusCode + ")";
         }
         else
         {

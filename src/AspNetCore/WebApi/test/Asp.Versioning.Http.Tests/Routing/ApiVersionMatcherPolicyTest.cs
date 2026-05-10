@@ -90,6 +90,64 @@ public class ApiVersionMatcherPolicyTest
     }
 
     [Fact]
+    public async Task jump_table_should_use_introduced_endpoint_for_controller_declared_version_before_action()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( "1.0" ) } );
+        var v1 = new ApiVersion( 1, 0 );
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+        var apiModel = new ApiVersionModel(
+            declaredVersions: [v1, v2, v3],
+            supportedVersions: [v1, v2, v3],
+            deprecatedVersions: [],
+            advertisedVersions: [],
+            deprecatedAdvertisedVersions: [] );
+        var endpointModel = new ApiVersionModel(
+            declaredVersions: [v2, v3],
+            supportedVersions: [v2, v3],
+            deprecatedVersions: [],
+            advertisedVersions: [],
+            deprecatedAdvertisedVersions: [] );
+        var routePattern = RoutePatternFactory.Parse( "api/values" );
+        var builder = new RouteEndpointBuilder( Limbo, routePattern, 0 )
+        {
+            Metadata =
+            {
+                new ApiVersionMetadata( apiModel, endpointModel, introducedInApiVersions: [new( v2, 404 )] ),
+            },
+        };
+        var endpoints = new[] { builder.Build() };
+        var edges = policy.GetEdges( endpoints );
+        var tableEdges = new List<PolicyJumpTableEdge>();
+
+        for ( var i = 0; i < edges.Count; i++ )
+        {
+            tableEdges.Add( new( edges[i].State, i ) );
+        }
+
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var endpoint = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await endpoint.RequestDelegate!( responseContext );
+
+        // assert
+        responseContext.Response.StatusCode.Should().Be( 404 );
+    }
+
+    [Fact]
     public async Task apply_should_have_candidate_for_matched_api_version()
     {
         // arrange

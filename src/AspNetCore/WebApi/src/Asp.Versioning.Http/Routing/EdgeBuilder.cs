@@ -71,7 +71,19 @@ internal sealed class EdgeBuilder
         }
     }
 
+    public void AddIntroducedLater( RouteEndpoint endpoint, ApiVersion apiVersion, int statusCode, ApiVersionMetadata metadata )
+    {
+        var key = new EdgeKey( apiVersion, statusCode, metadata, routePatterns );
+
+        Add( ref key, new IntroducedInApiVersionEndpoint( statusCode ), endpoint.RoutePattern, once: true );
+    }
+
     private void Add( ref EdgeKey key, RouteEndpoint endpoint )
+    {
+        Add( ref key, endpoint, endpoint.RoutePattern, once: false );
+    }
+
+    private void Add( ref EdgeKey key, Endpoint endpoint, RoutePattern routePattern, bool once )
     {
         if ( keys.TryGetValue( key, out var existing ) )
         {
@@ -82,7 +94,6 @@ internal sealed class EdgeBuilder
             keys.Add( key );
         }
 
-        var routePattern = endpoint.RoutePattern;
         var needsRoutePattern = versionsByUrl && routePattern.HasVersionConstraint( constraintName );
 
         if ( needsRoutePattern )
@@ -93,6 +104,11 @@ internal sealed class EdgeBuilder
         if ( !edges.TryGetValue( key, out var endpoints ) )
         {
             edges.Add( key, endpoints = [] );
+        }
+
+        if ( once && endpoints.Count > 0 )
+        {
+            return;
         }
 
         endpoints.Add( endpoint );
