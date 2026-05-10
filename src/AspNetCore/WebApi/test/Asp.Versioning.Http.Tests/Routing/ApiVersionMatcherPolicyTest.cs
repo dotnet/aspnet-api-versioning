@@ -316,6 +316,62 @@ public class ApiVersionMatcherPolicyTest
     }
 
     [Fact]
+    public async Task jump_table_should_write_requested_url_segment_in_problem_details_for_introduced_endpoint()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new UrlSegmentApiVersionReader(),
+            ReportApiVersions = true,
+        };
+
+        // act
+        var httpContext = await InvokeJumpTableIntroducedEndpoint( options, NewUrlSegmentIntroducedEndpointCandidates() );
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 404, "2.0", "http://tempuri.org/v1/api/values", "1" );
+        httpContext.Response.Headers["api-supported-versions"].Should().Equal( "2.0" );
+    }
+
+    [Fact]
+    public async Task url_segment_introduced_endpoint_should_write_same_problem_details_from_jump_table_and_apply()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new UrlSegmentApiVersionReader(),
+            ReportApiVersions = true,
+        };
+        var endpoints = NewUrlSegmentIntroducedEndpointCandidates();
+
+        // act
+        var fast = await InvokeJumpTableIntroducedEndpoint( options, endpoints );
+        var slow = await InvokeApplyIntroducedEndpoint( options, endpoints );
+
+        // assert
+        ( await ReadResponseBody( fast ) ).Should().Be( await ReadResponseBody( slow ) );
+        fast.Response.Headers["api-supported-versions"].Should().Equal( slow.Response.Headers["api-supported-versions"] );
+    }
+
+    [Fact]
+    public async Task url_segment_introduced_endpoint_should_use_latest_matching_introduced_version()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new UrlSegmentApiVersionReader(),
+            ReportApiVersions = true,
+        };
+        var endpoints = NewUrlSegmentIntroducedEndpointCandidates( latestStatusCode: 410, earlierStatusCode: 404 );
+
+        // act
+        var httpContext = await InvokeJumpTableIntroducedEndpoint( options, endpoints );
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 410, "3.0", "http://tempuri.org/v1/api/values", "1" );
+    }
+
+    [Fact]
     public async Task jump_table_should_not_report_api_versions_for_introduced_endpoint_when_disabled()
     {
         // arrange
@@ -747,12 +803,20 @@ public class ApiVersionMatcherPolicyTest
 
     private static RouteEndpoint NewIntroducedEndpoint( IntroducedInApiVersionMetadata[] introduced, ApiVersion implementedVersion )
     {
+        return NewIntroducedEndpoint( introduced, implementedVersion, "api/values" );
+    }
+
+    private static RouteEndpoint NewIntroducedEndpoint(
+        IntroducedInApiVersionMetadata[] introduced,
+        ApiVersion implementedVersion,
+        string routeTemplate )
+    {
         var v1 = new ApiVersion( 1, 0 );
         var v2 = new ApiVersion( 2, 0 );
         var v3 = new ApiVersion( 3, 0 );
         var apiModel = new ApiVersionModel( [v1, v2, v3], [v1, v2, v3], [], [], [] );
         var endpointModel = new ApiVersionModel( [implementedVersion], [implementedVersion], [], [], [] );
-        var routePattern = RoutePatternFactory.Parse( "api/values" );
+        var routePattern = RoutePatternFactory.Parse( routeTemplate );
         var builder = new RouteEndpointBuilder( Limbo, routePattern, 0 )
         {
             Metadata =
@@ -786,6 +850,28 @@ public class ApiVersionMatcherPolicyTest
             NewIntroducedEndpoint( [new( v2, 400 )], implementedVersion: v2 ),
             NewIntroducedEndpoint( [new( v3, 410 )], implementedVersion: v3 ),
             NewIntroducedEndpoint( [new( v3, 404 )], implementedVersion: v3 ),
+        ];
+    }
+
+    private static RouteEndpoint[] NewUrlSegmentIntroducedEndpointCandidates()
+    {
+        var v2 = new ApiVersion( 2, 0 );
+
+        return
+        [
+            NewIntroducedEndpoint( [new( v2, 404 )], implementedVersion: v2, "v{version:apiVersion}/api/values" ),
+        ];
+    }
+
+    private static RouteEndpoint[] NewUrlSegmentIntroducedEndpointCandidates( int latestStatusCode, int earlierStatusCode )
+    {
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+
+        return
+        [
+            NewIntroducedEndpoint( [new( v2, earlierStatusCode )], implementedVersion: v2, "v{version:apiVersion}/api/values" ),
+            NewIntroducedEndpoint( [new( v3, latestStatusCode )], implementedVersion: v3, "v{version:apiVersion}/api/values" ),
         ];
     }
 
@@ -841,7 +927,9 @@ public class ApiVersionMatcherPolicyTest
         RouteEndpoint[] endpoints )
     {
         var policy = NewApiVersionMatcherPolicy( options );
-        var httpContext = NewHttpContext( "1.0", options );
+        var httpContext = options.ApiVersionReader is UrlSegmentApiVersionReader
+                          ? NewUrlSegmentHttpContext( "1", options )
+                          : NewHttpContext( "1.0", options );
         var edges = policy.GetEdges( endpoints );
         var tableEdges = NewJumpTableEdges( edges );
         var jumpTable = policy.BuildJumpTable( 42, tableEdges );
@@ -864,8 +952,10 @@ public class ApiVersionMatcherPolicyTest
     {
         var feature = new Mock<IApiVersioningFeature>();
 
-        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
-        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        var requestedVersion = options.ApiVersionReader is UrlSegmentApiVersionReader ? "1" : "1.0";
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, requestedVersion );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, [requestedVersion] );
         feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
 
         var policy = NewApiVersionMatcherPolicy( options );
@@ -873,7 +963,9 @@ public class ApiVersionMatcherPolicyTest
             endpoints,
             endpoints.Select( _ => new RouteValueDictionary() ).ToArray(),
             endpoints.Select( _ => 0 ).ToArray() );
-        var httpContext = NewHttpContext( "1.0", options );
+        var httpContext = options.ApiVersionReader is UrlSegmentApiVersionReader
+                          ? NewUrlSegmentHttpContext( requestedVersion, options )
+                          : NewHttpContext( requestedVersion, options );
 
         httpContext.Features.Set( feature.Object );
 
@@ -898,6 +990,21 @@ public class ApiVersionMatcherPolicyTest
 
     private static async Task ResponseShouldHaveIntroducedProblemDetails( DefaultHttpContext context, int statusCode, string introducedIn )
     {
+        await ResponseShouldHaveIntroducedProblemDetails(
+            context,
+            statusCode,
+            introducedIn,
+            "http://tempuri.org/api/values",
+            "1.0" );
+    }
+
+    private static async Task ResponseShouldHaveIntroducedProblemDetails(
+        DefaultHttpContext context,
+        int statusCode,
+        string introducedIn,
+        string requestUri,
+        string requestedVersion )
+    {
         context.Response.ContentType.Should().Be( "application/problem+json" );
         context.Response.StatusCode.Should().Be( statusCode );
 
@@ -909,8 +1016,19 @@ public class ApiVersionMatcherPolicyTest
         root.GetProperty( "title" ).GetString().Should().Be( "API endpoint not yet introduced" );
         root.GetProperty( "status" ).GetInt32().Should().Be( statusCode );
         root.GetProperty( "detail" ).GetString().Should().Be(
-            $"The HTTP resource that matches the request URI 'http://tempuri.org/api/values' was introduced in API version '{introducedIn}' and is not available in the requested version '1.0'." );
+            $"The HTTP resource that matches the request URI '{requestUri}' was introduced in API version '{introducedIn}' and is not available in the requested version '{requestedVersion}'." );
         root.GetProperty( "code" ).GetString().Should().Be( "EndpointNotIntroduced" );
+    }
+
+    private static DefaultHttpContext NewUrlSegmentHttpContext( string apiVersion, ApiVersioningOptions options )
+    {
+        var context = NewHttpContext( apiVersion, options );
+
+        context.Request.Path = $"/v{apiVersion}/api/values";
+        context.ApiVersioningFeature.RawRequestedApiVersion = default;
+        context.ApiVersioningFeature.RawRequestedApiVersions = [];
+
+        return context;
     }
 
     private static HttpContext NewHttpContext(
