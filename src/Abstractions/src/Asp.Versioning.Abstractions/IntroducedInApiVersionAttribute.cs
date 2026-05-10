@@ -18,8 +18,17 @@ using DateOnly = System.DateTime;
 /// <remarks>
 /// The action is mapped to every API version declared by the containing controller that is greater than or equal to
 /// the introduced API version. Requests for a controller-declared API version earlier than the introduced API version
-/// are rejected using <see cref="StatusCode"/>.
+/// are rejected using <see cref="StatusCode"/>. Version-neutral controllers and actions ignore introduced API version
+/// metadata because version-neutral endpoints are not constrained to declared API versions.
 /// </remarks>
+/// <example>
+/// A controller that declares API versions 1.0, 2.0, and 3.0 can mark an action with
+/// <c>[IntroducedInApiVersion( "2.0" )]</c>. The action is mapped to versions 2.0 and 3.0.
+/// A request for version 1.0 is rejected using <see cref="StatusCode"/>. Set
+/// <see cref="StatusCode"/> to <see cref="UseConfiguredStatusCode"/> (<c>0</c>) to use the globally configured
+/// unsupported API version status code instead.
+/// </example>
+/// <seealso cref="MapToApiVersionAttribute"/>
 [AttributeUsage( Method, AllowMultiple = false, Inherited = false )]
 public class IntroducedInApiVersionAttribute : ApiVersionsBaseAttribute, IIntroducedInApiVersionProvider
 {
@@ -29,7 +38,7 @@ public class IntroducedInApiVersionAttribute : ApiVersionsBaseAttribute, IIntrod
     public const int DefaultStatusCode = 404;
 
     /// <summary>
-    /// Indicates that the configured the configured unsupported API version status code should be used.
+    /// Indicates that the configured unsupported API version status code should be used.
     /// </summary>
     public const int UseConfiguredStatusCode = 0;
 
@@ -78,6 +87,10 @@ public class IntroducedInApiVersionAttribute : ApiVersionsBaseAttribute, IIntrod
     /// <value>The HTTP status code. The default value is <c>404</c>.</value>
     /// <remarks>Set the value to <see cref="UseConfiguredStatusCode"/> to use the configured unsupported API version status code.</remarks>
     public int StatusCode { get; set; } = DefaultStatusCode;
+
+    /// <inheritdoc />
+    public override bool Equals( object? obj ) =>
+        obj is IntroducedInApiVersionAttribute other && base.Equals( obj ) && StatusCode == other.StatusCode;
 
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine( base.GetHashCode(), StatusCode );

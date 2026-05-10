@@ -62,4 +62,26 @@ public class IntroducedInApiVersionAttributeTest
         // assert
         statusCode.Should().Be( IntroducedInApiVersionAttribute.UseConfiguredStatusCode );
     }
+
+    [Fact]
+    public void introduced_in_api_version_attribute_should_compare_status_code_for_equality()
+    {
+        // arrange
+        var version = new IntroducedInApiVersionAttribute( "2026-12-01" ) { StatusCode = 404 };
+        var sameVersionAndStatus = new IntroducedInApiVersionAttribute( "2026-12-01" ) { StatusCode = 404 };
+        var sameVersionDifferentStatus = new IntroducedInApiVersionAttribute( "2026-12-01" ) { StatusCode = 410 };
+        var differentVersionSameStatus = new IntroducedInApiVersionAttribute( "2027-06-01" ) { StatusCode = 404 };
+
+        // act
+        var same = version.Equals( sameVersionAndStatus );
+        var differentStatus = version.Equals( sameVersionDifferentStatus );
+        var differentVersion = version.Equals( differentVersionSameStatus );
+
+        // assert
+        same.Should().BeTrue();
+        version.GetHashCode().Should().Be( sameVersionAndStatus.GetHashCode() );
+        differentStatus.Should().BeFalse();
+        version.GetHashCode().Should().NotBe( sameVersionDifferentStatus.GetHashCode() );
+        differentVersion.Should().BeFalse();
+    }
 }
