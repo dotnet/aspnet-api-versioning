@@ -37,6 +37,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             IEnumerable<ApiVersion> emptyVersions;
             var inheritedSupported = apiModel.SupportedApiVersions;
             var inheritedDeprecated = apiModel.DeprecatedApiVersions;
+            var effectiveMapped = ExpandMappedVersions( apiModel.DeclaredApiVersions );
             var noInheritedApiVersions = inheritedSupported.Count == 0 &&
                                          inheritedDeprecated.Count == 0;
 
@@ -57,7 +58,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
                         emptyVersions );
                 }
             }
-            else if ( mapped is null || mapped.Count == 0 )
+            else if ( !HasMappedVersions )
             {
                 endpointModel = new(
                     declaredVersions: SupportedVersions.Union( DeprecatedVersions ),
@@ -70,14 +71,14 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             {
                 emptyVersions = [];
                 endpointModel = new(
-                    declaredVersions: mapped,
+                    declaredVersions: effectiveMapped,
                     supportedVersions: apiModel.SupportedApiVersions,
                     deprecatedVersions: apiModel.DeprecatedApiVersions,
                     advertisedVersions: emptyVersions,
                     deprecatedAdvertisedVersions: emptyVersions );
             }
 
-            metadata = new( apiModel, endpointModel, name );
+            metadata = new( apiModel, endpointModel, name, GetIntroducedApiVersionMetadata() );
         }
 
         item.ApiVersionMetadata = metadata;

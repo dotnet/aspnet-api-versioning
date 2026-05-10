@@ -21,11 +21,17 @@ public class ApiVersionMetadata
     /// <param name="apiModel">The model for an entire API.</param>
     /// <param name="endpointModel">The model defined for a specific API endpoint.</param>
     /// <param name="name">The logical name of the API.</param>
-    public ApiVersionMetadata( ApiVersionModel apiModel, ApiVersionModel endpointModel, string? name = default )
+    /// <param name="introducedInApiVersions">The introduced API version metadata associated with the endpoint.</param>
+    public ApiVersionMetadata(
+        ApiVersionModel apiModel,
+        ApiVersionModel endpointModel,
+        string? name = default,
+        IEnumerable<IntroducedInApiVersionMetadata>? introducedInApiVersions = default )
     {
         this.apiModel = apiModel;
         this.endpointModel = endpointModel;
         Name = name ?? string.Empty;
+        IntroducedInApiVersions = introducedInApiVersions?.ToArray() ?? [];
     }
 
     /// <summary>
@@ -40,6 +46,7 @@ public class ApiVersionMetadata
         endpointModel = other.endpointModel;
         mergedModel = other.mergedModel;
         Name = other.Name;
+        IntroducedInApiVersions = other.IntroducedInApiVersions;
     }
 
     /// <summary>
@@ -59,6 +66,12 @@ public class ApiVersionMetadata
     /// </summary>
     /// <value>The logical name of the API.</value>
     public string Name { get; }
+
+    /// <summary>
+    /// Gets the introduced API version metadata associated with the endpoint.
+    /// </summary>
+    /// <value>A read-only list of introduced API version metadata.</value>
+    public IReadOnlyList<IntroducedInApiVersionMetadata> IntroducedInApiVersions { get; }
 
     /// <summary>
     /// Gets a value indicating whether the API is version-neutral.

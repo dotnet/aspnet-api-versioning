@@ -169,6 +169,16 @@ internal static class EndpointBuilderFinalizer
                 continue;
             }
 
+            if ( item is IIntroducedInApiVersionProvider introduced )
+            {
+                var introducedVersions = introduced.Versions;
+
+                for ( var j = 0; j < introducedVersions.Count; j++ )
+                {
+                    metadata.Add( new IntroducedInApiVersionMetadata( introducedVersions[j], introduced.StatusCode ) );
+                }
+            }
+
             metadata.RemoveAt( i );
 
             var versions = provider.Versions;
@@ -206,6 +216,7 @@ internal static class EndpointBuilderFinalizer
     private static ApiVersionMetadata Build( IList<object> metadata, ApiVersionSet versionSet, ApiVersioningOptions options )
     {
         var name = versionSet.Name;
+        var introducedInApiVersions = metadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
         ApiVersionModel? apiModel;
 
         if ( !TryGetApiVersions( metadata, out var buckets ) ||
@@ -213,10 +224,12 @@ internal static class EndpointBuilderFinalizer
         {
             if ( string.IsNullOrEmpty( name ) )
             {
-                return ApiVersionMetadata.Neutral;
+                return introducedInApiVersions.Length == 0
+                    ? ApiVersionMetadata.Neutral
+                    : new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, introducedInApiVersions: introducedInApiVersions );
             }
 
-            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name );
+            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name, introducedInApiVersions );
         }
 
         ApiVersionModel endpointModel;
@@ -269,7 +282,7 @@ internal static class EndpointBuilderFinalizer
             }
         }
 
-        return new( apiModel, endpointModel, name );
+        return new( apiModel, endpointModel, name, introducedInApiVersions );
     }
 
     private record struct ApiVersionBuckets(

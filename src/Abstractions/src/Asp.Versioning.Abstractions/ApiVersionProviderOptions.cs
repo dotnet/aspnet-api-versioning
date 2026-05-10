@@ -31,4 +31,11 @@ public enum ApiVersionProviderOptions
     /// <remarks>Mapped API versions indicate that the defined API versions are used for only meant
     /// to be used for mapping purposes. This option should not typically be combined with other options.</remarks>
     Mapped = 4,
+
+    /// <summary>
+    /// Indicates the provided API versions describe when an API was introduced.
+    /// </summary>
+    /// <remarks>Introduced API versions are expanded into mapped API versions from the controller-declared
+    /// API version set.</remarks>
+    Introduced = 8,
 }

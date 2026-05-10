@@ -50,7 +50,7 @@ public class ApiVersionCollator : IActionDescriptorProvider
 
                 var (apiModel, endpointModel, name) = metadata;
 
-                metadata = new( apiModel, endpointModel.Aggregate( collatedModel ), name );
+                metadata = new( apiModel, endpointModel.Aggregate( collatedModel ), name, metadata.IntroducedInApiVersions );
                 action.AddOrReplaceApiVersionMetadata( metadata );
             }
         }
