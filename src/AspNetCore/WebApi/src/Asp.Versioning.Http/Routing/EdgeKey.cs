@@ -62,7 +62,20 @@ internal readonly struct EdgeKey : IEquatable<EdgeKey>
 
     internal static EdgeKey AssumeDefault => new( EndpointType.AssumeDefault, new( new RoutePatternComparer() ) );
 
-    public bool Equals( [AllowNull] EdgeKey other ) => GetHashCode() == other.GetHashCode();
+    public bool Equals( [AllowNull] EdgeKey other )
+    {
+        if ( EndpointType != other.EndpointType )
+        {
+            return false;
+        }
+
+        if ( EndpointType is UserDefined or IntroducedLater && ApiVersion != other.ApiVersion )
+        {
+            return false;
+        }
+
+        return EndpointType != IntroducedLater || StatusCode == other.StatusCode;
+    }
 
     public override bool Equals( object? obj ) => obj is EdgeKey other && Equals( other );
 

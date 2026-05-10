@@ -315,6 +315,32 @@ public class ApiVersionMatcherPolicyTest
     }
 
     [Fact]
+    public void edge_key_equals_should_compare_introduced_later_status_code()
+    {
+        // arrange
+        var keyType = typeof( ApiVersionMatcherPolicy ).Assembly.GetType( "Asp.Versioning.Routing.EdgeKey" );
+        var ctor = keyType!.GetConstructor(
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+            binder: null,
+            [typeof( ApiVersion ), typeof( int ), typeof( ApiVersionMetadata ), typeof( HashSet<RoutePattern> )],
+            modifiers: null );
+        var apiVersion = new ApiVersion( 2.0 );
+        var metadata = ApiVersionMetadata.Empty;
+        var routePatterns = new HashSet<RoutePattern>();
+        var left = ctor!.Invoke( [apiVersion, 404, metadata, routePatterns] );
+        var same = ctor.Invoke( [apiVersion, 404, metadata, routePatterns] );
+        var differentStatusCode = ctor.Invoke( [apiVersion, 410, metadata, routePatterns] );
+
+        // act
+        var sameResult = left.Equals( same );
+        var differentResult = left.Equals( differentStatusCode );
+
+        // assert
+        sameResult.Should().BeTrue();
+        differentResult.Should().BeFalse();
+    }
+
+    [Fact]
     public async Task apply_should_have_candidate_for_matched_api_version()
     {
         // arrange
