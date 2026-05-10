@@ -30,8 +30,38 @@ public partial class ActionApiVersionConventionBuilderTTest
         controllerBuilder.Verify( cb => cb.Action( method ), Once() );
     }
 
+    [Fact]
+    public void custom_action_convention_builder_should_not_implement_introduced_contract()
+    {
+        // arrange
+        var builder = new CustomActionConventionBuilder();
+
+        // act
+        var actionBuilder = (IActionConventionBuilder<UndecoratedController>) builder;
+
+        // assert
+        actionBuilder.Should().NotBeAssignableTo<IIntroducedInApiVersionConventionBuilder>();
+    }
+
 #pragma warning disable IDE0079
 #pragma warning disable CA1034 // Nested types should not be visible
+
+    public sealed class CustomActionConventionBuilder : IActionConventionBuilder<UndecoratedController>
+    {
+        public IActionConventionBuilder<UndecoratedController> Action( MethodInfo actionMethod ) => this;
+
+        public void MapToApiVersion( ApiVersion apiVersion ) { }
+
+        public void IsApiVersionNeutral() { }
+
+        public void HasApiVersion( ApiVersion apiVersion ) { }
+
+        public void HasDeprecatedApiVersion( ApiVersion apiVersion ) { }
+
+        public void AdvertisesApiVersion( ApiVersion apiVersion ) { }
+
+        public void AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) { }
+    }
 
 #if !NETFRAMEWORK
     [ApiController]

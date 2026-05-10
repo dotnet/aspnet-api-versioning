@@ -16,7 +16,7 @@ using ActionModel = System.Web.Http.Controllers.HttpActionDescriptor;
 #if !NETFRAMEWORK
 [CLSCompliant( false )]
 #endif
-public interface IActionConventionBuilder : IIntroducedInApiVersionConventionBuilder, IApiVersionConvention<ActionModel>
+public interface IActionConventionBuilder : IMapToApiVersionConventionBuilder, IApiVersionConvention<ActionModel>
 {
     /// <summary>
     /// Gets the type of controller the convention builder is for.

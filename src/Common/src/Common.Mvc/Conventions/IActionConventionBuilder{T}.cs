@@ -14,7 +14,7 @@ using System.Web.Http.Controllers;
 #if !NETFRAMEWORK
 [CLSCompliant( false )]
 #endif
-public interface IActionConventionBuilder<out T> : IIntroducedInApiVersionConventionBuilder
+public interface IActionConventionBuilder<out T> : IMapToApiVersionConventionBuilder
 #if NETFRAMEWORK
     where T : notnull, IHttpController
 #else

@@ -10,7 +10,10 @@ using System.Reflection;
 #if !NETFRAMEWORK
 [CLSCompliant( false )]
 #endif
-public class ActionApiVersionConventionBuilder : ActionApiVersionConventionBuilderBase, IActionConventionBuilder
+public class ActionApiVersionConventionBuilder :
+    ActionApiVersionConventionBuilderBase,
+    IActionConventionBuilder,
+    IIntroducedInApiVersionConventionBuilder
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ActionApiVersionConventionBuilder"/> class.

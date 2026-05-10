@@ -18,7 +18,8 @@ using System.Web.Http.Controllers;
 public class ActionApiVersionConventionBuilder<T> :
     ActionApiVersionConventionBuilderBase,
     IActionConventionBuilder,
-    IActionConventionBuilder<T>
+    IActionConventionBuilder<T>,
+    IIntroducedInApiVersionConventionBuilder
 #if NETFRAMEWORK
     where T : notnull, IHttpController
 #else
