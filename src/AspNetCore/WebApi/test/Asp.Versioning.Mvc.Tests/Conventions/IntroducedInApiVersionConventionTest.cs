@@ -140,6 +140,34 @@ public class IntroducedInApiVersionConventionTest
         introduced.Should().BeEmpty();
     }
 
+    [Fact]
+    public void apply_to_should_share_introduced_metadata_instances_across_endpoint_and_api_version_metadata()
+    {
+        // arrange
+        var action = ApplyConventions( typeof( IntroducedController ), nameof( IntroducedController.GetIntroduced ) );
+        var metadata = GetApiVersionMetadata( action );
+
+        // act
+        var consolidated = metadata.IntroducedInApiVersions;
+        var standalone = action.Selectors.Single()
+            .EndpointMetadata
+            .OfType<IntroducedInApiVersionMetadata>()
+            .ToArray();
+
+        // assert
+        // The same IntroducedInApiVersionMetadata instances must back both
+        // the consolidated ApiVersionMetadata.IntroducedInApiVersions list
+        // and the standalone EndpointMetadata items. Two distinct sets would
+        // mean ApplyTo allocated and sorted twice for the same data.
+        consolidated.Should().HaveCount( standalone.Length );
+        for ( var i = 0; i < consolidated.Count; i++ )
+        {
+            ReferenceEquals( consolidated[i], standalone[i] ).Should().BeTrue(
+                "consolidated[{0}] and standalone[{0}] should be the same instance",
+                i );
+        }
+    }
+
     private static ActionModel ApplyConventions( Type controllerType, string actionName )
     {
         var controllerAttributes = controllerType.GetTypeInfo().GetCustomAttributes().Cast<object>().ToArray();
