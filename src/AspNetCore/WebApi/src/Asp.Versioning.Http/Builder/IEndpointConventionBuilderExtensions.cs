@@ -81,6 +81,73 @@ public static class IEndpointConventionBuilderExtensions
         }
 
         /// <summary>
+        /// Indicates that the configured endpoint was introduced in the specified API version.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public TBuilder IntroducedInApiVersion(
+            int majorVersion,
+            int? minorVersion = default,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode ) =>
+            builder.IntroducedInApiVersion( new ApiVersion( majorVersion, minorVersion, status ), statusCode );
+
+        /// <summary>
+        /// Indicates that the configured endpoint was introduced in the specified API version.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public TBuilder IntroducedInApiVersion(
+            double version,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode ) =>
+            builder.IntroducedInApiVersion( new ApiVersion( version, status ), statusCode );
+
+        /// <summary>
+        /// Indicates that the configured endpoint was introduced in the specified API version.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public TBuilder IntroducedInApiVersion(
+            int year,
+            int month,
+            int day,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode ) =>
+            builder.IntroducedInApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ), statusCode );
+
+        /// <summary>
+        /// Indicates that the configured endpoint was introduced in the specified API version.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public TBuilder IntroducedInApiVersion(
+            DateOnly groupVersion,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode ) =>
+            builder.IntroducedInApiVersion( new ApiVersion( groupVersion, status ), statusCode );
+
+        /// <summary>
+        /// Indicates that the configured endpoint was introduced in the specified API version.
+        /// </summary>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the endpoint was introduced in.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public TBuilder IntroducedInApiVersion(
+            ApiVersion apiVersion,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+        {
+            builder.Add( endpoint => AddMetadata( endpoint, new IntroducedInApiVersionConvention( apiVersion, statusCode ) ) );
+            return builder;
+        }
+
+        /// <summary>
         /// Indicates that the endpoint is API version-neutral.
         /// </summary>
         public TBuilder IsApiVersionNeutral()
@@ -410,6 +477,21 @@ public static class IEndpointConventionBuilderExtensions
         public ApiVersionMapping Mapping => ApiVersionMapping.None;
 
         public void Report( HttpResponse response, ApiVersionModel apiVersionModel ) { }
+    }
+
+    private sealed class IntroducedInApiVersionConvention : IIntroducedInApiVersionProvider
+    {
+        public IntroducedInApiVersionConvention( ApiVersion version, int statusCode )
+        {
+            Versions = new SingleItemReadOnlyList( version );
+            StatusCode = statusCode;
+        }
+
+        public ApiVersionProviderOptions Options => Introduced;
+
+        public IReadOnlyList<ApiVersion> Versions { get; }
+
+        public int StatusCode { get; }
     }
 
     private sealed class Convention : IApiVersionProvider

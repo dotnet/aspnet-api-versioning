@@ -216,26 +216,28 @@ internal static class EndpointBuilderFinalizer
     private static ApiVersionMetadata Build( IList<object> metadata, ApiVersionSet versionSet, ApiVersioningOptions options )
     {
         var name = versionSet.Name;
-        var introducedInApiVersions = metadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
         ApiVersionModel? apiModel;
 
         if ( !TryGetApiVersions( metadata, out var buckets ) ||
             ( apiModel = versionSet.Build( options ) ).IsApiVersionNeutral )
         {
+            var neutralIntroducedInApiVersions = metadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
+
             if ( string.IsNullOrEmpty( name ) )
             {
-                return introducedInApiVersions.Length == 0
+                return neutralIntroducedInApiVersions.Length == 0
                     ? ApiVersionMetadata.Neutral
-                    : new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, introducedInApiVersions: introducedInApiVersions );
+                    : new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, introducedInApiVersions: neutralIntroducedInApiVersions );
             }
 
-            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name, introducedInApiVersions );
+            return new( ApiVersionModel.Neutral, ApiVersionModel.Neutral, name, neutralIntroducedInApiVersions );
         }
 
         ApiVersionModel endpointModel;
         ApiVersion[] emptyVersions;
         var inheritedSupported = apiModel.SupportedApiVersions;
         var inheritedDeprecated = apiModel.DeprecatedApiVersions;
+        var introducedInApiVersions = metadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
 
         if ( buckets.AreEmpty )
         {
@@ -249,10 +251,12 @@ internal static class EndpointBuilderFinalizer
             else
             {
                 emptyVersions = [];
+                var introducedVersions = ExpandIntroducedVersions( apiModel.DeclaredApiVersions, introducedInApiVersions );
+
                 endpointModel = new(
-                    declaredVersions: emptyVersions,
-                    inheritedSupported,
-                    inheritedDeprecated,
+                    declaredVersions: introducedVersions ?? emptyVersions,
+                    introducedVersions is null ? inheritedSupported : introducedVersions.Intersect( inheritedSupported ),
+                    introducedVersions is null ? inheritedDeprecated : introducedVersions.Intersect( inheritedDeprecated ),
                     emptyVersions,
                     emptyVersions );
             }
@@ -283,6 +287,40 @@ internal static class EndpointBuilderFinalizer
         }
 
         return new( apiModel, endpointModel, name, introducedInApiVersions );
+    }
+
+    private static ApiVersion[]? ExpandIntroducedVersions(
+        IReadOnlyList<ApiVersion> declaredVersions,
+        IntroducedInApiVersionMetadata[] introducedInApiVersions )
+    {
+        if ( introducedInApiVersions.Length == 0 )
+        {
+            return default;
+        }
+
+        var effectiveIntroduced = introducedInApiVersions[0].IntroducedIn;
+
+        for ( var i = 1; i < introducedInApiVersions.Length; i++ )
+        {
+            if ( introducedInApiVersions[i].IntroducedIn > effectiveIntroduced )
+            {
+                effectiveIntroduced = introducedInApiVersions[i].IntroducedIn;
+            }
+        }
+
+        var versions = new List<ApiVersion>();
+
+        for ( var i = 0; i < declaredVersions.Count; i++ )
+        {
+            var declaredVersion = declaredVersions[i];
+
+            if ( declaredVersion >= effectiveIntroduced )
+            {
+                versions.Add( declaredVersion );
+            }
+        }
+
+        return [.. versions];
     }
 
     private record struct ApiVersionBuckets(
