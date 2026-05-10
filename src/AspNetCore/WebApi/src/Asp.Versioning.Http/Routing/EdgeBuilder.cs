@@ -15,6 +15,7 @@ internal sealed class EdgeBuilder
     private readonly bool versionsByUrl;
     private readonly bool unspecifiedAllowed;
     private readonly string constraintName;
+    private readonly int unsupportedApiVersionStatusCode;
     private readonly HashSet<EdgeKey> keys;
     private readonly Dictionary<EdgeKey, List<Endpoint>> edges;
     private readonly HashSet<RoutePattern> routePatterns = new( new RoutePatternComparer() );
@@ -29,6 +30,7 @@ internal sealed class EdgeBuilder
         versionsByUrl = source.VersionsByUrl();
         unspecifiedAllowed = options.AssumeDefaultVersionWhenUnspecified;
         constraintName = options.RouteConstraintName;
+        unsupportedApiVersionStatusCode = options.UnsupportedApiVersionStatusCode;
         keys = new( capacity + 1 );
         edges = new( capacity + RejectionEndpointCapacity )
         {
@@ -73,6 +75,11 @@ internal sealed class EdgeBuilder
 
     public void AddIntroducedLater( RouteEndpoint endpoint, ApiVersion apiVersion, int statusCode, ApiVersionMetadata metadata )
     {
+        if ( statusCode == IntroducedInApiVersionAttribute.UseConfiguredStatusCode )
+        {
+            statusCode = unsupportedApiVersionStatusCode;
+        }
+
         var key = new EdgeKey( apiVersion, statusCode, metadata, routePatterns );
 
         Add( ref key, new IntroducedInApiVersionEndpoint( statusCode ), endpoint.RoutePattern, once: true );

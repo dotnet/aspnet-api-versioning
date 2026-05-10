@@ -50,13 +50,22 @@ internal static class IntroducedInApiVersionStatusCode
         ApiVersion apiVersion,
         out int statusCode )
     {
+        var matched = default( IntroducedInApiVersionMetadata );
+
         for ( var i = 0; i < introduced.Count; i++ )
         {
-            if ( apiVersion < introduced[i].IntroducedIn )
+            var current = introduced[i];
+
+            if ( apiVersion < current.IntroducedIn && ( matched is null || current.IntroducedIn > matched.IntroducedIn ) )
             {
-                statusCode = introduced[i].StatusCode;
-                return true;
+                matched = current;
             }
+        }
+
+        if ( matched is not null )
+        {
+            statusCode = matched.StatusCode;
+            return true;
         }
 
         statusCode = 0;

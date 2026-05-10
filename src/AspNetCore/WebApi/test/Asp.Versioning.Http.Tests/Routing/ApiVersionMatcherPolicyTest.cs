@@ -148,6 +148,106 @@ public class ApiVersionMatcherPolicyTest
     }
 
     [Fact]
+    public async Task jump_table_should_use_configured_status_code_for_introduced_status_code_zero()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            UnsupportedApiVersionStatusCode = 410,
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( "1.0" ) } );
+        var endpoint = NewIntroducedEndpoint( IntroducedInApiVersionAttribute.UseConfiguredStatusCode );
+        var edges = policy.GetEdges( [endpoint] );
+        var tableEdges = new List<PolicyJumpTableEdge>();
+
+        for ( var i = 0; i < edges.Count; i++ )
+        {
+            tableEdges.Add( new( edges[i].State, i ) );
+        }
+
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await selected.RequestDelegate!( responseContext );
+
+        // assert
+        selected.DisplayName.Should().Be( "410 Introduced API Version" );
+        responseContext.Response.StatusCode.Should().Be( 410 );
+    }
+
+    [Fact]
+    public async Task apply_should_use_introduced_endpoint_for_controller_declared_version_before_action()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
+
+        var policy = NewApiVersionMatcherPolicy();
+        var endpoint = NewIntroducedEndpoint( 404 );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
+        var httpContext = NewHttpContext( feature );
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await policy.ApplyAsync( httpContext, candidates );
+        await httpContext.GetEndpoint().RequestDelegate!( responseContext );
+
+        // assert
+        httpContext.GetEndpoint().DisplayName.Should().Be( "404 Introduced API Version" );
+        responseContext.Response.StatusCode.Should().Be( 404 );
+    }
+
+    [Theory]
+    [InlineData( "1.0" )]
+    [InlineData( "2.0" )]
+    public async Task jump_table_should_use_latest_matching_introduced_version( string requestedVersion )
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, requestedVersion );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, [requestedVersion] );
+
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( requestedVersion ) } );
+        var endpoint = NewIntroducedEndpoint( [new( new ApiVersion( 2, 0 ), 409 ), new( new ApiVersion( 3, 0 ), 410 )], implementedVersion: new( 3, 0 ) );
+        var edges = policy.GetEdges( [endpoint] );
+        var tableEdges = new List<PolicyJumpTableEdge>();
+
+        for ( var i = 0; i < edges.Count; i++ )
+        {
+            tableEdges.Add( new( edges[i].State, i ) );
+        }
+
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await selected.RequestDelegate!( responseContext );
+
+        // assert
+        selected.DisplayName.Should().Be( "410 Introduced API Version" );
+        responseContext.Response.StatusCode.Should().Be( 410 );
+    }
+
+    [Fact]
     public async Task apply_should_have_candidate_for_matched_api_version()
     {
         // arrange
@@ -286,6 +386,44 @@ public class ApiVersionMatcherPolicyTest
     }
 
     private static Task Limbo( HttpContext context ) => Task.CompletedTask;
+
+    private static RouteEndpoint NewIntroducedEndpoint( int statusCode )
+    {
+        var v1 = new ApiVersion( 1, 0 );
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+        var apiModel = new ApiVersionModel( [v1, v2, v3], [v1, v2, v3], [], [], [] );
+        var endpointModel = new ApiVersionModel( [v2, v3], [v2, v3], [], [], [] );
+        var routePattern = RoutePatternFactory.Parse( "api/values" );
+        var builder = new RouteEndpointBuilder( Limbo, routePattern, 0 )
+        {
+            Metadata =
+            {
+                new ApiVersionMetadata( apiModel, endpointModel, introducedInApiVersions: [new( v2, statusCode )] ),
+            },
+        };
+
+        return (RouteEndpoint) builder.Build();
+    }
+
+    private static RouteEndpoint NewIntroducedEndpoint( IntroducedInApiVersionMetadata[] introduced, ApiVersion implementedVersion )
+    {
+        var v1 = new ApiVersion( 1, 0 );
+        var v2 = new ApiVersion( 2, 0 );
+        var v3 = new ApiVersion( 3, 0 );
+        var apiModel = new ApiVersionModel( [v1, v2, v3], [v1, v2, v3], [], [], [] );
+        var endpointModel = new ApiVersionModel( [implementedVersion], [implementedVersion], [], [], [] );
+        var routePattern = RoutePatternFactory.Parse( "api/values" );
+        var builder = new RouteEndpointBuilder( Limbo, routePattern, 0 )
+        {
+            Metadata =
+            {
+                new ApiVersionMetadata( apiModel, endpointModel, introducedInApiVersions: introduced ),
+            },
+        };
+
+        return (RouteEndpoint) builder.Build();
+    }
 
     private static ApiVersionMatcherPolicy NewApiVersionMatcherPolicy( ApiVersioningOptions options = default ) =>
         new(
