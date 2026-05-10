@@ -90,12 +90,9 @@ internal static class IntroducedInApiVersionStatusCode
                 continue;
             }
 
-            foreach ( var attribute in method.GetCustomAttributes( inherit: false ) )
+            foreach ( var introducedProvider in method.GetCustomAttributes( inherit: false ).OfType<IIntroducedInApiVersionProvider>() )
             {
-                if ( attribute is IIntroducedInApiVersionProvider introducedProvider )
-                {
-                    Add( introducedProvider, ref introduced );
-                }
+                Add( introducedProvider, ref introduced );
             }
         }
 

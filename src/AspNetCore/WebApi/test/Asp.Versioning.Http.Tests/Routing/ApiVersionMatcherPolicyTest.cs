@@ -185,6 +185,35 @@ public class ApiVersionMatcherPolicyTest
     }
 
     [Fact]
+    public async Task apply_should_use_configured_status_code_for_introduced_status_code_zero()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
+
+        var options = new ApiVersioningOptions()
+        {
+            UnsupportedApiVersionStatusCode = 410,
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var endpoint = NewIntroducedEndpoint( IntroducedInApiVersionAttribute.UseConfiguredStatusCode );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
+        var httpContext = NewHttpContext( feature );
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await policy.ApplyAsync( httpContext, candidates );
+        await httpContext.GetEndpoint().RequestDelegate!( responseContext );
+
+        // assert
+        httpContext.GetEndpoint().DisplayName.Should().Be( "410 Introduced API Version" );
+        responseContext.Response.StatusCode.Should().Be( 410 );
+    }
+
+    [Fact]
     public async Task apply_should_use_introduced_endpoint_for_controller_declared_version_before_action()
     {
         // arrange
@@ -245,6 +274,44 @@ public class ApiVersionMatcherPolicyTest
         // assert
         selected.DisplayName.Should().Be( "410 Introduced API Version" );
         responseContext.Response.StatusCode.Should().Be( 410 );
+    }
+
+    [Fact]
+    public async Task jump_table_should_use_smallest_status_code_for_same_introduced_version()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( feature, queryParameters: new() { ["api-version"] = new( "1.0" ) } );
+        var v2 = new ApiVersion( 2, 0 );
+        var first = NewIntroducedEndpoint( [new( v2, 410 )], implementedVersion: v2 );
+        var second = NewIntroducedEndpoint( [new( v2, 404 )], implementedVersion: v2 );
+        var edges = policy.GetEdges( [first, second] );
+        var tableEdges = new List<PolicyJumpTableEdge>();
+
+        for ( var i = 0; i < edges.Count; i++ )
+        {
+            tableEdges.Add( new( edges[i].State, i ) );
+        }
+
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await selected.RequestDelegate!( responseContext );
+
+        // assert
+        selected.DisplayName.Should().Be( "404 Introduced API Version" );
+        responseContext.Response.StatusCode.Should().Be( 404 );
     }
 
     [Fact]

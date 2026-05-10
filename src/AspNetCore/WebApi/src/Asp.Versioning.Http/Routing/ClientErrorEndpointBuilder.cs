@@ -71,6 +71,11 @@ internal sealed class ClientErrorEndpointBuilder
 
             if ( IntroducedInApiVersionStatusCode.TryGet( candidate.Endpoint, metadata, apiVersion, out var statusCode ) )
             {
+                if ( statusCode == IntroducedInApiVersionAttribute.UseConfiguredStatusCode )
+                {
+                    statusCode = options.UnsupportedApiVersionStatusCode;
+                }
+
                 return statusCode;
             }
         }
