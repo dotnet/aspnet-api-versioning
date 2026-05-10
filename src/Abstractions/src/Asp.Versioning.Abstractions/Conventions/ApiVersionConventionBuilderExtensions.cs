@@ -339,6 +339,9 @@ public static class ApiVersionConventionBuilderExtensions
         }
     }
 
+    /// <summary>
+    /// Provides extensions for builders that support the introduced-in API version convention.
+    /// </summary>
     /// <typeparam name="T">The type of <see cref="IIntroducedInApiVersionConventionBuilder"/>.</typeparam>
     /// <param name="builder">The extended <see cref="IIntroducedInApiVersionConventionBuilder"/>.</param>
     /// <returns>The original <paramref name="builder"/>.</returns>
