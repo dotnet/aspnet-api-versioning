@@ -2,8 +2,13 @@
 
 namespace Asp.Versioning.Conventions;
 
+using Asp.Versioning.Builder;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 using static Asp.Versioning.ApiVersionMapping;
 
@@ -251,6 +256,60 @@ public partial class ActionApiVersionConventionBuilderTest
             GetApiVersionMetadata( attributeAction ).Map( Explicit ).DeclaredApiVersions );
     }
 
+    [Fact]
+    public void introduced_convention_should_match_minimal_api_mapped_versions()
+    {
+        // arrange
+        var action = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+
+        action.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel(
+            new ApiVersion( 1, 0 ),
+            new ApiVersion( 2, 0 ),
+            new ApiVersion( 3, 0 ),
+            new ApiVersion( 4, 0 ) );
+        actionBuilder.MapToApiVersion( new ApiVersion( 2, 0 ) )
+                     .IntroducedInApiVersion( new ApiVersion( 3, 0 ) );
+
+        // act
+        actionBuilder.ApplyTo( action );
+        var mvcModel = GetApiVersionMetadata( action ).Map( Explicit );
+        var minimalModel = NewMinimalApiVersionMetadata(
+            route => route.MapToApiVersion( 2.0 ).IntroducedInApiVersion( 3.0 ) ).Map( Explicit );
+
+        // assert
+        minimalModel.DeclaredApiVersions.Should().Equal( mvcModel.DeclaredApiVersions );
+        minimalModel.ImplementedApiVersions.Should().Equal( mvcModel.ImplementedApiVersions );
+    }
+
+    [Fact]
+    public void introduced_convention_should_match_minimal_api_supported_versions()
+    {
+        // arrange
+        var action = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+
+        action.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel(
+            new ApiVersion( 1, 0 ),
+            new ApiVersion( 2, 0 ),
+            new ApiVersion( 3, 0 ),
+            new ApiVersion( 4, 0 ) );
+        actionBuilder.HasApiVersion( new ApiVersion( 1, 0 ) )
+                     .IntroducedInApiVersion( new ApiVersion( 3, 0 ) );
+
+        // act
+        actionBuilder.ApplyTo( action );
+        var mvcModel = GetApiVersionMetadata( action ).Map( Explicit );
+        var minimalModel = NewMinimalApiVersionMetadata(
+            route => route.HasApiVersion( 1.0 ).IntroducedInApiVersion( 3.0 ) ).Map( Explicit );
+
+        // assert
+        minimalModel.DeclaredApiVersions.Should().Equal( mvcModel.DeclaredApiVersions );
+        minimalModel.ImplementedApiVersions.Should().Equal( mvcModel.ImplementedApiVersions );
+    }
+
     private static ActionModel NewActionModel( Type controllerType, string actionName )
     {
         var controller = new ControllerModel( controllerType.GetTypeInfo(), [] )
@@ -273,6 +332,55 @@ public partial class ActionApiVersionConventionBuilderTest
     {
         var versions = new ApiVersion[] { new( 1, 0 ), new( 2, 0 ), new( 3, 0 ) };
 
-        return new( versions, versions, [], [], [] );
+        return NewControllerModel( versions );
+    }
+
+    private static ApiVersionModel NewControllerModel( params ApiVersion[] versions ) => new( versions, versions, [], [], [] );
+
+    private static ApiVersionMetadata NewMinimalApiVersionMetadata( Action<RouteHandlerBuilder> configure )
+    {
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasApiVersion( 3.0 )
+                                   .HasApiVersion( 4.0 )
+                                   .Build();
+        var route = app.Object.MapGet( "/test", () => Results.Ok() )
+                              .WithApiVersionSet( versionSet );
+
+        configure( route );
+
+        return dataSources.Single()
+                          .Endpoints
+                          .Single()
+                          .Metadata
+                          .OfType<ApiVersionMetadata>()
+                          .Single();
+    }
+
+    private sealed class MockServiceProvider : IServiceProvider
+    {
+        private readonly IOptions<ApiVersioningOptions> options = Options.Create( new ApiVersioningOptions() );
+
+        public object GetService( Type serviceType )
+        {
+            if ( typeof( IOptions<ApiVersioningOptions> ) == serviceType )
+            {
+                return options;
+            }
+
+            if ( typeof( IApiVersionParameterSource ) == serviceType )
+            {
+                return options.Value.ApiVersionReader;
+            }
+
+            return null;
+        }
     }
 }

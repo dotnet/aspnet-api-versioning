@@ -261,7 +261,9 @@ internal static class EndpointBuilderFinalizer
         {
             var (mapped, supported, deprecated, advertised, advertisedDeprecated) = buckets;
 
-            if ( mapped.Count == 0 )
+            var hasIntroducedVersions = introducedInApiVersions.Length > 0;
+
+            if ( mapped.Count == 0 && !hasIntroducedVersions )
             {
                 endpointModel = new(
                     declaredVersions: supported.Union( deprecated ),
@@ -273,10 +275,23 @@ internal static class EndpointBuilderFinalizer
             else
             {
                 emptyVersions = [];
+                var effectiveMapped = mapped;
+                var effectiveSupported = inheritedSupported.AsEnumerable();
+                var effectiveDeprecated = inheritedDeprecated.AsEnumerable();
+
+                if ( hasIntroducedVersions )
+                {
+                    effectiveMapped = ExpandIntroducedVersions( apiModel.DeclaredApiVersions, introducedInApiVersions, mapped ) ?? [];
+                    effectiveSupported = inheritedSupported.Intersect( effectiveMapped );
+                    effectiveDeprecated = inheritedDeprecated.Intersect( effectiveMapped );
+                }
+
+                // MVC treats IntroducedInApiVersion as an action-level mapping constraint: explicit
+                // supported/deprecated versions do not narrow the introduced-and-later expansion.
                 endpointModel = new(
-                    declaredVersions: mapped,
-                    supportedVersions: inheritedSupported,
-                    deprecatedVersions: inheritedDeprecated,
+                    declaredVersions: effectiveMapped,
+                    supportedVersions: effectiveSupported,
+                    deprecatedVersions: effectiveDeprecated,
                     advertisedVersions: emptyVersions,
                     deprecatedAdvertisedVersions: emptyVersions );
             }
@@ -287,7 +302,8 @@ internal static class EndpointBuilderFinalizer
 
     private static ApiVersion[]? ExpandIntroducedVersions(
         IReadOnlyList<ApiVersion> declaredVersions,
-        IntroducedInApiVersionMetadata[] introducedInApiVersions )
+        IntroducedInApiVersionMetadata[] introducedInApiVersions,
+        IEnumerable<ApiVersion>? mappedVersions = default )
     {
         if ( introducedInApiVersions.Length == 0 )
         {
@@ -304,7 +320,7 @@ internal static class EndpointBuilderFinalizer
             }
         }
 
-        var versions = new List<ApiVersion>();
+        var versions = mappedVersions is null ? new HashSet<ApiVersion>() : new HashSet<ApiVersion>( mappedVersions );
 
         for ( var i = 0; i < declaredVersions.Count; i++ )
         {
@@ -316,7 +332,7 @@ internal static class EndpointBuilderFinalizer
             }
         }
 
-        return [.. versions];
+        return [.. versions.OrderBy( v => v )];
     }
 
     private record struct ApiVersionBuckets(
