@@ -95,6 +95,11 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
 
         if ( !matched && hasCandidates && !DifferByRouteConstraintsOnly( candidates ) )
         {
+            if ( Options.ReportApiVersions )
+            {
+                httpContext.Features.Set( NewPolicyFeature( candidates ) );
+            }
+
             var builder = new ClientErrorEndpointBuilder( feature, candidates, Options, logger );
             httpContext.SetEndpoint( builder.Build() );
         }
@@ -243,9 +248,10 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                     metadata,
                     version,
                     Options.UnsupportedApiVersionStatusCode,
-                    out var statusCode ) )
+                    out var statusCode,
+                    out var introducedIn ) )
                 {
-                    builder.AddIntroducedLater( endpoint, version, statusCode, metadata );
+                    builder.AddIntroducedLater( endpoint, version, statusCode, introducedIn, metadata );
                 }
             }
         }
@@ -401,6 +407,24 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         }
 
         return new( new( model, model ) );
+    }
+
+    private static ApiVersionPolicyFeature? NewPolicyFeature( CandidateSet candidates )
+    {
+        var supported = default( SortedSet<ApiVersion> );
+        var deprecated = default( SortedSet<ApiVersion> );
+
+        for ( var i = 0; i < candidates.Count; i++ )
+        {
+            var metadata = candidates[i].Endpoint.Metadata.GetMetadata<ApiVersionMetadata>();
+
+            if ( metadata is not null )
+            {
+                Collate( metadata, ref supported, ref deprecated );
+            }
+        }
+
+        return NewPolicyFeature( supported, deprecated );
     }
 
     private static (bool Matched, bool HasCandidates) MatchApiVersion( CandidateSet candidates, ApiVersion? apiVersion )

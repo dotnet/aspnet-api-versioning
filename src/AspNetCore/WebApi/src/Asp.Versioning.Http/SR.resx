@@ -152,4 +152,7 @@
   <data name="VersionedResourceNotSupported" xml:space="preserve">
     <value>The HTTP resource that matches the request URI '{0}' does not support the API version '{1}'.</value>
   </data>
+  <data name="VersionedResourceNotIntroduced" xml:space="preserve">
+    <value>The HTTP resource that matches the request URI '{0}' was introduced in API version '{1}' and is not available in the requested version '{2}'.</value>
+  </data>
 </root>

@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using System.Text.Json;
 
 public class ApiVersionMatcherPolicyTest
 {
@@ -148,6 +150,32 @@ public class ApiVersionMatcherPolicyTest
     }
 
     [Fact]
+    public async Task jump_table_should_write_problem_details_for_introduced_endpoint()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            ReportApiVersions = true,
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( "1.0", options );
+        var endpoint = NewIntroducedEndpoint( 404 );
+        var edges = policy.GetEdges( [endpoint] );
+        var tableEdges = NewJumpTableEdges( edges );
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+
+        // act
+        await selected.RequestDelegate!( httpContext );
+        await httpContext.Response.CompleteAsync();
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 404 );
+        httpContext.Response.Headers["api-supported-versions"].Should().Equal( "2.0, 3.0" );
+    }
+
+    [Fact]
     public async Task jump_table_should_use_configured_status_code_for_introduced_status_code_zero()
     {
         // arrange
@@ -236,6 +264,92 @@ public class ApiVersionMatcherPolicyTest
         // assert
         httpContext.GetEndpoint().DisplayName.Should().Be( "404 Introduced API Version" );
         responseContext.Response.StatusCode.Should().Be( 404 );
+    }
+
+    [Fact]
+    public async Task apply_should_write_problem_details_for_introduced_endpoint()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
+
+        var options = new ApiVersioningOptions()
+        {
+            ReportApiVersions = true,
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var endpoint = NewIntroducedEndpoint( 404 );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
+        var httpContext = NewHttpContext( "1.0", options );
+
+        httpContext.Features.Set( feature.Object );
+
+        // act
+        await policy.ApplyAsync( httpContext, candidates );
+        await httpContext.GetEndpoint().RequestDelegate!( httpContext );
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 404 );
+        httpContext.Response.Headers["api-supported-versions"].Should().Equal( "2.0, 3.0" );
+    }
+
+    [Fact]
+    public async Task introduced_endpoint_should_write_same_problem_details_from_jump_table_and_apply()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            ReportApiVersions = true,
+        };
+
+        // act
+        var fast = await InvokeJumpTableIntroducedEndpoint( options );
+        var slow = await InvokeApplyIntroducedEndpoint( options );
+
+        // assert
+        ( await ReadResponseBody( fast ) ).Should().Be( await ReadResponseBody( slow ) );
+        fast.Response.Headers["api-supported-versions"].Should().Equal( slow.Response.Headers["api-supported-versions"] );
+    }
+
+    [Fact]
+    public async Task jump_table_should_not_report_api_versions_for_introduced_endpoint_when_disabled()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new QueryStringApiVersionReader(),
+            ReportApiVersions = false,
+        };
+
+        // act
+        var httpContext = await InvokeJumpTableIntroducedEndpoint( options );
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 404 );
+        httpContext.Response.Headers.ContainsKey( "api-supported-versions" ).Should().BeFalse();
+        httpContext.Response.Headers.ContainsKey( "api-deprecated-versions" ).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task apply_should_not_report_api_versions_for_introduced_endpoint_when_disabled()
+    {
+        // arrange
+        var options = new ApiVersioningOptions()
+        {
+            ReportApiVersions = false,
+        };
+
+        // act
+        var httpContext = await InvokeApplyIntroducedEndpoint( options );
+
+        // assert
+        await ResponseShouldHaveIntroducedProblemDetails( httpContext, 404 );
+        httpContext.Response.Headers.ContainsKey( "api-supported-versions" ).Should().BeFalse();
+        httpContext.Response.Headers.ContainsKey( "api-deprecated-versions" ).Should().BeFalse();
     }
 
     [Fact]
@@ -552,6 +666,105 @@ public class ApiVersionMatcherPolicyTest
             Options.Create( options ?? new() ),
             Mock.Of<ILogger<ApiVersionMatcherPolicy>>() );
 
+    private static List<PolicyJumpTableEdge> NewJumpTableEdges( IReadOnlyList<PolicyNodeEdge> edges )
+    {
+        var tableEdges = new List<PolicyJumpTableEdge>();
+
+        for ( var i = 0; i < edges.Count; i++ )
+        {
+            tableEdges.Add( new( edges[i].State, i ) );
+        }
+
+        return tableEdges;
+    }
+
+    private static DefaultHttpContext NewHttpContext( string apiVersion, ApiVersioningOptions options )
+    {
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IProblemDetailsService>( new TestProblemDetailsService() );
+        services.AddSingleton<IReportApiVersions>( new TestApiVersionReporter() );
+        services.AddSingleton<IApiVersionReader>( options.ApiVersionReader );
+        services.AddSingleton<IApiVersionParser>( ApiVersionParser.Default );
+
+        var context = new DefaultHttpContext()
+        {
+            RequestServices = services.BuildServiceProvider(),
+        };
+
+        context.Request.Scheme = Uri.UriSchemeHttp;
+        context.Request.Host = new( "tempuri.org" );
+        context.Request.Path = "/api/values";
+        context.Response.Body = new MemoryStream();
+        context.ApiVersioningFeature.RawRequestedApiVersion = apiVersion;
+
+        return context;
+    }
+
+    private static async Task<DefaultHttpContext> InvokeJumpTableIntroducedEndpoint( ApiVersioningOptions options )
+    {
+        var policy = NewApiVersionMatcherPolicy( options );
+        var httpContext = NewHttpContext( "1.0", options );
+        var endpoint = NewIntroducedEndpoint( 404 );
+        var edges = policy.GetEdges( [endpoint] );
+        var tableEdges = NewJumpTableEdges( edges );
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var selected = edges[jumpTable.GetDestination( httpContext )].Endpoints[0];
+
+        await selected.RequestDelegate!( httpContext );
+        await httpContext.Response.CompleteAsync();
+
+        return httpContext;
+    }
+
+    private static async Task<DefaultHttpContext> InvokeApplyIntroducedEndpoint( ApiVersioningOptions options )
+    {
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
+
+        var policy = NewApiVersionMatcherPolicy( options );
+        var endpoint = NewIntroducedEndpoint( 404 );
+        var candidates = new CandidateSet( [endpoint], [[]], [0] );
+        var httpContext = NewHttpContext( "1.0", options );
+
+        httpContext.Features.Set( feature.Object );
+
+        await policy.ApplyAsync( httpContext, candidates );
+        await httpContext.GetEndpoint().RequestDelegate!( httpContext );
+        await httpContext.Response.CompleteAsync();
+
+        return httpContext;
+    }
+
+    private static async Task<string> ReadResponseBody( DefaultHttpContext context )
+    {
+        context.Response.Body.Position = 0;
+
+        using var reader = new StreamReader( context.Response.Body, leaveOpen: true );
+
+        return await reader.ReadToEndAsync();
+    }
+
+    private static async Task ResponseShouldHaveIntroducedProblemDetails( DefaultHttpContext context, int statusCode )
+    {
+        context.Response.ContentType.Should().Be( "application/problem+json" );
+        context.Response.StatusCode.Should().Be( statusCode );
+
+        var body = await ReadResponseBody( context );
+        var problem = JsonDocument.Parse( body );
+        var root = problem.RootElement;
+
+        root.GetProperty( "type" ).GetString().Should().Be( "https://docs.api-versioning.org/problems#introduced" );
+        root.GetProperty( "title" ).GetString().Should().Be( "API endpoint not yet introduced" );
+        root.GetProperty( "status" ).GetInt32().Should().Be( statusCode );
+        root.GetProperty( "detail" ).GetString().Should().Be(
+            "The HTTP resource that matches the request URI 'http://tempuri.org/api/values' was introduced in API version '2.0' and is not available in the requested version '1.0'." );
+        root.GetProperty( "code" ).GetString().Should().Be( "EndpointNotIntroduced" );
+    }
+
     private static HttpContext NewHttpContext(
         Mock<IApiVersioningFeature> apiVersioningFeature,
         IServiceProvider services = default,
@@ -597,5 +810,44 @@ public class ApiVersionMatcherPolicyTest
         }
 
         return httpContext.Object;
+    }
+
+    private sealed class TestProblemDetailsService : IProblemDetailsService
+    {
+        public ValueTask WriteAsync( ProblemDetailsContext context ) => Write( context );
+
+        public async ValueTask<bool> TryWriteAsync( ProblemDetailsContext context )
+        {
+            await Write( context );
+            return true;
+        }
+
+        private static async ValueTask Write( ProblemDetailsContext context )
+        {
+            var response = context.HttpContext.Response;
+
+            response.ContentType = "application/problem+json";
+
+            await response.StartAsync();
+            await JsonSerializer.SerializeAsync( response.Body, context.ProblemDetails );
+        }
+    }
+
+    private sealed class TestApiVersionReporter : IReportApiVersions
+    {
+        public ApiVersionMapping Mapping => ApiVersionMapping.Explicit | ApiVersionMapping.Implicit;
+
+        public void Report( HttpResponse response, ApiVersionModel apiVersionModel )
+        {
+            if ( apiVersionModel.SupportedApiVersions.Count > 0 )
+            {
+                response.Headers["api-supported-versions"] = string.Join( ", ", apiVersionModel.SupportedApiVersions );
+            }
+
+            if ( apiVersionModel.DeprecatedApiVersions.Count > 0 )
+            {
+                response.Headers["api-deprecated-versions"] = string.Join( ", ", apiVersionModel.DeprecatedApiVersions );
+            }
+        }
     }
 }

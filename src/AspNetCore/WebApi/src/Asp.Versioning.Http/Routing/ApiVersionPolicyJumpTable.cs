@@ -111,6 +111,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
 
                 if ( rejection.IntroducedLater.TryGetValue( apiVersion, out destination ) )
                 {
+                    httpContext.Features.Set( policyFeature );
                     return destination;
                 }
 

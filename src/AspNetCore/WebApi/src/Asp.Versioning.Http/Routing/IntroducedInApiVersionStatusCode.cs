@@ -12,31 +12,49 @@ internal static class IntroducedInApiVersionStatusCode
         ApiVersionMetadata metadata,
         ApiVersion apiVersion,
         int unsupportedApiVersionStatusCode,
-        out int statusCode )
+        out int statusCode ) =>
+        TryGet( endpoint, metadata, apiVersion, unsupportedApiVersionStatusCode, out statusCode, out _ );
+
+    internal static bool TryGet(
+        Endpoint endpoint,
+        ApiVersionMetadata metadata,
+        ApiVersion apiVersion,
+        int unsupportedApiVersionStatusCode,
+        out int statusCode,
+        [NotNullWhen( true )] out ApiVersion? introducedIn )
     {
         metadata.Deconstruct( out var apiModel, out _ );
 
         if ( !apiModel.DeclaredApiVersions.Contains( apiVersion ) )
         {
             statusCode = 0;
+            introducedIn = default;
             return false;
         }
 
-        if ( TryGet( metadata.IntroducedInApiVersions, apiVersion, unsupportedApiVersionStatusCode, out statusCode ) )
+        if ( TryGet( metadata.IntroducedInApiVersions, apiVersion, unsupportedApiVersionStatusCode, out statusCode, out introducedIn ) )
         {
             return true;
         }
 
         var endpointMetadata = endpoint.Metadata;
 
-        if ( TryGet( endpointMetadata.GetOrderedMetadata<IntroducedInApiVersionMetadata>(), apiVersion, unsupportedApiVersionStatusCode, out statusCode ) )
+        if ( TryGet( endpointMetadata.GetOrderedMetadata<IntroducedInApiVersionMetadata>(), apiVersion, unsupportedApiVersionStatusCode, out statusCode, out introducedIn ) )
         {
             return true;
         }
 
         var reflectedIntroduced = GetIntroducedInApiVersions( endpointMetadata );
 
-        return reflectedIntroduced is not null && TryGet( reflectedIntroduced, apiVersion, unsupportedApiVersionStatusCode, out statusCode );
+        if ( reflectedIntroduced is not null &&
+             TryGet( reflectedIntroduced, apiVersion, unsupportedApiVersionStatusCode, out statusCode, out introducedIn ) )
+        {
+            return true;
+        }
+
+        statusCode = 0;
+        introducedIn = default;
+        return false;
     }
 
     internal static bool HasIntroducedInApiVersion( Endpoint endpoint, ApiVersionMetadata metadata )
@@ -54,7 +72,8 @@ internal static class IntroducedInApiVersionStatusCode
         IReadOnlyList<IntroducedInApiVersionMetadata> introduced,
         ApiVersion apiVersion,
         int unsupportedApiVersionStatusCode,
-        out int statusCode )
+        out int statusCode,
+        [NotNullWhen( true )] out ApiVersion? introducedIn )
     {
         var matched = default( IntroducedInApiVersionMetadata );
         var matchedStatusCode = 0;
@@ -82,10 +101,12 @@ internal static class IntroducedInApiVersionStatusCode
         if ( matched is not null )
         {
             statusCode = matchedStatusCode;
+            introducedIn = matched.IntroducedIn;
             return true;
         }
 
         statusCode = 0;
+        introducedIn = default;
         return false;
     }
 

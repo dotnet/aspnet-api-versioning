@@ -33,26 +33,27 @@ internal sealed class ClientErrorEndpointBuilder
             return new UnspecifiedApiVersionEndpoint( logger, options, GetDisplayNames() );
         }
 
-        var introducedInApiVersionStatusCode = GetIntroducedInApiVersionStatusCode();
+        var (introducedInApiVersionStatusCode, introducedIn) = GetIntroducedInApiVersionStatusCode();
 
         if ( introducedInApiVersionStatusCode > 0 )
         {
-            return new IntroducedInApiVersionEndpoint( introducedInApiVersionStatusCode );
+            return new IntroducedInApiVersionEndpoint( options, introducedInApiVersionStatusCode, introducedIn! );
         }
 
         return new UnsupportedApiVersionEndpoint( options );
     }
 
-    private int GetIntroducedInApiVersionStatusCode()
+    private (int StatusCode, ApiVersion? IntroducedIn) GetIntroducedInApiVersionStatusCode()
     {
         var apiVersion = feature.RequestedApiVersion;
 
         if ( apiVersion is null )
         {
-            return 0;
+            return default;
         }
 
         var result = 0;
+        var introducedIn = default( ApiVersion );
 
         for ( var i = 0; i < candidates.Count; i++ )
         {
@@ -69,16 +70,16 @@ internal sealed class ClientErrorEndpointBuilder
                 metadata,
                 apiVersion,
                 options.UnsupportedApiVersionStatusCode,
-                out var statusCode ) )
+                out var statusCode,
+                out var currentIntroducedIn ) &&
+                ( result == 0 || statusCode < result ) )
             {
-                if ( result == 0 || statusCode < result )
-                {
-                    result = statusCode;
-                }
+                result = statusCode;
+                introducedIn = currentIntroducedIn;
             }
         }
 
-        return result;
+        return (result, introducedIn);
     }
 
     private static string DisplayName( Endpoint endpoint )

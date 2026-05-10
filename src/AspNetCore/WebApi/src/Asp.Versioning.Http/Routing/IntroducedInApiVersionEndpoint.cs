@@ -19,4 +19,18 @@ internal sealed class IntroducedInApiVersionEndpoint : Endpoint
             Empty,
             statusCode + Name )
     { }
+
+    internal IntroducedInApiVersionEndpoint(
+        ApiVersioningOptions options,
+        int statusCode,
+        ApiVersion introducedIn )
+        : base(
+            context => EndpointProblem.IntroducedInApiVersion(
+                context,
+                options,
+                statusCode,
+                introducedIn ),
+            Empty,
+            statusCode + Name )
+    { }
 }
