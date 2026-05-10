@@ -7,7 +7,12 @@ using System.Diagnostics.CodeAnalysis;
 
 internal static class IntroducedInApiVersionStatusCode
 {
-    internal static bool TryGet( Endpoint endpoint, ApiVersionMetadata metadata, ApiVersion apiVersion, out int statusCode )
+    internal static bool TryGet(
+        Endpoint endpoint,
+        ApiVersionMetadata metadata,
+        ApiVersion apiVersion,
+        int unsupportedApiVersionStatusCode,
+        out int statusCode )
     {
         metadata.Deconstruct( out var apiModel, out _ );
 
@@ -17,21 +22,21 @@ internal static class IntroducedInApiVersionStatusCode
             return false;
         }
 
-        if ( TryGet( metadata.IntroducedInApiVersions, apiVersion, out statusCode ) )
+        if ( TryGet( metadata.IntroducedInApiVersions, apiVersion, unsupportedApiVersionStatusCode, out statusCode ) )
         {
             return true;
         }
 
         var endpointMetadata = endpoint.Metadata;
 
-        if ( TryGet( endpointMetadata.GetOrderedMetadata<IntroducedInApiVersionMetadata>(), apiVersion, out statusCode ) )
+        if ( TryGet( endpointMetadata.GetOrderedMetadata<IntroducedInApiVersionMetadata>(), apiVersion, unsupportedApiVersionStatusCode, out statusCode ) )
         {
             return true;
         }
 
         var reflectedIntroduced = GetIntroducedInApiVersions( endpointMetadata );
 
-        return reflectedIntroduced is not null && TryGet( reflectedIntroduced, apiVersion, out statusCode );
+        return reflectedIntroduced is not null && TryGet( reflectedIntroduced, apiVersion, unsupportedApiVersionStatusCode, out statusCode );
     }
 
     internal static bool HasIntroducedInApiVersion( Endpoint endpoint, ApiVersionMetadata metadata )
@@ -48,23 +53,35 @@ internal static class IntroducedInApiVersionStatusCode
     private static bool TryGet(
         IReadOnlyList<IntroducedInApiVersionMetadata> introduced,
         ApiVersion apiVersion,
+        int unsupportedApiVersionStatusCode,
         out int statusCode )
     {
         var matched = default( IntroducedInApiVersionMetadata );
+        var matchedStatusCode = 0;
 
         for ( var i = 0; i < introduced.Count; i++ )
         {
             var current = introduced[i];
+            var currentStatusCode = current.StatusCode;
 
-            if ( apiVersion < current.IntroducedIn && ( matched is null || current.IntroducedIn > matched.IntroducedIn ) )
+            if ( currentStatusCode == IntroducedInApiVersionAttribute.UseConfiguredStatusCode )
+            {
+                currentStatusCode = unsupportedApiVersionStatusCode;
+            }
+
+            if ( apiVersion < current.IntroducedIn &&
+                 ( matched is null ||
+                   current.IntroducedIn > matched.IntroducedIn ||
+                   ( current.IntroducedIn == matched.IntroducedIn && currentStatusCode < matchedStatusCode ) ) )
             {
                 matched = current;
+                matchedStatusCode = currentStatusCode;
             }
         }
 
         if ( matched is not null )
         {
-            statusCode = matched.StatusCode;
+            statusCode = matchedStatusCode;
             return true;
         }
 

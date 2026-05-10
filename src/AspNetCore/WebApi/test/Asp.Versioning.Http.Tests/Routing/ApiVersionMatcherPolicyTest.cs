@@ -238,6 +238,33 @@ public class ApiVersionMatcherPolicyTest
         responseContext.Response.StatusCode.Should().Be( 404 );
     }
 
+    [Fact]
+    public async Task apply_should_use_smallest_status_code_for_same_introduced_version()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, "1.0" );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, ["1.0"] );
+        feature.SetupProperty( f => f.RequestedApiVersion, new ApiVersion( 1, 0 ) );
+
+        var policy = NewApiVersionMatcherPolicy();
+        var v2 = new ApiVersion( 2, 0 );
+        var first = NewIntroducedEndpoint( [new( v2, 410 )], implementedVersion: v2 );
+        var second = NewIntroducedEndpoint( [new( v2, 404 )], implementedVersion: v2 );
+        var candidates = new CandidateSet( [first, second], [[], []], [0, 0] );
+        var httpContext = NewHttpContext( feature );
+        var responseContext = new DefaultHttpContext();
+
+        // act
+        await policy.ApplyAsync( httpContext, candidates );
+        await httpContext.GetEndpoint().RequestDelegate!( responseContext );
+
+        // assert
+        httpContext.GetEndpoint().DisplayName.Should().Be( "404 Introduced API Version" );
+        responseContext.Response.StatusCode.Should().Be( 404 );
+    }
+
     [Theory]
     [InlineData( "1.0" )]
     [InlineData( "2.0" )]

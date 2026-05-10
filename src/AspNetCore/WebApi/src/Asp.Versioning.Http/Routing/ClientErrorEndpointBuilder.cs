@@ -52,6 +52,8 @@ internal sealed class ClientErrorEndpointBuilder
             return 0;
         }
 
+        var result = 0;
+
         for ( var i = 0; i < candidates.Count; i++ )
         {
             ref readonly var candidate = ref candidates[i];
@@ -62,25 +64,21 @@ internal sealed class ClientErrorEndpointBuilder
                 continue;
             }
 
-            metadata.Deconstruct( out var apiModel, out _ );
-
-            if ( !apiModel.DeclaredApiVersions.Contains( apiVersion ) )
+            if ( IntroducedInApiVersionStatusCode.TryGet(
+                candidate.Endpoint,
+                metadata,
+                apiVersion,
+                options.UnsupportedApiVersionStatusCode,
+                out var statusCode ) )
             {
-                continue;
-            }
-
-            if ( IntroducedInApiVersionStatusCode.TryGet( candidate.Endpoint, metadata, apiVersion, out var statusCode ) )
-            {
-                if ( statusCode == IntroducedInApiVersionAttribute.UseConfiguredStatusCode )
+                if ( result == 0 || statusCode < result )
                 {
-                    statusCode = options.UnsupportedApiVersionStatusCode;
+                    result = statusCode;
                 }
-
-                return statusCode;
             }
         }
 
-        return 0;
+        return result;
     }
 
     private static string DisplayName( Endpoint endpoint )

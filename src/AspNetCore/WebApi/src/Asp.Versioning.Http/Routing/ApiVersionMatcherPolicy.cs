@@ -238,7 +238,12 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 {
                     builder.Add( endpoint, version, metadata );
                 }
-                else if ( IntroducedInApiVersionStatusCode.TryGet( endpoint, metadata, version, out var statusCode ) )
+                else if ( IntroducedInApiVersionStatusCode.TryGet(
+                    endpoint,
+                    metadata,
+                    version,
+                    Options.UnsupportedApiVersionStatusCode,
+                    out var statusCode ) )
                 {
                     builder.AddIntroducedLater( endpoint, version, statusCode, metadata );
                 }
