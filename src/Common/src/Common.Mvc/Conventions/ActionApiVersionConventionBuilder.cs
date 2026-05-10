@@ -51,6 +51,20 @@ public class ActionApiVersionConventionBuilder : ActionApiVersionConventionBuild
     }
 
     /// <summary>
+    /// Indicates that the configured action was introduced in the specified API version.
+    /// </summary>
+    /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the action was introduced in.</param>
+    /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+    /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
+    public virtual ActionApiVersionConventionBuilder IntroducedInApiVersion(
+        ApiVersion apiVersion,
+        int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+    {
+        IntroducedVersions.Add( new( apiVersion, statusCode ) );
+        return this;
+    }
+
+    /// <summary>
     /// Indicates that the action is API version-neutral.
     /// </summary>
     /// <returns>The original <see cref="ActionApiVersionConventionBuilder"/>.</returns>
@@ -115,6 +129,9 @@ public class ActionApiVersionConventionBuilder : ActionApiVersionConventionBuild
     void IDeclareApiVersionConventionBuilder.AdvertisesDeprecatedApiVersion( ApiVersion apiVersion ) => AdvertisesDeprecatedApiVersion( apiVersion );
 
     void IMapToApiVersionConventionBuilder.MapToApiVersion( ApiVersion apiVersion ) => MapToApiVersion( apiVersion );
+
+    void IIntroducedInApiVersionConventionBuilder.IntroducedInApiVersion( ApiVersion apiVersion, int statusCode ) =>
+        IntroducedInApiVersion( apiVersion, statusCode );
 
     IActionConventionBuilder IActionConventionBuilder.Action( MethodInfo actionMethod ) => Action( actionMethod );
 }

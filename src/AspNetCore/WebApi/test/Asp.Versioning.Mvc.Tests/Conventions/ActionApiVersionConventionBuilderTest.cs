@@ -114,4 +114,113 @@ public partial class ActionApiVersionConventionBuilderTest
                 ImplementedApiVersions = Array.Empty<ApiVersion>(),
             } );
     }
+
+    [Fact]
+    public void apply_to_should_expand_declared_api_versions_from_introduced_convention()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionModel = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+
+        actionModel.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel();
+        actionBuilder.IntroducedInApiVersion( new ApiVersion( 2, 0 ) );
+
+        // act
+        actionBuilder.ApplyTo( actionModel );
+
+        // assert
+        actionModel.Selectors
+                   .Single()
+                   .EndpointMetadata
+                   .OfType<ApiVersionMetadata>()
+                   .Single()
+                   .Map( Explicit )
+                   .DeclaredApiVersions
+                   .Should()
+                   .Equal( new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) );
+    }
+
+    [Fact]
+    public void introduced_in_api_version_should_support_fluent_overloads()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionModel = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+
+        actionBuilder.IntroducedInApiVersion( new ApiVersion( 2, 0 ), 409 )
+                     .IntroducedInApiVersion( 3, 0 )
+                     .IntroducedInApiVersion( 4.0 )
+                     .IntroducedInApiVersion( 2026, 12, 1 )
+                     .IntroducedInApiVersion( new DateOnly( 2027, 6, 1 ) );
+
+        // act
+        actionBuilder.ApplyTo( actionModel );
+
+        // assert
+        actionModel.Selectors
+                   .Single()
+                   .EndpointMetadata
+                   .OfType<IntroducedInApiVersionMetadata>()
+                   .Should()
+                   .BeEquivalentTo(
+                       new IntroducedInApiVersionMetadata[]
+                       {
+                           new( new ApiVersion( 2, 0 ), 409 ),
+                           new( new ApiVersion( 3, 0 ), IntroducedInApiVersionAttribute.DefaultStatusCode ),
+                           new( new ApiVersion( 4.0 ), IntroducedInApiVersionAttribute.DefaultStatusCode ),
+                           new( new ApiVersion( new DateOnly( 2026, 12, 1 ) ), IntroducedInApiVersionAttribute.DefaultStatusCode ),
+                           new( new ApiVersion( new DateOnly( 2027, 6, 1 ) ), IntroducedInApiVersionAttribute.DefaultStatusCode ),
+                       },
+                       options => options.WithStrictOrdering() );
+    }
+
+    [Fact]
+    public void introduced_convention_should_match_attribute_declared_versions()
+    {
+        // arrange
+        var conventionAction = NewActionModel( typeof( UndecoratedController ), nameof( UndecoratedController.Get ) );
+        var attributeAction = NewActionModel( typeof( DecoratedController ), nameof( DecoratedController.GetIntroduced ) );
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+
+        conventionAction.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel();
+        attributeAction.Controller.Properties[typeof( ApiVersionModel )] = NewControllerModel();
+        actionBuilder.IntroducedInApiVersion( new ApiVersion( 2, 0 ) );
+
+        // act
+        actionBuilder.ApplyTo( conventionAction );
+        new ActionApiVersionConventionBuilder( new ControllerApiVersionConventionBuilder( typeof( DecoratedController ) ) )
+            .ApplyTo( attributeAction );
+
+        // assert
+        GetApiVersionMetadata( conventionAction ).Map( Explicit ).DeclaredApiVersions.Should().Equal(
+            GetApiVersionMetadata( attributeAction ).Map( Explicit ).DeclaredApiVersions );
+    }
+
+    private static ActionModel NewActionModel( Type controllerType, string actionName )
+    {
+        var controller = new ControllerModel( controllerType.GetTypeInfo(), [] )
+        {
+            ControllerName = controllerType.Name.Replace( "Controller", string.Empty, StringComparison.Ordinal ),
+        };
+        var method = controllerType.GetMethod( actionName );
+        var action = new ActionModel( method, method.GetCustomAttributes().Cast<object>().ToArray() )
+        {
+            Controller = controller,
+        };
+
+        return action;
+    }
+
+    private static ApiVersionMetadata GetApiVersionMetadata( ActionModel action ) =>
+        action.Selectors.Single().EndpointMetadata.OfType<ApiVersionMetadata>().Single();
+
+    private static ApiVersionModel NewControllerModel()
+    {
+        var versions = new ApiVersion[] { new( 1, 0 ), new( 2, 0 ), new( 3, 0 ) };
+
+        return new( versions, versions, [], [], [] );
+    }
 }

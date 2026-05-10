@@ -52,5 +52,8 @@ public partial class ActionApiVersionConventionBuilderTest
         [MapToApiVersion( "2.0" )]
         [MapToApiVersion( "3.0" )]
         public IActionResult GetV2() => Ok();
+
+        [IntroducedInApiVersion( "2.0" )]
+        public IActionResult GetIntroduced() => Ok();
     }
 }
