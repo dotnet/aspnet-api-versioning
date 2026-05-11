@@ -5,10 +5,11 @@
 namespace Asp.Versioning.OpenApi.Configuration;
 
 using Asp.Versioning.ApiExplorer;
-using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
+using System.Net;
+using System.Runtime.CompilerServices;
 
 internal sealed class ConfigureOpenApiOptions(
     XmlCommentsTransformer xmlComments,
@@ -48,7 +49,6 @@ internal sealed class ConfigureOpenApiOptions(
         var options = versionedOptions.Document;
         var apiExplorer = new ApiExplorerTransformer( versionedOptions );
 
-        options.SetDocumentName( versionedOptions.Description.GroupName );
         options.AddDocumentTransformer( apiExplorer );
         options.AddSchemaTransformer( apiExplorer );
         options.AddOperationTransformer( apiExplorer );
