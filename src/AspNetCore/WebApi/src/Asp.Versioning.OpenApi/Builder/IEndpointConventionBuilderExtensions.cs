@@ -9,6 +9,7 @@ using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 /// <summary>
 /// Provides extension methods for <see cref="IEndpointConventionBuilder"/>.
@@ -43,12 +44,11 @@ public static class IEndpointConventionBuilderExtensions
 
     private static Task InterceptRequestServices( HttpContext context, RequestDelegate action )
     {
-        if ( context.RequestServices is not AggregateKeyedServiceProvider serviceProvider )
+        if ( context.RequestServices is not AggregateKeyedServiceProvider )
         {
-            serviceProvider = context.RequestServices.GetRequiredService<AggregateKeyedServiceProvider>();
+            context.RequestServices = context.RequestServices.GetRequiredService<IHost>().Services;
         }
 
-        context.RequestServices = serviceProvider;
         return action( context );
     }
 }

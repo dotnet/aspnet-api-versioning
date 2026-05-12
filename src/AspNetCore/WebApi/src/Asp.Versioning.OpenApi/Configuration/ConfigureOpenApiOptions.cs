@@ -8,8 +8,6 @@ using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Runtime.CompilerServices;
 
 internal sealed class ConfigureOpenApiOptions(
     XmlCommentsTransformer xmlComments,

@@ -5,16 +5,13 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.OpenApi;
 using Asp.Versioning.OpenApi.Configuration;
 using Asp.Versioning.OpenApi.Transformers;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Reflection;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
@@ -65,13 +62,74 @@ public static class IApiVersioningBuilderExtensions
 
         var services = builder.Services;
 
-        services.AddTransient( serviceProvider => NewRequestServices( serviceProvider, services ) );
+        services.Add( GetDocumentProviderDescriptor() );
+
+        var hostDescriptor = services.Single(
+            s => !s.IsKeyedService &&
+                s.ServiceType == typeof( IHost ) &&
+                s.Lifetime == ServiceLifetime.Singleton &&
+                s.ImplementationInstance is null &&
+                s.ImplementationType is null &&
+                s.ImplementationFactory is not null );
+        var hostDescriptorIndex = services.IndexOf( hostDescriptor );
+
+        builder.Services[hostDescriptorIndex] = CreateHostWrapperDescriptor( services, hostDescriptor.ImplementationFactory! );
 
         services.AddSingleton<VersionedOpenApiOptionsFactory>();
         services.TryAddEnumerable( Transient<IPostConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>() );
         services.TryAdd( Singleton<IOptionsFactory<VersionedOpenApiOptions>>( EM.GetRequiredService<VersionedOpenApiOptionsFactory> ) );
         services.AddTransient( sp => new XmlCommentsFile( assemblies, sp.GetRequiredService<IHostEnvironment>() ) );
         services.TryAddTransient( sp => new XmlCommentsTransformer( sp.GetRequiredService<XmlCommentsFile>() ) );
+    }
+
+    private static ServiceDescriptor GetDocumentProviderDescriptor()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddOpenApi();
+        foreach ( var descriptor in serviceCollection )
+        {
+            if ( descriptor.ServiceType.FullName == "Microsoft.Extensions.ApiDescriptions.IDocumentProvider" )
+            {
+                return descriptor;
+            }
+        }
+
+        throw new UnreachableException();
+    }
+
+    private static ServiceDescriptor CreateHostWrapperDescriptor( IServiceCollection serviceCollection, Func<IServiceProvider, object> hostFactory )
+    {
+        Func<IServiceProvider, object> updatedHostFactory = serviceProvider =>
+        {
+            var originalHost = (IHost) hostFactory( serviceProvider );
+            return new OpenApiHost(originalHost, NewRequestServices(serviceProvider, serviceCollection));
+        };
+
+        return new ServiceDescriptor( typeof( IHost ), updatedHostFactory, ServiceLifetime.Singleton );
+    }
+
+    private sealed class OpenApiHost : IHost
+    {
+        private readonly IHost originalHost;
+        private readonly IServiceProvider customServiceProvider;
+
+        public OpenApiHost( IHost originalHost, IServiceProvider customServiceProvider )
+        {
+            this.originalHost = originalHost;
+            this.customServiceProvider = customServiceProvider;
+        }
+
+        public IServiceProvider Services
+            => customServiceProvider;
+
+        public void Dispose()
+            => originalHost.Dispose();
+
+        public Task StartAsync( CancellationToken cancellationToken = default )
+            => originalHost.StartAsync( cancellationToken );
+
+        public Task StopAsync( CancellationToken cancellationToken = default )
+            => originalHost.StopAsync( cancellationToken );
     }
 
     // NOTE: The calling assembly must be captured at the call site that invokes AddOpenApi. In 99% of the cases that
@@ -90,21 +148,8 @@ public static class IApiVersioningBuilderExtensions
         return [.. assemblies];
     }
 
-    [UnconditionalSuppressMessage( "ILLink", "IL3050" )]
     private static AggregateKeyedServiceProvider NewRequestServices( IServiceProvider services, IServiceCollection parentServiceCollection )
     {
-        var provider = services.GetRequiredService<IApiVersionDescriptionProvider>();
-        var container = new AggregateKeyedServiceProvider( services );
-        var descriptions = provider.ApiVersionDescriptions;
-
-        for ( var i = 0; i < descriptions.Count; i++ )
-        {
-            var description = descriptions[i];
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddOpenApi( description.GroupName );
-            container.Add( serviceCollection, parentServiceCollection );
-        }
-
-        return container;
+        return new AggregateKeyedServiceProvider( services, parentServiceCollection );
     }
 }

@@ -4,8 +4,6 @@
   <TargetFramework>net10.0</TargetFramework>
   <AssemblyTitle>Example API</AssemblyTitle>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
-  <OpenApiGenerateDocumentsOnBuild>false</OpenApiGenerateDocumentsOnBuild>
  </PropertyGroup>
 
  <ItemGroup>
