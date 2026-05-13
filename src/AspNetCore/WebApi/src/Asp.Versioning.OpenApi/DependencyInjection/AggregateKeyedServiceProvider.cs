@@ -12,32 +12,33 @@ internal sealed class AggregateKeyedServiceProvider : IKeyedServiceProvider, IDi
 {
     private readonly IServiceCollection services;
     private readonly SemaphoreSlim semaphore = new SemaphoreSlim( 1, 1 );
-
-    private IServiceProvider serviceProvider;
+    private readonly IServiceProvider originalServiceProvider;
+    private IServiceProvider activeServiceProvider;
     private bool initialized;
     private int? initializingThreadId;
 
     public AggregateKeyedServiceProvider( IServiceProvider serviceProvider, IServiceCollection services )
     {
         this.services = services;
-        this.serviceProvider = serviceProvider;
+        originalServiceProvider = serviceProvider;
+        activeServiceProvider = serviceProvider;
         var lifetime = serviceProvider.GetRequiredService<IHostApplicationLifetime>();
-        lifetime.ApplicationStarted.Register( () => EnsureInitialized(true) );
+        lifetime.ApplicationStarted.Register( () => EnsureInitialized( true ) );
     }
 
     private IServiceProvider ServiceProvider
     {
         get
         {
-            EnsureInitialized(false);
-            return serviceProvider;
+            EnsureInitialized( false );
+            return activeServiceProvider;
         }
     }
 
-    private void EnsureInitialized(bool isReady)
+    private void EnsureInitialized( bool isReady )
     {
         // If already initialized, we can return immediately.
-        if ( initialized)
+        if ( initialized )
         {
             return;
         }
@@ -57,7 +58,7 @@ internal sealed class AggregateKeyedServiceProvider : IKeyedServiceProvider, IDi
             }
 
             initializingThreadId = Environment.CurrentManagedThreadId;
-            var provider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
+            var provider = activeServiceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
 
             var collection = new ServiceCollection();
             foreach ( var descriptor in services )
@@ -73,7 +74,7 @@ internal sealed class AggregateKeyedServiceProvider : IKeyedServiceProvider, IDi
                 collection.AddOpenApi( description.GroupName );
             }
 
-            serviceProvider = collection.BuildServiceProvider();
+            activeServiceProvider = collection.BuildServiceProvider();
             initialized = true;
             initializingThreadId = null;
         }
@@ -94,7 +95,7 @@ internal sealed class AggregateKeyedServiceProvider : IKeyedServiceProvider, IDi
     }
 
     public object? GetService( Type serviceType )
-        => ServiceProvider.GetService( serviceType );
+        => originalServiceProvider.GetService( serviceType ) ?? ServiceProvider.GetService( serviceType );
 
     public void Dispose()
     {
