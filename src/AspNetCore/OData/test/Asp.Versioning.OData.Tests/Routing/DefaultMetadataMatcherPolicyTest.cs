@@ -17,7 +17,9 @@ public class DefaultMetadataMatcherPolicyTest
         var paramSource = Mock.Of<IApiVersionParameterSource>();
         var options = Options.Create( new ApiVersioningOptions() );
         var policy = new DefaultMetadataMatcherPolicy( paramSource, options );
+#pragma warning disable CA1825 // Avoid zero-length array allocations
         var metadata = new ODataRoutingMetadata( string.Empty, EdmCoreModel.Instance, [] );
+#pragma warning restore CA1825 // Avoid zero-length array allocations
         var items = new object[] { metadata };
         var endpoints = new Endpoint[] { new( Limbo, new( items ), default ) };
 

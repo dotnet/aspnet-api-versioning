@@ -621,6 +621,7 @@ public class ODataValidationSettingsConventionTest
 
         model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
 
+#pragma warning disable CA1825 // Avoid zero-length array allocations
         return new()
         {
             ActionDescriptor = new ControllerActionDescriptor()
@@ -643,6 +644,7 @@ public class ODataValidationSettingsConventionTest
             },
             Properties = { [typeof( ApiVersion )] = ApiVersion.Default },
         };
+#pragma warning restore CA1825 // Avoid zero-length array allocations
     }
 
     private static ApiDescription NewApiDescription( Type controllerType ) =>
@@ -652,6 +654,7 @@ public class ODataValidationSettingsConventionTest
     {
         model.SetAnnotationValue( model, new ApiVersionAnnotation( ApiVersion.Default ) );
 
+#pragma warning disable CA1825 // Avoid zero-length array allocations
         return new()
         {
             ActionDescriptor = new ControllerActionDescriptor()
@@ -674,6 +677,7 @@ public class ODataValidationSettingsConventionTest
             },
             Properties = { [typeof( ApiVersion )] = ApiVersion.Default },
         };
+#pragma warning restore CA1825 // Avoid zero-length array allocations
     }
 
 #pragma warning disable IDE0060 // Remove unused parameter
