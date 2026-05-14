@@ -8,10 +8,9 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.OpenApi;
 using Asp.Versioning.OpenApi.Configuration;
-using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.AspNetCore.OpenApi.Extensions;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -64,18 +63,13 @@ public static class IApiVersioningBuilderExtensions
 
         var services = builder.Services;
 
-        services.AddTransient( NewRequestServices );
-        services.Add( Singleton( Type.IDocumentProvider, ResolveDocumentProvider ) );
+        services.AddSingleton<IAdditionalOpenApiDocumentNameProvider, OpenApiVersionedDocumentNamesProvider>();
         services.AddSingleton<VersionedOpenApiOptionsFactory>();
+        services.AddOpenApi(documentName: null);
         services.TryAddEnumerable( Transient<IPostConfigureOptions<OpenApiOptions>, ConfigureOpenApiOptions>() );
         services.TryAdd( Singleton<IOptionsFactory<VersionedOpenApiOptions>>( EM.GetRequiredService<VersionedOpenApiOptionsFactory> ) );
         services.AddTransient( sp => new XmlCommentsFile( assemblies, sp.GetRequiredService<IHostEnvironment>() ) );
         services.TryAddTransient( sp => new XmlCommentsTransformer( sp.GetRequiredService<XmlCommentsFile>() ) );
-
-        if ( GetJsonConfiguration() is { } descriptor )
-        {
-            services.TryAddEnumerable( descriptor );
-        }
     }
 
     // NOTE: The calling assembly must be captured at the call site that invokes AddOpenApi. In 99% of the cases that
@@ -92,57 +86,5 @@ public static class IApiVersioningBuilderExtensions
         }
 
         return [.. assemblies];
-    }
-
-    // HACK: the json configuration is internal; this approach negates the use of reflection
-    // REF: https://github.com/dotnet/aspnetcore/blob/08a9fc2c3864d99759ab3d71cfda868d852bfc4b/src/OpenApi/src/Extensions/OpenApiServiceCollectionExtensions.cs#L121
-    private static ServiceDescriptor? GetJsonConfiguration()
-    {
-        var services = new ServiceCollection();
-        services.AddOpenApi( "*" );
-        return services.SingleOrDefault( sd => sd.ServiceType == typeof( IConfigureOptions<JsonOptions> ) );
-    }
-
-    private static object ResolveDocumentProvider( IServiceProvider provider ) =>
-        provider.GetRequiredService<KeyedServiceContainer>().GetRequiredService( Type.IDocumentProvider );
-
-    [UnconditionalSuppressMessage( "ILLink", "IL3050" )]
-    private static KeyedServiceContainer NewRequestServices( IServiceProvider services )
-    {
-        var provider = services.GetRequiredService<IApiVersionDescriptionProvider>();
-        var container = new KeyedServiceContainer( services );
-        var type = typeof( IOpenApiDocumentProvider );
-        var descriptions = provider.ApiVersionDescriptions;
-        var names = new List<string>( descriptions.Count );
-
-        for ( var i = 0; i < descriptions.Count; i++ )
-        {
-            var description = descriptions[i];
-
-            // REF: https://github.com/dotnet/aspnetcore/blob/319e87fd950a99f3baae2aa79db3d4fb68783d85/src/OpenApi/src/Extensions/OpenApiServiceCollectionExtensions.cs#L64
-#pragma warning disable CA1308 // Normalize strings to uppercase
-            var key = description.GroupName.ToLowerInvariant();
-#pragma warning restore CA1308
-
-            names.Add( key );
-            container.AddService( Type.OpenApiSchemaService, key, Class.OpenApiSchemaService.New );
-            container.AddService( Type.OpenApiDocumentService, key, Class.OpenApiDocumentService.New );
-            container.AddService( type, key, ( sp, k ) => sp.GetRequiredKeyedService( Type.OpenApiDocumentService, k ) );
-        }
-
-        if ( names.Count > 0 )
-        {
-            var array = Array.CreateInstance( Type.NamedService, names.Count );
-
-            for ( var i = 0; i < names.Count; i++ )
-            {
-                array.SetValue( Class.NamedService.New( names[i] ), i );
-            }
-
-            container.AddService( Type.IDocumentProvider, Class.OpenApiDocumentProvider.New );
-            container.AddService( Type.IEnumerableOfNamedService, array );
-        }
-
-        return container;
     }
 }
