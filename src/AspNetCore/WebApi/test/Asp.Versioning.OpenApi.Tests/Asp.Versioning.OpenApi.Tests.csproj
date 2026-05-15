@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+  <TargetFramework>net11.0</TargetFramework>
   <RootNamespace>Asp.Versioning.OpenApi</RootNamespace>
   <AssemblyTitle>Test API</AssemblyTitle>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>

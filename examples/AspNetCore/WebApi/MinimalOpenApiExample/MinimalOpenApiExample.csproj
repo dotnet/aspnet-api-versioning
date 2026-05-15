@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
  <PropertyGroup>
-  <TargetFramework>net10.0</TargetFramework>
+  <TargetFramework>net11.0</TargetFramework>
   <AssemblyTitle>Example API</AssemblyTitle>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
  </PropertyGroup>
@@ -13,6 +13,12 @@
   </PackageReference>
   <PackageReference Include="Scalar.AspNetCore" />
   <PackageReference Include="Scalar.AspNetCore.Microsoft" />
+
+  <!-- Scalar package above brings Microsoft.AspNetCore.OpenApi 10 whose source gen doesn't work with latest Microsoft.OpenApi -->
+  <!-- The latest preview of Microsoft.AspNetCore.OpenApi has the fixed source gen. -->
+  <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+
+  <Reference Include="Microsoft.AspNetCore.OpenApi.dll" />
  </ItemGroup>
 
  <ItemGroup>

@@ -12,9 +12,10 @@
 
  <ItemGroup Label="ASP.NET Core">
   <PackageVersion Include="Microsoft.AspNetCore.OData" Version="10.0.0-preview.2" />
-  <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.3" />
+  <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="11.0.0-preview.4.26230.115" />
   <PackageVersion Include="Scalar.AspNetCore" Version="2.12.46" />
   <PackageVersion Include="Scalar.AspNetCore.Microsoft" Version="2.12.46" />
+  <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0-preview.4.26230.115" />
  </ItemGroup>
 
 </Project>
