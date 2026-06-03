@@ -30,7 +30,9 @@ internal static class XmlCommentsProvider
 
             if ( i >= 0 )
             {
-                name = name[..i] + "``" + type.GetGenericArguments().Length;
+                // A generic type uses a single backtick for its arity (e.g. List`1); the double backtick form
+                // is reserved for generic methods and generic parameters.
+                name = name[..i] + "`" + type.GetGenericArguments().Length;
             }
 
             return builder.Append( name.Replace( '+', '.' ) );
@@ -73,7 +75,10 @@ internal static class XmlCommentsProvider
     {
         if ( type.IsGenericParameter )
         {
-            return builder.Append( "``" ).Append( type.GenericParameterPosition );
+            // A type generic parameter uses a single backtick (e.g. `0), while a method generic parameter
+            // uses a double backtick (e.g. ``0).
+            var prefix = type.DeclaringMethod is null ? "`" : "``";
+            return builder.Append( prefix ).Append( type.GenericParameterPosition );
         }
 
         if ( type.IsArray )

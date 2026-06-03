@@ -175,4 +175,32 @@ public class XmlCommentsTest
         // assert
         example.Should().Be( "user@example.com" );
     }
+
+    [Fact]
+    public void summary_should_be_retrieved_for_generic_type_property()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( IRange<DateOnly> ).GetProperty( nameof( IRange<DateOnly>.Lower ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the lower bound of the range." );
+    }
+
+    [Fact]
+    public void summary_should_be_inherited_from_interface_via_inheritdoc()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( DateRange ).GetProperty( nameof( DateRange.Upper ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the upper bound of the range." );
+    }
 }

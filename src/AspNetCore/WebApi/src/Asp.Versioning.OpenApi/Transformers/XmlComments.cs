@@ -15,6 +15,7 @@ using System.Xml.Linq;
 /// </summary>
 public class XmlComments
 {
+    private const int MaxInheritDocDepth = 8;
     private readonly ConcurrentDictionary<string, XElement?> members = new();
 
     /// <summary>
@@ -182,8 +183,109 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the information for.</param>
     /// <returns>The <see cref="XElement"/> representing the matching <c>member</c> element or <c>null</c>.</returns>
-    protected virtual XElement? GetMember( MemberInfo member ) =>
-        GetMemberById( XmlCommentsProvider.GetDocumentationMemberId( member ) );
+    protected virtual XElement? GetMember( MemberInfo member ) => ResolveMember( member, depth: 0 );
+
+    private XElement? ResolveMember( MemberInfo member, int depth )
+    {
+        var element = GetMemberById( XmlCommentsProvider.GetDocumentationMemberId( member ) );
+
+        // The C# compiler writes <inheritdoc /> verbatim into the XML file; following it is the consumer's
+        // responsibility. Resolve it so members documented on a base type or an implemented interface still
+        // surface their summary, remarks, parameters, and so on.
+        if ( depth < MaxInheritDocDepth && element?.Element( "inheritdoc" ) is { } inheritdoc )
+        {
+            if ( ResolveInheritDoc( member, inheritdoc, depth ) is { } inherited )
+            {
+                return inherited;
+            }
+        }
+
+        return element;
+    }
+
+    private XElement? ResolveInheritDoc( MemberInfo member, XElement inheritdoc, int depth )
+    {
+        // Explicit source: <inheritdoc cref="..." />
+        if ( inheritdoc.Attribute( "cref" )?.Value is { Length: > 0 } cref
+             && GetMemberById( cref ) is { } referenced
+             && referenced.Element( "inheritdoc" ) is null )
+        {
+            return referenced;
+        }
+
+        // Implicit source: the same member on a base type, then on an implemented interface
+        foreach ( var inheritedMember in GetInheritedMembers( member ) )
+        {
+            if ( ResolveMember( inheritedMember, depth + 1 ) is { } resolved
+                 && resolved.Element( "inheritdoc" ) is null )
+            {
+                return resolved;
+            }
+        }
+
+        return null;
+    }
+
+    [UnconditionalSuppressMessage( "ILLink", "IL2070" )]
+    private static IEnumerable<MemberInfo> GetInheritedMembers( MemberInfo member )
+    {
+        // <inheritdoc /> on a type inherits from its base type and then its implemented interfaces
+        if ( member is Type type )
+        {
+            if ( type.BaseType is { } baseType && baseType != typeof( object ) )
+            {
+                yield return baseType;
+            }
+
+            foreach ( var contract in type.GetInterfaces() )
+            {
+                yield return contract;
+            }
+
+            yield break;
+        }
+
+        if ( member.DeclaringType is not { } declaringType )
+        {
+            yield break;
+        }
+
+        // Base class first (overrides and hidden members), then implemented interfaces
+        if ( declaringType.BaseType is { } baseDeclaringType
+             && baseDeclaringType != typeof( object )
+             && FindMatchingMember( baseDeclaringType, member ) is { } baseMember )
+        {
+            yield return baseMember;
+        }
+
+        foreach ( var contract in declaringType.GetInterfaces() )
+        {
+            if ( FindMatchingMember( contract, member ) is { } interfaceMember )
+            {
+                yield return interfaceMember;
+            }
+        }
+    }
+
+    [UnconditionalSuppressMessage( "ILLink", "IL2070" )]
+    private static MemberInfo? FindMatchingMember( Type type, MemberInfo member )
+    {
+        const BindingFlags Flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+
+        switch ( member )
+        {
+            case PropertyInfo property:
+                return type.GetProperty( property.Name, Flags );
+            case MethodInfo method:
+                var parameterTypes = method.GetParameters().Select( parameter => parameter.ParameterType ).ToArray();
+                return type.GetMethod( method.Name, Flags, binder: null, parameterTypes, modifiers: null )
+                       ?? type.GetMethods( Flags ).FirstOrDefault(
+                              candidate => candidate.Name == method.Name
+                                  && candidate.GetParameters().Length == parameterTypes.Length );
+            default:
+                return type.GetMember( member.Name, Flags ).FirstOrDefault();
+        }
+    }
 
     private static XElement? FindMember( XDocument xml, string key ) =>
         xml.Descendants( "member" ).FirstOrDefault( member => member.Attribute( "name" )?.Value == key );

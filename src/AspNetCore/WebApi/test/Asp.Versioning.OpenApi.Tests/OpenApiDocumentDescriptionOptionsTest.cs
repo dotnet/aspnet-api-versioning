@@ -3,6 +3,7 @@
 
 namespace Asp.Versioning.OpenApi;
 
+[AssumeCulture( "en-US" )]
 public class OpenApiDocumentDescriptionOptionsTest
 {
     [Fact]
