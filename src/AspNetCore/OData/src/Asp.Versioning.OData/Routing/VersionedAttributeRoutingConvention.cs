@@ -65,7 +65,7 @@ public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
     // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Routing/Conventions/AttributeRoutingConvention.cs#L238
     private static string? FindRelatedODataPrefix( string routeTemplate, string[] prefixes )
     {
-        if ( routeTemplate.StartsWith( '/' ) )
+        if ( routeTemplate.StartsWith( '/', StringComparison.Ordinal ) )
         {
             routeTemplate = routeTemplate[1..];
         }
@@ -175,7 +175,7 @@ public class VersionedAttributeRoutingConvention : AttributeRoutingConvention
             //       route template pattern.
             //
             // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Routing/Conventions/AttributeRoutingConvention.cs#L181
-            if ( attributeRoute.Template is string template && template.StartsWith( '/' ) )
+            if ( attributeRoute.Template is string template && template.StartsWith( '/', StringComparison.Ordinal ) )
             {
                 attributeRoute.Template = template.TrimStart( '/' );
             }

@@ -36,7 +36,7 @@
  </PropertyGroup>
 
  <ItemGroup Label="SourceLink">
-  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.0-*" PrivateAssets="All"/>
+  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.100-preview.6.26359.118" PrivateAssets="All"/>
  </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@
  </ItemGroup>
 
  <ItemGroup Condition=" '$(IsAspNetCore)' == 'true' ">
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(DotNetReleaseBasePackageVersion).*" />
+  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="11.0.0-preview.6.26359.118" />
  </ItemGroup>
 
  <ItemGroup>
