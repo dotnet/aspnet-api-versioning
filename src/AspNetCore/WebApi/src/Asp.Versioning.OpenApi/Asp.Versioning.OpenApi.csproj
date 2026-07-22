@@ -16,7 +16,7 @@
  </ItemGroup>
 
  <ItemGroup>
-  <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
+  <PackageReference Include="Microsoft.OpenApi" Version="[2.7.5, 3.0.0)" />
   <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.*" />
  </ItemGroup>
 
