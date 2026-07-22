@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using static System.Reflection.BindingFlags;
 
 /// <summary>
 /// Provides access to XML documentation comments, which enables the retrieval of summaries, remarks, return values,
@@ -189,7 +190,7 @@ public class XmlComments
     {
         var element = GetMemberById( XmlCommentsProvider.GetDocumentationMemberId( member ) );
 
-        // The C# compiler writes <inheritdoc /> verbatim into the XML file; following it is the consumer's
+        // The compiler writes <inheritdoc /> verbatim into the XML file; following it is the consumer's
         // responsibility. Resolve it so members documented on a base type or an implemented interface still
         // surface their summary, remarks, parameters, and so on.
         if ( depth < MaxInheritDocDepth && element?.Element( "inheritdoc" ) is { } inheritdoc )
@@ -270,7 +271,7 @@ public class XmlComments
     [UnconditionalSuppressMessage( "ILLink", "IL2070" )]
     private static MemberInfo? FindMatchingMember( Type type, MemberInfo member )
     {
-        const BindingFlags Flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+        const BindingFlags Flags = Public | NonPublic | Instance | Static;
 
         switch ( member )
         {

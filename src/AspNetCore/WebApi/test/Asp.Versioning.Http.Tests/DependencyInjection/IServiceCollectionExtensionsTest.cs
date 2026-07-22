@@ -27,34 +27,27 @@ public class IServiceCollectionExtensionsTest
         options.Should().Throw<OptionsValidationException>();
     }
 
-    // REF: https://github.com/dotnet/aspnet-api-versioning/issues/1191
     [Fact]
     public void add_api_versioning_should_not_displace_or_wrap_user_registered_problem_details_writers()
     {
         // arrange
         var services = new ServiceCollection();
-        var customWriter = new TestProblemDetailsWriter();
+        var writer = new Mock<IProblemDetailsWriter>();
 
+        writer.Setup( w => w.CanWrite( It.IsAny<ProblemDetailsContext>() ) ).Returns( true );
         services.AddProblemDetails();
-        services.AddSingleton<IProblemDetailsWriter>( customWriter );
+        services.AddSingleton( writer.Object );
 
-        var writersBefore = services.Where( s => s.ServiceType == typeof( IProblemDetailsWriter ) ).ToArray();
+        var before = services.Where( s => s.ServiceType == typeof( IProblemDetailsWriter ) ).ToArray();
 
         // act
         services.AddApiVersioning();
 
         // assert
-        var writersAfter = services.Where( s => s.ServiceType == typeof( IProblemDetailsWriter ) ).ToArray();
-        writersAfter.Should().Equal( writersBefore );
-
+        var after = services.Where( s => s.ServiceType == typeof( IProblemDetailsWriter ) ).ToArray();
         using var provider = services.BuildServiceProvider();
-        provider.GetServices<IProblemDetailsWriter>().Should().Contain( customWriter );
-    }
 
-    private sealed class TestProblemDetailsWriter : IProblemDetailsWriter
-    {
-        public bool CanWrite( ProblemDetailsContext context ) => true;
-
-        public ValueTask WriteAsync( ProblemDetailsContext context ) => ValueTask.CompletedTask;
+        after.Should().Equal( before );
+        provider.GetServices<IProblemDetailsWriter>().Should().Contain( writer.Object );
     }
 }
