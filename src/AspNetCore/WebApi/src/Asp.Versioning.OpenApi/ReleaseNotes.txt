@@ -1,1 +1,2 @@
-﻿
+﻿Clip dependent package version because the next major version is incompatible [dotnet/aspnetcore#67930](https://github.com/dotnet/aspnetcore/issues/67930)
+Fix `<inheritdoc />` summaries [Issue #1189](https://github.com/dotnet/aspnet-api-versioning/issues/1189)
