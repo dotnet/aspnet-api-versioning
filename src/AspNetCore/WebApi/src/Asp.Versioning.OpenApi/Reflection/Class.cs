@@ -10,7 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using static System.Linq.Expressions.Expression;
+using static System.Runtime.CompilerServices.UnsafeAccessorKind;
 
 // HACK: all of these types are internal in Microsoft.AspNetCore.OpenApi
 // REF: https://github.com/dotnet/aspnetcore/tree/main/src/OpenApi/src
@@ -18,80 +20,62 @@ internal static class Class
 {
     public static class OpenApiDocumentService
     {
-        private static readonly Func<IServiceProvider, string, object> factory = NewFactory();
-
-        public static object New( IServiceProvider serviceProvider, string documentName ) => factory( serviceProvider, documentName );
-
-        private static Func<IServiceProvider, string, object> NewFactory()
+        public static object New( IServiceProvider serviceProvider, string documentName )
         {
-            var constructor = Type.OpenApiDocumentService.GetConstructors().Single();
-            var serviceProvider = Parameter( typeof( IServiceProvider ), "serviceProvider" );
-            var documentName = Parameter( typeof( string ), "documentName" );
-            var getRequiredService = typeof( ServiceProviderServiceExtensions ).GetMethod(
-                nameof( ServiceProviderServiceExtensions.GetRequiredService ),
-                [typeof( IServiceProvider ), typeof( System.Type )] )!;
-            var apiDescriptionGroupCollectionProvider = typeof( IApiDescriptionGroupCollectionProvider );
-            var hostEnvironment = typeof( IHostEnvironment );
-            var optionsMonitor = typeof( IOptionsMonitor<OpenApiOptions> );
-            var server = typeof( IServer );
-            var body = Expression.New(
-                constructor,
-                documentName,
-                Convert( Call( getRequiredService, serviceProvider, Constant( apiDescriptionGroupCollectionProvider ) ), apiDescriptionGroupCollectionProvider ),
-                Convert( Call( getRequiredService, serviceProvider, Constant( hostEnvironment ) ), hostEnvironment ),
-                Convert( Call( getRequiredService, serviceProvider, Constant( optionsMonitor ) ), optionsMonitor ),
-                serviceProvider,
-                Convert( Call( getRequiredService, serviceProvider, Constant( server ) ), server ) );
-            var lambda = Lambda<Func<IServiceProvider, string, object>>( body, serviceProvider, documentName );
+            var apiDescriptionGroupCollectionProvider = serviceProvider.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
+            var hostEnvironment = serviceProvider.GetRequiredService<IHostEnvironment>();
+            var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<OpenApiOptions>>();
+            var server = serviceProvider.GetRequiredService<IServer>();
 
-            return lambda.Compile();
+            return OpenApiDocumentServiceCtor(
+                documentName,
+                apiDescriptionGroupCollectionProvider,
+                hostEnvironment,
+                optionsMonitor,
+                serviceProvider,
+                server );
         }
+
+        [UnsafeAccessor( Constructor )]
+        [return: UnsafeAccessorType( Type.Name.OpenApiDocumentService )]
+        private static extern object OpenApiDocumentServiceCtor(
+            string documentName,
+            IApiDescriptionGroupCollectionProvider apiDescriptionGroupCollectionProvider,
+            IHostEnvironment hostEnvironment,
+            IOptionsMonitor<OpenApiOptions> optionsMonitor,
+            IServiceProvider serviceProvider,
+            IServer server );
     }
 
     public static class OpenApiSchemaService
     {
-        private static readonly Func<IServiceProvider, string, object> factory = NewFactory();
-
-        public static object New( IServiceProvider serviceProvider, string documentName ) => factory( serviceProvider, documentName );
-
-        private static Func<IServiceProvider, string, object> NewFactory()
+        public static object New( IServiceProvider serviceProvider, string documentName )
         {
-            var constructor = Type.OpenApiSchemaService.GetConstructors().Single();
-            var serviceProvider = Parameter( typeof( IServiceProvider ), "serviceProvider" );
-            var documentName = Parameter( typeof( string ), "documentName" );
-            var getRequiredService = typeof( ServiceProviderServiceExtensions ).GetMethod(
-                nameof( ServiceProviderServiceExtensions.GetRequiredService ),
-                [typeof( IServiceProvider ), typeof( System.Type )] )!;
-            var jsonOptions = typeof( IOptions<JsonOptions> );
-            var optionsMonitor = typeof( IOptionsMonitor<OpenApiOptions> );
-            var body = Expression.New(
-                constructor,
-                documentName,
-                Convert( Call( getRequiredService, serviceProvider, Constant( jsonOptions ) ), jsonOptions ),
-                Convert( Call( getRequiredService, serviceProvider, Constant( optionsMonitor ) ), optionsMonitor ) );
-            var lambda = Lambda<Func<IServiceProvider, string, object>>( body, serviceProvider, documentName );
+            var jsonOptions = serviceProvider.GetRequiredService<IOptions<JsonOptions>>();
+            var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<OpenApiOptions>>();
 
-            return lambda.Compile();
+            return OpenApiSchemaServiceCtor( documentName, jsonOptions, optionsMonitor );
         }
+
+        [UnsafeAccessor( Constructor )]
+        [return: UnsafeAccessorType( Type.Name.OpenApiSchemaService )]
+        private static extern object OpenApiSchemaServiceCtor(
+            string documentName,
+            IOptions<JsonOptions> jsonOptions,
+            IOptionsMonitor<OpenApiOptions> optionsMonitor );
     }
 
     public static class OpenApiDocumentProvider
     {
-        private static readonly Func<IServiceProvider, object> factory = NewFactory();
+        public static object New( IServiceProvider serviceProvider ) => OpenApiDocumentProviderCtor( serviceProvider );
 
-        public static object New( IServiceProvider serviceProvider ) => factory( serviceProvider );
-
-        private static Func<IServiceProvider, object> NewFactory()
-        {
-            var constructor = Type.OpenApiDocumentProvider.GetConstructors().Single();
-            var serviceProvider = Parameter( typeof( IServiceProvider ), "serviceProvider" );
-            var body = Expression.New( constructor, serviceProvider );
-            var lambda = Lambda<Func<IServiceProvider, object>>( body, serviceProvider );
-
-            return lambda.Compile();
-        }
+        [UnsafeAccessor( Constructor )]
+        [return: UnsafeAccessorType( Type.Name.OpenApiDocumentProvider )]
+        private static extern object OpenApiDocumentProviderCtor( IServiceProvider serviceProvider );
     }
 
+    // this class cannot use UnsafeAccessor or UnsafeAccessorType because it is generic and neither the class nor the
+    // type parameter is known at compile time
     public static class NamedService
     {
         private static readonly Func<string, object> factory = NewFactory();
