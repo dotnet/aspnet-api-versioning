@@ -36,7 +36,12 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
         this.routePatterns = routePatterns;
         this.parser = parser;
         this.options = options;
-        versionsByUrl = routePatterns.Length > 0;
+
+        // grpc does not support route parameter constraints in the same way as other endpoints, which means there will
+        // not be a route pattern for a grpc endpoint that versions by url segment. grpc endpoints can also be versioned
+        // by query string. only add to the cost of extracting the api version from a url segment if that method of
+        // of versioning is enabled in combination with grpc
+        versionsByUrl = routePatterns.Length > 0 || ( Grpc.IsSupported && source.VersionsByUrl() );
         versionsByUrlOnly = source.VersionsByUrl( allowMultipleLocations: false );
         versionsByMediaTypeOnly = source.VersionsByMediaType( allowMultipleLocations: false );
     }
@@ -54,6 +59,7 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
              TryGetApiVersionFromPath( request, out var rawApiVersion ) &&
              DoesNotContainApiVersion( apiVersions, rawApiVersion ) )
         {
+            feature.RawRequestedApiVersion = rawApiVersion;
             apiVersions.Add( rawApiVersion );
             addedFromUrl = apiVersions.Count == apiVersions.Capacity;
         }
@@ -159,4 +165,12 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private bool TryGetApiVersionFromPath( HttpRequest request, [NotNullWhen( true )] out string? apiVersion ) =>
         request.TryGetApiVersionFromPath( routePatterns, options.RouteConstraintName, out apiVersion );
+
+    // REF: https://github.com/grpc/grpc-dotnet/blob/master/src/Grpc.AspNetCore.Server/Internal/GrpcMarkerService.cs
+    // REF: https://github.com/grpc/grpc-dotnet/blob/master/src/Grpc.AspNetCore.Server/GrpcServiceExtensions.cs#L71
+    private static class Grpc
+    {
+        private const string MarkerTypeName = "Grpc.AspNetCore.Server.Internal.GrpcMarkerService, Grpc.AspNetCore.Server";
+        public static readonly bool IsSupported = Type.GetType( MarkerTypeName ) is not null;
+    }
 }
