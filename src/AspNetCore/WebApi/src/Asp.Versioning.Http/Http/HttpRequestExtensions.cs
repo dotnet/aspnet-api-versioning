@@ -4,8 +4,11 @@
 
 namespace Microsoft.AspNetCore.Http;
 
+using Asp.Versioning;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using System.ComponentModel;
 using RoutePattern = Microsoft.AspNetCore.Routing.Patterns.RoutePattern;
 
@@ -34,18 +37,16 @@ public static class HttpRequestExtensions
             [NotNullWhen( true )] out string? apiVersion )
             where TList : IReadOnlyList<RoutePattern>
         {
+            ArgumentNullException.ThrowIfNull( request );
             ArgumentNullException.ThrowIfNull( routePatterns );
 
             if ( string.IsNullOrEmpty( constraintName ) || routePatterns.Count == 0 )
             {
-                apiVersion = default;
-                return false;
+                return request.TryInferApiVersionFromSegment( out apiVersion );
             }
 
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-            var path = ( request ?? throw new ArgumentNullException( nameof( request ) ) ).Path;
-#pragma warning restore CA2208 // Instantiate argument exceptions correctly
-            var values = new RouteValueDictionary();
+            var path = request.Path;
+            var values = default( RouteValueDictionary );
 
             // this only applies when versioning by url segment. route values have not been processed
             // since no candidates exist yet. we do know the name of the route constraint though. there
@@ -58,7 +59,14 @@ public static class HttpRequestExtensions
                 var defaults = new RouteValueDictionary( routePattern.RequiredValues );
                 var matcher = new TemplateMatcher( new( routePattern ), defaults );
 
-                values.Clear();
+                if ( values is null )
+                {
+                    values = [];
+                }
+                else
+                {
+                    values.Clear();
+                }
 
                 if ( !matcher.TryMatch( path, values ) )
                 {
@@ -83,6 +91,82 @@ public static class HttpRequestExtensions
                     }
                 }
             }
+
+            return request.TryInferApiVersionFromSegment( out apiVersion );
+        }
+
+        /// <summary>
+        /// Attempts to infer the API version from the current request path by looking for at each segment.
+        /// </summary>
+        /// <param name="apiVersion">The raw API version, if retrieved.</param>
+        /// <returns>True if the raw API version was retrieved; otherwise, false.</returns>
+        /// <remarks>
+        /// <para>
+        /// This is the last resort for inferring the API version and is intrinsically slow. There are no route
+        /// constraints to match against. '/v1' and 'api/v1' are the only recognized and supported prefixes as
+        /// versioning by URL segment is uniformly at the beginning of the path and a later segment in the path could
+        /// be accidentally misinterpreted.
+        /// </para>
+        /// <para>This approach addresses at least two use cases when an API version is specified as a segment in the
+        /// URL path:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>with a status</description>
+        /// </item>
+        /// <item>
+        /// <description>using gRPC</description>
+        /// </item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// An alternate design could support configuring a route template for the purposes of matching, but that would
+        /// only address the gRPC scenario. The path 'v2-preview' or 'api/v2-preview' would still not match.
+        /// </para>
+        /// </remarks>
+        private bool TryInferApiVersionFromSegment( [NotNullWhen( true )] out string? apiVersion )
+        {
+            if ( request.HttpContext.RequestServices.GetService<IApiVersionParser>() is not { } parser )
+            {
+                apiVersion = default;
+                return false;
+            }
+
+            var segments = new StringTokenizer( request.Path, ['/'] );
+            var count = 0;
+
+            foreach ( var segment in segments )
+            {
+                switch ( segment.Length )
+                {
+                    case 0:
+                        continue;
+                    case 1:
+                        goto NoMatch;
+                    default:
+                        ++count;
+                        break;
+                }
+
+                if ( count > 2 )
+                {
+                    break;
+                }
+
+                var span = segment.AsSpan();
+
+                if ( span[0] == 'v' || span[0] == 'V' )
+                {
+                    span = span[1..];
+
+                    if ( parser.TryParse( span, out var _ ) )
+                    {
+                        apiVersion = span.ToString();
+                        return true;
+                    }
+                }
+            }
+
+        NoMatch:
 
             apiVersion = default;
             return false;
