@@ -355,6 +355,36 @@ public class IEndpointConventionBuilderExtensionsTest
     }
 
     [Fact]
+    public void with_api_version_set_should_ignore_introduced_version_for_neutral_endpoint()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .IsApiVersionNeutral()
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .IntroducedInApiVersion( 2.0 );
+
+        // assert
+        var metadata = dataSources.Single()
+                                  .Endpoints
+                                  .Single()
+                                  .Metadata
+                                  .OfType<ApiVersionMetadata>()
+                                  .Single();
+
+        metadata.IntroducedInApiVersions.Should().BeEmpty();
+    }
+
+    [Fact]
     public void has_api_version_should_add_convention()
     {
         // arrange
@@ -407,6 +437,235 @@ public class IEndpointConventionBuilderExtensionsTest
 
         // assert
         versionSet.Build( new() ).SupportedApiVersions.Single().Should().Be( new ApiVersion( 1.0 ) );
+    }
+
+    [Fact]
+    public void introduced_in_api_version_should_add_convention()
+    {
+        // arrange
+        var conventions = new Mock<IEndpointConventionBuilder>();
+        var provider = default( IIntroducedInApiVersionProvider );
+
+        conventions.Setup( b => b.Add( It.IsAny<Action<EndpointBuilder>>() ) )
+                   .Callback( ( Action<EndpointBuilder> callback ) =>
+                   {
+                       var endpoint = Mock.Of<EndpointBuilder>();
+                       var versionSet = new ApiVersionSetBuilder( default ).Build();
+                       endpoint.Metadata.Add( versionSet );
+                       callback( endpoint );
+                       provider = endpoint.Metadata.OfType<IIntroducedInApiVersionProvider>().First();
+                   } );
+
+        var route = new RouteHandlerBuilder( [conventions.Object] );
+
+        // act
+        route.IntroducedInApiVersion( 2.0 );
+
+        // assert
+        provider.Should().BeEquivalentTo(
+            new
+            {
+                Options = Introduced,
+                Versions = new[] { new ApiVersion( 2.0 ) },
+                StatusCode = IntroducedInApiVersionAttribute.DefaultStatusCode,
+            } );
+    }
+
+    [Fact]
+    public void with_api_version_set_should_expand_introduced_version()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasApiVersion( 3.0 )
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .IntroducedInApiVersion( 2.0 );
+
+        // assert
+        var metadata = dataSources.Single()
+                                  .Endpoints
+                                  .Single()
+                                  .Metadata
+                                  .OfType<ApiVersionMetadata>()
+                                  .Single();
+
+        metadata.MappingTo( new ApiVersion( 1.0 ) ).Should().Be( ApiVersionMapping.None );
+        metadata.MappingTo( new ApiVersion( 2.0 ) ).Should().Be( ApiVersionMapping.Explicit );
+        metadata.MappingTo( new ApiVersion( 3.0 ) ).Should().Be( ApiVersionMapping.Explicit );
+        metadata.IntroducedInApiVersions.Single().Should().BeEquivalentTo(
+            new IntroducedInApiVersionMetadata( new ApiVersion( 2.0 ), IntroducedInApiVersionAttribute.DefaultStatusCode ) );
+    }
+
+    [Fact]
+    public void with_api_version_set_should_expand_supported_versions_from_introduced_version()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasApiVersion( 3.0 )
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .IntroducedInApiVersion( 2.0 )
+                  .HasApiVersion( 3.0 );
+
+        // assert
+        var metadata = dataSources.Single()
+                                  .Endpoints
+                                  .Single()
+                                  .Metadata
+                                  .OfType<ApiVersionMetadata>()
+                                  .Single();
+
+        metadata.MappingTo( new ApiVersion( 1.0 ) ).Should().Be( ApiVersionMapping.None );
+        metadata.MappingTo( new ApiVersion( 2.0 ) ).Should().Be( ApiVersionMapping.Explicit );
+        metadata.MappingTo( new ApiVersion( 3.0 ) ).Should().Be( ApiVersionMapping.Explicit );
+    }
+
+    [Fact]
+    public void with_api_version_set_should_apply_introduced_version_to_explicit_supported_versions()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasApiVersion( 3.0 )
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .HasApiVersion( 1.0 )
+                  .IntroducedInApiVersion( 3.0 );
+
+        // assert
+        var metadata = GetApiVersionMetadata( dataSources );
+        var model = metadata.Map( ApiVersionMapping.Explicit );
+
+        model.DeclaredApiVersions.Should().Equal( new ApiVersion( 3.0 ) );
+        model.ImplementedApiVersions.Should().Equal( new ApiVersion( 3.0 ) );
+        metadata.MappingTo( new ApiVersion( 1.0 ) ).Should().Be( ApiVersionMapping.None );
+        metadata.MappingTo( new ApiVersion( 3.0 ) ).Should().Be( ApiVersionMapping.Explicit );
+    }
+
+    [Fact]
+    public void with_api_version_set_should_expand_mapped_versions_from_introduced_version()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasApiVersion( 3.0 )
+                                   .HasApiVersion( 4.0 )
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .MapToApiVersion( 2.0 )
+                  .IntroducedInApiVersion( 3.0 );
+
+        // assert
+        var model = GetApiVersionMetadata( dataSources ).Map( ApiVersionMapping.Explicit );
+
+        model.DeclaredApiVersions.Should().Equal( new ApiVersion( 2.0 ), new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
+        model.ImplementedApiVersions.Should().Equal( new ApiVersion( 2.0 ), new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
+    }
+
+    [Theory]
+    [InlineData( 1.0 )]
+    [InlineData( 4.0 )]
+    public void with_api_version_set_should_mirror_mvc_when_supported_version_is_combined_with_introduced_version( double version )
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasApiVersion( 3.0 )
+                                   .HasApiVersion( 4.0 )
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .HasApiVersion( version )
+                  .IntroducedInApiVersion( 3.0 );
+
+        // assert
+        var model = GetApiVersionMetadata( dataSources ).Map( ApiVersionMapping.Explicit );
+
+        model.DeclaredApiVersions.Should().Equal( new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
+        model.ImplementedApiVersions.Should().Equal( new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
+    }
+
+    [Fact]
+    public void with_api_version_set_should_mirror_mvc_when_deprecated_version_is_combined_with_introduced_version()
+    {
+        // arrange
+        var dataSources = new List<EndpointDataSource>();
+        var app = new Mock<IEndpointRouteBuilder>();
+
+        app.SetupGet( a => a.ServiceProvider ).Returns( new MockServiceProvider() );
+        app.SetupGet( a => a.DataSources ).Returns( dataSources );
+
+        // act
+        var versionSet = app.Object.NewApiVersionSet()
+                                   .HasApiVersion( 1.0 )
+                                   .HasApiVersion( 2.0 )
+                                   .HasDeprecatedApiVersion( 3.0 )
+                                   .HasDeprecatedApiVersion( 4.0 )
+                                   .Build();
+
+        app.Object.MapGet( "/test", () => Results.Ok() )
+                  .WithApiVersionSet( versionSet )
+                  .HasDeprecatedApiVersion( 1.0 )
+                  .IntroducedInApiVersion( 3.0 );
+
+        // assert
+        var model = GetApiVersionMetadata( dataSources ).Map( ApiVersionMapping.Explicit );
+
+        model.DeclaredApiVersions.Should().Equal( new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
+        model.ImplementedApiVersions.Should().Equal( new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
+        model.SupportedApiVersions.Should().BeEmpty();
+        model.DeprecatedApiVersions.Should().Equal( new ApiVersion( 3.0 ), new ApiVersion( 4.0 ) );
     }
 
     [Fact]
@@ -750,4 +1009,12 @@ public class IEndpointConventionBuilderExtensionsTest
             return null;
         }
     }
+
+    private static ApiVersionMetadata GetApiVersionMetadata( IReadOnlyList<EndpointDataSource> dataSources ) =>
+        dataSources.Single()
+                   .Endpoints
+                   .Single()
+                   .Metadata
+                   .OfType<ApiVersionMetadata>()
+                   .Single();
 }

@@ -338,4 +338,93 @@ public static class ApiVersionConventionBuilderExtensions
             return builder;
         }
     }
+
+    /// <summary>
+    /// Provides extensions for builders that support the introduced-in API version convention.
+    /// </summary>
+    /// <typeparam name="T">The type of <see cref="IIntroducedInApiVersionConventionBuilder"/>.</typeparam>
+    /// <param name="builder">The extended <see cref="IIntroducedInApiVersionConventionBuilder"/>.</param>
+    /// <returns>The original <paramref name="builder"/>.</returns>
+    extension<T>( T builder )
+        where T : notnull, IIntroducedInApiVersionConventionBuilder
+    {
+        /// <summary>
+        /// Indicates that the configured controller action was introduced in the specified API version.
+        /// </summary>
+        /// <param name="majorVersion">The major version number.</param>
+        /// <param name="minorVersion">The optional minor version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public T IntroducedInApiVersion(
+            int majorVersion,
+            int? minorVersion = default,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+        {
+            builder.IntroducedInApiVersion( new ApiVersion( majorVersion, minorVersion, status ), statusCode );
+            return builder;
+        }
+
+        /// <summary>
+        /// Indicates that the configured controller action was introduced in the specified API version.
+        /// </summary>
+        /// <param name="version">The version number.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public T IntroducedInApiVersion(
+            double version,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+        {
+            builder.IntroducedInApiVersion( new ApiVersion( version, status ), statusCode );
+            return builder;
+        }
+
+        /// <summary>
+        /// Indicates that the configured controller action was introduced in the specified API version.
+        /// </summary>
+        /// <param name="year">The version year.</param>
+        /// <param name="month">The version month.</param>
+        /// <param name="day">The version day.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public T IntroducedInApiVersion(
+            int year,
+            int month,
+            int day,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+        {
+            builder.IntroducedInApiVersion( new ApiVersion( new DateOnly( year, month, day ), status ), statusCode );
+            return builder;
+        }
+
+        /// <summary>
+        /// Indicates that the configured controller action was introduced in the specified API version.
+        /// </summary>
+        /// <param name="groupVersion">The group version.</param>
+        /// <param name="status">The optional version status.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public T IntroducedInApiVersion(
+            DateOnly groupVersion,
+            string? status = default,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+        {
+            builder.IntroducedInApiVersion( new ApiVersion( groupVersion, status ), statusCode );
+            return builder;
+        }
+
+        /// <summary>
+        /// Indicates that the configured controller action was introduced in the specified API version.
+        /// </summary>
+        /// <param name="apiVersion">The <see cref="ApiVersion">API version</see> the action was introduced in.</param>
+        /// <param name="statusCode">The HTTP status code for earlier API versions.</param>
+        public T IntroducedInApiVersion(
+            ApiVersion apiVersion,
+            int statusCode = IntroducedInApiVersionAttribute.DefaultStatusCode )
+        {
+            builder.IntroducedInApiVersion( apiVersion, statusCode );
+            return builder;
+        }
+    }
 }

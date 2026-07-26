@@ -2,6 +2,8 @@
 
 namespace Asp.Versioning.Routing;
 
+using System.Collections.Frozen;
+
 internal struct RouteDestination
 {
     public readonly int Exit;
@@ -12,6 +14,7 @@ internal struct RouteDestination
     public int UnsupportedMediaType;
     public int AssumeDefault;
     public int NotAcceptable;
+    public IReadOnlyDictionary<ApiVersion, int> IntroducedLater;
 
     public RouteDestination( int exit )
     {
@@ -23,5 +26,6 @@ internal struct RouteDestination
         UnsupportedMediaType = exit;
         AssumeDefault = exit;
         NotAcceptable = exit;
+        IntroducedLater = FrozenDictionary<ApiVersion, int>.Empty;
     }
 }

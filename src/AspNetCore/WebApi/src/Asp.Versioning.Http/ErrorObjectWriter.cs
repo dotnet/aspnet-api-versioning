@@ -54,7 +54,8 @@ public partial class ErrorObjectWriter : IProblemDetailsWriter
         return type == ProblemDetailsDefaults.Unsupported.Type ||
                type == ProblemDetailsDefaults.Unspecified.Type ||
                type == ProblemDetailsDefaults.Invalid.Type ||
-               type == ProblemDetailsDefaults.Ambiguous.Type;
+               type == ProblemDetailsDefaults.Ambiguous.Type ||
+               type == ProblemDetailsDefaults.Introduced.Type;
     }
 
     /// <inheritdoc />

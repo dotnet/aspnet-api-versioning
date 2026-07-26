@@ -40,7 +40,7 @@ internal static class EndpointProblem
         {
             var reporter = context.RequestServices.GetRequiredService<IReportApiVersions>();
             var model = feature.Metadata.Map( reporter.Mapping );
-            context.Response.OnStarting( ReportApiVersions, (reporter, context.Response, model) );
+            reporter.Report( context.Response, model );
             return true;
         }
         else
@@ -58,7 +58,8 @@ internal static class EndpointProblem
 
         TryReportApiVersions( context, options );
 
-        if ( context.TryGetProblemDetailsService( out var problemDetails ) )
+        if ( context.RequestServices is not null &&
+             context.TryGetProblemDetailsService( out var problemDetails ) )
         {
             var detail = string.Format(
                 CultureInfo.CurrentCulture,
@@ -72,10 +73,29 @@ internal static class EndpointProblem
         return Task.CompletedTask;
     }
 
-    private static Task ReportApiVersions( object state )
+    internal static Task IntroducedInApiVersion(
+        HttpContext context,
+        ApiVersioningOptions options,
+        int statusCode,
+        ApiVersion introducedIn )
     {
-        var (reporter, response, model) = ((IReportApiVersions, HttpResponse, ApiVersionModel)) state;
-        reporter.Report( response, model );
+        context.Response.StatusCode = statusCode;
+
+        TryReportApiVersions( context, options );
+
+        if ( context.RequestServices is not null &&
+             context.TryGetProblemDetailsService( out var problemDetails ) )
+        {
+            var detail = string.Format(
+                CultureInfo.CurrentCulture,
+                Format.VersionedResourceNotIntroduced,
+                new Uri( context.Request.GetDisplayUrl() ).SafePath,
+                introducedIn,
+                context.ApiVersioningFeature.RawRequestedApiVersion );
+
+            return problemDetails.TryWriteAsync( New( context, Introduced, detail ) ).AsTask();
+        }
+
         return Task.CompletedTask;
     }
 }

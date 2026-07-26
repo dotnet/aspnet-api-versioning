@@ -109,6 +109,18 @@ internal sealed class ApiVersionPolicyJumpTable : PolicyJumpTable
                     return destination;
                 }
 
+                if ( rejection.IntroducedLater.TryGetValue( apiVersion, out destination ) )
+                {
+                    if ( addedFromUrl )
+                    {
+                        feature.RawRequestedApiVersion = rawApiVersion;
+                        feature.RequestedApiVersion = apiVersion;
+                    }
+
+                    httpContext.Features.Set( policyFeature );
+                    return destination;
+                }
+
                 httpContext.Features.Set( policyFeature );
 
                 if ( versionsByMediaTypeOnly )

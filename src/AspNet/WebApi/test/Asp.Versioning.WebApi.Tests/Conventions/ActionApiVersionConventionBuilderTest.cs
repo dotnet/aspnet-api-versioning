@@ -88,4 +88,90 @@ public partial class ActionApiVersionConventionBuilderTest
                 ImplementedApiVersions = Array.Empty<ApiVersion>(),
             } );
     }
+
+    [Fact]
+    public void apply_to_should_expand_declared_api_versions_from_introduced_convention()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionDescriptor = NewActionDescriptor();
+
+        actionBuilder.IntroducedInApiVersion( new ApiVersion( 2, 0 ) );
+
+        // act
+        actionBuilder.ApplyTo( actionDescriptor );
+
+        // assert
+        actionDescriptor.ApiVersionMetadata
+                        .Map( Explicit )
+                        .DeclaredApiVersions
+                        .Should()
+                        .Equal( new ApiVersion( 2, 0 ), new ApiVersion( 3, 0 ) );
+    }
+
+    [Fact]
+    public void apply_to_should_intersect_supported_api_versions_with_introduced_convention()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionDescriptor = NewActionDescriptor();
+        var version1 = new ApiVersion( 1, 0 );
+        var version2 = new ApiVersion( 2, 0 );
+        var version3 = new ApiVersion( 3, 0 );
+
+        actionBuilder.IntroducedInApiVersion( version2 );
+
+        // act
+        actionBuilder.ApplyTo( actionDescriptor );
+
+        // assert
+        var metadata = actionDescriptor.ApiVersionMetadata;
+        var model = metadata.Map( Explicit | Implicit );
+
+        model.SupportedApiVersions.Should().NotContain( version1 );
+        model.SupportedApiVersions.Should().ContainInOrder( version2, version3 );
+        metadata.MappingTo( version2 ).Should().Be( Explicit );
+        metadata.MappingTo( version3 ).Should().Be( Explicit );
+    }
+
+    [Fact]
+    public void apply_to_should_preserve_inherited_supported_api_versions_with_mapped_convention()
+    {
+        // arrange
+        var controllerBuilder = new ControllerApiVersionConventionBuilder( typeof( UndecoratedController ) );
+        var actionBuilder = new ActionApiVersionConventionBuilder( controllerBuilder );
+        var actionDescriptor = NewActionDescriptor();
+        var version1 = new ApiVersion( 1, 0 );
+        var version2 = new ApiVersion( 2, 0 );
+        var version3 = new ApiVersion( 3, 0 );
+
+        actionBuilder.MapToApiVersion( version2 );
+
+        // act
+        actionBuilder.ApplyTo( actionDescriptor );
+
+        // assert
+        actionDescriptor.ApiVersionMetadata
+                        .Map( Explicit | Implicit )
+                        .SupportedApiVersions
+                        .Should()
+                        .Equal( version1, version2, version3 );
+    }
+
+    private static ReflectedHttpActionDescriptor NewActionDescriptor()
+    {
+        var controllerDescriptor = new HttpControllerDescriptor()
+        {
+            ControllerName = "Undecorated",
+            ControllerType = typeof( UndecoratedController ),
+        };
+        var versions = new ApiVersion[] { new( 1, 0 ), new( 2, 0 ), new( 3, 0 ) };
+        var method = typeof( UndecoratedController ).GetMethod( nameof( UndecoratedController.Get ) );
+
+        controllerDescriptor.ApiVersionModel = new( versions, versions, [], [], [] );
+
+        return new( controllerDescriptor, method );
+    }
 }

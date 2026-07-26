@@ -33,7 +33,33 @@ internal sealed class ClientErrorEndpointBuilder
             return new UnspecifiedApiVersionEndpoint( logger, options, GetDisplayNames() );
         }
 
+        var (introducedInApiVersionStatusCode, introducedIn) = GetIntroducedInApiVersionStatusCode();
+
+        if ( introducedInApiVersionStatusCode > 0 )
+        {
+            return new IntroducedInApiVersionEndpoint( options, introducedInApiVersionStatusCode, introducedIn! );
+        }
+
         return new UnsupportedApiVersionEndpoint( options );
+    }
+
+    private (int StatusCode, ApiVersion? IntroducedIn) GetIntroducedInApiVersionStatusCode()
+    {
+        var apiVersion = feature.RequestedApiVersion;
+
+        if ( apiVersion is null )
+        {
+            return default;
+        }
+
+        return IntroducedInApiVersionStatusCode.TryGetBest(
+            candidates,
+            apiVersion,
+            options.UnsupportedApiVersionStatusCode,
+            out var statusCode,
+            out var introducedIn )
+            ? (statusCode, introducedIn)
+            : default;
     }
 
     private static string DisplayName( Endpoint endpoint )

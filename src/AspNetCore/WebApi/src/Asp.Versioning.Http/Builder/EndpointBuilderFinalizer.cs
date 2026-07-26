@@ -169,6 +169,16 @@ internal static class EndpointBuilderFinalizer
                 continue;
             }
 
+            if ( item is IIntroducedInApiVersionProvider introduced )
+            {
+                var introducedVersions = introduced.Versions;
+
+                for ( var j = 0; j < introducedVersions.Count; j++ )
+                {
+                    metadata.Add( new IntroducedInApiVersionMetadata( introducedVersions[j], introduced.StatusCode ) );
+                }
+            }
+
             metadata.RemoveAt( i );
 
             var versions = provider.Versions;
@@ -223,6 +233,7 @@ internal static class EndpointBuilderFinalizer
         ApiVersion[] emptyVersions;
         var inheritedSupported = apiModel.SupportedApiVersions;
         var inheritedDeprecated = apiModel.DeprecatedApiVersions;
+        var introducedInApiVersions = metadata.OfType<IntroducedInApiVersionMetadata>().ToArray();
 
         if ( buckets.AreEmpty )
         {
@@ -236,10 +247,12 @@ internal static class EndpointBuilderFinalizer
             else
             {
                 emptyVersions = [];
+                var introducedVersions = ExpandIntroducedVersions( apiModel.DeclaredApiVersions, introducedInApiVersions );
+
                 endpointModel = new(
-                    declaredVersions: emptyVersions,
-                    inheritedSupported,
-                    inheritedDeprecated,
+                    declaredVersions: introducedVersions ?? emptyVersions,
+                    introducedVersions is null ? inheritedSupported : introducedVersions.Intersect( inheritedSupported ),
+                    introducedVersions is null ? inheritedDeprecated : introducedVersions.Intersect( inheritedDeprecated ),
                     emptyVersions,
                     emptyVersions );
             }
@@ -248,7 +261,9 @@ internal static class EndpointBuilderFinalizer
         {
             var (mapped, supported, deprecated, advertised, advertisedDeprecated) = buckets;
 
-            if ( mapped.Count == 0 )
+            var hasIntroducedVersions = introducedInApiVersions.Length > 0;
+
+            if ( mapped.Count == 0 && !hasIntroducedVersions )
             {
                 endpointModel = new(
                     declaredVersions: supported.Union( deprecated ),
@@ -260,16 +275,64 @@ internal static class EndpointBuilderFinalizer
             else
             {
                 emptyVersions = [];
+                var effectiveMapped = mapped;
+                var effectiveSupported = inheritedSupported.AsEnumerable();
+                var effectiveDeprecated = inheritedDeprecated.AsEnumerable();
+
+                if ( hasIntroducedVersions )
+                {
+                    effectiveMapped = ExpandIntroducedVersions( apiModel.DeclaredApiVersions, introducedInApiVersions, mapped ) ?? [];
+                    effectiveSupported = inheritedSupported.Intersect( effectiveMapped );
+                    effectiveDeprecated = inheritedDeprecated.Intersect( effectiveMapped );
+                }
+
+                // MVC treats IntroducedInApiVersion as an action-level mapping constraint: explicit
+                // supported/deprecated versions do not narrow the introduced-and-later expansion.
                 endpointModel = new(
-                    declaredVersions: mapped,
-                    supportedVersions: inheritedSupported,
-                    deprecatedVersions: inheritedDeprecated,
+                    declaredVersions: effectiveMapped,
+                    supportedVersions: effectiveSupported,
+                    deprecatedVersions: effectiveDeprecated,
                     advertisedVersions: emptyVersions,
                     deprecatedAdvertisedVersions: emptyVersions );
             }
         }
 
-        return new( apiModel, endpointModel, name );
+        return new( apiModel, endpointModel, name, introducedInApiVersions );
+    }
+
+    private static ApiVersion[]? ExpandIntroducedVersions(
+        IReadOnlyList<ApiVersion> declaredVersions,
+        IntroducedInApiVersionMetadata[] introducedInApiVersions,
+        IEnumerable<ApiVersion>? mappedVersions = default )
+    {
+        if ( introducedInApiVersions.Length == 0 )
+        {
+            return default;
+        }
+
+        var effectiveIntroduced = introducedInApiVersions[0].IntroducedIn;
+
+        for ( var i = 1; i < introducedInApiVersions.Length; i++ )
+        {
+            if ( introducedInApiVersions[i].IntroducedIn > effectiveIntroduced )
+            {
+                effectiveIntroduced = introducedInApiVersions[i].IntroducedIn;
+            }
+        }
+
+        var versions = mappedVersions is null ? new HashSet<ApiVersion>() : new HashSet<ApiVersion>( mappedVersions );
+
+        for ( var i = 0; i < declaredVersions.Count; i++ )
+        {
+            var declaredVersion = declaredVersions[i];
+
+            if ( declaredVersion >= effectiveIntroduced )
+            {
+                versions.Add( declaredVersion );
+            }
+        }
+
+        return [.. versions.OrderBy( v => v )];
     }
 
     private record struct ApiVersionBuckets(

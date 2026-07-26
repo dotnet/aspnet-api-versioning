@@ -7,6 +7,12 @@
 ### Weather Forecast - Get All
 GET {{baseUrl}}/weatherforecast?api-version=1.0
 
+### MultiVersioned - Legacy v2-only (returns 400 — exact-match on v2.0)
+GET {{baseUrl}}/multiversioned/legacy?api-version=1.0
+
+### MultiVersioned - Modern (returns 404 — introduced in v2.0)
+GET {{baseUrl}}/multiversioned/modern?api-version=1.0
+
 ### Weather Forecast - Remove (Version-Neutral)
 DELETE {{baseUrl}}/weatherforecast?api-version=1.0
 
@@ -21,5 +27,19 @@ content-type: application/json
 
 {"date":"2026-02-22T15:00:00-08:00","temperatureC":12,"temperatureF":54,"summary":"Chilly"}
 
+### MultiVersioned - Legacy v2-only (200 — exact match)
+GET {{baseUrl}}/multiversioned/legacy?api-version=2.0
+
+### MultiVersioned - Modern (200 — introduced in v2.0, reachable from v2.0 onward)
+GET {{baseUrl}}/multiversioned/modern?api-version=2.0
+
 ### Weather Forecast - Remove (Version-Neutral)
 DELETE {{baseUrl}}/weatherforecast?api-version=2.0
+
+### VERSION 3.0
+
+### MultiVersioned - Legacy v2-only (returns 400 — .HasApiVersion(2.0) is exact-match, NOT v3)
+GET {{baseUrl}}/multiversioned/legacy?api-version=3.0
+
+### MultiVersioned - Modern (200 — .IntroducedInApiVersion(2.0) is "from v2 onward", auto-reaches v3)
+GET {{baseUrl}}/multiversioned/modern?api-version=3.0

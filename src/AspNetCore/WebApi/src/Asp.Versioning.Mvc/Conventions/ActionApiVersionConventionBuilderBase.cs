@@ -37,6 +37,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             ApiVersion[] emptyVersions;
             var inheritedSupported = apiModel.SupportedApiVersions;
             var inheritedDeprecated = apiModel.DeprecatedApiVersions;
+            var effectiveMapped = ExpandMappedVersions( apiModel.DeclaredApiVersions );
             var noInheritedApiVersions = inheritedSupported.Count == 0 &&
                                          inheritedDeprecated.Count == 0;
 
@@ -57,7 +58,7 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
                         emptyVersions );
                 }
             }
-            else if ( mapped is null || mapped.Count == 0 )
+            else if ( !HasMappedVersions )
             {
                 endpointModel = new(
                     declaredVersions: SupportedVersions.Union( DeprecatedVersions ),
@@ -69,17 +70,29 @@ public partial class ActionApiVersionConventionBuilderBase : IApiVersionConventi
             else
             {
                 emptyVersions = [];
+                var supportedVersions = HasIntroducedVersions ? inheritedSupported.Intersect( effectiveMapped ) : inheritedSupported;
+                var deprecatedVersions = HasIntroducedVersions ? inheritedDeprecated.Intersect( effectiveMapped ) : inheritedDeprecated;
+
                 endpointModel = new(
-                    declaredVersions: mapped,
-                    supportedVersions: inheritedSupported,
-                    deprecatedVersions: inheritedDeprecated,
+                    declaredVersions: effectiveMapped,
+                    supportedVersions: supportedVersions,
+                    deprecatedVersions: deprecatedVersions,
                     advertisedVersions: emptyVersions,
                     deprecatedAdvertisedVersions: emptyVersions );
             }
 
-            metadata = new( apiModel, endpointModel, name );
+            metadata = new( apiModel, endpointModel, name, GetIntroducedApiVersionMetadata() );
         }
 
         item.AddEndpointMetadata( metadata );
+
+        if ( !metadata.IsApiVersionNeutral )
+        {
+            var introducedItems = metadata.IntroducedInApiVersions;
+            for ( var i = 0; i < introducedItems.Count; i++ )
+            {
+                item.AddEndpointMetadata( introducedItems[i] );
+            }
+        }
     }
 }

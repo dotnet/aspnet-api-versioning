@@ -15,6 +15,7 @@ internal sealed class EdgeBuilder
     private readonly bool versionsByUrl;
     private readonly bool unspecifiedAllowed;
     private readonly string constraintName;
+    private readonly ApiVersioningOptions options;
     private readonly HashSet<EdgeKey> keys;
     private readonly Dictionary<EdgeKey, List<Endpoint>> edges;
     private readonly HashSet<RoutePattern> routePatterns = new( new RoutePatternComparer() );
@@ -29,6 +30,7 @@ internal sealed class EdgeBuilder
         versionsByUrl = source.VersionsByUrl();
         unspecifiedAllowed = options.AssumeDefaultVersionWhenUnspecified;
         constraintName = options.RouteConstraintName;
+        this.options = options;
         keys = new( capacity + 1 );
         edges = new( capacity + RejectionEndpointCapacity )
         {
@@ -71,7 +73,29 @@ internal sealed class EdgeBuilder
         }
     }
 
+    public void AddIntroducedLater(
+        RouteEndpoint endpoint,
+        ApiVersion apiVersion,
+        int statusCode,
+        ApiVersion introducedIn,
+        ApiVersionMetadata metadata )
+    {
+        if ( statusCode == IntroducedInApiVersionAttribute.UseConfiguredStatusCode )
+        {
+            statusCode = options.UnsupportedApiVersionStatusCode;
+        }
+
+        var key = new EdgeKey( apiVersion, statusCode, introducedIn, metadata, routePatterns );
+
+        Add( ref key, new IntroducedInApiVersionEndpoint( options, statusCode, introducedIn ), endpoint.RoutePattern, once: true );
+    }
+
     private void Add( ref EdgeKey key, RouteEndpoint endpoint )
+    {
+        Add( ref key, endpoint, endpoint.RoutePattern, once: false );
+    }
+
+    private void Add( ref EdgeKey key, Endpoint endpoint, RoutePattern routePattern, bool once )
     {
         if ( keys.TryGetValue( key, out var existing ) )
         {
@@ -82,7 +106,6 @@ internal sealed class EdgeBuilder
             keys.Add( key );
         }
 
-        var routePattern = endpoint.RoutePattern;
         var needsRoutePattern = versionsByUrl && routePattern.HasVersionConstraint( constraintName );
 
         if ( needsRoutePattern )
@@ -93,6 +116,11 @@ internal sealed class EdgeBuilder
         if ( !edges.TryGetValue( key, out var endpoints ) )
         {
             edges.Add( key, endpoints = [] );
+        }
+
+        if ( once && endpoints.Count > 0 )
+        {
+            return;
         }
 
         endpoints.Add( endpoint );

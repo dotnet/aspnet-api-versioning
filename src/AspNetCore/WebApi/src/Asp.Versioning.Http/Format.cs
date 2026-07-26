@@ -11,6 +11,7 @@ internal static class Format
     internal static readonly CompositeFormat InvalidMediaTypeTemplate = CompositeFormat.Parse( CommonSR.InvalidMediaTypeTemplate );
     internal static readonly CompositeFormat UnsetRequestDelegate = CompositeFormat.Parse( SR.UnsetRequestDelegate );
     internal static readonly CompositeFormat VersionedResourceNotSupported = CompositeFormat.Parse( SR.VersionedResourceNotSupported );
+    internal static readonly CompositeFormat VersionedResourceNotIntroduced = CompositeFormat.Parse( SR.VersionedResourceNotIntroduced );
     internal static readonly CompositeFormat InvalidDefaultApiVersion = CompositeFormat.Parse( SR.InvalidDefaultApiVersion );
     internal static readonly CompositeFormat InvalidPolicyKey = CompositeFormat.Parse( CommonSR.InvalidPolicyKey );
 }
