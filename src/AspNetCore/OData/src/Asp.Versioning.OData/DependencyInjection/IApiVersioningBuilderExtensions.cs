@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System.Globalization;
-using static Asp.Versioning.OData.ODataMultiModelApplicationModelProvider;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
@@ -61,7 +60,7 @@ public static class IApiVersioningBuilderExtensions
         {
             const string DefaultODataTemplateTranslator = "Microsoft.AspNetCore.OData.Routing.Template.DefaultODataTemplateTranslator, Microsoft.AspNetCore.OData";
 
-            services.TryRemoveODataService( typeof( IApplicationModelProvider ), ODataRoutingApplicationModelProviderType );
+            services.TryRemoveODataService( typeof( IApplicationModelProvider ), ODataRoutingApplicationModelProvider.GetType() );
 
             var partManager = services.GetOrCreateApplicationPartManager();
             var configured = partManager.ConfigureDefaultFeatureProviders();

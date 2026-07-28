@@ -11,14 +11,9 @@ using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
-using System.Runtime.CompilerServices;
-using static System.Linq.Expressions.Expression;
 
 internal sealed class ODataMultiModelApplicationModelProvider : IApplicationModelProvider
 {
-    [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors )]
-    internal static readonly Type ODataRoutingApplicationModelProviderType = GetDefaultApplicationModelProviderType();
-    private static readonly Func<IOptions<ODataOptions>, IApplicationModelProvider> NewODataApplicationModelProvider = CreateActivator( ODataRoutingApplicationModelProviderType );
     private readonly IODataApiVersionCollectionProvider apiVersionCollectionProvider;
     private readonly VersionedODataOptions versionedODataOptions;
     private readonly IOptionsFactory<ODataOptions> optionsFactory;
@@ -36,9 +31,9 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         this.optionsHolder = optionsHolder;
     }
 
-    internal static int DefaultODataOrder { get; } = NewODataApplicationModelProvider( Options.Create( new ODataOptions() ) ).Order;
+    internal static int DefaultODataOrder { get; } = ODataRoutingApplicationModelProvider.New().Order;
 
-    public int Order { get; } = DefaultODataOrder;
+    public int Order => DefaultODataOrder;
 
     public void OnProvidersExecuting( ApplicationModelProviderContext context )
     {
@@ -101,12 +96,12 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
                 //
                 // REF: https://github.com/OData/AspNetCoreOData/blob/main/src/Microsoft.AspNetCore.OData/Routing/ODataRoutingApplicationModelProvider.cs#L33
                 conventions.RemoveAt( index );
-                provider = NewODataApplicationModelProvider( Options.Create( options ) );
+                provider = ODataRoutingApplicationModelProvider.New( Options.Create( options ) );
                 conventions.Insert( index, convention );
             }
             else
             {
-                provider = NewODataApplicationModelProvider( Options.Create( options ) );
+                provider = ODataRoutingApplicationModelProvider.New( Options.Create( options ) );
             }
 
             provider.OnProvidersExecuted( context );
@@ -126,24 +121,6 @@ internal sealed class ODataMultiModelApplicationModelProvider : IApplicationMode
         CopyApiVersionEndpointMetadata( context.Result.Controllers );
 
         versionedODataOptions.Mapping = mapping;
-    }
-
-    [MethodImpl( MethodImplOptions.AggressiveInlining )]
-    [return: DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors )]
-    private static Type GetDefaultApplicationModelProviderType()
-    {
-        const string TypeName = "Microsoft.AspNetCore.OData.Routing.ODataRoutingApplicationModelProvider, Microsoft.AspNetCore.OData";
-        return Type.GetType( TypeName, throwOnError: true, ignoreCase: false )!;
-    }
-
-    private static Func<IOptions<ODataOptions>, IApplicationModelProvider> CreateActivator(
-        [DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors )] Type type )
-    {
-        var options = Parameter( typeof( IOptions<ODataOptions> ), "options" );
-        var @new = New( type.GetConstructors()[0], options );
-        var lambda = Lambda<Func<IOptions<ODataOptions>, IApplicationModelProvider>>( @new, options );
-
-        return lambda.Compile();
     }
 
     private void AddRouteComponents(
