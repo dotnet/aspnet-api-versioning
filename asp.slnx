@@ -80,6 +80,7 @@
     <Project Path="examples/AspNetCore/WebApi/BasicExample/BasicExample.csproj" />
     <Project Path="examples/AspNetCore/WebApi/ByNamespaceExample/ByNamespaceExample.csproj" />
     <Project Path="examples/AspNetCore/WebApi/ConventionsExample/ConventionsExample.csproj" />
+    <Project Path="examples/AspNetCore/WebApi/GrpcOpenApiExample/GrpcOpenApiExample.csproj" />
     <Project Path="examples/AspNetCore/WebApi/MinimalApiExample/MinimalApiExample.csproj" />
     <Project Path="examples/AspNetCore/WebApi/MinimalOpenApiExample/MinimalOpenApiExample.csproj" />
     <Project Path="examples/AspNetCore/WebApi/OpenApiExample/OpenApiExample.csproj" />
@@ -113,6 +114,7 @@
   <Folder Name="/src/AspNetCore/src/">
     <Project Path="src/AspNetCore/OData/src/Asp.Versioning.OData.ApiExplorer/Asp.Versioning.OData.ApiExplorer.csproj" />
     <Project Path="src/AspNetCore/OData/src/Asp.Versioning.OData/Asp.Versioning.OData.csproj" />
+    <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Grpc.ApiExplorer/Asp.Versioning.Grpc.ApiExplorer.csproj" />
     <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Http/Asp.Versioning.Http.csproj" />
     <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Mvc.ApiExplorer/Asp.Versioning.Mvc.ApiExplorer.csproj" />
     <Project Path="src/AspNetCore/WebApi/src/Asp.Versioning.Mvc/Asp.Versioning.Mvc.csproj" />
@@ -122,6 +124,7 @@
     <Project Path="src/AspNetCore/Acceptance/Asp.Versioning.Mvc.Acceptance.Tests/Asp.Versioning.Mvc.Acceptance.Tests.csproj" />
     <Project Path="src/AspNetCore/OData/test/Asp.Versioning.OData.ApiExplorer.Tests/Asp.Versioning.OData.ApiExplorer.Tests.csproj" />
     <Project Path="src/AspNetCore/OData/test/Asp.Versioning.OData.Tests/Asp.Versioning.OData.Tests.csproj" />
+    <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Grpc.ApiExplorer.Tests/Asp.Versioning.Grpc.ApiExplorer.Tests.csproj" Id="6b03a882-ece4-42e7-ba81-fa51415ed69d" />
     <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Http.Tests/Asp.Versioning.Http.Tests.csproj" />
     <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Mvc.ApiExplorer.Tests/Asp.Versioning.Mvc.ApiExplorer.Tests.csproj" />
     <Project Path="src/AspNetCore/WebApi/test/Asp.Versioning.Mvc.Tests/Asp.Versioning.Mvc.Tests.csproj" />

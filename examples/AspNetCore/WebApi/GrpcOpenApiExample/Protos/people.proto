@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiVersioning.Examples";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+package people;
+
+// Represents a person
+message Person {
+    // Gets or sets the unique identifier for a person
+    int32 id = 1;
+
+    // Gets or sets the first name of a person
+    string first_name = 2;
+
+    // Gets or sets the last name of a person
+    string last_name = 3;
+
+    // Gets or sets the email address for a person
+    string email = 4;
+
+    // Gets or sets the telephone number for a person
+    string phone = 5;
+}
+
+message PeopleRequest {
+  // Gets or sets the requested API version
+  string api_version = 1;
+}
+
+message PeopleIdRequest {
+  // Gets or sets the requested API version
+  string api_version = 1;
+
+  // Gets or sets the requested person identifier
+  int32 id = 2;
+}
+
+message PersonRequest {
+  // Gets or sets the requested API version
+  string api_version = 1;
+
+  // Gets or sets the requested person identifier
+  int32 id = 2;
+
+  // Gets or sets the person
+  Person person = 3;
+}
+
+message PeopleReply {
+    // Gets or sets the retrieved person
+    Person person = 1;
+
+    // Gets or sets the retrieved people
+    repeated Person people = 2;
+}
+
+service People {
+  rpc GetPeople (PeopleRequest) returns (PeopleReply) {
+    option (google.api.http) = {
+      get: "/api/{api_version}/people"
+      response_body: "people"
+    };
+  }
+
+  rpc GetPerson (PeopleIdRequest) returns (PeopleReply) {
+    option (google.api.http) = {
+      get: "/api/{api_version}/people/{id}"
+      response_body: "person"
+    };
+  }
+
+  rpc AddPerson (PersonRequest) returns (PeopleReply) {
+    option (google.api.http) = {
+      post: "/api/{api_version}/people"
+      body: "person"
+      response_body: "person"
+    };
+  }
+}

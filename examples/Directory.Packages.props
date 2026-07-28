@@ -11,6 +11,9 @@
  </ItemGroup>
 
  <ItemGroup Label="ASP.NET Core">
+  <PackageVersion Include="Grpc.AspNetCore" Version="2.80.0" />
+  <PackageVersion Include="Grpc.Tools" Version="2.80.0" />
+  <PackageVersion Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="10.0.10" />
   <PackageVersion Include="Microsoft.AspNetCore.OData" Version="10.0.0-preview.2" />
   <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.3" />
   <PackageVersion Include="Scalar.AspNetCore" Version="2.12.46" />

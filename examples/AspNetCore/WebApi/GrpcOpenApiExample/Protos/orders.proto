@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiVersioning.Examples";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package orders;
+
+// Represents the line item on an order
+message LineItem {
+    // Gets or sets the line item number
+    int32 number = 1;
+
+    // Gets or sets the line item description
+    string description = 2;
+
+    // Gets or sets the line item quantity
+    int32 quantity = 3;
+
+    // Gets or sets the line item unit price
+    double unit_price = 4;
+
+    // Gets or sets a value indicating whether the line item is fulfilled
+    bool fulfilled = 5;
+}
+
+// Represents an order
+message Order {
+    // Gets or sets the unique identifier for the order
+    int32 id = 1;
+
+    // Gets or sets the date and time when the order was created
+    google.protobuf.Timestamp created_date = 2;
+
+    // Gets or sets the date and time when the order becomes effective
+    google.protobuf.Timestamp effective_date = 3;
+
+    // Gets or sets the name of the ordering customer
+    string customer = 4;
+
+    // Gets or sets a description for the order
+    string description = 5;
+
+    // Gets a list of line items in the order
+    repeated LineItem line_items = 6;
+}
+
+message OrderIdRequest {
+  // Gets or sets the requested API version
+  string api_version = 1 [json_name = "api-version"];
+
+  // Gets or sets the requested order identifier
+  int32 id = 2;
+}
+
+message OrderRequest {
+  // Gets or sets the requested API version
+  string api_version = 1 [json_name = "api-version"];
+
+  // Gets or sets the requested order identifier
+  int32 id = 2;
+
+  // Gets or sets the order
+  Order order = 3;
+}
+
+message OrderReply {
+    // Gets or sets the retrieved order
+    Order order = 1;
+}
+
+service Orders {
+  rpc GetOrder (OrderIdRequest) returns (OrderReply) {
+    option (google.api.http) = {
+      get: "/api/orders/{id}"
+      response_body: "order"
+    };
+  }
+
+  rpc PlaceOrder (OrderRequest) returns (OrderReply) {
+    option (google.api.http) = {
+      post: "/api/orders"
+      body: "order"
+      response_body: "order"
+    };
+  }
+
+  rpc UpdateOrder (OrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/orders/{id}"
+      body: "order"
+    };
+  }
+
+  rpc CancelOrder (OrderIdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/orders/{id}"
+    };
+  }
+}

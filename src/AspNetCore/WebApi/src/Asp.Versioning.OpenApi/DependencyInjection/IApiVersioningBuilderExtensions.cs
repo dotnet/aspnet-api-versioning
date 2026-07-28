@@ -71,6 +71,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryAdd( Singleton<IOptionsFactory<VersionedOpenApiOptions>>( EM.GetRequiredService<VersionedOpenApiOptionsFactory> ) );
         services.AddTransient( sp => new XmlCommentsFile( assemblies, sp.GetRequiredService<IHostEnvironment>() ) );
         services.TryAddTransient( sp => new XmlCommentsTransformer( sp.GetRequiredService<XmlCommentsFile>() ) );
+        services.TryAddTransient<GrpcWellKnownTypeSchemaTransformer>();
 
         if ( GetJsonConfiguration() is { } descriptor )
         {

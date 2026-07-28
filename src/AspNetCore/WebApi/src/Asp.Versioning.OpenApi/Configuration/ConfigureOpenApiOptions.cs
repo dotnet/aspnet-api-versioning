@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 
 internal sealed class ConfigureOpenApiOptions(
     XmlCommentsTransformer xmlComments,
+    GrpcWellKnownTypeSchemaTransformer grpcWellKnownTypes,
     IApiVersionDescriptionProvider provider,
     VersionedOpenApiOptionsFactory factory )
     : IPostConfigureOptions<OpenApiOptions>
@@ -35,7 +36,7 @@ internal sealed class ConfigureOpenApiOptions(
                 Name = name,
                 Description = description,
                 Options = options,
-                OnCreated = versionedOptions => Configure( versionedOptions, xmlComments ),
+                OnCreated = versionedOptions => Configure( versionedOptions, xmlComments, grpcWellKnownTypes ),
             };
 
             factory.CreateAndConfigure( context );
@@ -43,7 +44,10 @@ internal sealed class ConfigureOpenApiOptions(
         }
     }
 
-    private static void Configure( VersionedOpenApiOptions versionedOptions, XmlCommentsTransformer xmlComments )
+    private static void Configure(
+        VersionedOpenApiOptions versionedOptions,
+        XmlCommentsTransformer xmlComments,
+        GrpcWellKnownTypeSchemaTransformer grpcWellKnownTypes )
     {
         var options = versionedOptions.Document;
         var apiExplorer = new ApiExplorerTransformer( versionedOptions );
@@ -51,6 +55,7 @@ internal sealed class ConfigureOpenApiOptions(
         options.SetDocumentName( versionedOptions.Description.GroupName );
         options.AddDocumentTransformer( apiExplorer );
         options.AddSchemaTransformer( apiExplorer );
+        options.AddSchemaTransformer( grpcWellKnownTypes );
         options.AddOperationTransformer( apiExplorer );
 
         if ( !xmlComments.IsEmpty )

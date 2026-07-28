@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+option csharp_namespace = "Asp.Versioning.Grpc.Tests";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package test;
+
+// Represents a line item on an order
+message LineItem {
+    // Gets or sets the line item number
+    int32 number = 1;
+
+    // Gets or sets the line item description
+    string description = 2;
+}
+
+// Represents an order
+message Order {
+    // Gets or sets the unique identifier for the order
+    int32 id = 1;
+
+    // Gets or sets the date and time when the order was created
+    google.protobuf.Timestamp created_date = 2;
+
+    // Gets or sets the name of the ordering customer
+    string customer = 3;
+
+    // Gets a list of line items in the order
+    repeated LineItem line_items = 4;
+}
+
+message OrderIdRequest {
+  // Gets or sets the requested API version
+  string api_version = 1 [json_name = "api-version"];
+
+  // Gets or sets the requested order identifier
+  int32 id = 2;
+
+  // Gets or sets a value indicating whether line items are included
+  bool include_line_items = 3;
+}
+
+message OrderRequest {
+  // Gets or sets the requested API version
+  string api_version = 1 [json_name = "api-version"];
+
+  // Gets or sets the requested order identifier
+  int32 id = 2;
+
+  // Gets or sets the order
+  Order order = 3;
+}
+
+message OrderReply {
+    // Gets or sets the retrieved order
+    Order order = 1;
+}
+
+service Orders {
+  // a route parameter, query parameters, and an unwrapped response body
+  rpc GetOrder (OrderIdRequest) returns (OrderReply) {
+    option (google.api.http) = {
+      get: "/api/orders/{id}"
+      response_body: "order"
+    };
+  }
+
+  // a named body field
+  rpc PlaceOrder (OrderRequest) returns (OrderReply) {
+    option (google.api.http) = {
+      post: "/api/orders"
+      body: "order"
+    };
+  }
+
+  // a wildcard body, which leaves no query parameters
+  rpc ReplaceOrder (OrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/orders/{id}"
+      body: "*"
+    };
+  }
+
+  // the API version expressed as a URL segment
+  rpc GetOrderByVersion (OrderIdRequest) returns (OrderReply) {
+    option (google.api.http) = {
+      get: "/api/{api_version}/orders/{id}"
+    };
+  }
+}

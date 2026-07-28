@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option csharp_namespace = "ApiVersioning.Examples";
+import "google/api/annotations.proto";
+
+package greet;
+
+// Requests a hello greeting
+message HelloRequest {
+  // Gets or sets the requested API version
+  string api_version = 1 [json_name = "api-version"];
+
+  // Gets or sets the name of the person to greet
+  string name = 2;
+}
+
+// Responds with a hello greeting
+message HelloReply {
+  // Gets or sets the greeting message
+  string message = 1;
+}
+
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {        
+      get: "/api/greet/{name}"
+      response_body: "message"
+    };
+  }
+}
+
+service GreeterByUrl {
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {        
+      get: "/api/{api_version}/greet/{name}"
+      response_body: "message"
+    };
+  }
+}
