@@ -9,6 +9,12 @@
  </PropertyGroup>
 
  <ItemGroup>
+  <!-- the transformer matches the well-known types by name so that gRPC is not a dependency of the library.
+       the tests need the real types to generate schemas from -->
+  <PackageReference Include="Google.Protobuf" Version="3.*" />
+ </ItemGroup>
+
+ <ItemGroup>
   <ProjectReference Include="..\..\src\Asp.Versioning.OpenApi\Asp.Versioning.OpenApi.csproj" />
  </ItemGroup>
 

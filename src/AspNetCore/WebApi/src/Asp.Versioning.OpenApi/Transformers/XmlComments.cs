@@ -100,6 +100,22 @@ public class XmlComments
     }
 
     /// <summary>
+    /// Gets the description for a parameter.
+    /// </summary>
+    /// <param name="parameter">The parameter to get the description for.</param>
+    /// <returns>The corresponding description or an empty string.</returns>
+    /// <remarks><see cref="GetParameterDescription(MemberInfo, string)"/> is typically used to get the description of
+    /// a parameter, which come from the <c>&lt;param/&gt;</c> tag for a parameter on a method. Some API styles, such as
+    /// gRPC, use request/reply messages that graft its own message semantics over the HTTP semantics. In these
+    /// scenarios, what the API Explorer considers a parameter is actually a property on a request message. When this
+    /// happens, we need to get description from the source property. <see cref="ParameterInfo"/> does not derive from
+    /// <see cref="MemberInfo"/> so that path doesn't work. If parameter-to-property mapping has been established, then
+    /// the expectation is that <see cref="ParameterInfo.Member"/> is the property and the associated
+    /// <c>&lt;summary/&gt;</c> tag provides the description. This approach is always considered a fallback mechanism.
+    /// </remarks>
+    internal string GetParameterDescription( ParameterInfo parameter ) => GetSummary( parameter.Member );
+
+    /// <summary>
     /// Gets the parameter <c>example</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the parameter from.</param>

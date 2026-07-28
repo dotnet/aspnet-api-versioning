@@ -161,9 +161,17 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
 
                 var name = arg.ParameterDescriptor.Name;
 
-                if ( string.IsNullOrEmpty( parameter.Description )
-                     && !string.IsNullOrEmpty( description = Documentation.GetParameterDescription( method, name ) ) )
+                if ( string.IsNullOrEmpty( parameter.Description ) )
                 {
+                    description = Documentation.GetParameterDescription( method, name );
+
+                    if ( string.IsNullOrEmpty( description )
+                         && arg.ParameterDescriptor is ControllerParameterDescriptor parameterDescriptor
+                         && parameterDescriptor.ParameterInfo is { } parameterInfo )
+                    {
+                        description = Documentation.GetParameterDescription( parameterInfo );
+                    }
+
                     parameter.Description = description;
                 }
 

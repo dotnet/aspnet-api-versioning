@@ -97,14 +97,22 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     {
         get
         {
-            var query = from description in ApiDescription.ParameterDescriptions
-                        where description.Source == BindingSource.Path &&
-                              description.ModelMetadata?.DataTypeName == nameof( ApiVersion )
-                        let constraints = description.RouteInfo?.Constraints ?? Empty<IRouteConstraint>()
-                        where constraints.OfType<ApiVersionRouteConstraint>().Any()
-                        select description;
+            var parameters = ApiDescription.ParameterDescriptions;
 
-            return query.Any();
+            for ( var i = 0; i < parameters.Count; i++ )
+            {
+                var parameter = parameters[i];
+
+                if ( parameter.Source == BindingSource.Path
+                     && parameter.ModelMetadata?.DataTypeName == nameof( ApiVersion )
+                     && parameter.RouteInfo is { } routeInfo
+                     && routeInfo.Constraints is { } constraints )
+                {
+                    return constraints.OfType<ApiVersionRouteConstraint>().Any();
+                }
+            }
+
+            return false;
         }
     }
 
@@ -148,10 +156,26 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     /// <param name="name">The name of the query string parameter.</param>
     protected virtual void AddQueryString( string name )
     {
-        if ( !HasPathParameter )
+        if ( HasPathParameter )
         {
-            ApiDescription.ParameterDescriptions.Add( NewApiVersionParameter( name, BindingSource.Query ) );
+            return;
         }
+
+        var parameters = ApiDescription.ParameterDescriptions;
+        var parameter = NewApiVersionParameter( name, BindingSource.Query );
+
+        for ( var i = 0; i < parameters.Count; i++ )
+        {
+            var existing = parameters[i];
+
+            if ( existing.Name == name && existing.Source == BindingSource.Query )
+            {
+                parameters[i] = parameter;
+                return;
+            }
+        }
+
+        parameters.Add( parameter );
     }
 
     /// <summary>
