@@ -4,6 +4,7 @@ namespace Asp.Versioning.Routing;
 
 using System.Reflection;
 using System.Web.Http.Routing;
+using static System.Globalization.CultureInfo;
 using static System.Linq.Expressions.Expression;
 
 internal sealed class ParsedRouteAdapter<T> : IParsedRoute where T : notnull
@@ -58,7 +59,8 @@ internal sealed class ParsedRouteAdapter<T> : IParsedRoute where T : notnull
                     adapter = (IPathSegment) Activator.CreateInstance( adapterType, pathSegment );
                     break;
                 default:
-                    throw new InvalidOperationException( $"Encountered the {type.Name} path segment, which was not expected." );
+                    var message = string.Format( InvariantCulture, SR.UnexpectedPathSegment, type.Name );
+                    throw new InvalidOperationException( message );
             }
 
             adapters.Add( adapter );

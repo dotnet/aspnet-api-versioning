@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.Routing;
 
+using static System.Globalization.CultureInfo;
 using static System.Linq.Expressions.Expression;
 
 internal sealed class PathContentSegmentAdapter<T> : IPathContentSegment where T : notnull
@@ -50,7 +51,8 @@ internal sealed class PathContentSegmentAdapter<T> : IPathContentSegment where T
                     }
 
                 default:
-                    throw new InvalidOperationException( $"Encountered the {type.Name} path subsegment, which was not expected." );
+                    var message = string.Format( InvariantCulture, SR.UnexpectedPathSubsegment, type.Name );
+                    throw new InvalidOperationException( message );
             }
 
             adapters.Add( adapter );

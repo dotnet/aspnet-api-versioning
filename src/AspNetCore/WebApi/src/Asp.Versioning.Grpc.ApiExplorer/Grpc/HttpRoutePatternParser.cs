@@ -1,8 +1,9 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-using System.Text;
-
 namespace Asp.Versioning.Grpc;
+
+using System.Text;
+using static System.Globalization.CultureInfo;
 
 // HTTP Template Grammar:
 //
@@ -14,6 +15,8 @@ namespace Asp.Versioning.Grpc;
 // Method     = ":" LITERAL ;
 internal sealed class HttpRoutePatternParser( string input )
 {
+    internal static readonly CompositeFormat RoutePatternParseError = CompositeFormat.Parse( SR.RoutePatternParseError );
+    internal static readonly CompositeFormat MissingTemplateChar = CompositeFormat.Parse( SR.MissingTemplateChar );
     private readonly string input = input;
     private readonly List<string> segments = [];
     private readonly List<HttpRouteVariable> variables = [];
@@ -37,7 +40,7 @@ internal sealed class HttpRoutePatternParser( string input )
         {
             if ( !inVariable || variables.LastOrDefault() is not HttpRouteVariable variable )
             {
-                throw new InvalidOperationException( "Unexpected error when updating variable." );
+                throw new InvalidOperationException( SR.UnexpectedRouteVariableError );
             }
 
             return variable;
@@ -52,12 +55,12 @@ internal sealed class HttpRoutePatternParser( string input )
         }
         catch ( InvalidOperationException ex )
         {
-            throw new InvalidOperationException( $"Error parsing path template '{input}'.", ex );
+            throw new InvalidOperationException( string.Format( CurrentCulture, RoutePatternParseError, input ), ex );
         }
 
         if ( tokenStart < input.Length )
         {
-            throw new InvalidOperationException( "Path template wasn't parsed to the end." );
+            throw new InvalidOperationException( SR.UnparsedRoutePattern );
         }
     }
 
@@ -66,7 +69,7 @@ internal sealed class HttpRoutePatternParser( string input )
     {
         if ( !Consume( '/' ) )
         {
-            throw new InvalidOperationException( "Path template must start with a '/'." );
+            throw new InvalidOperationException( SR.PathMustStartWithSlash );
         }
 
         ParseSegments();
@@ -75,7 +78,7 @@ internal sealed class HttpRoutePatternParser( string input )
         {
             if ( CurrentChar != ':' )
             {
-                throw new InvalidOperationException( "Path segment must end with a '/'." );
+                throw new InvalidOperationException( SR.PathMustEndWithSlash );
             }
 
             ParseMethod();
@@ -90,7 +93,7 @@ internal sealed class HttpRoutePatternParser( string input )
             // Support '/' template.
             if ( !ParseSegment() && segments.Count > 0 )
             {
-                throw new InvalidOperationException( "Route template shouldn't end with a '/'." );
+                throw new InvalidOperationException( SR.TemplateShouldNotEndWithSlash );
             }
 
             if ( !Consume( '/' ) )
@@ -114,7 +117,7 @@ internal sealed class HttpRoutePatternParser( string input )
                 {
                     if ( hasCatchAllSegment )
                     {
-                        throw new InvalidOperationException( "Only literal segments can follow a catch-all segment." );
+                        throw new InvalidOperationException( SR.LiteralOnlyAfterCatchAll );
                     }
 
                     ConsumeAndAssert( '*' );
@@ -142,7 +145,7 @@ internal sealed class HttpRoutePatternParser( string input )
             case '{':
                 if ( hasCatchAllSegment )
                 {
-                    throw new InvalidOperationException( "Only literal segments can follow a catch-all segment." );
+                    throw new InvalidOperationException( SR.LiteralOnlyAfterCatchAll );
                 }
 
                 ParseVariable();
@@ -177,7 +180,7 @@ internal sealed class HttpRoutePatternParser( string input )
     {
         if ( !TryParseLiteral( out var literal ) )
         {
-            throw new InvalidOperationException( "Empty literal segment." );
+            throw new InvalidOperationException( SR.EmptyLiteral );
         }
 
         segments.Add( literal );
@@ -190,7 +193,7 @@ internal sealed class HttpRoutePatternParser( string input )
         {
             if ( !ParseIdentifier() )
             {
-                throw new InvalidOperationException( "Incomplete or empty field path." );
+                throw new InvalidOperationException( SR.EmptyFieldPath );
             }
         }
         while ( Consume( '.' ) );
@@ -203,7 +206,7 @@ internal sealed class HttpRoutePatternParser( string input )
 
         if ( !TryParseLiteral( out method ) )
         {
-            throw new InvalidOperationException( "Empty method." );
+            throw new InvalidOperationException( SR.EmptyMethod );
         }
     }
 
@@ -263,7 +266,7 @@ internal sealed class HttpRoutePatternParser( string input )
                 case '}':
                     if ( !result )
                     {
-                        throw new InvalidOperationException( "Path template has an empty segment." );
+                        throw new InvalidOperationException( SR.EmptyPathSegment );
                     }
 
                     literal = builder.ToString();
@@ -290,7 +293,7 @@ internal sealed class HttpRoutePatternParser( string input )
     {
         if ( !Consume( c ) )
         {
-            throw new InvalidOperationException( $"Expected '{c}' when parsing path template." );
+            throw new InvalidOperationException( string.Format( InvariantCulture, MissingTemplateChar, c ) );
         }
     }
 
@@ -329,7 +332,7 @@ internal sealed class HttpRoutePatternParser( string input )
     {
         if ( inVariable )
         {
-            throw new InvalidOperationException( "Variable can't be nested." );
+            throw new InvalidOperationException( SR.NestedVariable );
         }
 
         variables.Add( new HttpRouteVariable() );

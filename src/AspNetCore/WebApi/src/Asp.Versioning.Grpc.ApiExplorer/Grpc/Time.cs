@@ -57,7 +57,7 @@ internal static class Time
 
         if ( text.IsEmpty || text[^1] != 's' )
         {
-            throw new FormatException( "Duration must end with 's'." );
+            throw new FormatException( SR.MalformedDuration );
         }
 
         text = text[..^1];

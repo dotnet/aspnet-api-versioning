@@ -4,15 +4,20 @@
 
 namespace Google.Protobuf.Reflection;
 
+using Asp.Versioning;
 using Asp.Versioning.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using System.Globalization;
+using System.Text;
 using static Google.Protobuf.Reflection.FieldType;
 using static System.Globalization.CultureInfo;
 using Type = System.Type;
 
 internal static class FieldDescriptorExtensions
 {
+    private static readonly CompositeFormat UnsupportedType = CompositeFormat.Parse( SR.UnsupportedType );
+    private static readonly CompositeFormat InvalidEnumValue = CompositeFormat.Parse( SR.InvalidEnumValue );
+
     extension( FieldDescriptor fieldDescriptor )
     {
         public Type ClrType
@@ -74,7 +79,8 @@ internal static class FieldDescriptorExtensions
             _ => throw fieldDescriptor.NewUnsupportedType(),
         };
 
-        private InvalidOperationException NewUnsupportedType() => new( "Unsupported type: " + fieldDescriptor.FieldType );
+        private InvalidOperationException NewUnsupportedType() =>
+            new( string.Format( InvariantCulture, UnsupportedType, fieldDescriptor.FieldType ) );
 
         private int FromEnum( object? value )
         {
@@ -82,11 +88,12 @@ internal static class FieldDescriptorExtensions
             {
                 var enumValueDescriptor = ( int.TryParse( s, NumberStyles.Integer, InvariantCulture, out var i )
                     ? fieldDescriptor.EnumType.FindValueByNumber( i )
-                    : fieldDescriptor.EnumType.FindValueByName( s ) ) ?? throw new InvalidOperationException( $"Invalid value '{s}' for enum type {fieldDescriptor.EnumType.Name}." );
+                    : fieldDescriptor.EnumType.FindValueByName( s ) )
+                    ?? throw new InvalidOperationException( string.Format( InvariantCulture, InvalidEnumValue, s, fieldDescriptor.EnumType.Name ) );
                 return enumValueDescriptor.Number;
             }
 
-            throw new InvalidOperationException( "String required to convert to enum." );
+            throw new InvalidOperationException( SR.StringRequiredForEnum );
         }
 
         private object? FromMessage( object? value )
@@ -131,6 +138,6 @@ internal static class FieldDescriptorExtensions
             return ByteString.FromBase64( bytes );
         }
 
-        throw new InvalidOperationException( "Base64 encoded string required to convert to bytes." );
+        throw new InvalidOperationException( SR.Base64StringRequired );
     }
 }

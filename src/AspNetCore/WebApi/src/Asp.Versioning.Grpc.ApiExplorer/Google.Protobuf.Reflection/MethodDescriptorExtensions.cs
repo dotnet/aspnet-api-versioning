@@ -7,11 +7,18 @@ namespace Google.Protobuf.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.Grpc;
 using Google.Api;
+using System.Text;
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
+using static System.Globalization.CultureInfo;
 using Type = System.Type;
 
 internal static class MethodDescriptorExtensions
 {
+    private static readonly CompositeFormat NestedBodyField = CompositeFormat.Parse( SR.NestedBodyField );
+    private static readonly CompositeFormat NestedResponseBodyField = CompositeFormat.Parse( SR.NestedResponseBodyField );
+    private static readonly CompositeFormat MissingBodyField = CompositeFormat.Parse( SR.MissingBodyField );
+    private static readonly CompositeFormat MissingResponseBodyField = CompositeFormat.Parse( SR.MissingResponseBodyField );
+
     // transcoding assumes that the app is referencing google.api.commonprotos and httprule is from that assembly;
     // however, it's possible the app has compiled http.proto with grpc.tools, so the extension value is httprule from
     // a different assembly. this custom extension uses the httprule field number but has a return type of object.
@@ -65,12 +72,12 @@ internal static class MethodDescriptorExtensions
 
             if ( body.Contains( '.', StringComparison.Ordinal ) )
             {
-                throw new InvalidOperationException( $"The body field '{body}' references a nested field. The body field name must be on the top-level request message." );
+                throw new InvalidOperationException( string.Format( InvariantCulture, NestedBodyField, body ) );
             }
 
             if ( methodDescriptor.InputType.FindFieldByName( body ) is not { } bodyDescriptor )
             {
-                throw new InvalidOperationException( $"Couldn't find matching field for body '{body}' on {methodDescriptor.InputType.Name}." );
+                throw new InvalidOperationException( string.Format( InvariantCulture, MissingBodyField, body, methodDescriptor.InputType.Name ) );
             }
 
             var propertyName = PascalCase.Format( bodyDescriptor.Name );
@@ -107,12 +114,12 @@ internal static class MethodDescriptorExtensions
 
             if ( responseBody.Contains( '.', StringComparison.Ordinal ) )
             {
-                throw new InvalidOperationException( $"The response body field '{responseBody}' references a nested field. The response body field name must be on the top-level response message." );
+                throw new InvalidOperationException( string.Format( InvariantCulture, NestedResponseBodyField, responseBody ) );
             }
 
             if ( methodDescriptor.OutputType.FindFieldByName( responseBody ) is not { } responseBodyDescriptor )
             {
-                throw new InvalidOperationException( $"Couldn't find matching field for response body '{responseBody}' on {methodDescriptor.OutputType.Name}." );
+                throw new InvalidOperationException( string.Format( InvariantCulture, MissingResponseBodyField, responseBody, methodDescriptor.OutputType.Name ) );
             }
 
             return responseBodyDescriptor;
