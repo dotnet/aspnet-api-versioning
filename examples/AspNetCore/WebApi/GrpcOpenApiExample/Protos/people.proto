@@ -3,7 +3,6 @@ syntax = "proto3";
 option csharp_namespace = "ApiVersioning.Examples";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 package people;
 
