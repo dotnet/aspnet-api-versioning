@@ -117,80 +117,92 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ActionSelector_AmbiguousMatchType" xml:space="preserve">
-    <value>{0} on type {1}</value>
+  <data name="Base64StringRequired" xml:space="preserve">
+    <value>Base64 encoded string required to convert to bytes.</value>
   </data>
-  <data name="ApiControllerActionSelector_ActionNameNotFound" xml:space="preserve">
-    <value>No action was found on the controller '{0}' that matches the name '{1}'.</value>
+  <data name="EmptyFieldPath" xml:space="preserve">
+    <value>Incomplete or empty field path.</value>
   </data>
-  <data name="ApiControllerActionSelector_ActionNotFound" xml:space="preserve">
-    <value>No action was found on the controller '{0}' that matches the request.</value>
+  <data name="EmptyLiteral" xml:space="preserve">
+    <value>Empty literal segment.</value>
   </data>
-  <data name="ApiControllerActionSelector_AmbiguousMatch" xml:space="preserve">
-    <value>Multiple actions were found that match the request: {0}</value>
+  <data name="EmptyMethod" xml:space="preserve">
+    <value>Empty method.</value>
   </data>
-  <data name="ApiControllerActionSelector_HttpMethodNotSupported" xml:space="preserve">
-    <value>The requested resource does not support HTTP method '{0}'.</value>
+  <data name="EmptyPathSegment" xml:space="preserve">
+    <value>Path template has an empty segment.</value>
   </data>
-  <data name="ApiVersionUnspecified" xml:space="preserve">
-    <value>An API version is required, but was not specified.</value>
+  <data name="InvalidEnumValue" xml:space="preserve">
+    <value>Invalid value "{0}" for enumeration type {1}.</value>
+    <comment>0 = value
+1 = type</comment>
   </data>
-  <data name="Argument_EmptyString" xml:space="preserve">
-    <value>The value cannot be an empty string.</value>
+  <data name="LiteralOnlyAfterCatchAll" xml:space="preserve">
+    <value>Only literal segments can follow a catch-all segment.</value>
   </data>
-  <data name="ControllerNameNotFound" xml:space="preserve">
-    <value>No route providing a controller name was found to match request URI '{0}'.</value>
+  <data name="MalformedDuration" xml:space="preserve">
+    <value>Duration must end with 's'.</value>
   </data>
-  <data name="ControllerSelectorMappingCycle" xml:space="preserve">
-    <value>A cycle was detected in a call to IHttpControllerSelector.GetControllerMapping().</value>
+  <data name="MapRequiresRepeating" xml:space="preserve">
+    <value>Map field requires repeating keys and values.</value>
   </data>
-  <data name="DefaultControllerFactory_ControllerNameAmbiguous_WithRouteTemplate" xml:space="preserve">
-    <value>Multiple types were found that match the controller named '{0}'. This can happen if the route that services this request ('{1}') found multiple controllers defined with the same name but differing namespaces, which is not supported.{3}{3}The request for '{0}' has found the following matching controllers:{2}</value>
+  <data name="MissingBodyField" xml:space="preserve">
+    <value>Could not find matching field for body "{0}" on {1}.</value>
+    <comment>0 = field
+1 = message</comment>
   </data>
-  <data name="DefaultControllerFactory_ControllerNameNotFound" xml:space="preserve">
-    <value>No type was found that matches the controller named '{0}'.</value>
+  <data name="MissingResponseBodyField" xml:space="preserve">
+    <value>Could not find matching field for response body "{0}" on {1}.</value>
+    <comment>0 = field
+1 = message</comment>
   </data>
-  <data name="DirectRoute_AmbiguousController" xml:space="preserve">
-    <value>Multiple controller types were found that match the URL. This can happen if attribute routes on multiple controllers match the requested URL.{1}{1}The request has found the following matching controller types: {0}</value>
+  <data name="MissingFieldForRouteParam" xml:space="preserve">
+    <value>Could not find matching field for route parameter "{0}" on {1}.</value>
+    <comment>0 = field path
+1 = message type</comment>
   </data>
-  <data name="InvalidDefaultApiVersion" xml:space="preserve">
-    <value>{0}.{1} is an invalid value for {2}.{3}. Did you mean to apply {4} via attribute or convention instead?</value>
-    <comment>0 = ApiVersion
-1 = Neutral
-2 = ApiVersioningOptions
-3 = DefaultApiVersion
-4 = IApiVersionNeutral</comment>
+  <data name="MissingTemplateChar" xml:space="preserve">
+    <value>Expected '{0}' when parsing path template.</value>
+    <comment>0 = char</comment>
   </data>
-  <data name="NoControllerSelected" xml:space="preserve">
-    <value>A controller was not selected for request URI '{0}' and API version '{1}'.</value>
+  <data name="NestedBodyField" xml:space="preserve">
+    <value>The body field "{0}" references a nested field. The body field name must be on the top-level request message.</value>
+    <comment>0 = field</comment>
   </data>
-  <data name="NoServiceRegistered" xml:space="preserve">
-    <value>No service for type '{0}' has been registered.</value>
+  <data name="NestedResponseBodyField" xml:space="preserve">
+    <value>The response body field "{0}" references a nested field. The response body field name must be on the top-level request message.</value>
+    <comment>0 = field</comment>
   </data>
-  <data name="ResourceNotFound" xml:space="preserve">
-    <value>No HTTP resource was found that matches the request URI '{0}'.</value>
+  <data name="NestedVariable" xml:space="preserve">
+    <value>Variable cannot be nested.</value>
   </data>
-  <data name="UnexpectedPathSegment" xml:space="preserve">
-    <value>Encountered the {0} path segment, which was not expected.</value>
+  <data name="NonRepeatingMultipleValues" xml:space="preserve">
+    <value>Cannot set multiple values onto a non-repeating field.</value>
+  </data>
+  <data name="PathMustEndWithSlash" xml:space="preserve">
+    <value>Path segment must end with a '/'.</value>
+  </data>
+  <data name="PathMustStartWithSlash" xml:space="preserve">
+    <value>Path template must start with a '/'.</value>
+  </data>
+  <data name="RoutePatternParseError" xml:space="preserve">
+    <value>Error parsing path template "{0}".</value>
+    <comment>0 = input</comment>
+  </data>
+  <data name="StringRequiredForEnum" xml:space="preserve">
+    <value>String required to convert to enumeration.</value>
+  </data>
+  <data name="TemplateShouldNotEndWithSlash" xml:space="preserve">
+    <value>Route template should not end with a '/'.</value>
+  </data>
+  <data name="UnexpectedRouteVariableError" xml:space="preserve">
+    <value>Unexpected error when updating variable.</value>
+  </data>
+  <data name="UnparsedRoutePattern" xml:space="preserve">
+    <value>Path template wasn't parsed to the end.</value>
+  </data>
+  <data name="UnsupportedType" xml:space="preserve">
+    <value>Unsupported type: {0}</value>
     <comment>0 = type</comment>
-  </data>
-  <data name="UnexpectedPathSubsegment" xml:space="preserve">
-    <value>Encountered the {0} path subsegment, which was not expected.</value>
-    <comment>0 = type</comment>
-  </data>
-  <data name="VersionedActionNameNotFound" xml:space="preserve">
-    <value>No route providing a controller name with API version '{1}' was found to match HTTP method '{2}' and request URI '{0}'.</value>
-  </data>
-  <data name="VersionedControllerNameNotFound" xml:space="preserve">
-    <value>No route providing a controller name with API version '{1}' was found to match request URI '{0}'.</value>
-  </data>
-  <data name="VersionedMediaTypeNotSupported" xml:space="preserve">
-    <value>The requested resource with API version '{0}' does not support the requested media type.</value>
-  </data>
-  <data name="VersionedMethodNotSupported" xml:space="preserve">
-    <value>The requested resource with API version '{0}' does not support HTTP method '{1}'.</value>
-  </data>
-  <data name="VersionedResourceNotSupported" xml:space="preserve">
-    <value>The HTTP resource that matches the request URI '{0}' does not support the API version '{1}'.</value>
   </data>
 </root>

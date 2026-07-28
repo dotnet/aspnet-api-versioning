@@ -4,11 +4,15 @@
 
 namespace Google.Protobuf.Reflection;
 
+using Asp.Versioning;
 using Asp.Versioning.Grpc;
 using Google.Protobuf.WellKnownTypes;
+using System.Text;
+using static System.Globalization.CultureInfo;
 
 internal static class MessageDescriptorExtensions
 {
+    private static readonly CompositeFormat MissingFieldForRouteParam = CompositeFormat.Parse( SR.MissingFieldForRouteParam );
     private static readonly HashSet<string> WellKnownTypeNames =
     [
         "google/protobuf/any.proto",
@@ -83,7 +87,7 @@ internal static class MessageDescriptorExtensions
 
                 if ( !messageDescriptor.TryResolveDescriptors( path, allowJsonName: false, out var fieldDescriptors ) )
                 {
-                    var message = $"Could not find matching field for route parameter '{string.Join( ".", path )}' on {messageDescriptor.Name}.";
+                    var message = string.Format( InvariantCulture, MissingFieldForRouteParam, string.Join( ".", path ), messageDescriptor.Name );
                     throw new InvalidOperationException( message );
                 }
 

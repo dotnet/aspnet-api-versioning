@@ -4,6 +4,7 @@
 
 namespace Google.Protobuf.Reflection;
 
+using Asp.Versioning;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Primitives;
 using System.Collections;
@@ -51,7 +52,7 @@ internal static class MessageExtensions
                 }
                 else
                 {
-                    throw new InvalidOperationException( "Map field requires repeating keys and values." );
+                    throw new InvalidOperationException( SR.MapRequiresRepeating );
                 }
             }
             else if ( field.IsRepeated )
@@ -91,7 +92,7 @@ internal static class MessageExtensions
                     }
                     else
                     {
-                        throw new InvalidOperationException( "Can't set multiple values onto a non-repeating field." );
+                        throw new InvalidOperationException( SR.NonRepeatingMultipleValues );
                     }
                 }
                 else if ( values is IMessage nestedMessage )
