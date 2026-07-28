@@ -19,6 +19,7 @@ internal sealed class EdgeBuilder
     private readonly Dictionary<EdgeKey, List<Endpoint>> edges;
     private readonly HashSet<RoutePattern> routePatterns = new( new RoutePatternComparer() );
     private EdgeKey assumeDefault = EdgeKey.AssumeDefault;
+    private List<Endpoint>? unversioned;
 
     public EdgeBuilder(
         int capacity,
@@ -32,20 +33,40 @@ internal sealed class EdgeBuilder
         keys = new( capacity + 1 );
         edges = new( capacity + RejectionEndpointCapacity )
         {
-            [EdgeKey.Malformed] = [new MalformedApiVersionEndpoint( logger, options )],
-            [EdgeKey.Ambiguous] = [new AmbiguousApiVersionEndpoint( logger )],
-            [EdgeKey.Unspecified] = [new UnspecifiedApiVersionEndpoint( logger, options )],
-            [EdgeKey.Unsupported] = [new UnsupportedApiVersionEndpoint( options )],
-            [EdgeKey.UnsupportedMediaType] = [new UnsupportedMediaTypeEndpoint( options )],
-            [EdgeKey.NotAcceptable] = [new NotAcceptableEndpoint( options )],
+            [EdgeKey.Malformed] = [MalformedApiVersionEndpoint.New( logger, options )],
+            [EdgeKey.Ambiguous] = [AmbiguousApiVersionEndpoint.New( logger )],
+            [EdgeKey.Unspecified] = [UnspecifiedApiVersionEndpoint.New( logger, options )],
+            [EdgeKey.Unsupported] = [UnsupportedApiVersionEndpoint.New( options )],
+            [EdgeKey.UnsupportedMediaType] = [UnsupportedMediaTypeEndpoint.New( options )],
+            [EdgeKey.NotAcceptable] = [NotAcceptableEndpoint.New( options )],
         };
     }
 
     public IReadOnlyList<PolicyNodeEdge> Build()
     {
         routePatterns.TrimExcess();
+
+        if ( unversioned is not null )
+        {
+            // an endpoint without ApiVersionMetadata is not versioned and must never have an API versioning policy
+            // enforced against it. the endpoints of an edge become the candidates of the destination it jumps to,
+            // which means an endpoint that is omitted from an edge is unreachable. carry the unversioned endpoints
+            // into every edge so they remain a candidate for any destination the jump table can select. a client error
+            // endpoint always sorts last, so an unversioned endpoint that matches will be selected ahead of it
+            foreach ( var endpoints in edges.Values )
+            {
+                endpoints.AddRange( unversioned );
+            }
+
+            // the jump table can also exit to the destination of the enclosing node; for example, a 404 when versioning
+            // by url segment only. that destination has no edge, so provide one that the policy can redirect the exit to
+            edges.Add( EdgeKey.Unversioned, [.. unversioned] );
+        }
+
         return [.. edges.Select( edge => new PolicyNodeEdge( edge.Key, edge.Value ) )];
     }
+
+    public void AddUnversioned( Endpoint endpoint ) => ( unversioned ??= [] ).Add( endpoint );
 
     public void Add( RouteEndpoint endpoint )
     {

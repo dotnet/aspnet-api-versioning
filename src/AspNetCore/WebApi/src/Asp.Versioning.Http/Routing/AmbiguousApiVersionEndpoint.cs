@@ -3,16 +3,16 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
-using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
 
-internal sealed class AmbiguousApiVersionEndpoint : Endpoint
+internal static class AmbiguousApiVersionEndpoint
 {
     private const string Name = "400 Ambiguous API Version";
 
-    internal AmbiguousApiVersionEndpoint( ILogger logger )
-        : base( c => OnExecute( c, logger ), Empty, Name ) { }
+    internal static RouteEndpoint New( ILogger logger ) =>
+        ClientErrorEndpoint.New( c => OnExecute( c, logger ), Name );
 
     private static Task OnExecute( HttpContext context, ILogger logger )
     {

@@ -4,7 +4,7 @@ namespace Asp.Versioning.Routing;
 
 internal struct RouteDestination
 {
-    public readonly int Exit;
+    public int Exit;
     public int Malformed;
     public int Ambiguous;
     public int Unspecified;

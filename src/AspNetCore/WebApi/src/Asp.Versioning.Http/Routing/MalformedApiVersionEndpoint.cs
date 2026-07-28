@@ -4,16 +4,16 @@ namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
-using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
 
-internal sealed class MalformedApiVersionEndpoint : Endpoint
+internal static class MalformedApiVersionEndpoint
 {
     private const string Name = "400 Invalid API Version";
 
-    internal MalformedApiVersionEndpoint( ILogger logger, ApiVersioningOptions options )
-        : base( context => OnExecute( context, options, logger ), Empty, Name ) { }
+    internal static RouteEndpoint New( ILogger logger, ApiVersioningOptions options ) =>
+        ClientErrorEndpoint.New( context => OnExecute( context, options, logger ), Name );
 
     private static Task OnExecute( HttpContext context, ApiVersioningOptions options, ILogger logger )
     {

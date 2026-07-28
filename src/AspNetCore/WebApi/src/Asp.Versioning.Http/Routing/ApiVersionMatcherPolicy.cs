@@ -91,9 +91,11 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             feature.RequestedApiVersion = apiVersion;
         }
 
-        var (matched, hasCandidates) = MatchApiVersion( candidates, apiVersion );
+        var (matched, hasCandidates, unversioned) = MatchApiVersion( candidates, apiVersion );
 
-        if ( !matched && hasCandidates && !DifferByRouteConstraintsOnly( candidates ) )
+        // an unversioned candidate is still a valid match. replacing the endpoint with a client error
+        // would enforce an api versioning policy against an endpoint that never opted into versioning
+        if ( !matched && hasCandidates && !unversioned && !DifferByRouteConstraintsOnly( candidates ) )
         {
             var builder = new ClientErrorEndpointBuilder( feature, candidates, Options, logger );
             httpContext.SetEndpoint( builder.Build() );
@@ -146,9 +148,14 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 case EndpointType.NotAcceptable:
                     rejection.NotAcceptable = edge.Destination;
                     break;
+                case EndpointType.Unversioned:
+                    // the edge only exists when the node contains one or more endpoints that are not versioned. exiting
+                    // the node would make them unreachable, so exit to them instead. if none of them match, the result
+                    // is the same 404 the exit destination produces
+                    rejection.Exit = edge.Destination;
+                    break;
                 default:
-                    // the route patterns provided to each edge is a
-                    // singleton so any edge will do
+                    // the route patterns provided to each edge is a singleton so any edge will do
                     routePatterns ??= [.. state.RoutePatterns];
                     destinations.Add( state.ApiVersion, edge.Destination );
                     break;
@@ -182,6 +189,10 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             if ( endpoints[i] is not RouteEndpoint endpoint ||
                  endpoint.Metadata.GetMetadata<ApiVersionMetadata>() is not ApiVersionMetadata metadata )
             {
+                // the endpoint is not versioned. it can only appear here because it overlapped with a versioned
+                // endpoint in the route table; for example, a static asset that happens to match a catch-all template.
+                // api versioning policies must not be enforced against it, but dropping it here would make it unreachable
+                builder.AddUnversioned( endpoints[i] );
                 continue;
             }
 
@@ -244,16 +255,15 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             return false;
         }
 
-        // HACK: edge case where the only differences are route template semantics.
-        // the established behavior is 400 when an endpoint 'could' match, but doesn't.
-        // this will not work for the scenario:
+        // HACK: edge case where the only differences are route template semantics. the established behavior is 400 when
+        // an endpoint 'could' match, but doesn't. this will not work for the scenario:
         //
         // * 1.0 = values/{id}
         // * 2.0 = values/{id:int}
         //
-        // Where the requested version is 2.0 and {id} is 'abc'. Users expect 404 in this
-        // scenario. Both candidates have been eliminated, but the policy doesn't know why.
-        // the only differences are route constraints; otherwise, the templates are equivalent.
+        // Where the requested version is 2.0 and {id} is 'abc'. Users expect 404 in this scenario. Both candidates have
+        // been eliminated, but the policy doesn't know why. the only differences are route constraints; otherwise, the
+        // templates are equivalent.
         //
         // for the scenario:
         //
@@ -334,16 +344,12 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         SortedSet<ApiVersion>? supported,
         SortedSet<ApiVersion>? deprecated )
     {
-        // this is a best guess effort at collating all supported and deprecated
-        // versions for an api when unmatched and it needs to be reported. it's
-        // impossible to be sure as there is no way to correlate an arbitrary
-        // request url by endpoint or name. the routing system will build a tree
-        // based on the route template before the jump table policy is created,
-        // which provides a natural method of grouping. manual, contrived tests
-        // demonstrated that were the results were correctly collated together.
-        // it is possible there is an edge case that isn't covered, but it's
-        // unclear what that would look like. one or more test cases should be
-        // added to document that is discovered
+        // this is a best guess effort at collating all supported and deprecated versions for an api when unmatched and
+        // it needs to be reported. it's impossible to be sure as there is no way to correlate an arbitrary request url
+        // by endpoint or name. the routing system will build a tree based on the route template before the jump table
+        // policy is created, which provides a natural method of grouping. manual, contrived tests demonstrated that
+        // were the results were correctly collated together. it is possible there is an edge case that isn't covered,
+        // but it's unclear what that would look like. one or more test cases should be added to document that if discovered
         ApiVersionModel model;
 
         if ( supported == null )
@@ -368,12 +374,15 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
         return new( new( model, model ) );
     }
 
-    private static (bool Matched, bool HasCandidates) MatchApiVersion( CandidateSet candidates, ApiVersion? apiVersion )
+    private static (bool Matched, bool HasCandidates, bool Unversioned) MatchApiVersion(
+        CandidateSet candidates,
+        ApiVersion? apiVersion )
     {
         var total = candidates.Count;
         var matched = false;
         var implicitMatches = new Matches( stackalloc int[total] );
         var hasCandidates = false;
+        var unversioned = false;
 
         for ( var i = 0; i < total; i++ )
         {
@@ -382,14 +391,18 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
                 continue;
             }
 
-            hasCandidates = true;
             ref readonly var candidate = ref candidates[i];
             var metadata = candidate.Endpoint.Metadata.GetMetadata<ApiVersionMetadata>();
 
             if ( metadata == null )
             {
+                // the candidate is not versioned. leave it valid and remember that endpoint
+                // selection has something to fall back on other than a client error
+                unversioned = true;
                 continue;
             }
+
+            hasCandidates = true;
 
             switch ( metadata.MappingTo( apiVersion ) )
             {
@@ -425,7 +438,7 @@ public sealed partial class ApiVersionMatcherPolicy : MatcherPolicy, IEndpointSe
             matched = !implicitMatches.IsEmpty;
         }
 
-        return (matched, hasCandidates);
+        return (matched, hasCandidates, unversioned);
     }
 
     private ValueTask<ApiVersion> TrySelectApiVersionAsync( HttpContext httpContext, CandidateSet candidates )

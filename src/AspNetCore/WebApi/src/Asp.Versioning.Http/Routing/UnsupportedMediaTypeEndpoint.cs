@@ -3,19 +3,17 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
-using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
+using Microsoft.AspNetCore.Routing;
 
-internal sealed class UnsupportedMediaTypeEndpoint : Endpoint
+internal static class UnsupportedMediaTypeEndpoint
 {
     private const string Name = "415 HTTP Unsupported Media Type";
 
-    internal UnsupportedMediaTypeEndpoint( ApiVersioningOptions options )
-        : base(
+    internal static RouteEndpoint New( ApiVersioningOptions options ) =>
+        ClientErrorEndpoint.New(
             context => EndpointProblem.UnsupportedApiVersion(
                 context,
                 options,
                 StatusCodes.Status415UnsupportedMediaType ),
-            Empty,
-            Name )
-    { }
+            Name );
 }

@@ -2,20 +2,17 @@
 
 namespace Asp.Versioning.Routing;
 
-using Microsoft.AspNetCore.Http;
-using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
+using Microsoft.AspNetCore.Routing;
 
-internal sealed class UnsupportedApiVersionEndpoint : Endpoint
+internal static class UnsupportedApiVersionEndpoint
 {
     private const string Name = " Unsupported API Version";
 
-    internal UnsupportedApiVersionEndpoint( ApiVersioningOptions options )
-        : base(
+    internal static RouteEndpoint New( ApiVersioningOptions options ) =>
+        ClientErrorEndpoint.New(
             context => EndpointProblem.UnsupportedApiVersion(
                 context,
                 options,
                 options.UnsupportedApiVersionStatusCode ),
-            Empty,
-            options.UnsupportedApiVersionStatusCode + Name )
-    { }
+            options.UnsupportedApiVersionStatusCode + Name );
 }
