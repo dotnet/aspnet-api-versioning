@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.Routing;
 
-using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
@@ -225,6 +224,130 @@ public class ApiVersionMatcherPolicyTest
         // assert
         candidates.IsValidCandidate( 0 ).Should().BeTrue();
         feature.Object.RequestedApiVersion.Should().Be( new ApiVersion( 1, 0 ) );
+    }
+
+    [Fact]
+    public void get_edges_should_keep_unversioned_endpoint_reachable_from_every_edge()
+    {
+        // arrange
+        var policy = NewApiVersionMatcherPolicy();
+        var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+        var versioned = new RouteEndpointBuilder( Limbo, RoutePatternFactory.Parse( "{a}/{b}" ), 0 )
+        {
+            DisplayName = "Versioned",
+            Metadata = { new ApiVersionMetadata( model, model ) },
+        }.Build();
+        var unversioned = new RouteEndpointBuilder( Limbo, RoutePatternFactory.Parse( "scalar/scalar.js" ), 0 )
+        {
+            DisplayName = "Unversioned",
+        }.Build();
+
+        // act
+        var edges = policy.GetEdges( [versioned, unversioned] );
+
+        // assert
+        edges.Should().OnlyContain( edge => edge.Endpoints.Contains( unversioned ) );
+    }
+
+    [Fact]
+    public void build_jump_table_should_exit_to_unversioned_endpoints()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, default );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, [] );
+
+        // versioning by url segment only reports 404 instead of 400 when the version is unspecified,
+        // which exits the node. the unversioned endpoints must be reachable from that destination
+        var options = new ApiVersioningOptions()
+        {
+            ApiVersionReader = new UrlSegmentApiVersionReader(),
+        };
+        var policy = NewApiVersionMatcherPolicy( options );
+        var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+        var versioned = new RouteEndpointBuilder( Limbo, RoutePatternFactory.Parse( "{a}/{b}" ), 0 )
+        {
+            DisplayName = "Versioned",
+            Metadata = { new ApiVersionMetadata( model, model ) },
+        }.Build();
+        var unversioned = new RouteEndpointBuilder( Limbo, RoutePatternFactory.Parse( "scalar/scalar.js" ), 0 )
+        {
+            DisplayName = "Unversioned",
+        }.Build();
+        var edges = policy.GetEdges( [versioned, unversioned] );
+        var tableEdges = new List<PolicyJumpTableEdge>();
+
+        for ( var i = 0; i < edges.Count; i++ )
+        {
+            tableEdges.Add( new( edges[i].State, i ) );
+        }
+
+        var jumpTable = policy.BuildJumpTable( 42, tableEdges );
+        var httpContext = NewHttpContext( feature );
+
+        // act
+        var destination = jumpTable.GetDestination( httpContext );
+
+        // assert
+        destination.Should().NotBe( 42 );
+        edges[destination].Endpoints.Should().Equal( unversioned );
+    }
+
+    [Fact]
+    public void client_error_endpoint_should_sort_after_unversioned_endpoint()
+    {
+        // arrange
+        var policy = NewApiVersionMatcherPolicy();
+        var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+        var versioned = new RouteEndpointBuilder( Limbo, RoutePatternFactory.Parse( "{a}/{b}" ), 0 )
+        {
+            DisplayName = "Versioned",
+            Metadata = { new ApiVersionMetadata( model, model ) },
+        }.Build();
+        var unversioned = new RouteEndpointBuilder( Limbo, RoutePatternFactory.Parse( "scalar/scalar.js" ), 0 )
+        {
+            DisplayName = "Unversioned",
+        }.Build();
+        var edges = policy.GetEdges( [versioned, unversioned] );
+        var edge = edges.Single( e => e.State.ToString() == "VER: Unspecified" );
+
+        // act
+        var clientError = edge.Endpoints.Single( e => e != unversioned );
+
+        // assert
+        // the routing system sorts a non-RouteEndpoint ahead of every RouteEndpoint, which would make
+        // a client error the highest priority candidate. it must be a RouteEndpoint with the lowest
+        // possible order so an endpoint that is not versioned is always selected ahead of it
+        clientError.Should()
+                   .BeOfType<RouteEndpoint>()
+                   .Which.Order.Should().Be( int.MaxValue );
+    }
+
+    [Fact]
+    public async Task apply_should_not_use_400_endpoint_for_unversioned_candidate()
+    {
+        // arrange
+        var feature = new Mock<IApiVersioningFeature>();
+
+        feature.SetupProperty( f => f.RawRequestedApiVersion, default );
+        feature.SetupProperty( f => f.RawRequestedApiVersions, [] );
+        feature.SetupProperty( f => f.RequestedApiVersion, default );
+
+        var policy = NewApiVersionMatcherPolicy();
+        var model = new ApiVersionModel( new ApiVersion( 1, 0 ) );
+        var items = new object[] { new ApiVersionMetadata( model, model ) };
+        var versioned = new Endpoint( Limbo, new( items ), "Versioned" );
+        var unversioned = new Endpoint( Limbo, new(), "Unversioned" );
+        var candidates = new CandidateSet( [versioned, unversioned], [[], []], [0, 1] );
+        var httpContext = NewHttpContext( feature );
+
+        // act
+        await policy.ApplyAsync( httpContext, candidates );
+
+        // assert
+        httpContext.GetEndpoint().Should().BeNull();
+        candidates.IsValidCandidate( 1 ).Should().BeTrue();
     }
 
     private static Task Limbo( HttpContext context ) => Task.CompletedTask;

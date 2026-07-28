@@ -3,19 +3,17 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
-using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
+using Microsoft.AspNetCore.Routing;
 
-internal sealed class NotAcceptableEndpoint : Endpoint
+internal static class NotAcceptableEndpoint
 {
     private const string Name = "406 HTTP Not Acceptable";
 
-    internal NotAcceptableEndpoint( ApiVersioningOptions options )
-        : base(
+    internal static RouteEndpoint New( ApiVersioningOptions options ) =>
+        ClientErrorEndpoint.New(
             context => EndpointProblem.UnsupportedApiVersion(
                 context,
                 options,
                 StatusCodes.Status406NotAcceptable ),
-            Empty,
-            Name )
-    { }
+            Name );
 }

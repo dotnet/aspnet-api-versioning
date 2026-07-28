@@ -30,10 +30,10 @@ internal sealed class ClientErrorEndpointBuilder
     {
         if ( feature.RawRequestedApiVersions.Count == 0 )
         {
-            return new UnspecifiedApiVersionEndpoint( logger, options, GetDisplayNames() );
+            return UnspecifiedApiVersionEndpoint.New( logger, options, GetDisplayNames() );
         }
 
-        return new UnsupportedApiVersionEndpoint( options );
+        return UnsupportedApiVersionEndpoint.New( options );
     }
 
     private static string DisplayName( Endpoint endpoint )

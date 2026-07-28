@@ -3,18 +3,18 @@
 namespace Asp.Versioning.Routing;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using static Microsoft.AspNetCore.Http.EndpointMetadataCollection;
 
-internal sealed class UnspecifiedApiVersionEndpoint : Endpoint
+internal static class UnspecifiedApiVersionEndpoint
 {
     private const string Name = "400 Unspecified API Version";
 
-    internal UnspecifiedApiVersionEndpoint(
+    internal static RouteEndpoint New(
         ILogger logger,
         ApiVersioningOptions options,
-        string[]? displayNames = default )
-        : base( context => OnExecute( context, options, displayNames, logger ), Empty, Name ) { }
+        string[]? displayNames = default ) =>
+        ClientErrorEndpoint.New( context => OnExecute( context, options, displayNames, logger ), Name );
 
     private static Task OnExecute(
         HttpContext context,
