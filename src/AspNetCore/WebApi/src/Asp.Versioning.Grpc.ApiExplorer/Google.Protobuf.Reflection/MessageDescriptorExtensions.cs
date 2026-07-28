@@ -67,14 +67,7 @@ internal static class MessageDescriptorExtensions
                 fieldDescriptors ??= [];
                 fieldDescriptors.Add( field );
 
-                if ( field.FieldType == FieldType.Message )
-                {
-                    currentDescriptor = field.MessageType;
-                }
-                else
-                {
-                    currentDescriptor = null;
-                }
+                currentDescriptor = field.FieldType == FieldType.Message ? field.MessageType : null;
             }
 
             return fieldDescriptors != null;
