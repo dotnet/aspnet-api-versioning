@@ -24,4 +24,15 @@
   <ProjectReference Include="..\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
  </ItemGroup>
 
+ <!-- the XML comment source generator in Microsoft.AspNetCore.OpenApi emits a comment cache and a pair of
+      transformers into every assembly it runs in, whether or not that assembly has an AddOpenApi call site
+      for it to intercept. this library provides its own XML comment support, so the generated code is dead
+      weight; it is built from this assembly's comments, not the application's. ExcludeAssets="analyzers" on
+      the package reference does not remove it, so the analyzer is dropped from the compilation directly. -->
+ <Target Name="RemoveOpenApiXmlCommentGenerator" BeforeTargets="CoreCompile">
+  <ItemGroup>
+   <Analyzer Remove="@(Analyzer)" Condition=" '%(Filename)' == 'Microsoft.AspNetCore.OpenApi.SourceGenerators' " />
+  </ItemGroup>
+ </Target>
+
 </Project>

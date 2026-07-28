@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Xml.Linq;
 using static System.Reflection.BindingFlags;
 
@@ -45,40 +46,44 @@ public class XmlComments
     /// </summary>
     /// <param name="member">The member to get the summary from.</param>
     /// <returns>The corresponding <c>&lt;summary&gt;</c> or an empty string.</returns>
-    public virtual string GetSummary( MemberInfo member )
-        => GetMember( member )?.Element( "summary" )?.Value.Trim() ?? string.Empty;
+    public virtual string GetSummary( MemberInfo member ) => Text( GetMember( member )?.Element( "summary" ) );
 
     /// <summary>
     /// Gets the <c>description</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the description from.</param>
     /// <returns>The corresponding <c>&lt;description&gt;</c> or an empty string.</returns>
-    public virtual string GetDescription( MemberInfo member )
-        => GetMember( member )?.Element( "description" )?.Value.Trim() ?? string.Empty;
+    public virtual string GetDescription( MemberInfo member ) => Text( GetMember( member )?.Element( "description" ) );
 
     /// <summary>
     /// Gets the <c>remarks</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the remarks from.</param>
     /// <returns>The corresponding <c>&lt;remarks&gt;</c> or an empty string.</returns>
-    public virtual string GetRemarks( MemberInfo member )
-        => GetMember( member )?.Element( "remarks" )?.Value.Trim() ?? string.Empty;
+    public virtual string GetRemarks( MemberInfo member ) => Text( GetMember( member )?.Element( "remarks" ) );
 
     /// <summary>
     /// Gets the <c>returns</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the returns from.</param>
     /// <returns>The corresponding <c>&lt;returns&gt;</c> or an empty string.</returns>
-    public virtual string GetReturns( MemberInfo member )
-        => GetMember( member )?.Element( "returns" )?.Value.Trim() ?? string.Empty;
+    public virtual string GetReturns( MemberInfo member ) => Text( GetMember( member )?.Element( "returns" ) );
+
+    /// <summary>
+    /// Gets the <c>value</c> from the specified member, if any.
+    /// </summary>
+    /// <param name="member">The member to get the value from.</param>
+    /// <returns>The corresponding <c>&lt;value&gt;</c> or an empty string.</returns>
+    /// <remarks>The <c>&lt;value&gt;</c> tag documents what a property represents and is complementary to
+    /// <c>&lt;summary&gt;</c> rather than a replacement for it. A property can have both.</remarks>
+    public virtual string GetValue( MemberInfo member ) => Text( GetMember( member )?.Element( "value" ) );
 
     /// <summary>
     /// Gets the <c>example</c> from the specified member, if any.
     /// </summary>
     /// <param name="member">The member to get the example from.</param>
     /// <returns>The corresponding <c>&lt;example&gt;</c> or an empty string.</returns>
-    public virtual string GetExample( MemberInfo member )
-        => GetMember( member )?.Element( "example" )?.Value.Trim() ?? string.Empty;
+    public virtual string GetExample( MemberInfo member ) => Text( GetMember( member )?.Element( "example" ) );
 
     /// <summary>
     /// Gets the <c>param</c> description from the specified member, if any.
@@ -90,10 +95,8 @@ public class XmlComments
     {
         if ( GetMember( member ) is { } element )
         {
-            return element.Elements( "param" )
-                          .FirstOrDefault( x => x.Attribute( "name" )?.Value == name )?
-                          .Value
-                          .Trim() ?? string.Empty;
+            return Text( element.Elements( "param" )
+                                .FirstOrDefault( x => x.Attribute( "name" )?.Value == name ) );
         }
 
         return string.Empty;
@@ -125,11 +128,9 @@ public class XmlComments
     {
         if ( GetMember( member ) is { } element )
         {
-            return element.Elements( "param" )
-                          .FirstOrDefault( x => x.Attribute( "name" )?.Value == name )?
-                          .Attribute( "example" )?
-                          .Value
-                          .Trim() ?? string.Empty;
+            return Text( element.Elements( "param" )
+                                .FirstOrDefault( x => x.Attribute( "name" )?.Value == name )?
+                                .Attribute( "example" ) );
         }
 
         return string.Empty;
@@ -186,10 +187,8 @@ public class XmlComments
     {
         if ( GetMember( member ) is { } element )
         {
-            return element.Elements( "response" )
-                          .FirstOrDefault( x => x.Attribute( "code" )?.Value == statusCode )?
-                          .Value
-                          .Trim() ?? string.Empty;
+            return Text( element.Elements( "response" )
+                                .FirstOrDefault( x => x.Attribute( "code" )?.Value == statusCode ) );
         }
 
         return string.Empty;
@@ -307,5 +306,413 @@ public class XmlComments
     private static XElement? FindMember( XDocument xml, string key ) =>
         xml.Descendants( "member" ).FirstOrDefault( member => member.Attribute( "name" )?.Value == key );
 
-    private XElement? GetMemberById( string id ) => members.GetOrAdd( id, key => FindMember( Xml, key ) );
+    private XElement? GetMemberById( string id ) => members.GetOrAdd( id, key => Normalize( FindMember( Xml, key ) ) );
+
+    // The compiler copies the documentation tags into the XML file verbatim, so reading the text of an element
+    // yields the concatenated text of everything inside it. Tags that convey structure are lost; the items of a
+    // list run together into a single sentence and code samples are indistinguishable from prose. Rewrite those
+    // tags into the Markdown that OpenAPI descriptions are rendered as before the text is read.
+    //
+    // The result is cached, so this is done once per member. A copy is normalized to leave the source document
+    // untouched; the same element can be reached again through <inheritdoc />.
+    private static XElement? Normalize( XElement? element )
+    {
+        if ( element is null )
+        {
+            return null;
+        }
+
+        var copy = new XElement( element );
+
+        // strip the indentation the XML file is written with before anything is substituted. doing it up front
+        // means replacement text needs no indentation of its own, which cannot be derived reliably anyway: XLinq
+        // merges the text nodes around a replaced element, so the text preceding a sibling tag changes as the
+        // pass proceeds
+        Dedent( copy );
+
+        // order matters. <code> is resolved first so an inline tag nested in a block stays literal, then <c> so
+        // that inline code survives being flattened into the text of a list item or a paragraph. the tags that
+        // absorb their content are resolved last for the same reason.
+        ResolveCodeTags( copy, "code", "```" );
+        ResolveCodeTags( copy, "c", "`" );
+        ResolveListTags( copy );
+        ResolveParamRefTags( copy );
+        ResolveParaTags( copy );
+
+        return copy;
+    }
+
+    private static string Text( XElement? element ) => element is null ? string.Empty : TrimEachLine( element.Value );
+
+    private static string Text( XAttribute? attribute ) => attribute is null ? string.Empty : TrimEachLine( attribute.Value );
+
+    // <paramref /> refers to a parameter of the operation, which is part of the API over the wire, so its name
+    // is meaningful in a description. <typeparamref /> is not; a type parameter is a C# concept with no
+    // representation in a request or a response, and neither is <see langword="" /> or <see cref="" />.
+    private static void ResolveParamRefTags( XElement element )
+    {
+        foreach ( var paramRef in element.Descendants( "paramref" ).ToArray() )
+        {
+            if ( paramRef.Parent is not null
+                 && paramRef.Attribute( "name" )?.Value is { Length: > 0 } name )
+            {
+                paramRef.ReplaceWith( new XText( name ) );
+            }
+        }
+    }
+
+    // A blank line is what separates paragraphs in the Markdown a description is rendered as; a single line break
+    // is only a soft break and renders as a space, which would leave the tag with no effect. The content of the
+    // containing element is rebuilt rather than each <para /> being replaced in turn, because the whitespace
+    // between two of them is not a reliable separator: XLinq merges the text nodes around a replaced element.
+    //
+    // This runs last, so every other tag has already been resolved to text and <para /> is the only element left.
+    private static void ResolveParaTags( XElement element )
+    {
+        foreach ( var parent in element.DescendantsAndSelf().ToArray() )
+        {
+            if ( !parent.Elements( "para" ).Any() )
+            {
+                continue;
+            }
+
+            var blocks = new List<string>();
+
+            foreach ( var node in parent.Nodes() )
+            {
+                var text = node switch
+                {
+                    XText content => TrimEachLine( content.Value ),
+                    XElement para => TrimEachLine( para.Value ),
+                    _ => string.Empty,
+                };
+
+                if ( text.Length > 0 )
+                {
+                    blocks.Add( text );
+                }
+            }
+
+            parent.ReplaceNodes( new XText( string.Join( "\n\n", blocks ) ) );
+        }
+    }
+
+    private static void ResolveListTags( XElement element )
+    {
+        foreach ( var list in element.Descendants( "list" ).ToArray() )
+        {
+            if ( list.Parent is null )
+            {
+                continue;
+            }
+
+            var type = list.Attribute( "type" )?.Value;
+
+            if ( StringComparer.Ordinal.Equals( type, "table" )
+                 && TryResolveTable( list, out var table ) )
+            {
+                list.ReplaceWith( new XText( table ) );
+                continue;
+            }
+
+            var bullets = type switch
+            {
+                "number" => BulletedList.Numbered(),
+                _ => BulletedList.Bullets(),
+            };
+            var items = list.Elements( "item" ).Select( item => bullets.Next() + ItemOf( item ) );
+
+            list.ReplaceWith( new XText( string.Join( "\n", items ) ) );
+        }
+    }
+
+    // An item can be written as plain text or as a definition of a <term /> by a <description />. Markdown has no
+    // definition list, so a definition renders as a bolded term followed by its description. Reading the text of
+    // the item would run the two together because the tags are adjacent.
+    //
+    // This is deliberately not the cell handling used for a table. Outside of a table a pipe is an ordinary
+    // character and the line structure of a description is worth keeping.
+    private static string ItemOf( XElement item )
+    {
+        var term = item.Element( "term" );
+        var description = item.Element( "description" );
+
+        if ( term is null && description is null )
+        {
+            return TrimEachLine( item.Value );
+        }
+
+        var name = term is null ? string.Empty : TrimEachLine( term.Value );
+        var text = description is null ? string.Empty : TrimEachLine( description.Value );
+
+        if ( name.Length == 0 )
+        {
+            return text;
+        }
+
+        return text.Length == 0 ? name : "**" + name + "**: " + text;
+    }
+
+    // A table is the one list type with a Markdown equivalent that is not a list. It only resolves to a table when
+    // there is more than one column; a table of one column conveys nothing a bulleted list does not, so the caller
+    // falls back to bullets. Markdown requires a header row, so a list with no <listheader /> gets a blank one.
+    private static bool TryResolveTable( XElement list, [NotNullWhen( true )] out string? table )
+    {
+        var header = CellsOf( list.Element( "listheader" ) );
+        var rows = list.Elements( "item" ).Select( CellsOf ).ToList();
+        var columns = header.Count;
+
+        for ( var i = 0; i < rows.Count; i++ )
+        {
+            columns = Math.Max( columns, rows[i].Count );
+        }
+
+        if ( columns < 2 )
+        {
+            table = default;
+            return false;
+        }
+
+        // a table cannot interrupt a paragraph, so it is surrounded by blank lines
+        var markdown = new StringBuilder( "\n" );
+
+        AppendRow( markdown, header, columns );
+        AppendRow( markdown, [.. Enumerable.Repeat( "---", columns )], columns );
+
+        for ( var i = 0; i < rows.Count; i++ )
+        {
+            AppendRow( markdown, rows[i], columns );
+        }
+
+        table = markdown.ToString();
+        return true;
+    }
+
+    private static List<string> CellsOf( XElement? row )
+    {
+        if ( row is null )
+        {
+            return [];
+        }
+
+        var cells = row.Elements()
+                       .Where( cell => cell.Name == "term" || cell.Name == "description" )
+                       .Select( cell => CellOf( cell.Value ) )
+                       .ToList();
+
+        // an item written without <term /> or <description /> is a single cell of text
+        if ( cells.Count == 0 )
+        {
+            cells.Add( CellOf( row.Value ) );
+        }
+
+        return cells;
+    }
+
+    // A row occupies a single line and is delimited by pipes, so the whitespace in a cell is collapsed and any
+    // pipe of its own is escaped. Neither can be represented in a cell otherwise.
+    private static string CellOf( string text )
+    {
+        var cell = new StringBuilder( text.Length );
+        var space = false;
+
+        for ( var i = 0; i < text.Length; i++ )
+        {
+            var ch = text[i];
+
+            if ( char.IsWhiteSpace( ch ) )
+            {
+                space = cell.Length > 0;
+                continue;
+            }
+
+            if ( space )
+            {
+                cell.Append( ' ' );
+                space = false;
+            }
+
+            if ( ch == '|' )
+            {
+                cell.Append( '\\' );
+            }
+
+            cell.Append( ch );
+        }
+
+        return cell.ToString();
+    }
+
+    private static void AppendRow( StringBuilder table, List<string> cells, int columns )
+    {
+        table.Append( '|' );
+
+        for ( var i = 0; i < columns; i++ )
+        {
+            var cell = i < cells.Count ? cells[i] : string.Empty;
+
+            table.Append( cell.Length == 0 ? " " : " " + cell + " " ).Append( '|' );
+        }
+
+        table.Append( '\n' );
+    }
+
+    private static void ResolveCodeTags( XElement element, string name, string delimiter )
+    {
+        foreach ( var code in element.Descendants( name ).ToArray() )
+        {
+            if ( code.Parent is null )
+            {
+                continue;
+            }
+
+            var text = delimiter + TrimEachLine( code.Value ) + delimiter;
+
+            code.ReplaceWith( new XText( text ) );
+        }
+    }
+
+    // The XML file is written with its own indentation, which becomes part of the text of every element inside a
+    // member. Remove it from each text node so the member reads as it was written and substituted text does not
+    // have to reproduce it. An XML processor normalizes line endings, so only '\n' occurs here.
+    private static void Dedent( XElement element )
+    {
+        var margin = MarginOf( element.Value );
+
+        if ( margin == 0 )
+        {
+            return;
+        }
+
+        foreach ( var text in element.DescendantNodes().OfType<XText>() )
+        {
+            text.Value = Unindent( text.Value, margin );
+        }
+    }
+
+    private static string Unindent( string text, int margin )
+    {
+        var unindented = new StringBuilder( text.Length );
+        var i = 0;
+
+        while ( i < text.Length )
+        {
+            var ch = text[i++];
+
+            unindented.Append( ch );
+
+            if ( ch != '\n' )
+            {
+                continue;
+            }
+
+            for ( var j = 0; j < margin && i < text.Length && ( text[i] == ' ' || text[i] == '\t' ); j++ )
+            {
+                i++;
+            }
+        }
+
+        return unindented.ToString();
+    }
+
+    private static int MarginOf( string text )
+    {
+        var lines = text.Split( '\n' );
+        var margin = int.MaxValue;
+
+        for ( var i = 0; i < lines.Length; i++ )
+        {
+            var line = lines[i];
+
+            if ( line.Trim().Length == 0 )
+            {
+                continue;
+            }
+
+            var indent = 0;
+
+            while ( indent < line.Length && char.IsWhiteSpace( line[indent] ) )
+            {
+                indent++;
+            }
+
+            margin = Math.Min( margin, indent );
+        }
+
+        return margin == int.MaxValue ? 0 : margin;
+    }
+
+    // Trims each line while preserving relative indentation. A code sample is indented to match the source it
+    // was written in; removing only the common indentation keeps the sample readable without the leading noise.
+    private static string TrimEachLine( string text )
+    {
+        var lines = text.Split( '\n' );
+        var margin = int.MaxValue;
+
+        for ( var i = 0; i < lines.Length; i++ )
+        {
+            var line = lines[i].TrimEnd();
+
+            if ( line.Length == 0 )
+            {
+                continue;
+            }
+
+            var indent = 0;
+
+            while ( indent < line.Length && char.IsWhiteSpace( line[indent] ) )
+            {
+                indent++;
+            }
+
+            margin = Math.Min( margin, indent );
+        }
+
+        if ( margin == int.MaxValue )
+        {
+            margin = 0;
+        }
+
+        var trimmed = new StringBuilder();
+        var empty = true;
+
+        for ( var i = 0; i < lines.Length; i++ )
+        {
+            var line = lines[i].TrimEnd();
+
+            // skip leading blank lines; the tag is almost always opened on its own line
+            if ( empty && line.Length == 0 )
+            {
+                continue;
+            }
+
+            if ( !empty )
+            {
+                trimmed.Append( '\n' );
+            }
+
+            empty = false;
+            trimmed.Append( line.Length > margin ? line[margin..] : string.Empty );
+        }
+
+        return trimmed.ToString().TrimEnd();
+    }
+
+    private sealed class BulletedList
+    {
+        private readonly Func<int, string> generate;
+        private int count;
+
+        private BulletedList( Func<int, string> generate ) => this.generate = generate;
+
+        private static string Increment( int number ) => number.ToString( CultureInfo.InvariantCulture ) + ". ";
+
+        private static string Bullet( int number ) => "* ";
+
+        public static BulletedList Numbered() => new( Increment );
+
+        public static BulletedList Bullets() => new( Bullet );
+
+        public string Next() => generate( ++count );
+    }
 }

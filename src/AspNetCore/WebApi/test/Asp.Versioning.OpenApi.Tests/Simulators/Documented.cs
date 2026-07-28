@@ -1,0 +1,100 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+
+#pragma warning disable SA1629
+
+namespace Asp.Versioning.OpenApi.Simulators;
+
+/// <summary>
+/// Represents a model whose members exercise the documentation tags that convey structure.
+/// </summary>
+public class Documented
+{
+    /// <summary>
+    /// Gets or sets the status.
+    /// </summary>
+    /// <value>Defaults to <c>Pending</c>.</value>
+    public string Status { get; set; }
+
+    // deliberately documented with <value> and no <summary>
+#pragma warning disable SA1604
+    /// <value>The unique identifier.</value>
+    public int Kind { get; set; }
+#pragma warning restore SA1604
+
+    /// <summary>
+    /// Gets or sets the tags.
+    /// <list type="bullet">
+    /// <item>First</item>
+    /// <item>Second</item>
+    /// </list>
+    /// </summary>
+    public string Tags { get; set; }
+
+    /// <summary>
+    /// Gets or sets the steps.
+    /// <list type="number">
+    /// <item>First</item>
+    /// <item>Second</item>
+    /// </list>
+    /// </summary>
+    public string Steps { get; set; }
+
+    /// <summary>
+    /// Gets or sets the format, which is <c>yyyy-MM-dd</c>.
+    /// </summary>
+    public string Format { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sample.
+    /// <code>
+    ///     var value = 42;
+    ///     Use( value );
+    /// </code>
+    /// </summary>
+    public string Sample { get; set; }
+
+    /// <summary>
+    /// Gets or sets the definitions.
+    /// <list type="bullet">
+    /// <item><term>Foo</term><description>Does foo</description></item>
+    /// <item><term>Bar</term></item>
+    /// <item><description>Just a description</description></item>
+    /// <item>Plain text</item>
+    /// </list>
+    /// </summary>
+    public string Definitions { get; set; }
+
+    /// <summary>
+    /// Gets or sets the matrix.
+    /// <list type="table">
+    /// <listheader><term>Name</term><description>Meaning</description></listheader>
+    /// <item><term>A</term><description>First</description></item>
+    /// <item><term>B</term><description>Second</description></item>
+    /// </list>
+    /// </summary>
+    public string Matrix { get; set; }
+
+    /// <summary>
+    /// Gets or sets the headerless.
+    /// <list type="table">
+    /// <item><term>A</term><description>Uses a | pipe</description></item>
+    /// </list>
+    /// </summary>
+    public string Headerless { get; set; }
+
+    /// <summary>
+    /// Gets or sets the narrow.
+    /// <list type="table">
+    /// <item><description>Only</description></item>
+    /// <item><description>One</description></item>
+    /// </list>
+    /// </summary>
+    public string Narrow { get; set; }
+
+    /// <summary>
+    /// Gets or sets the notes.
+    /// <para>The first note.</para>
+    /// <para>The second note, which mentions <c>Status</c>.</para>
+    /// </summary>
+    public string Notes { get; set; }
+}
