@@ -97,11 +97,11 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
     {
         get
         {
-            var parameters = ApiDescription.ParameterDescriptions;
+            var apiParameters = ApiDescription.ParameterDescriptions;
 
-            for ( var i = 0; i < parameters.Count; i++ )
+            for ( var i = 0; i < apiParameters.Count; i++ )
             {
-                var parameter = parameters[i];
+                var parameter = apiParameters[i];
 
                 if ( parameter.Source == BindingSource.Path
                      && parameter.ModelMetadata?.DataTypeName == nameof( ApiVersion )
@@ -161,21 +161,21 @@ public class ApiVersionParameterDescriptionContext : IApiVersionParameterDescrip
             return;
         }
 
-        var parameters = ApiDescription.ParameterDescriptions;
+        var parameterDescriptions = ApiDescription.ParameterDescriptions;
         var parameter = NewApiVersionParameter( name, BindingSource.Query );
 
-        for ( var i = 0; i < parameters.Count; i++ )
+        for ( var i = 0; i < parameterDescriptions.Count; i++ )
         {
-            var existing = parameters[i];
+            var existing = parameterDescriptions[i];
 
             if ( existing.Name == name && existing.Source == BindingSource.Query )
             {
-                parameters[i] = parameter;
+                parameterDescriptions[i] = parameter;
                 return;
             }
         }
 
-        parameters.Add( parameter );
+        parameterDescriptions.Add( parameter );
     }
 
     /// <summary>

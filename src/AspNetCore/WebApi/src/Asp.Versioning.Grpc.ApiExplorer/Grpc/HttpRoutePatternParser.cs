@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
+using System.Text;
+
 namespace Asp.Versioning.Grpc;
 
 // HTTP Template Grammar:
@@ -48,7 +50,7 @@ internal sealed class HttpRoutePatternParser( string input )
         {
             ParseTemplate();
         }
-        catch ( Exception ex )
+        catch ( InvalidOperationException ex )
         {
             throw new InvalidOperationException( $"Error parsing path template '{input}'.", ex );
         }
@@ -85,13 +87,10 @@ internal sealed class HttpRoutePatternParser( string input )
     {
         while ( true )
         {
-            if ( !ParseSegment() )
+            // Support '/' template.
+            if ( !ParseSegment() && segments.Count > 0 )
             {
-                // Support '/' template.
-                if ( segments.Count > 0 )
-                {
-                    throw new InvalidOperationException( "Route template shouldn't end with a '/'." );
-                }
+                throw new InvalidOperationException( "Route template shouldn't end with a '/'." );
             }
 
             if ( !Consume( '/' ) )
@@ -210,7 +209,7 @@ internal sealed class HttpRoutePatternParser( string input )
 
     private bool ParseIdentifier()
     {
-        var identifier = string.Empty;
+        var identifier = new System.Text.StringBuilder();
         var hasEndChar = false;
 
         while ( !hasEndChar && NextChar() )
@@ -226,17 +225,17 @@ internal sealed class HttpRoutePatternParser( string input )
                     break;
                 default:
                     Consume( c );
-                    identifier += c;
+                    identifier.Append( c );
                     break;
             }
         }
 
-        if ( string.IsNullOrEmpty( identifier ) )
+        if ( identifier.Length == 0 )
         {
             return false;
         }
 
-        CurrentVariable.FieldPath.Add( identifier );
+        CurrentVariable.FieldPath.Add( identifier.ToString() );
         return true;
     }
 
@@ -251,6 +250,7 @@ internal sealed class HttpRoutePatternParser( string input )
 
         // initialize to false in case we encounter an empty literal
         var result = false;
+        var builder = new StringBuilder();
 
         while ( true )
         {
@@ -266,10 +266,11 @@ internal sealed class HttpRoutePatternParser( string input )
                         throw new InvalidOperationException( "Path template has an empty segment." );
                     }
 
+                    literal = builder.ToString();
                     return result;
                 default:
                     Consume( c );
-                    literal += c;
+                    builder.Append( c );
                     break;
             }
 
@@ -281,6 +282,7 @@ internal sealed class HttpRoutePatternParser( string input )
             }
         }
 
+        literal = builder.ToString();
         return result;
     }
 

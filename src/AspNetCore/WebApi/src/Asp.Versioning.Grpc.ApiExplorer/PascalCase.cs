@@ -33,14 +33,9 @@ internal static class PascalCase
             }
             else if ( char.IsUpper( text[i] ) )
             {
-                if ( i == 0 && !capitalize )
-                {
-                    output[j++] = char.ToLower( text[i], InvariantCulture );
-                }
-                else
-                {
-                    output[j++] = text[i];
-                }
+                output[j++] = i == 0 && !capitalize ?
+                    char.ToLower( text[i], InvariantCulture ) :
+                    text[i];
 
                 capitalize = false;
             }
