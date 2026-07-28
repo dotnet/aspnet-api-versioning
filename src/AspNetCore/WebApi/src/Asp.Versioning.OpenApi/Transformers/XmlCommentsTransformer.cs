@@ -76,7 +76,7 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
                  && type.GetProperty( name, IgnoreCase | Instance | Public ) is { } property )
             {
                 if ( string.IsNullOrEmpty( prop.Description )
-                     && !string.IsNullOrEmpty( description = Documentation.GetSummary( property ) ) )
+                     && !string.IsNullOrEmpty( description = GetPropertyDescription( property ) ) )
                 {
                     prop.Description = description;
                 }
@@ -122,9 +122,19 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
 
         if ( operation.Responses is { } responses )
         {
+            // <returns> describes the return value of the method, which only maps to a response when there is
+            // exactly one. with more than one, there is no way to know which response it refers to; <response>
+            // exists for that case and always wins where both are present.
+            var returns = responses.Count == 1 ? Documentation.GetReturns( method ) : string.Empty;
+
             foreach ( var (statusCode, response) in responses )
             {
                 description = Documentation.GetResponseDescription( method, statusCode );
+
+                if ( string.IsNullOrEmpty( description ) )
+                {
+                    description = returns;
+                }
 
                 if ( !string.IsNullOrEmpty( description ) )
                 {
@@ -191,6 +201,21 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         }
 
         return Task.CompletedTask;
+    }
+
+    // <summary> says what a property is and <value> says what it holds. they are complementary, so when a
+    // property has both, both are used
+    private string GetPropertyDescription( MemberInfo property )
+    {
+        var summary = Documentation.GetSummary( property );
+        var value = Documentation.GetValue( property );
+
+        if ( string.IsNullOrEmpty( value ) )
+        {
+            return summary;
+        }
+
+        return string.IsNullOrEmpty( summary ) ? value : summary + '\n' + value;
     }
 
     private static bool TryResolveMethod( ActionDescriptor action, [MaybeNullWhen( false )] out MethodInfo method )
