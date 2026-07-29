@@ -18,8 +18,10 @@ using static System.Reflection.BindingFlags;
 /// OpenAPI document.
 /// </summary>
 [CLSCompliant( false )]
-public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperationTransformer
+public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperationTransformer, IOpenApiDocumentTransformer
 {
+    private const string ModelTypeKey = "x-asp-versioning-model-type";
+
     internal XmlCommentsTransformer( XmlCommentsFile file ) :
         this( file.Path )
     {
@@ -65,30 +67,28 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
             schema.Example = example;
         }
 
-        if ( schema.Properties is not { } properties )
+        // a schema is created once per type and the same instance is reused everywhere the type appears, including
+        // as the target of a reference. describing a member here would write the description of one property onto
+        // the schema of the property's own type, which every other use of that type would then report. the members
+        // are described once the document is complete and the shared schemas have been replaced by references
+        if ( schema.Properties is { Count: > 0 } )
         {
-            return Task.CompletedTask;
+            ( schema.Metadata ??= new Dictionary<string, object>() )[ModelTypeKey] = type;
         }
 
-        foreach ( var (name, prop) in properties )
-        {
-            if ( prop is not null
-                 && type.GetProperty( name, IgnoreCase | Instance | Public ) is { } property )
-            {
-                if ( string.IsNullOrEmpty( prop.Description )
-                     && !string.IsNullOrEmpty( description = GetPropertyDescription( property ) ) )
-                {
-                    prop.Description = description;
-                }
+        return Task.CompletedTask;
+    }
 
-                if ( prop.Example is null
-                     && prop.Examples is not null
-                     && ( example = ToJson( Documentation.GetExample( property ) ) ) is not null )
-                {
-                    prop.Examples.Add( example );
-                }
-            }
-        }
+    /// <inheritdoc />
+    public virtual Task TransformAsync(
+        OpenApiDocument document,
+        OpenApiDocumentTransformerContext context,
+        CancellationToken cancellationToken )
+    {
+        ArgumentNullException.ThrowIfNull( document );
+        ArgumentNullException.ThrowIfNull( context );
+
+        new OpenApiWalker( new SchemaVisitor( DescribeMembers ) ).Walk( document );
 
         return Task.CompletedTask;
     }
@@ -203,6 +203,57 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         return Task.CompletedTask;
     }
 
+    [UnconditionalSuppressMessage( "ILLink", "IL2070", Justification = "The model type is reported by the API Explorer and is never trimmed" )]
+    private void DescribeMembers( OpenApiSchema schema )
+    {
+        if ( schema.Metadata is not { } metadata
+             || !metadata.TryGetValue( ModelTypeKey, out var value )
+             || value is not Type type
+             || schema.Properties is not { } properties )
+        {
+            return;
+        }
+
+        foreach ( var (name, member) in properties )
+        {
+            if ( member is not null
+                 && type.GetProperty( name, IgnoreCase | Instance | Public ) is { } property )
+            {
+                Describe( member, property );
+            }
+        }
+    }
+
+    private void Describe( IOpenApiSchema member, PropertyInfo property )
+    {
+        // a member whose type has a schema of its own is a reference to that schema, which is shared by every
+        // other use of the type. the description belongs to the reference rather than to what it refers to;
+        // OpenAPI 3.1 allows both to appear together
+        if ( member is OpenApiSchemaReference reference )
+        {
+            if ( string.IsNullOrEmpty( reference.Reference.Description )
+                 && GetPropertyDescription( property ) is { Length: > 0 } summary )
+            {
+                reference.Reference.Description = summary;
+            }
+
+            return;
+        }
+
+        if ( string.IsNullOrEmpty( member.Description )
+             && GetPropertyDescription( property ) is { Length: > 0 } description )
+        {
+            member.Description = description;
+        }
+
+        if ( member.Example is null
+             && member.Examples is not null
+             && ToJson( Documentation.GetExample( property ) ) is { } example )
+        {
+            member.Examples.Add( example );
+        }
+    }
+
     // <summary> says what a property is and <value> says what it holds. they are complementary, so when a
     // property has both, both are used
     private string GetPropertyDescription( MemberInfo property )
@@ -256,6 +307,21 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
         catch ( JsonException )
         {
             return JsonNode.Parse( $"\"{example}\"" );
+        }
+    }
+
+    // the same schema is reached once per use, so a schema is only described the first time it is visited.
+    // describing it again would append a duplicate example
+    private sealed class SchemaVisitor( Action<OpenApiSchema> describe ) : OpenApiVisitorBase
+    {
+        private readonly HashSet<object> visited = new( ReferenceEqualityComparer.Instance );
+
+        public override void Visit( IOpenApiSchema schema )
+        {
+            if ( schema is OpenApiSchema described && visited.Add( described ) )
+            {
+                describe( described );
+            }
         }
     }
 }
