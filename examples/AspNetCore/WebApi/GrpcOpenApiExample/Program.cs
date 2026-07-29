@@ -33,10 +33,10 @@ var orders = app.NewVersionedApi( "Orders" );
 var people = app.NewVersionedApi( "People" );
 var greeter = app.NewVersionedApi( "Greeter" );
 
-orders.MapGrpcService<V1.OrdersService>().HasApiVersion( 1.0 );
+orders.MapGrpcService<V1.OrdersService>().HasApiVersion( 1.0 ).HasApiVersion( 2.0 ).HasApiVersion( 3.0 );
 greeter.MapGrpcService<V1.GreeterService>().HasApiVersion( 1.0 );
 greeter.MapGrpcService<V3.GreeterService>().HasApiVersion( 3.0 );
-people.MapGrpcService<V3.PeopleService>().HasApiVersion( 3.0 );
+people.MapGrpcService<V3.PeopleService>().HasApiVersion( 1.0 ).HasApiVersion( 2.0 ).HasApiVersion( 3.0 );
 
 if ( app.Environment.IsDevelopment() )
 {

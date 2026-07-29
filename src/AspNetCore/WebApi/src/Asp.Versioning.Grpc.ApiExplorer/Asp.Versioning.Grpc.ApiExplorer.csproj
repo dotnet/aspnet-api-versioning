@@ -15,4 +15,13 @@
   <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="10.0.*" />
  </ItemGroup>
 
+ <ItemGroup>
+  <None Include="protos\**\*.proto" Pack="true" PackagePath="content/protos" />
+  <None Include="build\*.targets" Pack="true" PackagePath="build" />
+ </ItemGroup>
+
+ <ItemGroup>
+   <ProjectReference Include="..\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />
+ </ItemGroup>
+
 </Project>

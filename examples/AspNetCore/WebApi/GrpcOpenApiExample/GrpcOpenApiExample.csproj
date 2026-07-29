@@ -30,8 +30,15 @@
   <IncludeHttpRuleProtos>true</IncludeHttpRuleProtos>
  </PropertyGroup>
 
+ <!-- an application that references the Asp.Versioning.Grpc.ApiExplorer package sets the
+      IncludeApiVersioningProtos property instead. that property is handled by the targets shipped in the package,
+      which a project reference does not import, so the proto files are imported from the source project here -->
+ <PropertyGroup>
+  <ApiVersioningProtosPath>..\..\..\..\src\AspNetCore\WebApi\src\Asp.Versioning.Grpc.ApiExplorer\protos</ApiVersioningProtosPath>
+ </PropertyGroup>
+
  <ItemGroup>
-  <Protobuf Include="Protos\*.proto" />
+  <Protobuf Include="Protos\*.proto" AdditionalImportDirs="$(ApiVersioningProtosPath)" />
  </ItemGroup>
 
 </Project>

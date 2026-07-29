@@ -1,0 +1,16 @@
+﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
+
+syntax = "proto3";
+
+package asp.api;
+
+option csharp_namespace = "Asp.Versioning";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FieldOptions {
+  // the api version ranges the field is included in.
+  // repeat the option to include the field split between ranges.
+  // included in all versions when absent.
+  repeated string version = 50501;
+}
