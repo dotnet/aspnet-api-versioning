@@ -126,11 +126,18 @@
   <data name="ApiVersionInvalidFormat" xml:space="preserve">
     <value>The specified API version is invalid.</value>
   </data>
+  <data name="Argument_EmptyString" xml:space="preserve">
+    <value>The value cannot be an empty string.</value>
+  </data>
   <data name="EmptyKey" xml:space="preserve">
     <value>The key cannot be empty.</value>
   </data>
   <data name="FirstCharMustBeLetter" xml:space="preserve">
     <value>The first character must be a letter.</value>
+  </data>
+  <data name="InvalidApiVersionRange" xml:space="preserve">
+    <value>The API version range "{0}" is invalid.</value>
+    <comment>0 = range expression</comment>
   </data>
   <data name="InvalidFormatString" xml:space="preserve">
     <value>Input string was not in a correct format.</value>

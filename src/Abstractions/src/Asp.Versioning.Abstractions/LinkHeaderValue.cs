@@ -498,7 +498,7 @@ public partial class LinkHeaderValue
         {
             if ( key.Length == 0 )
             {
-                throw new ArgumentException( SR.EmptyKey, nameof( key ) );
+                throw new System.ArgumentException( SR.EmptyKey, nameof( key ) );
             }
 
 #if NETSTANDARD1_0
@@ -510,7 +510,7 @@ public partial class LinkHeaderValue
 #endif
             if ( !char.IsLetter( ch ) )
             {
-                throw new ArgumentException( SR.FirstCharMustBeLetter, nameof( key ) );
+                throw new System.ArgumentException( SR.FirstCharMustBeLetter, nameof( key ) );
             }
 
             for ( var i = 1; i < text.Length; i++ )
@@ -524,7 +524,7 @@ public partial class LinkHeaderValue
 
                 if ( !valid )
                 {
-                    throw new ArgumentException( SR.InvalidLinkKey, nameof( key ) );
+                    throw new System.ArgumentException( SR.InvalidLinkKey, nameof( key ) );
                 }
             }
 

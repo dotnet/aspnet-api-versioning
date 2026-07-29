@@ -26,7 +26,7 @@ internal sealed class LinkList( string relationType ) : Collection<LinkHeaderVal
         if ( !item.RelationType.Equals( relationType, StringComparison.OrdinalIgnoreCase ) )
         {
             var message = string.Format( CultureInfo.CurrentCulture, Format.InvalidRelationType, relationType );
-            throw new ArgumentException( message, nameof( item ) );
+            throw new System.ArgumentException( message, nameof( item ) );
         }
     }
 }
