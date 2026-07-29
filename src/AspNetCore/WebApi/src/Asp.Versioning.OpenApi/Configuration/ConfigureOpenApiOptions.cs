@@ -7,6 +7,7 @@ namespace Asp.Versioning.OpenApi.Configuration;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 
@@ -14,6 +15,7 @@ internal sealed class ConfigureOpenApiOptions(
     XmlCommentsTransformer xmlComments,
     GrpcWellKnownTypeSchemaTransformer grpcWellKnownTypes,
     IApiVersionDescriptionProvider provider,
+    IApiDescriptionGroupCollectionProvider apiDescriptionProvider,
     VersionedOpenApiOptionsFactory factory )
     : IPostConfigureOptions<OpenApiOptions>
 {
@@ -36,7 +38,8 @@ internal sealed class ConfigureOpenApiOptions(
                 Name = name,
                 Description = description,
                 Options = options,
-                OnCreated = versionedOptions => Configure( versionedOptions, xmlComments, grpcWellKnownTypes ),
+                OnCreated = versionedOptions =>
+                    Configure( versionedOptions, xmlComments, grpcWellKnownTypes, apiDescriptionProvider ),
             };
 
             factory.CreateAndConfigure( context );
@@ -47,21 +50,25 @@ internal sealed class ConfigureOpenApiOptions(
     private static void Configure(
         VersionedOpenApiOptions versionedOptions,
         XmlCommentsTransformer xmlComments,
-        GrpcWellKnownTypeSchemaTransformer grpcWellKnownTypes )
+        GrpcWellKnownTypeSchemaTransformer grpcWellKnownTypes,
+        IApiDescriptionGroupCollectionProvider apiDescriptionProvider )
     {
         var options = versionedOptions.Document;
         var apiExplorer = new ApiExplorerTransformer( versionedOptions );
+        var modelMetadata = new ModelMetadataSchemaTransformer( apiDescriptionProvider, versionedOptions );
 
         options.SetDocumentName( versionedOptions.Description.GroupName );
         options.AddDocumentTransformer( apiExplorer );
         options.AddSchemaTransformer( apiExplorer );
         options.AddSchemaTransformer( grpcWellKnownTypes );
+        options.AddSchemaTransformer( modelMetadata );
         options.AddOperationTransformer( apiExplorer );
 
         if ( !xmlComments.IsEmpty )
         {
             options.AddSchemaTransformer( xmlComments );
             options.AddOperationTransformer( xmlComments );
+            options.AddDocumentTransformer( xmlComments );
         }
     }
 }
