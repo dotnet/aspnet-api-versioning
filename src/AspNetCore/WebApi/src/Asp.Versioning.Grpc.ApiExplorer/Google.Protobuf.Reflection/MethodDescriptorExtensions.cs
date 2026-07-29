@@ -25,7 +25,7 @@ internal static class MethodDescriptorExtensions
     // the method always returns the extension value, and the calling code can convert it to the expected type.
     // see https://github.com/protocolbuffers/protobuf/issues/9626 for more details.
     private static readonly Extension<MethodOptions, object> UntypedHttpExtension =
-        new( AnnotationsExtensions.Http.FieldNumber, codec: null );
+        new( Google.Api.AnnotationsExtensions.Http.FieldNumber, codec: null );
 
     extension( MethodDescriptor methodDescriptor )
     {

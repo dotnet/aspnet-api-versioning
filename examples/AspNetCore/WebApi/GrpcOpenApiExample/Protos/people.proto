@@ -2,9 +2,25 @@ syntax = "proto3";
 
 option csharp_namespace = "ApiVersioning.Examples";
 
+import "asp/api/annotations.proto";
 import "google/api/annotations.proto";
 
 package people;
+
+// Represents an address
+message Address {
+    // Gets or sets the street address
+    string street = 1;
+    
+    // Gets or sets the address city
+    string city = 2;
+
+    // Gets or sets the address state
+    string state = 3;
+
+    // Gets or sets the address zip code
+    string zip = 4;
+}
 
 // Represents a person
 message Person {
@@ -17,11 +33,17 @@ message Person {
     // Gets or sets the last name of a person
     string last_name = 3;
 
+    // Gets or sets the person's home address
+    Address home_address = 4 [(asp.api.version) = "2.0"];
+
+    // Gets or sets the person's work address
+    Address work_address = 5 [(asp.api.version) = "3.0"];
+
     // Gets or sets the email address for a person
-    string email = 4;
+    string email = 6 [(asp.api.version) = "2.0"];
 
     // Gets or sets the telephone number for a person
-    string phone = 5;
+    string phone = 7 [(asp.api.version) = "3.0"];
 }
 
 message PeopleRequest {

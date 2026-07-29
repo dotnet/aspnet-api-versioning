@@ -23,6 +23,7 @@ using static System.Net.Mime.MediaTypeNames;
 internal sealed class GrpcJsonTranscodingDescriptionProvider(
     EndpointDataSource source,
     FileDescriptorPool pool,
+    ApiVersionMetadataCache cache,
     IOptions<GrpcApiExplorerOptions> options ) : IApiDescriptionProvider
 {
     private readonly Lazy<IRouteConstraint?> apiVersionRouteConstraint = new( NewRouteConstraint );
@@ -54,7 +55,116 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
         }
     }
 
-    public void OnProvidersExecuted( ApiDescriptionProviderContext context ) { }
+    // OnProvidersExecuting runs in ascending order, but OnProvidersExecuted runs in descending order. this provider is
+    // ordered before the versioned API Explorer, which means it runs after the versioned API Explorer has expanded each
+    // result into one API description per API version and assigned ApiDescription.ApiVersion. that expansion clones the
+    // parameter and response descriptions, so the fields that don't apply to the version being described can be removed
+    // here without affecting the other versions.
+    public void OnProvidersExecuted( ApiDescriptionProviderContext context )
+    {
+        var results = context.Results;
+
+        for ( var i = 0; i < results.Count; i++ )
+        {
+            var result = results[i];
+
+            // the ApiVersion property is set by the versioned API Explorer, which is not referenced by design. read
+            // the well-known property directly instead so gRPC continues to work without API versioning
+            if ( result.GetProperty<ApiVersion>() is not { } apiVersion ||
+                 GetTranscodingMetadata( result ) is not { } metadata )
+            {
+                continue;
+            }
+
+            RemoveExcludedParameters( result, metadata.MethodDescriptor.InputType, apiVersion );
+            ApplyApiVersionToMessages( result, apiVersion );
+        }
+    }
+
+    private static GrpcJsonTranscodingMetadata? GetTranscodingMetadata( ApiDescription apiDescription )
+    {
+        var endpointMetadata = apiDescription.ActionDescriptor.EndpointMetadata;
+
+        if ( endpointMetadata is null )
+        {
+            return default;
+        }
+
+        for ( var i = 0; i < endpointMetadata.Count; i++ )
+        {
+            if ( endpointMetadata[i] is GrpcJsonTranscodingMetadata metadata )
+            {
+                return metadata;
+            }
+        }
+
+        return default;
+    }
+
+    // route and query parameters are flattened field paths of the input message, so an excluded field anywhere along
+    // the path excludes the parameter. a name that doesn't resolve to a field isn't ours - notably the API version
+    // parameter added by the versioned API Explorer - and is always left alone
+    private void RemoveExcludedParameters( ApiDescription apiDescription, MessageDescriptor input, ApiVersion apiVersion )
+    {
+        var parameters = apiDescription.ParameterDescriptions;
+
+        for ( var i = parameters.Count - 1; i >= 0; i-- )
+        {
+            var parameter = parameters[i];
+
+            if ( parameter.Source != BindingSource.Path && parameter.Source != BindingSource.Query )
+            {
+                continue;
+            }
+
+            var path = parameter.Name.Split( '.' );
+
+            if ( !input.TryResolveDescriptors( path, allowJsonName: true, out var fields ) )
+            {
+                continue;
+            }
+
+            for ( var j = 0; j < fields.Count; j++ )
+            {
+                if ( !cache.IsVisibleTo( fields[j], apiVersion ) )
+                {
+                    parameters.RemoveAt( i );
+                    break;
+                }
+            }
+        }
+    }
+
+    // the body and response types are message types whose members cannot be expressed as a subset by the CLR type
+    // alone. the model metadata is rebound to the version being described so that the excluded members are dropped
+    // from the reported properties of the message and of every message nested within it
+    private void ApplyApiVersionToMessages( ApiDescription apiDescription, ApiVersion apiVersion )
+    {
+        var parameters = apiDescription.ParameterDescriptions;
+
+        for ( var i = 0; i < parameters.Count; i++ )
+        {
+            var parameter = parameters[i];
+
+            if ( parameter.Source == BindingSource.Body &&
+                 parameter.ModelMetadata is GrpcModelMetadata metadata )
+            {
+                parameter.ModelMetadata = metadata.ForApiVersion( cache, apiVersion );
+            }
+        }
+
+        var responseTypes = apiDescription.SupportedResponseTypes;
+
+        for ( var i = 0; i < responseTypes.Count; i++ )
+        {
+            var responseType = responseTypes[i];
+
+            if ( responseType.ModelMetadata is GrpcModelMetadata metadata )
+            {
+                responseType.ModelMetadata = metadata.ForApiVersion( cache, apiVersion );
+            }
+        }
+    }
 
     // ApiVersionRouteConstraint is critical to the versioned API Explorer, but gRPC doesn't use or even directly
     // reference API Versioning and can technically be used with out it. if the versioned API Explorer is present, then
@@ -108,7 +218,11 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
         var metadata = endpoint.Metadata.GetMetadata<GrpcMethodMetadata>()!;
         var routePattern = HttpRoutePattern.Parse( pattern, options.Value );
         var routeParameters = descriptor.InputType.RouteParameterDescriptors( routePattern.Variables );
-        var responseType = descriptor.ResponseBodyDescriptor( http.ResponseBody )?.ClrType ?? descriptor.OutputType.ClrType;
+        var responseBody = descriptor.ResponseBodyDescriptor( http.ResponseBody );
+        var responseType = responseBody?.ClrType ?? descriptor.OutputType.ClrType;
+        var responseMessage = responseBody is null
+            ? descriptor.OutputType
+            : responseBody.FieldType == FieldType.Message && !responseBody.IsMap ? responseBody.MessageType : default;
         var apiDescription = new ApiDescription
         {
             ActionDescriptor = new ControllerActionDescriptor()
@@ -137,7 +251,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
                 {
                     ApiResponseFormats = { new() { MediaType = Application.Json } },
                     Type = responseType,
-                    ModelMetadata = new GrpcModelMetadata( ModelMetadataIdentity.ForType( responseType ) ),
+                    ModelMetadata = new GrpcModelMetadata( ModelMetadataIdentity.ForType( responseType ), responseMessage ),
                     StatusCode = 200,
                 },
                 new()
@@ -220,7 +334,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
         {
             Name = "Input",
             Type = identity.ModelType,
-            ModelMetadata = new GrpcModelMetadata( identity ),
+            ModelMetadata = new GrpcModelMetadata( identity, body.Descriptor ),
             Source = BindingSource.Body,
             ParameterDescriptor = body.ParameterInfo is { } parameterInfo
             ? new() { ParameterInfo = parameterInfo }

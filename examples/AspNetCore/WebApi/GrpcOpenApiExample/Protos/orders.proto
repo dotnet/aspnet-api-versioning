@@ -2,6 +2,7 @@ syntax = "proto3";
 
 option csharp_namespace = "ApiVersioning.Examples";
 
+import "asp/api/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
@@ -23,7 +24,7 @@ message LineItem {
     double unit_price = 4;
 
     // Gets or sets a value indicating whether the line item is fulfilled
-    bool fulfilled = 5;
+    bool fulfilled = 5 [(asp.api.version) = "2.0"];
 }
 
 // Represents an order
@@ -35,13 +36,13 @@ message Order {
     google.protobuf.Timestamp created_date = 2;
 
     // Gets or sets the date and time when the order becomes effective
-    google.protobuf.Timestamp effective_date = 3;
+    google.protobuf.Timestamp effective_date = 3 [(asp.api.version) = "2.0"];
 
     // Gets or sets the name of the ordering customer
     string customer = 4;
 
     // Gets or sets a description for the order
-    string description = 5;
+    string description = 5 [(asp.api.version) = "3.0"];
 
     // Gets a list of line items in the order
     repeated LineItem line_items = 6;

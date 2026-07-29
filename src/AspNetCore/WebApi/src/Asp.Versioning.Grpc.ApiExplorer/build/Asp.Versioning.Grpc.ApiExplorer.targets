@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup>
+  <!-- the path of the proto files. content from the nupkg. -->
+  <ApiVersioningProtosPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../content/protos'))</ApiVersioningProtosPath>
+ </PropertyGroup>
+
+ <!-- Run immediately before the Protobuf_BeforeCompile extension point. -->
+ <!-- Only include protos if project has set <IncludeApiVersioningProtos> property to true. -->
+ <Target Name="ApiVersioningProtos_BeforeCompile"
+         BeforeTargets="Protobuf_BeforeCompile"
+         Condition=" '$(IncludeApiVersioningProtos)' == 'true' ">
+  <PropertyGroup>
+   <!-- Add nupkg proto files by including path in Protobuf_StandardImportsPath. -->
+   <Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(ApiVersioningProtosPath)</Protobuf_StandardImportsPath>
+  </PropertyGroup>
+  <Message Text="Included proto files at $(ApiVersioningProtosPath) in import path." Importance="high" />
+  <Message Text="Updated proto imports path: $(Protobuf_StandardImportsPath)" Importance="high" />
+ </Target>
+</Project>

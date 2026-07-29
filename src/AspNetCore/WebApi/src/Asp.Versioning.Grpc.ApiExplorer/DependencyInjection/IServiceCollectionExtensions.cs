@@ -4,11 +4,14 @@
 
 namespace Microsoft.Extensions.DependencyInjection;
 
+using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Grpc;
+using Grpc.AspNetCore.Server;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
@@ -46,8 +49,10 @@ public static class IServiceCollectionExtensions
 
             services.AddGrpc().AddJsonTranscoding();
             services.TryAddEnumerable( Transient<IApiDescriptionProvider, GrpcJsonTranscodingDescriptionProvider>() );
+            services.TryAddEnumerable( Transient<IConfigureOptions<GrpcServiceOptions>, ApiVersioningGrpcOptions>() );
             services.AddSingleton<FileDescriptorPool>();
             services.TryAddSingleton( NewGroupCollectionProvider );
+            services.AddSingleton( NewMetadataCache );
 
             return services;
         }
@@ -64,6 +69,9 @@ public static class IServiceCollectionExtensions
             actionDescriptorCollectionProvider ?? new EmptyActionDescriptorCollectionProvider(),
             apiDescriptionProvider );
     }
+
+    private static ApiVersionMetadataCache NewMetadataCache( IServiceProvider serviceProvider ) =>
+        new( serviceProvider.GetService<IApiVersionParser>() ?? ApiVersionParser.Default );
 
 #pragma warning restore CA1859
 #pragma warning disable IDE0079
