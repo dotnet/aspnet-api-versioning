@@ -12,7 +12,6 @@ namespace Asp.Versioning {
     using System;
     using System.Reflection;
     
-    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -20,7 +19,7 @@ namespace Asp.Versioning {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SR {
@@ -89,6 +88,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value cannot be an empty string..
+        /// </summary>
+        internal static string Argument_EmptyString {
+            get {
+                return ResourceManager.GetString("Argument_EmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The key cannot be empty..
         /// </summary>
         internal static string EmptyKey {
@@ -103,6 +111,15 @@ namespace Asp.Versioning {
         internal static string FirstCharMustBeLetter {
             get {
                 return ResourceManager.GetString("FirstCharMustBeLetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The API version range &quot;{0}&quot; is invalid..
+        /// </summary>
+        internal static string InvalidApiVersionRange {
+            get {
+                return ResourceManager.GetString("InvalidApiVersionRange", resourceCulture);
             }
         }
         

@@ -353,6 +353,6 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
         }
 
         var message = string.Format( CultureInfo.CurrentCulture, Format.ApiVersionBadStatus, status );
-        throw new ArgumentException( message, nameof( status ) );
+        throw new System.ArgumentException( message, nameof( status ) );
     }
 }

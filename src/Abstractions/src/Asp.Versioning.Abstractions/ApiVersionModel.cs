@@ -40,7 +40,7 @@ public sealed class ApiVersionModel
                 DeprecatedApiVersions = emptyVersions;
                 break;
             default:
-                throw new ArgumentException( $"The kind {kind} is not supported." );
+                throw new System.ArgumentException( $"The kind {kind} is not supported." );
         }
     }
 
