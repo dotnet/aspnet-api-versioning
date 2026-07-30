@@ -1,17 +1,20 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.Grpc;
+#pragma warning disable CA1812
 
+namespace Asp.Versioning;
+
+using Asp.Versioning.ApiExplorer;
 using Google.Protobuf.Reflection;
 using System.Collections.Concurrent;
 
-internal sealed class ApiVersionMetadataCache( IApiVersionParser parser )
+internal sealed class ApiVersionMetadataCache( IApiVersionParser parser ) : IMemberFilter<FieldDescriptor>
 {
     private readonly ConcurrentDictionary<FieldDescriptor, ApiVersionRange> cache = new();
 
     public ApiVersionRange Get( FieldDescriptor field ) => cache.GetOrAdd( field, Add );
 
-    public bool IsVisibleTo( FieldDescriptor field, ApiVersion apiVersion ) => Get( field ).Contains( apiVersion );
+    public bool IsVisible( FieldDescriptor member, ApiVersion apiVersion ) => Get( member ).Contains( apiVersion );
 
     private ApiVersionRange Add( FieldDescriptor field )
     {
