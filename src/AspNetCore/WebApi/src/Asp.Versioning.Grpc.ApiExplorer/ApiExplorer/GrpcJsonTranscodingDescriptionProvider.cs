@@ -24,10 +24,10 @@ using static System.Net.Mime.MediaTypeNames;
 internal sealed class GrpcJsonTranscodingDescriptionProvider(
     EndpointDataSource source,
     FileDescriptorPool pool,
-    ApiVersionMetadataCache cache,
+    IMemberFilter<FieldDescriptor> filter,
     IOptions<GrpcApiExplorerOptions> options ) : IApiDescriptionProvider
 {
-    private readonly ApiVersionRouteConstraint apiVersionRouteConstraint = new();
+    private static readonly ApiVersionRouteConstraint ApiVersionRouteConstraint = new();
 
     // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs
     public int Order => -900;
@@ -127,7 +127,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
 
             for ( var j = 0; j < fields.Count; j++ )
             {
-                if ( !cache.IsVisibleTo( fields[j], apiVersion ) )
+                if ( !filter.IsVisible( fields[j], apiVersion ) )
                 {
                     parameters.RemoveAt( i );
                     break;
@@ -150,7 +150,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
             if ( parameter.Source == BindingSource.Body &&
                  parameter.ModelMetadata is GrpcModelMetadata metadata )
             {
-                parameter.ModelMetadata = metadata.ForApiVersion( cache, apiVersion );
+                parameter.ModelMetadata = metadata.ForApiVersion( filter, apiVersion );
             }
         }
 
@@ -162,7 +162,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
 
             if ( responseType.ModelMetadata is GrpcModelMetadata metadata )
             {
-                responseType.ModelMetadata = metadata.ForApiVersion( cache, apiVersion );
+                responseType.ModelMetadata = metadata.ForApiVersion( filter, apiVersion );
             }
         }
     }
@@ -170,7 +170,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
     // the ApiVersion type is modeled as a first-class data type, but gRPC doesn't have a representation for it. when
     // we identify a parameter that represents an API version, explicitly set the expected data type and constraints
     // the versioned API Explorer expects.
-    private (GrpcModelMetadata ModelMetadata, ApiParameterRouteInfo? RouteInfo) NewMetadataAndRouteInfo(
+    private static (GrpcModelMetadata ModelMetadata, ApiParameterRouteInfo? RouteInfo) NewMetadataAndRouteInfo(
         string name,
         ModelMetadataIdentity identity,
         GrpcApiExplorerOptions options,
@@ -185,7 +185,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
 
             if ( routeParameter )
             {
-                routeInfo = new() { Constraints = [apiVersionRouteConstraint] };
+                routeInfo = new() { Constraints = [ApiVersionRouteConstraint] };
             }
         }
 
@@ -262,7 +262,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
     }
 
     [RequiresDynamicCode( "Might not be available at runtime" )]
-    private void AddRouteParameters(
+    private static void AddRouteParameters(
         ApiDescription apiDescription,
         Dictionary<string, RouteParameter> parameters,
         GrpcApiExplorerOptions options )
@@ -328,7 +328,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
     }
 
     [RequiresDynamicCode( "Might not be available at runtime" )]
-    private void AddQueryParameters(
+    private static void AddQueryParameters(
         ApiDescription apiDescription,
         Dictionary<string, FieldDescriptor> parameters,
         GrpcApiExplorerOptions options )

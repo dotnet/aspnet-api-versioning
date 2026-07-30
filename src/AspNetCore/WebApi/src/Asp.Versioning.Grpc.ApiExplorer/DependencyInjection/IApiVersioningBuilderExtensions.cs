@@ -7,54 +7,54 @@ namespace Microsoft.Extensions.DependencyInjection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Grpc;
-using Grpc.AspNetCore.Server;
+using Google.Protobuf.Reflection;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
-/// Provides extension methods for the <see cref="IServiceCollection"/> interface.
+/// Provides ASP.NET Core API Explorer specific extension methods for <see cref="IApiVersioningBuilder"/>.
 /// </summary>
-[CLSCompliant( false )]
-public static class IServiceCollectionExtensions
+public static class IApiVersioningBuilderExtensions
 {
-    private const string TrimmingMessage = "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming";
+    private const string TrimmingMessage = "The API Explorer does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming";
 
-    /// <param name="services">The extended <see cref="IServiceCollection">service collection</see>.</param>
-    /// <returns>The original <paramref name="services"/>.</returns>
-    extension( IServiceCollection services )
+    /// <param name="builder">The extended <see cref="IApiVersioningBuilder">API versioning builder</see>.</param>
+    /// <returns>The original <paramref name="builder"/>.</returns>
+    extension( IApiVersioningBuilder builder )
     {
         /// <summary>
         /// Adds the API Explorer extensions for gRPC.
         /// </summary>
         /// <param name="setupAction">An <see cref="Action{T}">action</see> used to configure the provided options.</param>
         [RequiresUnreferencedCode( TrimmingMessage )]
-        public IServiceCollection AddGrpcApiExplorer( Action<GrpcApiExplorerOptions> setupAction )
+        public IApiVersioningBuilder AddGrpcApiExplorer( Action<GrpcApiExplorerOptions> setupAction )
         {
-            ArgumentNullException.ThrowIfNull( services );
+            ArgumentNullException.ThrowIfNull( builder );
             ArgumentNullException.ThrowIfNull( setupAction );
 
-            return services.Configure( setupAction ).AddGrpcApiExplorer();
+            builder.Services.Configure( setupAction );
+            return builder.AddGrpcApiExplorer();
         }
 
         /// <summary>
         /// Adds the API Explorer extensions for gRPC.
         /// </summary>
         [RequiresUnreferencedCode( TrimmingMessage )]
-        public IServiceCollection AddGrpcApiExplorer()
+        public IApiVersioningBuilder AddGrpcApiExplorer()
         {
-            ArgumentNullException.ThrowIfNull( services );
+            ArgumentNullException.ThrowIfNull( builder );
+
+            var services = builder.Services;
 
             services.AddGrpc().AddJsonTranscoding();
             services.TryAddEnumerable( Transient<IApiDescriptionProvider, GrpcJsonTranscodingDescriptionProvider>() );
-            services.TryAddEnumerable( Transient<IConfigureOptions<GrpcServiceOptions>, ApiVersioningGrpcOptions>() );
             services.AddSingleton<FileDescriptorPool>();
             services.TryAddSingleton( NewGroupCollectionProvider );
-            services.AddSingleton( NewMetadataCache );
+            services.TryAddSingleton( NewMemberFilter );
 
-            return services;
+            return builder;
         }
     }
 
@@ -70,8 +70,8 @@ public static class IServiceCollectionExtensions
             apiDescriptionProvider );
     }
 
-    private static ApiVersionMetadataCache NewMetadataCache( IServiceProvider serviceProvider ) =>
-        new( serviceProvider.GetService<IApiVersionParser>() ?? ApiVersionParser.Default );
+    private static IMemberFilter<FieldDescriptor> NewMemberFilter( IServiceProvider serviceProvider ) =>
+        serviceProvider.GetService<IMemberFilter<FieldDescriptor>>() ?? new DefaultMemberFilter();
 
 #pragma warning restore CA1859
 #pragma warning disable IDE0079
@@ -80,5 +80,10 @@ public static class IServiceCollectionExtensions
     private sealed class EmptyActionDescriptorCollectionProvider : IActionDescriptorCollectionProvider
     {
         public ActionDescriptorCollection ActionDescriptors { get; } = new( [], 1 );
+    }
+
+    private sealed class DefaultMemberFilter : IMemberFilter<FieldDescriptor>
+    {
+        public bool IsVisible( FieldDescriptor member, ApiVersion apiVersion ) => true;
     }
 }
