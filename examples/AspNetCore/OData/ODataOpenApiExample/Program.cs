@@ -1,7 +1,5 @@
-﻿using ApiVersioning.Examples;
-using Asp.Versioning;
+﻿using Asp.Versioning;
 using Asp.Versioning.Conventions;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OData;
 using Scalar.AspNetCore;
 using System.Reflection;
