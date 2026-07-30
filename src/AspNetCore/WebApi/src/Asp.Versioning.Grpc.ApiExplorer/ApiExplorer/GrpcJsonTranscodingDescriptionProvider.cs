@@ -6,6 +6,7 @@ namespace Asp.Versioning.ApiExplorer;
 
 using Asp.Versioning;
 using Asp.Versioning.Grpc;
+using Asp.Versioning.Routing;
 using global::Grpc.AspNetCore.Server;
 using Google.Api;
 using Google.Protobuf.Reflection;
@@ -26,7 +27,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
     ApiVersionMetadataCache cache,
     IOptions<GrpcApiExplorerOptions> options ) : IApiDescriptionProvider
 {
-    private readonly Lazy<IRouteConstraint?> apiVersionRouteConstraint = new( NewRouteConstraint );
+    private readonly ApiVersionRouteConstraint apiVersionRouteConstraint = new();
 
     // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs
     public int Order => -900;
@@ -38,8 +39,8 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
 
         foreach ( var endpoint in endpoints )
         {
-            if ( endpoint is not RouteEndpoint routeEndpoint
-                 || endpoint.Metadata.GetMetadata<GrpcJsonTranscodingMetadata>() is not { } metadata )
+            if ( endpoint is not RouteEndpoint routeEndpoint ||
+                 endpoint.Metadata.GetMetadata<GrpcJsonTranscodingMetadata>() is not { } metadata )
             {
                 continue;
             }
@@ -166,22 +167,6 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
         }
     }
 
-    // ApiVersionRouteConstraint is critical to the versioned API Explorer, but gRPC doesn't use or even directly
-    // reference API Versioning and can technically be used with out it. if the versioned API Explorer is present, then
-    // this will never be trimmed. we don't need to do anything with this except create a single instance. failure is
-    // acceptable and, in some cases, expected.
-    private static IRouteConstraint? NewRouteConstraint()
-    {
-        const string TypeName = "Asp.Versioning.Routing.ApiVersionRouteConstraint, Asp.Versioning.Http";
-
-        if ( Type.GetType( TypeName, throwOnError: false ) is { } type )
-        {
-            return Activator.CreateInstance( type ) as IRouteConstraint;
-        }
-
-        return default;
-    }
-
     // the ApiVersion type is modeled as a first-class data type, but gRPC doesn't have a representation for it. when
     // we identify a parameter that represents an API version, explicitly set the expected data type and constraints
     // the versioned API Explorer expects.
@@ -198,9 +183,9 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
         {
             metadata.SetDataTypeName( "ApiVersion" );
 
-            if ( routeParameter && apiVersionRouteConstraint.Value is { } constraint )
+            if ( routeParameter )
             {
-                routeInfo = new() { Constraints = [constraint] };
+                routeInfo = new() { Constraints = [apiVersionRouteConstraint] };
             }
         }
 
