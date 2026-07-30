@@ -11,6 +11,7 @@ client-based applications.
 - Asp.Versioning.ApiVersionAttribute
 - Asp.Versioning.ApiVersionMetadata
 - Asp.Versioning.ApiVersionModel
+- Asp.Versioning.DeprecationPolicy
 - Asp.Versioning.IApiVersionNeutral
 - Asp.Versioning.IApiVersionParameterSource
 - Asp.Versioning.IApiVersionParser
