@@ -1,14 +1,14 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-// created by the gRPC interceptor pipeline
 #pragma warning disable CA1812
 
-namespace Asp.Versioning.Grpc;
+namespace Asp.Versioning;
 
-using global::Grpc.Core;
-using global::Grpc.Core.Interceptors;
+using Asp.Versioning.ApiExplorer;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using Grpc.Core;
+using Grpc.Core.Interceptors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,20 +34,20 @@ internal sealed class FieldInterceptor : Interceptor
             return response;
         }
 
-        var cache = http.RequestServices.GetRequiredService<ApiVersionMetadataCache>();
+        var filter = http.RequestServices.GetRequiredService<IMemberFilter<FieldDescriptor>>();
 
-        FilterFields( cache, message, apiVersion );
+        FilterFields( filter, message, apiVersion );
 
         return response;
     }
 
-    private static void FilterFields( ApiVersionMetadataCache cache, IMessage message, ApiVersion apiVersion )
+    private static void FilterFields( IMemberFilter<FieldDescriptor> filter, IMessage message, ApiVersion apiVersion )
     {
         var descriptor = message.Descriptor;
 
         foreach ( var field in descriptor.Fields.InDeclarationOrder() )
         {
-            if ( !cache.IsVisibleTo( field, apiVersion ) )
+            if ( !filter.IsVisible( field, apiVersion ) )
             {
                 field.Accessor.Clear( message );
                 continue;
@@ -55,7 +55,7 @@ internal sealed class FieldInterceptor : Interceptor
 
             if ( field.FieldType == FieldType.Message && field.Accessor.GetValue( message ) is IMessage nested )
             {
-                FilterFields( cache, nested, apiVersion );
+                FilterFields( filter, nested, apiVersion );
             }
         }
     }
