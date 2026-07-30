@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.Grpc;
 
+using Asp.Versioning.ApiExplorer;
 using Google.Protobuf.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 internal sealed class GrpcModelMetadata : ModelMetadata
 {
     private readonly MessageDescriptor? messageDescriptor;
-    private readonly ApiVersionMetadataCache? cache;
+    private readonly IMemberFilter<FieldDescriptor>? filter;
     private readonly ApiVersion? apiVersion;
     private readonly bool repeated;
     private string? dataTypeName;
@@ -25,13 +26,13 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     private GrpcModelMetadata(
         ModelMetadataIdentity identity,
         MessageDescriptor? messageDescriptor,
-        ApiVersionMetadataCache? cache,
+        IMemberFilter<FieldDescriptor>? filter,
         ApiVersion? apiVersion,
         bool repeated = false )
         : base( identity )
     {
         this.messageDescriptor = messageDescriptor;
-        this.cache = cache;
+        this.filter = filter;
         this.apiVersion = apiVersion;
         this.repeated = repeated;
     }
@@ -41,7 +42,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     // the API version is only known after the versioned API Explorer has expanded the API description into one
     // result per version. the metadata of the original description is shared by every clone, so a new instance is
     // returned rather than mutating the existing one
-    internal GrpcModelMetadata ForApiVersion( ApiVersionMetadataCache cache, ApiVersion apiVersion ) =>
+    internal GrpcModelMetadata ForApiVersion( IMemberFilter<FieldDescriptor> cache, ApiVersion apiVersion ) =>
         new( Identity, messageDescriptor, cache, apiVersion ) { dataTypeName = dataTypeName };
 
     public override IReadOnlyDictionary<object, object> AdditionalValues { get; } =
@@ -71,8 +72,8 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     // a repeated field is described by the schema of its element, so the message members hang off the element
     // rather than off the collection property itself
     public override ModelMetadata? ElementMetadata =>
-        elementMetadata ??= repeated && messageDescriptor is not null && cache is not null && apiVersion is not null
-            ? new GrpcModelMetadata( ModelMetadataIdentity.ForType( messageDescriptor.ClrType ), messageDescriptor, cache, apiVersion )
+        elementMetadata ??= repeated && messageDescriptor is not null && filter is not null && apiVersion is not null
+            ? new GrpcModelMetadata( ModelMetadataIdentity.ForType( messageDescriptor.ClrType ), messageDescriptor, filter, apiVersion )
             : default;
 
     public override IEnumerable<KeyValuePair<EnumGroupAndName, string>>? EnumGroupedDisplayNamesAndValues { get; }
@@ -126,7 +127,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     [UnconditionalSuppressMessage( "ILLink", "IL2075", Justification = "Message types are rooted by the generated gRPC service and are never trimmed" )]
     private ModelPropertyCollection NewProperties()
     {
-        if ( messageDescriptor is null || cache is null || apiVersion is null || repeated )
+        if ( messageDescriptor is null || filter is null || apiVersion is null || repeated )
         {
             return new( [] );
         }
@@ -138,7 +139,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
         {
             var field = fields[i];
 
-            if ( !cache.IsVisibleTo( field, apiVersion )
+            if ( !filter.IsVisible( field, apiVersion )
                 || ModelType.GetProperty( field.PropertyName ) is not { } propertyInfo )
             {
                 continue;
@@ -148,7 +149,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
             var nested = field.FieldType == FieldType.Message && !field.IsMap ? field.MessageType : default;
             var identity = ModelMetadataIdentity.ForProperty( propertyInfo, propertyInfo.PropertyType, ModelType );
 
-            members.Add( new GrpcModelMetadata( identity, nested, cache, apiVersion, field.IsRepeated && !field.IsMap ) );
+            members.Add( new GrpcModelMetadata( identity, nested, filter, apiVersion, field.IsRepeated && !field.IsMap ) );
         }
 
         return new( members );
