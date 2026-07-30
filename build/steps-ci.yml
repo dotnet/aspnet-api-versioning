@@ -8,7 +8,8 @@ steps:
   displayName: Install .NET SDK
   inputs:
     packageType: sdk
-    version: 10.0.x # https://github.com/dotnet/core/blob/main/release-notes/releases-index.json
+    includePreviewVersions: true
+    version: 11.0.x # https://github.com/dotnet/core/blob/main/release-notes/releases-index.json
 
 - script: >
     dotnet test

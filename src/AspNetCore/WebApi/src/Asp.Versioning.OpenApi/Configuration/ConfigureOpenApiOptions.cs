@@ -5,7 +5,6 @@
 namespace Asp.Versioning.OpenApi.Configuration;
 
 using Asp.Versioning.ApiExplorer;
-using Asp.Versioning.OpenApi.Reflection;
 using Asp.Versioning.OpenApi.Transformers;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.OpenApi;
@@ -57,7 +56,6 @@ internal sealed class ConfigureOpenApiOptions(
         var apiExplorer = new ApiExplorerTransformer( versionedOptions );
         var modelMetadata = new ModelMetadataSchemaTransformer( apiDescriptionProvider, versionedOptions );
 
-        options.SetDocumentName( versionedOptions.Description.GroupName );
         options.AddDocumentTransformer( apiExplorer );
         options.AddSchemaTransformer( apiExplorer );
         options.AddSchemaTransformer( grpcWellKnownTypes );

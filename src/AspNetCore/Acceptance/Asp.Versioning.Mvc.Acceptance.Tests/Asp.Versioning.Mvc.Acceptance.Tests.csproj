@@ -7,7 +7,7 @@
 
  <ItemGroup>
   <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
-  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="$(DotNetReleaseBasePackageVersion).*" />
+  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="11.0.0-preview.6.26359.118" />
  </ItemGroup>
 
  <ItemGroup>
