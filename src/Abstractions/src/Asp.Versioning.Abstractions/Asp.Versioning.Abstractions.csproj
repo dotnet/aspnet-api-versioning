@@ -9,12 +9,7 @@
   <RootNamespace>Asp.Versioning</RootNamespace>
   <PackageTags>Asp;AspNet;AspNetCore;Versioning</PackageTags>
   
-  <!--
-   Not directly used by this library so leave it up to consumers to resolve.
-   Consider removing at a future date.
-   
-   REF: https://github.com/advisories/GHSA-cmhx-cq75-c4mj
-   -->
+  <!-- REF: https://github.com/advisories/GHSA-cmhx-cq75-c4mj -->
   <NoWarn>$(NoWarn);NU1903</NoWarn>
  </PropertyGroup>
 

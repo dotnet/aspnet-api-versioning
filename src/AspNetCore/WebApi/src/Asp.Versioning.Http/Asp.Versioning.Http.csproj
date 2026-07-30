@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>10.0.0</VersionPrefix>
+  <VersionPrefix>10.0.1</VersionPrefix>
   <AssemblyVersion>10.0.0.0</AssemblyVersion>
   <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
   <RootNamespace>Asp.Versioning</RootNamespace>
@@ -9,13 +9,6 @@
   <Description>A service API versioning library for Microsoft ASP.NET Core.</Description>
   <PackageTags>Asp;AspNet;AspNetCore;Versioning</PackageTags>
   <IsAotCompatible>true</IsAotCompatible>
-
-  <!--
-   Possibly remove in a future release.
-   
-   REF: https://github.com/advisories/GHSA-cmhx-cq75-c4mj
-  -->
-  <NoWarn>$(NoWarn);NU1903</NoWarn>
  </PropertyGroup>
 
  <ItemGroup>
