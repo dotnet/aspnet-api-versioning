@@ -1,1 +1,2 @@
 ﻿Optimize internal use of Reflection
+Fix broken routes [Issue #1138](https://github.com/dotnet/aspnet-api-versioning/issues/1138)
