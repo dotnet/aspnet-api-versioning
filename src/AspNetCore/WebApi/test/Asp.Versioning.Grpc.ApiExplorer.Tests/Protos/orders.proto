@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "Asp.Versioning.Grpc.Tests";
+option csharp_namespace = "Asp.Versioning";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";

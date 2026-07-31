@@ -2,7 +2,6 @@
 
 namespace Asp.Versioning.ApiExplorer;
 
-using Asp.Versioning.Grpc.Tests;
 using Asp.Versioning.Routing;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc.Controllers;

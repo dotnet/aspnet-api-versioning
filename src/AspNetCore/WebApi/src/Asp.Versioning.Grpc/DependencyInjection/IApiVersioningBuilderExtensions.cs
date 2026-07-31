@@ -5,7 +5,6 @@
 namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using Google.Protobuf.Reflection;
 using Grpc.AspNetCore.Server;
 using Microsoft.Extensions.DependencyInjection.Extensions;

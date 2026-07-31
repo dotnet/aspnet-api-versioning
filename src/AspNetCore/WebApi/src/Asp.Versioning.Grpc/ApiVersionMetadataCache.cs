@@ -4,7 +4,6 @@
 
 namespace Asp.Versioning;
 
-using Asp.Versioning.ApiExplorer;
 using Google.Protobuf.Reflection;
 using System.Collections.Concurrent;
 

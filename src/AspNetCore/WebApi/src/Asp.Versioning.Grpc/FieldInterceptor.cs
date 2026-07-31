@@ -4,7 +4,6 @@
 
 namespace Asp.Versioning;
 
-using Asp.Versioning.ApiExplorer;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Core;
