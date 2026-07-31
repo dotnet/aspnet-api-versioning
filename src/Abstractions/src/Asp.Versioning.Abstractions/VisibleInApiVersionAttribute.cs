@@ -22,7 +22,7 @@ public class VisibleInApiVersionAttribute : Attribute
     /// <param name="otherRules">Additional ranges to parse, if any.</param>
     /// <remarks>See <seealso cref="ApiVersionRange"/> for more information on rule notation.</remarks>
     protected VisibleInApiVersionAttribute( IApiVersionParser parser, string rule, params string[] otherRules )
-        => Range = ApiVersionRange.Parse( parser, otherRules );
+        => Range = ApiVersionRange.Parse( parser, rule, otherRules );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VisibleInApiVersionAttribute"/> class.
