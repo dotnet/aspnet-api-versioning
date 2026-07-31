@@ -22,12 +22,12 @@ public class GrpcApiVersionRouteParameter
     /// <remarks>
     /// <para>
     /// gRPC supports route parameters in route templates, but a parameter must match an entire segment. It
-    /// cannot match part of a segment in the same manner as a ASP.NET route constraint and an API version does not
+    /// cannot match part of a segment in the same manner as an ASP.NET route constraint and an API version does not
     /// include literal characters such as <c>"v"</c>. As a result, the character is not included in the route
     /// template.
     /// </para>
     /// <para>
-    /// This setting adds the expected literal in the route template went is built for the API Explorer. As an example,
+    /// This setting adds the expected literal in the route template when it is built for the API Explorer. As an example,
     /// the gRPC route template <c>"api/{api-version}/example"</c> will be generated as
     /// <c>"api/v{api-version}/example"</c> and produce the expected behavior in the API Explorer.
     /// </para>
