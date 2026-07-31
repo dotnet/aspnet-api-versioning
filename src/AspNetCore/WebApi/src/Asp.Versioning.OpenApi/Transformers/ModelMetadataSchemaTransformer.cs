@@ -2,6 +2,7 @@
 
 namespace Asp.Versioning.OpenApi.Transformers;
 
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OpenApi;
@@ -19,8 +20,8 @@ using System.Threading.Tasks;
 /// A model type is a single CLR type, but the members it exposes can differ by API version. An API description
 /// provider that reports a reduced set of <see cref="ModelMetadata.Properties">properties</see> is describing a
 /// subset of the type, which the schema generated from the CLR type alone cannot express. Only metadata that
-/// reports at least one property is considered authoritative; a type whose metadata reports no properties at all
-/// is left untouched.
+/// reports the API version it was described for is considered authoritative; metadata describing a type as
+/// declared is left untouched.
 /// </remarks>
 [CLSCompliant( false )]
 public class ModelMetadataSchemaTransformer : IOpenApiSchemaTransformer
@@ -145,12 +146,15 @@ public class ModelMetadataSchemaTransformer : IOpenApiSchemaTransformer
             return;
         }
 
-        var properties = metadata.Properties;
-
-        if ( properties.Count == 0 )
+        // only metadata described for an API version reports an authoritative member list. metadata that describes
+        // a model type as declared reports every member it has, which says nothing about the described API. a type
+        // described with no visible members is meaningfully different from a type that was never described
+        if ( metadata.DescribedApiVersion is null )
         {
             return;
         }
+
+        var properties = metadata.Properties;
 
         map ??= [];
 
