@@ -7,19 +7,23 @@ namespace Asp.Versioning;
 using Google.Protobuf.Reflection;
 using System.Collections.Concurrent;
 
-internal sealed class ApiVersionMetadataCache( IApiVersionParser parser ) : IMemberFilter<FieldDescriptor>
+internal sealed class ApiVersionMetadataCache( IApiVersionParser parser ) : IAnnotation<FieldDescriptor, ApiVersionRange>
 {
-    private readonly ConcurrentDictionary<FieldDescriptor, ApiVersionRange> cache = new();
+    // a field descriptor is a process-lifetime object, so the annotation resolved for it never changes. an
+    // unannotated field is cached as null so that its options are only inspected once
+    private readonly ConcurrentDictionary<FieldDescriptor, ApiVersionRange?> cache = new();
 
-    public ApiVersionRange Get( FieldDescriptor field ) => cache.GetOrAdd( field, Add );
+    public bool TryGet( FieldDescriptor source, [MaybeNullWhen( false )] out ApiVersionRange annotation )
+    {
+        annotation = cache.GetOrAdd( source, Resolve );
+        return annotation is not null;
+    }
 
-    public bool IsVisible( FieldDescriptor member, ApiVersion apiVersion ) => Get( member ).Contains( apiVersion );
-
-    private ApiVersionRange Add( FieldDescriptor field )
+    private ApiVersionRange? Resolve( FieldDescriptor field )
     {
         if ( field.GetOptions()?.GetExtension( AnnotationsExtensions.Version ) is not { Count: > 0 } versions )
         {
-            return ApiVersionRange.Any;
+            return default;
         }
 
         return ApiVersionRange.Parse( parser, versions );
