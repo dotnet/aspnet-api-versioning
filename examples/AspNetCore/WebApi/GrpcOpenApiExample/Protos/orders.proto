@@ -49,22 +49,16 @@ message Order {
 }
 
 message OrderIdRequest {
-  // Gets or sets the requested API version
-  string api_version = 1 [json_name = "api-version"];
-
   // Gets or sets the requested order identifier
-  int32 id = 2;
+  int32 id = 1;
 }
 
 message OrderRequest {
-  // Gets or sets the requested API version
-  string api_version = 1 [json_name = "api-version"];
-
   // Gets or sets the requested order identifier
-  int32 id = 2;
+  int32 id = 1;
 
   // Gets or sets the order
-  Order order = 3;
+  Order order = 2;
 }
 
 message OrderReply {

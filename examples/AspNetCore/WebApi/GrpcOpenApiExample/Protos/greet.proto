@@ -8,7 +8,7 @@ package greet;
 // Requests a hello greeting
 message HelloRequest {
   // Gets or sets the requested API version
-  string api_version = 1 [json_name = "api-version"];
+  string api_version = 1 [json_name = "api-version"]; // required because the url method is also used
 
   // Gets or sets the name of the person to greet
   string name = 2;

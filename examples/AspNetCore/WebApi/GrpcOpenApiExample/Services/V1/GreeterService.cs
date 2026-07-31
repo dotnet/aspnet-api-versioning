@@ -14,6 +14,9 @@ public class GreeterService : Greeter.GreeterBase
     /// <param name="request"></param>
     /// <param name="context"></param>
     /// <returns>A user-specific greeting</returns>
-    public override Task<HelloReply> SayHello( HelloRequest request, ServerCallContext context ) =>
-        Task.FromResult( new HelloReply { Message = $"Hello {request.Name} (v{request.ApiVersion})" } );
+    public override Task<HelloReply> SayHello( HelloRequest request, ServerCallContext context )
+    {
+        var apiVersion = context.GetHttpContext().ApiVersioningFeature.RawRequestedApiVersion;
+        return Task.FromResult( new HelloReply { Message = $"Hello {request.Name} (v{apiVersion})" } );
+    }
 }
