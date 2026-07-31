@@ -63,6 +63,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddSingleton<IOptionsFactory<ApiExplorerOptions>, ApiExplorerOptionsFactory<ApiExplorerOptions>>();
         services.TryAddTransient<IApiVersionDescriptionProviderFactory, ApiVersionDescriptionProviderFactory>();
         services.TryAddSingleton( static sp => sp.GetRequiredService<IApiVersionDescriptionProviderFactory>().Create() );
+        services.TryAddEnumerable( Transient<IApiDescriptionProvider, VersionedModelMetadataProvider>() );
 
         // use internal constructor until ASP.NET Core fixes their bug
         // BUG: https://github.com/dotnet/aspnetcore/issues/41773
