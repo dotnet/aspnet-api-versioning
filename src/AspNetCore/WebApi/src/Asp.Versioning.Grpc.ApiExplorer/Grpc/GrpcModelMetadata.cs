@@ -10,10 +10,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 internal sealed class GrpcModelMetadata : ModelMetadata
 {
     private readonly MessageDescriptor? messageDescriptor;
-    private readonly IMemberFilter<FieldDescriptor>? filter;
+    private readonly IAnnotation<FieldDescriptor, ApiVersionRange>? annotation;
     private readonly ApiVersion? apiVersion;
     private readonly bool repeated;
     private string? dataTypeName;
+    private IReadOnlyDictionary<object, object>? additionalValues;
     private ModelPropertyCollection? properties;
     private ModelMetadata? elementMetadata;
 
@@ -26,13 +27,13 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     private GrpcModelMetadata(
         ModelMetadataIdentity identity,
         MessageDescriptor? messageDescriptor,
-        IMemberFilter<FieldDescriptor>? filter,
+        IAnnotation<FieldDescriptor, ApiVersionRange>? annotation,
         ApiVersion? apiVersion,
         bool repeated = false )
         : base( identity )
     {
         this.messageDescriptor = messageDescriptor;
-        this.filter = filter;
+        this.annotation = annotation;
         this.apiVersion = apiVersion;
         this.repeated = repeated;
     }
@@ -42,11 +43,16 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     // the API version is only known after the versioned API Explorer has expanded the API description into one
     // result per version. the metadata of the original description is shared by every clone, so a new instance is
     // returned rather than mutating the existing one
-    internal GrpcModelMetadata ForApiVersion( IMemberFilter<FieldDescriptor> cache, ApiVersion apiVersion ) =>
-        new( Identity, messageDescriptor, cache, apiVersion ) { dataTypeName = dataTypeName };
+    internal GrpcModelMetadata ForApiVersion( IAnnotation<FieldDescriptor, ApiVersionRange> annotation, ApiVersion apiVersion ) =>
+        new( Identity, messageDescriptor, annotation, apiVersion ) { dataTypeName = dataTypeName };
 
-    public override IReadOnlyDictionary<object, object> AdditionalValues { get; } =
-        new Dictionary<object, object>( capacity: 0 );
+    // the API version is recorded under a well-known key so that a consumer can tell metadata which describes a
+    // subset of a message from metadata which describes the message as declared. a key is used rather than a
+    // shared type because the API Explorer package is not referenced by design
+    public override IReadOnlyDictionary<object, object> AdditionalValues =>
+        additionalValues ??= apiVersion is null
+            ? new Dictionary<object, object>( capacity: 0 )
+            : new Dictionary<object, object>( capacity: 1 ) { [typeof( ApiVersion )] = apiVersion };
 
     // evaluated on demand so that a message which references itself, directly or transitively, doesn't recurse
     public override ModelPropertyCollection Properties => properties ??= NewProperties();
@@ -72,8 +78,8 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     // a repeated field is described by the schema of its element, so the message members hang off the element
     // rather than off the collection property itself
     public override ModelMetadata? ElementMetadata =>
-        elementMetadata ??= repeated && messageDescriptor is not null && filter is not null && apiVersion is not null
-            ? new GrpcModelMetadata( ModelMetadataIdentity.ForType( messageDescriptor.ClrType ), messageDescriptor, filter, apiVersion )
+        elementMetadata ??= repeated && messageDescriptor is not null && annotation is not null && apiVersion is not null
+            ? new GrpcModelMetadata( ModelMetadataIdentity.ForType( messageDescriptor.ClrType ), messageDescriptor, annotation, apiVersion )
             : default;
 
     public override IEnumerable<KeyValuePair<EnumGroupAndName, string>>? EnumGroupedDisplayNamesAndValues { get; }
@@ -127,7 +133,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     [UnconditionalSuppressMessage( "ILLink", "IL2075", Justification = "Message types are rooted by the generated gRPC service and are never trimmed" )]
     private ModelPropertyCollection NewProperties()
     {
-        if ( messageDescriptor is null || filter is null || apiVersion is null || repeated )
+        if ( messageDescriptor is null || annotation is null || apiVersion is null || repeated )
         {
             return new( [] );
         }
@@ -139,7 +145,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
         {
             var field = fields[i];
 
-            if ( !filter.IsVisible( field, apiVersion )
+            if ( !annotation.IsVisible( field, apiVersion )
                 || ModelType.GetProperty( field.PropertyName ) is not { } propertyInfo )
             {
                 continue;
@@ -149,7 +155,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
             var nested = field.FieldType == FieldType.Message && !field.IsMap ? field.MessageType : default;
             var identity = ModelMetadataIdentity.ForProperty( propertyInfo, propertyInfo.PropertyType, ModelType );
 
-            members.Add( new GrpcModelMetadata( identity, nested, filter, apiVersion, field.IsRepeated && !field.IsMap ) );
+            members.Add( new GrpcModelMetadata( identity, nested, annotation, apiVersion, field.IsRepeated && !field.IsMap ) );
         }
 
         return new( members );

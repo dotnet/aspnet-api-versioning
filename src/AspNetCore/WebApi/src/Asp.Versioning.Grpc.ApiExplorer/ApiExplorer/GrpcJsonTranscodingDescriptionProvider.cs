@@ -24,11 +24,11 @@ using static System.Net.Mime.MediaTypeNames;
 internal sealed class GrpcJsonTranscodingDescriptionProvider(
     EndpointDataSource source,
     FileDescriptorPool pool,
-    IMemberFilter<FieldDescriptor>? filter,
+    IAnnotation<FieldDescriptor, ApiVersionRange>? annotation,
     IOptions<GrpcApiExplorerOptions> options ) : IApiDescriptionProvider
 {
     private static readonly ApiVersionRouteConstraint ApiVersionRouteConstraint = new();
-    private readonly IMemberFilter<FieldDescriptor> filter = filter ?? new DefaultMemberFilter();
+    private readonly IAnnotation<FieldDescriptor, ApiVersionRange> annotations = annotation ?? new DefaultMemberAnnotation();
 
     // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs
     public int Order => -900;
@@ -128,7 +128,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
 
             for ( var j = 0; j < fields.Count; j++ )
             {
-                if ( !filter.IsVisible( fields[j], apiVersion ) )
+                if ( !annotations.IsVisible( fields[j], apiVersion ) )
                 {
                     parameters.RemoveAt( i );
                     break;
@@ -151,7 +151,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
             if ( parameter.Source == BindingSource.Body &&
                  parameter.ModelMetadata is GrpcModelMetadata metadata )
             {
-                parameter.ModelMetadata = metadata.ForApiVersion( filter, apiVersion );
+                parameter.ModelMetadata = metadata.ForApiVersion( annotations, apiVersion );
             }
         }
 
@@ -163,7 +163,7 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
 
             if ( responseType.ModelMetadata is GrpcModelMetadata metadata )
             {
-                responseType.ModelMetadata = metadata.ForApiVersion( filter, apiVersion );
+                responseType.ModelMetadata = metadata.ForApiVersion( annotations, apiVersion );
             }
         }
     }
@@ -369,8 +369,13 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
         }
     }
 
-    private sealed class DefaultMemberFilter : IMemberFilter<FieldDescriptor>
+    // used when the gRPC API versioning package isn't present. nothing is annotated, so nothing is filtered
+    private sealed class DefaultMemberAnnotation : IAnnotation<FieldDescriptor, ApiVersionRange>
     {
-        public bool IsVisible( FieldDescriptor member, ApiVersion apiVersion ) => true;
+        public bool TryGet( FieldDescriptor source, [MaybeNullWhen( false )] out ApiVersionRange annotation )
+        {
+            annotation = default;
+            return false;
+        }
     }
 }
