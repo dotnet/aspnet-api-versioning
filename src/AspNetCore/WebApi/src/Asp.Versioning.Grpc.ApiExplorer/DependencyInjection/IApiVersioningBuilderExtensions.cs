@@ -52,7 +52,6 @@ public static class IApiVersioningBuilderExtensions
             services.TryAddEnumerable( Transient<IApiDescriptionProvider, GrpcJsonTranscodingDescriptionProvider>() );
             services.AddSingleton<FileDescriptorPool>();
             services.TryAddSingleton( NewGroupCollectionProvider );
-            services.TryAddSingleton( NewMemberFilter );
 
             return builder;
         }
@@ -70,9 +69,6 @@ public static class IApiVersioningBuilderExtensions
             apiDescriptionProvider );
     }
 
-    private static IMemberFilter<FieldDescriptor> NewMemberFilter( IServiceProvider serviceProvider ) =>
-        serviceProvider.GetService<IMemberFilter<FieldDescriptor>>() ?? new DefaultMemberFilter();
-
 #pragma warning restore CA1859
 #pragma warning disable IDE0079
 #pragma warning disable CA1812
@@ -80,10 +76,5 @@ public static class IApiVersioningBuilderExtensions
     private sealed class EmptyActionDescriptorCollectionProvider : IActionDescriptorCollectionProvider
     {
         public ActionDescriptorCollection ActionDescriptors { get; } = new( [], 1 );
-    }
-
-    private sealed class DefaultMemberFilter : IMemberFilter<FieldDescriptor>
-    {
-        public bool IsVisible( FieldDescriptor member, ApiVersion apiVersion ) => true;
     }
 }

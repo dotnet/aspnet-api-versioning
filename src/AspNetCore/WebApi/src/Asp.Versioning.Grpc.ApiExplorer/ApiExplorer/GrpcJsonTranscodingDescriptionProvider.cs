@@ -24,10 +24,11 @@ using static System.Net.Mime.MediaTypeNames;
 internal sealed class GrpcJsonTranscodingDescriptionProvider(
     EndpointDataSource source,
     FileDescriptorPool pool,
-    IMemberFilter<FieldDescriptor> filter,
+    IMemberFilter<FieldDescriptor>? filter,
     IOptions<GrpcApiExplorerOptions> options ) : IApiDescriptionProvider
 {
     private static readonly ApiVersionRouteConstraint ApiVersionRouteConstraint = new();
+    private readonly IMemberFilter<FieldDescriptor> filter = filter ?? new DefaultMemberFilter();
 
     // REF: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs
     public int Order => -900;
@@ -366,5 +367,10 @@ internal sealed class GrpcJsonTranscodingDescriptionProvider(
                 },
             } );
         }
+    }
+
+    private sealed class DefaultMemberFilter : IMemberFilter<FieldDescriptor>
+    {
+        public bool IsVisible( FieldDescriptor member, ApiVersion apiVersion ) => true;
     }
 }
