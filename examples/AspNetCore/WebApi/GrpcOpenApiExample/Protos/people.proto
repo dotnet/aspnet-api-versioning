@@ -46,6 +46,9 @@ message Person {
     string phone = 7 [(asp.api.version) = "3.0"];
 }
 
+// note: 'api_version' is required as a placeholder to identify where the api version route segment is
+// even though it likely never actually be used
+
 message PeopleRequest {
   // Gets or sets the requested API version
   string api_version = 1;

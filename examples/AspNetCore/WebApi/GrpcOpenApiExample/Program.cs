@@ -8,10 +8,12 @@ using V3 = ApiVersioning.Examples.Services.V3;
 var builder = WebApplication.CreateBuilder( args );
 var services = builder.Services;
 
+// only required because controllers are mixed in
 services.AddControllers();
 services.AddProblemDetails();
+
 services.AddApiVersioning()
-        .AddMvc()
+        .AddMvc() // only required because controllers are mixed in
         .AddApiExplorer(
             options =>
             {
@@ -23,20 +25,30 @@ services.AddApiVersioning()
                 // can also be used to control the format of the API version in route templates
                 options.SubstituteApiVersionInUrl = true;
             } )
+        .AddGrpc()
+        .AddGrpcApiExplorer()
         .AddOpenApi( options => options.Document.AddScalarTransformers() );
-
-services.AddGrpc().AddJsonTranscoding();
-services.AddGrpcApiExplorer();
 
 var app = builder.Build();
 var orders = app.NewVersionedApi( "Orders" );
 var people = app.NewVersionedApi( "People" );
 var greeter = app.NewVersionedApi( "Greeter" );
 
-orders.MapGrpcService<V1.OrdersService>().HasApiVersion( 1.0 ).HasApiVersion( 2.0 ).HasApiVersion( 3.0 );
+// single implementation versioned by query string, but with different transcoded fields
+orders.MapGrpcService<V1.OrdersService>()
+      .HasApiVersion( 1.0 )
+      .HasApiVersion( 2.0 )
+      .HasApiVersion( 3.0 );
+
+// split implementations, where 2.0 is a normal controller
 greeter.MapGrpcService<V1.GreeterService>().HasApiVersion( 1.0 );
 greeter.MapGrpcService<V3.GreeterService>().HasApiVersion( 3.0 );
-people.MapGrpcService<V3.PeopleService>().HasApiVersion( 1.0 ).HasApiVersion( 2.0 ).HasApiVersion( 3.0 );
+
+// single implementation versioned by url, but with different transcoded fields
+people.MapGrpcService<V3.PeopleService>()
+      .HasApiVersion( 1.0 )
+      .HasApiVersion( 2.0 )
+      .HasApiVersion( 3.0 );
 
 if ( app.Environment.IsDevelopment() )
 {
@@ -49,11 +61,14 @@ if ( app.Environment.IsDevelopment() )
             for ( var i = 0; i < descriptions.Count; i++ )
             {
                 var description = descriptions[i];
+                var isDefault = i == descriptions.Count - 1;
 
-                options.AddDocument( description.GroupName, description.GroupName );
+                options.AddDocument( description.GroupName, description.GroupName, isDefault: isDefault );
             }
         } );
 }
 
+// only required because controllers are mixed in
 app.MapControllers();
+
 app.Run();
