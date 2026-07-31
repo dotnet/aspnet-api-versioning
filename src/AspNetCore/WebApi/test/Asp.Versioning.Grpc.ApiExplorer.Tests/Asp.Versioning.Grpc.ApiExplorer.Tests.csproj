@@ -21,13 +21,15 @@
 
  <ItemGroup>
   <ProjectReference Include="..\..\src\Asp.Versioning.Grpc.ApiExplorer\Asp.Versioning.Grpc.ApiExplorer.csproj" />
-  <!-- not required by the library. the API version route constraint is resolved by name at run time and is
-       only applied when API versioning is present, which is one of the scenarios under test -->
-  <ProjectReference Include="..\..\src\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />
+  <ProjectReference Include="..\..\src\Asp.Versioning.Grpc\Asp.Versioning.Grpc.csproj" />
  </ItemGroup>
 
  <ItemGroup>
   <Protobuf Include="Protos\*.proto" />
+ </ItemGroup>
+
+ <ItemGroup>
+   <Folder Include="ApiExplorer\" />
  </ItemGroup>
 
 </Project>

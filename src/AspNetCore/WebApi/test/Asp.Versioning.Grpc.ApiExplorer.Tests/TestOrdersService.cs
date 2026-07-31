@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.Grpc.Tests;
+namespace Asp.Versioning;
 
 using global::Grpc.Core;
 using Google.Protobuf.WellKnownTypes;
