@@ -8,7 +8,6 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Conventions;
 using Asp.Versioning.OData;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,7 +15,7 @@ using Microsoft.Extensions.Options;
 using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 /// <summary>
-/// Provides extension methods for the <see cref="IServiceCollection"/> interface.
+/// Provides ASP.NET Core OData specific extension methods for <see cref="IApiVersioningBuilder"/>.
 /// </summary>
 [CLSCompliant( false )]
 public static class IApiVersioningBuilderExtensions
