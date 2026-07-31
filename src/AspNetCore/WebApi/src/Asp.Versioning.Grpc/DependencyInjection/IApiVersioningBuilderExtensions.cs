@@ -30,7 +30,7 @@ public static class IApiVersioningBuilderExtensions
             var services = builder.Services;
 
             services.AddGrpc();
-            services.TryAddSingleton<IAnnotation<FieldDescriptor, ApiVersionRange>, ApiVersionMetadataCache>();
+            services.TryAddSingleton<IAnnotation<FieldDescriptor, ApiVersionRange>, AnnotationCache>();
             services.TryAddEnumerable( Transient<IConfigureOptions<GrpcServiceOptions>, ApiVersioningGrpcOptions>() );
 
             return builder;
