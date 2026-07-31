@@ -6,6 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Json;
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
+using System.Reflection;
 using static ServiceDescriptor;
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
@@ -134,6 +136,7 @@ public static partial class IServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull( services );
 
+        services.AddHttpContextAccessor();
         services.AddTransient( ApiVersionAsService );
         services.TryAddSingleton<IApiVersionParser, ApiVersionParser>();
         services.AddSingleton( static sp => sp.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.ApiVersionReader );
@@ -147,6 +150,8 @@ public static partial class IServiceCollectionExtensions
         services.TryAddEnumerable( Singleton<MatcherPolicy, ApiVersionMatcherPolicy>() );
         services.TryAddEnumerable( Singleton<IApiVersionMetadataCollationProvider, EndpointApiVersionMetadataCollationProvider>() );
         services.TryAddTransient<IEndpointInspector, DefaultEndpointInspector>();
+        services.TryAddSingleton<IAnnotation<MemberInfo, ApiVersionRange>>( static _ => new AnnotationCache() );
+        services.TryAddEnumerable( Transient<IPostConfigureOptions<JsonOptions>, MemberVisibilityJsonOptionsSetup>() );
         services.Replace( WithLinkGeneratorDecorator( services ) );
     }
 

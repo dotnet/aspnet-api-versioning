@@ -8,6 +8,7 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.ApplicationModels;
 using Asp.Versioning.Conventions;
+using Asp.Versioning.Json;
 using Asp.Versioning.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -103,6 +104,7 @@ public static class IApiVersioningBuilderExtensions
         services.TryAddSingleton( static sp => new ReportApiVersionsAttribute( sp.GetRequiredService<IReportApiVersions>() ) );
         services.AddSingleton<ApplyContentTypeVersionActionFilter>();
         services.TryAddEnumerable( Transient<IPostConfigureOptions<MvcOptions>, ApiVersioningMvcOptionsSetup>() );
+        services.TryAddEnumerable( Transient<IPostConfigureOptions<JsonOptions>, MemberVisibilityMvcJsonOptionsSetup>() );
         services.TryAddEnumerable( Transient<IApplicationModelProvider, ApiVersioningApplicationModelProvider>() );
         services.TryAddEnumerable( Transient<IActionDescriptorProvider, ApiVersionCollator>() );
         services.TryAddEnumerable( Transient<IApiControllerSpecification, ApiBehaviorSpecification>() );
