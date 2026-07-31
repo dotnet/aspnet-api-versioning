@@ -1,6 +1,6 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.ApiExplorer;
+namespace Asp.Versioning;
 
 /// <summary>
 /// Defines the behavior of a member filter.
