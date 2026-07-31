@@ -133,6 +133,15 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The JSON property &apos;{0}&apos; could not be mapped to any .NET member contained in type &apos;{1}&apos;..
+        /// </summary>
+        internal static string UnmappedMember {
+            get {
+                return ResourceManager.GetString("UnmappedMember", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be specified to construct a {1}..
         /// </summary>
         internal static string UnsetRequestDelegate {
