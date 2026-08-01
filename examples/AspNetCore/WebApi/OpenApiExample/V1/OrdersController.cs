@@ -1,6 +1,6 @@
-﻿namespace ApiVersioning.Examples.V1.Controllers;
+﻿namespace ApiVersioning.Examples.V1;
 
-using ApiVersioning.Examples.V1.Models;
+using ApiVersioning.Examples.Models;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 

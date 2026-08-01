@@ -1,5 +1,6 @@
 ﻿namespace ApiVersioning.Examples.Services;
 
+using ApiVersioning.Examples.Models;
 using Asp.Versioning;
 
 /// <summary>
@@ -13,9 +14,9 @@ public static class People
         /// Maps the People APIs for <c>1.0</c>.
         /// </summary>
         /// <returns>The next builder.</returns>
-        public VersionedApiBuilder<Models.V2.Person> ToV1()
+        public VersionedApiBuilder<Person> ToV1()
         {
-            var people = new VersionedApiBuilder<Models.V1.Person>( apiBuilder.Endpoints );
+            var people = new VersionedApiBuilder<Person>( apiBuilder.Endpoints );
             var builder = people.Endpoints;
             var api = builder.MapGroup( "/api/v{version:apiVersion}/people" )
                              .HasDeprecatedApiVersion( 0.9 )
@@ -29,13 +30,13 @@ public static class People
         }
     }
 
-    extension( VersionedApiBuilder<Models.V2.Person> people )
+    extension( VersionedApiBuilder<Person> people )
     {
         /// <summary>
         /// Maps the People APIs for <c>2.0</c>.
         /// </summary>
         /// <returns>The next builder.</returns>
-        public VersionedApiBuilder<Models.V3.Person> ToV2()
+        public VersionedApiBuilder<Person> ToV2()
         {
             var builder = people.Endpoints;
             var api = builder.MapGroup( "/api/v{version:apiVersion}/people" )
@@ -54,7 +55,7 @@ public static class People
         }
     }
 
-    extension( VersionedApiBuilder<Models.V3.Person> people )
+    extension( VersionedApiBuilder<Person> people )
     {
         /// <summary>
         /// Maps the Person APIs for <c>3.0</c>.
@@ -73,8 +74,8 @@ public static class People
                .Produces( 404 );
 
             api.MapPost( "/", V3.Post )
-               .Accepts<Models.V3.Person>( "application/json" )
-               .Produces<Models.V3.Person>( 201 )
+               .Accepts<Person>( "application/json" )
+               .Produces<Person>( 201 )
                .Produces( 400 );
         }
     }
@@ -92,7 +93,7 @@ public static class People
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        public static Models.V1.Person Get( int id ) => new()
+        public static Person Get( int id ) => new()
         {
             Id = id,
             FirstName = "John",
@@ -111,7 +112,7 @@ public static class People
         /// <description>Gets all people.</description>
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
-        public static Models.V2.Person[] GetAll() =>
+        public static Person[] GetAll() =>
         [
             new()
             {
@@ -144,7 +145,7 @@ public static class People
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        public static Models.V2.Person GetById( int id ) => new()
+        public static Person GetById( int id ) => new()
         {
             Id = id,
             FirstName = "John",
@@ -164,7 +165,7 @@ public static class People
         /// <description>Gets all people.</description>
         /// <returns>All available people.</returns>
         /// <response code="200">The successfully retrieved people.</response>
-        public static Models.V3.Person[] GetAll() =>
+        public static Person[] GetAll() =>
         [
             new()
             {
@@ -200,7 +201,7 @@ public static class People
         /// <returns>The requested person.</returns>
         /// <response code="200">The person was successfully retrieved.</response>
         /// <response code="404">The person does not exist.</response>
-        public static Models.V3.Person GetById( int id ) => new()
+        public static Person GetById( int id ) => new()
         {
             Id = id,
             FirstName = "John",
@@ -219,7 +220,7 @@ public static class People
         /// <returns>The created person.</returns>
         /// <response code="201">The person was successfully created.</response>
         /// <response code="400">The person was invalid.</response>
-        public static IResult Post( HttpRequest request, ApiVersion version, Models.V3.Person person )
+        public static IResult Post( HttpRequest request, ApiVersion version, Person person )
         {
             person.Id = 42;
             var scheme = request.Scheme;

@@ -1,6 +1,6 @@
+using ApiVersioning.Examples.Services;
 using Asp.Versioning;
 using Scalar.AspNetCore;
-using ApiVersioning.Examples.Services;
 using System.Reflection;
 
 [assembly: AssemblyDescription( "An example API" )]
