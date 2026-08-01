@@ -29,7 +29,8 @@ public class VisibleInApiVersionAttribute : Attribute
     /// </summary>
     /// <param name="rule">The range to parse.</param>
     /// <remarks>See <seealso cref="ApiVersionRange"/> for more information on rule notation.</remarks>
-    public VisibleInApiVersionAttribute( string rule ) => Range = ApiVersionRange.Parse( rule );
+    public VisibleInApiVersionAttribute( [StringSyntax( "ApiVersionRange" )] string rule )
+        => Range = ApiVersionRange.Parse( rule );
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VisibleInApiVersionAttribute"/> class.
@@ -37,7 +38,9 @@ public class VisibleInApiVersionAttribute : Attribute
     /// <param name="rule">The range to parse.</param>
     /// <param name="otherRules">Additional ranges to parse, if any.</param>
     /// <remarks>See <seealso cref="ApiVersionRange"/> for more information on rule notation.</remarks>
-    public VisibleInApiVersionAttribute( string rule, params string[] otherRules )
+    public VisibleInApiVersionAttribute(
+        [StringSyntax( "ApiVersionRange" )] string rule,
+        [StringSyntax( "ApiVersionRange" )] params string[] otherRules )
         => Range = ApiVersionRange.Parse( rule, otherRules );
 
     /// <summary>

@@ -8,7 +8,11 @@ namespace Asp.Versioning;
 public partial class ApiVersion : ISpanFormattable
 {
     /// <inheritdoc />
-    public virtual bool TryFormat( Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
+    public virtual bool TryFormat(
+        Span<char> destination,
+        out int charsWritten,
+        [StringSyntax( "ApiVersionFormat" )] ReadOnlySpan<char> format,
+        IFormatProvider? provider )
     {
         var instance = ApiVersionFormatProvider.GetInstance( provider );
 #pragma warning disable IDE0079

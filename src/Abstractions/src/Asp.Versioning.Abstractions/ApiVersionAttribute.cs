@@ -55,7 +55,7 @@ public class ApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionProvider
     /// Initializes a new instance of the <see cref="ApiVersionAttribute"/> class.
     /// </summary>
     /// <param name="version">The API version string.</param>
-    public ApiVersionAttribute( string version ) : base( version ) { }
+    public ApiVersionAttribute( [StringSyntax( "ApiVersion" )] string version ) : base( version ) { }
 
     ApiVersionProviderOptions IApiVersionProvider.Options => options;
 

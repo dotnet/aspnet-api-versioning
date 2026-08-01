@@ -366,7 +366,10 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
     /// <param name="arg">The argument to format.</param>
     /// <param name="formatProvider">The <see cref="IFormatProvider"/> used to format the argument.</param>
     /// <returns>A <see cref="string">string</see> representing the formatted argument.</returns>
-    public virtual string Format( string? format, object? arg, IFormatProvider? formatProvider )
+    public virtual string Format(
+        [StringSyntax( "ApiVersionFormat" )] string? format,
+        object? arg,
+        IFormatProvider? formatProvider )
     {
         if ( arg is not ApiVersion value )
         {
