@@ -375,7 +375,7 @@ public class NamespaceParser
 #else
             identifier[..length],
 #endif
-            NumberStyles.Integer,
+            NumberStyles.None,
             FormatProvider,
             out var result ) )
         {

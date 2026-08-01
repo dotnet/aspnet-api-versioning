@@ -125,6 +125,38 @@ public class ApiVersionFormatProviderTest
     }
 
     [Theory]
+    [MemberData( nameof( MalformedPaddingData ) )]
+    public void format_should_not_allow_malformed_padding( FormatProviderKind kind, string malformedFormat )
+    {
+        // arrange
+        // the padding count is taken from the format string, so it can neither size the stack
+        // nor surface as an arithmetic error
+        var provider = GetProvider( kind );
+        var apiVersion = ApiVersionParser.Default.Parse( "1.5" );
+
+        // act
+        Action format = () => provider.Format( malformedFormat, apiVersion, null );
+
+        // assert
+        format.Should().Throw<FormatException>();
+    }
+
+    [Theory]
+    [MemberData( nameof( FormatProvidersData ) )]
+    public void format_should_allow_maximum_padding( FormatProviderKind kind )
+    {
+        // arrange
+        var provider = GetProvider( kind );
+        var apiVersion = ApiVersionParser.Default.Parse( "1.5" );
+
+        // act
+        var format = provider.Format( "p99", apiVersion, null );
+
+        // assert
+        format.Should().Be( "5".PadLeft( 99, '0' ) );
+    }
+
+    [Theory]
     [AssumeCulture( "en-us" )]
     [MemberData( nameof( GroupVersionFormatData ) )]
     public void format_should_return_formatted_group_version_string( FormatProviderKind kind, string format )
@@ -416,6 +448,29 @@ public class ApiVersionFormatProviderTest
                 data.Add( provider, "MM-dd-yyyy'" );
                 data.Add( provider, "\"MM-dd-yyyy" );
                 data.Add( provider, "MM-dd-yyyy\"" );
+            }
+
+            return data;
+        }
+    }
+
+    public static TheoryData<FormatProviderKind, string> MalformedPaddingData
+    {
+        get
+        {
+            var data = new TheoryData<FormatProviderKind, string>();
+
+            foreach ( var provider in FormatProvidersData )
+            {
+                data.Add( provider, "p100" );
+                data.Add( provider, "P100" );
+                data.Add( provider, "p256" );
+                data.Add( provider, "p1000" );
+                data.Add( provider, "p2147483647" );
+                data.Add( provider, "p2147483648" );
+                data.Add( provider, "P2147483648" );
+                data.Add( provider, "p99999999999999999999" );
+                data.Add( provider, "P99999999999999999999" );
             }
 
             return data;

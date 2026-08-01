@@ -35,11 +35,13 @@ public partial class ApiVersion
             return false;
         }
 
+        var last = status.Length - 1;
+
         for ( var i = 1; i < status.Length; i++ )
         {
             ch = ref status[i];
 
-            if ( !char.IsLetterOrDigit( ch ) && ch != '.' )
+            if ( !char.IsLetterOrDigit( ch ) && ( ch != '.' || i == last ) )
             {
                 return false;
             }

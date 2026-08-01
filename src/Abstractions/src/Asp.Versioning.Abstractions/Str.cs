@@ -14,6 +14,8 @@ using Text = System.ReadOnlySpan<char>;
 
 internal static class Str
 {
+    internal const int MaxStackAllocChars = 256;
+
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
 #if NETSTANDARD1_0
     internal static bool IsNullOrEmpty( Text? text )

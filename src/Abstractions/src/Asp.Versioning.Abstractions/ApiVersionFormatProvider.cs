@@ -187,6 +187,14 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
     internal const string GroupVersionFormat = "yyyy-MM-dd";
 
     /// <summary>
+    /// The largest supported padding count in a custom format string.
+    /// </summary>
+    /// <remarks>This is the largest precision the "D" standard numeric format supports on every
+    /// target framework. .NET Framework silently reinterprets a larger precision as a custom format,
+    /// which yields text such as "D255" rather than a padded number.</remarks>
+    internal const int MaxPadding = 99;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ApiVersionFormatProvider"/> class.
     /// </summary>
     public ApiVersionFormatProvider()
@@ -468,12 +476,23 @@ public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatte
             }
         }
 
-        count = end > start
-            ? int.Parse(
+        if ( end == start )
+        {
+            count = 2;
+            return;
+        }
+
+        // the padding count comes from the format string, so an unbounded value would size the
+        // stack from input; a version component is at most 10 digits, which MaxPadding far exceeds
+        if ( !int.TryParse(
                 Str.StringOrSpan( Str.Slice( format, start, end ) ),
-                default,
-                formatProvider )
-            : 2;
+                NumberStyles.None,
+                formatProvider,
+                out count ) ||
+             count > MaxPadding )
+        {
+            throw new FormatException( SR.InvalidFormatString );
+        }
     }
 
     private static void AppendStatus( StringBuilder text, string? status )

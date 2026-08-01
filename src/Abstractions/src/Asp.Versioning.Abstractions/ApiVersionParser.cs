@@ -145,7 +145,7 @@ public class ApiVersionParser : IApiVersionParser
             {
                 if ( !int.TryParse(
                     Str.StringOrSpan( Str.Truncate( text, index ) ),
-                    NumberStyles.Integer,
+                    NumberStyles.None,
                     FormatProvider,
                     out var num ) )
                 {
@@ -156,7 +156,7 @@ public class ApiVersionParser : IApiVersionParser
 
                 if ( !int.TryParse(
                     Str.StringOrSpan( Str.Substring( text, index + 1 ) ),
-                    NumberStyles.Integer,
+                    NumberStyles.None,
                     FormatProvider,
                     out num ) )
                 {
@@ -169,7 +169,7 @@ public class ApiVersionParser : IApiVersionParser
             {
                 if ( !int.TryParse(
                     Str.StringOrSpan( text ),
-                    NumberStyles.Integer,
+                    NumberStyles.None,
                     FormatProvider,
                     out var num ) )
                 {
@@ -288,7 +288,7 @@ public class ApiVersionParser : IApiVersionParser
             {
                 if ( !int.TryParse(
                     Str.StringOrSpan( Str.Truncate( text, index ) ),
-                    NumberStyles.Integer,
+                    NumberStyles.None,
                     FormatProvider,
                     out var num ) )
                 {
@@ -300,7 +300,7 @@ public class ApiVersionParser : IApiVersionParser
 
                 if ( !int.TryParse(
                     Str.StringOrSpan( Str.Substring( text, index + 1 ) ),
-                    NumberStyles.Integer,
+                    NumberStyles.None,
                     FormatProvider,
                     out num ) )
                 {
@@ -314,7 +314,7 @@ public class ApiVersionParser : IApiVersionParser
             {
                 if ( !int.TryParse(
                     Str.StringOrSpan( text ),
-                    NumberStyles.Integer,
+                    NumberStyles.None,
                     FormatProvider,
                     out var num ) )
                 {

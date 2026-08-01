@@ -150,6 +150,29 @@ public class ApiVersionRangeTest
     }
 
     [Theory]
+    [InlineData( "]1.0,2.0[" )]
+    [InlineData( "]1.0,2.0]" )]
+    [InlineData( "]1.0,2.0)" )]
+    [InlineData( ")1.0,2.0[" )]
+    [InlineData( ")1.0,2.0]" )]
+    [InlineData( ")1.0,2.0)" )]
+    [InlineData( "[1.0,2.0[" )]
+    [InlineData( "[1.0,2.0(" )]
+    [InlineData( "(1.0,2.0[" )]
+    [InlineData( "(1.0,2.0(" )]
+    public void range_should_not_parse_mismatched_bounds( string rule )
+    {
+        // arrange
+
+
+        // act
+        Action parse = () => ApiVersionRange.Parse( rule );
+
+        // assert
+        parse.Should().Throw<FormatException>();
+    }
+
+    [Theory]
     [InlineData( "1.0" )]
     [InlineData( "[1.0,)" )]
     public void range_should_not_contain_minimum_version_inclusive( string rule )
