@@ -78,8 +78,7 @@ internal sealed class MemberVisibilityJsonModifier(
         {
             if ( !IsVisible( apiVersions ) )
             {
-                throw new JsonException(
-                    string.Format( CurrentCulture, UnmappedMember, name, type ) );
+                throw new JsonException( string.Format( CurrentCulture, UnmappedMember, name, type.Name ) );
             }
 
             set( obj, value );

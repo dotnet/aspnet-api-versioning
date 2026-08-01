@@ -19,7 +19,7 @@ namespace Asp.Versioning {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SR {
@@ -133,14 +133,14 @@ namespace Asp.Versioning {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The JSON property &apos;{0}&apos; could not be mapped to any .NET member contained in type &apos;{1}&apos;..
+        ///   Looks up a localized string similar to The JSON property &apos;{0}&apos; could not be found on type &apos;{1}&apos;..
         /// </summary>
         internal static string UnmappedMember {
             get {
                 return ResourceManager.GetString("UnmappedMember", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to {0} must be specified to construct a {1}..
         /// </summary>
