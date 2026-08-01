@@ -181,7 +181,8 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
     /// <param name="format">The format to return the text representation in. The value can be <c>null</c> or empty.</param>
     /// <returns>The <see cref="string">string</see> representation of the version.</returns>
     /// <exception cref="FormatException">The specified <paramref name="format"/> is not one of the supported format values.</exception>
-    public virtual string ToString( string format ) => ToString( format, CultureInfo.InvariantCulture );
+    public virtual string ToString( [StringSyntax( "ApiVersionFormat" )] string format ) =>
+        ToString( format, CultureInfo.InvariantCulture );
 
     /// <inheritdoc />
     public override string ToString() => ToString( null, CultureInfo.InvariantCulture );
@@ -335,7 +336,7 @@ public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion
     }
 
     /// <inheritdoc />
-    public virtual string ToString( string? format, IFormatProvider? formatProvider )
+    public virtual string ToString( [StringSyntax( "ApiVersionFormat" )] string? format, IFormatProvider? formatProvider )
     {
         var provider = ApiVersionFormatProvider.GetInstance( formatProvider );
 #pragma warning disable IDE0079

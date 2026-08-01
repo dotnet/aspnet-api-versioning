@@ -85,7 +85,9 @@ public class AdvertiseApiVersionsAttribute : ApiVersionsBaseAttribute, IApiVersi
     /// <param name="version">The API version string.</param>
     /// <param name="otherVersions">An array of other API version strings.</param>
     [CLSCompliant( false )]
-    public AdvertiseApiVersionsAttribute( string version, params string[] otherVersions )
+    public AdvertiseApiVersionsAttribute(
+        [StringSyntax( "ApiVersion" )] string version,
+        [StringSyntax( "ApiVersion" )] params string[] otherVersions )
         : base( version, otherVersions ) { }
 
     ApiVersionProviderOptions IApiVersionProvider.Options => options;

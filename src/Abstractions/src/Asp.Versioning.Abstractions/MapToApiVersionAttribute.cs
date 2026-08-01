@@ -53,7 +53,7 @@ public class MapToApiVersionAttribute : ApiVersionsBaseAttribute, IApiVersionPro
     /// Initializes a new instance of the <see cref="MapToApiVersionAttribute"/> class.
     /// </summary>
     /// <param name="version">The API version string.</param>
-    public MapToApiVersionAttribute( string version ) : base( version ) { }
+    public MapToApiVersionAttribute( [StringSyntax( "ApiVersion" )] string version ) : base( version ) { }
 
     ApiVersionProviderOptions IApiVersionProvider.Options => ApiVersionProviderOptions.Mapped;
 }
