@@ -221,6 +221,7 @@ public partial class ApiVersionTest
     [InlineData( "Alpha-1" )]
     [InlineData( "Beta-2" )]
     [InlineData( "RC-1" )]
+    [InlineData( "preview." )]
     public void is_valid_status_should_return_false_for_invalid_status( string status )
     {
         // arrange

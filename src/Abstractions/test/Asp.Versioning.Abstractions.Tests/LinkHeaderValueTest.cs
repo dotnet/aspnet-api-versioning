@@ -265,4 +265,24 @@ public class LinkHeaderValueTest
                 new( new( "http://tempuri.org/3" ), "test" ),
             } );
     }
+
+    [Theory]
+    [InlineData( 10 )]
+    [InlineData( 1000 )]
+    [InlineData( 1000000 )]
+    public void try_parse_should_unescape_quoted_string_of_any_length( int length )
+    {
+        // arrange
+        // a header value is remote input, so the buffer it is unescaped into cannot be
+        // allocated on the stack once the value grows beyond a fixed budget
+        var title = string.Concat( Enumerable.Repeat( "\\a", length ) );
+        var input = $"<http://tempuri.org>; rel=\"next\"; title=\"{title}\"";
+
+        // act
+        var result = LinkHeaderValue.TryParse( input, default, out var value );
+
+        // assert
+        result.Should().BeTrue();
+        value.Title.ToString().Should().Be( new string( 'a', length ) );
+    }
 }

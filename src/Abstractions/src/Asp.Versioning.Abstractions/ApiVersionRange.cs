@@ -244,10 +244,15 @@ public sealed partial class ApiVersionRange
         }
     }
 
-    private static Func<ApiVersion, IRule>? NewRule( char ch ) => ch switch
+    private static Func<ApiVersion, IRule>? NewLowerRule( char ch ) => ch switch
     {
         '[' => static version => new MinInclusive( version ),
         '(' => static version => new MinExclusive( version ),
+        _ => default,
+    };
+
+    private static Func<ApiVersion, IRule>? NewUpperRule( char ch ) => ch switch
+    {
         ']' => static version => new MaxInclusive( version ),
         ')' => static version => new MaxExclusive( version ),
         _ => default,
@@ -255,7 +260,7 @@ public sealed partial class ApiVersionRange
 
     private static bool TryParseLower( IApiVersionParser parser, Text expression, out IRule? rule )
     {
-        if ( expression.Length == 0 || NewRule( expression[0] ) is not { } newRule )
+        if ( expression.Length == 0 || NewLowerRule( expression[0] ) is not { } newRule )
         {
             rule = default;
             return false;
@@ -286,7 +291,7 @@ public sealed partial class ApiVersionRange
     {
         var length = expression.Length - 1;
 
-        if ( length < 0 || NewRule( expression[length] ) is not { } newRule )
+        if ( length < 0 || NewUpperRule( expression[length] ) is not { } newRule )
         {
             rule = default;
             return false;

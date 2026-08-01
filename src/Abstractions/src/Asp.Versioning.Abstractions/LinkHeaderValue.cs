@@ -661,7 +661,12 @@ public partial class LinkHeaderValue
             OnCreateString( buffer, input );
             return new( buffer );
 #elif NETSTANDARD2_0
-            Span<char> buffer = stackalloc char[input.Length - backSlashCount];
+            // the length comes from a header value, which cannot be capped the way a format string
+            // can, so anything beyond the stack budget is allocated on the heap instead
+            var length = input.Length - backSlashCount;
+            var overflow = length > Str.MaxStackAllocChars ? new char[length] : default;
+            Span<char> buffer = overflow ?? stackalloc char[length];
+
             OnCreateString( buffer, input );
             return buffer.ToString();
 #else
