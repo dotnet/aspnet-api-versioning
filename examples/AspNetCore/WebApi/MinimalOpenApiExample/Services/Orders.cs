@@ -1,6 +1,7 @@
-﻿using Asp.Versioning;
+﻿namespace ApiVersioning.Examples.Services;
 
-namespace ApiVersioning.Examples.Services;
+using ApiVersioning.Examples.Models;
+using Asp.Versioning;
 
 /// <summary>
 /// Provides the endpoint extensions for the Orders service.
@@ -13,9 +14,9 @@ public static class Orders
         /// Maps the Orders APIs for <c>1.0</c>.
         /// </summary>
         /// <returns>The next builder.</returns>
-        public VersionedApiBuilder<Models.V2.Order> ToV1()
+        public VersionedApiBuilder<Order> ToV1()
         {
-            var orders = new VersionedApiBuilder<Models.V1.Order>( apiBuilder.Endpoints );
+            var orders = new VersionedApiBuilder<Order>( apiBuilder.Endpoints );
             var builder = orders.Endpoints;
             var api = builder.MapGroup( "/api/orders" )
                              .HasDeprecatedApiVersion( 0.9 )
@@ -42,13 +43,13 @@ public static class Orders
         }
     }
 
-    extension( VersionedApiBuilder<Models.V2.Order> orders )
+    extension( VersionedApiBuilder<Order> orders )
     {
         /// <summary>
         /// Maps the Orders APIs for <c>2.0</c>.
         /// </summary>
         /// <returns>The next builder.</returns>
-        public VersionedApiBuilder<Models.V3.Order> ToV2()
+        public VersionedApiBuilder<Order> ToV2()
         {
             var builder = orders.Endpoints;
             var api = builder.MapGroup( "/api/orders" )
@@ -77,7 +78,7 @@ public static class Orders
         }
     }
 
-    extension( VersionedApiBuilder<Models.V3.Order> orders )
+    extension( VersionedApiBuilder<Order> orders )
     {
         /// <summary>
         /// Maps the Orders APIs for <c>3.0</c>.
@@ -118,7 +119,7 @@ public static class Orders
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        public static Models.V1.Order Get( int id ) => new() { Id = id, Customer = "John Doe" };
+        public static Order Get( int id ) => new() { Id = id, Customer = "John Doe" };
 
         /// <summary>
         /// Place Order
@@ -129,7 +130,7 @@ public static class Orders
         /// <returns>The created order.</returns>
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
-        public static IResult Post( HttpRequest request, Models.V1.Order order )
+        public static IResult Post( HttpRequest request, Order order )
         {
             order.Id = 42;
             var scheme = request.Scheme;
@@ -148,7 +149,7 @@ public static class Orders
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
-        public static IResult Patch( int id, Models.V1.Order order ) => Results.NoContent();
+        public static IResult Patch( int id, Order order ) => Results.NoContent();
     }
 
     /// <summary>
@@ -163,7 +164,7 @@ public static class Orders
         /// <param name="version"></param>
         /// <returns>All available orders.</returns>
         /// <response code="200">The successfully retrieved orders.</response>
-        public static Models.V2.Order[] GetAll( ApiVersion version ) =>
+        public static Order[] GetAll( ApiVersion version ) =>
         [
             new (){ Id = 1, Customer = "John Doe" },
             new (){ Id = 2, Customer = "Bob Smith" },
@@ -179,7 +180,7 @@ public static class Orders
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        public static Models.V2.Order GetById( int id, ApiVersion version ) => new() { Id = id, Customer = "John Doe" };
+        public static Order GetById( int id, ApiVersion version ) => new() { Id = id, Customer = "John Doe" };
 
         /// <summary>
         /// Place Order
@@ -190,7 +191,7 @@ public static class Orders
         /// <returns>The created order.</returns>
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
-        public static IResult Post( HttpRequest request, Models.V2.Order order )
+        public static IResult Post( HttpRequest request, Order order )
         {
             order.Id = 42;
             var scheme = request.Scheme;
@@ -209,7 +210,7 @@ public static class Orders
         /// <response code="204">The order was successfully updated.</response>
         /// <response code="400">The order is invalid.</response>
         /// <response code="404">The order does not exist.</response>
-        public static IResult Patch( int id, Models.V2.Order order ) => Results.NoContent();
+        public static IResult Patch( int id, Order order ) => Results.NoContent();
     }
 
     /// <summary>
@@ -223,7 +224,7 @@ public static class Orders
         /// <description>Retrieves all orders.</description>
         /// <returns>All available orders.</returns>
         /// <response code="200">The successfully retrieved orders.</response>
-        public static Models.V3.Order[] GetAll() =>
+        public static Order[] GetAll() =>
         [
             new (){ Id = 1, Customer = "John Doe" },
             new (){ Id = 2, Customer = "Bob Smith" },
@@ -238,7 +239,7 @@ public static class Orders
         /// <returns>The requested order.</returns>
         /// <response code="200">The order was successfully retrieved.</response>
         /// <response code="404">The order does not exist.</response>
-        public static Models.V3.Order GetById( int id ) => new() { Id = id, Customer = "John Doe" };
+        public static Order GetById( int id ) => new() { Id = id, Customer = "John Doe" };
 
         /// <summary>
         /// Place Order
@@ -249,7 +250,7 @@ public static class Orders
         /// <returns>The created order.</returns>
         /// <response code="201">The order was successfully placed.</response>
         /// <response code="400">The order is invalid.</response>
-        public static IResult Post( HttpRequest request, Models.V3.Order order )
+        public static IResult Post( HttpRequest request, Order order )
         {
             order.Id = 42;
             var scheme = request.Scheme;

@@ -1,5 +1,6 @@
-﻿namespace ApiVersioning.Examples.Models.V3;
+﻿namespace ApiVersioning.Examples.Models;
 
+using Asp.Versioning;
 using System.ComponentModel.DataAnnotations;
 
 /// <summary>
@@ -33,11 +34,13 @@ public class Person
     /// Gets or sets the email address for a person.
     /// </summary>
     /// <value>The person's email address.</value>
+    [VisibleInApiVersion( "2.0" )]
     public string Email { get; set; }
 
     /// <summary>
     /// Gets or sets the telephone number for a person.
     /// </summary>
     /// <value>The person's telephone number.</value>
+    [VisibleInApiVersion( "3.0" )]
     public string Phone { get; set; }
 }

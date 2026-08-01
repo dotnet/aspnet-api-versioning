@@ -1,5 +1,6 @@
-﻿namespace ApiVersioning.Examples.Models.V3;
+﻿namespace ApiVersioning.Examples.Models;
 
+using Asp.Versioning;
 using System.ComponentModel.DataAnnotations;
 
 /// <summary>
@@ -23,6 +24,7 @@ public class Order
     /// Gets or sets the date and time when the order becomes effective.
     /// </summary>
     /// <value>The order's effective date.</value>
+    [VisibleInApiVersion( "2.0" )]
     public DateTimeOffset EffectiveDate { get; set; } = DateTimeOffset.Now;
 
     /// <summary>

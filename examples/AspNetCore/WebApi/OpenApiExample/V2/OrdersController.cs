@@ -1,6 +1,6 @@
-﻿namespace ApiVersioning.Examples.V2.Controllers;
+﻿namespace ApiVersioning.Examples.V2;
 
-using ApiVersioning.Examples.V2.Models;
+using ApiVersioning.Examples.Models;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.AspNetCore.Http.StatusCodes;
