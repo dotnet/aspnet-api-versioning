@@ -61,4 +61,11 @@
   <PackageReference Include="Microsoft.Extensions.Primitives" Version="$(DotNetReleasePackageVersion)" />
  </ItemGroup>
 
+ <!-- the analyzer ships inside this package. it is not a ProjectReference because NuGet would place it in the restore
+      graph and apply target framework rules to it, and netstandard1.0 cannot resolve the netstandard2.0 the compiler
+      requires of an analyzer -->
+ <ItemGroup>
+  <AnalyzerProjectReference Include="..\..\..\Analyzers\src\Asp.Versioning.Analyzers\Asp.Versioning.Analyzers.csproj" />
+ </ItemGroup>
+
 </Project>
