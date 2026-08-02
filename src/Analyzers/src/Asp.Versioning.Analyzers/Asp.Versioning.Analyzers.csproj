@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+   <AssemblyVersion>1.0.0.0</AssemblyVersion>
+   <TargetFramework>netstandard2.0</TargetFramework>
+   <RootNamespace>Asp.Versioning.Analyzers</RootNamespace>
+   <AssemblyTitle>ASP.NET API Versioning Analyzers (Core)</AssemblyTitle>
+   <Description>The foundational analyzers for API versioning.</Description>
+  </PropertyGroup>
+
+</Project>

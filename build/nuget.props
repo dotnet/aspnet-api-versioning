@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
-  <IsPackable>true</IsPackable>
+  <IsPackable Condition=" '$(IsAnalyzer)' != 'true' ">true</IsPackable>
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/dotnet/aspnet-api-versioning</RepositoryUrl>
   <PackageIcon>icon.png</PackageIcon>
@@ -25,9 +25,7 @@
  </ItemGroup>
 
  <!-- REF: https://github.com/dotnet/sourcelink/blob/master/README.md -->
- <PropertyGroup Label="SourceLink">
-  <IncludeSymbols>true</IncludeSymbols>
-  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+ <PropertyGroup>
   <PublishRepositoryUrl>true</PublishRepositoryUrl>
   <EmbedUntrackedSources>true</EmbedUntrackedSources>
 
@@ -35,7 +33,15 @@
   <ContinuousIntegrationBuild Condition=" ('$(TF_BUILD)' == 'true') OR ('$(GITHUB_ACTIONS)' == 'true') ">true</ContinuousIntegrationBuild>
  </PropertyGroup>
 
- <ItemGroup Label="SourceLink">
+ <!-- an analyzer runs in the compiler rather than in the consuming application, so there is nothing to debug into from
+      its package. it also packs no build output, which leaves a symbol package with nothing to describe and fails to
+      pack with NU5017 -->
+ <PropertyGroup Label="SourceLink" Condition=" '$(IsAnalyzer)' != 'true' ">
+  <IncludeSymbols>true</IncludeSymbols>
+  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+ </PropertyGroup>
+
+ <ItemGroup Label="SourceLink" Condition=" '$(IsAnalyzer)' != 'true' ">
   <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.0-*" PrivateAssets="All"/>
  </ItemGroup>
 

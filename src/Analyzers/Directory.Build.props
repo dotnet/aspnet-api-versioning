@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../'))" />
+
+ <!-- the oldest compiler that can load the analyzer, so it is the lowest version providing the APIs used. do not
+      advance past the lowest, in-support version of the compiler that can load the analyzer -->
+ <ItemGroup>
+  <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+ </ItemGroup>
+
+ <!-- the analyzers package only supplies the rules applied while building an analyzer and never ships anywhere -->
+ <ItemGroup Condition=" '$(IsTestProject)' == 'true' ">
+  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.6.0" PrivateAssets="all" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Using Include="Microsoft.CodeAnalysis" />
+  <Using Include="Microsoft.CodeAnalysis.CSharp" />
+  <Using Include="Microsoft.CodeAnalysis.CSharp.Syntax" />
+  <Using Include="Microsoft.CodeAnalysis.Diagnostics" />
+  <Using Include="System.Collections.Immutable" />
+  <Using Include="System.Diagnostics.CodeAnalysis" />
+  <Using Include="System.Reflection" />
+ </ItemGroup>
+
+</Project>

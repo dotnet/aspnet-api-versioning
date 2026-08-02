@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../'))" />
+
+ <PropertyGroup>
+  <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeAnalyzerInPackage</TargetsForTfmSpecificContentInPackage>
+ </PropertyGroup>
+
+ <!-- an analyzer is packed as content rather than as build output, which the compiler discovers by convention from the
+      'analyzers/dotnet/cs' folder. this runs per target framework so that the assembly is resolved after it has been
+      built, which a static item cannot do -->
+ <Target Name="IncludeAnalyzerInPackage">
+  <ItemGroup>
+   <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers/dotnet/cs" />
+  </ItemGroup>
+ </Target>
+
+</Project>

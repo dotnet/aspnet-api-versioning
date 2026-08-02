@@ -17,6 +17,32 @@
  </Target>
 
  <!--
+ packs an analyzer into the package that it analyzes, which is how System.Text.Json ships its source generator. the
+ analyzer is referenced through a dedicated item rather than a ProjectReference so that NuGet does not resolve it as a
+ library; an analyzer always targets the netstandard2.0 that the compiler requires, which is not compatible with every
+ framework a package may target. the folder it is packed into carries no framework, so one copy applies to all of them
+ -->
+ <Target Name="IncludeAnalyzersInPackage"
+         BeforeTargets="_GetPackageFiles"
+         Condition=" '@(AnalyzerProjectReference)' != '' "
+         Label="NuGet">
+
+  <!-- NoBuild flows in from a pack that skips the build and TargetFramework from a cross-targeting build;
+       neither applies to the analyzer, which builds on demand for the framework it targets -->
+  <MSBuild Projects="@(AnalyzerProjectReference)"
+           Targets="Build"
+           Properties="Configuration=$(Configuration)"
+           RemoveProperties="NoBuild;TargetFramework">
+   <Output TaskParameter="TargetOutputs" ItemName="_AnalyzerAssembly" />
+  </MSBuild>
+
+  <ItemGroup>
+   <None Include="@(_AnalyzerAssembly)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+ </Target>
+
+ <!--
  reads the lines from the 'ReleaseNotes.txt' file, if any, and transforms them into a bulleted list.
  if there are no specific release notes, then the corresponding release link is used. minor and
  patch versions will typically have release notes. major releases often  have too many items to list

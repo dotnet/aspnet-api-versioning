@@ -15,10 +15,12 @@
   <Nullable>enable</Nullable>
   <IsSharedProject>false</IsSharedProject>
   <IsSharedProject Condition=" ('$(MSBuildProjectExtension)' == '.shproj') OR ('$(MSBuildProjectExtension)' == '.msbuildproj') ">true</IsSharedProject>
-  <IsPackable>true</IsPackable>
-  <IsPackable Condition=" '$(IsSharedProject)' == 'true' ">false</IsPackable>
   <IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
   <IsAspNetCore>$(MSBuildProjectDirectory.Contains('AspNetCore'))</IsAspNetCore>
+  <IsAnalyzer>$(MSBuildProjectName.Contains('Analyzers'))</IsAnalyzer>
+  <IsRoslynComponent>$(IsAnalyzer)</IsRoslynComponent>
+  <IsPackable>true</IsPackable>
+  <IsPackable Condition=" '$(IsSharedProject)' == 'true' OR '$(IsTestProject)' == 'true' OR '$(IsAnalyzer)' == 'true' ">false</IsPackable>
  </PropertyGroup>
 
  <ImportGroup Condition=" '$(IsSharedProject)' == 'false' ">
@@ -29,6 +31,9 @@
 
  <ImportGroup Condition=" '$(IsSharedProject)' == 'false' AND '$(IsTestProject)' == 'false' ">
   <Import Project="$(BuildDir)signing.props" />
+ </ImportGroup>
+
+ <ImportGroup Condition=" '$(IsPackable)' == 'true' ">
   <Import Project="$(BuildDir)nuget.props" />
  </ImportGroup>
 

@@ -96,6 +96,17 @@
   <Folder Name="/src/Abstractions/test/">
     <Project Path="src/Abstractions/test/Asp.Versioning.Abstractions.Tests/Asp.Versioning.Abstractions.Tests.csproj" />
   </Folder>
+  <Folder Name="/src/Analyzers/">
+    <File Path="src/Analyzers/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/src/Analyzers/src/">
+    <File Path="src/Analyzers/src/Directory.Build.props" />
+    <File Path="src/Analyzers/src/Directory.Build.targets" />
+    <Project Path="src/Analyzers/src/Asp.Versioning.Analyzers/Asp.Versioning.Analyzers.csproj" />
+  </Folder>
+  <Folder Name="/src/Analyzers/test/">
+    <Project Path="src/Analyzers/test/Asp.Versioning.Analyzers.Tests/Asp.Versioning.Analyzers.Tests.csproj" />
+  </Folder>
   <Folder Name="/src/AspNet/" />
   <Folder Name="/src/AspNet/src/">
     <Project Path="src/AspNet/OData/src/Asp.Versioning.WebApi.OData.ApiExplorer/Asp.Versioning.WebApi.OData.ApiExplorer.csproj" />
