@@ -23,6 +23,7 @@ public partial class ApiExplorerOptions
     /// <remarks>For information about API version formatting, review <see cref="ApiVersionFormatProvider"/>
     /// as well as the <see cref="ApiVersion.ToString(string)"/> and <see cref="ApiVersion.ToString(string, IFormatProvider)"/>
     /// methods.</remarks>
+    [StringSyntax( "ApiVersionFormat" )]
     public string GroupNameFormat { get; set; } = string.Empty;
 
     /// <summary>
@@ -34,6 +35,7 @@ public partial class ApiExplorerOptions
     /// <remarks>For information about API version formatting, review <see cref="ApiVersionFormatProvider"/>
     /// as well as the <see cref="ApiVersion.ToString(string)"/> and <see cref="ApiVersion.ToString(string, IFormatProvider)"/>
     /// methods.</remarks>
+    [StringSyntax( "ApiVersionFormat" )]
     public string SubstitutionFormat { get; set; } = "VVV";
 
     /// <summary>
