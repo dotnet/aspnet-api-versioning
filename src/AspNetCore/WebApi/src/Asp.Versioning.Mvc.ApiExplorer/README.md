@@ -12,6 +12,3 @@ number of scenarios such as test automation or OpenAPI document generation.
 
 - Asp.Versioning.ApiExplorerOptions
 - Asp.Versioning.VersionedApiDescriptionProvider
-
-## Release Notes
-

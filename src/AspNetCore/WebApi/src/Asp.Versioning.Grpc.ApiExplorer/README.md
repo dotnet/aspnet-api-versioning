@@ -9,6 +9,3 @@ in combination with ASP.NET API Versioning, this package also supports API Explo
 ## Commonly Used Types
 
 - Asp.Versioning.ApiExplorer.GrpcApiExplorerOptions
-
-## Release Notes
-

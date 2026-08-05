@@ -17,5 +17,3 @@ Minimal APIs. For additional functionality provided by ASP.NET Core MVC use the
 - Asp.Versioning.IDeprecationPolicyBuilder
 - Asp.Versioning.ISunsetPolicyBuilder
 - Asp.Versioning.QueryStringApiVersionReader
-
-## Release Notes

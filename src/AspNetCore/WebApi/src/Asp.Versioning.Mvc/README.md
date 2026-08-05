@@ -13,6 +13,3 @@ client-based applications.
 - Asp.Versioning.ControllerNameAttribute
 - Asp.Versioning.MvcApiVersioningOptions
 - Asp.Versioning.ReportApiVersionsAttribute
-
-## Release Notes
-

@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
- <PropertyGroup>
-  <SourcePackageReadmeFile>$(MSBuildProjectDirectory)\README.md</SourcePackageReadmeFile>
-  <TargetPackageReadmeFile>$(BaseIntermediateOutputPath)\README.md</TargetPackageReadmeFile>
- </PropertyGroup>
-
- <PropertyGroup>
-  <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeNuGetReadme</TargetsForTfmSpecificContentInPackage>
- </PropertyGroup>
-
- <Target Name="IncludeNuGetReadme">
-  <ItemGroup>
-   <TfmSpecificPackageFile Include="$(TargetPackageReadmeFile)" PackagePath="" />
-  </ItemGroup>
- </Target>
+ <!--
+ the read me must be added with Include rather than Update because a cross-targeting build does not apply the default
+ item globs in the outer build, which is where pack runs; there would be no item to update. the preceding Remove keeps
+ a single item in an inner build, where the default glob has already added it
+ -->
+ <ItemGroup Label="Package Files" Condition=" '$(PackageReadmeFile)' != '' ">
+  <None Remove="README.md" />
+  <None Include="README.md" Pack="true" PackagePath="" />
+ </ItemGroup>
 
  <!--
  packs an analyzer into the package that it analyzes, which is how System.Text.Json ships its source generator. the
@@ -49,53 +44,28 @@
  and are better served by the official release page. the original read me file is copied to the
  intermediate output, the releases notes appended, and the final file is packed in the package
  -->
- <Target Name="GenerateReadme"
-         BeforeTargets="GenerateNuspec"
-         Condition="Exists('$(SourcePackageReadmeFile)')"
-         Label="NuGet">
+ <Target Name="GenerateReadme" BeforeTargets="GenerateNuspec">
 
   <PropertyGroup>
    <ReleaseNotesFile>$(MSBuildProjectDirectory)\ReleaseNotes.txt</ReleaseNotesFile>
-   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' AND '$(PackageVersion.IndexOf(`-`))' == '-1' ">$(PackageVersion.Substring(0,$(PackageVersion.LastIndexOf('.')))).0</GitHubReleaseTag>
-   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' ">$(PackageVersion)</GitHubReleaseTag>
-   <PackageReleaseNotes>https://github.com/dotnet/aspnet-api-versioning/releases/tag/v$(GitHubReleaseTag)</PackageReleaseNotes>
+   <Crlf>&#x0D;&#x0A;</Crlf>
+   <ReadmeContent>| :mega: $(ReadmeBanner) |&#x0D;&#x0A;|-|&#x0D;&#x0A;</ReadmeContent>
   </PropertyGroup>
-
-  <!-- if there is banner text, merge as one big string
-       note: ReadLinesFromFile as items won't work here because empty lines are discarded -->
-  <PropertyGroup Condition=" '$(ReadmeBanner)' != '' ">
-   <ReadmeContent>| :mega: $(ReadmeBanner) |
-|-|
-
-$([System.IO.File]::ReadAllText('$(SourcePackageReadmeFile)'))
-   </ReadmeContent>
-  </PropertyGroup>
-
-  <!-- write all text with the banner -->
-  <WriteLinesToFile File="$(TargetPackageReadmeFile)"
-                    Lines="$(ReadmeContent)"
-                    Overwrite="true"
-                    Condition=" '$(ReadmeBanner)' != '' "/>
-
-  <!-- just copy the file without a banner -->
-  <Copy SourceFiles="$(SourcePackageReadmeFile)"
-        DestinationFiles="$(TargetPackageReadmeFile)"
-        OverwriteReadOnlyFiles="true"
-        Condition=" '$(ReadmeBanner)' == '' " />
 
   <ReadLinesFromFile File="$(ReleaseNotesFile)" Condition="Exists('$(ReleaseNotesFile)')" >
    <Output TaskParameter="Lines" ItemName="ReleaseNotes"/>
   </ReadLinesFromFile>
 
-  <!-- append link to release -->
-  <WriteLinesToFile File="$(TargetPackageReadmeFile)"
-                    Lines="$(PackageReleaseNotes)"
-                    Condition="@(ReleaseNotes->Count()) == 0" />
+  <PropertyGroup Condition="@(ReleaseNotes->Count()) == 0">
+   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' AND '$(PackageVersion.IndexOf(`-`))' == '-1' ">$(PackageVersion.Substring(0,$(PackageVersion.LastIndexOf('.')))).0</GitHubReleaseTag>
+   <GitHubReleaseTag Condition=" '$(GitHubReleaseTag)' == '' ">$(PackageVersion)</GitHubReleaseTag>
+   <PackageReleaseNotes>https://github.com/dotnet/aspnet-api-versioning/releases/tag/v$(GitHubReleaseTag)</PackageReleaseNotes>
+  </PropertyGroup>
 
-  <!-- append specific release notes -->
-  <WriteLinesToFile File="$(TargetPackageReadmeFile)"
-                    Lines="@(ReleaseNotes->'- %(Identity)')"
-                    Condition="@(ReleaseNotes->Count()) > 0" />
+  <PropertyGroup Condition="@(ReleaseNotes->Count()) > 0">
+   <PackageReleaseNotes Condition=" '$(ReadmeBanner)' != '' ">| :mega: $(ReadmeBanner) |&#x0D;&#x0A;|-|&#x0D;&#x0A;</PackageReleaseNotes>
+   <PackageReleaseNotes>$(PackageReleaseNotes)@(ReleaseNotes->'- %(Identity)','&#x0D;&#x0A;')</PackageReleaseNotes>
+  </PropertyGroup>
 
  </Target>
 

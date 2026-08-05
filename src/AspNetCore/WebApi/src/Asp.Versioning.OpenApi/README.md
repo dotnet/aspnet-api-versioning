@@ -11,6 +11,3 @@ This package contains the OpenAPI extensions which integrates [Microsoft.AspNetC
 - Asp.Versioning.OpenApi.IApiVersioningBuilderExtensions
 - Asp.Versioning.OpenApi.IEndpointConventionBuilderExtensions
 - Asp.Versioning.OpenApi.IEndpointRouteBuilderExtensions
-
-## Release Notes
-

@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <PropertyGroup>
-  <IsPackable Condition=" '$(IsAnalyzer)' != 'true' ">true</IsPackable>
+  <IsPackable>true</IsPackable>
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/dotnet/aspnet-api-versioning</RepositoryUrl>
   <PackageIcon>icon.png</PackageIcon>
@@ -10,11 +10,12 @@
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   <PackageLicenseExpression>MIT</PackageLicenseExpression>
   <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
-  <PackageReadmeFile>README.md</PackageReadmeFile>
+  <!-- the path is relative to the package root, not the file system; the corresponding file is packed in nuget.targets -->
+  <PackageReadmeFile Condition="Exists('$(MSBuildProjectDirectory)\README.md')">README.md</PackageReadmeFile>
   <NoWarn>NU5118;$(NoWarn)</NoWarn>
  </PropertyGroup>
 
- <ItemGroup Label="Packages Files">
+ <ItemGroup Label="Package Files">
   <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
   <None Include="$(MSBuildThisFileDirectory)..\LICENSE.txt" Pack="true" PackagePath="" Visible="false" />
  </ItemGroup>

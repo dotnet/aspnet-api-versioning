@@ -8,6 +8,3 @@ conventions that you use to describe which API versions are implemented by your 
 - Asp.Versioning.ApiVersionInformation
 - Asp.Versioning.ApiVersionWriter
 - Asp.Versioning.IApiNotification
-
-## Release Notes
-
