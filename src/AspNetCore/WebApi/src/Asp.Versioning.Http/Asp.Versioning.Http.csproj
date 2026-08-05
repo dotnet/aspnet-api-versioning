@@ -23,6 +23,13 @@
   <ProjectReference Include="..\..\..\..\Abstractions\src\Asp.Versioning.Abstractions\Asp.Versioning.Abstractions.csproj" />
  </ItemGroup>
 
+ <!-- the analyzer ships inside this package so that it reaches this package and everything built on
+      it. it is not a ProjectReference because the analyzer is not packable, which would otherwise
+      pack its assembly into lib rather than as an analyzer -->
+ <ItemGroup>
+  <AnalyzerProjectReference Include="..\..\..\..\Analyzers\src\Asp.Versioning.Api.Analyzers\Asp.Versioning.Api.Analyzers.csproj" />
+ </ItemGroup>
+
  <Import Project="..\..\..\..\Common\src\Common\Common.projitems" Label="Shared" />
  <Import Project="..\..\..\..\Common\src\Common.ProblemDetails\Common.ProblemDetails.projitems" Label="Shared" />
 
