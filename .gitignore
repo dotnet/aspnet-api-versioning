@@ -52,3 +52,6 @@ _ReSharper*/
 _NCrunch_*/
 _NCrunch_*
 *.ncrunch*
+
+# mdBook generated output (built by CI; see .github/workflows/gh-pages.yml)
+wiki/book/
