@@ -36,3 +36,50 @@ Versioning.
 | {{#include ../icons/warning.md}} | [AV0029](av0029.md) | Usage         | Remove unnecessary OpenAPI services             |
 | {{#include ../icons/warning.md}} | [AV0030](av0030.md) | Usage         | Missing WithDocumentPerVersion                  |
 | {{#include ../icons/warning.md}} | [AV0031](av0031.md) | Usage         | Missing API explorer                            |
+
+## Reporting
+
+Most rules report as you type, but some report only when the project is built.
+
+A rule that judges a single expression decides as soon as that expression is written. AV0017, for example, sees an
+assignment and has everything it needs. A rule that compares one call against another cannot decide until every file
+has been read, because the call it is looking for may be in a file that is not open. AV0028 cannot report a sunset
+until it has seen every deprecation, and AV0027 reports because a call is missing, which is only known once there is
+nothing left to read.
+
+The rules that report only on build are AV0013, AV0015, AV0016, AV0018, AV0019, AV0020, AV0021, AV0022, AV0023,
+AV0024, AV0026, AV0027, AV0028, AV0029, AV0030, and AV0031. The rest report live in the editor.
+
+These rules also report live in an editor configured to analyze the whole solution rather than only the documents
+that are open:
+
+- **Visual Studio**: Tools → Options → Text Editor → C# → Advanced → *Run background code analysis for* →
+  **Entire solution**
+- **Rider**: enable *Solution-Wide Analysis*
+- **Visual Studio Code**: `"dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution"`
+
+## Suppression
+
+A single rule is configured the same way as any other analyzer, by severity in an `.editorconfig` file:
+
+```ini
+[*.cs]
+dotnet_diagnostic.AV0028.severity = none
+```
+
+All of the rules are turned off at once with a property, which removes the analyzers instead of silencing each rule:
+
+```xml
+<PropertyGroup>
+ <EnableApiVersioningAnalyzers>false</EnableApiVersioningAnalyzers>
+</PropertyGroup>
+```
+
+Set it in `Directory.Build.props` to apply it to every project in a solution. The rules are enabled unless the
+property is `false`.
+
+>[!IMPORTANT]
+>`ExcludeAssets="analyzers"` on a package reference does not turn the rules off. The packages that ship the
+>analyzers are also reached through the dependencies of other packages, and NuGet combines the assets from every
+>path that reaches a package, so an exclusion on one path is undone by another that has none. Use the property
+>above instead.

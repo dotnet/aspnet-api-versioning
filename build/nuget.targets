@@ -31,8 +31,14 @@
    <Output TaskParameter="TargetOutputs" ItemName="_AnalyzerAssembly" />
   </MSBuild>
 
+  <!-- the targets file is renamed to the package so that NuGet imports it into the projects that reach this package,
+       and so that it removes the analyzer this package ships rather than any other -->
   <ItemGroup>
    <None Include="@(_AnalyzerAssembly)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+   <None Include="$(MSBuildThisFileDirectory)analyzers.targets"
+         Pack="true"
+         PackagePath="buildTransitive/$(PackageId).targets"
+         Visible="false" />
   </ItemGroup>
 
  </Target>
