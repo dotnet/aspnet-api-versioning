@@ -1,6 +1,1 @@
-﻿Clip dependent package version because the next major version is incompatible [dotnet/aspnetcore#67930](https://github.com/dotnet/aspnetcore/issues/67930)
-Add support for gRPC [Issue #1109](https://github.com/dotnet/aspnet-api-versioning/issues/1109)
-Fix `<inheritdoc />` summaries [Issue #1189](https://github.com/dotnet/aspnet-api-versioning/issues/1189)
-Support more XML comment tags [Issue #1205](https://github.com/dotnet/aspnet-api-versioning/issues/1205)
-Fix the description of a member that refers to another schema being applied to that schema
-Filter schema members using the API version the model metadata was described for
+﻿

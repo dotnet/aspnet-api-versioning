@@ -1,3 +1,1 @@
-﻿Fix API version extraction in URLs with status [Issue #1187](https://github.com/dotnet/aspnet-api-versioning/issues/1187)
-Support versioning by URL segment for gRPC services [Issue #](https://github.com/dotnet/aspnet-api-versioning/issues/1109)
-Add support for filtering JSON members by API version
+﻿
