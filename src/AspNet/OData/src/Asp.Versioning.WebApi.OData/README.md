@@ -15,6 +15,3 @@ metadata attributes and conventions that you use to describe which API versions 
 - Asp.Versioning.Routing.VersionedAttributeRoutingConvention
 - Asp.Versioning.Routing.VersionedMetadataRoutingConvention
 - Asp.Versioning.Routing.VersionedODataRoutingConventions
-
-## Release Notes
-

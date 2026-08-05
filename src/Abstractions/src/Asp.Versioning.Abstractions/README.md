@@ -19,6 +19,3 @@ client-based applications.
 - Asp.Versioning.LinkHeaderValue
 - Asp.Versioning.MapToApiVersionAttribute
 - Asp.Versioning.SunsetPolicy
-
-## Release Notes
-

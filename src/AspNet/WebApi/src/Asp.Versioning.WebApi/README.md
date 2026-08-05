@@ -16,5 +16,3 @@ and conventions that you use to describe which API versions are implemented by y
 - Asp.Versioning.IPolicyManager<SunsetPolicy>
 - Asp.Versioning.QueryStringApiVersionReader
 - Asp.Versioning.ReportApiVersionsAttribute
-
-## Release Notes

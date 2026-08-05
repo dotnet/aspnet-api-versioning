@@ -13,6 +13,3 @@ are useful in a number of scenarios such as test automation or OpenAPI document 
 - Asp.Versioning.ODataApiDescriptionProvider
 - Asp.Versioning.ODataApiExplorerOptions
 - Asp.Versioning.Conventions.ODataQueryOptionsConventionBuilder
-
-## Release Notes
-

@@ -13,6 +13,3 @@ useful in a number of scenarios such as test automation or OpenAPI document gene
 - Asp.Versioning.ApiExplorer.ODataApiExplorer
 - Asp.Versioning.ApiExplorer.ODataApiExplorerOptions
 - Asp.Versioning.Conventions.ODataQueryOptionsConventionBuilder
-
-## Release Notes
-
