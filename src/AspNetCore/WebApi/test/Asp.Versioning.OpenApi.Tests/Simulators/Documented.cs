@@ -54,6 +54,14 @@ public class Documented
     public string Sample { get; set; }
 
     /// <summary>
+    /// Gets or sets the snippet.
+    /// <code>
+    ///     The fence is ``` here.
+    /// </code>
+    /// </summary>
+    public string Snippet { get; set; }
+
+    /// <summary>
     /// Gets or sets the definitions.
     /// <list type="bullet">
     /// <item><term>Foo</term><description>Does foo</description></item>
@@ -97,4 +105,25 @@ public class Documented
     /// <para>The second note, which mentions <c>Status</c>.</para>
     /// </summary>
     public string Notes { get; set; }
+
+    /// <summary>
+    /// Gets or sets the highlights, which are <b>important</b> and <i>subtle</i>.
+    /// </summary>
+    public string Highlights { get; set; }
+
+    /// <summary>
+    /// Gets or sets the emphasis, which is <b>very <i>strongly</i> worded</b>.
+    /// </summary>
+    public string Emphasis { get; set; }
+
+    /// <summary>
+    /// Gets or sets the reference, which is described by <a href="https://example.com">the
+    /// specification</a>.
+    /// </summary>
+    public string Reference { get; set; }
+
+    /// <summary>
+    /// Gets or sets the site, which is <a href="https://example.com" />.
+    /// </summary>
+    public string Site { get; set; }
 }

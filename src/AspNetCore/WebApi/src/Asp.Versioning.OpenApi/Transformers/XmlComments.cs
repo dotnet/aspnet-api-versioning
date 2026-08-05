@@ -330,13 +330,14 @@ public class XmlComments
         // pass proceeds
         Dedent( copy );
 
-        // order matters. <code> is resolved first so an inline tag nested in a block stays literal, then <c> so
-        // that inline code survives being flattened into the text of a list item or a paragraph. the tags that
-        // absorb their content are resolved last for the same reason.
-        ResolveCodeTags( copy, "code", "```" );
-        ResolveCodeTags( copy, "c", "`" );
-        ResolveListTags( copy );
+        // order matters. <code> is resolved first so an inline tag nested in a block stays literal, then the
+        // tags that produce inline text so they survive being flattened into a list item, a table cell, or a
+        // paragraph. the tags that absorb their content are resolved last for the same reason.
+        ResolveCodeBlocks( copy );
+        ResolveInlineCode( copy );
         ResolveParamRefTags( copy );
+        ResolveInlineTags( copy );
+        ResolveListTags( copy );
         ResolveParaTags( copy );
 
         return copy;
@@ -349,6 +350,9 @@ public class XmlComments
     // <paramref /> refers to a parameter of the operation, which is part of the API over the wire, so its name
     // is meaningful in a description. <typeparamref /> is not; a type parameter is a C# concept with no
     // representation in a request or a response, and neither is <see langword="" /> or <see cref="" />.
+    //
+    // The tag names a code element rather than describing one, so the name is rendered as inline code. It reads
+    // as the identifier it is instead of running together with the prose around it.
     private static void ResolveParamRefTags( XElement element )
     {
         foreach ( var paramRef in element.Descendants( "paramref" ).ToArray() )
@@ -356,7 +360,7 @@ public class XmlComments
             if ( paramRef.Parent is not null
                  && paramRef.Attribute( "name" )?.Value is { Length: > 0 } name )
             {
-                paramRef.ReplaceWith( new XText( name ) );
+                paramRef.ReplaceWith( new XText( Delimit( name, "`" ) ) );
             }
         }
     }
@@ -426,11 +430,11 @@ public class XmlComments
         }
     }
 
-    // An item can be written as plain text or as a definition of a <term /> by a <description />. Markdown has no
-    // definition list, so a definition renders as a bolded term followed by its description. Reading the text of
+    // an item can be written as plain text or as a definition of a <term /> by a <description />. markdown has no
+    // definition list, so a definition renders as a bolded term followed by its description. reading the text of
     // the item would run the two together because the tags are adjacent.
     //
-    // This is deliberately not the cell handling used for a table. Outside of a table a pipe is an ordinary
+    // this is deliberately not the cell handling used for a table. outside of a table a pipe is an ordinary
     // character and the line structure of a description is worth keeping.
     private static string ItemOf( XElement item )
     {
@@ -453,9 +457,9 @@ public class XmlComments
         return text.Length == 0 ? name : "**" + name + "**: " + text;
     }
 
-    // A table is the one list type with a Markdown equivalent that is not a list. It only resolves to a table when
+    // a table is the one list type with a markdown equivalent that is not a list. it only resolves to a table when
     // there is more than one column; a table of one column conveys nothing a bulleted list does not, so the caller
-    // falls back to bullets. Markdown requires a header row, so a list with no <listheader /> gets a blank one.
+    // falls back to bullets. markdown requires a header row, so a list with no <listheader /> gets a blank one.
     private static bool TryResolveTable( XElement list, [NotNullWhen( true )] out string? table )
     {
         var header = CellsOf( list.Element( "listheader" ) );
@@ -509,39 +513,9 @@ public class XmlComments
         return cells;
     }
 
-    // A row occupies a single line and is delimited by pipes, so the whitespace in a cell is collapsed and any
-    // pipe of its own is escaped. Neither can be represented in a cell otherwise.
-    private static string CellOf( string text )
-    {
-        var cell = new StringBuilder( text.Length );
-        var space = false;
-
-        for ( var i = 0; i < text.Length; i++ )
-        {
-            var ch = text[i];
-
-            if ( char.IsWhiteSpace( ch ) )
-            {
-                space = cell.Length > 0;
-                continue;
-            }
-
-            if ( space )
-            {
-                cell.Append( ' ' );
-                space = false;
-            }
-
-            if ( ch == '|' )
-            {
-                cell.Append( '\\' );
-            }
-
-            cell.Append( ch );
-        }
-
-        return cell.ToString();
-    }
+    // a row occupies a single line and is delimited by pipes, so the whitespace in a cell is collapsed and any
+    // pipe of its own is escaped. neither can be represented in a cell otherwise.
+    private static string CellOf( string text ) => Flatten( text ).Replace( "|", "\\|", StringComparison.Ordinal );
 
     private static void AppendRow( StringBuilder table, List<string> cells, int columns )
     {
@@ -557,24 +531,142 @@ public class XmlComments
         table.Append( '\n' );
     }
 
-    private static void ResolveCodeTags( XElement element, string name, string delimiter )
+    // a fence only opens and closes a code block when it sits on a line of its own, so the block is surrounded
+    // by line breaks instead of being wrapped in place; a fence written inline is literal text and the block
+    // would never be closed. a code block cannot interrupt a paragraph either, which the leading break also
+    // takes care of.
+    private static void ResolveCodeBlocks( XElement element )
     {
-        foreach ( var code in element.Descendants( name ).ToArray() )
+        foreach ( var code in element.Descendants( "code" ).ToArray() )
         {
             if ( code.Parent is null )
             {
                 continue;
             }
 
-            var text = delimiter + TrimEachLine( code.Value ) + delimiter;
+            var content = TrimEachLine( code.Value );
+            var fence = FenceFor( content );
 
-            code.ReplaceWith( new XText( text ) );
+            code.ReplaceWith( new XText( "\n" + fence + "\n" + content + "\n" + fence + "\n" ) );
         }
     }
 
-    // The XML file is written with its own indentation, which becomes part of the text of every element inside a
-    // member. Remove it from each text node so the member reads as it was written and substituted text does not
-    // have to reproduce it. An XML processor normalizes line endings, so only '\n' occurs here.
+    // a fence has to be longer than any run of backticks in the block it delimits, three being the customary
+    // minimum. a sample that contains a fence of its own would otherwise close the block early and leave the
+    // remainder of the sample to be read as prose.
+    private static string FenceFor( string code )
+    {
+        const int MinimumFence = 3;
+        var longest = 0;
+        var run = 0;
+
+        for ( var i = 0; i < code.Length; i++ )
+        {
+            run = code[i] == '`' ? run + 1 : 0;
+            longest = Math.Max( longest, run );
+        }
+
+        return new string( '`', Math.Max( MinimumFence, longest + 1 ) );
+    }
+
+    private static void ResolveInlineCode( XElement element )
+    {
+        foreach ( var code in element.Descendants( "c" ).ToArray() )
+        {
+            if ( code.Parent is not null )
+            {
+                code.ReplaceWith( new XText( Delimit( code.Value, "`" ) ) );
+            }
+        }
+    }
+
+    // <b>, <i>, and <a> are the html tags a documentation comment carries inline, and each has a direct markdown
+    // equivalent. rewriting them keeps the meaning that reading the text of the enclosing element would drop.
+    // the tags are visited from the inside out so that one nested in another is rewritten before it is absorbed.
+    private static void ResolveInlineTags( XElement element )
+    {
+        var elements = element.Descendants().ToArray();
+
+        for ( var i = elements.Length - 1; i >= 0; i-- )
+        {
+            var inline = elements[i];
+
+            if ( inline.Parent is null )
+            {
+                continue;
+            }
+
+            var text = inline.Name.LocalName switch
+            {
+                "b" => Delimit( inline.Value, "**" ),
+                "i" => Delimit( inline.Value, "_" ),
+                "a" => LinkOf( inline ),
+                _ => default,
+            };
+
+            if ( text is not null )
+            {
+                inline.ReplaceWith( new XText( text ) );
+            }
+        }
+    }
+
+    // a link with no text renders as its own address, which is all there is to show. a link with no address is
+    // not a link at all, so only the text it wrapped is kept.
+    private static string LinkOf( XElement anchor )
+    {
+        var text = Flatten( anchor.Value );
+        var href = Flatten( anchor.Attribute( "href" )?.Value ?? string.Empty );
+
+        if ( href.Length == 0 )
+        {
+            return text;
+        }
+
+        return text.Length == 0 ? href : "[" + text + "](" + href + ")";
+    }
+
+    // a span occupies a single line and its delimiters cannot be padded by whitespace, so the content is
+    // flattened. an empty tag is dropped; a pair of delimiters with nothing between them is literal text.
+    private static string Delimit( string value, string delimiter )
+    {
+        var text = Flatten( value );
+
+        return text.Length == 0 ? string.Empty : delimiter + text + delimiter;
+    }
+
+    // collapses a run of text onto a single line. the markdown constructs that occupy exactly one line - a table
+    // row, a span - cannot carry the line breaks and indentation the xml file is written with.
+    private static string Flatten( string text )
+    {
+        var flattened = new StringBuilder( text.Length );
+        var space = false;
+
+        for ( var i = 0; i < text.Length; i++ )
+        {
+            var ch = text[i];
+
+            if ( char.IsWhiteSpace( ch ) )
+            {
+                space = flattened.Length > 0;
+                continue;
+            }
+
+            if ( space )
+            {
+                flattened.Append( ' ' );
+                space = false;
+            }
+
+            flattened.Append( ch );
+        }
+
+        return flattened.ToString();
+    }
+
+    // the xml file is written with its own indentation, which becomes part of the text of every element inside a
+    // member. remove it from each text node so the member reads as it was written and substituted text does not
+    // have to reproduce it. an xml processor normalizes line endings, so only '\n' occurs here.
     private static void Dedent( XElement element )
     {
         var margin = MarginOf( element.Value );
@@ -642,7 +734,7 @@ public class XmlComments
         return margin == int.MaxValue ? 0 : margin;
     }
 
-    // Trims each line while preserving relative indentation. A code sample is indented to match the source it
+    // trims each line while preserving relative indentation. a code sample is indented to match the source it
     // was written in; removing only the common indentation keeps the sample readable without the leading noise.
     private static string TrimEachLine( string text )
     {

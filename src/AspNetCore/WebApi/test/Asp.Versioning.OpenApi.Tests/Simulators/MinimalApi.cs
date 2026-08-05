@@ -29,6 +29,14 @@ public static class MinimalApi
     public static int Many() => 42;
 
     /// <summary>
+    /// Detailed
+    /// </summary>
+    /// <remarks>The long-form explanation.</remarks>
+    /// <description>The short-form explanation.</description>
+    /// <returns>The detailed answer.</returns>
+    public static int Detailed() => 42;
+
+    /// <summary>
     /// Echo
     /// </summary>
     /// <param name="id">A test parameter.</param>
