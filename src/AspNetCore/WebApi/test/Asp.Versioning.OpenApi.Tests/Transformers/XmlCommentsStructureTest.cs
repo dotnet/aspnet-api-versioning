@@ -211,7 +211,7 @@ public class XmlCommentsStructureTest
     }
 
     [Fact]
-    public void code_should_be_resolved_into_a_block()
+    public void code_should_be_resolved_into_a_fenced_block()
     {
         // arrange
         var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
@@ -221,7 +221,115 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the sample.\n```var value = 42;\nUse( value );```" );
+        summary.Should().Be(
+            "Gets or sets the sample.\n" +
+            "\n" +
+            "```\n" +
+            "var value = 42;\n" +
+            "Use( value );\n" +
+            "```" );
+    }
+
+    [Fact]
+    public void code_containing_a_fence_should_be_resolved_into_a_longer_fence()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Snippet ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the snippet.\n" +
+            "\n" +
+            "````\n" +
+            "The fence is ``` here.\n" +
+            "````" );
+    }
+
+    [Fact]
+    public void bold_and_italic_should_be_resolved_into_emphasis()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Highlights ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the highlights, which are **important** and _subtle_." );
+    }
+
+    [Fact]
+    public void nested_emphasis_should_be_resolved_from_the_inside_out()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Emphasis ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the emphasis, which is **very _strongly_ worded**." );
+    }
+
+    [Fact]
+    public void anchor_should_be_resolved_into_a_link()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Reference ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the reference, which is described by [the specification](https://example.com)." );
+    }
+
+    [Fact]
+    public void anchor_without_text_should_be_resolved_into_its_address()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Site ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the site, which is https://example.com." );
+    }
+
+    [Fact]
+    public async Task remarks_should_take_precedence_over_description()
+    {
+        // arrange
+        var paths = await GeneratePathsAsync();
+
+        // act
+        var description = paths["/test/detailed"]["get"]["description"];
+
+        // assert
+        description.GetValue<string>().Should().Be( "The long-form explanation." );
+    }
+
+    [Fact]
+    public async Task description_should_be_used_without_remarks()
+    {
+        // arrange
+        var paths = await GeneratePathsAsync();
+
+        // act
+        var description = paths["/test/{id}"]["get"]["description"];
+
+        // assert
+        description.GetValue<string>().Should().Be( "A test API." );
     }
 
     [Fact]
@@ -239,7 +347,7 @@ public class XmlCommentsStructureTest
     }
 
     [Fact]
-    public void paramref_should_be_resolved_into_the_parameter_name()
+    public void paramref_should_be_resolved_into_the_parameter_name_as_code()
     {
         // arrange
         var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
@@ -249,7 +357,7 @@ public class XmlCommentsStructureTest
         var returns = comments.GetReturns( method );
 
         // assert
-        returns.Should().Be( "The value of id." );
+        returns.Should().Be( "The value of `id`." );
     }
 
     [Fact]
@@ -262,7 +370,7 @@ public class XmlCommentsStructureTest
         var description = paths["/test/echo/{id}"]["get"]["responses"]["200"]["description"];
 
         // assert
-        description.GetValue<string>().Should().Be( "The value of id." );
+        description.GetValue<string>().Should().Be( "The value of `id`." );
     }
 
     [Fact]
@@ -310,6 +418,7 @@ public class XmlCommentsStructureTest
         api.MapGet( "one", MinimalApi.One );
         api.MapGet( "many", MinimalApi.Many ).Produces<int>().Produces( 400 );
         api.MapGet( "{id:int}", MinimalApi.Get ).Produces<int>().Produces( 400 );
+        api.MapGet( "detailed", MinimalApi.Detailed );
         api.MapGet( "documented", () => new Documented() );
         api.MapGet( "echo/{id:int}", MinimalApi.Echo );
         app.MapOpenApi().WithDocumentPerVersion();

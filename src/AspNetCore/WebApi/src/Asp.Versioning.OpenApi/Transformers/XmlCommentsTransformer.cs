@@ -114,10 +114,17 @@ public class XmlCommentsTransformer : IOpenApiSchemaTransformer, IOpenApiOperati
 
         var description = operation.Description;
 
-        if ( string.IsNullOrEmpty( description )
-             && !string.IsNullOrEmpty( description = Documentation.GetDescription( method ) ) )
+        if ( string.IsNullOrEmpty( description ) )
         {
-            operation.Description = description;
+            if ( string.IsNullOrEmpty( description = Documentation.GetRemarks( method ) ) )
+            {
+                description = Documentation.GetDescription( method );
+            }
+
+            if ( !string.IsNullOrEmpty( description ) )
+            {
+                operation.Description = description;
+            }
         }
 
         if ( operation.Responses is { } responses )

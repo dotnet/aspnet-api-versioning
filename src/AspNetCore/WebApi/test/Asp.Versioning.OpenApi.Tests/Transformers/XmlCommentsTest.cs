@@ -36,6 +36,20 @@ public class XmlCommentsTest
     }
 
     [Fact]
+    public void remarks_should_be_retrieved_for_minimal_api()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var method = typeof( MinimalApi ).GetMethod( nameof( MinimalApi.Detailed ) );
+
+        // act
+        var remarks = comments.GetRemarks( method );
+
+        // assert
+        remarks.Should().Be( "The long-form explanation." );
+    }
+
+    [Fact]
     public void parameter_description_should_be_retrieved_for_minimal_api()
     {
         // arrange
