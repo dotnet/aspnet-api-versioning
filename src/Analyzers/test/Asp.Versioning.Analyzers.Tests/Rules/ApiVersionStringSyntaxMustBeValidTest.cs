@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 
-namespace Asp.Versioning.Analyzers.AV0000;
+namespace Asp.Versioning.Analyzers.Rules;
 
 public class ApiVersionStringSyntaxMustBeValidTest
 {
