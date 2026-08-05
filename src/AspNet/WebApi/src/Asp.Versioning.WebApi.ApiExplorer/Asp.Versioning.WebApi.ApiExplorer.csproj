@@ -11,6 +11,10 @@
  </PropertyGroup>
 
  <ItemGroup>
+  <Compile Include="$(BackportDir)StringSyntaxAttribute.cs" Visible="false" />
+ </ItemGroup>
+
+ <ItemGroup>
   <ProjectReference Include="..\..\..\WebApi\src\Asp.Versioning.WebApi\Asp.Versioning.WebApi.csproj" />
  </ItemGroup>
 
