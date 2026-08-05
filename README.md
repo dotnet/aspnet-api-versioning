@@ -25,7 +25,7 @@ The supported flavors of ASP.NET are:
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Http.svg)](https://www.nuget.org/packages/Asp.Versioning.Http)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Http.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Http)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-core-with-minimal-apis)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/quick-starts/new-services.html#minimal-api)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi)
 
 * **ASP.NET Core with MVC (Core)**
@@ -33,7 +33,7 @@ The supported flavors of ASP.NET are:
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Mvc.svg)](https://www.nuget.org/packages/Asp.Versioning.Mvc)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Mvc.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Mvc)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-core-with-mvc-core)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/quick-starts/new-services.html#mvc-core)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi)
 
 * **ASP.NET Core with gRPC**
@@ -41,7 +41,7 @@ The supported flavors of ASP.NET are:
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Grpc.svg)](https://www.nuget.org/packages/Asp.Versioning.Grpc)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Grpc.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Grpc)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Versioning-with-gRPC)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/grpc/overview.html)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi/GrpcOpenApiExample)
 
 * **ASP.NET Core with OData**
@@ -49,7 +49,7 @@ The supported flavors of ASP.NET are:
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.OData.svg)](https://www.nuget.org/packages/Asp.Versioning.OData)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.OData.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.OData)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-core-with-odata)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/quick-starts/new-services.html#odata)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/OData)
 
 * **ASP.NET Web API**
@@ -57,7 +57,7 @@ The supported flavors of ASP.NET are:
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-web-api-classic)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet/quick-starts/new-services.html#web-api)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/WebApi)
 
 * **ASP.NET Web API with OData**
@@ -65,7 +65,7 @@ The supported flavors of ASP.NET are:
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.OData.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.OData.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/New-Services-Quick-Start#aspnet-web-api-with-odata-classic)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet/quick-starts/new-services.html#odata)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/OData)
 
 This is also the home of the ASP.NET API versioning API explorers that you can use to easily document your APIs with OpenAPI:
@@ -81,7 +81,7 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Mvc.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.Mvc.ApiExplorer)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Mvc.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Mvc.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-core--)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/docs/overview.html#minimal-api-or-mvc-core)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi/OpenApiSample)
 
 * **ASP.NET Core Versioned API Explorer and OpenAPI with gRPC**
@@ -89,7 +89,7 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Grpc.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.Grpc.ApiExplorer)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Grpc.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Grpc.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-core-with-grpc---)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/docs/overview.html#grpc)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/WebApi/GrpcOpenApiExample)
 
 * **ASP.NET Core with OData API Explorer**
@@ -97,7 +97,7 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.OData.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.OData.ApiExplorer)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.OData.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.OData.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-core-with-odata--)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/docs/overview.html#odata)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNetCore/OData/OpenApiODataSample)
 
 * **ASP.NET Web API Versioned API Explorer**
@@ -105,7 +105,7 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.ApiExplorer)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-web-api-classic-)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet/docs/overview.html#web-api)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/WebApi/OpenApiWebApiSample)
 
 * **ASP.NET Web API with OData API Explorer**
@@ -113,7 +113,7 @@ This is also the home of the ASP.NET API versioning API explorers that you can u
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.WebApi.OData.ApiExplorer.svg)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData.ApiExplorer)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.WebApi.OData.ApiExplorer.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.WebApi.OData.ApiExplorer)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#aspnet-web-api-with-odata-classic-)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet/docs/overview.html#odata)
   [![Examples](https://img.shields.io/badge/example-code-2B91AF)](../../tree/main/examples/AspNet/OData/OpenApiODataWebApiSample)
 
 The client-side libraries make it simple to create API version-aware HTTP clients.
@@ -123,11 +123,11 @@ The client-side libraries make it simple to create API version-aware HTTP client
 
   [![NuGet Package](https://img.shields.io/nuget/v/Asp.Versioning.Http.Client.svg)](https://www.nuget.org/packages/Asp.Versioning.Http.Client)
   [![NuGet Downloads](https://img.shields.io/nuget/dt/Asp.Versioning.Http.Client.svg?color=green)](https://www.nuget.org/packages/Asp.Versioning.Http.Client)
-  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](../../wiki/API-Documentation#http-client)
+  [![Quick Start](https://img.shields.io/badge/quick-start-9B6CD1)](https://dotnet.github.io/aspnet-api-versioning/aspnet-core/ext/clients.html)
 
 ## Documentation
 
-You can find additional examples, documentation, and getting started instructions in the [wiki](../../wiki).
+You can find additional examples, documentation, and getting started instructions in the [wiki](https://dotnet.github.io/aspnet-api-versioning).
 
 ## Discussion
 
