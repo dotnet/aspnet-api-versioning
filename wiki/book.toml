@@ -1,0 +1,31 @@
+[book]
+title = "ASP.NET API Versioning Documentation"
+authors = ["Chris Martinez"]
+language = "en"
+
+[output.html]
+site-url = "/docs/"
+no-section-label = true
+git-repository-url = "https://github.com/dotnet/aspnet-api-versioning"
+edit-url-template = "https://github.com/dotnet/aspnet-api-versioning/edit/main/wiki/{path}"
+preferred-dark-theme = "Ayu"
+additional-css = ["theme/custom.css"]
+additional-js = ["theme/pagetoc.js", "theme/sidebar-fold.js", "theme/footer.js"]
+
+[output.html.fold]
+enable = true
+level = 0
+
+[output.html.playground]
+editable = true
+line-numbers = true
+runnable = false
+
+[output.html.search]
+limit-results = 20
+use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 2
+boost-paragraph = 1
+expand = true
+heading-split-level = 2

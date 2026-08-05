@@ -1,0 +1,215 @@
+/*
+ * Fit a 120-character code line, matching the source authoring guideline.
+ * 120 chars * 8.4px (Source Code Pro 14px) + 20px code padding = 1028px, +2px for
+ * subpixel rounding. Re-measure if the code font or its size ever changes.
+ * mdBook defaults this to 750px in css/variables.css; this file loads last so it wins.
+ */
+:root {
+    --content-max-width: 1030px;
+}
+
+/*
+ * SUMMARY.md entries with no link -- "- [Quick Starts]()" -- render as a bare
+ * span, so they inherit .chapter li { color: var(--sidebar-non-existant) } and
+ * come out dimmer than their linked siblings. Match the linked entries instead.
+ */
+.chapter li {
+    color: var(--sidebar-fg);
+}
+
+strong {
+    color: darkcyan;
+}
+
+/*
+ * Page TOC pinned to the top-right. theme/pagetoc.js moves mdBook's generated
+ * .on-this-page tree into .pagetoc; below the breakpoint it moves it back into
+ * the sidebar, so the two media queries here must use the same breakpoint as
+ * BREAKPOINT in that file.
+ */
+.pagetoc {
+    display: none;
+}
+
+@media (min-width: 1500px) {
+    /* Reserve the right gutter so the centred content column shifts left
+       instead of running underneath the panel. */
+    .content {
+        padding-right: 260px;
+    }
+
+    .pagetoc {
+        display: block;
+        position: fixed;
+        top: var(--menu-bar-height);
+        right: 0;
+        width: 240px;
+        max-height: calc(100vh - var(--menu-bar-height) - 1rem);
+        overflow-y: auto;
+        padding: 1rem 1rem 2rem 0;
+        font-size: 0.85em;
+        line-height: 1.5;
+    }
+}
+
+.pagetoc-title {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+    margin-bottom: 0.5em;
+}
+
+/* Outside the sidebar the tree loses mdBook's .chapter-scoped styling, so the
+   list, links and active state are restyled here. */
+.pagetoc .on-this-page {
+    margin-left: 0;
+    padding-left: 10px;
+    border-inline-start: 2px solid var(--quote-border);
+}
+
+.pagetoc ol {
+    list-style: none;
+    margin: 0;
+    padding-inline-start: 1em;
+}
+
+.pagetoc > .on-this-page > ol {
+    padding-inline-start: 0;
+}
+
+.pagetoc a {
+    display: block;
+    padding: 2px 0;
+    color: var(--fg);
+    opacity: 0.75;
+    text-decoration: none;
+}
+
+.pagetoc a:hover {
+    opacity: 1;
+    color: var(--links);
+}
+
+.pagetoc a.current-header {
+    opacity: 1;
+    color: var(--links);
+    font-weight: 600;
+}
+
+/* The fold chevrons only earn their space in the narrow sidebar. */
+.pagetoc .chapter-fold-toggle {
+    display: none;
+}
+
+/* logo in the header, to the left of the book title */
+.menu-title::before {
+    content: "";
+    display: inline-block;
+    width: 1.6em;
+    height: 1.6em;
+    margin-inline-end: 0.4em;
+    vertical-align: -0.35em;
+    background: url("../logo.svg") no-repeat center / contain;
+}
+
+/* the logo's dark strokes vanish on the dark themes, so swap in a light variant */
+.ayu .menu-title::before,
+.coal .menu-title::before,
+.navy .menu-title::before {
+    background-image: url("../logo-dark.svg");
+}
+
+/*
+ * Site footer, appended to #mdbook-content by theme/footer.js. mdBook ships no footer
+ * of its own, so nothing here is overriding a default. Muted and separated by a
+ * rule so it reads as page furniture rather than as a final section of content.
+ */
+.book-footer {
+    /* #mdbook-content is wider than the text column, so without this the rule
+       above the footer would overhang the prose it is meant to sit under.
+       Matches how <main> centres itself inside the same box. */
+    max-width: var(--content-max-width);
+    margin: 3rem auto 0;
+    padding: 1rem 0 2rem;
+    border-top: 1px solid var(--quote-border);
+    font-size: 0.85em;
+    text-align: center;
+    opacity: 0.7;
+}
+
+/* Inheriting the muted color keeps the links from outweighing the copyright;
+   the underline is what marks them as links, and hover restores the accent.
+   The :link/:visited pair is required, not stylistic: chrome.css colors anchors
+   through `.content a:link`, so a plain `.book-footer a` loses on specificity
+   and the links come out in full accent blue. */
+.book-footer a:link,
+.book-footer a:visited {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.book-footer a:hover {
+    color: var(--links);
+}
+
+/*
+ * mdBook rewrites <i class="fa-solid fa-name"> into an inline <svg> wrapped in .fa-svg
+ * and ships no Font Awesome stylesheet, so fa-stack/fa-stack-1x/fa-stack-2x resolve to
+ * nothing. Worse, any extra class on the <i> makes mdBook skip the rewrite and emit a
+ * bare <i> that paints nothing -- keep those class lists to style + icon name only and
+ * do the layering here. Both icons sit at 1em rather than Font Awesome's 2em/1x ratio,
+ * which is what the severity icons want: a white disc directly behind the glyph so its
+ * knocked-out center reads white on the dark themes instead of showing the page through.
+ */
+.fa-stack {
+    position: relative;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.1em;
+}
+
+.fa-stack .fa-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* the -0.1em baseline nudge on .fa-svg svg is for the inline case; .fa-stack owns it now */
+.fa-stack .fa-svg svg {
+    margin-bottom: 0;
+}
+
+/*
+ * fa-circle and the outer subpath of the fa-circle-* glyphs are the same radius, so the
+ * backing disc's anti-aliased rim fringes out from under the glyph on top. Shrink it just
+ * below the glyph's edge; scaling defaults to the center, so the two stay concentric.
+ */
+.fa-stack .fa-svg:first-child svg {
+    transform: scale(0.94);
+}
+
+/*
+ * Severity icons. Authored as src/icons/severity/*.md and pulled in with {{#include}},
+ * so the markup is written once and the colors live here rather than inline -- mdBook
+ * drops any <i> carrying an extra class, so the severity class goes on the wrapper and
+ * the glyph picks the color up through currentColor. info and error stack their glyph
+ * over a white disc; warning is a bare triangle, where a disc would show past the
+ * sloped edges.
+ */
+.fa-stack .fa-svg:first-child {
+    color: white;
+}
+
+.severity-info {
+    color: rgb(68, 114, 196);
+}
+
+.severity-warning {
+    color: rgb(255, 192, 0);
+}
+
+.severity-error {
+    color: rgb(192, 0, 0);
+}

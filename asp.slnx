@@ -21,6 +21,7 @@
   </Folder>
   <Folder Name="/.github/workflows/">
     <File Path=".github/workflows/codeql-analysis.yml" />
+    <File Path=".github/workflows/gh-pages.yml" />
   </Folder>
   <Folder Name="/.vscode/">
     <File Path=".vscode/extensions.json" />
@@ -103,9 +104,11 @@
     <File Path="src/Analyzers/src/Directory.Build.props" />
     <File Path="src/Analyzers/src/Directory.Build.targets" />
     <Project Path="src/Analyzers/src/Asp.Versioning.Analyzers/Asp.Versioning.Analyzers.csproj" />
+    <Project Path="src/Analyzers/src/Asp.Versioning.Api.Analyzers/Asp.Versioning.Api.Analyzers.csproj" />
   </Folder>
   <Folder Name="/src/Analyzers/test/">
     <Project Path="src/Analyzers/test/Asp.Versioning.Analyzers.Tests/Asp.Versioning.Analyzers.Tests.csproj" />
+    <Project Path="src/Analyzers/test/Asp.Versioning.Api.Analyzers.Tests/Asp.Versioning.Api.Analyzers.Tests.csproj" />
   </Folder>
   <Folder Name="/src/AspNet/" />
   <Folder Name="/src/AspNet/src/">
@@ -167,4 +170,5 @@
     <Project Path="src/Common/test/Common.OData.Tests/Common.OData.Tests.shproj" />
     <Project Path="src/Common/test/Common.Tests/Common.Tests.shproj" />
   </Folder>
+  <Project Path="wiki/wiki.msbuildproj" Type="13b669be-bb05-4ddf-9536-439f39a36129" />
 </Solution>
