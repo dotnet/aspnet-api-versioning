@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+   <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
+   <RootNamespace>Asp.Versioning.Analyzers</RootNamespace>
+  </PropertyGroup>
+
+  <!-- the options the rules apply to are referenced so that the tests run against the real symbols
+       rather than a stand-in that could drift from them -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Asp.Versioning.Api.Analyzers\Asp.Versioning.Api.Analyzers.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\WebApi\src\Asp.Versioning.Http\Asp.Versioning.Http.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\WebApi\src\Asp.Versioning.Mvc.ApiExplorer\Asp.Versioning.Mvc.ApiExplorer.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\OData\src\Asp.Versioning.OData\Asp.Versioning.OData.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\OData\src\Asp.Versioning.OData.ApiExplorer\Asp.Versioning.OData.ApiExplorer.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\WebApi\src\Asp.Versioning.OpenApi\Asp.Versioning.OpenApi.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\WebApi\src\Asp.Versioning.Grpc.ApiExplorer\Asp.Versioning.Grpc.ApiExplorer.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\WebApi\src\Asp.Versioning.Grpc\Asp.Versioning.Grpc.csproj" />
+  </ItemGroup>
+
+</Project>
