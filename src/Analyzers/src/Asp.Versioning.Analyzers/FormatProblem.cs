@@ -29,7 +29,7 @@ internal readonly struct FormatProblem
         new( FormatProblemKind.UnterminatedLiteral, delimiter.ToString(), 0, 0 );
 
     public static FormatProblem PaddingOutOfRange( string count ) =>
-        new( FormatProblemKind.PaddingOutOfRange, count, ApiVersionFormatValidator.MaxPadding, 0 );
+        new( FormatProblemKind.PaddingOutOfRange, count, ApiVersionFormatProvider.MaxPadding, 0 );
 
     public static FormatProblem RepeatedSpecifier( string text, char specifier, int maxLength, int length ) =>
         new( FormatProblemKind.RepeatedSpecifier, specifier.ToString(), maxLength, length );

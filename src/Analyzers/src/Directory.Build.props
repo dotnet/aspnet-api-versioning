@@ -4,12 +4,63 @@
  <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)','$(MSBuildThisFileDirectory)../'))" />
 
  <PropertyGroup>
-  <NoWarn>$(NoWarn);1591</NoWarn>
+  <!-- CS3021 is reported for a linked backport that declares itself not CLS compliant, which an assembly that makes
+       no claim either way has no need of. an analyzer is never compiled against, so the claim does not matter here -->
+  <NoWarn>$(NoWarn);1591;CS3021</NoWarn>
   <IsClsCompliant>false</IsClsCompliant>
   <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   <IncludeBuildOutput>false</IncludeBuildOutput>
   <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
   <DevelopmentDependency>true</DevelopmentDependency>
+
+  <!-- scopes the types linked from the abstractions to the assembly they are linked into. they are an implementation
+       detail of the rules, and leaving them public would collide with the same types in the assembly they came from,
+       which the tests reference alongside an analyzer -->
+  <DefineConstants>$(DefineConstants);ANALYZER</DefineConstants>
  </PropertyGroup>
+
+ <!-- what the rules accept is decided by the code that reads it rather than described a second time by a rule, so
+      that code is compiled into the analyzer. an analyzer targets the netstandard2.0 the compiler requires, which the
+      abstractions already target, so these compile here the way they do there -->
+ <ItemGroup Label="Linked from Asp.Versioning.Abstractions">
+  <Compile Include="$(AbstractionsDir)ApiVersion.cs" Link="Linked\ApiVersion.cs" />
+  <Compile Include="$(AbstractionsDir)ApiVersionFormatProvider.cs" Link="Linked\ApiVersionFormatProvider.cs" />
+  <Compile Include="$(AbstractionsDir)ApiVersionParser.cs" Link="Linked\ApiVersionParser.cs" />
+  <Compile Include="$(AbstractionsDir)CollectionExtensions.cs" Link="Linked\CollectionExtensions.cs" />
+  <Compile Include="$(AbstractionsDir)Format.cs" Link="Linked\Format.cs" />
+  <Compile Include="$(AbstractionsDir)FormatToken.cs" Link="Linked\FormatToken.cs" />
+  <Compile Include="$(AbstractionsDir)FormatTokenizer.cs" Link="Linked\FormatTokenizer.cs" />
+  <Compile Include="$(AbstractionsDir)SR.Designer.cs" Link="Linked\SR.Designer.cs" />
+  <Compile Include="$(AbstractionsDir)Str.cs" Link="Linked\Str.cs" />
+  <Compile Include="$(AbstractionsDir)netstandard2.0\ApiVersion.cs" Link="Linked\netstandard2.0\ApiVersion.cs" />
+  <Compile Include="$(AbstractionsDir)netstandard2.0\ApiVersionFormatProvider.cs" Link="Linked\netstandard2.0\ApiVersionFormatProvider.cs" />
+  <Compile Include="$(AbstractionsDir)netstandard2.0\FormatWriter.cs" Link="Linked\netstandard2.0\FormatWriter.cs" />
+  <Compile Include="$(AbstractionsDir)netstandard2.0\IApiVersionParser.cs" Link="Linked\netstandard2.0\IApiVersionParser.cs" />
+ </ItemGroup>
+
+ <!-- the resources the linked sources raise failures with. the logical name is stated because the manifest name a
+      linked file would be given does not match the one the generated accessor looks them up by -->
+ <ItemGroup>
+  <EmbeddedResource Include="$(AbstractionsDir)SR.resx"
+                    Link="Linked\SR.resx"
+                    LogicalName="Asp.Versioning.SR.resources" />
+ </ItemGroup>
+
+ <!-- the same backports the abstractions compile for netstandard, which the linked sources depend on -->
+ <ItemGroup>
+  <Compile Include="$(BackportDir)ArgumentException.cs" Visible="false" />
+  <Compile Include="$(BackportDir)ArgumentNullException.cs" Visible="false" />
+  <Compile Include="$(BackportDir)BitOperations.cs" Visible="false" />
+  <Compile Include="$(BackportDir)CallerArgumentExpressionAttribute.cs" Visible="false" />
+  <Compile Include="$(BackportDir)HashCode.cs" Visible="false" />
+  <Compile Include="$(BackportDir)NullableAttributes.cs" Visible="false" />
+  <Compile Include="$(BackportDir)StringSyntaxAttribute.cs" Visible="false" />
+ </ItemGroup>
+
+ <ItemGroup>
+  <Using Include="Asp.Versioning.SR" Alias="BackportSR" />
+  <Using Include="Backport.ArgumentException" Alias="ArgumentException" />
+  <Using Include="Backport.ArgumentNullException" Alias="ArgumentNullException" />
+ </ItemGroup>
 
 </Project>

@@ -19,7 +19,12 @@ using Text = System.ReadOnlySpan<char>;
 /// </summary>
 /// <remarks>This class is used to match API version ranges. It is not intended to define an API version range. API
 /// versions must be explicitly declared.</remarks>
-public sealed partial class ApiVersionRange
+#if ANALYZER
+internal
+#else
+public
+#endif
+sealed partial class ApiVersionRange
 {
     private static ApiVersionRange? any;
     private static ApiVersionRange? empty;

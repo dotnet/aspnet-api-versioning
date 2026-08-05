@@ -6,6 +6,13 @@ namespace Asp.Versioning.Analyzers;
 
 using static Descriptor;
 
+/// <summary>
+/// Represents an analyzer that validates an API version.
+/// </summary>
+/// <remarks>
+/// What an API version accepts is decided by the parser that reads one, which is compiled into this assembly rather
+/// than described a second time here. A value the parser rejects is a value that throws where it is read.
+/// </remarks>
 [DiagnosticAnalyzer( LanguageNames.CSharp )]
 public sealed class ApiVersionStringSyntaxMustBeValid : StringSyntaxAnalyzer
 {
@@ -16,7 +23,7 @@ public sealed class ApiVersionStringSyntaxMustBeValid : StringSyntaxAnalyzer
 
     protected override void Validate( string text, Reporter reporter )
     {
-        if ( !ApiVersionValidator.IsValid( text ) )
+        if ( !ApiVersionParser.Default.TryParse( text.AsSpan(), out _ ) )
         {
             reporter.Report( AV0001_InvalidApiVersionSyntax );
         }

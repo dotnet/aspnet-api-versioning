@@ -3,17 +3,13 @@
 namespace Asp.Versioning.Analyzers;
 
 /// <remarks>
-/// This is a compile-time port of Asp.Versioning.FormatTokenizer. An analyzer cannot take a dependency
-/// on Asp.Versioning.Abstractions, so the accepted syntax is mirrored here. Any change to the tokenizer
-/// or to the supported format specifiers must be reflected in this type.
+/// Whether a format can be applied is decided by applying it, which is what the rule does. This describes what is
+/// wrong with one that cannot, because the failure a format raises names no part of the format, and it reports the
+/// repetition the format provider accepts but does not act on. Being wrong here costs a less specific message or a
+/// missing suggestion; it cannot make a format read as valid when it is not, or the reverse.
 /// </remarks>
 internal static class ApiVersionFormatValidator
 {
-    /// <summary>
-    /// The largest padding count supported by ApiVersionFormatProvider.
-    /// </summary>
-    internal const int MaxPadding = 99;
-
     public static void Validate( string format, ICollection<FormatProblem> problems )
     {
         var last = format.Length - 1;
@@ -96,7 +92,7 @@ internal static class ApiVersionFormatValidator
             {
                 var text = format.Substring( i + 1, digits - i - 1 );
 
-                if ( !int.TryParse( text, out var count ) || count > MaxPadding )
+                if ( !int.TryParse( text, out var count ) || count > ApiVersionFormatProvider.MaxPadding )
                 {
                     problems.Add( FormatProblem.PaddingOutOfRange( text ) );
                 }

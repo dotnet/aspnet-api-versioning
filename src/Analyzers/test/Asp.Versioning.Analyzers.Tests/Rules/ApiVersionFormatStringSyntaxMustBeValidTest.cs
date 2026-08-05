@@ -247,6 +247,78 @@ public class ApiVersionFormatStringSyntaxMustBeValidTest
         diagnostics.Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task analyzer_should_report_format_assigned_to_property()
+    {
+        // arrange
+        var source = Options( """
+            public class Startup
+            {
+                public void Configure( Options options ) => options.GroupNameFormat = "'vVVV";
+            }
+            """ );
+
+        // act
+        var diagnostics = await AnalyzerVerifier.AnalyzeAsync( source );
+
+        // assert
+        diagnostics.Should().ContainSingle().Which.Id.Should().Be( AV0009 );
+    }
+
+    [Fact]
+    public async Task analyzer_should_report_format_assigned_in_object_initializer()
+    {
+        // arrange
+        var source = Options( """
+            public class Startup
+            {
+                public Options Configure() => new Options { GroupNameFormat = "'vVVV" };
+            }
+            """ );
+
+        // act
+        var diagnostics = await AnalyzerVerifier.AnalyzeAsync( source );
+
+        // assert
+        diagnostics.Should().ContainSingle().Which.Id.Should().Be( AV0009 );
+    }
+
+    [Fact]
+    public async Task analyzer_should_report_format_assigned_to_field()
+    {
+        // arrange
+        var source = Options( """
+            public class Startup
+            {
+                public void Configure( Options options ) => options.SubstitutionFormat = "vv";
+            }
+            """ );
+
+        // act
+        var diagnostics = await AnalyzerVerifier.AnalyzeAsync( source );
+
+        // assert
+        diagnostics.Should().ContainSingle().Which.Id.Should().Be( AV0010 );
+    }
+
+    [Fact]
+    public async Task analyzer_should_not_report_assignment_to_unannotated_property()
+    {
+        // arrange
+        var source = Options( """
+            public class Startup
+            {
+                public void Configure( Options options ) => options.Name = "'vVVV";
+            }
+            """ );
+
+        // act
+        var diagnostics = await AnalyzerVerifier.AnalyzeAsync( source );
+
+        // assert
+        diagnostics.Should().BeEmpty();
+    }
+
     private static bool Throws( string format )
     {
         try
@@ -259,6 +331,25 @@ public class ApiVersionFormatStringSyntaxMustBeValidTest
             return true;
         }
     }
+
+    /// <remarks>The options an API explorer is configured with are declared here rather than referenced, because
+    /// the annotation is what the rule keys off of and not the assembly the annotated member came from.</remarks>
+    private static string Options( string code ) =>
+        """
+        using System.Diagnostics.CodeAnalysis;
+
+        public class Options
+        {
+            [StringSyntax( "ApiVersionFormat" )]
+            public string GroupNameFormat { get; set; }
+
+            [StringSyntax( "ApiVersionFormat" )]
+            public string SubstitutionFormat;
+
+            public string Name { get; set; }
+        }
+
+        """ + code;
 
     private static string Formatted( string format ) =>
         $$"""

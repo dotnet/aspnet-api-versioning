@@ -9,6 +9,7 @@
   <RootDir>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), .gitignore))))</RootDir>
   <BuildDir>$([MSBuild]::EnsureTrailingSlash($(RootDir)build))</BuildDir>
   <BackportDir>$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::Combine('$(RootDir)','src','Common','src','Common.Backport'))))</BackportDir>
+  <AbstractionsDir>$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::Combine('$(RootDir)','src','Abstractions','src','Asp.Versioning.Abstractions'))))</AbstractionsDir>
  </PropertyGroup>
 
  <PropertyGroup>

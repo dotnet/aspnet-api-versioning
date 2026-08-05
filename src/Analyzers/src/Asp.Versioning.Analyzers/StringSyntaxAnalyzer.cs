@@ -13,7 +13,8 @@ using static Microsoft.CodeAnalysis.Diagnostics.GeneratedCodeAnalysisFlags;
 /// Reports a diagnostic for every compile-time constant passed to a parameter, property, or field
 /// annotated with <c>[StringSyntax]</c> for a particular syntax, whose value fails validation. The
 /// annotation is discovered on the resolved symbol rather than on a known set of types, so any API
-/// annotated with the syntax is covered without being enumerated here.
+/// annotated with the syntax is covered without being enumerated here. A property or field is reached
+/// by assignment as much as by being passed, so what is assigned to one is validated the same way.
 /// </remarks>
 public abstract class StringSyntaxAnalyzer : DiagnosticAnalyzer
 {
@@ -39,6 +40,9 @@ public abstract class StringSyntaxAnalyzer : DiagnosticAnalyzer
             OnObjectCreation,
             SyntaxKind.ObjectCreationExpression,
             SyntaxKind.ImplicitObjectCreationExpression );
+
+        // an object initializer assigns through the same expression as a property does
+        context.RegisterSyntaxNodeAction( OnAssignment, SyntaxKind.SimpleAssignmentExpression );
     }
 
     protected abstract void Validate( string text, Reporter reporter );
@@ -89,6 +93,17 @@ public abstract class StringSyntaxAnalyzer : DiagnosticAnalyzer
             {
                 Validate( context, argument.Expression );
             }
+        }
+    }
+
+    private void OnAssignment( SyntaxNodeAnalysisContext context )
+    {
+        var assignment = (AssignmentExpressionSyntax) context.Node;
+        var assigned = context.SemanticModel.GetSymbolInfo( assignment.Left, context.CancellationToken ).Symbol;
+
+        if ( assigned is IPropertySymbol or IFieldSymbol && HasStringSyntax( assigned ) )
+        {
+            Validate( context, assignment.Right );
         }
     }
 

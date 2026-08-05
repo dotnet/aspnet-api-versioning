@@ -181,7 +181,12 @@ using Text = System.ReadOnlySpan<char>;
 ///     </item>
 /// </list>
 /// </remarks>
-public partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatter
+#if ANALYZER
+internal
+#else
+public
+#endif
+partial class ApiVersionFormatProvider : IFormatProvider, ICustomFormatter
 {
     private const int FormatCapacity = 32;
     internal const string GroupVersionFormat = "yyyy-MM-dd";

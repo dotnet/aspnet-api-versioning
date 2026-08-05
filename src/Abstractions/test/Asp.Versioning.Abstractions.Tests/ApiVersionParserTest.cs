@@ -36,6 +36,7 @@ public class ApiVersionParserTest
 
     [Theory]
     [InlineData( "Alpha1", "The specified API version is invalid." )]
+    [InlineData( "1-", "The specified API version is invalid." )]
     [InlineData( "1.1-Alpha-1", "The specified API version status 'Alpha-1' is invalid." )]
     [InlineData( "2013-02-29.1.0", "The specified API group version '2013-02-29' is invalid." )]
     public void parse_should_throw_format_exception_for_invalid_text( string text, string message )
@@ -82,6 +83,7 @@ public class ApiVersionParserTest
 
     [Theory]
     [InlineData( "Alpha1" )]
+    [InlineData( "1-" )]
     [InlineData( "1.1-Alpha-1" )]
     [InlineData( "2013-02-29.1.0" )]
     public void try_parse_should_return_false_when_text_is_invalid( string text )

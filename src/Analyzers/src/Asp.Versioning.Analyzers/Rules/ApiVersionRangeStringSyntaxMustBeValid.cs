@@ -6,6 +6,14 @@ namespace Asp.Versioning.Analyzers;
 
 using static Descriptor;
 
+/// <summary>
+/// Represents an analyzer that validates an API version range.
+/// </summary>
+/// <remarks>
+/// What a range accepts is decided by the range itself, which is compiled into this assembly rather than described a
+/// second time here. A range cannot be asked whether a rule parses without parsing it, so the failure it raises is
+/// caught instead; only a compile-time constant reaches this, so it happens where a rule is written and nowhere else.
+/// </remarks>
 [DiagnosticAnalyzer( LanguageNames.CSharp )]
 public sealed class ApiVersionRangeStringSyntaxMustBeValid : StringSyntaxAnalyzer
 {
@@ -16,7 +24,11 @@ public sealed class ApiVersionRangeStringSyntaxMustBeValid : StringSyntaxAnalyze
 
     protected override void Validate( string text, Reporter reporter )
     {
-        if ( !ApiVersionRangeValidator.IsValid( text ) )
+        try
+        {
+            Versioning.ApiVersionRange.Parse( text );
+        }
+        catch ( Exception ex ) when ( ex is FormatException or System.ArgumentException )
         {
             reporter.Report( AV0002_InvalidApiVersionRangeSyntax );
         }
