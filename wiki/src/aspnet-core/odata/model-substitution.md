@@ -1,0 +1,1 @@
+{{#include ../../shared/odata/model-substitution.md}}

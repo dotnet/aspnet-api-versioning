@@ -1,0 +1,2 @@
+A version-neutral controller using the query string method will not require that a client specify an API version. A
+version-neutral controller using the URL path method will match any well-formed API version in the URL path segment.
