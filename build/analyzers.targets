@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <!--
+ this file is packed into every package that ships an analyzer, renamed to the package that ships it, which is the
+ name NuGet imports a package's build logic by. it is packed under 'buildTransitive' rather than 'build' because a
+ package that ships an analyzer is usually reached through another package rather than referenced directly
+
+ the analyzer cannot be turned off with ExcludeAssets="analyzers" on the package reference. the package is also
+ reached through the dependencies of other packages, and NuGet combines the assets from every path that reaches it,
+ so an exclusion on one path is undone by another that has none. the item is removed after it has been resolved
+ instead, which no path can put back
+ -->
+ <Target Name="DisableApiVersioningAnalyzers"
+         BeforeTargets="CoreCompile"
+         Condition=" '$(EnableApiVersioningAnalyzers)' == 'false' ">
+
+  <!--
+  a target name cannot be composed from the package this file was renamed to, so a project that reaches more than one
+  package defines this target more than once and only the last one imported survives. every analyzer this product
+  ships is removed rather than only the one this package ships, so that the surviving target does the same work as
+  all of them together. the package a resolved analyzer came from is the only way to tell them apart, because the
+  compiler is handed a path into the package cache rather than anything naming the package
+  -->
+  <ItemGroup>
+   <Analyzer Remove="@(Analyzer)"
+             Condition=" '%(Analyzer.NuGetPackageId)' != '' and
+                         $([System.String]::Copy('%(Analyzer.NuGetPackageId)').StartsWith('Asp.Versioning')) " />
+  </ItemGroup>
+
+ </Target>
+
+</Project>
