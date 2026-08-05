@@ -5,7 +5,12 @@ namespace Asp.Versioning;
 /// <content>
 /// Contains additional implementation specific to .NET Standard 2.0.
 /// </content>
-public partial class ApiVersion
+#if ANALYZER
+internal
+#else
+public
+#endif
+partial class ApiVersion
 {
     /// <summary>
     /// Gets a value indicating whether the specified status is valid.

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
    <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -7,5 +7,9 @@
    <AssemblyTitle>ASP.NET API Versioning Analyzers (Core)</AssemblyTitle>
    <Description>The foundational analyzers for API versioning.</Description>
   </PropertyGroup>
+
+  <ItemGroup Label="Linked from Asp.Versioning.Abstractions">
+   <Compile Include="$(AbstractionsDir)ApiVersionRange.cs" Link="Linked\ApiVersionRange.cs" />
+  </ItemGroup>
 
 </Project>

@@ -22,7 +22,12 @@ using Text = System.ReadOnlySpan<char>;
 /// when the source folder starts with a number and the editor automatically prefixes it with an underscore. As an
 /// example, <c>Api._2018_04_01.Controllers</c> is equivalent to <c>Api.v2018_04_01.Controllers</c>.
 /// </remarks>
-public class NamespaceParser
+#if ANALYZER
+internal
+#else
+public
+#endif
+class NamespaceParser
 {
     private const string CompactDateFormat = "yyyyMMdd";
     private const string ReadableDateFormat = "yyyy_MM_dd";

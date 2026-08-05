@@ -8,7 +8,12 @@ using System.Text;
 /// <content>
 /// Contains additional implementation specific to .NET Standard 2.0.
 /// </content>
-public partial class ApiVersionFormatProvider
+#if ANALYZER
+internal
+#else
+public
+#endif
+partial class ApiVersionFormatProvider
 {
     /// <summary>
     /// Attempts to format the provided argument with the specified format and provider.

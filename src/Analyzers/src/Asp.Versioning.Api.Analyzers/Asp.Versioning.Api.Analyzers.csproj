@@ -12,4 +12,8 @@
    <InternalsVisibleTo Include="Asp.Versioning.Api.Analyzers.Tests" Key="$(StrongNamePublicKey)" />
   </ItemGroup>
 
+  <ItemGroup Label="Linked from Asp.Versioning.Abstractions">
+   <Compile Include="$(AbstractionsDir)NamespaceParser.cs" Link="Linked\NamespaceParser.cs" />
+  </ItemGroup>
+
 </Project>

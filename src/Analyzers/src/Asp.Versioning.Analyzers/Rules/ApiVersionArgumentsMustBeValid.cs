@@ -15,10 +15,18 @@ using static Microsoft.CodeAnalysis.Diagnostics.GeneratedCodeAnalysisFlags;
 /// <remarks>
 /// The numeric and date components of an API version carry no string syntax to key off of, so the API surface that
 /// accepts them is matched by name and each argument is then validated according to the parameter it is bound to.
+/// A status is judged by the same method an API version judges one with. The numeric and date components are judged
+/// against the range each is declared to accept, which the argument guards state and the calendar fixes, rather than
+/// by constructing a version per argument to see whether it is refused.
 /// </remarks>
 [DiagnosticAnalyzer( LanguageNames.CSharp )]
 public sealed class ApiVersionArgumentsMustBeValid : DiagnosticAnalyzer
 {
+    private const int MinYear = 1;
+    private const int MaxYear = 9999;
+    private const int MonthsPerYear = 12;
+    private const int MaxDaysPerMonth = 31;
+
     private static readonly HashSet<string> DeclaringTypes = new( StringComparer.Ordinal )
     {
         "Asp.Versioning.ApiVersionAttribute",
@@ -150,13 +158,13 @@ public sealed class ApiVersionArgumentsMustBeValid : DiagnosticAnalyzer
                 ValidateNumbers( context, expression );
                 break;
             case "year" when IsInt32( parameter.Type ):
-                date.Year = Capture( context, expression, AV0005_InvalidApiVersionYear, ApiVersionValidator.IsValidYear );
+                date.Year = Capture( context, expression, AV0005_InvalidApiVersionYear, IsValidYear );
                 break;
             case "month" when IsInt32( parameter.Type ):
-                date.Month = Capture( context, expression, AV0006_InvalidApiVersionMonth, ApiVersionValidator.IsValidMonth );
+                date.Month = Capture( context, expression, AV0006_InvalidApiVersionMonth, IsValidMonth );
                 break;
             case "day" when IsInt32( parameter.Type ):
-                date.Day = Capture( context, expression, AV0007_InvalidApiVersionDay, ApiVersionValidator.IsValidDay );
+                date.Day = Capture( context, expression, AV0007_InvalidApiVersionDay, IsValidDay );
                 break;
             case "status" when parameter.Type.SpecialType == SpecialType.System_String:
                 ValidateStatus( context, expression );
@@ -187,8 +195,8 @@ public sealed class ApiVersionArgumentsMustBeValid : DiagnosticAnalyzer
         // only a compile-time constant can be validated; anything else is unknowable until run time
         var valid = constant switch
         {
-            { HasValue: true, Value: double number } => ApiVersionValidator.IsValidNumber( number ),
-            { HasValue: true, Value: int number } => ApiVersionValidator.IsValidNumber( number ),
+            { HasValue: true, Value: double number } => number >= 0d && !double.IsNaN( number ) && !double.IsInfinity( number ),
+            { HasValue: true, Value: int number } => number >= 0,
             _ => true,
         };
 
@@ -202,7 +210,7 @@ public sealed class ApiVersionArgumentsMustBeValid : DiagnosticAnalyzer
     {
         var constant = context.SemanticModel.GetConstantValue( expression, context.CancellationToken );
 
-        if ( constant is { HasValue: true, Value: string status } && !ApiVersionValidator.IsValidStatus( status ) )
+        if ( constant is { HasValue: true, Value: string status } && !ApiVersion.IsValidStatus( status ) )
         {
             context.ReportDiagnostic( Diagnostic.Create( AV0003_InvalidApiVersionStatus, expression.GetLocation() ) );
         }
@@ -243,7 +251,8 @@ public sealed class ApiVersionArgumentsMustBeValid : DiagnosticAnalyzer
             return;
         }
 
-        if ( ApiVersionValidator.IsValidDate( year.Value, month.Value, day.Value ) )
+        // the individual components are already in range, and the Gregorian calendar is the one DateOnly composes from
+        if ( day.Value <= DateTime.DaysInMonth( year.Value, month.Value ) )
         {
             return;
         }
@@ -253,6 +262,12 @@ public sealed class ApiVersionArgumentsMustBeValid : DiagnosticAnalyzer
 
         context.ReportDiagnostic( Diagnostic.Create( AV0008_InvalidApiVersionDate, location ) );
     }
+
+    private static bool IsValidYear( int year ) => year is >= MinYear and <= MaxYear;
+
+    private static bool IsValidMonth( int month ) => month is >= 1 and <= MonthsPerYear;
+
+    private static bool IsValidDay( int day ) => day is >= 1 and <= MaxDaysPerMonth;
 
     private static bool IsInt32( ITypeSymbol type ) =>
         type.SpecialType == SpecialType.System_Int32 ||

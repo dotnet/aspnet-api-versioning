@@ -5,7 +5,12 @@ namespace Asp.Versioning;
 /// <summary>
 /// Defines the behavior of an API version parser.
 /// </summary>
-public interface IApiVersionParser
+#if ANALYZER
+internal
+#else
+public
+#endif
+interface IApiVersionParser
 {
     /// <summary>
     /// Parses the specified text.

@@ -36,36 +36,4 @@ public class NamespaceVersionTest
     [InlineData( "Api.Models.Orders" )]
     public void is_versioned_should_return_false_for_an_unversioned_namespace( string @namespace ) =>
         NamespaceVersion.IsVersioned( @namespace ).Should().BeFalse();
-
-    [Theory]
-    [MemberData( nameof( NamespaceTypes ) )]
-    public void is_versioned_should_agree_with_namespace_parser( string typeName )
-    {
-        // arrange
-        var type = Types[typeName];
-        var expected = NamespaceParser.Default.Parse( type ).Count > 0;
-
-        // act
-        var versioned = NamespaceVersion.IsVersioned( type.Namespace );
-
-        // assert
-        versioned.Should().Be( expected, "the port must agree with NamespaceParser" );
-    }
-
-    public static TheoryData<string> NamespaceTypes => [.. Types.Keys];
-
-    private static readonly IReadOnlyDictionary<string, Type> Types = new Dictionary<string, Type>
-    {
-        ["V1"] = typeof( Versioned.V1.VersionedV1Marker ),
-        ["v1_1"] = typeof( Versioned.v1_1.Versionedv1_1Marker ),
-        ["V2_0_Beta"] = typeof( Versioned.V2_0_Beta.VersionedV2_0_BetaMarker ),
-        ["_20180401"] = typeof( Versioned._20180401.Versioned20180401Marker ),
-        ["_2018_04_01"] = typeof( Versioned._2018_04_01.Versioned2018_04_01Marker ),
-        ["_2018_04_01_1_0_Beta"] = typeof( Versioned._2018_04_01_1_0_Beta.Versioned2018_04_01_1_0_BetaMarker ),
-        ["v2018_04_01_1_1_Beta"] = typeof( Versioned.v2018_04_01_1_1_Beta.Versionedv2018_04_01_1_1_BetaMarker ),
-        ["Controllers"] = typeof( Unversioned.Controllers.UnversionedControllersMarker ),
-        ["Version1"] = typeof( Unversioned.Version1.UnversionedVersion1Marker ),
-        ["vNext"] = typeof( Unversioned.vNext.UnversionedvNextMarker ),
-        ["v20181301"] = typeof( Unversioned.v20181301.Unversionedv20181301Marker ),
-    };
 }

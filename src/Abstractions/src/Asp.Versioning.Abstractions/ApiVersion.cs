@@ -10,7 +10,12 @@ using DateOnly = System.DateTime;
 /// <summary>
 /// Represents an application programming interface (API) version.
 /// </summary>
-public partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion>, IFormattable
+#if ANALYZER
+internal
+#else
+public
+#endif
+partial class ApiVersion : IEquatable<ApiVersion>, IComparable<ApiVersion>, IFormattable
 {
     private static ApiVersion? @default;
     private static ApiVersion? neutral;

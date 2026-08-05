@@ -20,7 +20,12 @@ using Text = System.ReadOnlySpan<char>;
 /// <summary>
 /// Represents the default API version parser.
 /// </summary>
-public class ApiVersionParser : IApiVersionParser
+#if ANALYZER
+internal
+#else
+public
+#endif
+class ApiVersionParser : IApiVersionParser
 {
     private static ApiVersionParser? @default;
 
@@ -87,7 +92,11 @@ public class ApiVersionParser : IApiVersionParser
                         case '-':
                             segment = Str.Substring( text, 11 );
 
-                            if ( ApiVersion.IsValidStatus( segment ) )
+                            if ( segment.Length == 0 )
+                            {
+                                throw InvalidFormat();
+                            }
+                            else if ( ApiVersion.IsValidStatus( segment ) )
                             {
                                 return new( date, status: segment.ToString() );
                             }
@@ -126,7 +135,11 @@ public class ApiVersionParser : IApiVersionParser
             {
                 segment = Str.Substring( text, index + 1 );
 
-                if ( !ApiVersion.IsValidStatus( segment ) )
+                if ( segment.Length == 0 )
+                {
+                    throw InvalidFormat();
+                }
+                else if ( !ApiVersion.IsValidStatus( segment ) )
                 {
                     throw InvalidStatus( segment.ToString() );
                 }
@@ -225,7 +238,7 @@ public class ApiVersionParser : IApiVersionParser
                         case '-':
                             segment = Str.Substring( text, 11 );
 
-                            if ( ApiVersion.IsValidStatus( segment ) )
+                            if ( segment.Length > 0 && ApiVersion.IsValidStatus( segment ) )
                             {
                                 apiVersion = new( date, status: segment.ToString() );
                                 return true;
@@ -268,7 +281,7 @@ public class ApiVersionParser : IApiVersionParser
             {
                 segment = Str.Substring( text, index + 1 );
 
-                if ( !ApiVersion.IsValidStatus( segment ) )
+                if ( segment.Length == 0 || !ApiVersion.IsValidStatus( segment ) )
                 {
                     apiVersion = default!;
                     return false;

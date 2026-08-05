@@ -126,6 +126,7 @@ public class ApiVersionArgumentsMustBeValidTest
     [InlineData( "[ApiVersion( 1.0, \"1bad\" )]" )]
     [InlineData( "[ApiVersion( 1.0, \"a-b\" )]" )]
     [InlineData( "[ApiVersion( 1.0, \"a b\" )]" )]
+    [InlineData( "[ApiVersion( 1.0, \"preview.\" )]" )]
     [InlineData( "[ApiVersion( 2016, 1, 1, \"a-b\" )]" )]
     [InlineData( "[AdvertiseApiVersions( 1.0, \"a-b\" )]" )]
     public async Task analyzer_should_report_invalid_status( string attribute )
@@ -138,6 +139,72 @@ public class ApiVersionArgumentsMustBeValidTest
 
         // assert
         diagnostics.Should().ContainSingle().Which.Id.Should().Be( AV0003 );
+    }
+
+    // a status is judged by the method an API version judges one with, so the two cannot disagree. an empty
+    // status is accepted here and refused by the parser, which reads one that was written down
+    [Theory]
+    [InlineData( "beta" )]
+    [InlineData( "alpha.1" )]
+    [InlineData( "RC" )]
+    [InlineData( "" )]
+    [InlineData( "1bad" )]
+    [InlineData( "a-b" )]
+    [InlineData( "a b" )]
+    [InlineData( "preview." )]
+    [InlineData( "alpha..1" )]
+    public async Task analyzer_should_agree_with_api_version_on_a_status( string status )
+    {
+        // arrange
+        var source = Attributed( $"[ApiVersion( 1.0, \"{status}\" )]" );
+
+        // act
+        var diagnostics = await AnalyzerVerifier.AnalyzeAsync( source );
+
+        // assert
+        diagnostics.Any( diagnostic => diagnostic.Id == AV0003 )
+                   .Should()
+                   .Be( !ApiVersion.IsValidStatus( status ), "the analyzer must agree with ApiVersion.IsValidStatus" );
+    }
+
+    // the date components are judged against the range each accepts rather than by composing a date, so what
+    // they accept together is compared against the calendar the version is composed from
+    [Theory]
+    [InlineData( 2016, 1, 1 )]
+    [InlineData( 2016, 2, 29 )]
+    [InlineData( 2016, 12, 31 )]
+    [InlineData( 2013, 2, 29 )]
+    [InlineData( 2016, 4, 31 )]
+    [InlineData( 2016, 2, 30 )]
+    [InlineData( 0, 1, 1 )]
+    [InlineData( 10000, 1, 1 )]
+    [InlineData( 2016, 0, 1 )]
+    [InlineData( 2016, 13, 1 )]
+    [InlineData( 2016, 1, 0 )]
+    [InlineData( 2016, 1, 32 )]
+    public async Task analyzer_should_agree_with_the_calendar_on_a_date( int year, int month, int day )
+    {
+        // arrange
+        var source = Attributed( $"[ApiVersion( {year}, {month}, {day} )]" );
+
+        // act
+        var diagnostics = await AnalyzerVerifier.AnalyzeAsync( source );
+
+        // assert
+        diagnostics.Any().Should().Be( !IsRealDate( year, month, day ), "the analyzer must agree with the calendar" );
+    }
+
+    private static bool IsRealDate( int year, int month, int day )
+    {
+        try
+        {
+            _ = new DateOnly( year, month, day );
+            return true;
+        }
+        catch ( ArgumentOutOfRangeException )
+        {
+            return false;
+        }
     }
 
     [Fact]
