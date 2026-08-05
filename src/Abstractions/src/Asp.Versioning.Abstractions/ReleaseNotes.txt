@@ -1,3 +1,1 @@
-﻿Added support for `ApiVersionRange`
-Added support for `IAnnotation<TSource, TAnnotation>`
-Added support for `VisibleInApiVersionAttribute`
+﻿

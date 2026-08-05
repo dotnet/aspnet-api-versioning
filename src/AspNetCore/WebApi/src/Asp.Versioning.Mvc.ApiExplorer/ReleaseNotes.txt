@@ -1,2 +1,1 @@
-﻿Add support for describing only the model members visible in the API version being explored
-Add `DelegatingModelMetadata` for decorating model metadata
+﻿

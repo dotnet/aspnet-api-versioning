@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
  <PropertyGroup>
-  <VersionPrefix>10.0.1</VersionPrefix>
-  <AssemblyVersion>10.0.0.0</AssemblyVersion>
+  <VersionPrefix>10.2.0</VersionPrefix>
+  <AssemblyVersion>10.2.0.0</AssemblyVersion>
   <TargetFramework>$(DefaultTargetFramework)</TargetFramework>
   <RootNamespace>Asp.Versioning.OpenApi</RootNamespace>
   <AssemblyTitle>ASP.NET Core API Versioning</AssemblyTitle>
