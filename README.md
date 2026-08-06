@@ -1,4 +1,4 @@
-[![.NET Foundation](https://img.shields.io/badge/.NET%20Foundation-blueviolet.svg)](https://dotnetfoundation.org/projects/project-detail/asp.net-api-versioning)
+[![.NET Foundation](https://img.shields.io/badge/.NET%20Foundation-blueviolet.svg)][dnf]
 [![MIT License](https://img.shields.io/github/license/dotnet/aspnet-api-versioning?color=%230b0&style=flat-square)](https://github.com/dotnet/aspnet-api-versioning/blob/main/LICENSE.txt)
 [![Build Status](https://dev.azure.com/aspnet-api-versioning/build/_apis/build/status/dotnet.aspnet-api-versioning?branchName=main)](https://dev.azure.com/aspnet-api-versioning/build/_build/latest?definitionId=1&branchName=main)
 
@@ -153,10 +153,12 @@ This project is licensed under the [MIT](LICENSE.TXT) license.
 
 ## .NET Foundation
 
-[<img align="right" width="100px" style="margin:-70px 0px 0px 0px" src="https://dotnetfoundation.org/img/logo_v4.svg" />](https://dotnetfoundation.org/projects/aspnet-api-versioning)
+[<img align="right" width="100px" style="margin:-70px 0px 0px 0px" src="dnf.svg" />][dnf]
 This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
 
 ----
 > If you are an existing user, please makes sure you review the [release notes](../../releases) between all major and minor package releases.
 
 <div style="text-align:center;margin-top:32px;font-size:small">Logo by <a href="https://sacramento-design.com" target="_blank">Sacramento Design Works</a></div>
+
+[dnf]: https://dotnetfoundation.org/projects/project-detail/asp.net-api-versioning

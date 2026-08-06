@@ -38,6 +38,7 @@
     <File Path=".gitattributes" />
     <File Path=".gitignore" />
     <File Path="azure-pipelines.yml" />
+    <File Path="dnf.svg" />
     <File Path="global.json" />
     <File Path="LICENSE.txt" />
     <File Path="logo.svg" />
