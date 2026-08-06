@@ -9,8 +9,11 @@
   <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
  </ItemGroup>
 
- <!-- the analyzers package only supplies the rules applied while building an analyzer and never ships anywhere -->
- <ItemGroup Condition=" '$(IsTestProject)' == 'true' ">
+ <!-- the analyzers package only supplies the rules applied while building an analyzer and never ships anywhere.
+      the analyzer projects are what those rules have to run against, so it cannot be scoped to the tests. the
+      compiler package depends on this one and otherwise pins a version whose rules predate RS1037, which is what
+      reports a descriptor that is missing the CompilationEnd tag -->
+ <ItemGroup>
   <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.6.0" PrivateAssets="all" />
  </ItemGroup>
 

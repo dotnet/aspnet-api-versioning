@@ -12,4 +12,12 @@
    <Compile Include="$(AbstractionsDir)ApiVersionRange.cs" Link="Linked\ApiVersionRange.cs" />
   </ItemGroup>
 
+  <!-- the ledger the release tracking rules check the descriptors against, so that a rule cannot be added, or have
+       its category or severity changed, without saying so. it is read while building this project and is not part
+       of the package -->
+  <ItemGroup>
+   <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+   <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+
 </Project>
