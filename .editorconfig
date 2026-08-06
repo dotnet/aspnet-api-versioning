@@ -207,3 +207,13 @@ dotnet_naming_style.test_methods.word_separator = _
 dotnet_naming_rule.test_methods.style    = test_methods
 dotnet_naming_rule.test_methods.symbols  = test_methods
 dotnet_naming_rule.test_methods.severity = error
+
+# these sources are compiled into the analyzer as well as the library they belong to. RS1035 bans the symbols an
+# analyzer must not depend on, and only the analyzer compilation applies it. every use here shapes exception text
+# or a backport hash seed rather than what a rule reports, so the ban is scoped off the linked sources instead of
+# the analyzer projects, which keeps it enforced for the rules themselves
+[src/Abstractions/src/Asp.Versioning.Abstractions/**.cs]
+dotnet_diagnostic.RS1035.severity = none
+
+[src/Common/src/Common.Backport/**.cs]
+dotnet_diagnostic.RS1035.severity = none

@@ -102,19 +102,23 @@ public sealed class ApiExplorerAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
-            // the versioned explorer adds this one itself, so the call is redundant rather than wrong
-            var descriptor = versionedApiExplorer ? AV0020_UnnecessaryEndpointsApiExplorer
-                           : versioned ? AV0021_UseVersionedApiExplorer
-                           : default;
-
-            if ( descriptor is null )
+            // the descriptor is named at each report rather than selected into a local first because that is the
+            // only shape the rule which reports a missing CompilationEnd tag can trace back to a descriptor
+            if ( versionedApiExplorer )
             {
-                return;
+                // the versioned explorer adds this one itself, so the call is redundant rather than wrong
+                foreach ( var callSite in endpointsApiExplorerCallSites )
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create( AV0020_UnnecessaryEndpointsApiExplorer, callSite ) );
+                }
             }
-
-            foreach ( var callSite in endpointsApiExplorerCallSites )
+            else if ( versioned )
             {
-                context.ReportDiagnostic( Diagnostic.Create( descriptor, callSite ) );
+                foreach ( var callSite in endpointsApiExplorerCallSites )
+                {
+                    context.ReportDiagnostic( Diagnostic.Create( AV0021_UseVersionedApiExplorer, callSite ) );
+                }
             }
         }
     }
