@@ -195,4 +195,4 @@ public class ApiInformation
 _Parsed API information_
 
 [Asp.Versioning.Http.Client]: https://www.nuget.org/packages/Asp.Versioning.Http.Client
-[IApiVersionReader]: ../../config/reader.md
+[IApiVersionReader]: ../config/reader.md

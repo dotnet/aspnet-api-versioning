@@ -11,4 +11,4 @@ is **not** part of the API version, but may be included in route templates if yo
 versioning. For more information and possible solutions to address this scenario, refer to the [known limitations].
 
 [version format]: ../version-format.md
-[known limitations]: ../known-limitations.md#url-path-segment-routing-with-a-default-api-version
+[known limitations]: ../limitations.md#url-path-segment

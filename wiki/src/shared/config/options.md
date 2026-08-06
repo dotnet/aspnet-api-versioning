@@ -91,4 +91,4 @@ Regardless of the configured option, when versioning by:
 
 [IApiVersionSelector]: selector.md
 [Conventions]: conventions.md
-[Policies]: ../how-to/version-policies.md
+[Policies]: ../version-policies.md

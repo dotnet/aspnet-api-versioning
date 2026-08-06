@@ -14,7 +14,7 @@ internal static class Descriptor
         DiagnosticSeverity defaultSeverity,
         string messageFormat )
     {
-        var helpLink = $"https://github.com/dotnet/aspnet-api-versioning/wiki/analyzer-rules-{id}";
+        var helpLink = $"https://dotnet.github.io/aspnet-api-versioning/diagnostic/{id.ToLowerInvariant()}.html";
 
         return new( id, title, messageFormat, category, defaultSeverity, isEnabledByDefault: true, helpLinkUri: helpLink );
     }

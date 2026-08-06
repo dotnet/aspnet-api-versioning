@@ -6,7 +6,7 @@
   <RepositoryType>git</RepositoryType>
   <RepositoryUrl>https://github.com/dotnet/aspnet-api-versioning</RepositoryUrl>
   <PackageIcon>icon.png</PackageIcon>
-  <PackageProjectUrl>https://github.com/dotnet/aspnet-api-versioning/wiki</PackageProjectUrl>
+  <PackageProjectUrl>https://dotnet.github.io/aspnet-api-versioning</PackageProjectUrl>
   <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   <PackageLicenseExpression>MIT</PackageLicenseExpression>
   <PackageOutputPath Condition=" $(PackageOutputPath) == '' ">$(MSBuildThisFileDirectory)..\bin</PackageOutputPath>
