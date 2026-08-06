@@ -1,0 +1,175 @@
+{
+	// Place workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	//
+	// add '(Workspace)' to disambiguate from the built-in xUnit 'fact' snippet
+	"(Workspace) xUnit Fact": {
+		"scope": "csharp",
+		"prefix": "fact",
+		"description": "xUnit fact test method",
+		"body": [
+			"[Fact]",
+			"public void ${1:name}()",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Fact (Asynchronous)": {
+		"scope": "csharp",
+		"prefix": "afact",
+		"description": "xUnit asynchronous fact test method",
+		"body": [
+			"[Fact]",
+			"public async Task ${1:name}()",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Theory": {
+		"scope": "csharp",
+		"prefix": "theory",
+		"description": "xUnit theory test method",
+		"body": [
+			"[Theory]",
+			"[InlineData( ${1:data} )]",
+			"public void ${2:name}( ${3:argType} ${4:argName} )",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Theory (Asynchronous)": {
+		"scope": "csharp",
+		"prefix": "atheory",
+		"description": "xUnit asynchronous theory test method",
+		"body": [
+			"[Theory]",
+			"[InlineData( ${1:data} )]",
+			"public async Task ${2:name}( ${3:argType} ${4:argName} )",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Member Data": {
+		"scope": "csharp",
+		"prefix": "mdata",
+		"description": "xUnit member data property",
+		"body": [
+			"public static IEnumerable<object[]> ${1:name}",
+			"{",
+			"\tget",
+			"\t{",
+			"\t\tyield return new object[]{ $0 };",
+			"\t}",
+			"}"
+		]
+	},
+	"xUnit Theory with Member Data": {
+		"scope": "csharp",
+		"prefix": "theorym",
+		"description": "xUnit theory test method with member data",
+		"body": [
+			"[Theory]",
+			"[MemberData( nameof( ${1:member} ) )]",
+			"public void ${2:name}( ${3:argType} ${4:argName} )",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Theory with Member Data (Asynchronous)": {
+		"scope": "csharp",
+		"prefix": "atheorym",
+		"description": "xUnit asynchronous theory test method with member data",
+		"body": [
+			"[Theory]",
+			"[MemberData( nameof( ${1:member} ) )]",
+			"public async Task ${2:name}( ${3:argType} ${4:argName} )",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Class Data": {
+		"scope": "csharp",
+		"prefix": "cdata",
+		"description": "xUnit class data",
+		"body": [
+			"public class ${1:name} : IEnumerable<object[]>",
+			"{",
+			"\tpublic IEnumerator<object[]> GetEnumerator()",
+			"\t{",
+			"\t\tyield return new object[]{ $0 };",
+			"\t}\n",
+			"\tIEnumerator IEnumerable.GetEnumerator() => GetEnumerator();",
+			"}"
+		]
+	},
+	"xUnit Theory with Class Data": {
+		"scope": "csharp",
+		"prefix": "theoryc",
+		"description": "xUnit theory test method with class data",
+		"body": [
+			"[Theory]",
+			"[ClassData( typeof( ${1:member} ) )]",
+			"public void ${2:name}( ${3:argType} ${4:argName} )",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	},
+	"xUnit Theory with Class Data (Asynchronous)": {
+		"scope": "csharp",
+		"prefix": "atheoryc",
+		"description": "xUnit asynchronous theory test method with class data",
+		"body": [
+			"[Theory]",
+			"[ClassData( typeof( ${1:member} ) )]",
+			"public async Task ${2:name}( ${3:argType} ${4:argName} )",
+			"{",
+			"\t// arrange",
+			"\t$0\n",
+			"\t// act\n\t\n",
+			"\t// assert\n\t",
+			"}"
+		]
+	}
+}
