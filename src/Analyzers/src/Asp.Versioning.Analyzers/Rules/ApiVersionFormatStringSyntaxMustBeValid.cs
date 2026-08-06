@@ -42,16 +42,13 @@ public sealed class ApiVersionFormatStringSyntaxMustBeValid : StringSyntaxAnalyz
         }
 
         // a repeated specifier is applied rather than rejected, so it is only ever reported as unexpected
-        foreach ( var problem in problems )
+        foreach ( var problem in problems.Where( p => p.Kind == FormatProblemKind.RepeatedSpecifier ) )
         {
-            if ( problem.Kind == FormatProblemKind.RepeatedSpecifier )
-            {
-                reporter.Report(
-                    AV0010_UnexpectedApiVersionFormat,
-                    problem.Specifier,
-                    problem.MaxLength,
-                    problem.Length );
-            }
+            reporter.Report(
+                AV0010_UnexpectedApiVersionFormat,
+                problem.Specifier,
+                problem.MaxLength,
+                problem.Length );
         }
     }
 

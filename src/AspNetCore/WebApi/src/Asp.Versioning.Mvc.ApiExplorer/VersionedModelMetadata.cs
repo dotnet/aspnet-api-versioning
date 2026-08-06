@@ -106,12 +106,12 @@ internal sealed class VersionedModelMetadata : DelegatingModelMetadata
         Justification = "MVC does not currently support trimming or native AOT. https://aka.ms/aspnet/trimming" )]
     private ModelPropertyCollection NewProperties()
     {
-        var properties = Inner.Properties;
-        var members = new List<ModelMetadata>( properties.Count );
+        var innerProperties = Inner.Properties;
+        var members = new List<ModelMetadata>( innerProperties.Count );
 
-        for ( var i = 0; i < properties.Count; i++ )
+        for ( var i = 0; i < innerProperties.Count; i++ )
         {
-            var property = properties[i];
+            var property = innerProperties[i];
 
             // the declaring member is resolved from the container rather than the metadata identity, which is not
             // accessible outside the assembly that declares it

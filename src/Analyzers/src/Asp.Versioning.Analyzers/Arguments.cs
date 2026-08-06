@@ -4,10 +4,10 @@ namespace Asp.Versioning.Analyzers;
 
 using System.Collections.Immutable;
 
-/// <remarks>
-/// Binds the arguments of an attribute, invocation, or object creation back to the symbol each argument
-/// is passed to, which is where the metadata that drives an analyzer is declared.
-/// </remarks>
+/// <summary>
+/// Binds the arguments of an attribute, invocation, or object creation back to the symbol each argument is passed to,
+/// which is where the metadata that drives an analyzer is declared.
+/// </summary>
 internal static class Arguments
 {
     public static IParameterSymbol? ResolveParameter(
@@ -55,9 +55,9 @@ internal static class Arguments
         return default;
     }
 
-    /// <remarks>An extension member is declared in a synthetic, nested extension type, so the type that
-    /// declares the member is its containing type. The synthetic type cannot be referred to by name,
-    /// which identifies it without an API that only a newer compiler would provide.</remarks>
+    // an extension member is declared in a synthetic, nested extension type, so the type that  declares the member is
+    // its containing type. The synthetic type cannot be referred to by name,  which identifies it without an API that
+    // only a newer compiler would provide
     public static INamedTypeSymbol? ResolveDeclaringType( IMethodSymbol method )
     {
         var type = method.ContainingType;

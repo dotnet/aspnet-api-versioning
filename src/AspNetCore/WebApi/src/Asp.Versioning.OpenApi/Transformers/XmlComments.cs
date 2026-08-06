@@ -333,6 +333,11 @@ public class XmlComments
         // order matters. <code> is resolved first so an inline tag nested in a block stays literal, then the
         // tags that produce inline text so they survive being flattened into a list item, a table cell, or a
         // paragraph. the tags that absorb their content are resolved last for the same reason.
+        //
+        // every pass below snapshots what it walks with ToArray() before it rewrites anything. Descendants() is
+        // a lazy walk over the live tree, so replacing an element mid-enumeration detaches the node the iterator
+        // is standing on and the walk faults. the Parent check that follows the snapshot is a separate concern:
+        // a node the snapshot captured may have since been absorbed by the replacement of an ancestor.
         ResolveCodeBlocks( copy );
         ResolveInlineCode( copy );
         ResolveParamRefTags( copy );
@@ -355,10 +360,9 @@ public class XmlComments
     // as the identifier it is instead of running together with the prose around it.
     private static void ResolveParamRefTags( XElement element )
     {
-        foreach ( var paramRef in element.Descendants( "paramref" ).ToArray() )
+        foreach ( var paramRef in element.Descendants( "paramref" ).ToArray().Where( e => e.Parent is not null ) )
         {
-            if ( paramRef.Parent is not null
-                 && paramRef.Attribute( "name" )?.Value is { Length: > 0 } name )
+            if ( paramRef.Attribute( "name" )?.Value is { Length: > 0 } name )
             {
                 paramRef.ReplaceWith( new XText( Delimit( name, "`" ) ) );
             }
@@ -537,13 +541,8 @@ public class XmlComments
     // takes care of.
     private static void ResolveCodeBlocks( XElement element )
     {
-        foreach ( var code in element.Descendants( "code" ).ToArray() )
+        foreach ( var code in element.Descendants( "code" ).ToArray().Where( e => e.Parent is not null ) )
         {
-            if ( code.Parent is null )
-            {
-                continue;
-            }
-
             var content = TrimEachLine( code.Value );
             var fence = FenceFor( content );
 
@@ -571,12 +570,9 @@ public class XmlComments
 
     private static void ResolveInlineCode( XElement element )
     {
-        foreach ( var code in element.Descendants( "c" ).ToArray() )
+        foreach ( var code in element.Descendants( "c" ).ToArray().Where( e => e.Parent is not null ) )
         {
-            if ( code.Parent is not null )
-            {
-                code.ReplaceWith( new XText( Delimit( code.Value, "`" ) ) );
-            }
+            code.ReplaceWith( new XText( Delimit( code.Value, "`" ) ) );
         }
     }
 
@@ -585,17 +581,8 @@ public class XmlComments
     // the tags are visited from the inside out so that one nested in another is rewritten before it is absorbed.
     private static void ResolveInlineTags( XElement element )
     {
-        var elements = element.Descendants().ToArray();
-
-        for ( var i = elements.Length - 1; i >= 0; i-- )
+        foreach ( var inline in element.Descendants().Reverse().ToArray().Where( e => e.Parent is not null ) )
         {
-            var inline = elements[i];
-
-            if ( inline.Parent is null )
-            {
-                continue;
-            }
-
             var text = inline.Name.LocalName switch
             {
                 "b" => Delimit( inline.Value, "**" ),

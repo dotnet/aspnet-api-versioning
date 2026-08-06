@@ -51,7 +51,7 @@ internal sealed class GrpcModelMetadata : ModelMetadata
     // shared type because the API Explorer package is not referenced by design
     public override IReadOnlyDictionary<object, object> AdditionalValues =>
         additionalValues ??= apiVersion is null
-            ? new Dictionary<object, object>( capacity: 0 )
+            ? []
             : new Dictionary<object, object>( capacity: 1 ) { [typeof( ApiVersion )] = apiVersion };
 
     // evaluated on demand so that a message which references itself, directly or transitively, doesn't recurse
