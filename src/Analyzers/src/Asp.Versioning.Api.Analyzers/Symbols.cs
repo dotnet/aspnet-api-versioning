@@ -2,10 +2,10 @@
 
 namespace Asp.Versioning.Analyzers;
 
-/// <remarks>
-/// The API surface the rules apply to is matched by name because it is not available to an analyzer,
-/// which the compiler requires to target netstandard2.0.
-/// </remarks>
+/// <summary>
+/// The API surface the rules apply to is matched by name because it is not available to an analyzer, which the compiler
+/// requires to target netstandard2.0.
+/// </summary>
 internal static class Symbols
 {
     public const string ApiVersioningOptions = "Asp.Versioning.ApiVersioningOptions";
@@ -26,8 +26,8 @@ internal static class Symbols
     public const string ApiVersionAttribute = "Asp.Versioning.ApiVersionAttribute";
     public const string ApiVersionNeutralAttribute = "Asp.Versioning.ApiVersionNeutralAttribute";
 
-    /// <remarks>An extension member is declared in a synthetic, nested type that cannot be referred to
-    /// by name, so the type that declares the member is its containing type.</remarks>
+    // an extension member is declared in a synthetic, nested type that cannot be referred to by name, so the type
+    // that declares the member is its containing type.
     public static INamedTypeSymbol? ResolveDeclaringType( IMethodSymbol method )
     {
         var type = method.ContainingType;
@@ -87,9 +87,8 @@ internal static class Symbols
         return false;
     }
 
-    /// <remarks>A controller derived from Controller serves a user interface, which is never versioned,
-    /// and one derived from ODataController is routed by its registered components rather than by an
-    /// attribute.</remarks>
+    // a controller derived from Controller serves a user interface, which is never versioned, and one derived from
+    // ODataController is routed by its registered components rather than by an attribute
     public static bool IsApiController( INamedTypeSymbol type ) =>
         type is { TypeKind: TypeKind.Class, IsAbstract: false } &&
         Inherits( type, ControllerBase ) &&
