@@ -37,7 +37,7 @@ headers was an over-normalization that wasn't really necessary. Additional infor
 [sunset policies]. The `Report` overload that accepts `Lazy<ApiVersionModel>` has been removed as it's no longer used
 or necessary.
 
-[sunset policies]: https://github.com/dotnet/aspnet-api-versioning/wiki/Version-Policies
+[sunset policies]: ../version-policies.md
 
 ## API Version Model Extensions
 
@@ -52,3 +52,26 @@ The following is the mapping between the old and new extension methods or proper
 - `GetApiVersionModel() → ApiVersionMetadata.Map(ApiVersionMapping.Explicit)`
 - `MappingTo(ApiVersion) → ApiVersionMetadata.MappingTo(ApiVersion)`
 - `IsMappedTo(ApiVersion) → ApiVersionMetadata.IsMappedTo(ApiVersion)`
+
+## Error Responses
+
+The `IErrorResponseProvider` service had been the hook to provide custom error responses. Problem Details ([RFC 7807])
+had only just been ratified when this project started and they were not part of ASP.NET yet. ASP.NET Core eventually
+added first-class support for Problem Details and `IErrorResponseProvider` had an adapter implementation for alignment
+in previous versions. Now that Problem Details are the de factor method for error reporting, it no longer makes sense to
+retain `IErrorResponseProvider` and it has been removed.
+
+The error responses bodies provided by `IErrorResponseProvider` complied with the
+[Microsoft REST Guidelines error response format], which is itself the error response format used by the OData protocol
+(see [OData JSON Format §21.1]). If you need to retain that format, the [Error Response backward compatibility] topic
+discusses how to enable it.
+
+`ProblemDetails.Type` could logically be used to model the established error `Code`; however, the value is supposed to
+be a URI. For backward compatibility, the existing error codes will be emitted as the `Code` extension in Problem
+Details. The [Error Responses] topic provides details for each well-known problem that may be returned in responses.
+
+[RFC 7807]: https://datatracker.ietf.org/doc/html/rfc7807
+[Microsoft REST Guidelines error response format]: https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#710-response-formats
+[OData JSON Format §21.1]: https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793
+[Error Response backward compatibility]: ../errors.md#backward-compatibility
+[Error Responses]: ../errors.md

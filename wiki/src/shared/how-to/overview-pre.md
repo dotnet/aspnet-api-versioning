@@ -23,7 +23,7 @@ a collection of endpoints; for example the _Orders_ API. What if we saw the rout
 part of the _Orders_ API or some other API? For this reason, API Versioning collates on the logical name of an API and
 not individual route templates. For more information see: [Controller Conventions].
 
-[Controller Conventions]: how-to/controller-conventions.md
+[Controller Conventions]: naming-conventions.md
 
 ## Routing Methods
 

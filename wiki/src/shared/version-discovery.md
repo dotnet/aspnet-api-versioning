@@ -16,4 +16,4 @@ Service authors might also choose to implement the `OPTIONS` method so that clie
 API versions their service supports.
 
 [versioning policies]: version-policies.md
-[ApiVersioningOptions.ReportApiVersions]: config/api-versioning-options.md
+[ApiVersioningOptions.ReportApiVersions]: config/options.md#report-api-versions

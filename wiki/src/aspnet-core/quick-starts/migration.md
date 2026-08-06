@@ -73,7 +73,7 @@ will continue to return `400` when versioning by query string or header, but tha
 [ApiVersioningOptions.UnsupportedApiVersionStatusCode]. Versioning by URL segment will always return `404`. Versioning
 by media type will always return `406` or `415`.
 
-[ApiVersioningOptions.UnsupportedApiVersionStatusCode]: https://github.com/dotnet/aspnet-api-versioning/wiki/API-Versioning-Options#unsupported-api-version-status-code
+[ApiVersioningOptions.UnsupportedApiVersionStatusCode]: ../config/options.md#unsupported-api-version-status-code
 
 The `UseApiVersioning()` middleware in ASP.NET Core has been removed. It never did anything except setup the
 `IApiVersioningFeature` in the current request, which doesn't require middleware.
@@ -104,9 +104,3 @@ services.AddApiVersioning()     // Core services with support for Minimal APIs
   - To configure conventions, use `.AddMvc(options => options.Conventions = ?)` via the `IApiVersioningBuilder` extension method
 - `ApiVersioningOptions.ControllerNameConvention` has been removed as an explicit option, but can be changed via dependency injection
   - To configure a different naming convention, use `builder.Services.AddSingleton<IControllerNameConvention, OriginalControllerNameConvention>()`
-
-[RFC 7807]: https://datatracker.ietf.org/doc/html/rfc7807
-[Microsoft REST Guidelines error response format]: https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#710-response-formats
-[OData JSON Format §21.1]: https://docs.oasis-open.org/odata/odata-json-format/v4.01/odata-json-format-v4.01.html#_Toc38457793
-[Error Response backward compatibility]: https://github.com/dotnet/aspnet-api-versioning/wiki/Error-Responses#Backward-Compatibility
-[Error Responses]: https://github.com/dotnet/aspnet-api-versioning/wiki/Error-Responses

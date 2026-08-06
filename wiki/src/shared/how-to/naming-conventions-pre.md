@@ -20,4 +20,4 @@ Unfortunately, this can cause an issue for service API versioning if you want to
 different types. If the defining type is in a different .NET namespace, then there is no issue; however, if they are in
 the same namespace there would be a name collision. For example:
 
-[ApiVersioningOptions.DefaultApiVersion]: ../config/api-versioning-options.md#default-api-version
+[ApiVersioningOptions.DefaultApiVersion]: ../config/options.md#default-api-version

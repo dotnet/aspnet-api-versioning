@@ -9,4 +9,4 @@ versions when new API versions are released. One possible solution to this limit
 database. If this is still undesirable, then there is still the option of using HTTP header injection by the host server
 or another mechanism to send the supported and deprecated API version information.
 
-[ApiVersioningOptions.ReportApiVersions]: ../configuring-your-application/api-versioning-options.md
+[ApiVersioningOptions.ReportApiVersions]: ../config/options.md#report-api-versions

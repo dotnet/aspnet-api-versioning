@@ -4,7 +4,7 @@ authors = ["Chris Martinez"]
 language = "en"
 
 [output.html]
-site-url = "/docs/"
+site-url = "/aspnet-api-versioning/"
 no-section-label = true
 git-repository-url = "https://github.com/dotnet/aspnet-api-versioning"
 edit-url-template = "https://github.com/dotnet/aspnet-api-versioning/edit/main/wiki/{path}"

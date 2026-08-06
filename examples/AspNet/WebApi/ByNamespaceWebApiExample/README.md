@@ -6,4 +6,4 @@ decorate controllers with API versions and have them automatically versioned usi
 their type. Launch the project and try the [example requests](Examples.http) to view an API in action.
 
 
-[wiki]: https://github.com/dotnet/aspnet-api-versioning/wiki/API-Version-Conventions#version-by-namespace-convention
+[wiki]: https://dotnet.github.io/aspnet-api-versioning/aspnet/config/conventions.html#namespace

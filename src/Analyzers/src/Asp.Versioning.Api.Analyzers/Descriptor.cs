@@ -16,7 +16,7 @@ internal static class Descriptor
         string messageFormat,
         params string[] customTags )
     {
-        var helpLink = $"https://github.com/dotnet/aspnet-api-versioning/wiki/analyzer-rules-{id}";
+        var helpLink = $"https://dotnet.github.io/aspnet-api-versioning/diagnostic/{id.ToLowerInvariant()}.html";
 
         return new(
             id,

@@ -10,7 +10,7 @@ property determines whether the constructed URLs use qualified names. The defaul
 This option allows you to configure OData query options. The configuration for query options can be expressed purely by
 convention, through the use of supported OData query attribute, or both. The default behavior will always apply
 conventions from OData query attributes without additional configuration. For more information see the
-[OData query options](odata-query-options.md) topic.
+[OData query options](odata-options.md#query-options) topic.
 
 ### Metadata Options
 
@@ -24,7 +24,7 @@ This property returns an `VersionedODataModelBuilder` that can be used for build
 that are used when defining the query options for APIs that do **not** use the full OData stack. Some OData query
 options can **only** be set via _Model Bound_ settings. This builder constructs an ad hoc EDM that will contain those
 settings solely for the purposes of API exploration and without opting into any other OData-specific features. For more
-information see the [OData query options](odata-query-options.md) topic.
+information see the [OData query options](odata-options.md#query-options) topic.
 
 ### Related Entity Id Parameter Description
 
