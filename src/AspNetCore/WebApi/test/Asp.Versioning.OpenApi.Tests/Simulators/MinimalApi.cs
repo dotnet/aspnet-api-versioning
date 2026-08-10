@@ -36,6 +36,34 @@ public static class MinimalApi
     /// <returns>The detailed answer.</returns>
     public static int Detailed() => 42;
 
+    /// <summary>Mixed</summary>
+    /// <remarks>
+    /// Text before code
+    ///
+    /// <code>
+    ///     var index = 5;
+    ///     index++;
+    /// </code>
+    ///
+    /// Text after code
+    /// </remarks>
+    /// <returns>The mixed answer.</returns>
+    public static int Mixed() => 42;
+
+    /// <summary>Outlined</summary>
+    /// <remarks>
+    /// Text before list
+    ///
+    /// <list type="bullet">
+    /// <item>First</item>
+    /// <item>Second</item>
+    /// </list>
+    ///
+    /// Text after list
+    /// </remarks>
+    /// <returns>The outlined answer.</returns>
+    public static int Outlined() => 42;
+
     /// <summary>
     /// Echo
     /// </summary>

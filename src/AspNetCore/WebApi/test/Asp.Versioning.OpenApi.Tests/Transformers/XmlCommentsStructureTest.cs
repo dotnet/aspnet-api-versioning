@@ -260,7 +260,7 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the highlights, which are **important** and _subtle_." );
+        summary.Should().Be( "Gets or sets the highlights, which are **important** and *subtle*." );
     }
 
     [Fact]
@@ -274,7 +274,62 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the emphasis, which is **very _strongly_ worded**." );
+        summary.Should().Be( "Gets or sets the emphasis, which is **very *strongly* worded**." );
+    }
+
+    [Fact]
+    public void nested_emphasis_should_be_resolved_the_same_way_in_either_order()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Intraword ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the intraword.\n" +
+            "\n" +
+            "Very***long***word\n" +
+            "\n" +
+            "Very***long***word" );
+    }
+
+    [Fact]
+    public void tag_beside_a_paragraph_should_not_start_one()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Sibling ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the sibling, which is underlined in place.\n" +
+            "\n" +
+            "A note." );
+    }
+
+    [Fact]
+    public void space_between_adjacent_inline_tags_should_be_retained()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Adjacent ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the adjacent.\n" +
+            "\n" +
+            "**Remark *of*** GetToDo\n" +
+            "\n" +
+            "**Remark**   *of*   GetToDo" );
     }
 
     [Fact]
@@ -374,6 +429,61 @@ public class XmlCommentsStructureTest
     }
 
     [Fact]
+    public void text_around_a_code_block_should_not_be_indented()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var method = typeof( MinimalApi ).GetMethod( nameof( MinimalApi.Mixed ) );
+
+        // act
+        var remarks = comments.GetRemarks( method );
+
+        // assert
+        remarks.Should().Be(
+            "Text before code\n" +
+            "\n\n" +
+            "```\n" +
+            "var index = 5;\n" +
+            "index++;\n" +
+            "```\n" +
+            "\n\n" +
+            "Text after code" );
+    }
+
+    [Fact]
+    public void text_around_a_list_should_not_be_indented()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var method = typeof( MinimalApi ).GetMethod( nameof( MinimalApi.Outlined ) );
+
+        // act
+        var remarks = comments.GetRemarks( method );
+
+        // assert
+        remarks.Should().Be(
+            "Text before list\n" +
+            "\n" +
+            "* First\n" +
+            "* Second\n" +
+            "\n" +
+            "Text after list" );
+    }
+
+    [Fact]
+    public async Task text_around_a_code_block_should_not_be_indented_in_the_document()
+    {
+        // arrange
+        var paths = await GeneratePathsAsync();
+
+        // act
+        var description = paths["/test/mixed"]["get"]["description"].GetValue<string>();
+
+        // assert
+        description.Should().NotContain( "\n    " ).And.StartWith( "Text before code" );
+    }
+
+    [Fact]
     public async Task summary_and_value_should_describe_a_property()
     {
         // arrange
@@ -421,6 +531,7 @@ public class XmlCommentsStructureTest
         api.MapGet( "detailed", MinimalApi.Detailed );
         api.MapGet( "documented", () => new Documented() );
         api.MapGet( "echo/{id:int}", MinimalApi.Echo );
+        api.MapGet( "mixed", MinimalApi.Mixed );
         app.MapOpenApi().WithDocumentPerVersion();
 
         var cancellationToken = TestContext.Current.CancellationToken;
