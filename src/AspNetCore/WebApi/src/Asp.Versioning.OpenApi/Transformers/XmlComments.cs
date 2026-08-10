@@ -24,7 +24,12 @@ public class XmlComments
     /// Initializes a new instance of the <see cref="XmlComments"/> class.
     /// </summary>
     /// <param name="path">The file path of the XML comments to read.</param>
-    protected XmlComments( string path ) => Xml = File.Exists( path ) ? XDocument.Load( path ) : new();
+    /// <remarks>The whitespace of the source file is preserved. A reader discards a text node that is only
+    /// whitespace by default, which is not insignificant here: it is the indentation the file is written with,
+    /// and it is the only way to know the margin that has to be removed before the text reads as Markdown. It is
+    /// also the space between two adjacent tags, which is the space between the words they wrap.</remarks>
+    protected XmlComments( string path ) =>
+        Xml = File.Exists( path ) ? XDocument.Load( path, LoadOptions.PreserveWhitespace ) : new();
 
     /// <summary>
     /// Creates and returns new <see cref="XmlComments"/> from the specified file.
@@ -374,7 +379,12 @@ public class XmlComments
     // containing element is rebuilt rather than each <para /> being replaced in turn, because the whitespace
     // between two of them is not a reliable separator: XLinq merges the text nodes around a replaced element.
     //
-    // This runs last, so every other tag has already been resolved to text and <para /> is the only element left.
+    // Only a <para /> starts a paragraph. Everything between two of them belongs to the same one, including a tag
+    // left in the tree because it has no Markdown of its own, such as <see /> or <u />. Reading one of those as a
+    // block of its own would break the sentence around it into a paragraph per fragment.
+    //
+    // This runs last, so every other tag has already been resolved to text and <para /> is the only element left
+    // that carries structure.
     private static void ResolveParaTags( XElement element )
     {
         foreach ( var parent in element.DescendantsAndSelf().ToArray() )
@@ -385,23 +395,38 @@ public class XmlComments
             }
 
             var blocks = new List<string>();
+            var paragraph = new StringBuilder();
 
             foreach ( var node in parent.Nodes() )
             {
-                var text = node switch
+                if ( node is XElement para && para.Name == "para" )
                 {
-                    XText content => TrimEachLine( content.Value ),
-                    XElement para => TrimEachLine( para.Value ),
-                    _ => string.Empty,
-                };
-
-                if ( text.Length > 0 )
+                    AddBlock( blocks, paragraph.ToString() );
+                    paragraph.Clear();
+                    AddBlock( blocks, para.Value );
+                }
+                else if ( node is XText content )
                 {
-                    blocks.Add( text );
+                    paragraph.Append( content.Value );
+                }
+                else if ( node is XElement other )
+                {
+                    paragraph.Append( other.Value );
                 }
             }
 
+            AddBlock( blocks, paragraph.ToString() );
             parent.ReplaceNodes( new XText( string.Join( "\n\n", blocks ) ) );
+        }
+    }
+
+    private static void AddBlock( List<string> blocks, string text )
+    {
+        var block = TrimEachLine( text );
+
+        if ( block.Length > 0 )
+        {
+            blocks.Add( block );
         }
     }
 
@@ -579,6 +604,11 @@ public class XmlComments
     // <b>, <i>, and <a> are the html tags a documentation comment carries inline, and each has a direct markdown
     // equivalent. rewriting them keeps the meaning that reading the text of the enclosing element would drop.
     // the tags are visited from the inside out so that one nested in another is rewritten before it is absorbed.
+    //
+    // emphasis is delimited by an asterisk rather than an underscore. the two are interchangeable on their own,
+    // but an underscore only opens or closes emphasis at a word boundary, so it is literal text in the middle of
+    // a word and it does not pair with the asterisk of a <b> nested the other way around; <b><i>x</i></b> and
+    // <i><b>x</b></i> then render differently despite meaning the same thing.
     private static void ResolveInlineTags( XElement element )
     {
         foreach ( var inline in element.Descendants().Reverse().ToArray().Where( e => e.Parent is not null ) )
@@ -586,7 +616,7 @@ public class XmlComments
             var text = inline.Name.LocalName switch
             {
                 "b" => Delimit( inline.Value, "**" ),
-                "i" => Delimit( inline.Value, "_" ),
+                "i" => Delimit( inline.Value, "*" ),
                 "a" => LinkOf( inline ),
                 _ => default,
             };
@@ -699,7 +729,10 @@ public class XmlComments
         var lines = text.Split( '\n' );
         var margin = int.MaxValue;
 
-        for ( var i = 0; i < lines.Length; i++ )
+        // the text of a member begins immediately after its opening tag rather than at the start of a line, so
+        // whatever precedes the first break carries none of the indentation the margin is measured from. counting
+        // it would report a margin of zero and leave the indentation on every line that does start one.
+        for ( var i = 1; i < lines.Length; i++ )
         {
             var line = lines[i];
 

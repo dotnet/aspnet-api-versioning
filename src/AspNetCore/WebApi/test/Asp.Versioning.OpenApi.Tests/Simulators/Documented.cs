@@ -117,6 +117,34 @@ public class Documented
     public string Emphasis { get; set; }
 
     /// <summary>
+    /// Gets or sets the sibling, which is <u>underlined</u> in place.
+    /// <para>A note.</para>
+    /// </summary>
+    public string Sibling { get; set; }
+
+    /// <summary>
+    /// Gets or sets the adjacent.
+    /// <para>
+    ///     <b>Remark <i>of</i></b> <u>GetToDo</u>
+    /// </para>
+    /// <para>
+    ///     <b>Remark</b>   <i>of</i>   <u>GetToDo</u>
+    /// </para>
+    /// </summary>
+    public string Adjacent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the intraword.
+    /// <para>
+    ///     Very<b><i>long</i></b>word
+    /// </para>
+    /// <para>
+    ///     Very<i><b>long</b></i>word
+    /// </para>
+    /// </summary>
+    public string Intraword { get; set; }
+
+    /// <summary>
     /// Gets or sets the reference, which is described by <a href="https://example.com">the
     /// specification</a>.
     /// </summary>
