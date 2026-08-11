@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # main branch
+  - package-ecosystem: "nuget"
+    directory: "/src"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "all"
+    assignees:
+      - "commonsensesoftware"
+    reviewers:
+      - "commonsensesoftware"
+    commit-message:
+      prefix: "[main] "
+      include: scope
