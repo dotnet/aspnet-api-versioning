@@ -1,1 +1,1 @@
-﻿Bump patched version due to transitive dependency
+﻿Fixed XML Comment whitespace handling [Issue #1205](https://github.com/dotnet/aspnet-api-versioning/issues/1205)
