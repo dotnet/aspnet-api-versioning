@@ -1,3 +1,5 @@
+<!-- description: The ODataApiExplorerOptions settings for ASP.NET Web API. -->
+
 {{#include ../../shared/docs/odata-options-pre.md}}
 - [UseApiExplorerSettings](#use-api-explorer-settings)<sup>1</sup>
 

@@ -1,3 +1,5 @@
+<!-- description: Wire Swashbuckle up to a versioned ASP.NET Core service with operation and document filters. -->
+
 {{#include ../../shared/docs/swashbuckle-pre.md}}
 
 Remember to add the necessary references to one or both of the following:

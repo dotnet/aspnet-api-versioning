@@ -1,0 +1,32 @@
+<!-- Social preview metadata.
+     mdBook injects this file at the "Custom HTML head" marker in its built-in
+     index.hbs. As with footer.js, index.hbs is deliberately NOT overridden --
+     CI installs the latest mdBook every run, so a forked page template would
+     silently drift from upstream.
+
+     Handlebars context available here: title, book_title, chapter_title,
+     description, path, path_to_root, language, is_index, git_repository_url.
+
+     Only the page-invariant tags live here. description/og:description,
+     og:url, and canonical are per-page and cannot be expressed in this
+     template -- mdBook registers no string helpers, so {{path}} (a source .md
+     path) cannot be rewritten into a page URL. tools/Add-PageMetadata.ps1
+     injects those after the build and takes precedence over anything below. -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="{{ book_title }}">
+<meta property="og:title" content="{{ chapter_title }}">
+<meta property="og:locale" content="{{ language }}">
+<meta property="og:image" content="https://dotnet.github.io/aspnet-api-versioning/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ASP.NET API Versioning Documentation">
+{{#if description}}
+<meta property="og:description" content="{{ description }}">
+{{/if}}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ chapter_title }}">
+<meta name="twitter:image" content="https://dotnet.github.io/aspnet-api-versioning/og-image.png">
+{{#if description}}
+<meta name="twitter:description" content="{{ description }}">
+{{/if}}

@@ -1,3 +1,5 @@
+<!-- description: Configure API versioning in ASP.NET Core with top-level statements or the Startup class. -->
+
 # Configuring Your Application
 
 Although different variations of ASP.NET have distinct application initialization methods, careful consideration was

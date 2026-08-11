@@ -1,3 +1,5 @@
+<!-- description: Migrate an ASP.NET Core service from the Microsoft.* packages to Asp.Versioning.* packages. -->
+
 {{#include ../../shared/quick-starts/migration-overview.md}}
 
 ## Package Identifiers

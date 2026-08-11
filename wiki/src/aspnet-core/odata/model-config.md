@@ -1,3 +1,5 @@
+<!-- description: Implement IModelConfiguration to shape an OData model per API version in ASP.NET Core. -->
+
 {{#include ../../shared/odata/model-config.md}}
 
 ## Dependency Injection

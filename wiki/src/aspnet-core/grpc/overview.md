@@ -1,3 +1,5 @@
+<!-- description: Version a gRPC service in ASP.NET Core by declaring which API versions each service serves. -->
+
 # API Versioning with gRPC
 
 Service API versioning using gRPC is nearly identical to the standard configuration with only a few modifications. When

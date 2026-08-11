@@ -1,3 +1,5 @@
+<!-- description: Version an ASP.NET Web API OData service with an Entity Data Model per API version. -->
+
 {{#include ../../shared/odata/overview-pre.md}}
 
 ```c#

@@ -1,3 +1,5 @@
+<!-- description: Version an ASP.NET Web API by URL path segment. -->
+
 {{#include ../../shared/how-to/version-by-url-pre.md}}
 
 ### Web API

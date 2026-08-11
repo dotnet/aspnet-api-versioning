@@ -1,3 +1,5 @@
+<!-- description: Use the VisibleInApiVersion attribute to control which API versions a model appears in. -->
+
 # Versioned Models
 
 When an API is versioned, it is often necessary to version the models that are used in the API. This is especially true

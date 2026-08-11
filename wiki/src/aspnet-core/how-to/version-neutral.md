@@ -1,3 +1,5 @@
+<!-- description: Make an ASP.NET Core endpoint accept any API version, or none, for cases such as health checks. -->
+
 {{#include ../../shared/how-to/version-neutral-pre.md}}
 
 ### Minimal API

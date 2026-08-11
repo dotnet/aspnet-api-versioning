@@ -1,3 +1,5 @@
+<!-- description: The implicit controller naming conventions in ASP.NET Core. -->
+
 {{#include ../../shared/how-to/naming-conventions-pre.md}}
 
 ```c#

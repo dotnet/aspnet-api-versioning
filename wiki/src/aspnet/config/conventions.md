@@ -1,3 +1,5 @@
+<!-- description: Declare API versions in ASP.NET Web API with conventions instead of attributes. -->
+
 {{#include ../../shared/config/conventions-pre.md}}
 
 ```c#

@@ -1,3 +1,5 @@
+<!-- description: The ApiExplorerOptions settings for ASP.NET Core, including group name format and URL version substitution. -->
+
 {{#include ../../shared/docs/options-pre.md}}
 - [FormatGroupName](#format-group-name)
 

@@ -1,3 +1,5 @@
+<!-- description: Version an ASP.NET Core API by URL path segment. -->
+
 {{#include ../../shared/how-to/version-by-url-pre.md}}
 
 ### Minimal API

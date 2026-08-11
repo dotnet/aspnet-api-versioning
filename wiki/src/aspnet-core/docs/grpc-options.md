@@ -1,3 +1,5 @@
+<!-- description: The GrpcApiExplorerOptions settings, including the route parameter that carries the API version. -->
+
 # gRPC Options
 
 The API Explorer support for gRPC has a few options that allow you to customize the behavior. The options are minimal

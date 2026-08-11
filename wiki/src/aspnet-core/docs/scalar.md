@@ -1,3 +1,5 @@
+<!-- description: Point the Scalar OpenAPI user interface at the documents generated for each API version. -->
+
 # Scalar Integration
 
 [Scalar](https://scalar.com/) has quickly become one of the more common, modern OpenAPI user interfaces and it easily

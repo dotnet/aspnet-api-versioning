@@ -1,3 +1,5 @@
+<!-- description: The ODataApiExplorerOptions settings for ASP.NET Core, including qualified names, query options, and metadata. -->
+
 {{#include ../../shared/docs/odata-options-pre.md}}
 
 {{#include ../../shared/docs/odata-options-post.md}}

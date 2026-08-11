@@ -1,3 +1,5 @@
+<!-- description: Runnable ASP.NET Core sample projects covering minimal APIs, MVC, gRPC, OData, and OpenAPI. -->
+
 # Examples
 
 Complete, runnable sample projects live in the [examples] folder of the repository.

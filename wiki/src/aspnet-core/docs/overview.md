@@ -1,3 +1,5 @@
+<!-- description: Document a versioned ASP.NET Core service with OpenAPI using the versioned API explorers. -->
+
 {{#include ../../shared/docs/overview-pre.md}}
 
 Any OpenAPI generator such as [Microsoft][openapi-ms], [Swashbuckle][openapi-swashbuckle], or [NSwag][openapi-nswag]

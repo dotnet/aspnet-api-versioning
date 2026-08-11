@@ -1,3 +1,5 @@
+<!-- description: Announce when an ASP.NET Core API version is deprecated and sunset. -->
+
 
 {{#include ../shared/version-policies.md}}
 

@@ -1,3 +1,5 @@
+<!-- description: Advertise supported and deprecated API versions from an ASP.NET Core service via response headers. -->
+
 
 {{#include ../shared/version-discovery.md}}
 
