@@ -213,3 +213,68 @@ strong {
 .severity-error {
     color: rgb(192, 0, 0);
 }
+
+/*
+ * The 404 page, authored as src/404.md. The logo mark is a ring, so it stands in for
+ * the zero of "404" rather than sitting beside it. The ring reads as static while the
+ * cobra inside it sways, which is the whole reason the rotation is on the mark itself.
+ */
+.not-found {
+    text-align: center;
+}
+
+.not-found-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.05em;
+    /* Scales with the viewport so the mark stays legible on a phone without
+       overflowing the content column on a wide screen. */
+    font-size: clamp(3.5rem, 16vw, 8rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.25em;
+}
+
+.not-found-code .not-found-logo {
+    width: 1.15em;
+    height: 1.15em;
+    /* Resolved against this stylesheet, not the document, so the <base href> mdBook
+       sets on the 404 page does not apply. Same relative path as .menu-title::before. */
+    background: url("../logo.svg") no-repeat center / contain;
+    animation: not-found-sway 5s ease-in-out infinite alternate;
+}
+
+/* matches the header logo swap: the dark strokes vanish on the dark themes */
+.ayu .not-found-code .not-found-logo,
+.coal .not-found-code .not-found-logo,
+.navy .not-found-code .not-found-logo {
+    background-image: url("../logo-dark.svg");
+}
+
+@keyframes not-found-sway {
+    from { transform: rotate(-9deg); }
+    to   { transform: rotate(9deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .not-found-code .not-found-logo {
+        animation: none;
+    }
+}
+
+/* The headline is the page's own title; the numeral above it already shouts. */
+.not-found h1 {
+    margin-top: 0;
+}
+
+/*
+ * Left-aligned so the response reads as a response. Sized to its content and centred
+ * rather than filling the column, so the two blocks line up as one quoted exchange.
+ */
+.not-found pre {
+    text-align: left;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+}
