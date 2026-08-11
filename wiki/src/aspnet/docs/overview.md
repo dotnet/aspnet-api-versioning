@@ -1,3 +1,5 @@
+<!-- description: Document a versioned ASP.NET Web API service with Swagger using the versioned API explorers. -->
+
 {{#include ../../shared/docs/overview-pre.md}}
 
 Any OpenAPI generator such as [Swashbuckle][openapi-swashbuckle], or [NSwag][openapi-nswag] that leverage the API

@@ -1,3 +1,5 @@
+<!-- description: Read the API version a client requested in ASP.NET Web API via extension methods, properties, or model binding. -->
+
 {{#include ../../shared/how-to/requested-version-pre.md}}
 
 ### Web API

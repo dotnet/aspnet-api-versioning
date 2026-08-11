@@ -1,3 +1,5 @@
+<!-- description: Mark an ASP.NET Core API version deprecated to advertise that it will become unsupported. -->
+
 {{#include ../../shared/how-to/deprecate-version-pre.md}}
 
 This example demonstrates API versioning using all non-URL segment methods.

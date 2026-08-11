@@ -1,3 +1,5 @@
+<!-- description: Add API versioning to ASP.NET Core and ASP.NET Web API services. -->
+
 # Introduction
 
 Versioning is an important aspect of any mature web service. Microsoft has published REST API guidelines that require

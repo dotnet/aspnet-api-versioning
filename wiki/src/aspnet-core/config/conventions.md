@@ -1,3 +1,5 @@
+<!-- description: Declare API versions in ASP.NET Core with conventions instead of attributes, including external assemblies. -->
+
 {{#include ../../shared/config/conventions-pre.md}}
 
 ```c#

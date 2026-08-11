@@ -1,3 +1,5 @@
+<!-- description: Configure version-specific OData batch handlers with the API versioning batch middleware. -->
+
 # Batching
 
 OData batch operations are meant to execute the same way that other requests do; however, there may be some minor, but

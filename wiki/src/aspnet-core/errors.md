@@ -1,3 +1,5 @@
+<!-- description: The RFC 7807 problem details returned for API version errors in ASP.NET Core. -->
+
 {{#include ../shared/errors-pre.md}}
 
 ## Customization

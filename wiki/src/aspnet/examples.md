@@ -1,3 +1,5 @@
+<!-- description: Runnable ASP.NET Web API sample projects covering Web API, OData, and Swagger. -->
+
 # Examples
 
 Complete, runnable sample projects live in the [examples] folder of the repository.

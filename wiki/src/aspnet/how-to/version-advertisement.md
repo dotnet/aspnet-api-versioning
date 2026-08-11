@@ -1,3 +1,5 @@
+<!-- description: Aggregate and advertise ASP.NET Web API versions that are split across deployments behind a gateway. -->
+
 {{#include ../../shared/how-to/version-advertisement-pre.md}}
 
 ```c#

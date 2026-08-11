@@ -1,3 +1,5 @@
+<!-- description: The VersionedOpenApiOptions settings that describe each generated OpenAPI document. -->
+
 # OpenAPI Options
 
 The OpenAPI options allows you to configure, customize, and extend the default behaviors when you add OpenAPI support.

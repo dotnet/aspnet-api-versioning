@@ -1,3 +1,5 @@
+<!-- description: Version an ASP.NET Core API with an arbitrary HTTP request header. -->
+
 {{#include ../../shared/how-to/version-by-header-pre.md}}
 
 ### Minimal API

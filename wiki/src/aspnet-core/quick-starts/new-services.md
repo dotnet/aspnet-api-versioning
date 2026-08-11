@@ -1,3 +1,5 @@
+<!-- description: Set up API versioning in a new ASP.NET Core service using minimal APIs, MVC, gRPC, or OData. -->
+
 {{#include ../../shared/quick-starts/new-services.md}}
 
 ### Minimal API

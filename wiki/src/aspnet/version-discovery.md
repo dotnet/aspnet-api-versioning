@@ -1,3 +1,5 @@
+<!-- description: Advertise supported and deprecated API versions from an ASP.NET Web API service via response headers. -->
+
 {{#include ../shared/version-discovery.md}}
 
 ### Web API

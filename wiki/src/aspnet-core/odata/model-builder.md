@@ -1,3 +1,5 @@
+<!-- description: Use VersionedODataModelBuilder to build an Entity Data Model for each API version in ASP.NET Core. -->
+
 {{#include ../../shared/odata/model-builder-pre.md}}
 
 >[!NOTE]

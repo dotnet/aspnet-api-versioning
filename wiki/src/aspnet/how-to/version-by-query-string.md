@@ -1,3 +1,5 @@
+<!-- description: Version an ASP.NET Web API with a query string parameter. -->
+
 {{#include ../../shared/how-to/version-by-query-string-pre.md}}
 
 ### Web API

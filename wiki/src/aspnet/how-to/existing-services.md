@@ -1,3 +1,5 @@
+<!-- description: Add API versioning to an ASP.NET Web API service without breaking clients that never sent a version. -->
+
 {{#include ../../shared/how-to/existing-services-pre.md}}
 
 ```c#

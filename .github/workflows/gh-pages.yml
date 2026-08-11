@@ -35,6 +35,13 @@ jobs:
         cd wiki
         mdbook build
 
+    # mdBook has no per-page description and cannot build a page URL in its template,
+    # so descriptions declared as <!-- description: ... --> comments are lifted into
+    # <head> here, along with og:url and canonical.
+    - name: Add Page Metadata
+      shell: pwsh
+      run: ./wiki/tools/Add-PageMetadata.ps1 -Book ./wiki/book -Require
+
     # mdBook rewrites .md links to .html without verifying the target exists, so a
     # renamed or removed page builds cleanly and 404s in production. This also checks
     # that the legacy wiki redirect map still resolves.

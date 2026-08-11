@@ -1,3 +1,5 @@
+<!-- description: Version an ASP.NET Web API with a media type parameter through content negotiation. -->
+
 {{#include ../../shared/how-to/version-by-media-type-pre.md}}
 
 ### Web API

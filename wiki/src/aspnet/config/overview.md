@@ -1,3 +1,5 @@
+<!-- description: Configure API versioning for ASP.NET Web API. -->
+
 # Configuring Your Application
 
 Although different variations of ASP.NET have distinct application initialization methods, careful consideration was

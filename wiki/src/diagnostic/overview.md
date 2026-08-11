@@ -1,3 +1,5 @@
+<!-- description: The AV analyzer rules that inspect code using ASP.NET API Versioning for correctness and style issues. -->
+
 # Diagnostic Code Analysis for ASP.NET API Versioning
 
 .NET compiler platform analyzers inspect application code for code quality and style issues using ASP.NET API

@@ -1,3 +1,5 @@
+<!-- description: Use annotations to control which API versions a Protocol Buffer field appears in. -->
+
 # Versioned Message Fields
 
 Protocol Buffer messages are designed to support backward compatibility. JSON schemas, on the other hand, can be strict

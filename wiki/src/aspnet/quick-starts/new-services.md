@@ -1,3 +1,5 @@
+<!-- description: Set up API versioning in a new ASP.NET Web API service. -->
+
 {{#include ../../shared/quick-starts/new-services.md}}
 
 ### Web API
