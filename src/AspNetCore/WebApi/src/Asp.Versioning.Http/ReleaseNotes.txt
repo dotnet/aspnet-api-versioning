@@ -1,1 +1,1 @@
-﻿Patch analyzers; no functional changes
+﻿Versioned endpoint route builder should support keyed services [Issue #1219](https://github.com/dotnet/aspnet-api-versioning/issues/1219)

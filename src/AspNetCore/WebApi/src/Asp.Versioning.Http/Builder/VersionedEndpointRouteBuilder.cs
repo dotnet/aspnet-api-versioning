@@ -5,6 +5,7 @@ namespace Asp.Versioning.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Collections;
 using static Asp.Versioning.ApiVersionProviderOptions;
@@ -59,9 +60,15 @@ public class VersionedEndpointRouteBuilder : IVersionedEndpointRouteBuilder
 
     private sealed class ServiceProviderDecorator(
         IServiceProvider decorated,
-        ApiVersionSetBuilder versionSetBuilder ) : IServiceProvider
+        ApiVersionSetBuilder versionSetBuilder ) : IKeyedServiceProvider
     {
         private ApiVersionSet? versionSet;
+
+        public object? GetKeyedService( Type serviceType, object? serviceKey ) =>
+            decorated.GetKeyedService( serviceType, serviceKey );
+
+        public object GetRequiredKeyedService( Type serviceType, object? serviceKey ) =>
+            decorated.GetRequiredKeyedService( serviceType, serviceKey );
 
         public object? GetService( Type serviceType )
         {
