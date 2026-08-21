@@ -154,4 +154,51 @@ public class Documented
     /// Gets or sets the site, which is <a href="https://example.com" />.
     /// </summary>
     public string Site { get; set; }
+
+    /// <summary>
+    /// Gets or sets the spec, which is described by <a href="https://example.com/spec"></a>.
+    /// </summary>
+    public string Spec { get; set; }
+
+    /// <summary>
+    /// Gets or sets the anonymous, which is described by <a>the specification</a>.
+    /// </summary>
+    public string Anonymous { get; set; }
+
+    /// <summary>
+    /// Gets or sets the manual, which is described by <see href="https://example.com">the
+    /// specification</see>.
+    /// </summary>
+    public string Manual { get; set; }
+
+    /// <summary>
+    /// Gets or sets the guide, which is described by <see href="https://example.com/guide" />.
+    /// </summary>
+    public string Guide { get; set; }
+
+    /// <summary>
+    /// Gets or sets the cited. <see cref="Status" />
+    /// </summary>
+    public string Cited { get; set; }
+
+    /// <summary>
+    /// Gets or sets the related, which is described by <seealso href="https://example.com/related">the related
+    /// specification</seealso>.
+    /// </summary>
+    public string Related { get; set; }
+
+    /// <summary>
+    /// Gets or sets the referred. <seealso cref="Status" />
+    /// </summary>
+    public string Referred { get; set; }
+
+    /// <summary>
+    /// Gets or sets the outline.
+    /// <list type="number">
+    /// <item><description>First step</description></item>
+    /// <item><description>Second step</description></item>
+    /// </list>
+    /// Text after list
+    /// </summary>
+    public string Outline { get; set; }
 }

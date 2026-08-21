@@ -3,12 +3,12 @@
 namespace Asp.Versioning.OpenApi.Transformers;
 
 using System.Collections.Concurrent;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
+using static System.Globalization.CultureInfo;
 using static System.Reflection.BindingFlags;
 
 /// <summary>
@@ -18,6 +18,10 @@ using static System.Reflection.BindingFlags;
 public class XmlComments
 {
     private const int MaxInheritDocDepth = 8;
+    private static readonly CompositeFormat ItemOfFormat = CompositeFormat.Parse( "**{0}**: {1}" );
+    private static readonly CompositeFormat LinkFormat = CompositeFormat.Parse( "[{0}]({1})" );
+    private static readonly CompositeFormat BlockFormat = CompositeFormat.Parse( "\n{0}\n" );
+    private static readonly CompositeFormat FenceBlockFormat = CompositeFormat.Parse( "\n{0}\n{1}\n{0}\n" );
     private readonly ConcurrentDictionary<string, XElement?> members = new();
 
     /// <summary>
@@ -176,7 +180,7 @@ public class XmlComments
     /// <a href="https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle">tutorial</a>
     /// for more information.</remarks>
     public virtual string GetResponseDescription( MemberInfo member, int statusCode )
-        => GetResponseDescription( member, statusCode.ToString( CultureInfo.InvariantCulture ) );
+        => GetResponseDescription( member, statusCode.ToString( InvariantCulture ) );
 
     /// <summary>
     /// Gets the <c>response</c> description from the specified member, if any.
@@ -454,8 +458,12 @@ public class XmlComments
                 _ => BulletedList.Bullets(),
             };
             var items = list.Elements( "item" ).Select( item => bullets.Next() + ItemOf( item ) );
+            var block = string.Format( InvariantCulture, BlockFormat, string.Join( '\n', items ) );
 
-            list.ReplaceWith( new XText( string.Join( "\n", items ) ) );
+            // a list is a block, so like a table it is surrounded by blank lines. the line that follows the last
+            // item would otherwise be a lazy continuation of it and the text written after the list would be
+            // pulled into it; the line that precedes the first item would be the paragraph the list interrupts.
+            list.ReplaceWith( new XText( block ) );
         }
     }
 
@@ -483,7 +491,7 @@ public class XmlComments
             return text;
         }
 
-        return text.Length == 0 ? name : "**" + name + "**: " + text;
+        return text.Length == 0 ? name : string.Format( InvariantCulture, ItemOfFormat, name, text );
     }
 
     // a table is the one list type with a markdown equivalent that is not a list. it only resolves to a table when
@@ -554,7 +562,14 @@ public class XmlComments
         {
             var cell = i < cells.Count ? cells[i] : string.Empty;
 
-            table.Append( cell.Length == 0 ? " " : " " + cell + " " ).Append( '|' );
+            table.Append( ' ' );
+
+            if ( cell.Length > 0 )
+            {
+                table.Append( cell ).Append( ' ' );
+            }
+
+            table.Append( '|' );
         }
 
         table.Append( '\n' );
@@ -570,8 +585,9 @@ public class XmlComments
         {
             var content = TrimEachLine( code.Value );
             var fence = FenceFor( content );
+            var block = new XText( string.Format( InvariantCulture, FenceBlockFormat, fence, content ) );
 
-            code.ReplaceWith( new XText( "\n" + fence + "\n" + content + "\n" + fence + "\n" ) );
+            code.ReplaceWith( block );
         }
     }
 
@@ -602,7 +618,8 @@ public class XmlComments
     }
 
     // <b>, <i>, and <a> are the html tags a documentation comment carries inline, and each has a direct markdown
-    // equivalent. rewriting them keeps the meaning that reading the text of the enclosing element would drop.
+    // equivalent. <see /> and <seealso /> join them in the one form that is a link rather than a reference to a
+    // code element. rewriting them keeps the meaning that reading the text of the enclosing element would drop.
     // the tags are visited from the inside out so that one nested in another is rewritten before it is absorbed.
     //
     // emphasis is delimited by an asterisk rather than an underscore. the two are interchangeable on their own,
@@ -618,6 +635,7 @@ public class XmlComments
                 "b" => Delimit( inline.Value, "**" ),
                 "i" => Delimit( inline.Value, "*" ),
                 "a" => LinkOf( inline ),
+                "see" or "seealso" => SeeOf( inline ),
                 _ => default,
             };
 
@@ -628,8 +646,19 @@ public class XmlComments
         }
     }
 
-    // a link with no text renders as its own address, which is all there is to show. a link with no address is
-    // not a link at all, so only the text it wrapped is kept.
+    // <see href="" /> and <seealso href="" /> are links written with the tags a documentation comment already uses
+    // for a reference; they are the form the documentation generators accept as an alternative to <a />, so they
+    // resolve the same way. both are inline where they are written, so the address belongs in the sentence around
+    // it; only the tooling that renders a separate "see also" section treats <seealso /> as a block of its own.
+    //
+    // every other form names a code element instead of an address - <see cref="" /> and <see langword="" /> have
+    // no markdown of their own - and is left in the tree for the text it wraps, if any, to be read in place.
+    private static string? SeeOf( XElement see ) => see.Attribute( "href" ) is null ? default : LinkOf( see );
+
+    // a link with no text has nothing to show but its own address, so the address becomes the text. writing the
+    // address on its own would rely on the renderer turning it into a link, which is an extension that not every
+    // renderer implements; Scalar does and Swagger UI does not. a link with no address is not a link at all, so
+    // only the text it wrapped is kept.
     private static string LinkOf( XElement anchor )
     {
         var text = Flatten( anchor.Value );
@@ -640,7 +669,12 @@ public class XmlComments
             return text;
         }
 
-        return text.Length == 0 ? href : "[" + text + "](" + href + ")";
+        if ( string.IsNullOrWhiteSpace( text ) )
+        {
+            text = href;
+        }
+
+        return string.Format( InvariantCulture, LinkFormat, text, href );
     }
 
     // a span occupies a single line and its delimiters cannot be padded by whitespace, so the content is
@@ -817,7 +851,7 @@ public class XmlComments
 
         private BulletedList( Func<int, string> generate ) => this.generate = generate;
 
-        private static string Increment( int number ) => number.ToString( CultureInfo.InvariantCulture ) + ". ";
+        private static string Increment( int number ) => number.ToString( InvariantCulture ) + ". ";
 
         private static string Bullet( int number ) => "* ";
 
