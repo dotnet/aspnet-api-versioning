@@ -64,6 +64,27 @@ public static class MinimalApi
     /// <returns>The outlined answer.</returns>
     public static int Outlined() => 42;
 
+    /// <summary>Stepped</summary>
+    /// <remarks>
+    /// Text before list
+    /// <list type="number">
+    ///     <item><description>First step</description></item>
+    ///     <item><description>Second step</description></item>
+    /// </list>
+    /// Text after list
+    /// </remarks>
+    /// <returns>The stepped answer.</returns>
+    public static int Stepped() => 42;
+
+    /// <summary>Linked</summary>
+    /// <remarks>
+    /// <a href="https://example.org/spec"></a>
+    ///
+    /// <a href="https://example.org/spec" />
+    /// </remarks>
+    /// <returns>The linked answer.</returns>
+    public static int Linked() => 42;
+
     /// <summary>
     /// Echo
     /// </summary>

@@ -1,1 +1,1 @@
-﻿Fixed XML Comment whitespace handling [Issue #1205](https://github.com/dotnet/aspnet-api-versioning/issues/1205)
+﻿Fixed XML Comment list and link handling [Issue #1205](https://github.com/dotnet/aspnet-api-versioning/issues/1205)

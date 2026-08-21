@@ -107,7 +107,7 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the tags.\n* First\n* Second" );
+        summary.Should().Be( "Gets or sets the tags.\n\n* First\n* Second" );
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the steps.\n1. First\n2. Second" );
+        summary.Should().Be( "Gets or sets the steps.\n\n1. First\n2. Second" );
     }
 
     [Fact]
@@ -137,6 +137,7 @@ public class XmlCommentsStructureTest
         // assert
         summary.Should().Be(
             "Gets or sets the definitions.\n" +
+            "\n" +
             "* **Foo**: Does foo\n" +
             "* Bar\n" +
             "* Just a description\n" +
@@ -193,7 +194,7 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the narrow.\n* Only\n* One" );
+        summary.Should().Be( "Gets or sets the narrow.\n\n* Only\n* One" );
     }
 
     [Fact]
@@ -348,7 +349,7 @@ public class XmlCommentsStructureTest
     }
 
     [Fact]
-    public void anchor_without_text_should_be_resolved_into_its_address()
+    public void self_closing_anchor_should_be_resolved_into_a_link_labeled_by_its_address()
     {
         // arrange
         var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
@@ -358,7 +359,130 @@ public class XmlCommentsStructureTest
         var summary = comments.GetSummary( property );
 
         // assert
-        summary.Should().Be( "Gets or sets the site, which is https://example.com." );
+        summary.Should().Be(
+            "Gets or sets the site, which is [https://example.com](https://example.com)." );
+    }
+
+    [Fact]
+    public void empty_anchor_should_be_resolved_into_a_link_labeled_by_its_address()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Spec ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the spec, which is described by " +
+            "[https://example.com/spec](https://example.com/spec)." );
+    }
+
+    [Fact]
+    public void anchor_without_an_address_should_be_resolved_into_its_text()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Anonymous ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the anonymous, which is described by the specification." );
+    }
+
+    [Fact]
+    public void see_with_an_address_should_be_resolved_into_a_link()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Manual ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the manual, which is described by [the specification](https://example.com)." );
+    }
+
+    [Fact]
+    public void see_with_an_address_and_without_text_should_be_labeled_by_its_address()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Guide ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the guide, which is described by " +
+            "[https://example.com/guide](https://example.com/guide)." );
+    }
+
+    [Fact]
+    public void see_with_a_reference_should_not_be_resolved_into_a_link()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Cited ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the cited." );
+    }
+
+    [Fact]
+    public void seealso_with_an_address_should_be_resolved_into_a_link()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Related ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the related, which is described by " +
+            "[the related specification](https://example.com/related)." );
+    }
+
+    [Fact]
+    public void seealso_with_a_reference_should_not_be_resolved_into_a_link()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Referred ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be( "Gets or sets the referred." );
+    }
+
+    [Fact]
+    public void anchors_without_text_should_be_resolved_into_links()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var method = typeof( MinimalApi ).GetMethod( nameof( MinimalApi.Linked ) );
+
+        // act
+        var remarks = comments.GetRemarks( method );
+
+        // assert
+        remarks.Should().Be(
+            "[https://example.org/spec](https://example.org/spec)\n" +
+            "\n" +
+            "[https://example.org/spec](https://example.org/spec)" );
     }
 
     [Fact]
@@ -463,9 +587,49 @@ public class XmlCommentsStructureTest
         // assert
         remarks.Should().Be(
             "Text before list\n" +
-            "\n" +
+            "\n\n" +
             "* First\n" +
             "* Second\n" +
+            "\n\n" +
+            "Text after list" );
+    }
+
+    [Fact]
+    public void text_after_a_list_should_not_be_absorbed_by_the_last_item()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var method = typeof( MinimalApi ).GetMethod( nameof( MinimalApi.Stepped ) );
+
+        // act
+        var remarks = comments.GetRemarks( method );
+
+        // assert
+        remarks.Should().Be(
+            "Text before list\n" +
+            "\n" +
+            "1. First step\n" +
+            "2. Second step\n" +
+            "\n" +
+            "Text after list" );
+    }
+
+    [Fact]
+    public void text_after_a_list_should_not_be_absorbed_within_a_summary()
+    {
+        // arrange
+        var comments = XmlComments.FromFile( FilePath.XmlCommentFile );
+        var property = typeof( Documented ).GetProperty( nameof( Documented.Outline ) );
+
+        // act
+        var summary = comments.GetSummary( property );
+
+        // assert
+        summary.Should().Be(
+            "Gets or sets the outline.\n" +
+            "\n" +
+            "1. First step\n" +
+            "2. Second step\n" +
             "\n" +
             "Text after list" );
     }
