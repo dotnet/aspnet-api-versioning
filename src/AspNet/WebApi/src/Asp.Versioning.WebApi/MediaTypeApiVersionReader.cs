@@ -16,20 +16,19 @@ public partial class MediaTypeApiVersionReader
         var version = contentType is null ? default : ReadContentTypeHeader( contentType );
         var accept = request.Headers.Accept;
 
-        if ( accept is null || ReadAcceptHeader( accept ) is not string otherVersion )
+        if ( accept is null || accept.Count == 0 )
         {
             return version is null ? [] : [version];
         }
 
-        var comparer = StringComparer.OrdinalIgnoreCase;
-
-        if ( version is null || comparer.Equals( version, otherVersion ) )
+        // TODO: the ranked implementation is the correct way, but ReadAcceptHeader requires a breaking change that
+        // cannot ship until the next major version. internally do the right thing, but if ReadAcceptHeader is
+        // overridden, then make sure we honor the implementation. the onus is on the implementer.
+        if ( acceptHeaderOverridden )
         {
-            return [otherVersion];
+            return Collate( version, ReadAcceptHeader( accept ) );
         }
 
-        return comparer.Compare( version, otherVersion ) <= 0
-               ? [version, otherVersion]
-               : [otherVersion, version];
+        return Collate( version, ReadRankedAcceptHeader( version is null ? accept : MediaTypeQuality.MaxRanked( accept ) ) );
     }
 }

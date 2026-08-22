@@ -16,11 +16,17 @@ using static System.StringComparison;
 /// </summary>
 public partial class MediaTypeApiVersionReader : IApiVersionReader
 {
+    private readonly bool acceptHeaderOverridden;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaTypeApiVersionReader"/> class.
     /// </summary>
     /// <remarks>This constructor always uses the "v" media type parameter.</remarks>
-    public MediaTypeApiVersionReader() => ParameterName = "v";
+    public MediaTypeApiVersionReader()
+    {
+        ParameterName = "v";
+        acceptHeaderOverridden = IsAcceptHeaderOverridden();
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaTypeApiVersionReader"/> class.
@@ -30,6 +36,7 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     {
         ArgumentException.ThrowIfNullOrEmpty( parameterName );
         ParameterName = parameterName;
+        acceptHeaderOverridden = IsAcceptHeaderOverridden();
     }
 
     /// <summary>
@@ -45,12 +52,30 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     /// <param name="accept">The <see cref="ICollection{T}">collection</see> of Accept
     /// <see cref="MediaTypeWithQualityHeaderValue">headers</see> to read from.</param>
     /// <returns>The API version read or <c>null</c>.</returns>
-    /// <remarks>The default implementation will return the first defined API version ranked by the media type
-    /// quality parameter.</remarks>
+    /// <remarks>
+    /// <para>This method returns the first defined API version ranked by the media type quality parameter. A media
+    /// type without a quality parameter has the highest weight of 1.0, and a media type with a quality of zero is
+    /// never considered because it means 'not acceptable'.</para>
+    /// <para>An API version reader discovers and collates API versions rather than selecting one, and equally
+    /// ranked media types can yield more than one. This method cannot express that, so it is only used when a
+    /// derived class overrides it; an overriding implementation is responsible for ranking and resolving the
+    /// Accept header itself. When it is not overridden, an internal implementation that collates equally ranked
+    /// media types is used instead.</para>
+    /// <para>This method will be refactored in a future major version.</para>
+    /// </remarks>
     protected virtual string? ReadAcceptHeader( ICollection<MediaTypeWithQualityHeaderValue> accept )
     {
+        // TODO: refactor breaking change at next major version
         ArgumentNullException.ThrowIfNull( accept );
+        return ReadRankedAcceptHeader( accept ) is { } versions ? versions[0] : default;
+    }
 
+    // this is the correct, expected behavior because equally ranked media types can collate more than one API version.
+    // it cannot replace ReadAcceptHeader before the next major version because widening the return type is a breaking
+    // change for any derived class that overrides it. this becomes the permanent implementation when a breaking change
+    // is allowed, at which point ReadAcceptHeader and the override detection it requires can both be removed
+    private List<string>? ReadRankedAcceptHeader( ICollection<MediaTypeWithQualityHeaderValue> accept )
+    {
         var count = accept.Count;
 
         if ( count == 0 )
@@ -60,48 +85,111 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
 
         var mediaTypes = accept.ToArray();
 
-        System.Array.Sort( mediaTypes, ByQualityDescending );
+        MediaTypeQuality.SortDescending( mediaTypes );
 
-        for ( var i = 0; i < count; i++ )
+        var versions = default( List<string> );
+        var start = 0;
+
+        while ( start < count )
         {
-#if NETFRAMEWORK
-            var parameters = mediaTypes[i].Parameters.ToArray();
-            var paramCount = parameters.Length;
-#else
-            var parameters = mediaTypes[i].Parameters;
-            var paramCount = parameters.Count;
-#endif
-            for ( var j = 0; j < paramCount; j++ )
+            // neither this media type nor any that follow can be considered
+            if ( !MediaTypeQuality.IsAcceptable( mediaTypes[start] ) )
             {
-                var parameter = parameters[j];
+                break;
+            }
 
-                if ( parameter.Name.Equals( ParameterName, OrdinalIgnoreCase ) )
+            var end = start + 1;
+
+            while ( end < count && MediaTypeQuality.SameRank( mediaTypes[end], mediaTypes[start] ) )
+            {
+                end++;
+            }
+
+            // media types collated at the same rank are equally preferred
+            for ( var i = start; i < end; i++ )
+            {
+                if ( ReadParameter( mediaTypes[i] ) is not string value )
                 {
-#if NETFRAMEWORK
-                    return parameter.Value;
-#else
-                    return parameter.Value.Value;
-#endif
+                    continue;
                 }
+
+                versions ??= new( capacity: end - start );
+
+                if ( !versions.Contains( value, StringComparer.OrdinalIgnoreCase ) )
+                {
+                    versions.Add( value );
+                }
+            }
+
+            // a higher rank breaks precedence over every media type ranked below it
+            if ( versions is not null )
+            {
+                break;
+            }
+
+            start = end;
+        }
+
+        return versions;
+    }
+
+    private bool IsAcceptHeaderOverridden()
+    {
+        if ( GetType() == typeof( MediaTypeApiVersionReader ) )
+        {
+            return false;
+        }
+
+        var readAcceptHeader = ReadAcceptHeader;
+
+        return readAcceptHeader.Method.DeclaringType != typeof( MediaTypeApiVersionReader );
+    }
+
+    private static IReadOnlyList<string> Collate( string? version, string? otherVersion )
+    {
+        if ( otherVersion is null )
+        {
+            return version is null ? [] : [version];
+        }
+
+        return version is null || StringComparer.OrdinalIgnoreCase.Equals( version, otherVersion )
+               ? [otherVersion]
+               : [version, otherVersion];
+    }
+
+    private static List<string> Collate( string? version, List<string>? versions )
+    {
+        if ( versions is null || versions.Count == 0 )
+        {
+            return version is null ? [] : [version];
+        }
+
+        if ( version is null )
+        {
+            return versions;
+        }
+
+        // the content-type version is ranked first among the equally ranked versions it is collated with
+        var collated = new List<string>( capacity: versions.Count + 1 ) { version };
+
+        for ( var i = 0; i < versions.Count; i++ )
+        {
+            if ( !StringComparer.OrdinalIgnoreCase.Equals( version, versions[i] ) )
+            {
+                collated.Add( versions[i] );
             }
         }
 
-        return default;
+        return collated;
     }
 
-    /// <summary>
-    /// Reads the requested API version from the HTTP Content-Type header.
-    /// </summary>
-    /// <param name="contentType">The Content-Type <see cref="MediaTypeHeaderValue">header</see> to read from.</param>
-    /// <returns>The API version read or <c>null</c>.</returns>
-    protected virtual string? ReadContentTypeHeader( MediaTypeHeaderValue contentType )
+    private string? ReadParameter( MediaTypeHeaderValue mediaType )
     {
-        ArgumentNullException.ThrowIfNull( contentType );
 #if NETFRAMEWORK
-        var parameters = contentType.Parameters.ToArray();
+        var parameters = mediaType.Parameters.ToArray();
         var count = parameters.Length;
 #else
-        var parameters = contentType.Parameters;
+        var parameters = mediaType.Parameters;
         var count = parameters.Count;
 #endif
         for ( var i = 0; i < count; i++ )
@@ -122,6 +210,17 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
     }
 
     /// <summary>
+    /// Reads the requested API version from the HTTP Content-Type header.
+    /// </summary>
+    /// <param name="contentType">The Content-Type <see cref="MediaTypeHeaderValue">header</see> to read from.</param>
+    /// <returns>The API version read or <c>null</c>.</returns>
+    protected virtual string? ReadContentTypeHeader( MediaTypeHeaderValue contentType )
+    {
+        ArgumentNullException.ThrowIfNull( contentType );
+        return ReadParameter( contentType );
+    }
+
+    /// <summary>
     /// Provides API version parameter descriptions supported by the current reader using the supplied provider.
     /// </summary>
     /// <param name="context">The <see cref="IApiVersionParameterDescriptionContext">context</see> used to add API version parameter descriptions.</param>
@@ -130,7 +229,4 @@ public partial class MediaTypeApiVersionReader : IApiVersionReader
         ArgumentNullException.ThrowIfNull( context );
         context.AddParameter( ParameterName, MediaTypeParameter );
     }
-
-    private static int ByQualityDescending( MediaTypeWithQualityHeaderValue? left, MediaTypeWithQualityHeaderValue? right ) =>
-        -Nullable.Compare( left?.Quality, right?.Quality );
 }
