@@ -1,1 +1,1 @@
-﻿
+﻿Fixed media type quality (q) ranking and collation [Issue #1221](https://github.com/dotnet/aspnet-api-versioning/issues/1221)

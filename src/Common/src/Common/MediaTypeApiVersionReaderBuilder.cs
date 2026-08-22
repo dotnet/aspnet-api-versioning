@@ -346,10 +346,12 @@ public partial class MediaTypeApiVersionReaderBuilder
             var contentType = headers.ContentType;
 #endif
             var accept = headers.Accept;
-            var version = default( string );
-            var versions = default( SortedSet<string> );
+            var versions = default( List<string> );
             var mediaTypes = default( List<MediaTypeHeaderValue> );
 
+            // the content-type header has no quality parameter, so it always ranks at the maximum weight; adding it
+            // first keeps it ahead of the equally ranked Accept media types it is collated with, while any lower
+            // ranked media type is outranked by it
             if ( contentType != null )
             {
 #if NETFRAMEWORK
@@ -372,29 +374,64 @@ public partial class MediaTypeApiVersionReaderBuilder
 
             Filter( mediaTypes );
 
-            switch ( mediaTypes.Count )
+            if ( mediaTypes.Count > 1 )
             {
-                case 0:
-                    return [];
-                case 1:
-                    break;
-                default:
-                    mediaTypes.Sort( static ( l, r ) => -Nullable.Compare( l.Quality, r.Quality ) );
-                    break;
+                MediaTypeQuality.SortDescending( mediaTypes );
             }
 
-            Read( mediaTypes, ref version, ref versions );
+            ReadHighestRanked( mediaTypes, ref versions );
 
             if ( versions == null )
             {
-                return version == null ? Array.Empty<string>() : [version];
+                return [];
             }
 
-            return selector( request, [.. versions] );
+            return versions.Count == 1 ? versions : selector( request, versions );
+        }
+
+        // the accept header is a list of preferences; the highest-ranked media types that yield an api version break
+        // precedence over all lower-ranked media types, while media types collated at that same rank are equally
+        // preferred and all contribute
+        private void ReadHighestRanked( List<MediaTypeHeaderValue> mediaTypes, ref List<string>? versions )
+        {
+            var count = mediaTypes.Count;
+            var start = 0;
+
+            while ( start < count )
+            {
+                var end = start + 1;
+
+                while ( end < count && MediaTypeQuality.SameRank( mediaTypes[end], mediaTypes[start] ) )
+                {
+                    end++;
+                }
+
+                var ranked = start == 0 && end == count
+                             ? mediaTypes
+                             : mediaTypes.GetRange( start, end - start );
+                var before = versions == null ? 0 : versions.Count;
+
+                Read( ranked, ref versions );
+
+                if ( versions != null && versions.Count > before )
+                {
+                    return;
+                }
+
+                start = end;
+            }
         }
 
         private void Filter( List<MediaTypeHeaderValue> mediaTypes )
         {
+            for ( var i = mediaTypes.Count - 1; i >= 0; i-- )
+            {
+                if ( !MediaTypeQuality.IsAcceptable( mediaTypes[i] ) )
+                {
+                    mediaTypes.RemoveAt( i );
+                }
+            }
+
             if ( excluded.Count > 0 )
             {
                 for ( var i = mediaTypes.Count - 1; i >= 0; i-- )
@@ -422,10 +459,9 @@ public partial class MediaTypeApiVersionReaderBuilder
             }
         }
 
-        private void Read(
-            IReadOnlyList<MediaTypeHeaderValue> mediaTypes,
-            ref string? version,
-            ref SortedSet<string>? versions )
+        // the order results are discovered in is meaningful, so duplicates are removed in place rather than by
+        // collecting into a set, which would sort them
+        private void Read( IReadOnlyList<MediaTypeHeaderValue> mediaTypes, ref List<string>? versions )
         {
             for ( var i = 0; i < readers.Length; i++ )
             {
@@ -433,21 +469,13 @@ public partial class MediaTypeApiVersionReaderBuilder
 
                 for ( var j = 0; j < result.Count; j++ )
                 {
-                    if ( version == null )
+                    var value = result[j];
+
+                    versions ??= [];
+
+                    if ( !versions.Contains( value, StringComparer.OrdinalIgnoreCase ) )
                     {
-                        version = result[j];
-                    }
-                    else if ( versions == null )
-                    {
-                        versions = new( StringComparer.OrdinalIgnoreCase )
-                        {
-                            version,
-                            result[j],
-                        };
-                    }
-                    else
-                    {
-                        versions.Add( result[j] );
+                        versions.Add( value );
                     }
                 }
             }

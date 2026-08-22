@@ -74,6 +74,8 @@ public class MediaTypeApiVersionReaderBuilderTest
     [InlineData( new[] { "application/xml", "application/json;q=0.2;v=1.0" }, "1.0" )]
     [InlineData( new[] { "application/json", "application/xml" }, null )]
     [InlineData( new[] { "application/xml", "application/xml+atom;q=0.8;api.ver=2.5", "application/json;q=0.2;v=1.0" }, "2.5" )]
+    [InlineData( new[] { "application/xml;q=0;v=2.0" }, null )]
+    [InlineData( new[] { "application/json;q=0;v=1.0", "application/xml;q=0.2;v=2.0" }, "2.0" )]
     public void read_should_retrieve_version_from_accept_with_quality( string[] mediaTypes, string expected )
     {
         // arrange
@@ -97,7 +99,37 @@ public class MediaTypeApiVersionReaderBuilderTest
     }
 
     [Fact]
-    public void read_should_retrieve_version_from_content_type_and_accept()
+    public void read_should_collate_incongruent_versions_from_content_type_and_accept()
+    {
+        // arrange
+        var reader = new MediaTypeApiVersionReaderBuilder().Parameter( "v" ).Build();
+
+        // the Accept media type has no quality parameter, so it is ranked equally with
+        // the Content-Type media type and both are collated, which is ambiguous
+        var request = new HttpRequestMessage( Post, "http://tempuri.org" )
+        {
+            Headers =
+            {
+                Accept = { Parse( "application/json;v=2.0" ) },
+            },
+            Content = new StringContent( "{\"message\":\"test\"}", UTF8 )
+            {
+                Headers =
+                {
+                    ContentType = Parse( "application/json;v=1.0" ),
+                },
+            },
+        };
+
+        // act
+        var versions = reader.Read( request );
+
+        // assert
+        versions.Should().BeEquivalentTo( ["1.0", "2.0"] );
+    }
+
+    [Fact]
+    public void read_should_prefer_version_from_content_type_over_accept()
     {
         // arrange
         var reader = new MediaTypeApiVersionReaderBuilder().Parameter( "v" ).Build();
@@ -125,7 +157,7 @@ public class MediaTypeApiVersionReaderBuilderTest
         var versions = reader.Read( request );
 
         // assert
-        versions.Should().BeEquivalentTo( ["1.5", "2.0"] );
+        versions.Single().Should().Be( "2.0" );
     }
 
     [Fact]
@@ -180,7 +212,7 @@ public class MediaTypeApiVersionReaderBuilderTest
             .Exclude( "application/xml" )
             .Exclude( "application/xml+atom" )
             .Build();
-        var request = new HttpRequestMessage( Post, "http://tempuri.org" )
+        var request = new HttpRequestMessage( Get, "http://tempuri.org" )
         {
             Headers =
             {
@@ -188,14 +220,7 @@ public class MediaTypeApiVersionReaderBuilderTest
                 {
                     Parse( "application/xml" ),
                     Parse( "application/xml+atom;q=0.8;v=1.5" ),
-                    Parse( "application/json;q=0.2;v=2.0" ),
-                },
-            },
-            Content = new StringContent( "{\"message\":\"test\"}", UTF8 )
-            {
-                Headers =
-                {
-                    ContentType = Parse( "application/json;v=2.0" ),
+                    Parse( "application/json;q=0.8;v=2.0" ),
                 },
             },
         };
@@ -215,7 +240,7 @@ public class MediaTypeApiVersionReaderBuilderTest
             .Parameter( "v" )
             .Include( "application/json" )
             .Build();
-        var request = new HttpRequestMessage( Post, "http://tempuri.org" )
+        var request = new HttpRequestMessage( Get, "http://tempuri.org" )
         {
             Headers =
             {
@@ -223,14 +248,7 @@ public class MediaTypeApiVersionReaderBuilderTest
                 {
                     Parse( "application/xml" ),
                     Parse( "application/xml+atom;q=0.8;v=1.5" ),
-                    Parse( "application/json;q=0.2;v=2.0" ),
-                },
-            },
-            Content = new StringContent( "{\"message\":\"test\"}", UTF8 )
-            {
-                Headers =
-                {
-                    ContentType = Parse( "application/json;v=2.0" ),
+                    Parse( "application/json;q=0.8;v=2.0" ),
                 },
             },
         };
@@ -335,7 +353,7 @@ public class MediaTypeApiVersionReaderBuilderTest
             .Parameter( "v" )
             .SelectFirstOrDefault()
             .Build();
-        var request = new HttpRequestMessage( Post, "http://tempuri.org" )
+        var request = new HttpRequestMessage( Get, "http://tempuri.org" )
         {
             Headers =
             {
@@ -343,14 +361,7 @@ public class MediaTypeApiVersionReaderBuilderTest
                 {
                     Parse( "application/xml" ),
                     Parse( "application/xml+atom;q=0.8;v=1.5" ),
-                    Parse( "application/json;q=0.2;v=2.0" ),
-                },
-            },
-            Content = new StringContent( "{\"message\":\"test\"}", UTF8 )
-            {
-                Headers =
-                {
-                    ContentType = Parse( "application/json;v=2.0" ),
+                    Parse( "application/json;q=0.8;v=2.0" ),
                 },
             },
         };
@@ -370,7 +381,7 @@ public class MediaTypeApiVersionReaderBuilderTest
             .Parameter( "v" )
             .SelectLastOrDefault()
             .Build();
-        var request = new HttpRequestMessage( Post, "http://tempuri.org" )
+        var request = new HttpRequestMessage( Get, "http://tempuri.org" )
         {
             Headers =
             {
@@ -378,14 +389,7 @@ public class MediaTypeApiVersionReaderBuilderTest
                 {
                     Parse( "application/xml" ),
                     Parse( "application/xml+atom;q=0.8;v=1.5" ),
-                    Parse( "application/json;q=0.2;v=2.0" ),
-                },
-            },
-            Content = new StringContent( "{\"message\":\"test\"}", UTF8 )
-            {
-                Headers =
-                {
-                    ContentType = Parse( "application/json;v=2.0" ),
+                    Parse( "application/json;q=0.8;v=2.0" ),
                 },
             },
         };

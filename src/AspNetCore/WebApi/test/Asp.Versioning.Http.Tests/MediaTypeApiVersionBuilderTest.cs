@@ -75,6 +75,8 @@ public class MediaTypeApiVersionBuilderTest
     [InlineData( new[] { "application/xml", "application/json;q=0.2;v=1.0" }, "1.0" )]
     [InlineData( new[] { "application/json", "application/xml" }, null )]
     [InlineData( new[] { "application/xml", "application/xml+atom;q=0.8;api.ver=2.5", "application/json;q=0.2;v=1.0" }, "2.5" )]
+    [InlineData( new[] { "application/xml;q=0;v=2.0" }, null )]
+    [InlineData( new[] { "application/json;q=0;v=1.0", "application/xml;q=0.2;v=2.0" }, "2.0" )]
     public void read_should_retrieve_version_from_accept_with_quality( string[] mediaTypes, string expected )
     {
         // arrange
@@ -99,7 +101,33 @@ public class MediaTypeApiVersionBuilderTest
     }
 
     [Fact]
-    public void read_should_retrieve_version_from_content_type_and_accept()
+    public void read_should_collate_incongruent_versions_from_content_type_and_accept()
+    {
+        // arrange
+        var reader = new MediaTypeApiVersionReaderBuilder().Parameter( "v" ).Build();
+        var request = new Mock<HttpRequest>();
+        var headers = new HeaderDictionary()
+        {
+            // the Accept media type has no quality parameter, so it is ranked equally with
+            // the Content-Type media type and both are collated, which is ambiguous
+            ["Accept"] = new StringValues( "application/json;v=2.0" ),
+            ["Content-Type"] = new StringValues( "application/json;v=1.0" ),
+        };
+
+        request.SetupGet( r => r.Headers ).Returns( headers );
+        request.SetupProperty( r => r.Body, Null );
+        request.SetupProperty( r => r.ContentLength, 0L );
+        request.SetupProperty( r => r.ContentType, "application/json;v=1.0" );
+
+        // act
+        var versions = reader.Read( request.Object );
+
+        // assert
+        versions.Should().BeEquivalentTo( ["1.0", "2.0"] );
+    }
+
+    [Fact]
+    public void read_should_prefer_version_from_content_type_over_accept()
     {
         // arrange
         var reader = new MediaTypeApiVersionReaderBuilder().Parameter( "v" ).Build();
@@ -125,7 +153,7 @@ public class MediaTypeApiVersionBuilderTest
         var versions = reader.Read( request.Object );
 
         // assert
-        versions.Should().BeEquivalentTo( "1.5", "2.0" );
+        versions.Single().Should().Be( "2.0" );
     }
 
     [Fact]
@@ -183,18 +211,14 @@ public class MediaTypeApiVersionBuilderTest
         {
             "application/xml",
             "application/xml+atom;q=0.8;v=1.5",
-            "application/json;q=0.2;v=2.0",
+            "application/json;q=0.8;v=2.0",
         };
         var headers = new HeaderDictionary()
         {
             ["Accept"] = new StringValues( mediaTypes ),
-            ["Content-Type"] = new StringValues( "application/json;v=2.0" ),
         };
 
         request.SetupGet( r => r.Headers ).Returns( headers );
-        request.SetupProperty( r => r.Body, Null );
-        request.SetupProperty( r => r.ContentLength, 0L );
-        request.SetupProperty( r => r.ContentType, "application/json;v=2.0" );
 
         // act
         var versions = reader.Read( request.Object );
@@ -216,18 +240,14 @@ public class MediaTypeApiVersionBuilderTest
         {
             "application/xml",
             "application/xml+atom;q=0.8;v=1.5",
-            "application/json;q=0.2;v=2.0",
+            "application/json;q=0.8;v=2.0",
         };
         var headers = new HeaderDictionary()
         {
             ["Accept"] = new StringValues( mediaTypes ),
-            ["Content-Type"] = new StringValues( "application/json;v=2.0" ),
         };
 
         request.SetupGet( r => r.Headers ).Returns( headers );
-        request.SetupProperty( r => r.Body, Null );
-        request.SetupProperty( r => r.ContentLength, 0L );
-        request.SetupProperty( r => r.ContentType, "application/json;v=2.0" );
 
         // act
         var versions = reader.Read( request.Object );
@@ -334,18 +354,14 @@ public class MediaTypeApiVersionBuilderTest
         {
             "application/xml",
             "application/xml+atom;q=0.8;v=1.5",
-            "application/json;q=0.2;v=2.0",
+            "application/json;q=0.8;v=2.0",
         };
         var headers = new HeaderDictionary()
         {
             ["Accept"] = new StringValues( mediaTypes ),
-            ["Content-Type"] = new StringValues( "application/json;v=2.0" ),
         };
 
         request.SetupGet( r => r.Headers ).Returns( headers );
-        request.SetupProperty( r => r.Body, Null );
-        request.SetupProperty( r => r.ContentLength, 0L );
-        request.SetupProperty( r => r.ContentType, "application/json;v=2.0" );
 
         // act
         var versions = reader.Read( request.Object );
@@ -367,18 +383,14 @@ public class MediaTypeApiVersionBuilderTest
         {
             "application/xml",
             "application/xml+atom;q=0.8;v=1.5",
-            "application/json;q=0.2;v=2.0",
+            "application/json;q=0.8;v=2.0",
         };
         var headers = new HeaderDictionary()
         {
             ["Accept"] = new StringValues( mediaTypes ),
-            ["Content-Type"] = new StringValues( "application/json;v=2.0" ),
         };
 
         request.SetupGet( r => r.Headers ).Returns( headers );
-        request.SetupProperty( r => r.Body, Null );
-        request.SetupProperty( r => r.ContentLength, 0L );
-        request.SetupProperty( r => r.ContentType, "application/json;v=2.0" );
 
         // act
         var versions = reader.Read( request.Object );

@@ -1,1 +1,1 @@
-﻿Versioned endpoint route builder should support keyed services [Issue #1219](https://github.com/dotnet/aspnet-api-versioning/issues/1219)
+﻿Fixed media type quality (q) ranking and collation [Issue #1221](https://github.com/dotnet/aspnet-api-versioning/issues/1221)
