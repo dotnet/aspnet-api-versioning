@@ -27,15 +27,12 @@ internal static class MediaTypeQuality
     {
         var maxRanked = default( List<MediaType> );
 
-        foreach ( var mediaType in mediaTypes )
+        foreach ( var mediaType in mediaTypes.Where( mt => WeightOf( mt ) == DefaultWeight ) )
         {
-            if ( WeightOf( mediaType ) == DefaultWeight )
-            {
-                ( maxRanked ??= new( capacity: mediaTypes.Count ) ).Add( mediaType );
-            }
+            ( maxRanked ??= new( capacity: mediaTypes.Count ) ).Add( mediaType );
         }
 
-        return maxRanked ?? (ICollection<MediaType>) [];
+        return maxRanked ?? [];
     }
 
     // an insertion sort is used because it is stable, which retains the order specified by the client for media types
