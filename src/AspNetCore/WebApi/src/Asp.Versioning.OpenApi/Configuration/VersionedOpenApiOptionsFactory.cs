@@ -22,18 +22,30 @@ internal sealed class VersionedOpenApiOptionsFactory(
     private readonly IConfigureOptions<VersionedOpenApiOptions>[] setups = [.. setups];
     private readonly IPostConfigureOptions<VersionedOpenApiOptions>[] postConfigures = [.. postConfigures];
     private readonly IValidateOptions<VersionedOpenApiOptions>[] validations = [.. validations];
-    private Context? context;
+
+    // create is only ever invoked synchronously from CreateAndConfigure on the same thread. the factory is a singleton, so
+    // an instance field would be shared by concurrent requests for different documents and one would clear it under another
+    [ThreadStatic]
+    private static Context? current;
 
     internal VersionedOpenApiOptions CreateAndConfigure( Context newContext )
     {
-        context = newContext;
-        var instance = Create( newContext.Name );
-        context = default;
-        return instance;
+        current = newContext;
+        
+        try
+        {
+            return Create( newContext.Name );
+        }
+        finally
+        {
+            current = default;
+        }
     }
 
     public VersionedOpenApiOptions Create( string name )
     {
+        var context = current;
+    
         if ( string.IsNullOrEmpty( name ) || context is null )
         {
             return DefaultOptions();
