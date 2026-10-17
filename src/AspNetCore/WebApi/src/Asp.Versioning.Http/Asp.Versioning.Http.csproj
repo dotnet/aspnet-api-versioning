@@ -15,6 +15,21 @@
   <FrameworkReference Include="Microsoft.AspNetCore.App" />
  </ItemGroup>
 
+ <!-- guidance for coding agents, packed by the build-only Trellis.AgentDocs.Packaging helper; adds no runtime dependency -->
+ <ItemGroup Label="AgentDocs">
+  <PackageReference Include="Trellis.AgentDocs.Packaging" Version="0.1.0-preview.22" PrivateAssets="all" />
+  <PackageGuidanceItem Include="docs/agent-guide.md"
+                       PackagePath="guides/agent-guide.md"
+                       Usage="required"
+                       Description="Read before adding or changing API versioning with Asp.Versioning.Http (Minimal APIs): registration, versioning endpoints, and default behavior." />
+  <PackageGuidanceItem Include="docs/version-sources-and-defaults.md"
+                       PackagePath="guides/version-sources-and-defaults.md"
+                       Description="Open when changing how clients send the API version (query string, header, URL segment) or what happens when none is sent." />
+  <PackageGuidanceItem Include="docs/deprecation-and-errors.md"
+                       PackagePath="guides/deprecation-and-errors.md"
+                       Description="Open when deprecating an API version, reading version headers, or changing unspecified, unsupported or invalid version responses." />
+ </ItemGroup>
+
  <ItemGroup>
   <InternalsVisibleTo Include="Asp.Versioning.Mvc" Key="$(StrongNamePublicKey)" />
  </ItemGroup>
